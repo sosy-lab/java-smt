@@ -10,34 +10,17 @@
 
 package org.sosy_lab.java_smt.api.proofs;
 
-import com.google.common.collect.ImmutableSet;
-import java.util.Optional;
-import org.sosy_lab.java_smt.api.Formula;
-
-/** A proof node in the proof DAG of a proof. */
+/**
+ * This class provides a proof of unsatisifabilty for a given query. It allows the retrieval of the
+ * root proof node in the proof DAG.
+ */
 public interface Proof {
 
-  /** Get the children of the proof node. */
-  ImmutableSet<Proof> getChildren();
-
   /**
-   * Check if the proof node is a leaf.
+   * Returns the root proof node of the DAG from this proof.
    *
-   * @return True if the proof node is a leaf, false otherwise.
+   * @return an object of type {@link ProofNode} the root proof node.
+   * @see ProofNode
    */
-  boolean isLeaf();
-
-  /**
-   * Get the formula of the proof node.
-   *
-   * @return The formula of the proof node.
-   */
-  Optional<Formula> getFormula();
-
-  /**
-   * Get the rule of the proof node.
-   *
-   * @return The rule of the proof node.
-   */
-  Optional<ProofRule> getRule();
+  public ProofNode getProofRoot();
 }

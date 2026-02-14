@@ -10,7 +10,7 @@ package org.sosy_lab.java_smt.solvers.cvc5;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
-import static org.sosy_lab.java_smt.solvers.cvc5.CVC5Proof.generateProofImpl;
+import static org.sosy_lab.java_smt.solvers.cvc5.CVC5ProofNode.generateProofImpl;
 
 import com.google.common.collect.Collections2;
 import com.google.common.collect.HashMultimap;
@@ -331,7 +331,7 @@ abstract class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
 
     // CVC5ProofProcessor pp = new CVC5ProofProcessor(creator);
     try {
-      return generateProofImpl(proofs[0], creator);
+      return new CVC5Proof(generateProofImpl(proofs[0], creator));
     } catch (CVC5ApiException e) {
       throw new SolverException("There was a problem generating proof", e);
     }

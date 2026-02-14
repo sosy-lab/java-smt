@@ -42,7 +42,7 @@ import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.RationalFormulaManager;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
-import org.sosy_lab.java_smt.api.proofs.Proof;
+import org.sosy_lab.java_smt.api.proofs.ProofNode;
 import org.sosy_lab.java_smt.api.proofs.ProofRule;
 
 public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
@@ -219,8 +219,8 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
       assertThat(prover.isUnsat()).isTrue();
 
       // Test getProof()
-      Proof proof = prover.getProof();
-      checkProof(proof);
+      ProofNode proofNode = prover.getProof().getProofRoot();
+      verifyProofObjectValidity(proofNode);
     }
   }
 
@@ -283,9 +283,9 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
       prover.addConstraint(bmgr.and(bmgr.or(a, c), bmgr.not(c)));
       assertThat(prover.isUnsat()).isTrue();
 
-      // Retrieve and verify proof
-      Proof proof = prover.getProof();
-      checkProof(proof);
+      // Retrieve and verify proofNode
+      ProofNode proofNode = prover.getProof().getProofRoot();
+      verifyProofObjectValidity(proofNode);
     }
   }
 
@@ -301,7 +301,7 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
       assertThat(prover.isUnsat()).isFalse();
 
       @SuppressWarnings("unused")
-      Proof proof = prover.getProof();
+      ProofNode proofNode = prover.getProof().getProofRoot();
       throw new AssertionError("Expected IllegalStateException was not thrown");
 
     } catch (IllegalStateException e) {
@@ -321,13 +321,8 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
       prover.addConstraint(bottom);
       assertThat(prover.isUnsat()).isTrue();
 
-      Proof proof = prover.getProof();
-      if (solverToUse().equals(MATHSAT5)){
-        throw new AssertionError("Expected " + "UnsupportedOperationException was not thrown");
-        }
-      assertThat(proof).isNotNull();
-    } catch (UnsupportedOperationException e) {
-      assertThat(solverToUse().equals(MATHSAT5)).isTrue();
+      ProofNode proofNode = prover.getProof().getProofRoot();
+      assertThat(proofNode).isNotNull();
     }
   }
 
@@ -347,8 +342,8 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
       assertThat(prover.isUnsat()).isTrue();
 
       // Test getProof()
-      Proof proof = prover.getProof();
-      checkProof(proof);
+      ProofNode proofNode = prover.getProof().getProofRoot();
+      verifyProofObjectValidity(proofNode);
     }
   }
 
@@ -371,8 +366,8 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
       assertThat(prover.isUnsat()).isTrue();
 
       // Test getProof()
-      Proof proof = prover.getProof();
-      checkProof(proof);
+      ProofNode proofNode = prover.getProof().getProofRoot();
+      verifyProofObjectValidity(proofNode);
 
       // assert integer formulas and test again
       prover.addConstraint(imgr.equal(x1, two));
@@ -381,10 +376,10 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
       assertThat(prover.isUnsat()).isTrue();
 
       // Test getProof()
-      Proof secondProof = prover.getProof();
-      checkProof(secondProof);
+      ProofNode secondProofNode = prover.getProof().getProofRoot();
+      verifyProofObjectValidity(secondProofNode);
 
-      assertThat(proof).isNotEqualTo(secondProof);
+      assertThat(proofNode).isNotEqualTo(secondProofNode);
     }
   }
 
@@ -434,8 +429,8 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
       assertThat(prover.isUnsat()).isTrue();
 
       // Test getProof()
-      Proof proof = prover.getProof();
-      checkProof(proof);
+      ProofNode proofNode = prover.getProof().getProofRoot();
+      verifyProofObjectValidity(proofNode);
 
       prover.pop();
       prover.pop();
@@ -448,10 +443,10 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
       assertThat(prover.isUnsat()).isTrue();
 
       // Test getProof()
-      Proof secondProof = prover.getProof();
-      checkProof(secondProof);
+      ProofNode secondProofNode = prover.getProof().getProofRoot();
+      verifyProofObjectValidity(secondProofNode);
 
-      assertThat(proof).isNotEqualTo(secondProof);
+      assertThat(proofNode).isNotEqualTo(secondProofNode);
     }
   }
 
@@ -468,7 +463,7 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
       assertThat(prover.isUnsat()).isTrue();
 
       @SuppressWarnings("unused")
-      Proof proof = prover.getProof();
+      ProofNode proofNode = prover.getProof().getProofRoot();
       throw new AssertionError("Expected IllegalStateException was not thrown");
 
     } catch (IllegalStateException e) {
@@ -511,8 +506,8 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
       assertThat(prover.isUnsat()).isTrue();
 
       // Test getProof()
-      Proof proof = prover.getProof();
-      checkProof(proof);
+      ProofNode proofNode = prover.getProof().getProofRoot();
+      verifyProofObjectValidity(proofNode);
     }
   }
 
@@ -541,28 +536,37 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
       assertThat(prover.isUnsat()).isTrue();
 
       // Test getProof()
-      Proof proof = prover.getProof();
-      checkProof(proof);
+      ProofNode proofNode = prover.getProof().getProofRoot();
+      verifyProofObjectValidity(proofNode);
     }
   }
 
-  // Traverses a proof and asserts that certain values are not null, instances, etc.
-  private void checkProof(Proof pRoot) {
+  /**
+   * Helper function that tests that every proof has valid information stored (proof rules,
+   * formulas, successors).
+   *
+   * <p>In this case a formula must be present, because only CVC5 is implemented. However, the
+   * implementation of solvers which not always expose a formula is a work in progress.
+   *
+   * @param pRoot the root of the proof DAG to be tested.
+   */
+  private void verifyProofObjectValidity(ProofNode pRoot) {
     assertThat(pRoot).isNotNull();
 
-    Deque<Proof> stack = new ArrayDeque<>();
+    Deque<ProofNode> stack = new ArrayDeque<>();
     stack.push(pRoot);
 
     while (!stack.isEmpty()) {
-      Proof proof = stack.pop();
-      Optional<ProofRule> rule = proof.getRule();
-      Optional<Formula> formula = proof.getFormula();
+      ProofNode proofNode = stack.pop();
+      ProofRule rule = proofNode.getRule();
+      Optional<Formula> formula = proofNode.getFormula();
 
-      if (rule.isPresent()) assertThat(rule.get()).isInstanceOf(ProofRule.class);
-      assertThat(proof.getChildren()).isNotNull();
-      if (solverToUse().equals(CVC5)) assertThat(formula.isPresent()).isTrue();
+      assertThat(rule).isNotNull();
+      assertThat(rule).isInstanceOf(ProofRule.class);
+      assertThat(proofNode.getChildren()).isNotNull();
+      assertThat(formula.isPresent()).isTrue();
 
-      for (Proof child : proof.getChildren()) {
+      for (ProofNode child : proofNode.getChildren()) {
         assertThat(child).isNotNull();
         stack.push(child);
       }

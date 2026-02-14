@@ -290,6 +290,6 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
   @Override
   public Proof getProof() throws InterruptedException, SolverException {
     throw new UnsupportedOperationException(
-        "Proof generation is not available for the current solver.");
+        "ProofNode generation is not available for the current solver.");
   }
 }
