@@ -207,6 +207,7 @@ public class Mathsat5NativeApiTest extends Mathsat5AbstractNativeApiTest {
   //This test produces a SIGSEV, apparently because of the destruction of the proof, which is
   // needed an works without problem for other proofs.
   @Test
+  @SuppressWarnings("unused")
   public void bitVectorProofTest() throws SolverException, InterruptedException {
 
     long cfg = msat_create_config();
@@ -263,7 +264,7 @@ public class Mathsat5NativeApiTest extends Mathsat5AbstractNativeApiTest {
     long proof = msat_get_proof(pm);
 
 
-    msat_destroy_proof_manager(pm); //if this method is not there then there is no SIGSEV
+      msat_destroy_proof_manager(pm); //if this method is not there then there is no SIGSEV
   }
 
   private void testProofManager(long testEnv) throws SolverException, InterruptedException {
