@@ -22,6 +22,7 @@ import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_dest
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_destroy_model_iterator;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_destroy_proof_manager;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_from_smtlib2;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_get_bv_type;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_get_enum_constants;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_get_enum_type;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_get_integer_type;
@@ -33,6 +34,11 @@ import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_get_
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_is_enum_type;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_is_integer_type;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_asin;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_bv_extract;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_bv_lshl;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_bv_number;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_bv_or;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_bv_zext;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_eq;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_equal;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_exp;
@@ -196,6 +202,68 @@ public class Mathsat5NativeApiTest extends Mathsat5AbstractNativeApiTest {
 
     msat_destroy_proof_manager(pm);
     msat_destroy_env(localEnv);
+  }
+
+  //This test produces a SIGSEV, apparently because of the destruction of the proof, which is
+  // needed an works without problem for other proofs.
+  @Test
+  public void bitVectorProofTest() throws SolverException, InterruptedException {
+
+    long cfg = msat_create_config();
+    msat_set_option_checked(cfg, "proof_generation", "true");
+    msat_set_option_checked(cfg, "theory.bv.eager", "false");
+    env = msat_create_env(cfg);
+    msat_destroy_config(cfg);
+
+    long bv8 = msat_get_bv_type(env, 8);
+    long bv32 = msat_get_bv_type(env, 32);
+
+    // Constants
+    long one32 = msat_make_bv_number(env, "1", 32, 10);
+    long seven32 = msat_make_bv_number(env, "7", 32, 10);
+
+    // Variables (unsigned char)
+    long a = msat_make_variable(env, "char_a", bv8);
+    long b = msat_make_variable(env, "char_b", bv8);
+
+    // Extend to 32 bits (zero-extend) unsigned
+    a = msat_make_bv_zext(env, 24, a);
+    b = msat_make_bv_zext(env, 24, b);
+
+    // OR with 1
+    a = msat_make_bv_or(env, a, one32);
+    b = msat_make_bv_or(env, b, one32);
+
+    // Extract low 8 bits
+    a = msat_make_bv_extract(env, 7, 0, a);
+    b = msat_make_bv_extract(env, 7, 0, b);
+
+    // Extend again to 32 bits
+    a = msat_make_bv_zext(env, 24, a);
+    b = msat_make_bv_zext(env, 24, b);
+
+    // Shift left by 7
+    a = msat_make_bv_lshl(env, a, seven32);
+    b = msat_make_bv_lshl(env, b, seven32);
+
+    // Extract low 8 bits again
+    a = msat_make_bv_extract(env, 7, 0, a);
+    b = msat_make_bv_extract(env, 7, 0, b);
+
+    // Assert NOT (a == b)
+    long eq = msat_make_equal(env, a, b);
+    long neq = msat_make_not(env, eq);
+
+    msat_assert_formula(env, neq);
+
+    boolean isSat = msat_check_sat(env);
+    assertThat(isSat).isFalse();
+
+    long pm = msat_get_proof_manager(env);
+    long proof = msat_get_proof(pm);
+
+
+    msat_destroy_proof_manager(pm); //if this method is not there then there is no SIGSEV
   }
 
   private void testProofManager(long testEnv) throws SolverException, InterruptedException {
