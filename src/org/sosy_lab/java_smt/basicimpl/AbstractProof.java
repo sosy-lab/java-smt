@@ -10,6 +10,7 @@
 
 package org.sosy_lab.java_smt.basicimpl;
 
+import java.util.Objects;
 import org.sosy_lab.java_smt.api.proofs.Proof;
 import org.sosy_lab.java_smt.api.proofs.ProofNode;
 
@@ -17,7 +18,7 @@ public class AbstractProof implements Proof {
   public final ProofNode root;
 
   public AbstractProof(ProofNode pRoot) {
-    root = pRoot;
+    root = Objects.requireNonNull(pRoot);
   }
 
   @Override
