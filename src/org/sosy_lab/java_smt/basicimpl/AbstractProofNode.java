@@ -12,6 +12,7 @@ package org.sosy_lab.java_smt.basicimpl;
 
 import com.google.common.collect.ImmutableSet;
 import java.util.LinkedHashSet;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -27,10 +28,10 @@ import org.sosy_lab.java_smt.api.proofs.ProofRule;
 public abstract class AbstractProofNode implements ProofNode {
 
   private ImmutableSet<ProofNode> children = ImmutableSet.of();
-  private ProofRule rule;
+  private Optional<ProofRule> rule;
   protected Optional<Formula> formula = Optional.empty();
 
-  protected AbstractProofNode(ProofRule pRule, @Nullable Formula pFormula) {
+  protected AbstractProofNode(Optional<ProofRule> pRule, @Nullable Formula pFormula) {
     this.rule = pRule;
     this.formula = Optional.ofNullable(pFormula);
   }
@@ -52,7 +53,7 @@ public abstract class AbstractProofNode implements ProofNode {
   }
 
   @Override
-  public ProofRule getRule() {
+  public Optional<ProofRule> getRule() {
     return rule;
   }
 
@@ -74,9 +75,10 @@ public abstract class AbstractProofNode implements ProofNode {
     String indent = "  ".repeat(pIndentLevel);
 
     String sFormula = getFormula().map(Object::toString).orElse("null");
+    String sRule = getRule().map(Objects::toString).orElse("null");
 
     sb.append(indent).append("Formula: ").append(sFormula).append("\n");
-    sb.append(indent).append("Rule: ").append(getRule().getName()).append("\n");
+    sb.append(indent).append("Rule: ").append(sRule).append("\n");
     sb.append(indent)
         .append("No. Children: ")
         .append(this.isLeaf() ? 0 : getChildren().size())
@@ -92,6 +94,16 @@ public abstract class AbstractProofNode implements ProofNode {
     }
 
     return sb.toString();
+  }
+
+  /**
+   * Used for seting the implicit formulas for certain proofs steps inn the proofs of
+   * unsatisfiability of some solvers. Not thought to be used for any other purposes.
+   *
+   * @param pFormula the formula this node should have.
+   */
+  public void setFormula(Formula pFormula) {
+    formula = Optional.ofNullable(pFormula);
   }
 
   protected abstract static class ProofFrame<T> {
