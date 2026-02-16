@@ -204,7 +204,7 @@ public class Mathsat5NativeApiTest extends Mathsat5AbstractNativeApiTest {
     msat_destroy_env(localEnv);
   }
 
-  //This test produces a SIGSEV, apparently because of the destruction of the proof, which is
+  // This test produces a SIGSEV, apparently because of the destruction of the proof, which is
   // needed an works without problem for other proofs.
   @Test
   @SuppressWarnings("unused")
@@ -263,8 +263,7 @@ public class Mathsat5NativeApiTest extends Mathsat5AbstractNativeApiTest {
     long pm = msat_get_proof_manager(env);
     long proof = msat_get_proof(pm);
 
-
-      msat_destroy_proof_manager(pm); //if this method is not there then there is no SIGSEV
+    msat_destroy_proof_manager(pm); // if this method is not there then there is no SIGSEV
   }
 
   private void testProofManager(long testEnv) throws SolverException, InterruptedException {

@@ -13,7 +13,7 @@ import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_asse
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_destroy_proof_manager;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_get_proof;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_get_proof_manager;
-import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5Proof.fromMsatProof;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5ProofNode.fromMsatProof;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
@@ -39,6 +39,7 @@ import org.sosy_lab.java_smt.api.QuantifiedFormulaManager.Quantifier;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.api.proofs.Proof;
+import org.sosy_lab.java_smt.api.proofs.ProofNode;
 import org.sosy_lab.java_smt.api.visitors.BooleanFormulaVisitor;
 import org.sosy_lab.java_smt.api.visitors.TraversalProcess;
 import org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5ProofRule.Rule;
@@ -73,7 +74,7 @@ class Mathsat5TheoremProver extends Mathsat5AbstractProver<Void> implements Prov
     Preconditions.checkState(this.isUnsat());
     checkGenerateProofs();
 
-    Mathsat5Proof root;
+    Mathsat5ProofNode root;
     long pm;
     try {
       pm = msat_get_proof_manager(curEnv);
@@ -82,18 +83,18 @@ class Mathsat5TheoremProver extends Mathsat5AbstractProver<Void> implements Prov
     }
     long msatProof = msat_get_proof(pm);
     root = fromMsatProof(this, msatProof);
-    clausifyResChain(root, context.getFormulaManager().getBooleanFormulaManager());
+    performResChain(root, context.getFormulaManager().getBooleanFormulaManager());
     msat_destroy_proof_manager(pm);
 
-    return root;
+    return new Mathsat5Proof(root);
   }
 
   // update all RES_CHAIN nodes in the proof DAG by computing resolution
   // formulas and return the updated root node with formulas attached.
-  private void clausifyResChain(Proof pRoot, BooleanFormulaManager pBfmgr) {
-    Map<Proof, Boolean> tempVisited;
-    ImmutableMap<Proof, Boolean> visited = ImmutableMap.of();
-    Deque<Proof> stack = new ArrayDeque<>();
+  private void performResChain(ProofNode pRoot, BooleanFormulaManager pBfmgr) {
+    Map<ProofNode, Boolean> tempVisited;
+    ImmutableMap<ProofNode, Boolean> visited = ImmutableMap.of();
+    Deque<ProofNode> stack = new ArrayDeque<>();
 
     stack.push(pRoot); // Start with the root node
     tempVisited = new LinkedHashMap<>(visited);
@@ -101,7 +102,7 @@ class Mathsat5TheoremProver extends Mathsat5AbstractProver<Void> implements Prov
     visited = ImmutableMap.copyOf(tempVisited);
 
     while (!stack.isEmpty()) {
-      Proof node = stack.peek(); // Look at the top node, but don't pop yet
+      ProofNode node = stack.peek(); // Look at the top node, but don't pop yet
 
       if (Objects.equals(visited.get(node), false)) {
         // First time visiting this node
@@ -111,10 +112,10 @@ class Mathsat5TheoremProver extends Mathsat5AbstractProver<Void> implements Prov
 
         // Push all children onto stack
         if (!node.isLeaf()) {
-          Set<Proof> childrenSet = node.getChildren();
-          List<Proof> children = new ArrayList<>(childrenSet);
+          Set<ProofNode> childrenSet = node.getChildren();
+          List<ProofNode> children = new ArrayList<>(childrenSet);
           for (int i = children.size() - 1; i >= 0; i--) {
-            Proof child = children.get(i);
+            ProofNode child = children.get(i);
             if (!visited.containsKey(child)) {
               stack.push(child); // Only push unvisited children
               tempVisited = new LinkedHashMap<>(visited);
@@ -138,9 +139,9 @@ class Mathsat5TheoremProver extends Mathsat5AbstractProver<Void> implements Prov
   }
 
   // process proof nodes and compute formulas for res-chain nodes
-  private void processResChain(Proof pNode, BooleanFormulaManager pBfmgr) {
-    ImmutableSet<Proof> childrenSet = pNode.getChildren();
-    ImmutableList<Proof> children = ImmutableList.copyOf(childrenSet);
+  private void processResChain(ProofNode pNode, BooleanFormulaManager pBfmgr) {
+    ImmutableSet<ProofNode> childrenSet = pNode.getChildren();
+    ImmutableList<ProofNode> children = ImmutableList.copyOf(childrenSet);
 
     // If the current node is a RES_CHAIN, compute the resolved formula
     if (pNode.getRule().get().equals(Rule.RES_CHAIN)) {
@@ -161,7 +162,7 @@ class Mathsat5TheoremProver extends Mathsat5AbstractProver<Void> implements Prov
       }
 
       // Store the resolved formula in the current node
-      ((Mathsat5Proof) pNode).setFormula(current);
+      ((Mathsat5ProofNode) pNode).setFormula(current);
     }
   }
 
