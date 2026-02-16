@@ -17,6 +17,7 @@ import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Optional;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.proofs.ProofNode;
 import org.sosy_lab.java_smt.api.proofs.ProofRule;
@@ -53,13 +54,13 @@ public final class CVC5ProofNode extends AbstractProofNode {
         stack.pop();
         int numChildren = frame.getNumArgs();
 
-        CVC5ProofRule proofRule =
+        ProofRule proofRule =
             Enum.valueOf(CVC5ProofRule.class, frame.getProof().getRule().toString());
 
         // Generate formula
         Term term = frame.getProof().getResult();
         Formula pFormula = pFormulaCreator.encapsulate(pFormulaCreator.getFormulaType(term), term);
-        CVC5ProofNode pn = new CVC5ProofNode(proofRule, pFormula);
+        CVC5ProofNode pn = new CVC5ProofNode(Optional.of(proofRule), pFormula);
         for (int i = 0; i < numChildren; i++) {
           io.github.cvc5.Proof child = frame.getProof().getChildren()[i];
 
@@ -81,7 +82,7 @@ public final class CVC5ProofNode extends AbstractProofNode {
     }
   }
 
-  private CVC5ProofNode(ProofRule pProofRule, Formula pFormula) {
+  private CVC5ProofNode(Optional<ProofRule> pProofRule, Formula pFormula) {
 
     super(pProofRule, pFormula);
   }

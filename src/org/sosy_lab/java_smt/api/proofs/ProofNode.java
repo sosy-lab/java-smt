@@ -39,5 +39,5 @@ public interface ProofNode {
    *
    * @return The rule of the proof node.
    */
-  ProofRule getRule();
+  Optional<ProofRule> getRule();
 }
