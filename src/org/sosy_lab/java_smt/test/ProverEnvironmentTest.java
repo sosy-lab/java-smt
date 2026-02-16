@@ -320,9 +320,13 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
     try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_PROOFS)) {
       prover.addConstraint(bottom);
       assertThat(prover.isUnsat()).isTrue();
-
+      if (solverToUse().equals(MATHSAT5)) {
+        throw new AssertionError("Expected UnsupportedOperationException was not thrown");
+      }
       ProofNode proofNode = prover.getProof().getProofRoot();
       assertThat(proofNode).isNotNull();
+    } catch (UnsupportedOperationException e) {
+      assertThat(solverToUse().equals(MATHSAT5)).isTrue();
     }
   }
 
@@ -558,13 +562,15 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
 
     while (!stack.isEmpty()) {
       ProofNode proofNode = stack.pop();
-      ProofRule rule = proofNode.getRule();
+      Optional<ProofRule> rule = proofNode.getRule();
       Optional<Formula> formula = proofNode.getFormula();
 
       assertThat(rule).isNotNull();
-      assertThat(rule).isInstanceOf(ProofRule.class);
+      if (!solverToUse().equals(MATHSAT5)) {
+        assertThat(rule.isPresent()).isTrue();
+        assertThat(formula.isPresent()).isTrue();
+      }
       assertThat(proofNode.getChildren()).isNotNull();
-      assertThat(formula.isPresent()).isTrue();
 
       for (ProofNode child : proofNode.getChildren()) {
         assertThat(child).isNotNull();
