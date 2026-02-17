@@ -64,6 +64,14 @@ public final class BooleanFormulaSubject extends Subject {
   }
 
   /**
+   * Use this for checking assertions about BooleanFormulas with Truth: <code>
+   * assertThatFormula(formula).is...()</code>.
+   */
+  public static BooleanFormulaSubject assertThat(BooleanFormula formula, SolverContext context) {
+    return assert_().about(booleanFormulasOf(context)).that(formula);
+  }
+
+  /**
    * Use this for checking assertions about BooleanFormulas (given the corresponding solver) with
    * Truth: <code>assertUsing(context)).that(formula).is...()</code>.
    */
@@ -267,7 +275,7 @@ public final class BooleanFormulaSubject extends Subject {
    *
    * <ol>
    *   <li>I is a subset of A\B
-   *   <li>A => I
+   *   <li>A implies I
    *   <li>I and B are mutually contradictory
    * </ol>
    */
