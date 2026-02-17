@@ -112,8 +112,7 @@ class Mathsat5TheoremProver extends Mathsat5AbstractProver<Void> implements Prov
 
         // Push all children onto stack
         if (!node.isLeaf()) {
-          Set<ProofNode> childrenSet = node.getChildren();
-          List<ProofNode> children = new ArrayList<>(childrenSet);
+          List<ProofNode> children = new ArrayList<>(node.getChildren());
           for (int i = children.size() - 1; i >= 0; i--) {
             ProofNode child = children.get(i);
             if (!visited.containsKey(child)) {

@@ -3,7 +3,7 @@
  * an API wrapper for a collection of SMT solvers:
  * https://github.com/sosy-lab/java-smt
  *
- * SPDX-FileCopyrightText: 2024 Dirk Beyer <https://www.sosy-lab.org>
+ * SPDX-FileCopyrightText: 2026 Dirk Beyer <https://www.sosy-lab.org>
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -24,6 +24,7 @@ import java.util.Deque;
 import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.java_smt.api.Formula;
@@ -131,7 +132,7 @@ class Mathsat5ProofNode extends AbstractProofNode {
       }
     }
     assert computed.get(pRootProof) != null;
-    return computed.get(pRootProof);
+    return Objects.requireNonNull(computed.get(pRootProof));
   }
 
   @Nullable
