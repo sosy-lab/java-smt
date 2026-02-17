@@ -358,6 +358,7 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
     return result;
   }
 
+  @SuppressWarnings("unused")
   protected TFormulaInfo parseImpl(String formulaStr) throws IllegalArgumentException {
     throw new UnsupportedOperationException(
         "parseImpl(String) must be implemented in a subclass, if required.");

@@ -211,7 +211,7 @@ public interface FormulaManager {
    * <p>Variables that are defined, but not used in the assertion, might be ignored by the SMT
    * solver, and they might not be available for later usage.
    *
-   * <p>Example: <code>(declare-fun x () Int)(assert (= 0 x))(assert (< x 10))</code>
+   * <p>Example: <code>(declare-fun x () Int)(assert (= 0 x))(assert (&lt; x 10))</code>
    *
    * @return A list of formulas from the assertions in the internal representation, in order.
    * @throws IllegalArgumentException If the string cannot be parsed.
