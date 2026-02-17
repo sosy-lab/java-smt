@@ -31,7 +31,6 @@ import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
-import org.sosy_lab.java_smt.api.UFManager;
 import org.sosy_lab.java_smt.basicimpl.interpolation_techniques.AbstractInterpolationTechnique;
 import org.sosy_lab.java_smt.basicimpl.interpolation_techniques.ModelBasedProjectionInterpolation;
 import org.sosy_lab.java_smt.basicimpl.interpolation_techniques.QuantifierEliminationInterpolation;
