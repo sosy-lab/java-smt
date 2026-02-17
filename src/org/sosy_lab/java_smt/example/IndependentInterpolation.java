@@ -114,7 +114,6 @@ public final class IndependentInterpolation {
     BooleanFormula itp = prover.getInterpolant(ImmutableList.of(ip1));
     logger.logf(
         Level.INFO,
-        String.format(
             "Interpolation Result:%n"
                 + "  Strategy: %s%n"
                 + "  Formula A: %s%n"
@@ -123,7 +122,7 @@ public final class IndependentInterpolation {
             STRATEGY,
             formulaA.toString().length() > 500 ? "Too large to display" : formulaA,
             formulaB.toString().length() > 500 ? "Too large to display" : formulaB,
-            itp));
+            itp);
   }
 
   private static <T> void interpolateExample2(
@@ -157,7 +156,6 @@ public final class IndependentInterpolation {
     logger.log(Level.INFO, "Interpolants are:", itp);
     logger.logf(
         Level.INFO,
-        String.format(
             "Interpolation Result:%n"
                 + "  Strategy: %s%n"
                 + "  Formula A: %s%n"
@@ -166,6 +164,6 @@ public final class IndependentInterpolation {
             STRATEGY,
             formulaA.toString().length() > 500 ? "Too large to display" : formulaA,
             formulaB.toString().length() > 500 ? "Too large to display" : formulaB,
-            itp));
+            itp);
   }
 }
