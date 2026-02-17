@@ -17,6 +17,7 @@ import static org.sosy_lab.java_smt.SolverContextFactory.Solvers.MATHSAT5;
 import static org.sosy_lab.java_smt.SolverContextFactory.Solvers.OPENSMT;
 import static org.sosy_lab.java_smt.SolverContextFactory.Solvers.PRINCESS;
 import static org.sosy_lab.java_smt.SolverContextFactory.Solvers.SMTINTERPOL;
+import static org.sosy_lab.java_smt.SolverContextFactory.Solvers.Z3;
 import static org.sosy_lab.java_smt.api.FormulaType.IntegerType;
 import static org.sosy_lab.java_smt.api.SolverContext.ProverOptions.GENERATE_UNSAT_CORE;
 import static org.sosy_lab.java_smt.api.SolverContext.ProverOptions.GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS;
@@ -207,7 +208,7 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
 
   @Test
   public void testGetSimpleBooleanProof() throws InterruptedException, SolverException {
-    assume().that(solverToUse()).isEqualTo(CVC5);
+    assume().that(solverToUse()).isEqualTo(Z3);
     requireProofGeneration(); // Ensures proofs are supported
     BooleanFormula q1 = bmgr.makeVariable("q1");
     BooleanFormula q2 = bmgr.makeVariable("q2");
@@ -228,7 +229,7 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
   @Test
   public void testGetComplexRationalNumeralAndUFProof()
       throws InterruptedException, SolverException {
-    assume().that(solverToUse()).isEqualTo(CVC5);
+    assume().that(solverToUse()).isEqualTo(Z3);
     requireProofGeneration(); // Ensures proofs are supported
     requireRationals();
 
@@ -292,7 +293,7 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
 
   @Test
   public void proofOfTrueTest() throws InterruptedException, SolverException {
-    assume().that(solverToUse()).isEqualTo(CVC5);
+    assume().that(solverToUse()).isEqualTo(Z3);
     requireProofGeneration();
 
     BooleanFormula tru = bmgr.makeTrue();
@@ -314,7 +315,7 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
   @Test
   public void proofOfFalseTest() throws InterruptedException, SolverException {
     requireProofGeneration();
-    assume().that(solverToUse()).isEqualTo(CVC5);
+    assume().that(solverToUse()).isEqualTo(Z3);
 
     BooleanFormula bottom = bmgr.makeFalse();
 
@@ -329,7 +330,7 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
 
   @Test
   public void testGetSimpleIntegerProof() throws InterruptedException, SolverException {
-    assume().that(solverToUse()).isEqualTo(CVC5);
+    assume().that(solverToUse()).isEqualTo(Z3);
     requireProofGeneration(); // Ensures proofs are supported
     requireIntegers();
 
@@ -351,7 +352,7 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
   @Test
   public void getProofAfterGetProofAndAddingAssertionsTest()
       throws InterruptedException, SolverException {
-    assume().that(solverToUse()).isEqualTo(CVC5);
+    assume().that(solverToUse()).isEqualTo(Z3);
     requireProofGeneration(); // Ensures proofs are supported
     BooleanFormula q1 = bmgr.makeVariable("q1");
     BooleanFormula q2 = bmgr.makeVariable("q2");
@@ -389,7 +390,7 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
   @Test
   public void getProofAfterGetProofClearingStackAndAddingDifferentAssertionsTest()
       throws InterruptedException, SolverException {
-    assume().that(solverToUse()).isEqualTo(CVC5);
+    assume().that(solverToUse()).isEqualTo(Z3);
     requireProofGeneration(); // Ensures proofs are supported
     requireIntegers();
 
@@ -456,7 +457,7 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
   // This test is based on the bvIsZeroAfterShiftLeft() test in BitvectorFormulaManagerTest
   @Test
   public void getBitVectorProofTest() throws InterruptedException, SolverException {
-    assume().that(solverToUse()).isEqualTo(CVC5);
+    assume().that(solverToUse()).isEqualTo(Z3);
     requireProofGeneration();
     requireBitvectors();
 
@@ -496,7 +497,7 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
   // This test is based on the testIntIndexIntValue() test in ArrayFormulaManagerTest
   @Test
   public void getArrayProofTest() throws InterruptedException, SolverException {
-    assume().that(solverToUse()).isEqualTo(CVC5);
+    assume().that(solverToUse()).isEqualTo(Z3);
     requireProofGeneration();
     requireIntegers();
     requireArrays();

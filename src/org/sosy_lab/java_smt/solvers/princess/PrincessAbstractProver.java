@@ -9,6 +9,7 @@
 package org.sosy_lab.java_smt.solvers.princess;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
 import static scala.collection.JavaConverters.asJava;
 import static scala.collection.JavaConverters.asScala;
 
@@ -242,13 +243,10 @@ abstract class PrincessAbstractProver<E> extends AbstractProverWithAllSat<E> {
   }
 
   @Override
-  public Proof getProof() {
+  public Proof getProof() throws SolverException, InterruptedException {
     Preconditions.checkState(!closed);
     checkGenerateProofs();
-    if (wasLastSatCheckSat) {
-
-      throw new IllegalStateException("Proofs can only be generated for UNSAT results.");
-    }
+    checkState(isUnsat());
     return PrincessProof.buildProofDAG(api.getCertificate(), creator, api);
   }
 

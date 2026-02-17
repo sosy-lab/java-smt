@@ -8,9 +8,9 @@
 
 package org.sosy_lab.java_smt.solvers.smtinterpol;
 
+import static com.google.common.base.Preconditions.checkState;
 import static org.sosy_lab.common.collect.Collections3.transformedImmutableSetCopy;
 
-import com.google.common.base.Preconditions;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableMap;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
@@ -104,7 +104,7 @@ abstract class SmtInterpolAbstractProver<T> extends AbstractProver<T> {
 
   @CanIgnoreReturnValue
   protected String addConstraint0(BooleanFormula constraint) {
-    Preconditions.checkState(!closed);
+    checkState(!closed);
 
     // create a term-name, used for unsat-core or interpolation, otherwise there is no overhead.
     String termName = generateTermName();
@@ -224,7 +224,7 @@ abstract class SmtInterpolAbstractProver<T> extends AbstractProver<T> {
   }
 
   @Override
-  public Proof getProof() throws InterruptedException {
+  public Proof getProof() throws InterruptedException, SolverException {
     checkState(!closed);
     checkGenerateProofs();
     checkState(isUnsat());
@@ -473,11 +473,6 @@ abstract class SmtInterpolAbstractProver<T> extends AbstractProver<T> {
           public TraversalProcess visitConstant(boolean value) {
             return TraversalProcess.SKIP;
           }
-
-          @Override
-          public TraversalProcess visitBoundVar(BooleanFormula var, int index) {
-            return TraversalProcess.SKIP;
-          }
         });
 
     return result;
@@ -549,11 +544,6 @@ abstract class SmtInterpolAbstractProver<T> extends AbstractProver<T> {
 
           @Override
           public TraversalProcess visitConstant(boolean value) {
-            return TraversalProcess.SKIP;
-          }
-
-          @Override
-          public TraversalProcess visitBoundVar(BooleanFormula var, int index) {
             return TraversalProcess.SKIP;
           }
         });

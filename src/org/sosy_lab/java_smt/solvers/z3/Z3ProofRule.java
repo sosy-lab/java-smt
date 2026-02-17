@@ -135,11 +135,6 @@ class Z3ProofRule implements ProofRule {
     public String getName() {
       return name;
     }
-
-    @Override
-    public String getFormula() {
-      return formula;
-    }
   }
 
   static class Parameter<T> {
@@ -165,11 +160,6 @@ class Z3ProofRule implements ProofRule {
   @Override
   public String getName() {
     return rule.getName();
-  }
-
-  @Override
-  public String getFormula() {
-    return rule.getFormula();
   }
 
   public List<Parameter<?>> getParameters() {

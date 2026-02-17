@@ -93,11 +93,6 @@ public class Z3ToResolutionProofConverter { // This class is incomplete and curr
     }
 
     @Override
-    public TraversalProcess visitBoundVar(BooleanFormula var, int deBruijnIdx) {
-      return TraversalProcess.ABORT;
-    }
-
-    @Override
     public TraversalProcess visitNot(BooleanFormula operand) {
       operands.add(operand);
       return TraversalProcess.ABORT;

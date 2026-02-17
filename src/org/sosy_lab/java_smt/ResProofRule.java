@@ -139,11 +139,6 @@ public final class ResProofRule {
     public String getName() {
       return name;
     }
-
-    @Override
-    public String getFormula() {
-      return formula;
-    }
   }
 
   /**

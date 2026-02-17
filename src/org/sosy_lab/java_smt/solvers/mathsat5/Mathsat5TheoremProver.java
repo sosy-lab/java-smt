@@ -262,12 +262,6 @@ class Mathsat5TheoremProver extends Mathsat5AbstractProver<Void> implements Prov
             result.add(formula);
             return TraversalProcess.SKIP;
           }
-
-          @Override
-          public TraversalProcess visitBoundVar(BooleanFormula var, int index) {
-            result.add(formula);
-            return TraversalProcess.SKIP;
-          }
         });
 
     return result;

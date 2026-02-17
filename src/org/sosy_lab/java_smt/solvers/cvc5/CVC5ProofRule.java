@@ -173,7 +173,7 @@ enum CVC5ProofRule implements ProofRule {
 
   private final String name;
 
-  CVC5ProofRule(String pName){
+  CVC5ProofRule(String pName) {
     name = pName;
   }
 
@@ -181,5 +181,4 @@ enum CVC5ProofRule implements ProofRule {
   public String getName() {
     return name;
   }
-
 }
