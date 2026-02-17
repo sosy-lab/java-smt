@@ -9,10 +9,12 @@
 package org.sosy_lab.java_smt.test;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
 import static com.google.common.truth.Truth.assert_;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.FluentIterable;
+import com.google.common.collect.Sets;
 import com.google.common.truth.Fact;
 import com.google.common.truth.FailureMetadata;
 import com.google.common.truth.SimpleSubjectBuilder;
@@ -21,8 +23,10 @@ import com.google.common.truth.Subject;
 import com.google.common.truth.Truth;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.BooleanFormulaManager;
+import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.Model.ValueAssignment;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
@@ -254,5 +258,52 @@ public final class BooleanFormulaSubject extends Subject {
     final BooleanFormula implication = bmgr.or(bmgr.not(formulaUnderTest), expected);
 
     checkIsUnsat(bmgr.not(implication), Fact.fact("expected to imply", expected));
+  }
+
+  /**
+   * Checks if the subject is a valid Craig interpolant for the given formulas A and B.
+   *
+   * <p>Checks 3 properties:
+   *
+   * <ol>
+   *   <li>I is a subset of A\B
+   *   <li>A => I
+   *   <li>I and B are mutually contradictory
+   * </ol>
+   */
+  public void isValidInterpolant(BooleanFormula formulaA, BooleanFormula formulaB)
+      throws SolverException, InterruptedException {
+    isValidInterpolant(List.of(formulaA), List.of(formulaB));
+  }
+
+  /** Checks if the subject is a valid Craig interpolant for the lists of formulas A and B. */
+  public void isValidInterpolant(List<BooleanFormula> formulasA, List<BooleanFormula> formulasB)
+      throws SolverException, InterruptedException {
+
+    BooleanFormulaManager bmgr = context.getFormulaManager().getBooleanFormulaManager();
+    BooleanFormula conjugatedFormulasOfA = bmgr.and(formulasA);
+    BooleanFormula conjugatedFormulasOfB = bmgr.and(formulasB);
+
+    // checks that every Symbol of the interpolant appears either in A or B
+    FormulaManager mgr = context.getFormulaManager();
+    Set<String> interpolantSymbols = mgr.extractVariablesAndUFs(formulaUnderTest).keySet();
+    Set<String> interpolASymbols = mgr.extractVariablesAndUFs(conjugatedFormulasOfA).keySet();
+    Set<String> interpolBSymbols = mgr.extractVariablesAndUFs(conjugatedFormulasOfB).keySet();
+    Set<String> intersection = Sets.intersection(interpolASymbols, interpolBSymbols);
+
+    checkState(
+        intersection.containsAll(interpolantSymbols),
+        "Interpolant contains symbols %s that are not part of both input formula groups A and B.",
+        Sets.difference(interpolantSymbols, intersection));
+
+    checkIsUnsat(
+        bmgr.and(conjugatedFormulasOfA, bmgr.not(formulaUnderTest)),
+        Fact.simpleFact("Interpolant expected to be implied by A (A => I)"),
+        ProverOptions.GENERATE_MODELS);
+
+    checkIsUnsat(
+        bmgr.and(formulaUnderTest, conjugatedFormulasOfB),
+        Fact.simpleFact("Interpolant expected to contradict B (I /\\ B => UNSAT)"),
+        ProverOptions.GENERATE_MODELS);
   }
 }

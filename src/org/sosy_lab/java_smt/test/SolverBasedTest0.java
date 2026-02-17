@@ -8,7 +8,6 @@
 
 package org.sosy_lab.java_smt.test;
 
-import static com.google.common.base.Preconditions.checkState;
 import static com.google.common.truth.TruthJUnit.assume;
 import static org.sosy_lab.java_smt.api.FormulaType.getSinglePrecisionFloatingPointType;
 import static org.sosy_lab.java_smt.api.SolverContext.ProverOptions.GENERATE_PROJECTION_BASED_INTERPOLANTS;
@@ -19,7 +18,6 @@ import static org.sosy_lab.java_smt.test.ProverEnvironmentSubject.assertThat;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Sets;
 import com.google.common.truth.Truth;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -512,54 +510,6 @@ public abstract class SolverBasedTest0 {
    */
   protected final BooleanFormulaSubject assertThatFormula(BooleanFormula formula) {
     return assertUsing(context).that(formula);
-  }
-
-  /** Check that the interpolant in the subject is valid fot the formulas A and B. */
-  public void isValidInterpolant(BooleanFormula interpolant, BooleanFormula a, BooleanFormula b)
-      throws SolverException, InterruptedException {
-    // TODO: move into assertion framework
-    isValidInterpolant(interpolant, ImmutableList.of(a), ImmutableList.of(b));
-  }
-
-  /** Check that the interpolant in the subject is valid fot the formulas A and B. */
-  public void isValidInterpolant(
-      BooleanFormula interpolant,
-      List<BooleanFormula> formulasOfA,
-      List<BooleanFormula> formulasOfB)
-      throws SolverException, InterruptedException {
-    // TODO: move into assertion framework
-
-    BooleanFormula conjugatedFormulasOfA = bmgr.and(formulasOfA);
-    BooleanFormula conjugatedFormulasOfB = bmgr.and(formulasOfB);
-
-    // checks that every Symbol of the interpolant appears either in A or B
-    Set<String> interpolantSymbols = mgr.extractVariablesAndUFs(interpolant).keySet();
-    Set<String> interpolASymbols = mgr.extractVariablesAndUFs(conjugatedFormulasOfA).keySet();
-    Set<String> interpolBSymbols = mgr.extractVariablesAndUFs(conjugatedFormulasOfB).keySet();
-    Set<String> intersection = Sets.intersection(interpolASymbols, interpolBSymbols);
-    // TODO: assertThat is not available with message
-    checkState(
-        intersection.containsAll(interpolantSymbols),
-        "Interpolant contains symbols %s that are not part of both input formula groups A and B.",
-        Sets.difference(interpolantSymbols, intersection));
-
-    try (ProverEnvironment validationProver = context.newProverEnvironment()) {
-      validationProver.push();
-      validationProver.addConstraint(bmgr.implication(conjugatedFormulasOfA, interpolant));
-      // TODO: assertThat is not available with message
-      checkState(
-          !validationProver.isUnsat(),
-          "Invalid Craig interpolation: formula group A does not imply the interpolant.");
-      validationProver.pop();
-
-      validationProver.push();
-      validationProver.addConstraint(bmgr.and(interpolant, conjugatedFormulasOfB));
-      // TODO: assertThat is not available with message
-      checkState(
-          validationProver.isUnsat(),
-          "Invalid Craig interpolation: interpolant does not contradict formula group B.");
-      validationProver.pop();
-    }
   }
 
   /**
