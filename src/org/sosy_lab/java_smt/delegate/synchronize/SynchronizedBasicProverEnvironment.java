@@ -20,6 +20,7 @@ import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.SolverContext;
 import org.sosy_lab.java_smt.api.SolverException;
+import org.sosy_lab.java_smt.api.proofs.Proof;
 
 class SynchronizedBasicProverEnvironment<T> implements BasicProverEnvironment<T> {
 
@@ -102,6 +103,11 @@ class SynchronizedBasicProverEnvironment<T> implements BasicProverEnvironment<T>
     synchronized (sync) {
       return delegate.getStatistics();
     }
+  }
+
+  @Override
+  public Proof getProof() throws SolverException, InterruptedException {
+    return delegate.getProof();
   }
 
   @Override
