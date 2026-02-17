@@ -10,6 +10,7 @@ package org.sosy_lab.java_smt.solvers.cvc5;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
+import static org.sosy_lab.java_smt.solvers.cvc5.CVC5Proof.generateProofImpl;
 
 import com.google.common.collect.Collections2;
 import com.google.common.collect.HashMultimap;
@@ -43,6 +44,7 @@ import org.sosy_lab.java_smt.api.Evaluator;
 import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
+import org.sosy_lab.java_smt.api.proofs.Proof;
 import org.sosy_lab.java_smt.basicimpl.AbstractProverWithAllSat;
 
 abstract class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
@@ -97,6 +99,7 @@ abstract class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
 
     newSolver.setOption("produce-assertions", "true");
     newSolver.setOption("dump-models", "true");
+    newSolver.setOption("produce-proofs", generateProofs ? "true" : "false");
 
     // Set Strings option to enable all String features (such as lessOrEquals)
     newSolver.setOption("strings-exp", "true");
@@ -315,6 +318,23 @@ abstract class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
   public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(
       Collection<BooleanFormula> pAssumptions) throws SolverException, InterruptedException {
     throw new UnsupportedOperationException(ASSUMPTION_SOLVING_NOT_SUPPORTED);
+  }
+
+  @Override
+  public Proof getProof() throws SolverException, InterruptedException {
+    checkGenerateProofs();
+    checkState(!closed);
+    checkState(isUnsat());
+
+    io.github.cvc5.Proof[] proofs = solver.getProof();
+    checkState(proofs != null && proofs.length != 0, "No proof available");
+
+    // CVC5ProofProcessor pp = new CVC5ProofProcessor(creator);
+    try {
+      return generateProofImpl(proofs[0], creator);
+    } catch (CVC5ApiException e) {
+      throw new SolverException("There was a problem generating proof", e);
+    }
   }
 
   @Override

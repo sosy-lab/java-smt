@@ -215,7 +215,10 @@ class PrincessEnvironment {
       Set<ProverOptions> pOptions) {
 
     SimpleAPI newApi =
-        getNewApi(useForInterpolation || pOptions.contains(ProverOptions.GENERATE_UNSAT_CORE));
+        getNewApi(
+            useForInterpolation
+                || pOptions.contains(ProverOptions.GENERATE_UNSAT_CORE)
+                || pOptions.contains(ProverOptions.GENERATE_PROOFS));
 
     // add all symbols, that are available until now
     boolVariablesCache.values().forEach(newApi::addBooleanVariable);

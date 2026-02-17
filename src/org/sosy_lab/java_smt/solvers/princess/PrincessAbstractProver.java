@@ -9,6 +9,7 @@
 package org.sosy_lab.java_smt.solvers.princess;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
 import static scala.collection.JavaConverters.asJava;
 import static scala.collection.JavaConverters.asScala;
 
@@ -18,6 +19,7 @@ import ap.api.SimpleAPI.SimpleAPIException;
 import ap.parser.IFormula;
 import ap.parser.IFunction;
 import ap.parser.ITerm;
+import ap.proof.certificates.Certificate;
 import com.google.common.base.Preconditions;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import java.util.ArrayDeque;
@@ -36,6 +38,7 @@ import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
+import org.sosy_lab.java_smt.api.proofs.Proof;
 import org.sosy_lab.java_smt.basicimpl.AbstractProverWithAllSat;
 import org.sosy_lab.java_smt.basicimpl.CachingModel;
 import scala.Enumeration.Value;
@@ -237,5 +240,17 @@ abstract class PrincessAbstractProver<E> extends AbstractProverWithAllSat<E> {
     public String toString() {
       return String.format("{%s, %s, %s}", booleanSymbols, theorySymbols, functionSymbols);
     }
+  }
+
+  @Override
+  public Proof getProof() throws SolverException, InterruptedException {
+    Preconditions.checkState(!closed);
+    checkGenerateProofs();
+    checkState(isUnsat());
+    return PrincessProof.buildProofDAG(api.getCertificate(), creator, api);
+  }
+
+  protected Certificate getCertificate() {
+    return api.getCertificate();
   }
 }

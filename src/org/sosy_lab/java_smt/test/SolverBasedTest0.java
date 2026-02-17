@@ -423,6 +423,22 @@ public abstract class SolverBasedTest0 {
         .isEqualTo(Solvers.Z3);
   }
 
+  protected void requireProofGeneration() {
+    assume()
+        .withMessage(
+            "Current version of solver %s does not support proof generation", solverToUse())
+        .that(solverToUse())
+        .isNoneOf(
+            Solvers.BOOLECTOR,
+            Solvers.BITWUZLA,
+            Solvers.YICES2,
+            Solvers.CVC4,
+            Solvers.PRINCESS,
+            Solvers.MATHSAT5,
+            Solvers.OPENSMT,
+            Solvers.SMTINTERPOL);
+  }
+
   /**
    * Use this for checking assertions about BooleanFormulas with Truth: <code>
    * assertThatFormula(formula).is...()</code>.

@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Optional;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
+import org.sosy_lab.java_smt.api.proofs.Proof;
 
 /**
  * Super interface for {@link ProverEnvironment} and {@link InterpolatingProverEnvironment} that
@@ -159,6 +160,12 @@ public interface BasicProverEnvironment<T> extends AutoCloseable {
   default ImmutableMap<String, String> getStatistics() {
     return ImmutableMap.of();
   }
+
+  /**
+   * Get proof of unsatisfiability of the conjuction of the current satck of all formulas. Should
+   * only be called after {@link #isUnsat()} returned <code>true</code>.
+   */
+  Proof getProof() throws SolverException, InterruptedException;
 
   /**
    * Closes the prover environment. The object should be discarded, and should not be used after
