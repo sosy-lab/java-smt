@@ -22,5 +22,5 @@ public interface Proof {
    * @return an object of type {@link ProofNode} the root proof node.
    * @see ProofNode
    */
-  public ProofNode getProofRoot();
+  ProofNode getProofRoot();
 }
