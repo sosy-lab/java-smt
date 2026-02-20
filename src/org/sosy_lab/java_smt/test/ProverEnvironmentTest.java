@@ -321,10 +321,10 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
     try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_PROOFS)) {
       prover.addConstraint(bottom);
       assertThat(prover.isUnsat()).isTrue();
+      ProofNode proofNode = prover.getProof().getProofRoot();
       if (solverToUse().equals(MATHSAT5)) {
         throw new AssertionError("Expected UnsupportedOperationException was not thrown");
       }
-      ProofNode proofNode = prover.getProof().getProofRoot();
       assertThat(proofNode).isNotNull();
     } catch (UnsupportedOperationException e) {
       assertThat(solverToUse().equals(MATHSAT5)).isTrue();
