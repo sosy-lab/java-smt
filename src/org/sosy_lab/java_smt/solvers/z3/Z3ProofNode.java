@@ -10,6 +10,8 @@
 
 package org.sosy_lab.java_smt.solvers.z3;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.microsoft.z3.Native;
 import com.microsoft.z3.enumerations.Z3_decl_kind;
 import com.microsoft.z3.enumerations.Z3_parameter_kind;
@@ -17,7 +19,7 @@ import com.microsoft.z3.enumerations.Z3_sort_kind;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -67,7 +69,8 @@ public class Z3ProofNode extends AbstractProofNode {
     Deque<Frame> stack = new ArrayDeque<>();
 
     // proof ast has been converted into Z3Proof
-    Map<Long, Z3ProofNode> computed = new HashMap<>();
+    ImmutableMap<Long, Z3ProofNode> computed = ImmutableMap.of();
+    Map<Long, Z3ProofNode> tempComputed = new LinkedHashMap<>();
 
     stack.push(new Frame(rootProof));
 
@@ -126,7 +129,9 @@ public class Z3ProofNode extends AbstractProofNode {
             node.addChild(computed.get(arg));
           }
         }
-        computed.put(frame.getProof(), node);
+        tempComputed = new LinkedHashMap<>(computed);
+        tempComputed.put(frame.getProof(), node);
+        computed = ImmutableMap.copyOf(tempComputed);
         Native.decRef(z3context, frame.getProof());
       }
     }
@@ -187,6 +192,6 @@ public class Z3ProofNode extends AbstractProofNode {
       }
     }
     Rule pr = getPRfromDK(declKind);
-    return new Z3ProofRule(pr, parameters);
+    return new Z3ProofRule(pr, ImmutableList.copyOf(parameters));
   }
 }

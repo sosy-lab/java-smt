@@ -10,7 +10,7 @@
 
 package org.sosy_lab.java_smt.solvers.z3;
 
-import java.util.List;
+import com.google.common.collect.ImmutableList;
 import org.sosy_lab.java_smt.api.proofs.ProofRule;
 
 /** Proof rules for Z3. These can be found in the Z3 API source code in the file Z3_api.h */
@@ -118,8 +118,8 @@ class Z3ProofRule implements ProofRule {
 
     private final String name;
 
-    Rule(String name) {
-      this.name = name;
+    Rule(String pName) {
+      name = pName;
     }
 
     @Override
@@ -131,8 +131,8 @@ class Z3ProofRule implements ProofRule {
   static class Parameter<T> {
     private final T value;
 
-    Parameter(T value) {
-      this.value = value;
+    Parameter(T pValue) {
+      value = pValue;
     }
 
     public T getValue() {
@@ -141,11 +141,11 @@ class Z3ProofRule implements ProofRule {
   }
 
   private final Rule rule;
-  private final List<Parameter<?>> parameters;
+  private final ImmutableList<Parameter<?>> parameters;
 
-  Z3ProofRule(Rule pRule, List<Parameter<?>> pParameters) {
-    this.rule = pRule;
-    this.parameters = pParameters;
+  Z3ProofRule(Rule pRule, ImmutableList<Parameter<?>> pParameters) {
+    rule = pRule;
+    parameters = ImmutableList.copyOf(pParameters);
   }
 
   @Override
@@ -153,7 +153,7 @@ class Z3ProofRule implements ProofRule {
     return rule.getName();
   }
 
-  public List<Parameter<?>> getParameters() {
-    return List.copyOf(this.parameters);
+  public ImmutableList<Parameter<?>> getParameters() {
+    return parameters;
   }
 }
