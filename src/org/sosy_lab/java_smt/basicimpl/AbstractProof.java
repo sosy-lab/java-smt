@@ -14,8 +14,8 @@ import java.util.Objects;
 import org.sosy_lab.java_smt.api.proofs.Proof;
 import org.sosy_lab.java_smt.api.proofs.ProofNode;
 
-public class AbstractProof implements Proof {
-  public final ProofNode root;
+public abstract class AbstractProof implements Proof {
+  private final ProofNode root;
 
   public AbstractProof(ProofNode pRoot) {
     root = Objects.requireNonNull(pRoot);
