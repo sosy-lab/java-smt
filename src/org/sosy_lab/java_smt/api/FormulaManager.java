@@ -187,7 +187,8 @@ public interface FormulaManager {
    *
    * @see #parseAll(String) for more details on the expected format and behavior of the SMT solver.
    * @return A single formula from the assertion in the internal representation.
-   * @throws IllegalArgumentException If the string cannot be parsed.
+   * @throws IllegalArgumentException If the string cannot be parsed, or if there is not exactly one
+   *     assertion in the query.
    */
   default BooleanFormula parse(String s) throws IllegalArgumentException {
     List<BooleanFormula> formulas = parseAll(s);
@@ -196,8 +197,8 @@ public interface FormulaManager {
   }
 
   /**
-   * Parse a boolean formula given as a String in an SMTLIB file format. We expect several
-   * assertions to be contained in the query.
+   * Parse a boolean formula given as a String in an SMTLIB file format. We expect several (zero or
+   * more) assertions to be contained in the query.
    *
    * <p>It depends on the used SMT solver whether the given query must be self-contained and include
    * declarations for all used symbols or not, and also whether the query is allowed to contain
