@@ -41,8 +41,10 @@ public class CVC4FloatingPointFormulaManager
   private final Expr roundingMode;
 
   protected CVC4FloatingPointFormulaManager(
-      CVC4FormulaCreator pCreator, FloatingPointRoundingMode pFloatingPointRoundingMode) {
-    super(pCreator);
+      CVC4FormulaCreator pCreator,
+      FloatingPointRoundingMode pFloatingPointRoundingMode,
+      CVC4BitvectorFormulaManager pBvFormulaManager) {
+    super(pCreator, pBvFormulaManager);
     exprManager = pCreator.getEnv();
     roundingMode = getRoundingModeImpl(pFloatingPointRoundingMode);
   }

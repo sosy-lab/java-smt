@@ -61,8 +61,10 @@ class Mathsat5FloatingPointFormulaManager
   private final long roundingMode;
 
   Mathsat5FloatingPointFormulaManager(
-      Mathsat5FormulaCreator pCreator, FloatingPointRoundingMode pFloatingPointRoundingMode) {
-    super(pCreator);
+      Mathsat5FormulaCreator pCreator,
+      FloatingPointRoundingMode pFloatingPointRoundingMode,
+      Mathsat5BitvectorFormulaManager pBvFormulaManager) {
+    super(pCreator, pBvFormulaManager);
 
     mathsatEnv = pCreator.getEnv();
     roundingMode = getRoundingModeImpl(pFloatingPointRoundingMode);

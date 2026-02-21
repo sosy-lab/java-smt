@@ -299,11 +299,48 @@ public interface FloatingPointFormulaManager {
   FloatingPointFormula fromIeeeBitvector(BitvectorFormula number, FloatingPointType pTargetType);
 
   /**
-   * Create a formula that produces a representation of the given floating-point value as a
-   * bitvector conforming to the IEEE 754-2008 FP format. The bit size of the resulting bitvector is
-   * equal to the total size of the {@link FloatingPointNumber}s precision.
+   * Returns a {@link BitvectorFormula} equal to the representation of the given floating-point
+   * value as a bitvector conforming to the IEEE 754-2008 FP format. The bit size of the resulting
+   * bitvector is equal to the total size of the {@link FloatingPointFormula}s {@link
+   * FloatingPointType}. This method is not natively supported by all solvers, and SMTLIB2 output
+   * generated containing formulas originating from this method is often not parsable by other
+   * solvers. You can use the method {@link #toIeeeBitvector(FloatingPointFormula,
+   * BitvectorFormula)} to avoid both problems.
    */
   BitvectorFormula toIeeeBitvector(FloatingPointFormula number);
+
+  /**
+   * Create a {@link BooleanFormula} representing the equality of the bitvector representation of
+   * the given {@link FloatingPointFormula}s value with the given {@link BitvectorFormula},
+   * conforming to the IEEE 754-2008 floating-point format. The size m of the given {@link
+   * BitvectorFormula} has to be equal to the sum of the sizes of the exponent eb and mantissa sb
+   * (including the hidden bit) of the given {@link FloatingPointFormula}. This implementation can
+   * be used independently of {@link #toIeeeBitvector(FloatingPointFormula)}, as it does not rely on
+   * an SMT solvers support for {@link #toIeeeBitvector(FloatingPointFormula)}. Behavior for special
+   * FP values (NaN, Inf, etc.), is solver dependent. This method is based on a suggestion in the
+   * (<a href="https://smt-lib.org/theories-FloatingPoint.shtml">SMTLIB2 standard</a>), with eb
+   * being the {@link FloatingPointFormula}s exponent bit size, sb being its mantissa with the
+   * hidden bit, and eb + sb equal to the bit size of the used {@link BitvectorFormula} parameter,
+   * illustrated in SMTLIB2 as:
+   *
+   * <p>(= ((_ to_fp eb sb) bitvectorFormulaSetToBeEqualToFpNumber) fpNumber)
+   *
+   * <p>Example usage in SMTLIB2, asserting the equality of the 2 parameters:
+   *
+   * <p>(declare-fun bitvectorFormulaSetToBeEqualToFpNumber () (_ BitVec m))
+   *
+   * <p>(assert (= ((_ to_fp eb sb) bitvectorFormulaSetToBeEqualToFpNumber) fpNumber))
+   *
+   * <p>Note: SMTLIB2 output of this method uses the SMTLIB2 keyword 'to_fp' as described above.
+   *
+   * @param fpNumber the {@link FloatingPointFormula} to be converted into an IEEE bitvector.
+   * @param bitvectorFormulaSetToBeEqualToFpNumber a {@link BitvectorFormula} that is set to be
+   *     equal to the IEEE bitvector representation of the {@link FloatingPointFormula} parameter.
+   * @return a {@link BooleanFormula} representing the result of the equality of the two parameters,
+   *     i.e. (= ((_ to_fp eb sb) bitvectorFormulaSetToBeEqualToFpNumber) fpNumber).
+   */
+  BooleanFormula toIeeeBitvector(
+      FloatingPointFormula fpNumber, BitvectorFormula bitvectorFormulaSetToBeEqualToFpNumber);
 
   FloatingPointFormula round(FloatingPointFormula formula, FloatingPointRoundingMode roundingMode);
 

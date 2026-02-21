@@ -12,6 +12,8 @@ import static com.google.common.collect.Iterables.getLast;
 import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.Truth.assertWithMessage;
 import static com.google.common.truth.TruthJUnit.assume;
+import static org.junit.Assert.assertThrows;
+import static org.sosy_lab.java_smt.api.FormulaType.getSinglePrecisionFloatingPointType;
 
 import com.google.common.base.Splitter;
 import com.google.common.collect.HashMultimap;
@@ -27,7 +29,9 @@ import org.junit.Test;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
+import org.sosy_lab.java_smt.api.FloatingPointFormula;
 import org.sosy_lab.java_smt.api.FormulaType;
+import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
 import org.sosy_lab.java_smt.api.FunctionDeclaration;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.SolverException;
@@ -109,6 +113,19 @@ public class SolverFormulaIOTest extends SolverBasedTest0.ParameterizedSolverBas
           + "(assert  (let (($x35 (and (xor q (= (+ a b) c)) (>= a b)))) (let (($x9 (= a b))) (and"
           + " (and (or $x35 u) q) (and $x9 $x35)))))";
 
+  private static final String TO_IEEE_BV_DUMP_Z3 =
+      "(declare-fun someOtherBv () (_ BitVec 32))\n"
+          + "(declare-fun fpVar () (_ FloatingPoint 8 24))\n"
+          + "(assert (= (fp.to_ieee_bv fpVar) someOtherBv))";
+
+  private static final String TO_IEEE_BV_DUMP_MATHSAT5 =
+      "(declare-fun fpVar () (_ FloatingPoint "
+          + "8 24))\n"
+          + "(declare-fun someOtherBv () (_ BitVec 32))\n"
+          + "(assert (let ((.def_12 (fp.as_ieee_bv fpVar)))\n"
+          + "(let ((.def_13 (= someOtherBv .def_12)))\n"
+          + ".def_13)))";
+
   private static final Collection<String> ABDE = ImmutableSet.of("a", "b", "d", "e");
   private static final Collection<String> AQBCU = ImmutableSet.of("a", "q", "b", "c", "u");
   private static final Collection<String> QBCU = ImmutableSet.of("q", "b", "c", "u");
@@ -161,7 +178,7 @@ public class SolverFormulaIOTest extends SolverBasedTest0.ParameterizedSolverBas
     checkVariableIsDeclared(formDump, "|main::a|", "Bool");
     checkVariableIsDeclared(formDump, "b", "Bool");
     checkThatAssertIsInLastLine(formDump);
-    checkThatDumpIsParseable(formDump);
+    checkThatDumpIsParseableWithCurrentSolver(formDump);
   }
 
   @Test
@@ -179,7 +196,7 @@ public class SolverFormulaIOTest extends SolverBasedTest0.ParameterizedSolverBas
     checkVariableIsDeclared(formDump, "|main a|", "Bool");
     checkVariableIsDeclared(formDump, "b", "Bool");
     checkThatAssertIsInLastLine(formDump);
-    checkThatDumpIsParseable(formDump);
+    checkThatDumpIsParseableWithCurrentSolver(formDump);
   }
 
   @Test
@@ -211,7 +228,7 @@ public class SolverFormulaIOTest extends SolverBasedTest0.ParameterizedSolverBas
     checkVariableIsDeclared(formDump, "b", "Bool");
 
     // The serialization has to be parse-able.
-    checkThatDumpIsParseable(formDump);
+    checkThatDumpIsParseableWithCurrentSolver(formDump);
   }
 
   @Test
@@ -230,7 +247,7 @@ public class SolverFormulaIOTest extends SolverBasedTest0.ParameterizedSolverBas
 
     String formDump = mgr.dumpFormula(valComp5).toString();
     checkThatAssertIsInLastLine(formDump);
-    checkThatDumpIsParseable(formDump);
+    checkThatDumpIsParseableWithCurrentSolver(formDump);
   }
 
   @Test
@@ -245,7 +262,7 @@ public class SolverFormulaIOTest extends SolverBasedTest0.ParameterizedSolverBas
     // check that int variable is declared correctly + necessary assert that has to be there
     assertThat(formDump).contains("(declare-fun a () Int)");
     checkThatAssertIsInLastLine(formDump);
-    checkThatDumpIsParseable(formDump);
+    checkThatDumpIsParseableWithCurrentSolver(formDump);
   }
 
   @Test
@@ -261,7 +278,7 @@ public class SolverFormulaIOTest extends SolverBasedTest0.ParameterizedSolverBas
     // check that int variable is declared correctly + necessary assert that has to be there
     checkVariableIsDeclared(formDump, "a", "(_ BitVec 8)");
     checkThatAssertIsInLastLine(formDump);
-    checkThatDumpIsParseable(formDump);
+    checkThatDumpIsParseableWithCurrentSolver(formDump);
   }
 
   @Test
@@ -280,7 +297,7 @@ public class SolverFormulaIOTest extends SolverBasedTest0.ParameterizedSolverBas
     // check that function is dumped correctly + necessary assert that has to be there
     assertThat(formDump).contains("(declare-fun fun_a (Int Int) Int)");
     checkThatAssertIsInLastLine(formDump);
-    checkThatDumpIsParseable(formDump);
+    checkThatDumpIsParseableWithCurrentSolver(formDump);
   }
 
   @Test
@@ -409,7 +426,7 @@ public class SolverFormulaIOTest extends SolverBasedTest0.ParameterizedSolverBas
     // check if dumped formula fits our specification
     checkThatFunOnlyDeclaredOnce(formDump, ImmutableSet.of("fun_a", "fun_b"));
     checkThatAssertIsInLastLine(formDump);
-    checkThatDumpIsParseable(formDump);
+    checkThatDumpIsParseableWithCurrentSolver(formDump);
   }
 
   @Test
@@ -429,7 +446,7 @@ public class SolverFormulaIOTest extends SolverBasedTest0.ParameterizedSolverBas
     // check if dumped formula fits our specification
     checkThatFunOnlyDeclaredOnce(formDump, ImmutableSet.of("fun_a"));
     checkThatAssertIsInLastLine(formDump);
-    checkThatDumpIsParseable(formDump);
+    checkThatDumpIsParseableWithCurrentSolver(formDump);
   }
 
   @Test
@@ -452,7 +469,114 @@ public class SolverFormulaIOTest extends SolverBasedTest0.ParameterizedSolverBas
     // check if dumped formula fits our specification
     checkThatFunOnlyDeclaredOnce(formDump, ImmutableSet.of("idx", "arr"));
     checkThatAssertIsInLastLine(formDump);
-    checkThatDumpIsParseable(formDump);
+    checkThatDumpIsParseableWithCurrentSolver(formDump);
+  }
+
+  // Tests that the output of the SMTLIB2 dump of the 2 versions of toIeeeBitvector() are
+  // distinct and that the correct SMTLIB2 keywords are used
+  @Test
+  public void floatingPointToIeeeBvSMTLIB2DumpTest() {
+    requireFloats();
+    requireBitvectors();
+
+    FloatingPointType fpType = getSinglePrecisionFloatingPointType();
+    FloatingPointFormula fp = fpmgr.makeVariable("fp", fpType);
+    BitvectorFormula someOtherBv = bvmgr.makeVariable(fpType.getTotalSize(), "someOtherBv");
+    BitvectorFormula bvFromFpFallback =
+        bvmgr.makeVariable(fpType.getTotalSize(), "bvFromFpFallback");
+    BooleanFormula fpToBvFallbackConstraint = fpmgr.toIeeeBitvector(fp, bvFromFpFallback);
+
+    String fallbackDump =
+        mgr.dumpFormula(
+                bmgr.and(fpToBvFallbackConstraint, bvmgr.equal(bvFromFpFallback, someOtherBv)))
+            .toString();
+    assertThat(fallbackDump).contains("((_ to_fp 8 24) bvFromFpFallback)");
+    assertThat(fallbackDump).doesNotContain("to_ieee_bv");
+
+    requireNativeFPToBitvector();
+    BitvectorFormula bvFromFpNative = fpmgr.toIeeeBitvector(fp);
+
+    String nativeDump = mgr.dumpFormula(bvmgr.equal(bvFromFpNative, someOtherBv)).toString();
+    if (solverToUse() == Solvers.MATHSAT5) {
+      // MathSAT5 does not stick to the standards naming here. But to be fair, the standard says
+      // that this method is not a good idea and our "fallback" (i.e. output fallbackDump) is
+      // preferred.
+      assertThat(nativeDump).contains("fp.as_ieee_bv");
+    } else {
+      assertThat(nativeDump).contains("fp.to_ieee_bv");
+    }
+    assertThat(nativeDump).doesNotContain("to_fp");
+  }
+
+  // Tests that the output of the SMTLIB2 dump of our versions of toIeeeBitvector() is always
+  // parseable
+  @Test
+  public void fallbackFloatingPointToIeeeBvSMTLIB2DumpParseTest() {
+    requireFloats();
+    requireBitvectors();
+
+    FloatingPointType fpType = getSinglePrecisionFloatingPointType();
+    FloatingPointFormula fpVar = fpmgr.makeVariable("fpVar", fpType);
+    BitvectorFormula someOtherBv = bvmgr.makeVariable(fpType.getTotalSize(), "someOtherBv");
+    BitvectorFormula bvFromFpFallback =
+        bvmgr.makeVariable(fpType.getTotalSize(), "bvFromFpFallback");
+    BooleanFormula fpToBvFallbackConstraint = fpmgr.toIeeeBitvector(fpVar, bvFromFpFallback);
+
+    String fallbackDump =
+        mgr.dumpFormula(
+                bmgr.and(fpToBvFallbackConstraint, bvmgr.equal(bvFromFpFallback, someOtherBv)))
+            .toString();
+    checkThatDumpIsParseableWithCurrentSolver(fallbackDump);
+  }
+
+  // Tests the parseability of the output of the SMTLIB2 dump of the native version of the
+  // toIeeeBitvector() method
+  @Test
+  public void nativeFloatingPointToIeeeBvSMTLIB2DumpParseTest() {
+    requireFloats();
+    requireBitvectors();
+    requireNativeFPToBitvector();
+
+    FloatingPointType fpType = getSinglePrecisionFloatingPointType();
+    FloatingPointFormula fpVar = fpmgr.makeVariable("fpVar", fpType);
+    BitvectorFormula someOtherBv = bvmgr.makeVariable(fpType.getTotalSize(), "someOtherBv");
+    BitvectorFormula bvFromFpNative = fpmgr.toIeeeBitvector(fpVar);
+
+    String nativeDump = mgr.dumpFormula(bvmgr.equal(bvFromFpNative, someOtherBv)).toString();
+    System.out.println(nativeDump);
+    checkThatDumpIsParseableWithCurrentSolver(nativeDump);
+  }
+
+  // Tests the parseability of the output of the SMTLIB2 dump of the native version of the
+  // toIeeeBitvector() method from Z3
+  @Test
+  public void nativeFloatingPointToIeeeBvSMTLIB2DumpFromZ3ParseTest() {
+    requireFloats();
+    requireBitvectors();
+
+    if (ImmutableSet.of(Solvers.Z3, Solvers.CVC4).contains(solverToUse())) {
+      checkThatDumpIsParseableWithCurrentSolver(TO_IEEE_BV_DUMP_Z3);
+    } else {
+      assertThrows(
+          IllegalArgumentException.class,
+          () -> checkThatDumpIsParseableWithCurrentSolver(TO_IEEE_BV_DUMP_Z3));
+    }
+  }
+
+  // Tests the parseability of the output of the SMTLIB2 dump of the native version of the
+  // toIeeeBitvector() method from MathSAT5
+  @Test
+  public void nativeFloatingPointToIeeeBvSMTLIB2DumpFromMathSAT5ParseTest() {
+    requireFloats();
+    requireBitvectors();
+
+    if (ImmutableSet.of(Solvers.MATHSAT5, Solvers.CVC4).contains(solverToUse())) {
+      checkThatDumpIsParseableWithCurrentSolver(TO_IEEE_BV_DUMP_MATHSAT5);
+    } else {
+      assertThrows(
+          IllegalArgumentException.class,
+          () -> checkThatDumpIsParseableWithCurrentSolver(TO_IEEE_BV_DUMP_MATHSAT5));
+    }
   }
 
   private void compareParseWithOrgExprFirst(
@@ -525,7 +649,7 @@ public class SolverFormulaIOTest extends SolverBasedTest0.ParameterizedSolverBas
   }
 
   @SuppressWarnings("CheckReturnValue")
-  private void checkThatDumpIsParseable(String dump) {
+  private void checkThatDumpIsParseableWithCurrentSolver(String dump) {
     try {
       requireParser();
       mgr.parse(dump);

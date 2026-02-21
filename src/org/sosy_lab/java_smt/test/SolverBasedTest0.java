@@ -257,15 +257,31 @@ public abstract class SolverBasedTest0 {
   }
 
   @SuppressWarnings("CheckReturnValue")
-  protected final void requireFPToBitvector() {
+  protected final void requireNativeFPToBitvector() {
     requireFloats();
     try {
       fpmgr.toIeeeBitvector(fpmgr.makeNumber(0, getSinglePrecisionFloatingPointType()));
     } catch (UnsupportedOperationException e) {
       assume()
-          .withMessage("Solver %s does not yet support FP-to-BV conversion", solverToUse())
+          .withMessage(
+              "Solver %s does not support FP-to-BV conversion, use the fallback methods "
+                  + "FloatingPointFormulaManager#toIeeeBitvector(FloatingPointFormula, "
+                  + "String, Map) and/or FloatingPointFormulaManager#toIeeeBitvector"
+                  + "(FloatingPointFormula, String).",
+              solverToUse())
           .that(solverToUse())
           .isNull();
+    }
+  }
+
+  @SuppressWarnings("CheckReturnValue")
+  protected final boolean solverSupportsNativeFPToBitvector() {
+    requireFloats();
+    try {
+      fpmgr.toIeeeBitvector(fpmgr.makeNumber(0, getSinglePrecisionFloatingPointType()));
+      return true;
+    } catch (UnsupportedOperationException e) {
+      return false;
     }
   }
 
