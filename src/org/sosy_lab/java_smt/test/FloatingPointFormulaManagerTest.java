@@ -844,7 +844,25 @@ public class FloatingPointFormulaManagerTest
         try (Model model = prover.getModel()) {
           FloatingPointNumber fpValue = model.evaluate(someFP);
           String fpAsString = fpValue.toString();
-          assertThat(fpAsString).isEqualTo(specialFpNumAsBv);
+
+          // 0.0 and -0.0 are equal for FP equality, hence a solver might return any
+          switch (solver) {
+            case Z3:
+            case Z3_WITH_INTERPOLATION:
+              if (specialFpNumAsBv.equals(SINGLE_PRECISION_POSITIVE_ZERO_BITWISE)) {
+                assertThat(fpAsString).isEqualTo(SINGLE_PRECISION_NEGATIVE_ZERO_BITWISE);
+                break;
+              }
+              //$FALL-THROUGH$
+            case MATHSAT5:
+              if (specialFpNumAsBv.equals(SINGLE_PRECISION_NEGATIVE_ZERO_BITWISE)) {
+                assertThat(fpAsString).isEqualTo(SINGLE_PRECISION_POSITIVE_ZERO_BITWISE);
+                break;
+              }
+              //$FALL-THROUGH$
+            default:
+              assertThat(fpAsString).isEqualTo(specialFpNumAsBv);
+          }
         }
       }
     }
