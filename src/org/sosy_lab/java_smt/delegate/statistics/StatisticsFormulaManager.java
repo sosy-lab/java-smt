@@ -146,6 +146,11 @@ class StatisticsFormulaManager implements FormulaManager {
   }
 
   @Override
+  public List<BooleanFormula> parseAll(String pS) throws IllegalArgumentException {
+    return delegate.parseAll(pS);
+  }
+
+  @Override
   public Appender dumpFormula(BooleanFormula pT) {
     return new Appenders.AbstractAppender() {
       @Override

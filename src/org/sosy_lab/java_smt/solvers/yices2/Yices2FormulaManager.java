@@ -89,9 +89,9 @@ public class Yices2FormulaManager extends AbstractFormulaManager<Integer, Intege
   }
 
   @Override
-  public Integer parseImpl(String pS) throws IllegalArgumentException {
+  protected Integer parseImpl(String pSmtScript) throws IllegalArgumentException {
     // TODO Might expect Yices input language instead of smt-lib2 notation
-    return yices_parse_term(pS);
+    return yices_parse_term(pSmtScript);
   }
 
   /** Helper function to (pretty) print yices2 sorts. */

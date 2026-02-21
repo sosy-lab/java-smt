@@ -78,7 +78,7 @@ final class Z3FormulaManager extends AbstractFormulaManager<Long, Long, Long, Lo
   }
 
   @Override
-  public Long parseImpl(String str) throws IllegalArgumentException {
+  protected List<Long> parseAllImpl(String pSmtScript) throws IllegalArgumentException {
 
     // Z3 does not access the existing symbols on its own,
     // but requires all symbols as part of the query.
@@ -96,14 +96,14 @@ final class Z3FormulaManager extends AbstractFormulaManager<Long, Long, Long, Lo
     List<Long> declSymbols = new ArrayList<>();
     List<Long> decls = new ArrayList<>();
 
-    long e = 0;
+    long parsedAssertionsAsVector = 0;
     boolean finished = false;
     while (!finished) {
       try {
-        e =
+        parsedAssertionsAsVector =
             Native.parseSmtlib2String(
                 env,
-                str,
+                pSmtScript,
                 sorts.length,
                 sortSymbols,
                 sorts,
@@ -132,16 +132,18 @@ final class Z3FormulaManager extends AbstractFormulaManager<Long, Long, Long, Lo
       }
     }
 
-    Preconditions.checkState(e != 0, "parsing aborted");
-    final int size = Native.astVectorSize(env, e);
-    Preconditions.checkArgument(
-        size == 1, "parsing expects exactly one asserted term, but got %s terms", size);
-    final long term = Native.astVectorGet(env, e, 0);
+    Preconditions.checkState(parsedAssertionsAsVector != 0, "parsing aborted");
+    final int size = Native.astVectorSize(env, parsedAssertionsAsVector);
+    ImmutableList.Builder<Long> result = ImmutableList.builder();
+    for (int i = 0; i < size; i++) {
+      long term = Native.astVectorGet(env, parsedAssertionsAsVector, i);
+      // last step: all parsed symbols need to be declared again to have them tracked in the
+      // creator.
+      declareAllSymbols(term);
+      result.add(term);
+    }
 
-    // last step: all parsed symbols need to be declared again to have them tracked in the creator.
-    declareAllSymbols(term);
-
-    return term;
+    return result.build();
   }
 
   @SuppressWarnings("CheckReturnValue")
