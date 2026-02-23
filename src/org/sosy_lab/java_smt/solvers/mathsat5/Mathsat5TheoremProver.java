@@ -8,6 +8,7 @@
 
 package org.sosy_lab.java_smt.solvers.mathsat5;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5FormulaManager.getMsatTerm;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_assert_formula;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_destroy_proof_manager;
@@ -129,7 +130,7 @@ class Mathsat5TheoremProver extends Mathsat5AbstractProver<Void> implements Prov
 
         if (node.getRule().isPresent()) {
           // Check if this node is a RES_CHAIN, process if true
-          if (node.getRule().get().equals(Rule.RES_CHAIN)) {
+          if (node.getRule().orElseThrow().equals(Rule.RES_CHAIN)) {
             processResChain(node, pBfmgr); // Process RES_CHAIN node
           }
         }
@@ -143,12 +144,11 @@ class Mathsat5TheoremProver extends Mathsat5AbstractProver<Void> implements Prov
     ImmutableList<ProofNode> children = ImmutableList.copyOf(childrenSet);
 
     // If the current node is a RES_CHAIN, compute the resolved formula
-    if (pNode.getRule().get().equals(Rule.RES_CHAIN)) {
+    if (pNode.getRule().orElseThrow().equals(Rule.RES_CHAIN)) {
       // Sanity check: res-chain nodes must have an odd number of children (clause, pivot, clause,
       // ..., clause)
-      if (children.size() < 3 || children.size() % 2 == 0) {
-        throw new IllegalArgumentException("Invalid res-chain structure: must be odd and >= 3");
-      }
+      checkArgument(children.size() >= 3 && children.size() % 2 != 0, "Invalid res-chain "
+          + "structure: must be odd and >= 3");
 
       // Begin resolution chain: start with the first clause
       BooleanFormula current = (BooleanFormula) children.get(0).getFormula().orElseThrow();
