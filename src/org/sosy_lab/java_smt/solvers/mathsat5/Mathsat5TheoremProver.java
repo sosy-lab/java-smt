@@ -147,8 +147,9 @@ class Mathsat5TheoremProver extends Mathsat5AbstractProver<Void> implements Prov
     if (pNode.getRule().orElseThrow().equals(Rule.RES_CHAIN)) {
       // Sanity check: res-chain nodes must have an odd number of children (clause, pivot, clause,
       // ..., clause)
-      checkArgument(children.size() >= 3 && children.size() % 2 != 0, "Invalid res-chain "
-          + "structure: must be odd and >= 3");
+      checkArgument(
+          children.size() >= 3 && children.size() % 2 != 0,
+          "Invalid res-chain " + "structure: must be odd and >= 3");
 
       // Begin resolution chain: start with the first clause
       BooleanFormula current = (BooleanFormula) children.get(0).getFormula().orElseThrow();
