@@ -45,6 +45,8 @@ import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.api.proofs.ProofNode;
 import org.sosy_lab.java_smt.api.proofs.ProofRule;
+import org.sosy_lab.java_smt.api.proofs.Z3ProofRuleExtension;
+import org.sosy_lab.java_smt.api.proofs.Z3ProofRuleParameter;
 
 public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
 
@@ -549,6 +551,30 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
     }
   }
 
+  // This query produces a proof containing a theory lemma proof rule with parameters for Z3, it
+  // helps verify the parameters are being created and retrieved properly in this case.
+  @Test
+  public void arithmeticQueryTest() throws InterruptedException, SolverException {
+    assume().that(solverToUse()).isAnyOf(CVC5, MATHSAT5, Z3);
+    requireProofGeneration(); // Ensures proofs are supported
+
+    IntegerFormula x = imgr.makeVariable("x");
+    IntegerFormula one = imgr.makeNumber("1");
+    IntegerFormula zero = imgr.makeNumber("0");
+
+    try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_PROOFS)) {
+      // UNSAT query: x >= 1 ∧ x <= 0
+      prover.addConstraint(imgr.greaterOrEquals(x, one));
+      prover.addConstraint(imgr.lessOrEquals(x, zero));
+
+      assertThat(prover.isUnsat()).isTrue();
+
+      // Test getProof()
+      ProofNode proofNode = prover.getProof().getProofRoot();
+      verifyProofObjectValidity(proofNode);
+    }
+  }
+
   /**
    * Helper function that tests that every proof has valid information stored (proof rules,
    * formulas, successors).
@@ -573,6 +599,9 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
       if (!solverToUse().equals(MATHSAT5)) {
         assertThat(rule.isPresent()).isTrue();
         assertThat(formula.isPresent()).isTrue();
+        if (solverToUse().equals(Z3)) {
+          verifyZ3ProofRuleParametersValidity(proofNode);
+        }
       }
       assertThat(proofNode.getChildren()).isNotNull();
 
@@ -580,6 +609,18 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
         assertThat(child).isNotNull();
         stack.push(child);
       }
+    }
+  }
+
+  private void verifyZ3ProofRuleParametersValidity(ProofNode pRoot) {
+    ProofRule rule = pRoot.getRule().get();
+    ImmutableList<Z3ProofRuleParameter<?>> parameters =
+        rule.getExtension(Z3ProofRuleExtension.class).get().getParameters();
+    assertThat(parameters).isNotNull();
+
+    for (Z3ProofRuleParameter<?> parameter : parameters) {
+      Object value = parameter.getValue();
+      assertThat(value).isNotNull();
     }
   }
 }
