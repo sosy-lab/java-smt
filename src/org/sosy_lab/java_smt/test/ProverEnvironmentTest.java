@@ -613,9 +613,9 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
   }
 
   private void verifyZ3ProofRuleParametersValidity(ProofNode pRoot) {
-    ProofRule rule = pRoot.getRule().get();
+    ProofRule rule = pRoot.getRule().orElseThrow();
     ImmutableList<Z3ProofRuleParameter<?>> parameters =
-        rule.getExtension(Z3ProofRuleExtension.class).get().getParameters();
+        rule.getExtension(Z3ProofRuleExtension.class).orElseThrow().getParameters();
     assertThat(parameters).isNotNull();
 
     for (Z3ProofRuleParameter<?> parameter : parameters) {
