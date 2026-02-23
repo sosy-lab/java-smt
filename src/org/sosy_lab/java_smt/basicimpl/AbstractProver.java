@@ -94,7 +94,6 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
         generateUnsatCoresOverAssumptions,
         TEMPLATE,
         ProverOptions.GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS);
-    Preconditions.checkState(!wasLastSatCheckSatisfiable);
   }
 
   protected final void checkGenerateInterpolants() {
