@@ -10,7 +10,7 @@ package org.sosy_lab.java_smt.solvers.bitwuzla;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Collections2;
-import java.util.ArrayList;
+import com.google.common.collect.Lists;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -172,14 +172,6 @@ class BitwuzlaTheoremProver extends AbstractProverWithAllSat<Void> implements Pr
     return getEvaluatorWithoutChecks();
   }
 
-  private List<BooleanFormula> getUnsatCore0() {
-    List<BooleanFormula> wrapped = new ArrayList<>();
-    for (Term term : env.get_unsat_core()) {
-      wrapped.add(creator.encapsulateBoolean(term));
-    }
-    return wrapped;
-  }
-
   /**
    * Get an unsat core. This should be called only immediately after an {@link #isUnsat()} call that
    * returned <code>false</code>.
@@ -187,7 +179,7 @@ class BitwuzlaTheoremProver extends AbstractProverWithAllSat<Void> implements Pr
   @Override
   public List<BooleanFormula> getUnsatCore() {
     checkGenerateUnsatCores();
-    return getUnsatCore0();
+    return Lists.transform(env.get_unsat_core(), creator::encapsulateBoolean);
   }
 
   /**
@@ -205,7 +197,9 @@ class BitwuzlaTheoremProver extends AbstractProverWithAllSat<Void> implements Pr
     checkGenerateUnsatCoresOverAssumptions();
     changedSinceLastSatQuery = false;
     boolean sat = !isUnsatWithAssumptions(assumptions);
-    return sat ? Optional.empty() : Optional.of(getUnsatCore0());
+    return sat
+        ? Optional.empty()
+        : Optional.of(Lists.transform(env.get_unsat_assumptions(), creator::encapsulateBoolean));
   }
 
   /**
