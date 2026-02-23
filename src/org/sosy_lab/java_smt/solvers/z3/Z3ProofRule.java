@@ -11,10 +11,13 @@
 package org.sosy_lab.java_smt.solvers.z3;
 
 import com.google.common.collect.ImmutableList;
+import java.util.Optional;
 import org.sosy_lab.java_smt.api.proofs.ProofRule;
+import org.sosy_lab.java_smt.api.proofs.Z3ProofRuleExtension;
+import org.sosy_lab.java_smt.api.proofs.Z3ProofRuleParameter;
 
 /** Proof rules for Z3. These can be found in the Z3 API source code in the file Z3_api.h */
-class Z3ProofRule implements ProofRule {
+class Z3ProofRule implements ProofRule, Z3ProofRuleExtension {
 
   enum Rule implements ProofRule {
     // Undefined proof object
@@ -128,20 +131,21 @@ class Z3ProofRule implements ProofRule {
     }
   }
 
-  static class Parameter<T> {
+  static class Parameter<T> implements Z3ProofRuleParameter<T> {
     private final T value;
 
     Parameter(T pValue) {
       value = pValue;
     }
 
+    @Override
     public T getValue() {
       return value;
     }
   }
 
   private final Rule rule;
-  private final ImmutableList<Parameter<?>> parameters;
+  private final ImmutableList<Z3ProofRuleParameter<?>> parameters;
 
   Z3ProofRule(Rule pRule, ImmutableList<Parameter<?>> pParameters) {
     rule = pRule;
@@ -153,7 +157,16 @@ class Z3ProofRule implements ProofRule {
     return rule.getName();
   }
 
-  public ImmutableList<Parameter<?>> getParameters() {
+  @Override
+  public ImmutableList<Z3ProofRuleParameter<?>> getParameters() {
     return parameters;
+  }
+
+  @Override
+  public <T> Optional<T> getExtension(Class<T> type) {
+    if (type == Z3ProofRuleExtension.class) {
+      return Optional.of(type.cast(this));
+    }
+    return Optional.empty();
   }
 }
