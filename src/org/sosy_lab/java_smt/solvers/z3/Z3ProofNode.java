@@ -33,7 +33,7 @@ import org.sosy_lab.java_smt.solvers.z3.Z3ProofRule.Rule;
 
 public class Z3ProofNode extends AbstractProofNode {
   private static class Frame extends ProofFrame<Long> {
-    protected Frame(Long proof) {
+    Frame(Long proof) {
       super(proof);
     }
   }
