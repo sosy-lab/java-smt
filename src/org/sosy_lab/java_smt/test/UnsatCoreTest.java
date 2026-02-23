@@ -23,8 +23,7 @@ import org.sosy_lab.java_smt.api.SolverException;
 public class UnsatCoreTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   @Test
   public void test_getUnsatCore() throws InterruptedException, SolverException {
-    assume().that(solver).isNotEqualTo(Solvers.BOOLECTOR);
-
+    requireUnsatCore();
     try (var prover = context.newProverEnvironment(ProverOptions.GENERATE_UNSAT_CORE)) {
       var a = bmgr.makeVariable("a");
       var b = bmgr.makeVariable("b");
@@ -38,8 +37,7 @@ public class UnsatCoreTest extends SolverBasedTest0.ParameterizedSolverBasedTest
 
   @Test
   public void test_getUnsatCore_noOption() throws InterruptedException, SolverException {
-    assume().that(solver).isNotEqualTo(Solvers.BOOLECTOR);
-
+    requireUnsatCore();
     try (var prover = context.newProverEnvironment()) {
       var a = bmgr.makeVariable("a");
       var b = bmgr.makeVariable("b");
@@ -53,9 +51,7 @@ public class UnsatCoreTest extends SolverBasedTest0.ParameterizedSolverBasedTest
 
   @Test
   public void test_unsatCoreOverAssumptions() throws InterruptedException, SolverException {
-    assume()
-        .that(solver)
-        .isNoneOf(Solvers.OPENSMT, Solvers.PRINCESS, Solvers.BOOLECTOR, Solvers.CVC4, Solvers.CVC5);
+    requireUnsatCoreOverAssumptions();
     // MathSat and old Z3 only allow literals as assumptions:
     assume().that(solver).isNoneOf(Solvers.MATHSAT5, Solvers.Z3_WITH_INTERPOLATION);
     try (var prover =
@@ -73,9 +69,7 @@ public class UnsatCoreTest extends SolverBasedTest0.ParameterizedSolverBasedTest
   @Test
   public void test_unsatCoreOverAssumptions_onlyLiterals()
       throws InterruptedException, SolverException {
-    assume()
-        .that(solver)
-        .isNoneOf(Solvers.OPENSMT, Solvers.PRINCESS, Solvers.BOOLECTOR, Solvers.CVC4, Solvers.CVC5);
+    requireUnsatCoreOverAssumptions();
     try (var prover =
         context.newProverEnvironment(ProverOptions.GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS)) {
       var a = bmgr.makeVariable("a");
@@ -91,9 +85,7 @@ public class UnsatCoreTest extends SolverBasedTest0.ParameterizedSolverBasedTest
   @Test
   public void test_unsatCoreOverAssumptions_noOption()
       throws InterruptedException, SolverException {
-    assume()
-        .that(solver)
-        .isNoneOf(Solvers.OPENSMT, Solvers.PRINCESS, Solvers.BOOLECTOR, Solvers.CVC4, Solvers.CVC5);
+    requireUnsatCoreOverAssumptions();
     try (var prover = context.newProverEnvironment()) {
       var a = bmgr.makeVariable("a");
       var b = bmgr.makeVariable("b");
