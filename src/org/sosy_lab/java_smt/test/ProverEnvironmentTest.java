@@ -22,6 +22,7 @@ import java.util.Optional;
 import org.junit.Test;
 import org.sosy_lab.java_smt.api.BasicProverEnvironment;
 import org.sosy_lab.java_smt.api.BooleanFormula;
+import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
@@ -94,19 +95,26 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
     }
   }
 
+  private Formula makeNumber(int number) {
+    return imgr == null ? bvmgr.makeBitvector(8, number) : imgr.makeNumber(number);
+  }
+
+  private Formula makeVariable(String name) {
+    return imgr == null ? bvmgr.makeVariable(8, name) : imgr.makeVariable(name);
+  }
+
   private void unsatCoreTest0(BasicProverEnvironment<?> pe)
       throws InterruptedException, SolverException {
-    requireIntegers();
     pe.push();
-    pe.addConstraint(imgr.equal(imgr.makeVariable("x"), imgr.makeNumber(1)));
-    pe.addConstraint(imgr.equal(imgr.makeVariable("x"), imgr.makeNumber(2)));
-    pe.addConstraint(imgr.equal(imgr.makeVariable("y"), imgr.makeNumber(2)));
+    pe.addConstraint(mgr.makeEqual(makeVariable("x"), makeNumber(1)));
+    pe.addConstraint(mgr.makeEqual(makeVariable("x"), makeNumber(2)));
+    pe.addConstraint(mgr.makeEqual(makeVariable("y"), makeNumber(2)));
     assertThat(pe).isUnsatisfiable();
     List<BooleanFormula> unsatCore = pe.getUnsatCore();
     assertThat(unsatCore)
         .containsExactly(
-            imgr.equal(imgr.makeVariable("x"), imgr.makeNumber(2)),
-            imgr.equal(imgr.makeVariable("x"), imgr.makeNumber(1)));
+            mgr.makeEqual(makeVariable("x"), makeNumber(2)),
+            mgr.makeEqual(makeVariable("x"), makeNumber(1)));
   }
 
   @Test
