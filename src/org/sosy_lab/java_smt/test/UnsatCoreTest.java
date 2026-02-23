@@ -61,7 +61,7 @@ public class UnsatCoreTest extends SolverBasedTest0.ParameterizedSolverBasedTest
       assertThat(prover.isUnsat()).isFalse();
       var assumptions = ImmutableSet.of(a, bmgr.not(a), bmgr.xor(a, b));
       assertThat(prover.isUnsatWithAssumptions(assumptions)).isTrue();
-      assertThat(prover.unsatCoreOverAssumptions(assumptions).get())
+      assertThat(prover.unsatCoreOverAssumptions(assumptions).orElseThrow())
           .containsExactly(a, bmgr.not(a));
     }
   }
@@ -78,7 +78,7 @@ public class UnsatCoreTest extends SolverBasedTest0.ParameterizedSolverBasedTest
       assertThat(prover.isUnsat()).isFalse();
       var assumptions = ImmutableSet.of(a, b);
       assertThat(prover.isUnsatWithAssumptions(assumptions)).isTrue();
-      assertThat(prover.unsatCoreOverAssumptions(assumptions).get()).containsExactly(a, b);
+      assertThat(prover.unsatCoreOverAssumptions(assumptions).orElseThrow()).containsExactly(a, b);
     }
   }
 
