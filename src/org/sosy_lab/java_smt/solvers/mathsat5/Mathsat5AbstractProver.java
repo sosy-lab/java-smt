@@ -196,7 +196,7 @@ abstract class Mathsat5AbstractProver<T2> extends AbstractProver<T2> {
   public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(
       Collection<BooleanFormula> assumptions) throws SolverException, InterruptedException {
     Preconditions.checkNotNull(assumptions);
-    closeAllEvaluators();
+    checkGenerateUnsatCoresOverAssumptions();
 
     if (!isUnsatWithAssumptions(assumptions)) {
       return Optional.empty();
