@@ -32,9 +32,9 @@ public interface ProofRule {
   String getName();
 
   /**
-   * Returns an Optional of the extension type passed as argument. Example: For a Z3 {@ProofRule}
-   * there might be parameters present, see {@link Z3ProofRuleParameter}, the interface {@link
-   * Z3ProofRuleExtension} has a method for retrieving these parameters.
+   * Returns an Optional of the extension type passed as argument. Example: For a Z3
+   * {@link ProofRule} there might be parameters present, see {@link Z3ProofRuleParameter}, the
+   * interface {@link Z3ProofRuleExtension} has a method for retrieving these parameters.
    *
    * @param type Class representation of the extension type
    * @return {@link Optional of the extension type}
