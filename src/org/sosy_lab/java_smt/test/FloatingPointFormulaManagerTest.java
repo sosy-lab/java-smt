@@ -853,13 +853,13 @@ public class FloatingPointFormulaManagerTest
                 assertThat(fpAsString).isEqualTo(SINGLE_PRECISION_NEGATIVE_ZERO_BITWISE);
                 break;
               }
-              //$FALL-THROUGH$
+            // $FALL-THROUGH$
             case MATHSAT5:
               if (specialFpNumAsBv.equals(SINGLE_PRECISION_NEGATIVE_ZERO_BITWISE)) {
                 assertThat(fpAsString).isEqualTo(SINGLE_PRECISION_POSITIVE_ZERO_BITWISE);
                 break;
               }
-              //$FALL-THROUGH$
+            // $FALL-THROUGH$
             default:
               assertThat(fpAsString).isEqualTo(specialFpNumAsBv);
           }
