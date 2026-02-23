@@ -10,6 +10,8 @@
 
 package org.sosy_lab.java_smt.api.proofs;
 
+import java.util.Optional;
+
 /**
  * A proof rule from a given proof format. E.g.:
  *
@@ -28,4 +30,18 @@ public interface ProofRule {
 
   /** Get the name of the proof rule. */
   String getName();
+
+  /**
+   * Returns an Optional of the extension type passed as argument. Example: For a Z3 {@ProofRule}
+   * there might be parameters present, see {@link Z3ProofRuleParameter}, the interface {@link
+   * Z3ProofRuleExtension} has a method for retrieving these parameters.
+   *
+   * @param type Class representation of the extension type
+   * @return {@link Optional of the extension type}
+   * @param <T> The extension type
+   */
+  @SuppressWarnings("unused")
+  default <T> Optional<T> getExtension(Class<T> type) {
+    return Optional.empty();
+  }
 }
