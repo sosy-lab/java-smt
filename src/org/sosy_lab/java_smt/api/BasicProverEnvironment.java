@@ -127,14 +127,20 @@ public interface BasicProverEnvironment<T> extends AutoCloseable {
   }
 
   /**
-   * Get an unsat core. This should be called only immediately after an {@link #isUnsat()} call that
-   * returned <code>false</code>.
+   * Get an unsat core.
+   *
+   * <p>This should be called only immediately after an {@link #isUnsat()} call that returned <code>
+   * false</code>. Requires the {@link ProverOptions#GENERATE_UNSAT_CORE} option to work.
    */
   List<BooleanFormula> getUnsatCore();
 
   /**
    * Returns an UNSAT core (if it exists, otherwise {@code Optional.empty()}), over the chosen
-   * assumptions. Does NOT require the {@link ProverOptions#GENERATE_UNSAT_CORE} option to work.
+   * assumptions.
+   *
+   * <p>Requires the {@link ProverOptions#GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS} option to work.
+   * {@link ProverOptions#GENERATE_UNSAT_CORE} is not needed, but both options can be safely
+   * combined.
    *
    * @param assumptions Selected assumptions
    * @return Empty optional if the constraints with assumptions are satisfiable, subset of
