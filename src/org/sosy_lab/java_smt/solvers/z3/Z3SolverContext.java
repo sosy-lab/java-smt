@@ -51,7 +51,6 @@ public final class Z3SolverContext extends AbstractSolverContext {
 
   private static final String OPT_ENGINE_CONFIG_KEY = "optsmt_engine";
   private static final String OPT_PRIORITY_CONFIG_KEY = "priority";
-  private static boolean generateProofs = false; // for debugging
 
   @Options(prefix = "solver.z3")
   private static class ExtraOptions {
@@ -148,7 +147,6 @@ public final class Z3SolverContext extends AbstractSolverContext {
     long cfg = Native.mkConfig();
     if (extraOptions.requireProofs.equals("true")) {
       Native.setParamValue(cfg, "PROOF", "true");
-      generateProofs = true;
     }
     Native.globalParamSet("smt.random_seed", String.valueOf(randomSeed));
     Native.globalParamSet("model.compact", "false");
