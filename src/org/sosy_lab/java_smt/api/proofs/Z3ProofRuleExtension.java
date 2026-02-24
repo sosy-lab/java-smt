@@ -27,7 +27,7 @@ import com.google.common.collect.ImmutableList;
  *
  * <p>- triangle-eq - Indicates a lemma related to the equivalence:
  *
- * <p> {@code (iff (= t1 t2) (and (<= t1 t2) (<= t2 t1)))}
+ * <p>{@code (iff (= t1 t2) (and (<= t1 t2) (<= t2 t1)))}
  *
  * <p>- gcd-test - Indicates an integer linear arithmetic lemma that uses a gcd test.
  *
