@@ -70,7 +70,7 @@ public class Z3ProofNode extends AbstractProofNode {
 
     // proof ast has been converted into Z3Proof
     ImmutableMap<Long, Z3ProofNode> computed = ImmutableMap.of();
-    Map<Long, Z3ProofNode> tempComputed = new LinkedHashMap<>();
+    Map<Long, Z3ProofNode> tempComputed;
 
     stack.push(new Frame(rootProof));
 
@@ -135,6 +135,7 @@ public class Z3ProofNode extends AbstractProofNode {
         Native.decRef(z3context, frame.getProof());
       }
     }
+    assert computed.get(rootProof) != null;
     return computed.get(rootProof);
   }
 
@@ -154,37 +155,34 @@ public class Z3ProofNode extends AbstractProofNode {
       switch (kind) {
         case Z3_PARAMETER_AST:
           long astRef = Native.getDeclAstParameter(z3context, decl, i);
-          parameters.add(new Z3ProofRule.Parameter<>(Native.astToString(z3context, astRef)));
+          parameters.add(new Parameter<>(Native.astToString(z3context, astRef)));
           break;
 
         case Z3_PARAMETER_INT:
-          parameters.add(
-              new Z3ProofRule.Parameter<>(Native.getDeclIntParameter(z3context, decl, i)));
+          parameters.add(new Parameter<>(Native.getDeclIntParameter(z3context, decl, i)));
           break;
 
         case Z3_PARAMETER_RATIONAL:
-          parameters.add(
-              new Z3ProofRule.Parameter<>(Native.getDeclRationalParameter(z3context, decl, i)));
+          parameters.add(new Parameter<>(Native.getDeclRationalParameter(z3context, decl, i)));
           break;
 
         case Z3_PARAMETER_SYMBOL:
           long symRef = Native.getDeclSymbolParameter(z3context, decl, i);
-          parameters.add(new Z3ProofRule.Parameter<>(Native.getSymbolString(z3context, symRef)));
+          parameters.add(new Parameter<>(Native.getSymbolString(z3context, symRef)));
           break;
 
         case Z3_PARAMETER_DOUBLE:
-          parameters.add(
-              new Z3ProofRule.Parameter<>(Native.getDeclDoubleParameter(z3context, decl, i)));
+          parameters.add(new Parameter<>(Native.getDeclDoubleParameter(z3context, decl, i)));
           break;
 
         case Z3_PARAMETER_SORT:
           long sortRef = Native.getDeclSortParameter(z3context, decl, i);
-          parameters.add(new Z3ProofRule.Parameter<>(Native.sortToString(z3context, sortRef)));
+          parameters.add(new Parameter<>(Native.sortToString(z3context, sortRef)));
           break;
 
         case Z3_PARAMETER_FUNC_DECL:
           long funcRef = Native.getDeclFuncDeclParameter(z3context, decl, i);
-          parameters.add(new Z3ProofRule.Parameter<>(Native.funcDeclToString(z3context, funcRef)));
+          parameters.add(new Parameter<>(Native.funcDeclToString(z3context, funcRef)));
           break;
 
         default:
