@@ -34,12 +34,12 @@ class BitwuzlaModel extends AbstractModel<Term, Sort, TermManager> {
 
   // The prover env, not the creator env!
   private final Bitwuzla bitwuzlaEnv;
-  private final BitwuzlaAbstractProver prover;
+  private final BitwuzlaAbstractProver<?> prover;
   private final ImmutableList<ValueAssignment> model;
 
   protected BitwuzlaModel(
       Bitwuzla bitwuzlaEnv,
-      BitwuzlaAbstractProver prover,
+      BitwuzlaAbstractProver<?> prover,
       BitwuzlaFormulaCreator bitwuzlaCreator,
       Collection<Term> assertedTerms) {
     super(prover, bitwuzlaCreator);

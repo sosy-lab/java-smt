@@ -10,21 +10,24 @@ package org.sosy_lab.java_smt.solvers.bitwuzla;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Collections2;
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.ShutdownNotifier;
+import org.sosy_lab.common.UniqueIdGenerator;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Model;
-import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractProverWithAllSat;
 import org.sosy_lab.java_smt.solvers.bitwuzla.api.Bitwuzla;
+import org.sosy_lab.java_smt.solvers.bitwuzla.api.Kind;
 import org.sosy_lab.java_smt.solvers.bitwuzla.api.Option;
 import org.sosy_lab.java_smt.solvers.bitwuzla.api.Options;
 import org.sosy_lab.java_smt.solvers.bitwuzla.api.Result;
@@ -32,7 +35,7 @@ import org.sosy_lab.java_smt.solvers.bitwuzla.api.Term;
 import org.sosy_lab.java_smt.solvers.bitwuzla.api.Terminator;
 import org.sosy_lab.java_smt.solvers.bitwuzla.api.Vector_Term;
 
-class BitwuzlaAbstractProver extends AbstractProverWithAllSat<Void> implements ProverEnvironment {
+abstract class BitwuzlaAbstractProver<T> extends AbstractProverWithAllSat<T> {
   private final Terminator terminator =
       new Terminator() {
         @Override
@@ -40,12 +43,12 @@ class BitwuzlaAbstractProver extends AbstractProverWithAllSat<Void> implements P
           return shutdownNotifier.shouldShutdown(); // shutdownNotifer is defined in the superclass
         }
       };
-  private final Bitwuzla env;
+  private static final UniqueIdGenerator ID_GENERATOR = new UniqueIdGenerator();
 
-  @SuppressWarnings("unused")
-  private final BitwuzlaFormulaManager manager;
+  protected final Map<Integer, Term> stack = new HashMap<>();
 
-  private final BitwuzlaFormulaCreator creator;
+  protected final BitwuzlaFormulaCreator creator;
+  protected final Bitwuzla env;
 
   protected BitwuzlaAbstractProver(
       BitwuzlaFormulaManager pManager,
@@ -54,7 +57,6 @@ class BitwuzlaAbstractProver extends AbstractProverWithAllSat<Void> implements P
       Set<ProverOptions> pOptions,
       Options pSolverOptions) {
     super(pOptions, pManager.getBooleanFormulaManager(), pShutdownNotifier);
-    manager = pManager;
     creator = pCreator;
 
     // Bitwuzla guarantees that Terms and Sorts are shared
@@ -93,14 +95,17 @@ class BitwuzlaAbstractProver extends AbstractProverWithAllSat<Void> implements P
     env.pop(1);
   }
 
-  @Override
-  public @Nullable Void addConstraintImpl(BooleanFormula constraint) throws InterruptedException {
+  @CanIgnoreReturnValue
+  protected int addConstraint0(BooleanFormula constraint) throws InterruptedException {
     Term formula = creator.extractInfo(constraint);
-    env.assert_formula(formula);
     for (Term t : creator.getConstraintsForTerm(formula)) {
-      env.assert_formula(t);
+      formula = creator.getEnv().mk_term(Kind.AND, formula, t);
     }
-    return null;
+    env.assert_formula(formula);
+
+    var label = BitwuzlaAbstractProver.ID_GENERATOR.getFreshId();
+    stack.put(label, formula);
+    return label;
   }
 
   /**
