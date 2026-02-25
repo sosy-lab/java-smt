@@ -43,8 +43,9 @@ public class BitwuzlaInterpolatingProver extends BitwuzlaAbstractProver<Integer>
   }
 
   private static Options enableInterpolation(Options pSolverOptions) {
-    pSolverOptions.set(Option.PRODUCE_INTERPOLANTS, 1);
-    return pSolverOptions;
+    Options newOptions = new Options(pSolverOptions);
+    newOptions.set(Option.PRODUCE_INTERPOLANTS, 1);
+    return newOptions;
   }
 
   @Override
