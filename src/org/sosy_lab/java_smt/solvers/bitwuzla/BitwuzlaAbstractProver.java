@@ -2,7 +2,7 @@
 // an API wrapper for a collection of SMT solvers:
 // https://github.com/sosy-lab/java-smt
 //
-// SPDX-FileCopyrightText: 2023 Dirk Beyer <https://www.sosy-lab.org>
+// SPDX-FileCopyrightText: 2026 Dirk Beyer <https://www.sosy-lab.org>
 //
 // SPDX-License-Identifier: Apache-2.0
 
@@ -12,15 +12,17 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.Lists;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
+import java.util.ArrayDeque;
 import java.util.Collection;
-import java.util.HashMap;
+import java.util.Deque;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.UniqueIdGenerator;
+import org.sosy_lab.common.collect.PathCopyingPersistentTreeMap;
+import org.sosy_lab.common.collect.PersistentMap;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
@@ -45,7 +47,7 @@ abstract class BitwuzlaAbstractProver<T> extends AbstractProverWithAllSat<T> {
       };
   private static final UniqueIdGenerator ID_GENERATOR = new UniqueIdGenerator();
 
-  protected final Map<Integer, Term> stack = new HashMap<>();
+  protected final Deque<PersistentMap<Integer, Term>> stack = new ArrayDeque<>();
 
   protected final BitwuzlaFormulaCreator creator;
   protected final Bitwuzla env;
@@ -64,6 +66,8 @@ abstract class BitwuzlaAbstractProver<T> extends AbstractProverWithAllSat<T> {
 
     // Install shutdown hook
     env.configure_terminator(terminator);
+
+    stack.push(PathCopyingPersistentTreeMap.of());
   }
 
   private Bitwuzla createEnvironment(Set<ProverOptions> pProverOptions, Options pSolverOptions) {
@@ -93,6 +97,7 @@ abstract class BitwuzlaAbstractProver<T> extends AbstractProverWithAllSat<T> {
   @Override
   public void popImpl() {
     env.pop(1);
+    stack.pop();
   }
 
   @CanIgnoreReturnValue
@@ -104,7 +109,7 @@ abstract class BitwuzlaAbstractProver<T> extends AbstractProverWithAllSat<T> {
     env.assert_formula(formula);
 
     var label = BitwuzlaAbstractProver.ID_GENERATOR.getFreshId();
-    stack.put(label, formula);
+    stack.push(stack.pop().putAndCopy(label, formula));
     return label;
   }
 
@@ -118,6 +123,7 @@ abstract class BitwuzlaAbstractProver<T> extends AbstractProverWithAllSat<T> {
   @Override
   public void pushImpl() throws InterruptedException {
     env.push(1);
+    stack.push(stack.peek());
   }
 
   private boolean readSATResult(Result resultValue) throws SolverException, InterruptedException {

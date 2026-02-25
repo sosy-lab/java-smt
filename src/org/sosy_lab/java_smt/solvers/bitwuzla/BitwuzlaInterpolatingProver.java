@@ -54,12 +54,16 @@ public class BitwuzlaInterpolatingProver extends BitwuzlaAbstractProver<Integer>
   public BooleanFormula getInterpolant(Collection<Integer> formulasOfA)
       throws SolverException, InterruptedException {
     checkGenerateInterpolants();
-    checkArgument(stack.keySet().containsAll(formulasOfA));
+    checkArgument(
+        getAssertedConstraintIds().containsAll(formulasOfA),
+        "interpolation can only be done over previously asserted formulas.");
+
+    checkArgument(stack.peek().keySet().containsAll(formulasOfA));
     return creator.encapsulateBoolean(
         formulasOfA.isEmpty()
             ? creator.getEnv().mk_true()
             : env.get_interpolant(
-                new Vector_Term(FluentIterable.from(formulasOfA).transform(stack::get))));
+                new Vector_Term(FluentIterable.from(formulasOfA).transform(stack.peek()::get))));
   }
 
   private List<BooleanFormula> init(List<BooleanFormula> formulas) {
@@ -72,7 +76,7 @@ public class BitwuzlaInterpolatingProver extends BitwuzlaAbstractProver<Integer>
       throws SolverException, InterruptedException {
     checkGenerateInterpolants();
     for (var partition : partitionedFormulas) {
-      checkArgument(stack.keySet().containsAll(partition));
+      checkArgument(stack.peek().keySet().containsAll(partition));
     }
     return init(
         Lists.transform(
@@ -80,7 +84,9 @@ public class BitwuzlaInterpolatingProver extends BitwuzlaAbstractProver<Integer>
                 new Vector_Vector_Term(
                     FluentIterable.from(partitionedFormulas)
                         .transform(
-                            p -> new Vector_Term(FluentIterable.from(p).transform(stack::get))))),
+                            p ->
+                                new Vector_Term(
+                                    FluentIterable.from(p).transform(stack.peek()::get))))),
             creator::encapsulateBoolean));
   }
 
