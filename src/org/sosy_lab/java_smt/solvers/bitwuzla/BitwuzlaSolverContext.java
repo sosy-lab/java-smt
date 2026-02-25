@@ -268,7 +268,7 @@ public final class BitwuzlaSolverContext extends AbstractSolverContext {
   protected ProverEnvironment newProverEnvironment0(Set<ProverOptions> options) {
     Preconditions.checkState(!closed, "solver context is already closed");
 
-    return new BitwuzlaTheoremProver(manager, creator, shutdownNotifier, options, solverOptions);
+    return new BitwuzlaAbstractProver(manager, creator, shutdownNotifier, options, solverOptions);
   }
 
   @Override
