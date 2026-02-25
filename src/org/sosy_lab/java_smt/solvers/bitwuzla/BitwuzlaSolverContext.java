@@ -267,14 +267,14 @@ public final class BitwuzlaSolverContext extends AbstractSolverContext {
   @Override
   protected ProverEnvironment newProverEnvironment0(Set<ProverOptions> options) {
     Preconditions.checkState(!closed, "solver context is already closed");
-
     return new BitwuzlaTheoremProver(manager, creator, shutdownNotifier, options, solverOptions);
   }
 
   @Override
   protected InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation0(
       Set<ProverOptions> pF) {
-    throw new UnsupportedOperationException("Bitwuzla does not support interpolation");
+    Preconditions.checkState(!closed, "solver context is already closed");
+    return new BitwuzlaInterpolatingProver(manager, creator, shutdownNotifier, pF, solverOptions);
   }
 
   @Override
