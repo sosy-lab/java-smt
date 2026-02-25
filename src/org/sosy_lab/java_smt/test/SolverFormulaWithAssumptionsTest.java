@@ -33,16 +33,6 @@ public class SolverFormulaWithAssumptionsTest
     return Logics.QF_LIA;
   }
 
-  private static final int BITSIZE = 32;
-
-  private Formula makeVariable(String name) {
-    return imgr == null ? bvmgr.makeVariable(BITSIZE, name) : imgr.makeVariable(name);
-  }
-
-  private Formula makeNumber(int number) {
-    return imgr == null ? bvmgr.makeBitvector(BITSIZE, number) : imgr.makeNumber(number);
-  }
-
   /**
    * Generate a prover environment depending on the parameter above. Can be overridden to
    * parameterize the test.

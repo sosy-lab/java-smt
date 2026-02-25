@@ -28,7 +28,6 @@ import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
-import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.solvers.cvc5.CVC5BooleanFormulaManager;
 import org.sosy_lab.java_smt.solvers.opensmt.Logics;
@@ -51,56 +50,6 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
   }
 
   private static final UniqueIdGenerator index = new UniqueIdGenerator(); // to get different names
-
-  private static final int BITSIZE = 32;
-
-  private Formula makeVariable(String name) {
-    return imgr == null ? bvmgr.makeVariable(BITSIZE, name) : imgr.makeVariable(name);
-  }
-
-  private Formula makeNumber(int number) {
-    return imgr == null ? bvmgr.makeBitvector(BITSIZE, number) : imgr.makeNumber(number);
-  }
-
-  private Formula addNumber(Formula x, Formula y) {
-    if (x instanceof IntegerFormula && y instanceof IntegerFormula) {
-      return imgr.add((IntegerFormula) x, (IntegerFormula) y);
-    }
-    if (x instanceof BitvectorFormula && y instanceof BitvectorFormula) {
-      return bvmgr.add((BitvectorFormula) x, (BitvectorFormula) y);
-    }
-    throw new IllegalArgumentException();
-  }
-
-  private Formula multiplyNumber(Formula x, Formula y) {
-    if (x instanceof IntegerFormula && y instanceof IntegerFormula) {
-      return imgr.multiply((IntegerFormula) x, (IntegerFormula) y);
-    }
-    if (x instanceof BitvectorFormula && y instanceof BitvectorFormula) {
-      return bvmgr.multiply((BitvectorFormula) x, (BitvectorFormula) y);
-    }
-    throw new IllegalArgumentException();
-  }
-
-  private BooleanFormula lessThanNumber(Formula x, Formula y) {
-    if (x instanceof IntegerFormula && y instanceof IntegerFormula) {
-      return imgr.lessThan((IntegerFormula) x, (IntegerFormula) y);
-    }
-    if (x instanceof BitvectorFormula && y instanceof BitvectorFormula) {
-      return bvmgr.lessThan((BitvectorFormula) x, (BitvectorFormula) y, true);
-    }
-    throw new IllegalArgumentException();
-  }
-
-  private BooleanFormula greaterThanNumber(Formula x, Formula y) {
-    if (x instanceof IntegerFormula && y instanceof IntegerFormula) {
-      return imgr.greaterThan((IntegerFormula) x, (IntegerFormula) y);
-    }
-    if (x instanceof BitvectorFormula && y instanceof BitvectorFormula) {
-      return bvmgr.greaterThan((BitvectorFormula) x, (BitvectorFormula) y, true);
-    }
-    throw new IllegalArgumentException();
-  }
 
   @Test
   @SuppressWarnings("CheckReturnValue")
