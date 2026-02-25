@@ -11,9 +11,12 @@
 package org.sosy_lab.java_smt.solvers.bitwuzla;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkState;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.FluentIterable;
-import com.google.common.collect.Lists;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Iterables;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
@@ -57,8 +60,8 @@ public class BitwuzlaInterpolatingProver extends BitwuzlaAbstractProver<Integer>
     checkArgument(
         getAssertedConstraintIds().containsAll(formulasOfA),
         "interpolation can only be done over previously asserted formulas.");
-
     checkArgument(stack.peek().keySet().containsAll(formulasOfA));
+
     return creator.encapsulateBoolean(
         formulasOfA.isEmpty()
             ? creator.getEnv().mk_true()
@@ -66,28 +69,34 @@ public class BitwuzlaInterpolatingProver extends BitwuzlaAbstractProver<Integer>
                 new Vector_Term(FluentIterable.from(formulasOfA).transform(stack.peek()::get))));
   }
 
-  private List<BooleanFormula> init(List<BooleanFormula> formulas) {
-    return formulas.subList(0, formulas.size() - 1);
-  }
-
   @Override
   public List<BooleanFormula> getSeqInterpolants(
       List<? extends Collection<Integer>> partitionedFormulas)
       throws SolverException, InterruptedException {
     checkGenerateInterpolants();
+    Preconditions.checkArgument(
+        !partitionedFormulas.isEmpty(), "at least one partition should be available.");
+    final ImmutableSet<Integer> assertedConstraintIds = getAssertedConstraintIds();
+    checkArgument(
+        partitionedFormulas.stream().allMatch(assertedConstraintIds::containsAll),
+        "interpolation can only be done over previously asserted formulas.");
     for (var partition : partitionedFormulas) {
       checkArgument(stack.peek().keySet().containsAll(partition));
     }
-    return init(
-        Lists.transform(
-            env.get_interpolants(
-                new Vector_Vector_Term(
-                    FluentIterable.from(partitionedFormulas)
-                        .transform(
-                            p ->
-                                new Vector_Term(
-                                    FluentIterable.from(p).transform(stack.peek()::get))))),
-            creator::encapsulateBoolean));
+
+    Vector_Vector_Term partitions =
+        new Vector_Vector_Term(
+            FluentIterable.from(partitionedFormulas)
+                .transform(
+                    p -> new Vector_Term(FluentIterable.from(p).transform(stack.peek()::get))));
+    Vector_Term itps = env.get_interpolants(partitions);
+    checkState(
+        creator.getEnv().mk_false().equals(Iterables.getLast(itps)),
+        "the last interpolant should be false");
+    return FluentIterable.from(itps)
+        .limit(itps.size() - 1) // ignore the last interpolant, which is always "false"
+        .transform(creator::encapsulateBoolean)
+        .toList();
   }
 
   @Override
