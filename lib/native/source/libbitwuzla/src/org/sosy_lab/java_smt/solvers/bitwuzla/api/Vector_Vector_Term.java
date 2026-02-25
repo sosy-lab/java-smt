@@ -8,41 +8,31 @@
 
 package org.sosy_lab.java_smt.solvers.bitwuzla.api;
 
-public class Vector_Vector_Term extends java.util.AbstractList<Vector_Term> implements java.util.RandomAccess {
+public class Vector_Vector_Term extends java.util.AbstractList<Vector_Term> implements java.util.RandomAccess, Reference {
   private transient long swigCPtr;
   protected transient boolean swigCMemOwn;
 
   protected Vector_Vector_Term(long cPtr, boolean cMemoryOwn) {
     swigCMemOwn = cMemoryOwn;
     swigCPtr = cPtr;
+    TermManager.addReference(this);
   }
 
   protected static long getCPtr(Vector_Vector_Term obj) {
     return (obj == null) ? 0 : obj.swigCPtr;
   }
 
-  protected static long swigRelease(Vector_Vector_Term obj) {
-    long ptr = 0;
-    if (obj != null) {
-      if (!obj.swigCMemOwn)
-        throw new RuntimeException("Cannot release ownership as memory is not owned");
-      ptr = obj.swigCPtr;
-      obj.swigCMemOwn = false;
-      obj.delete();
-    }
-    return ptr;
+  void deleteCPtr() {
+    BitwuzlaNativeJNI.delete_Vector_Vector_Term(swigCPtr);
   }
 
-  @SuppressWarnings({"deprecation", "removal"})
-  protected void finalize() {
-    delete();
-  }
-
-  public synchronized void delete() {
+  @Override
+  public synchronized void close() {
     if (swigCPtr != 0) {
+      TermManager.removeReference(this);
       if (swigCMemOwn) {
         swigCMemOwn = false;
-        BitwuzlaNativeJNI.delete_Vector_Vector_Term(swigCPtr);
+        deleteCPtr();
       }
       swigCPtr = 0;
     }
