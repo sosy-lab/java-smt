@@ -1560,6 +1560,12 @@ public class FloatingPointFormulaManagerTest
         .withMessage("MathSAT5 does not support floating-point interpolation")
         .that(solver)
         .isNotEqualTo(Solvers.MATHSAT5);
+    assume()
+        .withMessage(
+            "Bitwuzla uses internal symbols in fp interpolants that cause problems for "
+                + "this test")
+        .that(solver)
+        .isNotEqualTo(Solvers.BITWUZLA);
 
     FloatingPointFormula var = fpmgr.makeVariable("x", singlePrecType);
     BooleanFormula f1 = fpmgr.equalWithFPSemantics(var, zero);
