@@ -182,6 +182,14 @@ public class DebuggingFormulaManager implements FormulaManager {
   }
 
   @Override
+  public List<BooleanFormula> parseAll(String s) throws IllegalArgumentException {
+    debugging.assertThreadLocal();
+    List<BooleanFormula> results = delegate.parseAll(s);
+    results.forEach(debugging::addFormulaTerm);
+    return results;
+  }
+
+  @Override
   public Appender dumpFormula(BooleanFormula pT) {
     debugging.assertThreadLocal();
     debugging.assertFormulaInContext(pT);

@@ -22,6 +22,7 @@ import io.github.cvc5.Term;
 import io.github.cvc5.TermManager;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import org.sosy_lab.java_smt.api.Formula;
@@ -91,8 +92,8 @@ class CVC5FormulaManager extends AbstractFormulaManager<Term, Sort, TermManager,
   }
 
   @Override
-  public Term parseImpl(String smtQuery) throws IllegalArgumentException {
-    return new CVC5Parser(creator, this).parse(smtQuery);
+  protected List<Term> parseAllImpl(String smtQuery) throws IllegalArgumentException {
+    return new CVC5Parser(creator, this).parseAll(smtQuery);
   }
 
   @Override

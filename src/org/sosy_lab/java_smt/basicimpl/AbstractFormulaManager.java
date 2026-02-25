@@ -13,6 +13,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.CharMatcher;
+import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableBiMap;
@@ -20,13 +21,16 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
+import com.google.errorprone.annotations.ForOverride;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.Appender;
 import org.sosy_lab.common.Appenders;
+import org.sosy_lab.common.collect.Collections3;
 import org.sosy_lab.java_smt.api.ArrayFormulaManager;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.EnumerationFormulaManager;
@@ -354,7 +358,31 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
     return result;
   }
 
-  protected abstract TFormulaInfo parseImpl(String formulaStr) throws IllegalArgumentException;
+  @SuppressWarnings("unused")
+  protected TFormulaInfo parseImpl(String formulaStr) throws IllegalArgumentException {
+    throw new UnsupportedOperationException(
+        "parseImpl(String) must be implemented in a subclass, if required.");
+  }
+
+  @ForOverride
+  protected List<TFormulaInfo> parseAllImpl(String formulaStr) throws IllegalArgumentException {
+    // The fallback implementation splits the input into declarations and assertions,
+    // and parses each assertion separately,
+    // which is not very efficient, but it works for simple cases and is better than nothing
+    List<String> tokens = Tokenizer.tokenize(formulaStr);
+
+    List<String> declarationTokens =
+        tokens.stream().filter(Tokenizer::isDeclarationToken).collect(Collectors.toList());
+    List<String> definitionTokens =
+        tokens.stream().filter(Tokenizer::isDefinitionToken).collect(Collectors.toList());
+    List<String> assertTokens =
+        tokens.stream().filter(Tokenizer::isAssertToken).collect(Collectors.toList());
+    String definitions =
+        Joiner.on("").join(declarationTokens) + Joiner.on("").join(definitionTokens);
+
+    return Collections3.transformedImmutableListCopy(
+        assertTokens, assertion -> parseImpl(definitions + assertion));
+  }
 
   /**
    * Takes an SMT-LIB2 script and cleans it up.
@@ -408,7 +436,7 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
             String.format("SMTLIB command '%s' is not supported when parsing formulas.", message));
 
       } else {
-        // Remove everything else
+        // Remove everything else, such as unknown or solver-specific commands, comments, etc.
       }
       pos++;
     }
@@ -416,8 +444,10 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
   }
 
   @Override
-  public BooleanFormula parse(String formulaStr) throws IllegalArgumentException {
-    return formulaCreator.encapsulateBoolean(parseImpl(sanitize(formulaStr)));
+  public List<BooleanFormula> parseAll(String formulaStr) throws IllegalArgumentException {
+    return parseAllImpl(sanitize(formulaStr)).stream()
+        .map(formulaCreator::encapsulateBoolean)
+        .collect(Collectors.toList());
   }
 
   protected abstract String dumpFormulaImpl(TFormulaInfo t) throws IOException;
