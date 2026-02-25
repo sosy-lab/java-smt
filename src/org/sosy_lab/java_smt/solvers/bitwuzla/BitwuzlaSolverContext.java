@@ -299,7 +299,7 @@ public final class BitwuzlaSolverContext extends AbstractSolverContext {
    */
   @Override
   protected boolean supportsAssumptionSolving() {
-    return true;
+    return false;
   }
 
   /**

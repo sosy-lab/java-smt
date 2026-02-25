@@ -10,8 +10,8 @@ package org.sosy_lab.java_smt.solvers.bitwuzla;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Collections2;
+import com.google.common.collect.Lists;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
@@ -96,7 +96,7 @@ abstract class BitwuzlaAbstractProver<T> extends AbstractProverWithAllSat<T> {
   }
 
   @CanIgnoreReturnValue
-  protected int addConstraint0(BooleanFormula constraint) throws InterruptedException {
+  protected int addConstraint0(BooleanFormula constraint) {
     Term formula = creator.extractInfo(constraint);
     for (Term t : creator.getConstraintsForTerm(formula)) {
       formula = creator.getEnv().mk_term(Kind.AND, formula, t);
@@ -144,19 +144,8 @@ abstract class BitwuzlaAbstractProver<T> extends AbstractProverWithAllSat<T> {
    * @param assumptions A list of literals.
    */
   @Override
-  public boolean isUnsatWithAssumptions(Collection<BooleanFormula> assumptions)
-      throws SolverException, InterruptedException {
-    Preconditions.checkState(!closed);
-
-    Collection<Term> newAssumptions = new LinkedHashSet<>();
-    for (BooleanFormula formula : assumptions) {
-      Term term = creator.extractInfo(formula);
-      newAssumptions.add(term);
-      newAssumptions.addAll(creator.getConstraintsForTerm(term));
-    }
-
-    final Result result = env.check_sat(new Vector_Term(newAssumptions));
-    return readSATResult(result);
+  public boolean isUnsatWithAssumptions(Collection<BooleanFormula> assumptions) {
+    throw new UnsupportedOperationException();
   }
 
   /**
@@ -177,14 +166,6 @@ abstract class BitwuzlaAbstractProver<T> extends AbstractProverWithAllSat<T> {
     return getEvaluatorWithoutChecks();
   }
 
-  private List<BooleanFormula> getUnsatCore0() {
-    List<BooleanFormula> wrapped = new ArrayList<>();
-    for (Term term : env.get_unsat_core()) {
-      wrapped.add(creator.encapsulateBoolean(term));
-    }
-    return wrapped;
-  }
-
   /**
    * Get an unsat core. This should be called only immediately after an {@link #isUnsat()} call that
    * returned <code>false</code>.
@@ -192,7 +173,7 @@ abstract class BitwuzlaAbstractProver<T> extends AbstractProverWithAllSat<T> {
   @Override
   public List<BooleanFormula> getUnsatCore() {
     checkGenerateUnsatCores();
-    return getUnsatCore0();
+    return Lists.transform(env.get_unsat_core(), creator::encapsulateBoolean);
   }
 
   /**
@@ -208,9 +189,20 @@ abstract class BitwuzlaAbstractProver<T> extends AbstractProverWithAllSat<T> {
       Collection<BooleanFormula> assumptions) throws SolverException, InterruptedException {
     Preconditions.checkNotNull(assumptions);
     checkGenerateUnsatCoresOverAssumptions();
-    changedSinceLastSatQuery = false;
-    boolean sat = !isUnsatWithAssumptions(assumptions);
-    return sat ? Optional.empty() : Optional.of(getUnsatCore0());
+
+    changedSinceLastSatQuery = true;
+
+    Collection<Term> newAssumptions = new LinkedHashSet<>();
+    for (BooleanFormula formula : assumptions) {
+      Term term = creator.extractInfo(formula);
+      newAssumptions.add(term);
+      newAssumptions.addAll(creator.getConstraintsForTerm(term));
+    }
+    Result result = env.check_sat(new Vector_Term(newAssumptions));
+
+    return !readSATResult(result)
+        ? Optional.empty()
+        : Optional.of(Lists.transform(env.get_unsat_assumptions(), creator::encapsulateBoolean));
   }
 
   /**
