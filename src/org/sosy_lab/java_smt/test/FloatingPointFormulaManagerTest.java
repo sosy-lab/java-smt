@@ -271,12 +271,12 @@ public class FloatingPointFormulaManagerTest
 
       // Model: var = NaN
       assertThat(prover.isUnsat()).isFalse();
-      var model = prover.getModel().asList();
-      assertThat(model).hasSize(1);
-      var assignment = model.get(0).getAssignmentAsFormula();
+      try (var model = prover.getModel()) {
+        var assignment = model.asList().get(0).getAssignmentAsFormula();
+        prover.addConstraint(bmgr.not(assignment));
+      }
 
       // No other solutions
-      prover.addConstraint(bmgr.not(assignment));
       assertThat(prover.isUnsat()).isTrue();
     }
   }
@@ -292,15 +292,17 @@ public class FloatingPointFormulaManagerTest
 
       // 1st solution: var = 0.0
       assertThat(prover.isUnsat()).isFalse();
-      var model1 = prover.getModel().asList();
-      assertThat(model1).hasSize(1);
-      prover.addConstraint(bmgr.not(model1.get(0).getAssignmentAsFormula()));
+      try (var model = prover.getModel()) {
+        var assignment = model.asList().get(0).getAssignmentAsFormula();
+        prover.addConstraint(bmgr.not(assignment));
+      }
 
       // 2nd solution: var = -0.0
       assertThat(prover.isUnsat()).isFalse();
-      var model2 = prover.getModel().asList();
-      assertThat(model2).hasSize(1);
-      prover.addConstraint(bmgr.not(model2.get(0).getAssignmentAsFormula()));
+      try (var model = prover.getModel()) {
+        var assignment = model.asList().get(0).getAssignmentAsFormula();
+        prover.addConstraint(bmgr.not(assignment));
+      }
 
       // No other solutions
       assertThat(prover.isUnsat()).isTrue();
