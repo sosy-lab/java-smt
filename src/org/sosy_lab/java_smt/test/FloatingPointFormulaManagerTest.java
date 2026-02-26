@@ -261,6 +261,53 @@ public class FloatingPointFormulaManagerTest
   }
 
   @Test
+  public void nanModelAssignment() throws InterruptedException, SolverException {
+    try (var prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
+      // Equation: var = NaN
+      prover.addConstraint(
+          mgr.makeEqual(
+              fpmgr.makeVariable("var", FormulaType.getSinglePrecisionFloatingPointType()),
+              fpmgr.makeNaN(FormulaType.getSinglePrecisionFloatingPointType())));
+
+      // Model: var = NaN
+      assertThat(prover.isUnsat()).isFalse();
+      var model = prover.getModel().asList();
+      assertThat(model).hasSize(1);
+      var assignment = model.get(0).getAssignmentAsFormula();
+
+      // No other solutions
+      prover.addConstraint(bmgr.not(assignment));
+      assertThat(prover.isUnsat()).isTrue();
+    }
+  }
+
+  @Test
+  public void zeroModelAssignment() throws InterruptedException, SolverException {
+    try (var prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
+      // Equation: var =fp 0.0
+      prover.addConstraint(
+          fpmgr.equalWithFPSemantics(
+              fpmgr.makeVariable("var", FormulaType.getSinglePrecisionFloatingPointType()),
+              fpmgr.makeNumber(0, FormulaType.getSinglePrecisionFloatingPointType())));
+
+      // 1st solution: var = 0.0
+      assertThat(prover.isUnsat()).isFalse();
+      var model1 = prover.getModel().asList();
+      assertThat(model1).hasSize(1);
+      prover.addConstraint(bmgr.not(model1.get(0).getAssignmentAsFormula()));
+
+      // 2nd solution: var = -0.0
+      assertThat(prover.isUnsat()).isFalse();
+      var model2 = prover.getModel().asList();
+      assertThat(model2).hasSize(1);
+      prover.addConstraint(bmgr.not(model2.get(0).getAssignmentAsFormula()));
+
+      // No other solutions
+      assertThat(prover.isUnsat()).isTrue();
+    }
+  }
+
+  @Test
   public void nanOrdering() throws SolverException, InterruptedException {
     for (FloatingPointFormula other : new FloatingPointFormula[] {zero, posInf, negInf}) {
       assertThatFormula(fpmgr.greaterThan(nan, other)).isUnsatisfiable();
