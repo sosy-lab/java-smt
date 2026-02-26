@@ -196,6 +196,8 @@ abstract class Mathsat5AbstractProver<T2> extends AbstractProver<T2> {
     Preconditions.checkNotNull(assumptions);
     checkGenerateUnsatCoresOverAssumptions();
 
+    closeAllEvaluators();
+
     if (!isUnsatWithAssumptions(assumptions)) {
       return Optional.empty();
     }
