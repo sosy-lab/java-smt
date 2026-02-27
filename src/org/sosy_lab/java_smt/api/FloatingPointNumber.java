@@ -227,6 +227,8 @@ public abstract class FloatingPointNumber {
       Sign sign, BigInteger exponent, BigInteger mantissa, FloatingPointType floatingPointType) {
     Preconditions.checkArgument(exponent.signum() >= 0, "Exponent must not be negative");
     Preconditions.checkArgument(mantissa.signum() >= 0, "Mantissa must not be negative");
+    // Notice that the values for exponent and mantissa may contain leading zeroes. So their bit
+    // sizes might be smaller than the sizes from the type
     Preconditions.checkArgument(
         exponent.bitLength() <= floatingPointType.getExponentSize(),
         "Exponent is too large for the exponent size");
