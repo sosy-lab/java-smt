@@ -19,6 +19,7 @@ import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Multimap;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -44,7 +45,7 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
 
   // flags for status
   protected boolean closed = false;
-  private boolean wasLastSatCheckSatisfiable = true; // assume SAT for an empty prover
+  protected boolean wasLastSatCheckSatisfiable = true; // assume SAT for an empty prover
   protected boolean changedSinceLastSatQuery = true; // assume changed for an empty prover
 
   private final Set<Evaluator> evaluators = new LinkedHashSet<>();
@@ -213,6 +214,7 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
    * @throws UnsupportedOperationException if optimization is not supported by this prover
    */
   protected OptStatus checkImpl() throws InterruptedException, SolverException {
+    // TODO: Should this also change wasLastSatCheckSatisfiable etc.?
     if (this instanceof OptimizationProverEnvironment) {
       throw new UnsupportedOperationException("checkImpl() must be implemented in a subclass.");
     }
