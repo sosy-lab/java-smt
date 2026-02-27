@@ -151,9 +151,20 @@ class Yices2TheoremProver extends AbstractProverWithAllSat<Void> implements Prov
     Preconditions.checkState(!closed);
     Preconditions.checkNotNull(pAssumptions);
     changedSinceLastSatQuery = false;
+    wasLastSatCheckSatisfiable = false;
+
     // TODO handle BooleanFormulaCollection / check for literals
-    return !yices_check_sat_with_assumptions(
-        curEnv, DEFAULT_PARAMS, pAssumptions.size(), uncapsulate(pAssumptions), shutdownNotifier);
+    final boolean isUnsat =
+        !yices_check_sat_with_assumptions(
+            curEnv,
+            DEFAULT_PARAMS,
+            pAssumptions.size(),
+            uncapsulate(pAssumptions),
+            shutdownNotifier);
+    if (!isUnsat) {
+      wasLastSatCheckSatisfiable = true;
+    }
+    return isUnsat;
   }
 
   @SuppressWarnings("resource")
