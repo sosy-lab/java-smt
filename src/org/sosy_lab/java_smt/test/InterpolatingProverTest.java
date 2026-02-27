@@ -244,6 +244,10 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
   @Test
   public <T> void binaryBVInterpolation1() throws SolverException, InterruptedException {
     requireBitvectors();
+    assume()
+        .withMessage("Solver %s does not support interpolation over bitvectors", solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.Z3_WITH_INTERPOLATION);
 
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
 
@@ -1046,6 +1050,10 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
     requireBitvectors();
     requireInterpolation();
 
+    assume()
+        .withMessage("Solver %s does not support interpolation over bitvectors", solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.Z3_WITH_INTERPOLATION);
     assume()
         .withMessage("Solver %s runs into timeout on this test", solverToUse())
         .that(solverToUse())
