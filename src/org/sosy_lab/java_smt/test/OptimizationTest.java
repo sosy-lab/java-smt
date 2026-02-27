@@ -44,7 +44,8 @@ public class OptimizationTest extends SolverBasedTest0.ParameterizedSolverBasedT
   @Test
   public void testUnbounded() throws SolverException, InterruptedException {
     requireRationals();
-    try (OptimizationProverEnvironment prover = context.newOptimizationProverEnvironment()) {
+    try (OptimizationProverEnvironment prover =
+        context.newOptimizationProverEnvironment(ProverOptions.GENERATE_MODELS)) {
       RationalFormula x = rmgr.makeVariable("x");
       RationalFormula obj = rmgr.makeVariable("obj");
       prover.addConstraint(
@@ -53,6 +54,44 @@ public class OptimizationTest extends SolverBasedTest0.ParameterizedSolverBasedT
       OptStatus response = prover.check();
       assertThat(response).isEqualTo(OptStatus.OPT);
       assertThat(prover.upper(handle, Rational.ZERO)).isEmpty();
+    }
+  }
+
+  @Test
+  public void testUpperAndLowerFailAfterChange() throws SolverException, InterruptedException {
+    requireRationals();
+    try (OptimizationProverEnvironment prover = context.newOptimizationProverEnvironment()) {
+      RationalFormula x = rmgr.makeVariable("x");
+      RationalFormula obj = rmgr.makeVariable("obj");
+      prover.addConstraint(
+          bmgr.and(rmgr.greaterOrEquals(x, rmgr.makeNumber("100")), rmgr.equal(x, obj)));
+      int handle = prover.maximize(obj);
+      OptStatus response = prover.check();
+      assertThat(response).isEqualTo(OptStatus.OPT);
+      prover.addConstraint(rmgr.greaterOrEquals(x, rmgr.makeNumber("10")));
+      assertThrows(IllegalStateException.class, () -> prover.upper(handle, Rational.ZERO));
+      assertThat(response).isEqualTo(OptStatus.OPT);
+      prover.addConstraint(rmgr.greaterOrEquals(x, rmgr.makeNumber("9")));
+      assertThrows(IllegalStateException.class, () -> prover.lower(handle, Rational.ZERO));
+    }
+  }
+
+  @Test
+  public void testUpperAndLowerFailAfterStackChange() throws SolverException, InterruptedException {
+    requireRationals();
+    try (OptimizationProverEnvironment prover = context.newOptimizationProverEnvironment()) {
+      RationalFormula x = rmgr.makeVariable("x");
+      RationalFormula obj = rmgr.makeVariable("obj");
+      prover.addConstraint(
+          bmgr.and(rmgr.greaterOrEquals(x, rmgr.makeNumber("100")), rmgr.equal(x, obj)));
+      int handle = prover.maximize(obj);
+      OptStatus response = prover.check();
+      assertThat(response).isEqualTo(OptStatus.OPT);
+      prover.push();
+      assertThrows(IllegalStateException.class, () -> prover.upper(handle, Rational.ZERO));
+      assertThat(response).isEqualTo(OptStatus.OPT);
+      prover.pop();
+      assertThrows(IllegalStateException.class, () -> prover.lower(handle, Rational.ZERO));
     }
   }
 
@@ -248,7 +287,8 @@ public class OptimizationTest extends SolverBasedTest0.ParameterizedSolverBasedT
           .doesNotContain("MathSAT5 version 1.7.3");
     }
 
-    try (OptimizationProverEnvironment prover = context.newOptimizationProverEnvironment()) {
+    try (OptimizationProverEnvironment prover =
+        context.newOptimizationProverEnvironment(ProverOptions.GENERATE_MODELS)) {
       RationalFormula x = rmgr.makeVariable("x");
       RationalFormula y = rmgr.makeVariable("y");
       RationalFormula obj = rmgr.makeVariable("obj");
@@ -301,7 +341,8 @@ public class OptimizationTest extends SolverBasedTest0.ParameterizedSolverBasedT
   public void testStrictConstraint() throws SolverException, InterruptedException {
     requireRationals();
 
-    try (OptimizationProverEnvironment prover = context.newOptimizationProverEnvironment()) {
+    try (OptimizationProverEnvironment prover =
+        context.newOptimizationProverEnvironment(ProverOptions.GENERATE_MODELS)) {
       RationalFormula x = rmgr.makeVariable("x");
 
       // assume (x < 1)
