@@ -10,8 +10,11 @@ package org.sosy_lab.java_smt.test;
 
 import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.TruthJUnit.assume;
+import static org.junit.Assert.assertThrows;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Range;
+import com.google.common.truth.TruthJUnit;
 import java.math.BigInteger;
 import org.junit.Before;
 import org.junit.Test;
@@ -50,6 +53,125 @@ public class OptimizationTest extends SolverBasedTest0.ParameterizedSolverBasedT
       OptStatus response = prover.check();
       assertThat(response).isEqualTo(OptStatus.OPT);
       assertThat(prover.upper(handle, Rational.ZERO)).isEmpty();
+    }
+  }
+
+  @Test
+  @SuppressWarnings("CheckReturnValue")
+  public void feasibleGetModelFailsAfterChangeTest() throws SolverException, InterruptedException {
+    requireRationals();
+    try (OptimizationProverEnvironment prover =
+        context.newOptimizationProverEnvironment(ProverOptions.GENERATE_MODELS)) {
+      RationalFormula x = rmgr.makeVariable("x");
+      RationalFormula y = rmgr.makeVariable("y");
+      prover.addConstraint(rmgr.lessThan(x, y));
+      prover.maximize(x);
+      OptStatus response = prover.check();
+      assertThat(response).isEqualTo(OptStatus.OPT);
+      prover.addConstraint(rmgr.lessThan(x, y));
+      assertThrows(IllegalStateException.class, prover::getModel);
+    }
+  }
+
+  @Test
+  @SuppressWarnings("CheckReturnValue")
+  public void feasibleGetModelFailsAfterPushPopTest() throws SolverException, InterruptedException {
+    requireRationals();
+    try (OptimizationProverEnvironment prover =
+        context.newOptimizationProverEnvironment(ProverOptions.GENERATE_MODELS)) {
+      RationalFormula x = rmgr.makeVariable("x");
+      RationalFormula y = rmgr.makeVariable("y");
+      prover.addConstraint(rmgr.lessThan(x, y));
+      prover.maximize(x);
+      OptStatus response = prover.check();
+      assertThat(response).isEqualTo(OptStatus.OPT);
+      prover.push();
+      assertThrows(IllegalStateException.class, prover::getModel);
+      assertThat(response).isEqualTo(OptStatus.OPT);
+      prover.pop();
+      assertThrows(IllegalStateException.class, prover::getModel);
+    }
+  }
+
+  @Test
+  @SuppressWarnings("CheckReturnValue")
+  public void assumptionSolvingGetModelFailsAfterChangeTest()
+      throws SolverException, InterruptedException {
+    requireRationals();
+    TruthJUnit.assume()
+        .withMessage(
+            "Z3 does not support assumption solving and optimization " + "solving at the same time")
+        .that(solver)
+        .isNotEqualTo(Solvers.Z3);
+
+    try (OptimizationProverEnvironment prover =
+        context.newOptimizationProverEnvironment(ProverOptions.GENERATE_MODELS)) {
+      RationalFormula x = rmgr.makeVariable("x");
+      RationalFormula y = rmgr.makeVariable("y");
+      // x <= y
+      prover.addConstraint(rmgr.lessThan(x, y));
+      assertThat(prover.isUnsatWithAssumptions(ImmutableList.of(bmgr.makeVariable("name"))))
+          .isFalse();
+      prover.addConstraint(rmgr.lessThan(x, y));
+      assertThrows(IllegalStateException.class, prover::getModel);
+    }
+  }
+
+  @Test
+  @SuppressWarnings("CheckReturnValue")
+  public void assumptionSolvingGetModelFailsAfterPushPopTest()
+      throws SolverException, InterruptedException {
+    requireRationals();
+    TruthJUnit.assume()
+        .withMessage(
+            "Z3 does not support assumption solving and optimization " + "solving at the same time")
+        .that(solver)
+        .isNotEqualTo(Solvers.Z3);
+
+    try (OptimizationProverEnvironment prover =
+        context.newOptimizationProverEnvironment(ProverOptions.GENERATE_MODELS)) {
+      RationalFormula x = rmgr.makeVariable("x");
+      RationalFormula y = rmgr.makeVariable("y");
+      // x <= y
+      prover.addConstraint(rmgr.lessThan(x, y));
+      assertThat(prover.isUnsatWithAssumptions(ImmutableList.of(bmgr.makeVariable("name"))))
+          .isFalse();
+      prover.push();
+      assertThrows(IllegalStateException.class, prover::getModel);
+      assertThat(prover.isUnsatWithAssumptions(ImmutableList.of(bmgr.makeVariable("name"))));
+      prover.pop();
+      assertThrows(IllegalStateException.class, prover::getModel);
+    }
+  }
+
+  @Test
+  @SuppressWarnings("CheckReturnValue")
+  public void solvingGetModelFailsAfterChangeTest() throws SolverException, InterruptedException {
+    requireRationals();
+    try (OptimizationProverEnvironment prover =
+        context.newOptimizationProverEnvironment(ProverOptions.GENERATE_MODELS)) {
+      RationalFormula x = rmgr.makeVariable("x");
+      RationalFormula y = rmgr.makeVariable("y");
+      // x <= y
+      prover.addConstraint(rmgr.lessOrEquals(x, y));
+      assertThat(prover.isUnsat()).isFalse();
+      prover.addConstraint(rmgr.lessThan(x, y));
+      assertThrows(IllegalStateException.class, prover::getModel);
+    }
+  }
+
+  @Test
+  @SuppressWarnings("CheckReturnValue")
+  public void infeasibleGetModelFailsTest() throws SolverException, InterruptedException {
+    requireRationals();
+    try (OptimizationProverEnvironment prover = context.newOptimizationProverEnvironment()) {
+      RationalFormula x = rmgr.makeVariable("x");
+      RationalFormula y = rmgr.makeVariable("y");
+      prover.addConstraint(bmgr.and(rmgr.lessThan(x, y), rmgr.greaterThan(x, y)));
+      prover.maximize(x);
+      OptStatus response = prover.check();
+      assertThat(response).isEqualTo(OptStatus.UNSAT);
+      assertThrows(IllegalStateException.class, prover::getModel);
     }
   }
 
