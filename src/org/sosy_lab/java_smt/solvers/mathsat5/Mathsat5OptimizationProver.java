@@ -120,12 +120,14 @@ class Mathsat5OptimizationProver extends Mathsat5AbstractProver<Void>
   @Override
   public Optional<Rational> upper(int handle, Rational epsilon) {
     checkState(!closed);
+    checkGenerateModels();
     return getValue(handle, epsilon);
   }
 
   @Override
   public Optional<Rational> lower(int handle, Rational epsilon) {
     checkState(!closed);
+    checkGenerateModels();
     return getValue(handle, epsilon);
   }
 
