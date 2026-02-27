@@ -640,6 +640,57 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
     }
   }
 
+  private static class CheckIndexed extends DefaultFormulaVisitor<Void> {
+    private final FunctionDeclarationKind kind;
+    private final List<Integer> index;
+
+    private CheckIndexed(FunctionDeclarationKind pKind, List<Integer> pIndex) {
+      kind = pKind;
+      index = pIndex;
+    }
+
+    @Override
+    protected Void visitDefault(Formula f) {
+      return null;
+    }
+
+    @Override
+    public Void visitFunction(
+        Formula f, List<Formula> args, FunctionDeclaration<?> functionDeclaration) {
+      assertThat(functionDeclaration.getKind()).isEqualTo(kind);
+      assertThat(functionDeclaration.getIndices()).isEqualTo(index);
+      return visitDefault(f);
+    }
+  }
+
+  @Test
+  public void bvExtractVisit() {
+    requireBitvectors();
+    assume()
+        .withMessage("Visiting indexed functions not fully supported on %")
+        .that(solver)
+        .isNoneOf(Solvers.CVC4, Solvers.YICES2);
+
+    var x = bvmgr.makeVariable(8, "x");
+    var f = bvmgr.extract(x, 3, 0);
+
+    mgr.visit(f, new CheckIndexed(FunctionDeclarationKind.BV_EXTRACT, ImmutableList.of(3, 0)));
+  }
+
+  @Test
+  public void bvExtendVisit() {
+    requireBitvectors();
+    assume()
+        .withMessage("Visiting indexed functions not fully supported on %")
+        .that(solver)
+        .isNoneOf(Solvers.CVC4, Solvers.YICES2, Solvers.PRINCESS);
+
+    var x = bvmgr.makeVariable(8, "x");
+    var f = bvmgr.extend(x, 8, false);
+
+    mgr.visit(f, new CheckIndexed(FunctionDeclarationKind.BV_ZERO_EXTENSION, ImmutableList.of(8)));
+  }
+
   @Test
   public void bvVisit() throws SolverException, InterruptedException {
     requireBitvectors();
