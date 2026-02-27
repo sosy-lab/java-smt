@@ -8,12 +8,15 @@
 
 package org.sosy_lab.java_smt.api;
 
-import com.google.common.collect.ImmutableList;
+import static com.google.common.base.Preconditions.checkArgument;
+
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Iterables;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
-import java.util.Collection;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import org.sosy_lab.common.Appender;
 import org.sosy_lab.java_smt.api.visitors.FormulaTransformationVisitor;
 import org.sosy_lab.java_smt.api.visitors.FormulaVisitor;
@@ -140,8 +143,8 @@ public interface FormulaManager {
    * @param pArgs Arguments to be compared for equality, ordering does not matter.
    * @return Equality formula
    */
-  default BooleanFormula equal(Formula... pArgs) {
-    return equal(ImmutableList.copyOf(pArgs));
+  default BooleanFormula makeEqual(Formula... pArgs) {
+    return makeEqual(Arrays.asList(pArgs));
   }
 
   /**
@@ -151,7 +154,7 @@ public interface FormulaManager {
    * @param pArgs Arguments to be compared for equality, ordering does not matter.
    * @return Equality formula
    */
-  BooleanFormula equal(Collection<Formula> pArgs);
+  BooleanFormula makeEqual(Iterable<Formula> pArgs);
 
   /**
    * Create a distinctness formula between the given arguments. We return "true" if all arguments
@@ -160,8 +163,8 @@ public interface FormulaManager {
    * @param pArgs Arguments to be compared for distinctness, ordering does not matter.
    * @return Distinctness formula
    */
-  default BooleanFormula distinct(Formula... pArgs) {
-    return distinct(ImmutableList.copyOf(pArgs));
+  default BooleanFormula makeDistinct(Formula... pArgs) {
+    return makeDistinct(Arrays.asList(pArgs));
   }
 
   /**
@@ -171,7 +174,7 @@ public interface FormulaManager {
    * @param pArgs Arguments to be compared for distinctness, ordering does not matter.
    * @return Distinctness formula
    */
-  BooleanFormula distinct(Collection<Formula> pArgs);
+  BooleanFormula makeDistinct(Iterable<Formula> pArgs);
 
   /** Returns the type of the given Formula. */
   <T extends Formula> FormulaType<T> getFormulaType(T formula);
@@ -181,6 +184,21 @@ public interface FormulaManager {
    * assertion to be contained in the query.
    *
    * <p>Example: <code>(declare-fun x () Int)(assert (= 0 x))</code>
+   *
+   * @see #parseAll(String) for more details on the expected format and behavior of the SMT solver.
+   * @return A single formula from the assertion in the internal representation.
+   * @throws IllegalArgumentException If the string cannot be parsed, or if there is not exactly one
+   *     assertion in the query.
+   */
+  default BooleanFormula parse(String s) throws IllegalArgumentException {
+    List<BooleanFormula> formulas = parseAll(s);
+    checkArgument(!formulas.isEmpty(), "No assertion found in the SMTLIB string.");
+    return Objects.requireNonNull(Iterables.getOnlyElement(formulas));
+  }
+
+  /**
+   * Parse a boolean formula given as a String in an SMTLIB file format. We expect several (zero or
+   * more) assertions to be contained in the query.
    *
    * <p>It depends on the used SMT solver whether the given query must be self-contained and include
    * declarations for all used symbols or not, and also whether the query is allowed to contain
@@ -194,10 +212,12 @@ public interface FormulaManager {
    * <p>Variables that are defined, but not used in the assertion, might be ignored by the SMT
    * solver, and they might not be available for later usage.
    *
-   * @return A single formula from the assertion in the internal representation.
+   * <p>Example: <code>(declare-fun x () Int)(assert (= 0 x))(assert (&lt; x 10))</code>
+   *
+   * @return A list of formulas from the assertions in the internal representation, in order.
    * @throws IllegalArgumentException If the string cannot be parsed.
    */
-  BooleanFormula parse(String s) throws IllegalArgumentException;
+  List<BooleanFormula> parseAll(String s) throws IllegalArgumentException;
 
   /**
    * Serialize an input formula to an SMT-LIB format. Very useful when passing formulas between
