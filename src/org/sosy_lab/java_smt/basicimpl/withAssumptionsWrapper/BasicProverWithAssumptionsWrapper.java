@@ -70,6 +70,8 @@ public class BasicProverWithAssumptionsWrapper<T, P extends BasicProverEnvironme
       throws SolverException, InterruptedException {
     clearAssumptions();
     solverAssumptionsAsFormula.addAll(assumptions);
+    // Since we are using the delegates isUnsat() impl, we don't need to update
+    // wasLastSatCheckSatisfiable etc.
     for (BooleanFormula formula : assumptions) {
       registerPushedFormula(delegate.push(formula));
     }
