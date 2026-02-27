@@ -113,10 +113,15 @@ abstract class Mathsat5AbstractProver<T2> extends AbstractProver<T2> {
     Preconditions.checkState(!closed);
     checkForLiterals(pAssumptions);
     changedSinceLastSatQuery = false;
+    wasLastSatCheckSatisfiable = false;
 
     final long hook = msat_set_termination_callback(curEnv, context.getTerminationTest());
     try {
-      return !msat_check_sat_with_assumptions(curEnv, getMsatTerm(pAssumptions));
+      boolean isSat = msat_check_sat_with_assumptions(curEnv, getMsatTerm(pAssumptions));
+      if (isSat) {
+        wasLastSatCheckSatisfiable = true;
+      }
+      return !isSat;
     } finally {
       msat_free_termination_callback(hook);
     }
