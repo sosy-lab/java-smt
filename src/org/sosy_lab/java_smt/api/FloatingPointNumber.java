@@ -269,6 +269,8 @@ public abstract class FloatingPointNumber {
   public static FloatingPointNumber of(String bits, FloatingPointType floatingPointType) {
     // Note: sign bit + exponent size + mantissa size without hidden bit == exponent size + mantissa
     // size with hidden bit
+    checkNotNull(bits);
+    checkNotNull(floatingPointType);
     var exponentSize = floatingPointType.getExponentSize();
     var mantissaSizeWithoutHiddenBit = floatingPointType.getMantissaSizeWithoutHiddenBit();
     Preconditions.checkArgument(
