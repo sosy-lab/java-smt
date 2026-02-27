@@ -10,7 +10,6 @@ package org.sosy_lab.java_smt.solvers.cvc4;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Collections2;
-import com.google.common.collect.ImmutableList;
 import edu.stanford.CVC4.Exception;
 import edu.stanford.CVC4.Expr;
 import edu.stanford.CVC4.ExprManager;
@@ -29,7 +28,6 @@ import org.sosy_lab.java_smt.api.BasicProverEnvironment;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.BooleanFormulaManager;
 import org.sosy_lab.java_smt.api.Evaluator;
-import org.sosy_lab.java_smt.api.Model.ValueAssignment;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
@@ -40,8 +38,8 @@ class CVC4TheoremProver extends AbstractProverWithAllSat<Void>
     implements ProverEnvironment, BasicProverEnvironment<Void> {
 
   private final CVC4FormulaCreator creator;
+  private final int randomSeed;
   SmtEngine smtEngine; // final except for SL theory
-  private boolean changedSinceLastSatQuery = false;
 
   /**
    * The local exprManager allows to set options per Prover (and not globally). See <a
@@ -50,10 +48,10 @@ class CVC4TheoremProver extends AbstractProverWithAllSat<Void>
    * <p>TODO If the overhead of importing/exporting the expressions is too expensive, we can disable
    * this behavior. This change would cost us the flexibility of setting options per Prover.
    */
-  private final ExprManager exprManager = new ExprManager();
+  private ExprManager exprManager; // final except for SL theory
 
   /** We copy expression between different ExprManagers. The map serves as cache. */
-  private final ExprManagerMapCollection exportMapping = new ExprManagerMapCollection();
+  private ExprManagerMapCollection exportMapping; // final except for SL theory
 
   // CVC4 does not support separation logic in incremental mode.
   private final boolean incremental;
@@ -61,26 +59,34 @@ class CVC4TheoremProver extends AbstractProverWithAllSat<Void>
   protected CVC4TheoremProver(
       CVC4FormulaCreator pFormulaCreator,
       ShutdownNotifier pShutdownNotifier,
-      int randomSeed,
+      int pRandomSeed,
       Set<ProverOptions> pOptions,
       BooleanFormulaManager pBmgr) {
     super(pOptions, pBmgr, pShutdownNotifier);
 
     creator = pFormulaCreator;
-    smtEngine = new SmtEngine(exprManager);
+    randomSeed = pRandomSeed;
     incremental = !enableSL;
 
-    setOptions(randomSeed, pOptions);
+    createNewEngine();
   }
 
-  private void setOptions(int randomSeed, Set<ProverOptions> pOptions) {
+  private void createNewEngine() {
+    if (smtEngine != null) {
+      smtEngine.delete(); // cleanup
+    }
+    if (exportMapping != null) {
+      exportMapping.delete();
+    }
+    if (exprManager != null) {
+      exprManager.delete(); // cleanup
+    }
+    exprManager = new ExprManager();
+    smtEngine = new SmtEngine(exprManager);
+    exportMapping = new ExprManagerMapCollection();
     smtEngine.setOption("incremental", new SExpr(incremental));
-    if (pOptions.contains(ProverOptions.GENERATE_MODELS)) {
-      smtEngine.setOption("produce-models", new SExpr(true));
-    }
-    if (pOptions.contains(ProverOptions.GENERATE_UNSAT_CORE)) {
-      smtEngine.setOption("produce-unsat-cores", new SExpr(true));
-    }
+    smtEngine.setOption("produce-models", new SExpr(generateModels));
+    smtEngine.setOption("produce-unsat-cores", new SExpr(generateUnsatCores));
     smtEngine.setOption("produce-assertions", new SExpr(true));
     smtEngine.setOption("dump-models", new SExpr(true));
     // smtEngine.setOption("produce-unsat-cores", new SExpr(true));
@@ -91,10 +97,6 @@ class CVC4TheoremProver extends AbstractProverWithAllSat<Void>
     // Enable more complete quantifier solving (for more information see
     // CVC4QuantifiedFormulaManager)
     smtEngine.setOption("full-saturate-quant", new SExpr(true));
-  }
-
-  protected void setOptionForIncremental() {
-    smtEngine.setOption("incremental", new SExpr(true));
   }
 
   /** import an expression from global context into this prover's context. */
@@ -109,7 +111,6 @@ class CVC4TheoremProver extends AbstractProverWithAllSat<Void>
 
   @Override
   protected void pushImpl() throws InterruptedException {
-    setChanged();
     if (incremental) {
       smtEngine.push();
     }
@@ -117,7 +118,6 @@ class CVC4TheoremProver extends AbstractProverWithAllSat<Void>
 
   @Override
   protected void popImpl() {
-    setChanged();
     if (incremental) {
       smtEngine.pop();
     }
@@ -126,7 +126,6 @@ class CVC4TheoremProver extends AbstractProverWithAllSat<Void>
   @Override
   protected @Nullable Void addConstraintImpl(BooleanFormula pF) throws InterruptedException {
     Preconditions.checkState(!closed);
-    setChanged();
     if (incremental) {
       assertFormula(pF);
     }
@@ -145,8 +144,6 @@ class CVC4TheoremProver extends AbstractProverWithAllSat<Void>
   @SuppressWarnings("resource")
   @Override
   public CVC4Model getModel() throws SolverException {
-    Preconditions.checkState(!closed);
-    Preconditions.checkState(!changedSinceLastSatQuery);
     checkGenerateModels();
     // special case for CVC4: Models are not permanent and need to be closed
     // before any change is applied to the prover stack. So, we register the Model as Evaluator.
@@ -160,7 +157,6 @@ class CVC4TheoremProver extends AbstractProverWithAllSat<Void>
 
   @Override
   public Evaluator getEvaluator() {
-    Preconditions.checkState(!closed);
     checkGenerateModels();
     return getEvaluatorWithoutChecks();
   }
@@ -171,42 +167,31 @@ class CVC4TheoremProver extends AbstractProverWithAllSat<Void>
     return registerEvaluator(new CVC4Evaluator(this, creator, smtEngine));
   }
 
-  private void setChanged() {
-    closeAllEvaluators();
-    if (!changedSinceLastSatQuery) {
-      changedSinceLastSatQuery = true;
-      if (!incremental) {
-        // create a new clean smtEngine
-        smtEngine = new SmtEngine(exprManager);
-      }
-    }
-  }
-
   @Override
-  public ImmutableList<ValueAssignment> getModelAssignments() throws SolverException {
-    Preconditions.checkState(!closed);
-    Preconditions.checkState(!changedSinceLastSatQuery);
-    return super.getModelAssignments();
+  protected boolean hasPersistentModel() {
+    return false;
   }
 
   @Override
   @SuppressWarnings("try")
-  public boolean isUnsat() throws InterruptedException, SolverException {
-    Preconditions.checkState(!closed);
+  protected boolean isUnsatImpl() throws InterruptedException, SolverException {
     closeAllEvaluators();
-    changedSinceLastSatQuery = false;
+
     if (!incremental) {
-      for (BooleanFormula f : getAssertedFormulas()) {
-        assertFormula(f);
-      }
+      // in non-incremental mode, we need to create a new solver instance for each sat check
+      createNewEngine();
+      getAssertedFormulas().forEach(this::assertFormula);
     }
 
     Result result;
     try (ShutdownHook hook = new ShutdownHook(shutdownNotifier, smtEngine::interrupt)) {
       shutdownNotifier.shutdownIfNecessary();
       result = smtEngine.checkSat();
+    } catch (Exception e) {
+      throw new SolverException("CVC4 failed during satisfiability check", e);
+    } finally {
+      shutdownNotifier.shutdownIfNecessary();
     }
-    shutdownNotifier.shutdownIfNecessary();
     return convertSatResult(result);
   }
 
@@ -229,9 +214,7 @@ class CVC4TheoremProver extends AbstractProverWithAllSat<Void>
 
   @Override
   public List<BooleanFormula> getUnsatCore() {
-    Preconditions.checkState(!closed);
     checkGenerateUnsatCores();
-    Preconditions.checkState(!changedSinceLastSatQuery);
     List<BooleanFormula> converted = new ArrayList<>();
     for (Expr aCore : smtEngine.getUnsatCore()) {
       converted.add(creator.encapsulateBoolean(exportExpr(aCore)));
@@ -242,13 +225,13 @@ class CVC4TheoremProver extends AbstractProverWithAllSat<Void>
   @Override
   public boolean isUnsatWithAssumptions(Collection<BooleanFormula> pAssumptions)
       throws SolverException, InterruptedException {
-    throw new UnsupportedOperationException();
+    throw new UnsupportedOperationException(ASSUMPTION_SOLVING_NOT_SUPPORTED);
   }
 
   @Override
   public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(
       Collection<BooleanFormula> pAssumptions) throws SolverException, InterruptedException {
-    throw new UnsupportedOperationException();
+    throw new UnsupportedOperationException(ASSUMPTION_SOLVING_NOT_SUPPORTED);
   }
 
   @Override

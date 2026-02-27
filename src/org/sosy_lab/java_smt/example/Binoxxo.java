@@ -9,6 +9,7 @@
 package org.sosy_lab.java_smt.example;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableList;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.nio.charset.Charset;
@@ -95,7 +96,7 @@ public final class Binoxxo {
           SolverContextFactory.createSolverContext(config, logger, notifier, solver)) {
 
         for (BinoxxoSolver<?> binoxxo :
-            List.of(
+            ImmutableList.of(
                 new IntegerBasedBinoxxoSolver(context), new BooleanBasedBinoxxoSolver(context))) {
           long start = System.currentTimeMillis();
 
@@ -300,7 +301,7 @@ public final class Binoxxo {
       for (int row = 0; row < size; row++) {
         for (int col = 0; col < size - 2; col++) {
           List<IntegerFormula> lst =
-              List.of(symbols[row][col], symbols[row][col + 1], symbols[row][col + 2]);
+              ImmutableList.of(symbols[row][col], symbols[row][col + 1], symbols[row][col + 2]);
           IntegerFormula sum = imgr.sum(lst);
           rules.add(bmgr.or(imgr.equal(one, sum), imgr.equal(two, sum)));
         }
@@ -310,7 +311,7 @@ public final class Binoxxo {
       for (int col = 0; col < size; col++) {
         for (int row = 0; row < size - 2; row++) {
           List<IntegerFormula> lst =
-              List.of(symbols[row][col], symbols[row + 1][col], symbols[row + 2][col]);
+              ImmutableList.of(symbols[row][col], symbols[row + 1][col], symbols[row + 2][col]);
           IntegerFormula sum = imgr.sum(lst);
           rules.add(bmgr.or(imgr.equal(one, sum), imgr.equal(two, sum)));
         }
@@ -398,7 +399,7 @@ public final class Binoxxo {
       for (int row = 0; row < size; row++) {
         for (int col = 0; col < size - 2; col++) {
           List<BooleanFormula> lst =
-              List.of(symbols[row][col], symbols[row][col + 1], symbols[row][col + 2]);
+              ImmutableList.of(symbols[row][col], symbols[row][col + 1], symbols[row][col + 2]);
           rules.add(bmgr.not(bmgr.and(lst)));
           rules.add(bmgr.or(lst));
         }
@@ -408,7 +409,7 @@ public final class Binoxxo {
       for (int col = 0; col < size; col++) {
         for (int row = 0; row < size - 2; row++) {
           List<BooleanFormula> lst =
-              List.of(symbols[row][col], symbols[row + 1][col], symbols[row + 2][col]);
+              ImmutableList.of(symbols[row][col], symbols[row + 1][col], symbols[row + 2][col]);
           rules.add(bmgr.not(bmgr.and(lst)));
           rules.add(bmgr.or(lst));
         }

@@ -108,7 +108,7 @@ public final class Sudoku {
           SolverContextFactory.createSolverContext(config, logger, notifier, solver)) {
 
         for (SudokuSolver<?> sudoku :
-            List.of(
+            ImmutableList.of(
                 new IntegerBasedSudokuSolver(context),
                 new EnumerationBasedSudokuSolver(context),
                 new BooleanBasedSudokuSolver(context))) {

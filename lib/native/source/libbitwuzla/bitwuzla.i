@@ -57,8 +57,10 @@ namespace bitwuzla {
 /** Output streams */
 %ignore set_bv_format;
 %ignore set_letify;
-%ignore operator<< (std::ostream &ostream, const set_bv_format &f);
+%ignore operator<< (std::ostream &out, const set_bv_format &f);
+%ignore operator<< (std::ostream &out, const set_letify &l);
 %ignore operator<< (std::ostream &out, Result result);
+%ignore operator<< (std::ostream &out, const Term &term);
 %ignore operator<< (std::ostream &out, Kind kind);
 %ignore operator<< (std::ostream &out, RoundingMode rm);
 
@@ -69,6 +71,7 @@ namespace bitwuzla {
 %ignore Options::operator= (const Options &options);
 %ignore Options::set (Option option, const char *mode);
 %ignore Options::set (Option option, uint64_t value);
+%ignore Options::set_diagnostic_output_stream(std::ostream& out);
 %extend Options {
   void set(Option option, int value) {
     $self->set(option, value);
@@ -110,7 +113,12 @@ namespace bitwuzla {
 }
 %extend Term {
   std::string symbol() {
-    return $self->symbol().value();
+    std::string sym = $self->symbol().value();
+    if (sym.front() == '|' && sym.back() == '|') {
+      return sym.substr(1, sym.size() - 2);
+    } else {
+      return sym;
+    }
   }
 }
 
@@ -314,6 +322,8 @@ namespace bitwuzla::parser {
 %ignore Parser::Parser(TermManager &tm, Options &options, std::ostream *out);
 %ignore Parser::configure_auto_print_model(bool value);
 %ignore Parser::parse(const std::string &infile_name, std::istream &input, bool parse_only=false);
+%ignore Parser::diagnostic_output_stream() const;
+%ignore Parser::statistics() const;
 
 /** Exception */
 %ignore Exception;

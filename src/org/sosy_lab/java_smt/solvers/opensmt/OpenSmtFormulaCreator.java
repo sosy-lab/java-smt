@@ -332,10 +332,10 @@ public final class OpenSmtFormulaCreator extends FormulaCreator<PTRef, SRef, Log
   public Object convertValue(PTRef value) {
     Logic logic = getEnv();
     if (logic.isTrue(value)) {
-      return Boolean.TRUE;
+      return true;
     }
     if (logic.isFalse(value)) {
-      return Boolean.FALSE;
+      return false;
     }
     ArithLogic alogic = (ArithLogic) getEnv();
     if (alogic.isIntConst(value)) {

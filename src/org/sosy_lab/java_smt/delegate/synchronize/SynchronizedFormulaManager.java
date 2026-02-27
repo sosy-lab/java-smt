@@ -152,6 +152,20 @@ class SynchronizedFormulaManager implements FormulaManager {
   }
 
   @Override
+  public BooleanFormula makeEqual(Iterable<Formula> pArgs) {
+    synchronized (sync) {
+      return delegate.makeEqual(pArgs);
+    }
+  }
+
+  @Override
+  public BooleanFormula makeDistinct(Iterable<Formula> pArgs) {
+    synchronized (sync) {
+      return delegate.makeDistinct(pArgs);
+    }
+  }
+
+  @Override
   public <T extends Formula> FormulaType<T> getFormulaType(T pFormula) {
     synchronized (sync) {
       return delegate.getFormulaType(pFormula);
@@ -162,6 +176,13 @@ class SynchronizedFormulaManager implements FormulaManager {
   public BooleanFormula parse(String pS) throws IllegalArgumentException {
     synchronized (sync) {
       return delegate.parse(pS);
+    }
+  }
+
+  @Override
+  public List<BooleanFormula> parseAll(String pS) throws IllegalArgumentException {
+    synchronized (sync) {
+      return delegate.parseAll(pS);
     }
   }
 

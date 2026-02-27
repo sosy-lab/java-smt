@@ -13,6 +13,7 @@ import static org.junit.Assert.assertThrows;
 
 import com.google.common.base.Preconditions;
 import io.github.cvc5.CVC5ApiException;
+import io.github.cvc5.Context;
 import io.github.cvc5.Kind;
 import io.github.cvc5.Op;
 import io.github.cvc5.Proof;
@@ -24,7 +25,6 @@ import io.github.cvc5.Sort;
 import io.github.cvc5.Term;
 import io.github.cvc5.TermManager;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -95,8 +95,7 @@ public class CVC5NativeAPITest {
 
   @After
   public void freeEnvironment() {
-    solver.deletePointer();
-    termManager.deletePointer();
+    Context.deletePointers();
   }
 
   /*
@@ -1031,7 +1030,7 @@ public class CVC5NativeAPITest {
 
     // UnsatCores are iterable
     for (Term e : unsatCore) {
-      assertThat(e.toString()).isIn(Arrays.asList("(not (or a b))", "(and a b)"));
+      assertThat(e.toString()).isAnyOf("(not (or a b))", "(and a b)");
     }
   }
 

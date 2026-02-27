@@ -149,7 +149,7 @@ public class DebugModeTest extends SolverBasedTest0.ParameterizedSolverBasedTest
       BooleanFormula formula = hardProblem.generate(DEFAULT_PROBLEM_SIZE);
 
       // We expect debug mode to throw an exception for all solvers, except CVC4, CVC5 and Yices
-      if (!List.of(Solvers.CVC4, Solvers.YICES2).contains(solverToUse())) {
+      if (!ImmutableList.of(Solvers.CVC4, Solvers.YICES2).contains(solverToUse())) {
         assertThrows(IllegalArgumentException.class, () -> checkFormulaInDebugContext(formula));
       } else {
         checkFormulaInDebugContext(formula);

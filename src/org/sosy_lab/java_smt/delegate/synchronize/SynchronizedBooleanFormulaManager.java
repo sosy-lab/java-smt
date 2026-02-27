@@ -117,13 +117,6 @@ class SynchronizedBooleanFormulaManager implements BooleanFormulaManager {
   }
 
   @Override
-  public BooleanFormula and(BooleanFormula... pBits) {
-    synchronized (sync) {
-      return delegate.and(pBits);
-    }
-  }
-
-  @Override
   public Collector<BooleanFormula, ?, BooleanFormula> toConjunction() {
     return Collectors.collectingAndThen(Collectors.toList(), this::and);
   }
@@ -137,13 +130,6 @@ class SynchronizedBooleanFormulaManager implements BooleanFormulaManager {
 
   @Override
   public BooleanFormula or(Collection<BooleanFormula> pBits) {
-    synchronized (sync) {
-      return delegate.or(pBits);
-    }
-  }
-
-  @Override
-  public BooleanFormula or(BooleanFormula... pBits) {
     synchronized (sync) {
       return delegate.or(pBits);
     }

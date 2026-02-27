@@ -23,6 +23,7 @@ lib/native/source/libbitwuzla/doc
 lib/native/source/libbitwuzla/install*
 lib/native/source/opensmt/install*
 lib/native/source/*/*.so
+lib/native/source/*/*.dll
 lib/native/source/*/*.o
 lib/native/source/**/*.java
 lib/native/source/**/**/*.java

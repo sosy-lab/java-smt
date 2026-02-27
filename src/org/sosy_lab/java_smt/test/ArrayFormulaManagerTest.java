@@ -246,4 +246,32 @@ public class ArrayFormulaManagerTest extends SolverBasedTest0.ParameterizedSolve
       }
     }
   }
+
+  @Test
+  public void testArrayWithManyValues() throws SolverException, InterruptedException {
+    requireIntegers();
+    requireArrays();
+
+    // The example array formula is: for x in [1...N]: arr = store(arr, x, x)
+    // as SMTLIB: arr = store(store(store(... store(array, 0, 0), 1, 1), ... , N-1, N-1)
+    ArrayFormula<IntegerFormula, IntegerFormula> array =
+        amgr.makeArray("array", IntegerType, IntegerType);
+    ArrayFormula<IntegerFormula, IntegerFormula> storedArray = array;
+    final int numValues = 100;
+    for (int i = 0; i < numValues; i++) {
+      storedArray = amgr.store(storedArray, imgr.makeNumber(i), imgr.makeNumber(i));
+    }
+
+    // (x >= 0 && x < numValues) => (x == arr[x]) for the defined array
+    IntegerFormula x = imgr.makeVariable("x");
+    BooleanFormula indexAssignment = imgr.equal(x, amgr.select(storedArray, x)); // x == arr[x]
+    BooleanFormula query =
+        bmgr.implication(
+            bmgr.and(
+                imgr.greaterOrEquals(x, imgr.makeNumber(0)),
+                imgr.lessThan(x, imgr.makeNumber(numValues))),
+            indexAssignment);
+
+    assertThatFormula(query).isTautological();
+  }
 }

@@ -134,9 +134,10 @@ public class SolverConcurrencyTest {
             Solvers.SMTINTERPOL,
             Solvers.BITWUZLA,
             Solvers.BOOLECTOR,
-            Solvers.OPENSMT, // INFO: OpenSMT does not support concurrent stacks
+            Solvers.OPENSMT,
             Solvers.MATHSAT5,
             Solvers.Z3,
+            Solvers.Z3_WITH_INTERPOLATION,
             Solvers.PRINCESS,
             Solvers.YICES2,
             Solvers.CVC5);
@@ -168,7 +169,8 @@ public class SolverConcurrencyTest {
             Solvers.CVC5,
             Solvers.YICES2,
             Solvers.BITWUZLA,
-            Solvers.OPENSMT);
+            Solvers.OPENSMT,
+            Solvers.Z3_WITH_INTERPOLATION);
   }
 
   /**
@@ -293,12 +295,10 @@ public class SolverConcurrencyTest {
       throws InvalidConfigurationException, InterruptedException, SolverException {
     requireIntegers();
     // CVC4 does not support parsing and therefore no translation.
-    // Princess has a wierd bug
-    // TODO: Look into the Princess problem
     assume()
         .withMessage("Solver does not support translation of formulas")
         .that(solver)
-        .isNoneOf(Solvers.CVC4, Solvers.CVC5, Solvers.PRINCESS);
+        .isNotEqualTo(Solvers.CVC4);
 
     ConcurrentLinkedQueue<ContextAndFormula> contextAndFormulaList = new ConcurrentLinkedQueue<>();
 
@@ -530,12 +530,14 @@ public class SolverConcurrencyTest {
   public void continuousRunningThreadFormulaTransferTranslateTest() {
     requireIntegers();
     // CVC4 does not support parsing and therefore no translation.
-    // Princess has a wierd bug
-    // TODO: Look into the Princess problem
     assume()
         .withMessage("Solver does not support translation of formulas")
         .that(solver)
-        .isNoneOf(Solvers.CVC4, Solvers.CVC5, Solvers.PRINCESS);
+        .isNotEqualTo(Solvers.CVC4);
+    assume()
+        .withMessage("Princess will run out of memory")
+        .that(solver)
+        .isNotEqualTo(Solvers.PRINCESS);
 
     // This is fine! We might access this more than once at a time,
     // but that gives only access to the bucket, which is threadsafe.

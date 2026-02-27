@@ -102,10 +102,14 @@ abstract class Z3AbstractProver extends AbstractProverWithAllSat<Void> {
     }
   }
 
+  @Override
+  protected boolean hasPersistentModel() {
+    return true;
+  }
+
   @SuppressWarnings("resource")
   @Override
   public Model getModel() throws SolverException {
-    Preconditions.checkState(!closed);
     checkGenerateModels();
     return new CachingModel(getEvaluatorWithoutChecks());
   }
@@ -158,7 +162,6 @@ abstract class Z3AbstractProver extends AbstractProverWithAllSat<Void> {
 
   @Override
   public List<BooleanFormula> getUnsatCore() {
-    Preconditions.checkState(!closed);
     checkGenerateUnsatCores();
     if (storedConstraints == null) {
       throw new UnsupportedOperationException(

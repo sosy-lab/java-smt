@@ -269,13 +269,12 @@ public class BooleanFormulaManagerTest extends SolverBasedTest0.ParameterizedSol
 
   @Test
   public void simplificationTest() {
-    // Boolector and CVC5 fail this as it either simplifies to much, or nothing
-    // TODO: maybe this is just a matter of options, check!
+    // Boolector fail this as it either simplifies to much, or nothing
     assume()
         .withMessage(
             "Solver %s fails on this test as it does not simplify any formulas.", solverToUse())
         .that(solverToUse())
-        .isNoneOf(Solvers.BOOLECTOR, Solvers.CVC5);
+        .isNotEqualTo(Solvers.BOOLECTOR);
 
     BooleanFormula tru = bmgr.makeBoolean(true);
     BooleanFormula fals = bmgr.makeBoolean(false);

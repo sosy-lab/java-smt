@@ -149,6 +149,24 @@ public class DebuggingFormulaManager implements FormulaManager {
   }
 
   @Override
+  public BooleanFormula makeEqual(Iterable<Formula> pArgs) {
+    debugging.assertThreadLocal();
+    pArgs.forEach(debugging::assertFormulaInContext);
+    BooleanFormula result = delegate.makeEqual(pArgs);
+    debugging.addFormulaTerm(result);
+    return result;
+  }
+
+  @Override
+  public BooleanFormula makeDistinct(Iterable<Formula> pArgs) {
+    debugging.assertThreadLocal();
+    pArgs.forEach(debugging::assertFormulaInContext);
+    BooleanFormula result = delegate.makeDistinct(pArgs);
+    debugging.addFormulaTerm(result);
+    return result;
+  }
+
+  @Override
   public <T extends Formula> FormulaType<T> getFormulaType(T formula) {
     debugging.assertThreadLocal();
     debugging.assertFormulaInContext(formula);
@@ -161,6 +179,14 @@ public class DebuggingFormulaManager implements FormulaManager {
     BooleanFormula result = delegate.parse(s);
     debugging.addFormulaTerm(result);
     return result;
+  }
+
+  @Override
+  public List<BooleanFormula> parseAll(String s) throws IllegalArgumentException {
+    debugging.assertThreadLocal();
+    List<BooleanFormula> results = delegate.parseAll(s);
+    results.forEach(debugging::addFormulaTerm);
+    return results;
   }
 
   @Override

@@ -245,6 +245,10 @@ final class Mathsat5NativeApi {
 
   public static native long msat_get_array_element_type(long e, long t);
 
+  /**
+   * MathSAT5 expects the mantissa argument for floating-points and floating-point types to not
+   * include the hidden bit!
+   */
   public static native long msat_get_fp_type(long e, int exp_with, int mant_with);
 
   public static native long msat_get_fp_roundingmode_type(long e);
@@ -272,6 +276,7 @@ final class Mathsat5NativeApi {
 
   public static native int msat_get_fp_type_exp_width(long e, long t);
 
+  /** MathSAT5 returns the mantissa argument without the hidden bit! */
   public static native int msat_get_fp_type_mant_width(long e, long t);
 
   public static native boolean msat_is_fp_roundingmode_type(long e, long t);
@@ -463,6 +468,10 @@ final class Mathsat5NativeApi {
 
   public static native long msat_make_fp_round_to_int(long e, long rounding, long t);
 
+  /**
+   * MathSAT5 expects the mantissa argument for floating-points and floating-point types to not
+   * include the hidden bit!
+   */
   public static native long msat_make_fp_cast(
       long e, long exp_w, long mant_w, long rounding, long t);
 
@@ -470,14 +479,26 @@ final class Mathsat5NativeApi {
 
   public static native long msat_make_fp_to_ubv(long e, long width, long rounding, long t);
 
+  /**
+   * MathSAT5 expects the mantissa argument for floating-points and floating-point types to not
+   * include the hidden bit!
+   */
   public static native long msat_make_fp_from_sbv(
       long e, long exp_w, long mant_w, long rounding, long t);
 
+  /**
+   * MathSAT5 expects the mantissa argument for floating-points and floating-point types to not
+   * include the hidden bit!
+   */
   public static native long msat_make_fp_from_ubv(
       long e, long exp_w, long mant_w, long rounding, long t);
 
   public static native long msat_make_fp_as_ieeebv(long e, long t);
 
+  /**
+   * MathSAT5 expects the mantissa argument for floating-points and floating-point types to not
+   * include the hidden bit!
+   */
   public static native long msat_make_fp_from_ieeebv(long e, long exp_w, long mant_w, long t);
 
   public static native long msat_make_fp_isnan(long e, long t);
@@ -494,15 +515,35 @@ final class Mathsat5NativeApi {
 
   public static native long msat_make_fp_ispos(long e, long t);
 
+  /**
+   * MathSAT5 expects the mantissa argument for floating-points and floating-point types to not
+   * include the hidden bit!
+   */
   public static native long msat_make_fp_plus_inf(long e, long exp_w, long mant_w);
 
+  /**
+   * MathSAT5 expects the mantissa argument for floating-points and floating-point types to not
+   * include the hidden bit!
+   */
   public static native long msat_make_fp_minus_inf(long e, long exp_w, long mant_w);
 
+  /**
+   * MathSAT5 expects the mantissa argument for floating-points and floating-point types to not
+   * include the hidden bit!
+   */
   public static native long msat_make_fp_nan(long e, long exp_w, long mant_w);
 
+  /**
+   * MathSAT5 expects the mantissa argument for floating-points and floating-point types to not
+   * include the hidden bit!
+   */
   public static native long msat_make_fp_rat_number(
       long e, String numRep, long exp_w, long mant_w, long rounding);
 
+  /**
+   * MathSAT5 expects the mantissa argument for floating-points and floating-point types to not
+   * include the hidden bit!
+   */
   public static native long msat_make_fp_bits_number(
       long e, String bitRep, long exp_w, long mant_w);
 
@@ -651,6 +692,14 @@ final class Mathsat5NativeApi {
   public static native boolean msat_term_is_bv_ror(long e, long t);
 
   public static native boolean msat_term_is_bv_comp(long e, long t);
+
+  public static native boolean msat_term_is_fp_roundingmode_nearest_even(long e, long t);
+
+  public static native boolean msat_term_is_fp_roundingmode_zero(long e, long t);
+
+  public static native boolean msat_term_is_fp_roundingmode_plus_inf(long e, long t);
+
+  public static native boolean msat_term_is_fp_roundingmode_minus_inf(long e, long t);
 
   public static native boolean msat_term_is_quantifier(long e, long t);
 

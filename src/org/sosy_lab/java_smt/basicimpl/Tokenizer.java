@@ -14,7 +14,11 @@ import com.google.common.collect.ImmutableList;
 import java.util.List;
 import java.util.Optional;
 
-/** Helper class for splitting up an SMT-LIB2 file into a string of commands. */
+/**
+ * Helper class for splitting up an SMT-LIB2 file into a string of commands.
+ *
+ * <p>This is not a full SMTLIB parser, but only provides basic support for SMTLIB commands.
+ */
 public final class Tokenizer {
 
   private Tokenizer() {}
@@ -133,7 +137,7 @@ public final class Tokenizer {
     }
     if (level != 0) {
       // Throw an exception if the brackets don't match
-      throw new IllegalArgumentException();
+      throw new IllegalArgumentException("brackets do not match, too many open brackets");
     }
     return builder.build();
   }
@@ -166,7 +170,7 @@ public final class Tokenizer {
    * <p>Use {@link #tokenize(String)} to turn an SMT-LIB2 script into a string of input tokens.
    */
   public static boolean isDefinitionToken(String token) {
-    return matchesOneOf(token, "define-fun");
+    return matchesOneOf(token, "define-fun", "define-const");
   }
 
   /**

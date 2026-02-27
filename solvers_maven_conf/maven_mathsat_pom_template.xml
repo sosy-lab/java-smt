@@ -6,7 +6,7 @@ This file is part of JavaSMT,
 an API wrapper for a collection of SMT solvers:
 https://github.com/sosy-lab/java-smt
 
-SPDX-FileCopyrightText: 2021 Dirk Beyer <https://www.sosy-lab.org>
+SPDX-FileCopyrightText: 2025 Dirk Beyer <https://www.sosy-lab.org>
 
 SPDX-License-Identifier: Apache-2.0
 -->
@@ -41,7 +41,7 @@ SPDX-License-Identifier: Apache-2.0
           <url>http://mathsat.fbk.eu/download.html</url>
       </license>
       <license>
-          <name>MPIR is licensed LGPL v3+</name>
+          <name>GMP is licensed both GNU LGPL v3 and GNU GPL v2</name>
           <url>https://www.gnu.org/licenses/lgpl-3.0.en.html</url>
       </license>
   </licenses>

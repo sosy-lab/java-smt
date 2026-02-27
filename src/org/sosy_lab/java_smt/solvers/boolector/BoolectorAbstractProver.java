@@ -22,7 +22,6 @@ import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractProverWithAllSat;
-import org.sosy_lab.java_smt.basicimpl.CachingModel;
 import org.sosy_lab.java_smt.solvers.boolector.BtorJNI.TerminationCallback;
 
 abstract class BoolectorAbstractProver<T> extends AbstractProverWithAllSat<T> {
@@ -33,7 +32,6 @@ abstract class BoolectorAbstractProver<T> extends AbstractProverWithAllSat<T> {
   private final long btor;
   private final BoolectorFormulaManager manager;
   private final BoolectorFormulaCreator creator;
-  protected boolean wasLastSatCheckSat = false; // and stack is not changed
   private final TerminationCallback terminationCallback;
   private final long terminationCallbackHelper;
 
@@ -63,6 +61,11 @@ abstract class BoolectorAbstractProver<T> extends AbstractProverWithAllSat<T> {
   }
 
   @Override
+  protected boolean hasPersistentModel() {
+    return false;
+  }
+
+  @Override
   public void close() {
     if (!closed) {
       // Free resources of callback
@@ -81,12 +84,9 @@ abstract class BoolectorAbstractProver<T> extends AbstractProverWithAllSat<T> {
    * Boolector should throw its own exceptions that tell you what went wrong!
    */
   @Override
-  public boolean isUnsat() throws SolverException, InterruptedException {
-    Preconditions.checkState(!closed);
-    wasLastSatCheckSat = false;
+  protected boolean isUnsatImpl() throws SolverException, InterruptedException {
     final int result = BtorJNI.boolector_sat(btor);
     if (result == BtorJNI.BTOR_RESULT_SAT_get()) {
-      wasLastSatCheckSat = true;
       return false;
     } else if (result == BtorJNI.BTOR_RESULT_UNSAT_get()) {
       return true;
@@ -123,31 +123,32 @@ abstract class BoolectorAbstractProver<T> extends AbstractProverWithAllSat<T> {
     return isUnsat();
   }
 
-  @SuppressWarnings("resource")
   @Override
   public Model getModel() throws SolverException {
-    Preconditions.checkState(!closed);
-    Preconditions.checkState(wasLastSatCheckSat, NO_MODEL_HELP);
     checkGenerateModels();
-    return new CachingModel(getEvaluatorWithoutChecks());
+    return getEvaluatorWithoutChecks();
   }
 
+  @SuppressWarnings("resource")
   @Override
   protected BoolectorModel getEvaluatorWithoutChecks() {
-    return new BoolectorModel(
-        btor, creator, this, Collections2.transform(getAssertedFormulas(), creator::extractInfo));
+    return registerEvaluator(
+        new BoolectorModel(
+            btor,
+            creator,
+            this,
+            Collections2.transform(getAssertedFormulas(), creator::extractInfo)));
   }
 
   @Override
   public List<BooleanFormula> getUnsatCore() {
-    throw new UnsupportedOperationException("Unsat core is not supported by Boolector.");
+    throw new UnsupportedOperationException(UNSAT_CORE_NOT_SUPPORTED);
   }
 
   @Override
   public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(
       Collection<BooleanFormula> pAssumptions) throws SolverException, InterruptedException {
-    throw new UnsupportedOperationException(
-        "Unsat core with assumptions is not supported by Boolector.");
+    throw new UnsupportedOperationException(UNSAT_CORE_NOT_SUPPORTED);
   }
 
   @Override

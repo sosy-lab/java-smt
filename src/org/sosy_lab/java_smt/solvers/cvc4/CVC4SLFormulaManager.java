@@ -45,6 +45,6 @@ public class CVC4SLFormulaManager extends AbstractSLFormulaManager<Expr, Type, E
 
   @Override
   protected Expr makeNilElement(Type pType) {
-    return exprManager.mkExpr(Kind.SEP_NIL, pType.mkGroundTerm());
+    return exprManager.mkNullaryOperator(pType, Kind.SEP_NIL);
   }
 }

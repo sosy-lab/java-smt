@@ -38,27 +38,21 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<String>
   private final TermManager termManager = creator.getEnv();
 
   private final FormulaManager mgr;
-  private final Set<ProverOptions> solverOptions;
-  private final ImmutableMap<String, String> furtherOptionsMap;
-  private final int seed;
   private final CVC5BooleanFormulaManager bmgr;
   private final boolean validateInterpolants;
 
   CVC5InterpolatingProver(
       CVC5FormulaCreator pFormulaCreator,
       ShutdownNotifier pShutdownNotifier,
-      int randomSeed,
-      Set<ProverOptions> pOptions,
+      int pRandomSeed,
+      ImmutableSet<ProverOptions> pOptions,
       FormulaManager pMgr,
       ImmutableMap<String, String> pFurtherOptionsMap,
       boolean pValidateInterpolants) {
-    super(pFormulaCreator, pShutdownNotifier, randomSeed, pOptions, pMgr, pFurtherOptionsMap);
+    super(pFormulaCreator, pShutdownNotifier, pRandomSeed, pOptions, pMgr, pFurtherOptionsMap);
     mgr = pMgr;
-    solverOptions = pOptions;
-    seed = randomSeed;
     bmgr = (CVC5BooleanFormulaManager) mgr.getBooleanFormulaManager();
     validateInterpolants = pValidateInterpolants;
-    furtherOptionsMap = pFurtherOptionsMap;
   }
 
   /**
@@ -66,13 +60,10 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<String>
    * produce-interpolants which is set here. From CVC5AbstractProver Line 66
    */
   @Override
-  protected void setSolverOptions(
-      int randomSeed,
-      Set<ProverOptions> pOptions,
-      ImmutableMap<String, String> pFurtherOptionsMap,
-      Solver pSolver) {
-    super.setSolverOptions(randomSeed, pOptions, pFurtherOptionsMap, pSolver);
-    pSolver.setOption("produce-interpolants", "true");
+  protected Solver getNewSolver() {
+    Solver newSolver = super.getNewSolver();
+    newSolver.setOption("produce-interpolants", "true");
+    return newSolver;
   }
 
   @Override
@@ -83,7 +74,7 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<String>
   @Override
   public BooleanFormula getInterpolant(Collection<String> pFormulasOfA)
       throws SolverException, InterruptedException {
-    checkState(!closed);
+    checkGenerateInterpolants();
     checkArgument(
         getAssertedConstraintIds().containsAll(pFormulasOfA),
         "interpolation can only be done over previously asserted formulas.");
@@ -101,6 +92,7 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<String>
   @Override
   public List<BooleanFormula> getSeqInterpolants(List<? extends Collection<String>> partitions)
       throws SolverException, InterruptedException {
+    checkGenerateInterpolants();
     checkArgument(!partitions.isEmpty(), "at least one partition should be available.");
     final ImmutableSet<String> assertedConstraintIds = getAssertedConstraintIds();
     checkArgument(
@@ -114,7 +106,7 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<String>
       Collection<Term> formulasA =
           FluentIterable.from(partitions.get(i - 1))
               .transform(assertedTerms.peek()::get)
-              .append(previousItp)
+              .append(new Term[] {previousItp}) // class Term is Iterable<Term>, be careful here
               .toSet();
       Collection<Term> formulasB =
           FluentIterable.concat(partitions.subList(i, n))
@@ -184,8 +176,7 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<String>
     Term phiMinus = bmgr.andImpl(formulasB);
 
     // Uses a separate Solver instance to leave the original solver-context unmodified
-    Solver itpSolver = new Solver(termManager);
-    setSolverOptions(seed, solverOptions, furtherOptionsMap, itpSolver);
+    Solver itpSolver = getNewSolver();
 
     Term interpolant;
     try {
@@ -225,9 +216,8 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<String>
         Sets.difference(interpolantSymbols, intersection));
 
     // build and check both Craig interpolation formulas with the generated interpolant.
-    Solver validationSolver = new Solver(termManager);
     // interpolation option is not required for validation
-    super.setSolverOptions(seed, solverOptions, furtherOptionsMap, validationSolver);
+    Solver validationSolver = getNewSolver();
     try {
       validationSolver.push();
       validationSolver.assertFormula(termManager.mkTerm(Kind.IMPLIES, phiPlus, interpolant));

@@ -15,6 +15,7 @@ import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_APP_TER
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_ARITH_CONST;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_ARITH_GE_ATOM;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_ARITH_SUM;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_ARRAY_SELECT;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_BIT_TERM;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_BOOL_CONST;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_BV_ARRAY;
@@ -41,12 +42,14 @@ import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_IDIV;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_IMOD;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_IS_INT_ATOM;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_ITE_TERM;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_LAMBDA_TERM;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_NOT_TERM;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_OR_TERM;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_POWER_PRODUCT;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_RDIV;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_SELECT_TERM;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_UNINTERPRETED_TERM;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_UPDATE_TERM;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_VARIABLE;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_XOR_TERM;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_abs;
@@ -111,16 +114,19 @@ import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_sum_com
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_term_bitsize;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_term_child;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_term_constructor;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_term_is_bitvector;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_term_is_bool;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_term_is_int;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_term_is_real;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_term_num_children;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_term_to_string;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_true;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_type_child;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_type_is_bitvector;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_type_is_bool;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_type_is_function;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_type_is_int;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_type_is_real;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_type_of_term;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_type_to_string;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_update;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_xor;
 
 import com.google.common.base.Joiner;
@@ -136,24 +142,30 @@ import com.google.common.primitives.Ints;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 import org.sosy_lab.common.rationals.Rational;
+import org.sosy_lab.java_smt.api.ArrayFormula;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
+import org.sosy_lab.java_smt.api.FormulaType.ArrayFormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
 import org.sosy_lab.java_smt.api.FunctionDeclarationKind;
 import org.sosy_lab.java_smt.api.QuantifiedFormulaManager.Quantifier;
 import org.sosy_lab.java_smt.api.visitors.FormulaVisitor;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 import org.sosy_lab.java_smt.basicimpl.FunctionDeclarationImpl;
+import org.sosy_lab.java_smt.solvers.yices2.Yices2Formula.Yices2ArrayFormula;
 import org.sosy_lab.java_smt.solvers.yices2.Yices2Formula.Yices2BitvectorFormula;
 import org.sosy_lab.java_smt.solvers.yices2.Yices2Formula.Yices2BooleanFormula;
 import org.sosy_lab.java_smt.solvers.yices2.Yices2Formula.Yices2IntegerFormula;
 import org.sosy_lab.java_smt.solvers.yices2.Yices2Formula.Yices2RationalFormula;
 
+@SuppressWarnings({"ClassTypeParameterName", "MethodTypeParameterName"})
 public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long, Integer> {
 
   private static final ImmutableSet<Integer> CONSTANT_AND_VARIABLE_CONSTRUCTORS =
@@ -169,6 +181,14 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
    * type per var name, meaning there is only 1 column per row!
    */
   private final Table<String, Integer, Integer> formulaCache = HashBasedTable.create();
+
+  /**
+   * List of all UF function declarations.
+   *
+   * <p>We need this in the visitor to tell the difference between functions and arrays. Both are
+   * modeled internally by function terms.
+   */
+  private final Set<Integer> ufSymbols = new HashSet<>();
 
   protected Yices2FormulaCreator() {
     super(null, yices_bool_type(), yices_int_type(), yices_real_type(), null, null);
@@ -186,7 +206,7 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
 
   @Override
   public Integer getArrayType(Integer pIndexType, Integer pElementType) {
-    throw new UnsupportedOperationException();
+    return yices_function_type(1, new int[] {pIndexType}, pElementType);
   }
 
   @Override
@@ -197,6 +217,20 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
   @Override
   public Integer extractInfo(Formula pT) {
     return Yices2FormulaManager.getYicesTerm(pT);
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  protected <TI extends Formula, TE extends Formula> FormulaType<TE> getArrayFormulaElementType(
+      ArrayFormula<TI, TE> pArray) {
+    return ((Yices2ArrayFormula<TI, TE>) pArray).getElementType();
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  protected <TI extends Formula, TE extends Formula> FormulaType<TI> getArrayFormulaIndexType(
+      ArrayFormula<TI, TE> pArray) {
+    return ((Yices2ArrayFormula<TI, TE>) pArray).getIndexType();
   }
 
   @SuppressWarnings("unchecked")
@@ -219,6 +253,10 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
       return (T) new Yices2RationalFormula(pTerm);
     } else if (pType.isBitvectorType()) {
       return (T) new Yices2BitvectorFormula(pTerm);
+    } else if (pType.isArrayType()) {
+      var range = ((ArrayFormulaType<?, ?>) pType).getElementType();
+      var dom = ((ArrayFormulaType<?, ?>) pType).getIndexType();
+      return (T) encapsulateArray(pTerm, dom, range);
     }
     throw new IllegalArgumentException("Cannot create formulas of type " + pType + " in Yices");
   }
@@ -235,12 +273,24 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
     return new Yices2BitvectorFormula(pTerm);
   }
 
+  @Override
+  protected <TI extends Formula, TE extends Formula> ArrayFormula<TI, TE> encapsulateArray(
+      Integer pTerm, FormulaType<TI> pIndexType, FormulaType<TE> pElementType) {
+    checkArgument(
+        getFormulaType(pTerm).equals(FormulaType.getArrayType(pIndexType, pElementType)),
+        "Array formula has unexpected type: %s",
+        getFormulaType(pTerm));
+    return new Yices2Formula.Yices2ArrayFormula<>(pTerm, pIndexType, pElementType);
+  }
+
   @SuppressWarnings("unchecked")
   @Override
   public <T extends Formula> FormulaType<T> getFormulaType(T pFormula) {
     if (pFormula instanceof BitvectorFormula) {
       int type = yices_type_of_term(extractInfo(pFormula));
       return (FormulaType<T>) FormulaType.getBitvectorTypeWithSize(yices_bvtype_size(type));
+    } else if (pFormula instanceof ArrayFormula) {
+      return (FormulaType<T>) convertType(yices_type_of_term(extractInfo(pFormula)));
     } else {
       return super.getFormulaType(pFormula);
     }
@@ -248,19 +298,26 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
 
   @Override
   public FormulaType<?> getFormulaType(Integer pFormula) {
-    if (yices_term_is_bool(pFormula)) {
+    return convertType(yices_type_of_term(pFormula));
+  }
+
+  /** Convert from Yices2 types to JavaSMT FormulaTypes. */
+  private FormulaType<?> convertType(Integer pType) {
+    if (yices_type_is_bool(pType)) {
       return FormulaType.BooleanType;
-    } else if (yices_term_is_int(pFormula)) {
+    } else if (yices_type_is_int(pType)) {
       return FormulaType.IntegerType;
-    } else if (yices_term_is_real(pFormula)) {
+    } else if (yices_type_is_real(pType)) {
       return FormulaType.RationalType;
-    } else if (yices_term_is_bitvector(pFormula)) {
-      return FormulaType.getBitvectorTypeWithSize(yices_term_bitsize(pFormula));
+    } else if (yices_type_is_bitvector(pType)) {
+      return FormulaType.getBitvectorTypeWithSize(yices_bvtype_size(pType));
+    } else if (yices_type_is_function(pType)) {
+      var domain = yices_type_child(pType, 0);
+      var range = yices_type_child(pType, 1);
+      return FormulaType.getArrayType(convertType(domain), convertType(range));
     }
     throw new IllegalArgumentException(
-        String.format(
-            "Unknown formula type '%s' for formula '%s'",
-            yices_type_to_string(yices_type_of_term(pFormula)), yices_term_to_string(pFormula)));
+        String.format("Unknown formula type '%s'", yices_type_to_string(pType)));
   }
 
   /** Creates a named, free variable. Might retrieve it from the cache if created prior. */
@@ -324,6 +381,7 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
     return bound;
   }
 
+  @SuppressWarnings("deprecation")
   @Override
   public <R> R visit(FormulaVisitor<R> pVisitor, Formula pFormula, Integer pF) {
     int constructor = yices_term_constructor(pF);
@@ -334,6 +392,17 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
         return pVisitor.visitConstant(pFormula, convertValue(pF, pF));
       case YICES_BV_CONST:
         return pVisitor.visitConstant(pFormula, convertValue(pF, pF));
+      case YICES_LAMBDA_TERM:
+        // We use lambda terms as array constants
+        return pVisitor.visitFunction(
+            pFormula,
+            ImmutableList.of(encapsulateWithTypeOf(yices_term_child(pF, 1))),
+            FunctionDeclarationImpl.of(
+                "const",
+                FunctionDeclarationKind.CONST,
+                ImmutableList.of(getFormulaType(yices_term_child(pF, 1))),
+                getFormulaType(pF),
+                0));
       case YICES_UNINTERPRETED_TERM:
         return pVisitor.visitFreeVariable(pFormula, yices_get_term_name(pF));
       case YICES_VARIABLE:
@@ -397,14 +466,32 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
         functionKind = FunctionDeclarationKind.ITE;
         break;
       case YICES_APP_TERM:
-        functionKind = FunctionDeclarationKind.UF;
-        functionArgs = getArgs(pF);
-        functionName = yices_term_to_string(functionArgs.get(0));
-        functionDeclaration = functionArgs.get(0);
-        functionArgs.remove(0);
+        var fun = yices_term_child(pF, 0);
+        if (ufSymbols.contains(fun)) {
+          functionKind = FunctionDeclarationKind.UF;
+          functionArgs = getArgs(pF);
+          functionName = yices_get_term_name(functionArgs.get(0));
+          functionDeclaration = functionArgs.get(0);
+          functionArgs.remove(0);
+        } else {
+          functionKind = FunctionDeclarationKind.SELECT;
+          functionArgs = getArgs(pF);
+          functionName = "select";
+          functionDeclaration = -YICES_ARRAY_SELECT;
+        }
+        break;
+      case YICES_UPDATE_TERM:
+        functionKind = FunctionDeclarationKind.STORE;
+        functionArgs =
+            ImmutableList.of(
+                yices_term_child(pF, 0), yices_term_child(pF, 1), yices_term_child(pF, 2));
+        functionDeclaration = -YICES_UPDATE_TERM;
         break;
       case YICES_EQ_TERM:
         functionKind = FunctionDeclarationKind.EQ; // Covers all equivalences
+        break;
+      case YICES_DISTINCT_TERM:
+        functionKind = FunctionDeclarationKind.DISTINCT;
         break;
       case YICES_NOT_TERM:
         if (isNestedExists(pF)) {
@@ -759,6 +846,10 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
           return yices_bvproduct(pArgs.size(), Ints.toArray(pArgs));
         case YICES_AND:
           return yices_and(pArgs.size(), Ints.toArray(pArgs));
+        case YICES_ARRAY_SELECT:
+          return yices_application(pArgs.get(0), 1, new int[] {pArgs.get(1)});
+        case YICES_UPDATE_TERM:
+          return yices_update(pArgs.get(0), 1, new int[] {pArgs.get(1)}, pArgs.get(2));
         default:
           // TODO add more cases
           // if something bad happens here,
@@ -807,6 +898,7 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
       yicesFuncType = yices_function_type(size, argTypeArray, pReturnType);
     }
     int uf = createNamedVariable(yicesFuncType, pName);
+    ufSymbols.add(uf);
     return uf;
   }
 
