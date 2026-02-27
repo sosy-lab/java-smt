@@ -71,6 +71,53 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
   }
 
   @Test
+  public void assumptionsWithModelFailsAfterAddingConstraintTest()
+      throws SolverException, InterruptedException {
+    BooleanFormula b = bmgr.makeVariable("b");
+    BooleanFormula c = bmgr.makeVariable("c");
+
+    try (ProverEnvironment pe = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
+      pe.push();
+      pe.addConstraint(bmgr.or(b, bmgr.makeBoolean(false)));
+      assertThat(pe.isUnsat()).isFalse();
+      assertThat(pe.isUnsatWithAssumptions(ImmutableList.of(bmgr.not(b)))).isTrue();
+      assertThat(pe.isUnsatWithAssumptions(ImmutableList.of(b))).isFalse();
+      pe.addConstraint(c);
+      assertThrows(IllegalStateException.class, pe::getModel);
+    }
+  }
+
+  @Test
+  public void assumptionsWithModelFailsAfterPushTest()
+      throws SolverException, InterruptedException {
+    BooleanFormula b = bmgr.makeVariable("b");
+
+    try (ProverEnvironment pe = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
+      pe.push();
+      pe.addConstraint(bmgr.or(b, bmgr.makeBoolean(false)));
+      assertThat(pe.isUnsat()).isFalse();
+      assertThat(pe.isUnsatWithAssumptions(ImmutableList.of(bmgr.not(b)))).isTrue();
+      assertThat(pe.isUnsatWithAssumptions(ImmutableList.of(b))).isFalse();
+      pe.push();
+      assertThrows(IllegalStateException.class, pe::getModel);
+    }
+  }
+
+  @Test
+  public void assumptionsWithModelFailsAfterUnsatTest()
+      throws SolverException, InterruptedException {
+    BooleanFormula b = bmgr.makeVariable("b");
+
+    try (ProverEnvironment pe = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
+      pe.push();
+      pe.addConstraint(bmgr.or(b, bmgr.makeBoolean(false)));
+      assertThat(pe.isUnsat()).isFalse();
+      assertThat(pe.isUnsatWithAssumptions(ImmutableList.of(bmgr.not(b)))).isTrue();
+      assertThrows(IllegalStateException.class, pe::getModel);
+    }
+  }
+
+  @Test
   public void unsatCoreTest() throws SolverException, InterruptedException {
     requireUnsatCore();
     try (BasicProverEnvironment<?> pe = context.newProverEnvironment(GENERATE_UNSAT_CORE)) {
