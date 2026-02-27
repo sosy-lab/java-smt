@@ -18,12 +18,12 @@ import org.sosy_lab.java_smt.solvers.bitwuzla.api.Term;
 import org.sosy_lab.java_smt.solvers.bitwuzla.api.TermManager;
 
 public class BitwuzlaArrayFormulaManager
-    extends AbstractArrayFormulaManager<Term, Sort, Void, BitwuzlaDeclaration> {
+    extends AbstractArrayFormulaManager<Term, Sort, TermManager, BitwuzlaDeclaration> {
   private final TermManager termManager;
 
   protected BitwuzlaArrayFormulaManager(BitwuzlaFormulaCreator pCreator) {
     super(pCreator);
-    termManager = pCreator.getTermManager();
+    termManager = pCreator.getEnv();
   }
 
   @Override

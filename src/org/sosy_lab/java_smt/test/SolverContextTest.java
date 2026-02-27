@@ -57,7 +57,7 @@ public class SolverContextTest extends SolverBasedTest0.ParameterizedSolverBased
             "Solver %s does not support to access formulae after closing the context",
             solverToUse())
         .that(solverToUse())
-        .isNoneOf(Solvers.CVC5, Solvers.OPENSMT);
+        .isNoneOf(Solvers.CVC5, Solvers.BITWUZLA, Solvers.OPENSMT);
 
     assertThat(term).isEqualTo(term2);
     assertThat(term).isNotEqualTo(term3);

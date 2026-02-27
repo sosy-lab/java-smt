@@ -14,6 +14,7 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.microsoft.z3legacy.enumerations.Z3_decl_kind.Z3_OP_DISTINCT;
 
 import com.google.common.base.Preconditions;
+import com.google.common.base.Splitter;
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -245,8 +246,9 @@ class Z3LegacyFormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
         return FormulaType.getArrayType(
             getFormulaTypeFromSort(domainSort), getFormulaTypeFromSort(rangeSort));
       case Z3_FLOATING_POINT_SORT:
-        return FormulaType.getFloatingPointType(
-            Native.fpaGetEbits(z3context, pSort), Native.fpaGetSbits(z3context, pSort) - 1);
+        // fpaGetSbits returns the mantissa with hidden bit
+        return FormulaType.getFloatingPointTypeFromSizesWithHiddenBit(
+            Native.fpaGetEbits(z3context, pSort), Native.fpaGetSbits(z3context, pSort));
       case Z3_ROUNDING_MODE_SORT:
         return FormulaType.FloatingPointRoundingModeType;
       case Z3_RE_SORT:
@@ -460,7 +462,8 @@ class Z3LegacyFormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
 
   @Override
   public Long getFloatingPointType(FloatingPointType type) {
-    long fpSort = Native.mkFpaSort(getEnv(), type.getExponentSize(), type.getMantissaSize() + 1);
+    long fpSort =
+        Native.mkFpaSort(getEnv(), type.getExponentSize(), type.getMantissaSizeWithHiddenBit());
     Native.incRef(getEnv(), Native.sortToAst(getEnv(), fpSort));
     return fpSort;
   }
@@ -984,47 +987,74 @@ class Z3LegacyFormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
       assert "0".equals(sign) || "1".equals(sign);
       final var expo = new BigInteger(Native.getNumeralString(environment, expoBv));
       final var mant = new BigInteger(Native.getNumeralString(environment, mantBv));
-      return FloatingPointNumber.of(
-          Sign.of(sign.charAt(0) == '1'),
-          expo,
-          mant,
-          pType.getExponentSize(),
-          pType.getMantissaSize());
+      return FloatingPointNumber.of(Sign.of(sign.charAt(0) == '1'), expo, mant, pType);
+    }
 
-      //    } else if (Native.fpaIsNumeralInf(environment, pValue)) {
-      //      // Floating Point Inf uses:
-      //      //  - an sign for posiive/negative infinity,
-      //      //  - "11..11" as exponent,
-      //      //  - "00..00" as mantissa.
-      //      String sign = getSign(pValue).isNegative() ? "1" : "0";
-      //      return FloatingPointNumber.of(
-      //          sign + "1".repeat(pType.getExponentSize()) + "0".repeat(pType.getMantissaSize()),
-      //          pType.getExponentSize(),
-      //          pType.getMantissaSize());
-      //
-      //    } else if (Native.fpaIsNumeralNan(environment, pValue)) {
-      //      // TODO We are underspecified here and choose several bits on our own.
-      //      //  This is not sound, if we combine FP anf BV theory.
-      //      // Floating Point NaN uses:
-      //      //  - an unspecified sign (we choose "0"),
-      //      //  - "11..11" as exponent,
-      //      //  - an unspecified mantissa (we choose all "1").
-      //      return FloatingPointNumber.of(
-      //          "0" + "1".repeat(pType.getExponentSize()) + "1".repeat(pType.getMantissaSize()),
-      //          pType.getExponentSize(),
-      //          pType.getMantissaSize());
+    String astString = Native.astToString(environment, pValue);
+    if (astString.startsWith("(_ +zero") || astString.startsWith("(_ -zero")) {
+      String sign = getSign(pValue).isNegative() ? "1" : "0";
+      return FloatingPointNumber.of(
+          sign
+              + "0".repeat(pType.getExponentSize())
+              + "0".repeat(pType.getMantissaSizeWithoutHiddenBit()),
+          pType);
+
+      // } else if (Native.fpaIsNumeralInf(environment, pValue)) {
+    } else if (astString.startsWith("(_ +oo") || astString.startsWith("(_ -oo")) {
+      // Floating Point Inf uses:
+      //  - an sign for posiive/negative infinity,
+      //  - "11..11" as exponent,
+      //  - "00..00" as mantissa.
+      String sign = getSign(pValue).isNegative() ? "1" : "0";
+      return FloatingPointNumber.of(
+          sign
+              + "1".repeat(pType.getExponentSize())
+              + "0".repeat(pType.getMantissaSizeWithoutHiddenBit()),
+          pType);
+
+      // } else if (Native.fpaIsNumeralNan(environment, pValue)) {
+    } else if (astString.startsWith("(_ NaN ")) {
+      // TODO: is_NaN() is currently not exposed in the JNI. It should be added and the string
+      //  comparison should be replaced
+
+      // TODO We are underspecified here and choose several bits on our own.
+      //  This is not sound, if we combine FP anf BV theory.
+      // Floating Point NaN uses:
+      //  - an unspecified sign (we choose "0"),
+      //  - "11..11" as exponent,
+      //  - an unspecified mantissa (we choose all "1").
+      return FloatingPointNumber.of(
+          "0"
+              + "1".repeat(pType.getExponentSize())
+              + "1".repeat(pType.getMantissaSizeWithoutHiddenBit()),
+          pType);
 
     } else {
+      // AST is of the form: (fp #b1 #x80 #b10000000000000000000000)
+      // But Z3 might switch up hex and binary representations!
+      String prunedAst = astString.substring(4, astString.length() - 1);
+      List<String> splitAstComponents = Splitter.on(' ').splitToList(prunedAst);
+
+      String exponent = splitAstComponents.get(1);
+      String mantissa = splitAstComponents.get(2);
       Sign sign = getSign(pValue);
-      var exponent = Native.fpaGetNumeralExponentString(environment, pValue);
-      var mantissa = Native.fpaGetNumeralSignificandString(environment, pValue);
+
       return FloatingPointNumber.of(
-          sign,
-          new BigInteger(exponent),
-          new BigInteger(mantissa),
-          pType.getExponentSize(),
-          pType.getMantissaSize());
+          sign, getBigIntFromHexOrBinary(exponent), getBigIntFromHexOrBinary(mantissa), pType);
     }
+  }
+
+  private BigInteger getBigIntFromHexOrBinary(String hexOrBinaryZ3String) {
+    if (hexOrBinaryZ3String.startsWith("#x")) {
+      return new BigInteger(hexOrBinaryZ3String.substring(2), 16);
+    } else if (hexOrBinaryZ3String.startsWith("#b")) {
+      return new BigInteger(hexOrBinaryZ3String.substring(2), 2);
+    }
+    throw new UnsupportedOperationException(
+        "Unsupported number representation "
+            + hexOrBinaryZ3String
+            + " in "
+            + "floating-point number");
   }
 
   private Sign getSign(Long pValue) {

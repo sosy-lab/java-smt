@@ -22,7 +22,8 @@ import org.sosy_lab.java_smt.basicimpl.AbstractFloatingPointFormulaManager;
 class Z3LegacyFloatingPointFormulaManager
     extends AbstractFloatingPointFormulaManager<Long, Long, Long, Long> {
 
-  private static final FloatingPointType highPrec = FormulaType.getFloatingPointType(15, 112);
+  private static final FloatingPointType highPrec =
+      FormulaType.getFloatingPointTypeFromSizesWithoutHiddenBit(15, 112);
 
   private final long z3context;
   private final long roundingMode;
@@ -80,7 +81,8 @@ class Z3LegacyFloatingPointFormulaManager
 
     final long signSort = getFormulaCreator().getBitvectorType(1);
     final long expoSort = getFormulaCreator().getBitvectorType(type.getExponentSize());
-    final long mantSort = getFormulaCreator().getBitvectorType(type.getMantissaSize());
+    final long mantSort =
+        getFormulaCreator().getBitvectorType(type.getMantissaSizeWithoutHiddenBit());
 
     final long signBv = Native.mkNumeral(z3context, sign.isNegative() ? "1" : "0", signSort);
     Native.incRef(z3context, signBv);
@@ -101,7 +103,7 @@ class Z3LegacyFloatingPointFormulaManager
     // Z3 does not allow specifying a rounding mode for numerals,
     // so we create it first with a high precision and then round it down explicitly.
     if (pType.getExponentSize() <= highPrec.getExponentSize()
-        || pType.getMantissaSize() <= highPrec.getMantissaSize()) {
+        || pType.getMantissaSizeWithHiddenBit() <= highPrec.getMantissaSizeWithHiddenBit()) {
       long highPrecNumber = Native.mkNumeral(z3context, pN, mkFpaSort(highPrec));
       Native.incRef(z3context, highPrecNumber);
       long smallPrecNumber =

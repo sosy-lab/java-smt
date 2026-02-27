@@ -294,11 +294,11 @@ public class SolverConcurrencyTest {
   public void testFormulaTranslationWithConcurrentContexts()
       throws InvalidConfigurationException, InterruptedException, SolverException {
     requireIntegers();
-    // CVC4 and CVC5 do not support parsing and therefore no translation.
+    // CVC4 does not support parsing and therefore no translation.
     assume()
         .withMessage("Solver does not support translation of formulas")
         .that(solver)
-        .isNoneOf(Solvers.CVC4, Solvers.CVC5);
+        .isNotEqualTo(Solvers.CVC4);
 
     ConcurrentLinkedQueue<ContextAndFormula> contextAndFormulaList = new ConcurrentLinkedQueue<>();
 
@@ -529,11 +529,11 @@ public class SolverConcurrencyTest {
   @Test
   public void continuousRunningThreadFormulaTransferTranslateTest() {
     requireIntegers();
-    // CVC4 and CVC5 do not support parsing and therefore no translation.
+    // CVC4 does not support parsing and therefore no translation.
     assume()
         .withMessage("Solver does not support translation of formulas")
         .that(solver)
-        .isNoneOf(Solvers.CVC4, Solvers.CVC5);
+        .isNotEqualTo(Solvers.CVC4);
     assume()
         .withMessage("Princess will run out of memory")
         .that(solver)

@@ -241,10 +241,6 @@ public abstract class SolverBasedTest0 {
         .withMessage("Solver %s does not support the theory of bitvectors", solverToUse())
         .that(bvmgr)
         .isNotNull();
-    assume()
-        .withMessage("Solver %s does not support bitvectors for interpolation", solverToUse())
-        .that(solverToUse())
-        .isNotEqualTo(Solvers.Z3_WITH_INTERPOLATION);
   }
 
   protected final void requireBitvectorToInt() {
@@ -308,10 +304,6 @@ public abstract class SolverBasedTest0 {
         .withMessage("Solver %s does not support the theory of floats", solverToUse())
         .that(fpmgr)
         .isNotNull();
-    assume()
-        .withMessage("Solver %s does not support floats for interpolation", solverToUse())
-        .that(solverToUse())
-        .isNotEqualTo(Solvers.Z3_WITH_INTERPOLATION);
   }
 
   /** Skip test if the solver does not support strings. */

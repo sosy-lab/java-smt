@@ -1184,6 +1184,6 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
     BooleanFormula z1 = bmgr.makeVariable("z");
     BooleanFormula z2 = fmgr.declareAndCallUF("z", FormulaType.BooleanType);
     assertThat(z1).isEqualTo(z2);
-    assertThatFormula(mgr.distinct(z1, z2)).isUnsatisfiable();
+    assertThatFormula(mgr.makeDistinct(z1, z2)).isUnsatisfiable();
   }
 }
