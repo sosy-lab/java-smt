@@ -213,7 +213,6 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
    * @throws UnsupportedOperationException if optimization is not supported by this prover
    */
   protected OptStatus checkImpl() throws InterruptedException, SolverException {
-    // TODO: Should this also change wasLastSatCheckSatisfiable etc.?
     if (this instanceof OptimizationProverEnvironment) {
       throw new UnsupportedOperationException("checkImpl() must be implemented in a subclass.");
     }
