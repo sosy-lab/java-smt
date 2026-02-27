@@ -146,6 +146,7 @@ class Mathsat5OptimizationProver extends Mathsat5AbstractProver<Void>
   @Override
   public Model getModel() throws SolverException {
     checkState(!closed);
+    checkGenerateModels(); // Needed before loading objective model!
     if (!objectiveMap.isEmpty()) {
       msat_load_objective_model(curEnv, objectiveMap.values().iterator().next());
     }
