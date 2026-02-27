@@ -32,7 +32,8 @@ SPDX-License-Identifier: Apache-2.0
         runtime-princess,
         runtime-smtinterpol,
         runtime-yices2,
-        runtime-z3
+        runtime-z3,
+        runtime-z3-legacy
     "/>
     <property name="ivy.configuration.main" value="core"/>
     <property name="ivy.configurations" value="build, ${ivy.configuration.main}, ${ivy.solver.configurations}, test, format-source, checkstyle, spotbugs"/>
@@ -80,11 +81,13 @@ SPDX-License-Identifier: Apache-2.0
     <!-- Main targets -->
 
     <target name="clean" description="Clean">
-        <property name="jarFiles" value="${class.dir}/** ${ivy.module}-*.jar ivy-*.xml *.jar"/>
+        <property name="jarFiles" value="${class.dir}/** ${source.generated.dir}/** ${ivy.module}-*.jar ivy-*.xml *.jar"/>
+        <property name="docFiles" value="${documentation.javadoc.dir}/** ${z3.javadoc.dir}/**"/>
+        <property name="junitFiles" value="${junit.dir}/** JUnit-coverage/** JUnit.html"/>
         <property name="libraryFiles" value="*.so *.dll *.dylib dist/"/>
 
         <delete includeEmptyDirs="true">
-            <fileset dir="." includes="${libraryFiles} ${jarFiles} Javadoc-z3/"/>
+            <fileset dir="." includes="${libraryFiles} ${jarFiles} ${docFiles} ${junitFiles}"/>
             <fileset dir="lib/native/source/libmathsat5j" includes="*.so *.dll *.o"/>
             <fileset dir="lib/native/source/libbitwuzla" includes="install-linux/ install-linux-x64/ install-linux-arm64/ install-windows/ install-windows-x64/ build/ doc/ *.so *.dll bitwuzla_wrap.o"/>
             <fileset dir="lib/native/source/opensmt" includes="build/ doc/ install-linux-x64/ install-linux-arm64/ *.o *.so version.h"/>

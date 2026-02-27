@@ -8,6 +8,7 @@
 
 package org.sosy_lab.java_smt.solvers.boolector;
 
+import java.util.List;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager;
 
@@ -35,8 +36,13 @@ final class BoolectorFormulaManager extends AbstractFormulaManager<Long, Long, L
   }
 
   @Override
-  public Long parseImpl(String pS) throws IllegalArgumentException {
-    throw new UnsupportedOperationException("Boolector can not parse single formulas.");
+  protected Long equalImpl(Long pArg1, Long pArgs) {
+    return BtorJNI.boolector_eq(getEnvironment(), pArg1, pArgs);
+  }
+
+  @Override
+  protected List<Long> parseAllImpl(String pSmtScript) throws IllegalArgumentException {
+    throw new UnsupportedOperationException(API_METHOD_NOT_IMPLEMENTED);
   }
 
   @Override

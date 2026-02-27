@@ -2,7 +2,7 @@
 // an API wrapper for a collection of SMT solvers:
 // https://github.com/sosy-lab/java-smt
 //
-// SPDX-FileCopyrightText: 2021 Dirk Beyer <https://www.sosy-lab.org>
+// SPDX-FileCopyrightText: 2025 Dirk Beyer <https://www.sosy-lab.org>
 //
 // SPDX-License-Identifier: Apache-2.0
 
@@ -13,6 +13,7 @@ import static org.junit.Assert.assertThrows;
 import static org.sosy_lab.java_smt.api.FormulaType.BooleanType;
 import static org.sosy_lab.java_smt.api.FormulaType.IntegerType;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.truth.Truth;
 import java.util.EnumSet;
 import org.junit.Before;
@@ -100,6 +101,23 @@ public class SolverFormulaIODeclarationsTest
   }
 
   @Test
+  public void parseInvalidQuery1() {
+    for (final String q :
+        ImmutableList.of("()", "(x)", "(exit)", "(and)", "(or)", "(not)", "(=)")) {
+      assertThrows(IllegalArgumentException.class, () -> mgr.parse(q));
+    }
+  }
+
+  @Test
+  public void parseInvalidQuery2() {
+    for (final String q :
+        ImmutableList.of(
+            "(pop)", "(push)", "(assert)", "(assert true", "(assert", "assert", "1", "true")) {
+      assertThrows(IllegalArgumentException.class, () -> mgr.parse(q));
+    }
+  }
+
+  @Test
   public void parseDeclareNeverTest1() {
     String query = "(assert var)";
     assertThrows(IllegalArgumentException.class, () -> mgr.parse(query));
@@ -167,7 +185,7 @@ public class SolverFormulaIODeclarationsTest
     BitvectorFormula var = bvmgr.makeVariable(8, "x");
     String query =
         "(declare-fun x () (_ BitVec 8))(declare-fun x () (_ BitVec 8))(assert (= x #b00000000))";
-    if (EnumSet.of(Solvers.MATHSAT5, Solvers.BITWUZLA).contains(solverToUse())) {
+    if (EnumSet.of(Solvers.MATHSAT5, Solvers.BITWUZLA, Solvers.CVC5).contains(solverToUse())) {
       BooleanFormula formula = mgr.parse(query);
       Truth.assertThat(mgr.extractVariables(formula).values()).containsExactly(var);
     } else {
@@ -226,7 +244,7 @@ public class SolverFormulaIODeclarationsTest
     String query = "(declare-fun x () Bool)(assert x)";
     BooleanFormula formula = mgr.parse(query);
     Truth.assertThat(mgr.extractVariables(formula).values()).hasSize(1);
-    if (!EnumSet.of(Solvers.PRINCESS, Solvers.Z3, Solvers.BITWUZLA).contains(solverToUse())) {
+    if (!EnumSet.of(Solvers.Z3, Solvers.BITWUZLA).contains(solverToUse())) {
       assertThrows(IllegalArgumentException.class, () -> imgr.makeVariable("x"));
     } else if (EnumSet.of(Solvers.BITWUZLA).contains(solverToUse())) {
       Truth.assertThat(mgr.extractVariables(formula).values())

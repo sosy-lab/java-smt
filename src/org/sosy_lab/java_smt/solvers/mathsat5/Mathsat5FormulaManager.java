@@ -11,6 +11,7 @@ package org.sosy_lab.java_smt.solvers.mathsat5;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_apply_substitution;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_from_smtlib2;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_copy_from;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_eq;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_simplify;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_to_smtlib2;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_to_smtlib2_ext;
@@ -66,6 +67,11 @@ final class Mathsat5FormulaManager extends AbstractFormulaManager<Long, Long, Lo
 
   static long[] getMsatTerm(Collection<? extends Formula> pFormulas) {
     return Longs.toArray(Collections2.transform(pFormulas, Mathsat5FormulaManager::getMsatTerm));
+  }
+
+  @Override
+  protected Long equalImpl(Long pArg1, Long pArgs) {
+    return msat_make_eq(getEnvironment(), pArg1, pArgs);
   }
 
   @Override

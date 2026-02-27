@@ -12,6 +12,8 @@ import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.Truth.assertWithMessage;
 import static com.google.common.truth.TruthJUnit.assume;
 import static org.junit.Assert.assertThrows;
+import static org.sosy_lab.java_smt.api.FormulaType.getFloatingPointTypeFromSizesWithHiddenBit;
+import static org.sosy_lab.java_smt.api.FormulaType.getFloatingPointTypeFromSizesWithoutHiddenBit;
 import static org.sosy_lab.java_smt.test.ProverEnvironmentSubject.assertThat;
 
 import com.google.common.collect.ImmutableList;
@@ -35,6 +37,7 @@ import org.sosy_lab.java_smt.api.FloatingPointRoundingMode;
 import org.sosy_lab.java_smt.api.FloatingPointRoundingModeFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
+import org.sosy_lab.java_smt.api.FormulaType.BitvectorType;
 import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
 import org.sosy_lab.java_smt.api.FunctionDeclaration;
 import org.sosy_lab.java_smt.api.FunctionDeclarationKind;
@@ -81,16 +84,16 @@ public class FloatingPointFormulaManagerTest
 
   @Test
   public void floatingPointType() {
-    FloatingPointType type = FormulaType.getFloatingPointType(23, 42);
+    FloatingPointType type = getFloatingPointTypeFromSizesWithoutHiddenBit(23, 42);
     FloatingPointFormula var = fpmgr.makeVariable("x", type);
     FloatingPointType result = (FloatingPointType) mgr.getFormulaType(var);
 
-    assertWithMessage("exponent size")
+    assertWithMessage("exponent sizes not equal")
         .that(result.getExponentSize())
         .isEqualTo(type.getExponentSize());
-    assertWithMessage("mantissa size")
-        .that(result.getMantissaSize())
-        .isEqualTo(type.getMantissaSize());
+    assertWithMessage("mantissa sizes not equal")
+        .that(result.getMantissaSizeWithHiddenBit())
+        .isEqualTo(type.getMantissaSizeWithHiddenBit());
   }
 
   @Test
@@ -325,7 +328,7 @@ public class FloatingPointFormulaManagerTest
 
     for (FloatingPointType prec :
         new FloatingPointType[] {
-          singlePrecType, doublePrecType, FormulaType.getFloatingPointType(5, 6),
+          singlePrecType, doublePrecType, getFloatingPointTypeFromSizesWithoutHiddenBit(5, 6),
         }) {
 
       final FloatingPointFormula numFive = fpmgr.makeNumber(5, prec);
@@ -349,7 +352,7 @@ public class FloatingPointFormulaManagerTest
 
     for (FloatingPointType prec :
         new FloatingPointType[] {
-          singlePrecType, doublePrecType, FormulaType.getFloatingPointType(5, 6),
+          singlePrecType, doublePrecType, getFloatingPointTypeFromSizesWithoutHiddenBit(5, 6),
         }) {
 
       final FloatingPointFormula num = fpmgr.makeNumber(42, prec);
@@ -603,7 +606,7 @@ public class FloatingPointFormulaManagerTest
     checkEqualityOfNumberConstantsFor(3.4028234663852886e+38, doublePrecType);
 
     // check unequality for large types
-    FloatingPointType nearDouble = FormulaType.getFloatingPointType(12, 52);
+    FloatingPointType nearDouble = getFloatingPointTypeFromSizesWithoutHiddenBit(12, 52);
     FloatingPointFormula h1 =
         fpmgr.makeNumber(BigDecimal.TEN.pow(309).multiply(BigDecimal.valueOf(1.0001)), nearDouble);
     FloatingPointFormula h2 =
@@ -611,7 +614,7 @@ public class FloatingPointFormulaManagerTest
     assertThatFormula(fpmgr.equalWithFPSemantics(h1, h2)).isUnsatisfiable();
 
     // check equality for short types
-    FloatingPointType smallType = FormulaType.getFloatingPointType(4, 4);
+    FloatingPointType smallType = getFloatingPointTypeFromSizesWithoutHiddenBit(4, 4);
     FloatingPointFormula i1 =
         fpmgr.makeNumber(BigDecimal.TEN.pow(50).multiply(BigDecimal.valueOf(1.001)), smallType);
     FloatingPointFormula i2 =
@@ -640,7 +643,7 @@ public class FloatingPointFormulaManagerTest
     assertThatFormula(fpmgr.isNegative(ni2)).isTautological();
 
     // check equality for short types
-    FloatingPointType smallType2 = FormulaType.getFloatingPointType(4, 4);
+    FloatingPointType smallType2 = getFloatingPointTypeFromSizesWithoutHiddenBit(4, 4);
     FloatingPointFormula j1 =
         fpmgr.makeNumber(BigDecimal.TEN.pow(500).multiply(BigDecimal.valueOf(1.001)), smallType2);
     FloatingPointFormula j2 =
@@ -669,9 +672,12 @@ public class FloatingPointFormulaManagerTest
     assertThatFormula(fpmgr.isNegative(nj2)).isTautological();
 
     // Z3 supports at least FloatingPointType(15, 112). Larger types seem to be rounded.
-    if (!ImmutableSet.of(Solvers.Z3, Solvers.CVC4).contains(solver)) {
+    if (!ImmutableSet.of(Solvers.Z3, Solvers.Z3_WITH_INTERPOLATION, Solvers.CVC4)
+        .contains(solver)) {
       // check unequality for very large types
-      FloatingPointType largeType = FormulaType.getFloatingPointType(100, 100);
+      int exponentSize = solver == Solvers.BITWUZLA ? 30 : 100; // Bitwuzla has issues above 40 bit.
+      FloatingPointType largeType =
+          getFloatingPointTypeFromSizesWithoutHiddenBit(exponentSize, 100);
       FloatingPointFormula k1 =
           fpmgr.makeNumber(BigDecimal.TEN.pow(200).multiply(BigDecimal.valueOf(1.001)), largeType);
       FloatingPointFormula k2 =
@@ -708,7 +714,7 @@ public class FloatingPointFormulaManagerTest
 
   private void checkNearInf(int mantissa, int exponent, long value)
       throws SolverException, InterruptedException {
-    FloatingPointType type = FormulaType.getFloatingPointType(exponent, mantissa);
+    FloatingPointType type = getFloatingPointTypeFromSizesWithoutHiddenBit(exponent, mantissa);
     FloatingPointFormula fp1 = fpmgr.makeNumber(BigDecimal.valueOf(value), type);
     assertThatFormula(fpmgr.isInfinity(fp1)).isTautological();
     FloatingPointFormula fp2 = fpmgr.makeNumber(BigDecimal.valueOf(value - 1), type);
@@ -743,7 +749,7 @@ public class FloatingPointFormulaManagerTest
 
   private void checkNearMinusInf(int mantissa, int exponent, long value)
       throws SolverException, InterruptedException {
-    FloatingPointType type = FormulaType.getFloatingPointType(exponent, mantissa);
+    FloatingPointType type = getFloatingPointTypeFromSizesWithoutHiddenBit(exponent, mantissa);
     FloatingPointFormula fp1 = fpmgr.makeNumber(BigDecimal.valueOf(value), type);
     assertThatFormula(fpmgr.isInfinity(fp1)).isTautological();
     FloatingPointFormula fp2 = fpmgr.makeNumber(BigDecimal.valueOf(value + 1), type);
@@ -1107,7 +1113,7 @@ public class FloatingPointFormulaManagerTest
             IllegalArgumentException.class, () -> fpmgr.fromIeeeBitvector(bv, singlePrecType));
     assertThat(exSingle.getMessage())
         .contains(
-            "The total size 32 of type FloatingPoint<exp=8,mant=23> "
+            "The total size 32 of type FloatingPoint<exp=8,mant=24> "
                 + "has to match the size 9 of type Bitvector<9>.");
 
     var exDouble =
@@ -1115,7 +1121,7 @@ public class FloatingPointFormulaManagerTest
             IllegalArgumentException.class, () -> fpmgr.fromIeeeBitvector(bv, doublePrecType));
     assertThat(exDouble.getMessage())
         .contains(
-            "The total size 64 of type FloatingPoint<exp=11,mant=52> "
+            "The total size 64 of type FloatingPoint<exp=11,mant=53> "
                 + "has to match the size 9 of type Bitvector<9>.");
   }
 
@@ -1308,12 +1314,242 @@ public class FloatingPointFormulaManagerTest
               Float.MIN_VALUE,
               Float.MIN_NORMAL,
             }) {
-          FloatingPointNumber fiveValue = model.evaluate(fpmgr.makeNumber(f, singlePrecType));
-          assertThat(fiveValue.floatValue()).isEqualTo(f);
-          assertThat(fiveValue.doubleValue()).isEqualTo((double) f);
+          var constFpNum = fpmgr.makeNumber(f, singlePrecType);
+          FloatingPointNumber fpValue = model.evaluate(constFpNum);
+          assertThat(fpValue.getMantissaSizeWithHiddenBit())
+              .isEqualTo(singlePrecType.getMantissaSizeWithHiddenBit());
+          assertThat(fpValue.getMantissaSizeWithoutHiddenBit())
+              .isEqualTo(singlePrecType.getMantissaSizeWithHiddenBit() - 1);
+          assertThat(fpValue.floatValue()).isEqualTo(f);
+          assertThat(fpValue.doubleValue()).isEqualTo((double) f);
         }
       }
     }
+  }
+
+  // The standard defines the mantissa such that it includes the hidden bit, and mantissa +
+  //  exponent equal the total size. This test checks this, + that it holds with to/from IEEE
+  //  bitvector
+  @Test
+  public void bitvectorToFloatingPointMantissaSignBitInterpretationSinglePrecision() {
+    int bvSize32 = singlePrecType.getTotalSize();
+    BitvectorFormula bvNumber32 = bvmgr.makeBitvector(bvSize32, BigInteger.ZERO);
+    // Sanity checks
+    assertThat(bvSize32).isEqualTo(32);
+    assertThat(singlePrecType.getExponentSize()).isEqualTo(8);
+    assertThat(singlePrecType.getMantissaSizeWithoutHiddenBit()).isEqualTo(23);
+    assertThat(singlePrecType.getMantissaSizeWithHiddenBit()).isEqualTo(24);
+    assertThat(bvmgr.getLength(bvNumber32)).isEqualTo(bvSize32);
+    assertThat(mgr.getFormulaType(bvNumber32).isBitvectorType()).isTrue();
+    assertThat(((BitvectorType) mgr.getFormulaType(bvNumber32)).getSize()).isEqualTo(bvSize32);
+
+    // Transform the BV to FP and check that it conforms to the precision used
+    FloatingPointFormula bvToFpSinglePrec = fpmgr.fromIeeeBitvector(bvNumber32, singlePrecType);
+    assertThat(mgr.getFormulaType(bvToFpSinglePrec).isFloatingPointType()).isTrue();
+    assertThat(((FloatingPointType) mgr.getFormulaType(bvToFpSinglePrec)).getTotalSize())
+        .isEqualTo(singlePrecType.getTotalSize());
+    assertThat(
+            ((FloatingPointType) mgr.getFormulaType(bvToFpSinglePrec))
+                .getMantissaSizeWithHiddenBit())
+        .isEqualTo(singlePrecType.getMantissaSizeWithHiddenBit());
+    assertThat(
+            ((FloatingPointType) mgr.getFormulaType(bvToFpSinglePrec))
+                .getMantissaSizeWithoutHiddenBit())
+        .isEqualTo(singlePrecType.getMantissaSizeWithoutHiddenBit());
+    assertThat(((FloatingPointType) mgr.getFormulaType(bvToFpSinglePrec)).getExponentSize())
+        .isEqualTo(singlePrecType.getExponentSize());
+
+    // The same as above, but build the precision by hand with the different APIs
+    FloatingPointType fpTypeWithSignBit =
+        getFloatingPointTypeFromSizesWithHiddenBit(
+            singlePrecType.getExponentSize(), singlePrecType.getMantissaSizeWithHiddenBit());
+    FloatingPointType fpTypeWithoutSignBit =
+        getFloatingPointTypeFromSizesWithoutHiddenBit(
+            singlePrecType.getExponentSize(), singlePrecType.getMantissaSizeWithoutHiddenBit());
+    assertThat(fpTypeWithSignBit).isEqualTo(singlePrecType);
+    assertThat(fpTypeWithoutSignBit).isEqualTo(singlePrecType);
+
+    FloatingPointFormula bvToFpfpTypeWithSignBit =
+        fpmgr.fromIeeeBitvector(bvNumber32, fpTypeWithSignBit);
+    assertThat(mgr.getFormulaType(bvToFpfpTypeWithSignBit).isFloatingPointType()).isTrue();
+    assertThat(((FloatingPointType) mgr.getFormulaType(bvToFpfpTypeWithSignBit)).getTotalSize())
+        .isEqualTo(singlePrecType.getTotalSize());
+    assertThat(
+            ((FloatingPointType) mgr.getFormulaType(bvToFpfpTypeWithSignBit))
+                .getMantissaSizeWithHiddenBit())
+        .isEqualTo(singlePrecType.getMantissaSizeWithHiddenBit());
+    assertThat(
+            ((FloatingPointType) mgr.getFormulaType(bvToFpfpTypeWithSignBit))
+                .getMantissaSizeWithoutHiddenBit())
+        .isEqualTo(singlePrecType.getMantissaSizeWithoutHiddenBit());
+    assertThat(((FloatingPointType) mgr.getFormulaType(bvToFpfpTypeWithSignBit)).getExponentSize())
+        .isEqualTo(singlePrecType.getExponentSize());
+
+    FloatingPointFormula bvToFpfpTypeWithoutSignBit =
+        fpmgr.fromIeeeBitvector(bvNumber32, fpTypeWithoutSignBit);
+    assertThat(mgr.getFormulaType(bvToFpfpTypeWithoutSignBit).isFloatingPointType()).isTrue();
+    assertThat(((FloatingPointType) mgr.getFormulaType(bvToFpfpTypeWithoutSignBit)).getTotalSize())
+        .isEqualTo(singlePrecType.getTotalSize());
+    assertThat(
+            ((FloatingPointType) mgr.getFormulaType(bvToFpfpTypeWithoutSignBit))
+                .getMantissaSizeWithHiddenBit())
+        .isEqualTo(singlePrecType.getMantissaSizeWithHiddenBit());
+    assertThat(
+            ((FloatingPointType) mgr.getFormulaType(bvToFpfpTypeWithoutSignBit))
+                .getMantissaSizeWithoutHiddenBit())
+        .isEqualTo(singlePrecType.getMantissaSizeWithoutHiddenBit());
+    assertThat(
+            ((FloatingPointType) mgr.getFormulaType(bvToFpfpTypeWithoutSignBit)).getExponentSize())
+        .isEqualTo(singlePrecType.getExponentSize());
+  }
+
+  @Test
+  public void floatingPointMantissaSignBitWithBitvectorInterpretationSinglePrecision()
+      throws SolverException, InterruptedException {
+    requireFPToBitvector();
+
+    int bvSize32 = singlePrecType.getTotalSize();
+    BitvectorFormula bvNumber32 = bvmgr.makeBitvector(bvSize32, BigInteger.ZERO);
+    FloatingPointFormula bvToFpSinglePrec = fpmgr.fromIeeeBitvector(bvNumber32, singlePrecType);
+    FloatingPointType fpTypeWithSignBit =
+        getFloatingPointTypeFromSizesWithHiddenBit(
+            singlePrecType.getExponentSize(), singlePrecType.getMantissaSizeWithHiddenBit());
+    FloatingPointType fpTypeWithoutSignBit =
+        getFloatingPointTypeFromSizesWithoutHiddenBit(
+            singlePrecType.getExponentSize(), singlePrecType.getMantissaSizeWithoutHiddenBit());
+    FloatingPointFormula bvToFpfpTypeWithSignBit =
+        fpmgr.fromIeeeBitvector(bvNumber32, fpTypeWithSignBit);
+    FloatingPointFormula bvToFpfpTypeWithoutSignBit =
+        fpmgr.fromIeeeBitvector(bvNumber32, fpTypeWithoutSignBit);
+
+    // Check FP to BV conversion in regard to precision (all above is asserted in
+    //  bitvectorToFloatingPointMantissaSignBitInterpretationSinglePrecision())
+    BitvectorFormula bvToFpSinglePrecToBv = fpmgr.toIeeeBitvector(bvToFpSinglePrec);
+    assertThat(bvmgr.getLength(bvToFpSinglePrecToBv)).isEqualTo(bvSize32);
+
+    BitvectorFormula bvToFpTypeWithSignBitToBv = fpmgr.toIeeeBitvector(bvToFpfpTypeWithSignBit);
+    assertThat(bvmgr.getLength(bvToFpTypeWithSignBitToBv)).isEqualTo(bvSize32);
+
+    BitvectorFormula bvToFpTypeWithoutSignBitToBv =
+        fpmgr.toIeeeBitvector(bvToFpfpTypeWithoutSignBit);
+    assertThat(bvmgr.getLength(bvToFpTypeWithoutSignBitToBv)).isEqualTo(bvSize32);
+
+    assertThatFormula(bvmgr.equal(bvToFpSinglePrecToBv, bvNumber32)).isTautological();
+    assertThatFormula(bvmgr.equal(bvToFpTypeWithSignBitToBv, bvNumber32)).isTautological();
+    assertThatFormula(bvmgr.equal(bvToFpTypeWithoutSignBitToBv, bvNumber32)).isTautological();
+  }
+
+  // The standard defines the mantissa such that it includes the hidden bit, and mantissa +
+  //  exponent equal the total size. This test checks this, + that it holds with from
+  //  bitvector to IEEE FP
+  @Test
+  public void bitvectorToFloatingPointMantissaSignBitInterpretationDoublePrecision() {
+    int bvSize64 = doublePrecType.getTotalSize();
+    BitvectorFormula bvNumberSize64 = bvmgr.makeBitvector(bvSize64, BigInteger.ZERO);
+    // Sanity checks
+    assertThat(bvSize64).isEqualTo(64);
+    assertThat(doublePrecType.getExponentSize()).isEqualTo(11);
+    assertThat(doublePrecType.getMantissaSizeWithoutHiddenBit()).isEqualTo(52);
+    assertThat(doublePrecType.getMantissaSizeWithHiddenBit()).isEqualTo(53);
+    assertThat(bvmgr.getLength(bvNumberSize64)).isEqualTo(bvSize64);
+    assertThat(mgr.getFormulaType(bvNumberSize64).isBitvectorType()).isTrue();
+    assertThat(((BitvectorType) mgr.getFormulaType(bvNumberSize64)).getSize()).isEqualTo(bvSize64);
+
+    // Transform the BV to FP and check that it conforms to the precision used
+    FloatingPointFormula bvToFpDoublePrec = fpmgr.fromIeeeBitvector(bvNumberSize64, doublePrecType);
+    assertThat(mgr.getFormulaType(bvToFpDoublePrec).isFloatingPointType()).isTrue();
+    assertThat(((FloatingPointType) mgr.getFormulaType(bvToFpDoublePrec)).getTotalSize())
+        .isEqualTo(doublePrecType.getTotalSize());
+    assertThat(
+            ((FloatingPointType) mgr.getFormulaType(bvToFpDoublePrec))
+                .getMantissaSizeWithHiddenBit())
+        .isEqualTo(doublePrecType.getMantissaSizeWithHiddenBit());
+    assertThat(
+            ((FloatingPointType) mgr.getFormulaType(bvToFpDoublePrec))
+                .getMantissaSizeWithoutHiddenBit())
+        .isEqualTo(doublePrecType.getMantissaSizeWithoutHiddenBit());
+    assertThat(((FloatingPointType) mgr.getFormulaType(bvToFpDoublePrec)).getExponentSize())
+        .isEqualTo(doublePrecType.getExponentSize());
+
+    // The same as above, but build the precision by hand with the different APIs
+    FloatingPointType fpTypeWithSignBit =
+        getFloatingPointTypeFromSizesWithHiddenBit(
+            doublePrecType.getExponentSize(), doublePrecType.getMantissaSizeWithHiddenBit());
+    FloatingPointType fpTypeWithoutSignBit =
+        getFloatingPointTypeFromSizesWithoutHiddenBit(
+            doublePrecType.getExponentSize(), doublePrecType.getMantissaSizeWithoutHiddenBit());
+    assertThat(fpTypeWithSignBit).isEqualTo(doublePrecType);
+    assertThat(fpTypeWithoutSignBit).isEqualTo(doublePrecType);
+
+    FloatingPointFormula bvToFpfpTypeWithSignBit =
+        fpmgr.fromIeeeBitvector(bvNumberSize64, fpTypeWithSignBit);
+    assertThat(mgr.getFormulaType(bvToFpfpTypeWithSignBit).isFloatingPointType()).isTrue();
+    assertThat(((FloatingPointType) mgr.getFormulaType(bvToFpfpTypeWithSignBit)).getTotalSize())
+        .isEqualTo(doublePrecType.getTotalSize());
+    assertThat(
+            ((FloatingPointType) mgr.getFormulaType(bvToFpfpTypeWithSignBit))
+                .getMantissaSizeWithHiddenBit())
+        .isEqualTo(doublePrecType.getMantissaSizeWithHiddenBit());
+    assertThat(
+            ((FloatingPointType) mgr.getFormulaType(bvToFpfpTypeWithSignBit))
+                .getMantissaSizeWithoutHiddenBit())
+        .isEqualTo(doublePrecType.getMantissaSizeWithoutHiddenBit());
+    assertThat(((FloatingPointType) mgr.getFormulaType(bvToFpfpTypeWithSignBit)).getExponentSize())
+        .isEqualTo(doublePrecType.getExponentSize());
+
+    FloatingPointFormula bvToFpfpTypeWithoutSignBit =
+        fpmgr.fromIeeeBitvector(bvNumberSize64, fpTypeWithoutSignBit);
+    assertThat(mgr.getFormulaType(bvToFpfpTypeWithoutSignBit).isFloatingPointType()).isTrue();
+    assertThat(((FloatingPointType) mgr.getFormulaType(bvToFpfpTypeWithoutSignBit)).getTotalSize())
+        .isEqualTo(doublePrecType.getTotalSize());
+    assertThat(
+            ((FloatingPointType) mgr.getFormulaType(bvToFpfpTypeWithoutSignBit))
+                .getMantissaSizeWithHiddenBit())
+        .isEqualTo(doublePrecType.getMantissaSizeWithHiddenBit());
+    assertThat(
+            ((FloatingPointType) mgr.getFormulaType(bvToFpfpTypeWithoutSignBit))
+                .getMantissaSizeWithoutHiddenBit())
+        .isEqualTo(doublePrecType.getMantissaSizeWithoutHiddenBit());
+    assertThat(
+            ((FloatingPointType) mgr.getFormulaType(bvToFpfpTypeWithoutSignBit)).getExponentSize())
+        .isEqualTo(doublePrecType.getExponentSize());
+  }
+
+  // Checks the correct precision/exponent/mantissa in FP to BV conversion
+  @Test
+  public void floatingPointMantissaSignBitWithBitvectorInterpretationDoublePrecision()
+      throws SolverException, InterruptedException {
+    requireFPToBitvector();
+
+    int bvSize64 = doublePrecType.getTotalSize();
+    BitvectorFormula bvNumberSize64 = bvmgr.makeBitvector(bvSize64, BigInteger.ZERO);
+    FloatingPointFormula bvToFpDoublePrec = fpmgr.fromIeeeBitvector(bvNumberSize64, doublePrecType);
+    FloatingPointType fpTypeWithSignBit =
+        getFloatingPointTypeFromSizesWithHiddenBit(
+            doublePrecType.getExponentSize(), doublePrecType.getMantissaSizeWithHiddenBit());
+    FloatingPointType fpTypeWithoutSignBit =
+        getFloatingPointTypeFromSizesWithoutHiddenBit(
+            doublePrecType.getExponentSize(), doublePrecType.getMantissaSizeWithoutHiddenBit());
+    FloatingPointFormula bvToFpfpTypeWithSignBit =
+        fpmgr.fromIeeeBitvector(bvNumberSize64, fpTypeWithSignBit);
+    FloatingPointFormula bvToFpfpTypeWithoutSignBit =
+        fpmgr.fromIeeeBitvector(bvNumberSize64, fpTypeWithoutSignBit);
+
+    // Check FP to BV conversion in regard to precision (all above is asserted in
+    //  bitvectorToFloatingPointMantissaSignBitInterpretationDoublePrecision())
+    BitvectorFormula bvToFpDoublePrecToBv = fpmgr.toIeeeBitvector(bvToFpDoublePrec);
+    assertThat(bvmgr.getLength(bvToFpDoublePrecToBv)).isEqualTo(bvSize64);
+
+    BitvectorFormula bvToFpTypeWithSignBitToBv = fpmgr.toIeeeBitvector(bvToFpfpTypeWithSignBit);
+    assertThat(bvmgr.getLength(bvToFpTypeWithSignBitToBv)).isEqualTo(bvSize64);
+
+    BitvectorFormula bvToFpTypeWithoutSignBitToBv =
+        fpmgr.toIeeeBitvector(bvToFpfpTypeWithoutSignBit);
+    assertThat(bvmgr.getLength(bvToFpTypeWithoutSignBitToBv)).isEqualTo(bvSize64);
+
+    assertThatFormula(bvmgr.equal(bvToFpTypeWithSignBitToBv, bvNumberSize64)).isTautological();
+    assertThatFormula(bvmgr.equal(bvToFpDoublePrecToBv, bvNumberSize64)).isTautological();
+    assertThatFormula(bvmgr.equal(bvToFpTypeWithoutSignBitToBv, bvNumberSize64)).isTautological();
   }
 
   @Test
@@ -1361,14 +1597,16 @@ public class FloatingPointFormulaManagerTest
                   BigInteger.valueOf(exponent), BigInteger.valueOf(mantissa), sign, singlePrecType);
           final FloatingPointNumber fpNumber =
               FloatingPointNumber.of(
-                  sign,
-                  BigInteger.valueOf(exponent),
-                  BigInteger.valueOf(mantissa),
-                  singlePrecType.getExponentSize(),
-                  singlePrecType.getMantissaSize());
+                  sign, BigInteger.valueOf(exponent), BigInteger.valueOf(mantissa), singlePrecType);
+          assertThat(fpNumber.getMantissaSizeWithHiddenBit())
+              .isEqualTo(singlePrecType.getMantissaSizeWithHiddenBit());
+          assertThat(fpNumber.getMantissaSizeWithoutHiddenBit())
+              .isEqualTo(singlePrecType.getMantissaSizeWithHiddenBit() - 1);
           final FloatingPointFormula fp1 = fpmgr.makeNumber(fpNumber);
           final FloatingPointFormula fp2 = fpmgr.makeNumber(pFloat, singlePrecType);
-          return bmgr.and(fpmgr.assignment(fpFromBv, fp1), fpmgr.assignment(fpFromBv, fp2));
+          final BooleanFormula assignment1 = fpmgr.assignment(fpFromBv, fp1);
+          final BooleanFormula assignment2 = fpmgr.assignment(fpFromBv, fp2);
+          return bmgr.and(assignment1, assignment2);
         });
   }
 
@@ -1387,14 +1625,16 @@ public class FloatingPointFormulaManagerTest
                   BigInteger.valueOf(exponent), BigInteger.valueOf(mantissa), sign, doublePrecType);
           final FloatingPointNumber fpNumber =
               FloatingPointNumber.of(
-                  sign,
-                  BigInteger.valueOf(exponent),
-                  BigInteger.valueOf(mantissa),
-                  doublePrecType.getExponentSize(),
-                  doublePrecType.getMantissaSize());
+                  sign, BigInteger.valueOf(exponent), BigInteger.valueOf(mantissa), doublePrecType);
+          assertThat(fpNumber.getMantissaSizeWithHiddenBit())
+              .isEqualTo(doublePrecType.getMantissaSizeWithHiddenBit());
+          assertThat(fpNumber.getMantissaSizeWithoutHiddenBit())
+              .isEqualTo(doublePrecType.getMantissaSizeWithHiddenBit() - 1);
           final FloatingPointFormula fp1 = fpmgr.makeNumber(fpNumber);
           final FloatingPointFormula fp2 = fpmgr.makeNumber(pDouble, doublePrecType);
-          return bmgr.and(fpmgr.assignment(fpFromBv, fp1), fpmgr.assignment(fpFromBv, fp2));
+          final BooleanFormula assignment1 = fpmgr.assignment(fpFromBv, fp1);
+          final BooleanFormula assignment2 = fpmgr.assignment(fpFromBv, fp2);
+          return bmgr.and(assignment1, assignment2);
         });
   }
 

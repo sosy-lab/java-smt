@@ -11,10 +11,13 @@ package org.sosy_lab.java_smt.solvers.yices2;
 import static com.google.common.base.CharMatcher.inRange;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_APP_TERM;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bvtype_size;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_distinct;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_eq;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_parse_term;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_term_child;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_term_constructor;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_term_to_string;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_true;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_type_children;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_type_is_bitvector;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_type_num_children;
@@ -24,6 +27,8 @@ import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_type_to
 import com.google.common.base.CharMatcher;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
+import com.google.common.collect.ImmutableList;
+import com.google.common.primitives.Ints;
 import java.io.IOException;
 import java.util.Locale;
 import java.util.Map;
@@ -69,9 +74,24 @@ public class Yices2FormulaManager extends AbstractFormulaManager<Integer, Intege
   }
 
   @Override
-  public Integer parseImpl(String pS) throws IllegalArgumentException {
+  protected Integer equalImpl(Integer pArg1, Integer pArgs) {
+    return yices_eq(pArg1, pArgs);
+  }
+
+  @Override
+  protected Integer distinctImpl(Iterable<Integer> pArgs) {
+    int[] array = Ints.toArray(ImmutableList.copyOf(pArgs));
+    if (array.length < 2) {
+      return yices_true();
+    } else {
+      return yices_distinct(array.length, array);
+    }
+  }
+
+  @Override
+  protected Integer parseImpl(String pSmtScript) throws IllegalArgumentException {
     // TODO Might expect Yices input language instead of smt-lib2 notation
-    return yices_parse_term(pS);
+    return yices_parse_term(pSmtScript);
   }
 
   /** Helper function to (pretty) print yices2 sorts. */

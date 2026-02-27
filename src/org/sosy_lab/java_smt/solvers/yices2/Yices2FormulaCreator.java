@@ -490,6 +490,9 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
       case YICES_EQ_TERM:
         functionKind = FunctionDeclarationKind.EQ; // Covers all equivalences
         break;
+      case YICES_DISTINCT_TERM:
+        functionKind = FunctionDeclarationKind.DISTINCT;
+        break;
       case YICES_NOT_TERM:
         if (isNestedExists(pF)) {
           int existsTerm = Iterables.getOnlyElement(getArgs(pF));

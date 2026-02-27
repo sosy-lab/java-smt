@@ -524,7 +524,7 @@ class PrincessFormulaCreator
       }
     } else if (input instanceof IFunApp) {
       if (kind == FunctionDeclarationKind.UF) {
-        solverDeclaration = new PrincessIFunctionDeclaration(((IFunApp) input).fun());
+        solverDeclaration = new PrincessIFunctionDeclaration((IFunApp) input);
       } else if (kind == FunctionDeclarationKind.MUL) {
         solverDeclaration = PrincessMultiplyDeclaration.INSTANCE;
       } else {
@@ -716,7 +716,7 @@ class PrincessFormulaCreator
   @Override
   public PrincessFunctionDeclaration declareUFImpl(
       String pName, Sort pReturnType, List<Sort> args) {
-    return new PrincessIFunctionDeclaration(environment.declareFun(pName, pReturnType, args));
+    return environment.declareFun(pName, pReturnType, args);
   }
 
   @Override

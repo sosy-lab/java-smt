@@ -120,8 +120,7 @@ public class SolverContextFactoryTest {
       case YICES2:
         return IS_LINUX && !IS_ARCH_ARM64;
       case CVC5:
-        return (IS_LINUX && isSufficientVersionOfLibcxx("cvc5jni"))
-            || (IS_WINDOWS && !IS_ARCH_ARM64);
+        return (IS_LINUX && isSufficientVersionOfLibcxx("cvc5jni")) || IS_WINDOWS || IS_MAC;
       case OPENSMT:
         return IS_LINUX && isSufficientVersionOfLibcxx("opensmtj");
       case BITWUZLA:
@@ -132,6 +131,8 @@ public class SolverContextFactoryTest {
             || (IS_WINDOWS && !IS_ARCH_ARM64);
       case Z3:
         return (IS_LINUX && isSufficientVersionOfLibcxx("z3")) || IS_WINDOWS || IS_MAC;
+      case Z3_WITH_INTERPOLATION:
+        return IS_LINUX;
       default:
         throw new AssertionError("unexpected solver: " + solverToUse());
     }
@@ -225,9 +226,12 @@ public class SolverContextFactoryTest {
     String solverName = solverToUse().toString();
     if (solverToUse() == Solvers.YICES2) {
       solverName = "YICES"; // remove the number "2" from the name
+    } else if (solverToUse() == Solvers.Z3_WITH_INTERPOLATION) {
+      solverName = "Z3";
     }
     String optionalSuffix = "([A-Za-z0-9.,:_+\\-\\s()@]+)?"; // any string
-    String versionNumberRegex = "(version\\s)?\\d+\\.\\d+(\\.\\d+)?"; // 2-3 numbers with dots
+    String versionNumberRegex =
+        "(version\\s)?\\d+\\.\\d+(\\.\\d+)?(\\.\\d+)?"; // 2-4 numbers with dots
     if (solverToUse() == Solvers.PRINCESS) {
       versionNumberRegex = "\\d+-\\d+-\\d+"; // Princess uses date instead of version
     }

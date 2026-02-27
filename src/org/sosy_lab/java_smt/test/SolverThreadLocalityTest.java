@@ -347,6 +347,7 @@ public class SolverThreadLocalityTest extends SolverBasedTest0.ParameterizedSolv
             Solvers.MATHSAT5,
             Solvers.SMTINTERPOL,
             Solvers.Z3,
+            Solvers.Z3_WITH_INTERPOLATION,
             Solvers.PRINCESS,
             Solvers.BOOLECTOR,
             Solvers.BITWUZLA,
