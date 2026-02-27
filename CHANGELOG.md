@@ -32,7 +32,8 @@ SPDX-License-Identifier: Apache-2.0
 - Boolector: (broken) support for quantified formulas has been removed.
 
 ### Solver updates
-- Updated CVC5 from version 1.0.5 to intermediate version 2026-01-21 (version 1.3.2 with some additional updates)
+- Updated CVC5 from version 1.0.5 to daily release version 2026-02-26-d22638a (2 days 
+  after version 1.3.3)
 - Updated MathSAT5 from version 5.6.10 to 5.6.15
 - Updated OptiMathSAT from version 1.7.1 to 1.7.3
 - Updated Z3 from version 4.12.5 to 4.15.4
@@ -53,7 +54,7 @@ SPDX-License-Identifier: Apache-2.0
 - Yices2: support for the theory of arrays has been added.
 - String theory: Clarified that Strings used in the `StringFormulaManager` API are indeed Java Strings and may contain Unicode characters. Escape sequences like `\u0020` will not be translated automatically. Use `AbstractStringFormulaManager.escapeUnicodeForSmtlib()` and `AbstractStringFormulaManager.unescapeUnicodeForSmtlib()` to handle escape sequences when translating from/to SMT/SMTLIB2.
 - Added `FormulaManager.makeEqual()` and `FormulaManager.makeDistinct()` as a more general way of creating equality (= ...) and distinct (distinct ...) formulas. The new methods are provided in addition of existing, theory specific, methods such as `IntegerFormulaManager.equal()` or `BitvectorFormulaManager.distinct()`. The API allows for an arbitrary number of arguments. The type of the arguments must match, except for formulas over Integer and Real theories, which may be mixed.
-
+- Multi-assertion SMTLIB2 parsing has been added and can be used via `FormulaManager.parseAll()`.
 
 ### Updates
 - Memory leaks in CVC5 and Bitwuzla have been fixed.
