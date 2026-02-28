@@ -284,7 +284,7 @@ public class SolverContextFactory {
       case Z3:
         return Z3SolverContext.create(
             logger,
-            config,
+            Configuration.builder().copyFrom(config).setOption("requireProofs", "true").build(),
             shutdownNotifier,
             logfile,
             randomSeed,
