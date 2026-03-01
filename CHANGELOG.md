@@ -32,6 +32,8 @@ SPDX-License-Identifier: Apache-2.0
     - Use `FloatingPointFormulaManager.fromRoundingModeFormula()` to get the rounding mode of a `FloatingPointRoundingModeFormula`, and `FloatingPointFormulaManager.makeRoundingMode()` to create new `FloatingPointRoundingModeFormula`s.
     - The rounding-modes can now be accessed via `FloatingPointRoundingMode.getRoundingMode()`, but have been renamed: `FP_ROUND_AWAY` to `NEAREST_TIES_AWAY`, `FP_ROUND_AWAY` to `NEAREST_TIES_TO_EVEN`, `FP_ROUND_NEGATIVE` to `TOWARD_NEGATIVE`, `FP_ROUND_POSITIVE` to `TOWARD_POSITIVE`, and `FP_ROUND_ZERO` to `TOWARD_ZERO`.
 - Boolector: (broken) support for quantified formulas has been removed.
+- Unsat-core over assumptions generation now always requires the correct option `ProverOptions.GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS`. 
+  It was possible to use `ProverOptions.GENERATE_UNSAT_CORE` for unsat-core over assumption generation in MathSAT5 before.
 
 ### Solver updates
 - Updated CVC5 from version 1.0.5 to daily release version 2026-02-26-d22638a (2 days 
@@ -59,6 +61,8 @@ SPDX-License-Identifier: Apache-2.0
 - Multi-assertion SMTLIB2 parsing has been added and can be used via `FormulaManager.parseAll()`.
 
 ### Updates
+- Documentation for `unsatCoreOverAssumptions()` has been updated to reflect that it calls `isUnsatOverAssumptions()` automatically, 
+  and does not require a call to `isUnsat()` or `isUnsatOverAssumptions()` directly preceding it.
 - We now ensure that all model generating API (i.e. `getModel()`, `lower()`, and `upper()`) is only
   ever used directly after SAT has been returned by a solver. This ensures that no outdated models are retrieved.
   All value assignments of a new model are now automatically cached for all solvers in the first call to `getModel()`.
