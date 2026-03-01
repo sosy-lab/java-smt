@@ -117,9 +117,11 @@ abstract class BoolectorAbstractProver<T> extends AbstractProverWithAllSat<T> {
   public boolean isUnsatWithAssumptions(Collection<BooleanFormula> pAssumptions)
       throws SolverException, InterruptedException {
     Preconditions.checkState(!closed);
+
     for (BooleanFormula assumption : pAssumptions) {
       BtorJNI.boolector_assume(btor, BoolectorFormulaManager.getBtorTerm(assumption));
     }
+    // We don't need to update wasLastSatCheckSatisfiable etc. as isUnsat() does it automatically
     return isUnsat();
   }
 

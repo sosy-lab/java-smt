@@ -142,6 +142,8 @@ class BitwuzlaTheoremProver extends AbstractProverWithAllSat<Void> implements Pr
   public boolean isUnsatWithAssumptions(Collection<BooleanFormula> assumptions)
       throws SolverException, InterruptedException {
     Preconditions.checkState(!closed);
+    changedSinceLastSatQuery = false;
+    wasLastSatCheckSatisfiable = false;
 
     Collection<Term> newAssumptions = new LinkedHashSet<>();
     for (BooleanFormula formula : assumptions) {
@@ -151,7 +153,11 @@ class BitwuzlaTheoremProver extends AbstractProverWithAllSat<Void> implements Pr
     }
 
     final Result result = env.check_sat(new Vector_Term(newAssumptions));
-    return readSATResult(result);
+    final boolean isUnsat = readSATResult(result);
+    if (!isUnsat) {
+      wasLastSatCheckSatisfiable = true;
+    }
+    return isUnsat;
   }
 
   /**
