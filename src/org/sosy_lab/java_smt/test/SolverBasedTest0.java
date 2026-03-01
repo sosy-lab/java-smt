@@ -32,6 +32,7 @@ import org.sosy_lab.java_smt.SolverContextFactory;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.ArrayFormulaManager;
 import org.sosy_lab.java_smt.api.BasicProverEnvironment;
+import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BitvectorFormulaManager;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.BooleanFormulaManager;
@@ -484,6 +485,56 @@ public abstract class SolverBasedTest0 {
         }
       }
     }
+  }
+
+  private static final int BITSIZE = 32;
+
+  protected Formula makeVariable(String name) {
+    return imgr == null ? bvmgr.makeVariable(BITSIZE, name) : imgr.makeVariable(name);
+  }
+
+  protected Formula makeNumber(int number) {
+    return imgr == null ? bvmgr.makeBitvector(BITSIZE, number) : imgr.makeNumber(number);
+  }
+
+  protected Formula addNumber(Formula x, Formula y) {
+    if (x instanceof IntegerFormula && y instanceof IntegerFormula) {
+      return imgr.add((IntegerFormula) x, (IntegerFormula) y);
+    }
+    if (x instanceof BitvectorFormula && y instanceof BitvectorFormula) {
+      return bvmgr.add((BitvectorFormula) x, (BitvectorFormula) y);
+    }
+    throw new IllegalArgumentException();
+  }
+
+  protected Formula multiplyNumber(Formula x, Formula y) {
+    if (x instanceof IntegerFormula && y instanceof IntegerFormula) {
+      return imgr.multiply((IntegerFormula) x, (IntegerFormula) y);
+    }
+    if (x instanceof BitvectorFormula && y instanceof BitvectorFormula) {
+      return bvmgr.multiply((BitvectorFormula) x, (BitvectorFormula) y);
+    }
+    throw new IllegalArgumentException();
+  }
+
+  protected BooleanFormula lessThanNumber(Formula x, Formula y) {
+    if (x instanceof IntegerFormula && y instanceof IntegerFormula) {
+      return imgr.lessThan((IntegerFormula) x, (IntegerFormula) y);
+    }
+    if (x instanceof BitvectorFormula && y instanceof BitvectorFormula) {
+      return bvmgr.lessThan((BitvectorFormula) x, (BitvectorFormula) y, true);
+    }
+    throw new IllegalArgumentException();
+  }
+
+  protected BooleanFormula greaterThanNumber(Formula x, Formula y) {
+    if (x instanceof IntegerFormula && y instanceof IntegerFormula) {
+      return imgr.greaterThan((IntegerFormula) x, (IntegerFormula) y);
+    }
+    if (x instanceof BitvectorFormula && y instanceof BitvectorFormula) {
+      return bvmgr.greaterThan((BitvectorFormula) x, (BitvectorFormula) y, true);
+    }
+    throw new IllegalArgumentException();
   }
 
   @RunWith(Parameterized.class)

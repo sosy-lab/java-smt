@@ -34,12 +34,12 @@ class BitwuzlaModel extends AbstractModel<Term, Sort, TermManager> {
 
   // The prover env, not the creator env!
   private final Bitwuzla bitwuzlaEnv;
-  private final BitwuzlaTheoremProver prover;
+  private final BitwuzlaAbstractProver<?> prover;
   private final ImmutableList<ValueAssignment> model;
 
   protected BitwuzlaModel(
       Bitwuzla bitwuzlaEnv,
-      BitwuzlaTheoremProver prover,
+      BitwuzlaAbstractProver<?> prover,
       BitwuzlaFormulaCreator bitwuzlaCreator,
       Collection<Term> assertedTerms) {
     super(prover, bitwuzlaCreator);
@@ -121,8 +121,7 @@ class BitwuzlaModel extends AbstractModel<Term, Sort, TermManager> {
     while (value.kind().equals(Kind.ARRAY_STORE)) {
       Term index = value.get(1);
       Term element = value.get(2);
-      Term select =
-          ((BitwuzlaFormulaCreator) creator).getEnv().mk_term(Kind.ARRAY_SELECT, expr, index);
+      Term select = creator.getEnv().mk_term(Kind.ARRAY_SELECT, expr, index);
 
       // CASE 1: nested array dimension, let's recurse deeper
       if (expr.sort().array_element().is_array()) {
@@ -152,12 +151,7 @@ class BitwuzlaModel extends AbstractModel<Term, Sort, TermManager> {
   }
 
   private Term buildEqForTwoTerms(Term left, Term right) {
-    assert left.sort().equals(right.sort());
-    Kind kind = Kind.EQUAL;
-    if (left.sort().is_fp() || right.sort().is_fp()) {
-      kind = Kind.FP_EQUAL;
-    }
-    return ((BitwuzlaFormulaCreator) creator).getEnv().mk_term(kind, left, right);
+    return creator.getEnv().mk_term(Kind.EQUAL, left, right);
   }
 
   private ValueAssignment getAssignmentForUfInstantiation(Term pTerm) {
