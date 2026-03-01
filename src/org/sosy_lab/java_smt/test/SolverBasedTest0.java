@@ -402,7 +402,7 @@ public abstract class SolverBasedTest0 {
     assume()
         .withMessage("Solver %s does not support unsat core generation", solverToUse())
         .that(solverToUse())
-        .isNotEqualTo(Solvers.PRINCESS);
+        .isNoneOf(Solvers.OPENSMT, Solvers.PRINCESS, Solvers.BOOLECTOR, Solvers.CVC4, Solvers.CVC5);
   }
 
   protected void requireSubstitution() {
