@@ -21,6 +21,30 @@ import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 
 public class UnsatCoreTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
+
+  // Tests that unsat cores can not be requested after changes to the stack have been made after
+  // UNSAT has been established.
+  @Test
+  public void getUnsatCoreAfterStackModificationFailureTest()
+      throws InterruptedException, SolverException {
+    requireUnsatCore();
+    try (var prover = context.newProverEnvironment(ProverOptions.GENERATE_UNSAT_CORE)) {
+      var a = bmgr.makeVariable("a");
+      var b = bmgr.makeVariable("b");
+      prover.addConstraint(a);
+      prover.addConstraint(bmgr.not(a));
+      assertThat(prover.isUnsat()).isTrue();
+      prover.push();
+      assertThrows(IllegalStateException.class, prover::getUnsatCore);
+      assertThat(prover.isUnsat()).isTrue();
+      prover.pop();
+      assertThrows(IllegalStateException.class, prover::getUnsatCore);
+      assertThat(prover.isUnsat()).isTrue();
+      prover.addConstraint(bmgr.xor(a, b));
+      assertThrows(IllegalStateException.class, prover::getUnsatCore);
+    }
+  }
+
   @Test
   public void test_getUnsatCore() throws InterruptedException, SolverException {
     requireUnsatCore();
