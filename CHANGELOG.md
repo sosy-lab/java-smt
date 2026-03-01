@@ -41,12 +41,13 @@ SPDX-License-Identifier: Apache-2.0
 - Updated MathSAT5 from version 5.6.10 to 5.6.15
 - Updated OptiMathSAT from version 1.7.1 to 1.7.3
 - Updated Z3 from version 4.12.5 to 4.15.4
-- Updated Bitwuzla from version 0.4.0 to 0.8.2
+- Updated Bitwuzla from version 0.4.0 to intermediate version based on Bitwuzlas main branch Feb 25, 2026 (version 0.8.2 + additional updates, e.g. interpolation)
 - Updated OpenSMT2 from version 2.6.0 to 2.9.0
 
 ### New Additions
 - NEW SOLVER: Z3 (version 4.5.0) with interpolation support has been added as an solver, and can be used by choosing `Solvers.Z3_WITH_INTERPOLATION`. This version is distinct from the up-to-date version of Z3 (without interpolation support). This is currently experimental and still being worked on! Also, since this version of Z3 is more than 10 years old, it does not benefit from updates and developments in Z3 since then.
 - OpenSMT2: options to specify a wanted interpolation technique (e.g. `interpolation.algorithm.lraTheory`), as well as interpolant simplification (`interpolation.simplificationLevel`) has been added.
+- Bitwuzla: interpolation support has been added.
 - CVC5: SMTLIB2 parsing support has been added.
 - CVC4/5: added support for bitvector to IEEE 754 floating-point number conversion with `FloatingPointManager.fromIeeeBitvector()`.
 - Princess: support for the theory of Reals has been added.
