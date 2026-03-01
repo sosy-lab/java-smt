@@ -136,13 +136,15 @@ public interface BasicProverEnvironment<T> extends AutoCloseable {
 
   /**
    * Returns an UNSAT core (if it exists, otherwise {@code Optional.empty()}), over the chosen
-   * assumptions.
+   * assumptions. Neither {@link #isUnsat()}, nor {@link #isUnsatWithAssumptions(Collection)} needs
+   * to be called before using this method, as {@link #isUnsatWithAssumptions(Collection)} is
+   * automatically called with the given assumptions.
    *
    * <p>Requires the {@link ProverOptions#GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS} option to work.
    * {@link ProverOptions#GENERATE_UNSAT_CORE} is not needed, but both options can be safely
    * combined.
    *
-   * @param assumptions Selected assumptions
+   * @param assumptions Selected assumptions.
    * @return Empty optional if the constraints with assumptions are satisfiable, subset of
    *     assumptions which is unsatisfiable with the original constraints otherwise.
    */
