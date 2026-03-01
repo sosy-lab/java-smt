@@ -24,8 +24,10 @@ SPDX-License-Identifier: Apache-2.0
 - Floating-Point theory, `FloatingPointNumber`, and `FloatingPointType` have been reworked:
     - We now handle floating-point precisions as defined in the SMTLIB2 standard https://smt-lib.org/theories-FloatingPoint.shtml, i.e. output shows them now with the hidden bit included in the mantissa. Related documentation has been updated and extended to explain expected in- and output, i.e. `FloatingPointType.toSMTLIBString()`, `FloatingPointType.toString()`, and `FloatingPointType.fromString()`.
     - API has been added to discern mantissas with hidden bit, from mantissas without hidden bit. The old API, implicitly expecting a mantissa without hidden bit, has been deprecated. E.g. `FloatingPointType.getMantissaSize()` has been deprecated, while `FloatingPointType.getMantissaSizeWithHiddenBit()` and `FloatingPointType.getMantissaSizeWithoutHiddenBit()` have been added.
+    - `FloatingPointNumber`s are now constructed using `FloatingPointType`, similar to how
+      `FloatingPointFormula`s are constructed.
     - Public constants for single and double floating-point precisions that did not specify whether their mantissa includes the hidden bit have been deprecated, and new constants with more precise naming have been added.
-- Floating-Point rounding-mode has been reworked: 2 methods have been added to `FloatingPointFormulaManager` to allow access to rounding mode formulas, i.e. `FloatingPointRoundingModeFormula`, formula representing a rounding mode for floating-point operations.
+- Floating-Point rounding-mode has also been reworked: 2 methods have been added to `FloatingPointFormulaManager` to allow access to rounding-mode formulas, i.e. `FloatingPointRoundingModeFormula`, formula representing a rounding mode for floating-point operations.
     - The old rounding-modes, `FP_ROUND_EVEN`, `FP_ROUND_AWAY`, `FP_ROUND_POSITIVE`, `FP_ROUND_NEGATIVE`, and `FP_ROUND_ZERO`, have been removed from `FunctionDeclarationKind`.
     - Use `FloatingPointFormulaManager.fromRoundingModeFormula()` to get the rounding mode of a `FloatingPointRoundingModeFormula`, and `FloatingPointFormulaManager.makeRoundingMode()` to create new `FloatingPointRoundingModeFormula`s.
     - The rounding-modes can now be accessed via `FloatingPointRoundingMode.getRoundingMode()`, but have been renamed: `FP_ROUND_AWAY` to `NEAREST_TIES_AWAY`, `FP_ROUND_AWAY` to `NEAREST_TIES_TO_EVEN`, `FP_ROUND_NEGATIVE` to `TOWARD_NEGATIVE`, `FP_ROUND_POSITIVE` to `TOWARD_POSITIVE`, and `FP_ROUND_ZERO` to `TOWARD_ZERO`.
@@ -57,6 +59,10 @@ SPDX-License-Identifier: Apache-2.0
 - Multi-assertion SMTLIB2 parsing has been added and can be used via `FormulaManager.parseAll()`.
 
 ### Updates
+- We now ensure that all model generating API (i.e. `getModel()`, `lower()`, and `upper()`) is only
+  ever used directly after SAT has been returned by a solver. This ensures that no outdated models are retrieved.
+  All value assignments of a new model are now automatically cached for all solvers in the first call to `getModel()`.
+  Cached models are cleaned up automatically.
 - Memory leaks in CVC5 and Bitwuzla have been fixed.
 - Model generation in CVC5 and Bitwuzla has been optimized and should now be faster.
 - We now support multiple architectures for solver binaries, allowing us to support ARM64 architectures in addition to x64 architectures. The following pre-build solver binaries are now available for ARM64 in our dependency system:
