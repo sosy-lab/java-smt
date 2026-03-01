@@ -8,6 +8,7 @@
 
 package org.sosy_lab.java_smt.test;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.truth.Truth.assertThat;
 import static org.junit.Assert.assertThrows;
 import static org.sosy_lab.java_smt.api.SolverContext.ProverOptions.GENERATE_UNSAT_CORE;
@@ -90,49 +91,41 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
   }
 
   /**
-   * Creates a "number" literal for the given integer value.
+   * Creates an integer number if a {@link org.sosy_lab.java_smt.api.IntegerFormulaManager} is
+   * available, else a Bitvector number with size 32 bits.
    *
-   * <p>"Numbers" can be either integer or bitvector formulas, depending on the capabilities of the
-   * solver. We prefer to return integers, and will only use fixed-size bitvectors as a fallback
-   *
-   * <p>Currently, the only solver that does not support integers in this test class is Bitwuzla
-   *
-   * @param number Value of the literal
-   * @return Integer or bitvector formula. If a bitvector formula is returned, the bitwidth will be
-   *     large enough to hold 32bit integer values
+   * @return {@link org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula} or {@link
+   *     org.sosy_lab.java_smt.api.BitvectorFormula}.
    */
-  private Formula makeNumber(int number) {
-    return imgr == null ? bvmgr.makeBitvector(32, number) : imgr.makeNumber(number);
+  private Formula makeIntOrBvNumber(int number) {
+    return imgr == null ? checkNotNull(bvmgr).makeBitvector(32, number) : imgr.makeNumber(number);
   }
 
   /**
-   * Creates a "number" variable.
+   * Creates an integer variable if a {@link org.sosy_lab.java_smt.api.IntegerFormulaManager} is
+   * available, else a Bitvector variable with size 32 bits.
    *
-   * <p>"Numbers" can be either integer or bitvector formulas, depending on the capabilities of the
-   * solver. We prefer to return integers, and will only use fixed-size bitvectors as a fallback.
-   *
-   * <p>Currently, the only solver that does not support integers in this test class is Bitwuzla
-   *
-   * @param name Name of the new variable
-   * @return Integer or bitvector formula. If a bitvector formula is returned, the bitwidth will be
-   *     large enough to hold 32bit integer values
+   * @return {@link org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula} or {@link
+   *     org.sosy_lab.java_smt.api.BitvectorFormula}.
    */
-  private Formula makeNumberVariable(String name) {
-    return imgr == null ? bvmgr.makeVariable(32, name) : imgr.makeVariable(name);
+  private Formula makeIntOrBvVariable(String variableName) {
+    return imgr == null
+        ? checkNotNull(bvmgr).makeVariable(32, variableName)
+        : imgr.makeVariable(variableName);
   }
 
   private void unsatCoreTest0(BasicProverEnvironment<?> pe)
       throws InterruptedException, SolverException {
     pe.push();
-    pe.addConstraint(mgr.makeEqual(makeNumberVariable("x"), makeNumber(1)));
-    pe.addConstraint(mgr.makeEqual(makeNumberVariable("x"), makeNumber(2)));
-    pe.addConstraint(mgr.makeEqual(makeNumberVariable("y"), makeNumber(2)));
+    pe.addConstraint(mgr.makeEqual(makeIntOrBvVariable("x"), makeIntOrBvNumber(1)));
+    pe.addConstraint(mgr.makeEqual(makeIntOrBvVariable("x"), makeIntOrBvNumber(2)));
+    pe.addConstraint(mgr.makeEqual(makeIntOrBvVariable("y"), makeIntOrBvNumber(2)));
     assertThat(pe).isUnsatisfiable();
     List<BooleanFormula> unsatCore = pe.getUnsatCore();
     assertThat(unsatCore)
         .containsExactly(
-            mgr.makeEqual(makeNumberVariable("x"), makeNumber(2)),
-            mgr.makeEqual(makeNumberVariable("x"), makeNumber(1)));
+            mgr.makeEqual(makeIntOrBvVariable("x"), makeIntOrBvNumber(2)),
+            mgr.makeEqual(makeIntOrBvVariable("x"), makeIntOrBvNumber(1)));
   }
 
   @Test
