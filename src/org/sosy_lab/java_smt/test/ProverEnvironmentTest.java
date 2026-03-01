@@ -89,26 +89,50 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
     }
   }
 
+  /**
+   * Creates a "number" literal for the given integer value.
+   *
+   * <p>"Numbers" can be either integer or bitvector formulas, depending on the capabilities of the
+   * solver. We prefer to return integers, and will only use fixed-size bitvectors as a fallback
+   *
+   * <p>Currently, the only solver that does not support integers in this test class is Bitwuzla
+   *
+   * @param number Value of the literal
+   * @return Integer or bitvector formula. If a bitvector formula is returned, the bitwidth will be
+   *     large enough to hold 32bit integer values
+   */
   private Formula makeNumber(int number) {
-    return imgr == null ? bvmgr.makeBitvector(8, number) : imgr.makeNumber(number);
+    return imgr == null ? bvmgr.makeBitvector(32, number) : imgr.makeNumber(number);
   }
 
-  private Formula makeVariable(String name) {
-    return imgr == null ? bvmgr.makeVariable(8, name) : imgr.makeVariable(name);
+  /**
+   * Creates a "number" variable.
+   *
+   * <p>"Numbers" can be either integer or bitvector formulas, depending on the capabilities of the
+   * solver. We prefer to return integers, and will only use fixed-size bitvectors as a fallback.
+   *
+   * <p>Currently, the only solver that does not support integers in this test class is Bitwuzla
+   *
+   * @param name Name of the new variable
+   * @return Integer or bitvector formula. If a bitvector formula is returned, the bitwidth will be
+   *     large enough to hold 32bit integer values
+   */
+  private Formula makeNumberVariable(String name) {
+    return imgr == null ? bvmgr.makeVariable(32, name) : imgr.makeVariable(name);
   }
 
   private void unsatCoreTest0(BasicProverEnvironment<?> pe)
       throws InterruptedException, SolverException {
     pe.push();
-    pe.addConstraint(mgr.makeEqual(makeVariable("x"), makeNumber(1)));
-    pe.addConstraint(mgr.makeEqual(makeVariable("x"), makeNumber(2)));
-    pe.addConstraint(mgr.makeEqual(makeVariable("y"), makeNumber(2)));
+    pe.addConstraint(mgr.makeEqual(makeNumberVariable("x"), makeNumber(1)));
+    pe.addConstraint(mgr.makeEqual(makeNumberVariable("x"), makeNumber(2)));
+    pe.addConstraint(mgr.makeEqual(makeNumberVariable("y"), makeNumber(2)));
     assertThat(pe).isUnsatisfiable();
     List<BooleanFormula> unsatCore = pe.getUnsatCore();
     assertThat(unsatCore)
         .containsExactly(
-            mgr.makeEqual(makeVariable("x"), makeNumber(2)),
-            mgr.makeEqual(makeVariable("x"), makeNumber(1)));
+            mgr.makeEqual(makeNumberVariable("x"), makeNumber(2)),
+            mgr.makeEqual(makeNumberVariable("x"), makeNumber(1)));
   }
 
   @Test
