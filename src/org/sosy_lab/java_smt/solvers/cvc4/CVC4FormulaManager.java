@@ -19,6 +19,7 @@ import edu.stanford.CVC4.vectorExpr;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
@@ -84,8 +85,8 @@ class CVC4FormulaManager extends AbstractFormulaManager<Expr, Type, ExprManager,
   }
 
   @Override
-  public Expr parseImpl(String formulaStr) throws IllegalArgumentException {
-    throw new UnsupportedOperationException();
+  protected List<Expr> parseAllImpl(String pSmtScript) throws IllegalArgumentException {
+    throw new UnsupportedOperationException(API_METHOD_NOT_IMPLEMENTED);
   }
 
   @Override

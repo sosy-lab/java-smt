@@ -8,14 +8,9 @@
 
 package org.sosy_lab.java_smt.test;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.truth.Truth.assertThat;
-import static com.google.common.truth.TruthJUnit.assume;
 import static org.junit.Assert.assertThrows;
-import static org.sosy_lab.java_smt.SolverContextFactory.Solvers.CVC4;
-import static org.sosy_lab.java_smt.SolverContextFactory.Solvers.CVC5;
-import static org.sosy_lab.java_smt.SolverContextFactory.Solvers.MATHSAT5;
-import static org.sosy_lab.java_smt.SolverContextFactory.Solvers.OPENSMT;
-import static org.sosy_lab.java_smt.SolverContextFactory.Solvers.PRINCESS;
 import static org.sosy_lab.java_smt.api.SolverContext.ProverOptions.GENERATE_UNSAT_CORE;
 import static org.sosy_lab.java_smt.api.SolverContext.ProverOptions.GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS;
 import static org.sosy_lab.java_smt.test.ProverEnvironmentSubject.assertThat;
@@ -26,6 +21,7 @@ import java.util.Optional;
 import org.junit.Test;
 import org.sosy_lab.java_smt.api.BasicProverEnvironment;
 import org.sosy_lab.java_smt.api.BooleanFormula;
+import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
@@ -50,10 +46,6 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
 
   @Test
   public void assumptionsWithModelTest() throws SolverException, InterruptedException {
-    assume()
-        .withMessage("MathSAT can't construct models for SAT check with assumptions")
-        .that(solver)
-        .isNotEqualTo(MATHSAT5);
     BooleanFormula b = bmgr.makeVariable("b");
     BooleanFormula c = bmgr.makeVariable("c");
 
@@ -67,6 +59,53 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
       try (Model m = pe.getModel()) {
         assertThat(m.evaluate(c)).isTrue();
       }
+    }
+  }
+
+  @Test
+  public void assumptionsWithModelFailsAfterAddingConstraintTest()
+      throws SolverException, InterruptedException {
+    BooleanFormula b = bmgr.makeVariable("b");
+    BooleanFormula c = bmgr.makeVariable("c");
+
+    try (ProverEnvironment pe = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
+      pe.push();
+      pe.addConstraint(bmgr.or(b, bmgr.makeBoolean(false)));
+      assertThat(pe.isUnsat()).isFalse();
+      assertThat(pe.isUnsatWithAssumptions(ImmutableList.of(bmgr.not(b)))).isTrue();
+      assertThat(pe.isUnsatWithAssumptions(ImmutableList.of(b))).isFalse();
+      pe.addConstraint(c);
+      assertThrows(IllegalStateException.class, pe::getModel);
+    }
+  }
+
+  @Test
+  public void assumptionsWithModelFailsAfterPushTest()
+      throws SolverException, InterruptedException {
+    BooleanFormula b = bmgr.makeVariable("b");
+
+    try (ProverEnvironment pe = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
+      pe.push();
+      pe.addConstraint(bmgr.or(b, bmgr.makeBoolean(false)));
+      assertThat(pe.isUnsat()).isFalse();
+      assertThat(pe.isUnsatWithAssumptions(ImmutableList.of(bmgr.not(b)))).isTrue();
+      assertThat(pe.isUnsatWithAssumptions(ImmutableList.of(b))).isFalse();
+      pe.push();
+      assertThrows(IllegalStateException.class, pe::getModel);
+    }
+  }
+
+  @Test
+  public void assumptionsWithModelFailsAfterUnsatTest()
+      throws SolverException, InterruptedException {
+    BooleanFormula b = bmgr.makeVariable("b");
+
+    try (ProverEnvironment pe = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
+      pe.push();
+      pe.addConstraint(bmgr.or(b, bmgr.makeBoolean(false)));
+      assertThat(pe.isUnsat()).isFalse();
+      assertThat(pe.isUnsatWithAssumptions(ImmutableList.of(bmgr.not(b)))).isTrue();
+      assertThrows(IllegalStateException.class, pe::getModel);
     }
   }
 
@@ -98,30 +137,47 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
     }
   }
 
+  /**
+   * Creates an integer number if a {@link org.sosy_lab.java_smt.api.IntegerFormulaManager} is
+   * available, else a Bitvector number with size 32 bits.
+   *
+   * @return {@link org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula} or {@link
+   *     org.sosy_lab.java_smt.api.BitvectorFormula}.
+   */
+  private Formula makeIntOrBvNumber(int number) {
+    return imgr == null ? checkNotNull(bvmgr).makeBitvector(32, number) : imgr.makeNumber(number);
+  }
+
+  /**
+   * Creates an integer variable if a {@link org.sosy_lab.java_smt.api.IntegerFormulaManager} is
+   * available, else a Bitvector variable with size 32 bits.
+   *
+   * @return {@link org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula} or {@link
+   *     org.sosy_lab.java_smt.api.BitvectorFormula}.
+   */
+  private Formula makeIntOrBvVariable(String variableName) {
+    return imgr == null
+        ? checkNotNull(bvmgr).makeVariable(32, variableName)
+        : imgr.makeVariable(variableName);
+  }
+
   private void unsatCoreTest0(BasicProverEnvironment<?> pe)
       throws InterruptedException, SolverException {
-    requireIntegers();
     pe.push();
-    pe.addConstraint(imgr.equal(imgr.makeVariable("x"), imgr.makeNumber(1)));
-    pe.addConstraint(imgr.equal(imgr.makeVariable("x"), imgr.makeNumber(2)));
-    pe.addConstraint(imgr.equal(imgr.makeVariable("y"), imgr.makeNumber(2)));
+    pe.addConstraint(mgr.makeEqual(makeIntOrBvVariable("x"), makeIntOrBvNumber(1)));
+    pe.addConstraint(mgr.makeEqual(makeIntOrBvVariable("x"), makeIntOrBvNumber(2)));
+    pe.addConstraint(mgr.makeEqual(makeIntOrBvVariable("y"), makeIntOrBvNumber(2)));
     assertThat(pe).isUnsatisfiable();
     List<BooleanFormula> unsatCore = pe.getUnsatCore();
     assertThat(unsatCore)
         .containsExactly(
-            imgr.equal(imgr.makeVariable("x"), imgr.makeNumber(2)),
-            imgr.equal(imgr.makeVariable("x"), imgr.makeNumber(1)));
+            mgr.makeEqual(makeIntOrBvVariable("x"), makeIntOrBvNumber(2)),
+            mgr.makeEqual(makeIntOrBvVariable("x"), makeIntOrBvNumber(1)));
   }
 
   @Test
   public void unsatCoreWithAssumptionsNullTest() throws InterruptedException, SolverException {
-    requireUnsatCore();
-    assume()
-        .withMessage(
-            "Solver %s does not support unsat core generation over assumptions", solverToUse())
-        .that(solverToUse())
-        .isNoneOf(PRINCESS, CVC4, CVC5, OPENSMT);
-
+    requireUnsatCoreOverAssumptions();
     try (ProverEnvironment pe =
         context.newProverEnvironment(GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS)) {
       pe.push(bmgr.makeFalse());
@@ -133,12 +189,7 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
   @Test
   public void unsatCoreWithAssumptionsTest() throws SolverException, InterruptedException {
     requireIntegers();
-    requireUnsatCore();
-    assume()
-        .withMessage(
-            "Solver %s does not support unsat core generation over assumptions", solverToUse())
-        .that(solverToUse())
-        .isNoneOf(PRINCESS, CVC4, CVC5, OPENSMT);
+    requireUnsatCoreOverAssumptions();
     try (ProverEnvironment pe =
         context.newProverEnvironment(GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS)) {
       pe.push();
@@ -155,12 +206,10 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
 
   @Test
   public void testSatWithUnsatUnsatCoreOptions() throws InterruptedException, SolverException {
-    requireUnsatCore();
     try (ProverEnvironment prover = context.newProverEnvironment(GENERATE_UNSAT_CORE)) {
       checkSimpleQuery(prover);
     }
 
-    requireUnsatCoreOverAssumptions();
     try (ProverEnvironment prover =
         context.newProverEnvironment(GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS)) {
       checkSimpleQuery(prover);

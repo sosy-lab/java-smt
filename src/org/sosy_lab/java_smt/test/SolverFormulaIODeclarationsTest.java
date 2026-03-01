@@ -8,7 +8,6 @@
 
 package org.sosy_lab.java_smt.test;
 
-import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.Truth.assert_;
 import static org.junit.Assert.assertThrows;
 import static org.sosy_lab.java_smt.api.FormulaType.BooleanType;
@@ -105,11 +104,7 @@ public class SolverFormulaIODeclarationsTest
   public void parseInvalidQuery1() {
     for (final String q :
         ImmutableList.of("()", "(x)", "(exit)", "(and)", "(or)", "(not)", "(=)")) {
-      if (ImmutableList.of(Solvers.MATHSAT5, Solvers.OPENSMT).contains(solverToUse())) {
-        assertThat(mgr.parse(q)).isEqualTo(bmgr.makeTrue());
-      } else {
-        assertThrows(IllegalArgumentException.class, () -> mgr.parse(q));
-      }
+      assertThrows(IllegalArgumentException.class, () -> mgr.parse(q));
     }
   }
 

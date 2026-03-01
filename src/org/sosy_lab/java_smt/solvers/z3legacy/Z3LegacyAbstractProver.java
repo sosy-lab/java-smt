@@ -217,6 +217,7 @@ abstract class Z3LegacyAbstractProver<T> extends AbstractProverWithAllSat<T> {
       throws SolverException, InterruptedException {
     Preconditions.checkState(!closed);
     changedSinceLastSatQuery = false;
+    wasLastSatCheckSatisfiable = false;
 
     int result;
     try {
@@ -230,7 +231,11 @@ abstract class Z3LegacyAbstractProver<T> extends AbstractProverWithAllSat<T> {
       throw creator.handleZ3Exception(e);
     }
     undefinedStatusToException(result);
-    return result == Z3_lbool.Z3_L_FALSE.toInt();
+    boolean isUnsat = result == Z3_lbool.Z3_L_FALSE.toInt();
+    if (!isUnsat) {
+      wasLastSatCheckSatisfiable = true;
+    }
+    return isUnsat;
   }
 
   private void undefinedStatusToException(int solverStatus)

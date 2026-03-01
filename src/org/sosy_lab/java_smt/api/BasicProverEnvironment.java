@@ -26,6 +26,8 @@ public interface BasicProverEnvironment<T> extends AutoCloseable {
   String NO_MODEL_HELP = "Model computation failed. Are the pushed formulae satisfiable?";
   String ASSUMPTION_SOLVING_NOT_SUPPORTED = "Solving with assumptions is not supported.";
   String UNSAT_CORE_NOT_SUPPORTED = "Unsat core extraction is not supported.";
+  String UNSAT_CORE_WITH_ASSUMPTIONS_NOT_SUPPORTED =
+      "Unsat core with assumptions is not supported.";
 
   /**
    * Push a backtracking point and add a formula to the current stack, asserting it. The return
@@ -125,16 +127,24 @@ public interface BasicProverEnvironment<T> extends AutoCloseable {
   }
 
   /**
-   * Get an unsat core. This should be called only immediately after an {@link #isUnsat()} call that
-   * returned <code>false</code>.
+   * Get an unsat core.
+   *
+   * <p>This should be called only immediately after an {@link #isUnsat()} call that returned <code>
+   * false</code>. Requires the {@link ProverOptions#GENERATE_UNSAT_CORE} option to work.
    */
   List<BooleanFormula> getUnsatCore();
 
   /**
    * Returns an UNSAT core (if it exists, otherwise {@code Optional.empty()}), over the chosen
-   * assumptions. Does NOT require the {@link ProverOptions#GENERATE_UNSAT_CORE} option to work.
+   * assumptions. Neither {@link #isUnsat()}, nor {@link #isUnsatWithAssumptions(Collection)} needs
+   * to be called before using this method, as {@link #isUnsatWithAssumptions(Collection)} is
+   * automatically called with the given assumptions.
    *
-   * @param assumptions Selected assumptions
+   * <p>Requires the {@link ProverOptions#GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS} option to work.
+   * {@link ProverOptions#GENERATE_UNSAT_CORE} is not needed, but both options can be safely
+   * combined.
+   *
+   * @param assumptions Selected assumptions.
    * @return Empty optional if the constraints with assumptions are satisfiable, subset of
    *     assumptions which is unsatisfiable with the original constraints otherwise.
    */
