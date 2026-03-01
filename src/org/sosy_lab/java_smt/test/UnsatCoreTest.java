@@ -46,7 +46,7 @@ public class UnsatCoreTest extends SolverBasedTest0.ParameterizedSolverBasedTest
   }
 
   @Test
-  public void test_getUnsatCore() throws InterruptedException, SolverException {
+  public void simpleGetUnsatCoreTest() throws InterruptedException, SolverException {
     requireUnsatCore();
     try (var prover = context.newProverEnvironment(ProverOptions.GENERATE_UNSAT_CORE)) {
       var a = bmgr.makeVariable("a");
@@ -60,7 +60,7 @@ public class UnsatCoreTest extends SolverBasedTest0.ParameterizedSolverBasedTest
   }
 
   @Test
-  public void test_getUnsatCore_noOption() throws InterruptedException, SolverException {
+  public void getUnsatCoreThrowsWithoutOptionTest() throws InterruptedException, SolverException {
     requireUnsatCore();
     try (var prover = context.newProverEnvironment()) {
       var a = bmgr.makeVariable("a");
@@ -74,7 +74,7 @@ public class UnsatCoreTest extends SolverBasedTest0.ParameterizedSolverBasedTest
   }
 
   @Test
-  public void test_unsatCoreOverAssumptions() throws InterruptedException, SolverException {
+  public void simpleUnsatCoreOverAssumptionsTest() throws InterruptedException, SolverException {
     requireUnsatCoreOverAssumptions();
     // MathSat and old Z3 only allow literals as assumptions:
     assume().that(solver).isNoneOf(Solvers.MATHSAT5, Solvers.Z3_WITH_INTERPOLATION);
@@ -91,7 +91,7 @@ public class UnsatCoreTest extends SolverBasedTest0.ParameterizedSolverBasedTest
   }
 
   @Test
-  public void test_unsatCoreOverAssumptions_onlyLiterals()
+  public void unsatCoreOverAssumptionsOnlyLiteralsTest()
       throws InterruptedException, SolverException {
     requireUnsatCoreOverAssumptions();
     try (var prover =
@@ -107,7 +107,7 @@ public class UnsatCoreTest extends SolverBasedTest0.ParameterizedSolverBasedTest
   }
 
   @Test
-  public void test_unsatCoreOverAssumptions_noOption()
+  public void unsatCoreOverAssumptionsThrowsForMissingOptionTest()
       throws InterruptedException, SolverException {
     requireUnsatCoreOverAssumptions();
     try (var prover = context.newProverEnvironment()) {
