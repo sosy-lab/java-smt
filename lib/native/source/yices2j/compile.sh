@@ -75,19 +75,12 @@ echo "Linking libraries together into one file..."
 # This will link together the file produced above, the Yices library, the GMP library and the standard libraries.
 # Everything except the standard libraries is included statically.
 # The result is a single shared library containing all necessary components.
-if [ `uname -m` = "x86_64" ]; then
-    gcc -Wall -g -o $OUT_FILE -shared -Wl,-soname,libyices2j.so \
+gcc -Wall -g -o $OUT_FILE -shared -Wl,-soname,libyices2j.so \
     -L. -L$YICES_LIB_DIR -L$GMP_LIB_DIR -L$GPERF_LIB_DIR \
     -I$GMP_HEADER_DIR -I$GPERF_HEADER_DIR $OBJ_FILES -Wl,-Bstatic \
     -lyices -lgmpxx -lgmp -lgp -static-libstdc++ -lstdc++ \
     -Wl,-Bdynamic -lc -lm -Wl,--version-script=libyices2j.version
-else
-    # TODO compiling for/on a 32bit system was not done for quite a long time. We should drop it.
-    gcc -Wall -g -o ${OUT_FILE} -shared -Wl,-soname,libyices2j.so \
-    -L${YICES_LIB_DIR} -L${GMP_LIB_DIR} -L${GPERF_LIB_DIR} \
-    -I${GMP_HEADER_DIR} -I${GPERF_HEADER_DIR} ${OBJ_FILES} \
-    -Wl,-Bstatic -lyices -lgmpxx -lgmp -Wl,-Bdynamic -lc -lm -lstdc++
-fi
+
 
 if [ $? -ne 0 ]; then
     echo "There was a problem during compilation of \"org_sosy_1lab_java_1smt_solvers_yices2_Yices2NativeApi.c\""
