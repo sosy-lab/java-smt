@@ -34,12 +34,14 @@ cd ${DIR}
 
 JNI_HEADERS="$(../get_jni_headers.sh)"
 
-YICES_SRC_DIR="$1"/include
+YICES_HEADER_DIR="$1"/include
 YICES_LIB_DIR="$1"/lib
+
 GMP_HEADER_DIR="$2"/include
 GMP_LIB_DIR="$2"/lib
-GPERF_HEADER_DIR="$3"
-GPERF_LIB_DIR=$GPERF_HEADER_DIR/lib
+
+POLY_LIB_DIR="$3"/lib
+CUDD_LIB_DIR="$4"/lib
 
 # check requirements
 if [ ! -f "$YICES_LIB_DIR/libyices.a" ]; then
@@ -52,10 +54,15 @@ if [ ! -f "$GMP_LIB_DIR/libgmp.a" ]; then
     echo "Can not find $GMP_LIB_DIR/libgmp.a"
     exit 1
 fi
-if [ ! -f "$GPERF_LIB_DIR/libgp.a" ]; then
-    echo "You need to specify the GPERF directory on the command line!"
-    echo "Can not find $GPERF_LIB_DIR/libgp.a"
-	exit 1
+if [ ! -f "$POLY_LIB_DIR/libpoly.a" ]; then
+    echo "You need to specify the Libpoly directory on the command line!"
+    echo "Can not find $POLY_LIB_DIR/libpoly.a"
+    exit 1
+fi
+if [ ! -f "$CUDD_LIB_DIR/libcudd.a" ]; then
+    echo "You need to specify the CUDD directory on the command line!"
+    echo "Can not find $CUDD_LIB_DIR/libcudd.a"
+    exit 1
 fi
 
 SRC_FILES="org_sosy_1lab_java_1smt_solvers_yices2_Yices2NativeApi.c"
@@ -67,7 +74,7 @@ echo "Compiling the C wrapper code and creating the \"$OUT_FILE\" library..."
 
 # This will compile the JNI wrapper part, given the JNI and the Yices header files
 gcc -g -std=gnu99 -Wall -Wextra -Wpedantic -Wno-return-type -Wno-unused-parameter \
-    $JNI_HEADERS -I$YICES_SRC_DIR -I$GMP_HEADER_DIR -I$GPERF_HEADER_DIR $SRC_FILES -fPIC -c
+    $JNI_HEADERS -I$YICES_HEADER_DIR -I$GMP_HEADER_DIR $SRC_FILES -fPIC -c
 
 echo "Compilation Done"
 echo "Linking libraries together into one file..."
@@ -76,9 +83,9 @@ echo "Linking libraries together into one file..."
 # Everything except the standard libraries is included statically.
 # The result is a single shared library containing all necessary components.
 gcc -Wall -g -o $OUT_FILE -shared -Wl,-soname,libyices2j.so \
-    -L. -L$YICES_LIB_DIR -L$GMP_LIB_DIR -L$GPERF_LIB_DIR \
-    -I$GMP_HEADER_DIR -I$GPERF_HEADER_DIR $OBJ_FILES -Wl,-Bstatic \
-    -lyices -lgmpxx -lgmp -lgp -static-libstdc++ -lstdc++ \
+    -L$YICES_LIB_DIR -L$GMP_LIB_DIR -L$POLY_LIB_DIR -L$CUDD_LIB_DIR \
+    -I$GMP_HEADER_DIR $OBJ_FILES -Wl,-Bstatic \
+    -lyices -lcudd -lpoly -lgmpxx -lgmp -static-libstdc++ -lstdc++ \
     -Wl,-Bdynamic -lc -lm -Wl,--version-script=libyices2j.version
 
 

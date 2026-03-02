@@ -20,11 +20,14 @@ SPDX-License-Identifier: Apache-2.0
         <sequential>
             <checkPathOption pathOption="yices2.path" defaultPath="/path/to/yices2" targetName="Yices2 source folder"/>
             <checkPathOption pathOption="gmp.path" defaultPath="/path/to/gmp" targetName="GMP source folder"/>
-            <checkPathOption pathOption="gperf.path" defaultPath="/path/to/gperf" targetName="GPERF source folder"/>
-           <exec executable="lib/native/source/yices2j/compile.sh" failonerror="true">
-               <arg value="${yices2.path}" />
-               <arg value="${gmp.path}" />
-               <arg value="${gperf.path}" />
+            <checkPathOption pathOption="libpoly.path" defaultPath="/path/to/libpoly" targetName="Libpoly source folder"/>
+            <checkPathOption pathOption="cudd.path" defaultPath="/path/to/cudd" targetName="CUDD source folder"/>
+
+            <exec executable="lib/native/source/yices2j/compile.sh" failonerror="true">
+                <arg value="${yices2.path}"/>
+                <arg value="${gmp.path}"/>
+                <arg value="${libpoly.path}"/>
+                <arg value="${cudd.path}"/>
            </exec>
        </sequential>
     </target>
