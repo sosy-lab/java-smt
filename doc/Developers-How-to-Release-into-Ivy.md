@@ -348,39 +348,64 @@ contains one of the dependencies (`gmp`) in a precompiled version. The following
 still work without the image, however, some of the paths may have to be adjusted, and `gmp`
 needs to be downloaded and compiled (with `PIC` support) separately
 
-Prepare `gperf` (a dependency of Yices2, and not inluded in the docker image):
-```bash
-wget http://ftp.gnu.org/pub/gnu/gperf/gperf-3.3.tar.gz
-tar -zxvf gperf-3.3.tar.gz
-cd gperf-3.3
-./configure --enable-cxx --with-pic --disable-shared --enable-fat
-make -j
-```
+#### MCSAT build
 
-Download and build Yices2 from source:
-```bash
-git clone git@github.com:SRI-CSL/yices2.git
-cd yices2
-autoconf
-export LDFLAGS=-L/dependencies/gmp-6.3.0/install/x64-linux/lib
-export CFLAGS=-I/dependencies/gmp-6.3.0/install/x64-linux/include
-./configure --enable-thread-safety --prefix=/workspace/yices2/install
+First we need to fetch and build two dependencies:
+
+- libpoly:
+
+```shell
+git clone https://github.com/SRI-CSL/libpoly.git
+cd libpoly
+cmake .. -DCMAKE_BUILD_TYPE="Release" \
+  -DCMAKE_INSTALL_PREFIX=/workspace/libpoly/install \
+  -DGMP_INCLUDE_DIR=/dependencies/gmp-6.3.0/install/x64-linux/include \
+  -DGMP_LIBRARY=/dependencies/gmp-6.3.0/install/x64-linux/lib/libgmp.a
 make -j
 make install
 ```
 
-Get the version of Yices2:
+- cudd
+
+```shell
+git clone https://github.com/ivmai/cudd.git
+cd cudd
+export CFLAGS=-fPIC
+./configure --prefix=/workspace/cudd/install
+
+# Then patch `autoconf`, `automake`, etc in the Makefile
+make -j
+make install
+```
+
+#### Yices
+
+Then we can build the actual solver:
+
+```shell
+LDFLAGS="-L/dependencies/gmp-6.3.0/install/x64-linux/lib -L/workspace/libpoly/install/lib -L/workspace/cudd/install/lib" \
+CFLAGS="-I/dependencies/gmp-6.3.0/install/x64-linux/include -I/workspace/libpoly/install/include -I/workspace/cudd/install/include" \
+./configure --enable-mcsat --prefix=/workspace/yices2/install
+make -j
+make install
+```
+
+#### JavaSMT solver binary
+
+First, get the version of Yices2:
 ```bash
 git describe --tags
 ```
 
-Publish the solver binary from within JavaSMT:
-```bash
+Then publish the solver binary from within JavaSMT:
+
+```shell
 ant publish-yices2 \
   -Dyices2.path=/workspace/yices2/install \
   -Dgmp.path=/dependencies/gmp-6.3.0/install/x64-linux \
-  -Dgperf.path=/workspace/gperf-3.3 \ 
-  -Dyices2.version=2.7.0-g85cf17e4
+  -Dlibpoly.path=/workspace/libpoly/install \
+  -Dcudd.path=/workspace/cudd/install \ 
+  -Dyices2.version=${VERSION}
 ```
 
 Afterward, you need to update the version number in `solvers_ivy_conf/ivy_javasmt_yices2.xml` and publish new Java components for Yices2.
