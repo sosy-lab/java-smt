@@ -15,9 +15,12 @@ import static org.sosy_lab.common.collect.Collections3.transformedImmutableListC
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.java_smt.basicimpl.AbstractModel;
 import org.sosy_lab.java_smt.solvers.bitwuzla.api.Bitwuzla;
@@ -31,12 +34,12 @@ class BitwuzlaModel extends AbstractModel<Term, Sort, TermManager> {
 
   // The prover env, not the creator env!
   private final Bitwuzla bitwuzlaEnv;
-  private final BitwuzlaTheoremProver prover;
+  private final BitwuzlaAbstractProver<?> prover;
   private final ImmutableList<ValueAssignment> model;
 
   protected BitwuzlaModel(
       Bitwuzla bitwuzlaEnv,
-      BitwuzlaTheoremProver prover,
+      BitwuzlaAbstractProver<?> prover,
       BitwuzlaFormulaCreator bitwuzlaCreator,
       Collection<Term> assertedTerms) {
     super(prover, bitwuzlaCreator);
@@ -49,13 +52,37 @@ class BitwuzlaModel extends AbstractModel<Term, Sort, TermManager> {
     model = generateModel(assertedTerms);
   }
 
+  private Set<Term> collectModelTerms(Collection<Term> asserted) {
+    ImmutableSet.Builder<Term> builder = ImmutableSet.builder();
+    var cache = new HashSet<Term>();
+    var work = new ArrayDeque<Term>();
+    work.addAll(asserted);
+    while (!work.isEmpty()) {
+      var term = work.pop();
+      if (cache.add(term)) {
+        var kind = term.kind();
+        if (kind == Kind.CONSTANT) {
+          builder.add(term);
+        } else if (kind == Kind.APPLY) {
+          builder.add(term);
+          for (int c = 1; c < term.num_children(); c++) {
+            work.push(term.get(c));
+          }
+        } else {
+          for (int c = 0; c < term.num_children(); c++) {
+            work.push(term.get(c));
+          }
+        }
+      }
+    }
+    return builder.build();
+  }
+
   /** Build a list of assignments that stays valid after closing the model. */
   private ImmutableList<ValueAssignment> generateModel(Collection<Term> assertedTerms) {
-    checkState(!isClosed());
-    checkState(!prover.isClosed(), "Cannot use model after prover is closed");
     ImmutableSet.Builder<ValueAssignment> builder = ImmutableSet.builder();
-    for (Term expr : assertedTerms) {
-      creator.extractVariablesAndUFs(expr, true, (name, f) -> builder.addAll(getAssignments(f)));
+    for (Term f : collectModelTerms(assertedTerms)) {
+      builder.addAll(getAssignments(f));
     }
     return builder.build().asList();
   }
@@ -94,8 +121,7 @@ class BitwuzlaModel extends AbstractModel<Term, Sort, TermManager> {
     while (value.kind().equals(Kind.ARRAY_STORE)) {
       Term index = value.get(1);
       Term element = value.get(2);
-      Term select =
-          ((BitwuzlaFormulaCreator) creator).getEnv().mk_term(Kind.ARRAY_SELECT, expr, index);
+      Term select = creator.getEnv().mk_term(Kind.ARRAY_SELECT, expr, index);
 
       // CASE 1: nested array dimension, let's recurse deeper
       if (expr.sort().array_element().is_array()) {
@@ -125,12 +151,7 @@ class BitwuzlaModel extends AbstractModel<Term, Sort, TermManager> {
   }
 
   private Term buildEqForTwoTerms(Term left, Term right) {
-    assert left.sort().equals(right.sort());
-    Kind kind = Kind.EQUAL;
-    if (left.sort().is_fp() || right.sort().is_fp()) {
-      kind = Kind.FP_EQUAL;
-    }
-    return ((BitwuzlaFormulaCreator) creator).getEnv().mk_term(kind, left, right);
+    return creator.getEnv().mk_term(Kind.EQUAL, left, right);
   }
 
   private ValueAssignment getAssignmentForUfInstantiation(Term pTerm) {

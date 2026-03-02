@@ -34,6 +34,8 @@ import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FunctionDeclaration;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
+import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
+import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.api.visitors.FormulaTransformationVisitor;
 
@@ -48,15 +50,15 @@ public class FormulaManagerTest extends SolverBasedTest0.ParameterizedSolverBase
     var var1 = mgr.makeVariable(BooleanType, "var1");
     var var2 = mgr.makeVariable(formulaType, "var2");
 
-    assertThrows(IllegalArgumentException.class, () -> mgr.equal(var1, var2));
-    assertThrows(IllegalArgumentException.class, () -> mgr.distinct(var1, var2));
+    assertThrows(IllegalArgumentException.class, () -> mgr.makeEqual(var1, var2));
+    assertThrows(IllegalArgumentException.class, () -> mgr.makeDistinct(var1, var2));
 
     if (bvmgr != null) {
       var bv1 = mgr.makeVariable(getBitvectorTypeWithSize(8), "bv1");
       var bv2 = mgr.makeVariable(getBitvectorTypeWithSize(16), "bv2");
 
-      assertThrows(IllegalArgumentException.class, () -> mgr.equal(bv1, bv2));
-      assertThrows(IllegalArgumentException.class, () -> mgr.distinct(bv1, bv2));
+      assertThrows(IllegalArgumentException.class, () -> mgr.makeEqual(bv1, bv2));
+      assertThrows(IllegalArgumentException.class, () -> mgr.makeDistinct(bv1, bv2));
     }
 
     if (amgr != null) {
@@ -66,8 +68,8 @@ public class FormulaManagerTest extends SolverBasedTest0.ParameterizedSolverBase
       var arr1 = mgr.makeVariable(getArrayType(domainType, rangeType), "arr1");
       var arr2 = mgr.makeVariable(getArrayType(rangeType, domainType), "arr2");
 
-      assertThrows(IllegalArgumentException.class, () -> mgr.equal(arr1, arr2));
-      assertThrows(IllegalArgumentException.class, () -> mgr.distinct(arr1, arr2));
+      assertThrows(IllegalArgumentException.class, () -> mgr.makeEqual(arr1, arr2));
+      assertThrows(IllegalArgumentException.class, () -> mgr.makeDistinct(arr1, arr2));
     }
   }
 
@@ -76,15 +78,15 @@ public class FormulaManagerTest extends SolverBasedTest0.ParameterizedSolverBase
     var formulaType = imgr != null ? IntegerType : getBitvectorTypeWithSize(8);
     var var1 = mgr.makeVariable(formulaType, "var1");
 
-    assertThat(mgr.equal()).isEqualTo(bmgr.makeTrue());
-    assertThat(mgr.distinct()).isEqualTo(bmgr.makeTrue());
+    assertThat(mgr.makeEqual()).isEqualTo(bmgr.makeTrue());
+    assertThat(mgr.makeDistinct()).isEqualTo(bmgr.makeTrue());
 
-    assertThat(mgr.equal(var1)).isEqualTo(bmgr.makeTrue());
-    assertThat(mgr.distinct(var1)).isEqualTo(bmgr.makeTrue());
+    assertThat(mgr.makeEqual(var1)).isEqualTo(bmgr.makeTrue());
+    assertThat(mgr.makeDistinct(var1)).isEqualTo(bmgr.makeTrue());
   }
 
   @Test
-  public void testEquality() {
+  public void testEquality() throws SolverException, InterruptedException {
     // Check if `=` terms are rewritten
     var formulaType = imgr != null ? IntegerType : getBitvectorTypeWithSize(8);
 
@@ -92,9 +94,10 @@ public class FormulaManagerTest extends SolverBasedTest0.ParameterizedSolverBase
     var var2 = mgr.makeVariable(formulaType, "var2");
     var var3 = mgr.makeVariable(formulaType, "var3");
 
-    var f = mgr.equal(var1, var2, var3);
-    var g = bmgr.and(mgr.equal(var1, var2), mgr.equal(var2, var3));
+    var f = mgr.makeEqual(var1, var2, var3);
+    var g = bmgr.and(mgr.makeEqual(var1, var2), mgr.makeEqual(var2, var3));
 
+    assertThatFormula(f).isEquisatisfiableTo(g);
     if (solver == Solvers.SMTINTERPOL) {
       // Only SmtInterpol support equality with more than two arguments
       assertThat(f).isNotEqualTo(g);
@@ -102,6 +105,62 @@ public class FormulaManagerTest extends SolverBasedTest0.ParameterizedSolverBase
       // ... all other solvers will rewrite
       assertThat(f).isEqualTo(g);
     }
+  }
+
+  /**
+   * Check that an exception is thrown if the arguments to `=` don't have compatible types. However,
+   * some types are compatible if a solver can convert them internally (e.g. Integer and Rational
+   * --> see {@link #testEquality_withIntegerAndRationalTypes}).
+   */
+  @Test
+  public void testEquality_withDifferentTypes() {
+
+    // Incompatible types: Boolean and Numeric
+    var boolVar = mgr.makeVariable(BooleanType, "boolVar");
+    var numVarType = imgr != null ? IntegerType : getBitvectorTypeWithSize(8);
+    var numVar = mgr.makeVariable(numVarType, "numVar");
+    assertThrows(IllegalArgumentException.class, () -> mgr.makeEqual(boolVar, numVar));
+
+    // Incompatible types: Bitvector of different sizes
+    if (bvmgr != null) {
+      var bv8 = mgr.makeVariable(getBitvectorTypeWithSize(8), "bv8");
+      var bv16 = mgr.makeVariable(getBitvectorTypeWithSize(16), "bv16");
+      assertThrows(IllegalArgumentException.class, () -> mgr.makeEqual(bv8, bv16));
+    }
+
+    // Incompatible types: Array of different types
+    if (amgr != null) {
+      var domainType = numVarType;
+      var rangeType = numVarType == IntegerType ? RationalType : getBitvectorTypeWithSize(16);
+      var arr1 = mgr.makeVariable(getArrayType(domainType, rangeType), "arr1");
+      var arr2 = mgr.makeVariable(getArrayType(rangeType, domainType), "arr2");
+      assertThrows(IllegalArgumentException.class, () -> mgr.makeEqual(arr1, arr2));
+    }
+  }
+
+  @Test
+  public void testEquality_withIntegerAndRationalTypes()
+      throws SolverException, InterruptedException {
+    requireIntegers();
+    requireRationals();
+    assume().that(solver).isNotEqualTo(Solvers.OPENSMT); // OpenSMT does not support mixed terms
+
+    IntegerFormula intVar = imgr.makeVariable("intVar");
+    RationalFormula ratVar = rmgr.makeVariable("ratVar");
+    BooleanFormula eqVar = mgr.makeEqual(intVar, ratVar);
+    assertThatFormula(eqVar).isSatisfiable();
+
+    IntegerFormula intNum5 = imgr.makeNumber(5);
+    RationalFormula ratNum5 = rmgr.makeNumber(5);
+    BooleanFormula eqNum = mgr.makeEqual(intNum5, ratNum5);
+    assertThatFormula(eqNum).isTautological();
+
+    RationalFormula ratNum6 = rmgr.makeNumber(6);
+    BooleanFormula eqNumFalse = mgr.makeEqual(intNum5, ratNum6);
+    assertThatFormula(eqNumFalse).isUnsatisfiable();
+
+    BooleanFormula eqIntVarRatConst = mgr.makeEqual(intVar, ratNum5);
+    assertThatFormula(eqIntVarRatConst).isSatisfiable();
   }
 
   private class Rebuilder extends FormulaTransformationVisitor {
@@ -124,9 +183,9 @@ public class FormulaManagerTest extends SolverBasedTest0.ParameterizedSolverBase
         case NOT:
           return bmgr.not((BooleanFormula) args.get(0));
         case EQ:
-          return mgr.equal(args);
+          return mgr.makeEqual(args);
         case DISTINCT:
-          return mgr.distinct(args);
+          return mgr.makeDistinct(args);
         default:
           throw new UnsupportedOperationException();
       }
@@ -143,7 +202,7 @@ public class FormulaManagerTest extends SolverBasedTest0.ParameterizedSolverBase
     var var2 = mgr.makeVariable(formulaType, "var2");
     var var3 = mgr.makeVariable(formulaType, "var3");
 
-    var f = mgr.equal(var1, var2, var3);
+    var f = mgr.makeEqual(var1, var2, var3);
     var g = mgr.transformRecursively(f, new Rebuilder(mgr));
 
     assertThat(f).isEqualTo(g);
@@ -168,7 +227,7 @@ public class FormulaManagerTest extends SolverBasedTest0.ParameterizedSolverBase
             + String.format("(declare-const %s %s)", var3, formulaSort)
             + String.format("(assert (= %s %s %s))", var1, var2, var3);
 
-    var f = mgr.equal(var1, var2, var3);
+    var f = mgr.makeEqual(var1, var2, var3);
     var g = mgr.parse(str);
 
     assertThat(f).isEqualTo(g);
@@ -183,12 +242,12 @@ public class FormulaManagerTest extends SolverBasedTest0.ParameterizedSolverBase
     var var2 = mgr.makeVariable(formulaType, "var2");
     var var3 = mgr.makeVariable(formulaType, "var3");
 
-    var f = mgr.distinct(var1, var2, var3);
+    var f = mgr.makeDistinct(var1, var2, var3);
     var g =
         bmgr.and(
-            bmgr.not(mgr.equal(var1, var2)),
-            bmgr.not(mgr.equal(var1, var3)),
-            bmgr.not(mgr.equal(var2, var3)));
+            bmgr.not(mgr.makeEqual(var1, var2)),
+            bmgr.not(mgr.makeEqual(var1, var3)),
+            bmgr.not(mgr.makeEqual(var2, var3)));
 
     if (ImmutableList.of(Solvers.BOOLECTOR, Solvers.MATHSAT5, Solvers.PRINCESS).contains(solver)) {
       // Solvers that rewrite
@@ -197,6 +256,75 @@ public class FormulaManagerTest extends SolverBasedTest0.ParameterizedSolverBase
       // Solvers that keep the distinct term
       // Note that Bitwuzla will partially rewrite and only supports distinct for 2 arguments
       assertThat(f).isNotEqualTo(g);
+    }
+  }
+
+  /**
+   * Check that an exception is thrown if the arguments to `distinct` don't have compatible types.
+   * However, some types are compatible if a solver can convert them internally (e.g. Integer and
+   * Rational --> {@link #testDistinct_withIntegerAndRationalTypes}).
+   */
+  @Test
+  public void testDistinct_withDifferentTypes() {
+
+    // Incompatible types: Boolean and Numeric
+    var boolVar = mgr.makeVariable(BooleanType, "boolVar");
+    var numVarType = imgr != null ? IntegerType : getBitvectorTypeWithSize(8);
+    var numVar = mgr.makeVariable(numVarType, "numVar");
+    assertThrows(IllegalArgumentException.class, () -> mgr.makeDistinct(boolVar, numVar));
+
+    // Incompatible types: Bitvector of different sizes
+    if (bvmgr != null) {
+      var bv8 = mgr.makeVariable(getBitvectorTypeWithSize(8), "bv8");
+      var bv16 = mgr.makeVariable(getBitvectorTypeWithSize(16), "bv16");
+      assertThrows(IllegalArgumentException.class, () -> mgr.makeDistinct(bv8, bv16));
+    }
+
+    // Incompatible types: Array of different types
+    if (amgr != null) {
+      var domainType = numVarType;
+      var rangeType = numVarType == IntegerType ? RationalType : getBitvectorTypeWithSize(16);
+      var arr1 = mgr.makeVariable(getArrayType(domainType, rangeType), "arr1");
+      var arr2 = mgr.makeVariable(getArrayType(rangeType, domainType), "arr2");
+      assertThrows(IllegalArgumentException.class, () -> mgr.makeDistinct(arr1, arr2));
+    }
+  }
+
+  @Test
+  public void testDistinct_withIntegerAndRationalTypes()
+      throws SolverException, InterruptedException {
+    requireIntegers();
+    requireRationals();
+    assume().that(solver).isNotEqualTo(Solvers.OPENSMT); // OpenSMT does not support mixed terms
+
+    IntegerFormula intVar = imgr.makeVariable("intVar");
+    RationalFormula ratVar = rmgr.makeVariable("ratVar");
+    BooleanFormula distinctVar = mgr.makeDistinct(intVar, ratVar);
+    assertThatFormula(distinctVar).isSatisfiable();
+
+    IntegerFormula intNum5 = imgr.makeNumber(5);
+    RationalFormula ratNum5 = rmgr.makeNumber(5);
+    BooleanFormula distinctNum = mgr.makeDistinct(intNum5, ratNum5);
+    assertThatFormula(distinctNum).isUnsatisfiable();
+
+    RationalFormula ratNum6 = rmgr.makeNumber(6);
+    BooleanFormula distinctNumTrue = mgr.makeDistinct(intNum5, ratNum6);
+    assertThatFormula(distinctNumTrue).isTautological();
+
+    BooleanFormula distinctIntVarRatConst = mgr.makeDistinct(intVar, ratNum5);
+    assertThatFormula(distinctIntVarRatConst).isSatisfiable();
+
+    // build assertion: distinct(intVar, 5) && intVar == 5 --> should be unsat
+    try (ProverEnvironment prover = context.newProverEnvironment()) {
+      prover.addConstraint(distinctIntVarRatConst);
+      assertThat(prover.isUnsat()).isFalse();
+      prover.push();
+      prover.addConstraint(imgr.equal(intVar, intNum5)); // intVar == 5
+      assertThat(prover.isUnsat()).isTrue();
+      prover.pop();
+      prover.push();
+      prover.addConstraint(imgr.equal(intVar, imgr.makeNumber(7))); // intVar == 7
+      assertThat(prover.isUnsat()).isFalse();
     }
   }
 
@@ -210,7 +338,7 @@ public class FormulaManagerTest extends SolverBasedTest0.ParameterizedSolverBase
     var var2 = mgr.makeVariable(formulaType, "var2");
     var var3 = mgr.makeVariable(formulaType, "var3");
 
-    var f = mgr.distinct(var1, var2, var3);
+    var f = mgr.makeDistinct(var1, var2, var3);
     var g = mgr.transformRecursively(f, new Rebuilder(mgr));
 
     assertThat(f).isEqualTo(g);
@@ -235,7 +363,7 @@ public class FormulaManagerTest extends SolverBasedTest0.ParameterizedSolverBase
             + String.format("(declare-const %s %s)", var3, formulaSort)
             + String.format("(assert (distinct %s %s %s))", var1, var2, var3);
 
-    var f = mgr.distinct(var1, var2, var3);
+    var f = mgr.makeDistinct(var1, var2, var3);
     var g = mgr.parse(str);
 
     assertThat(f).isEqualTo(g);

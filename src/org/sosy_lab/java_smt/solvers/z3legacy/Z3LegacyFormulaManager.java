@@ -16,7 +16,6 @@ import com.google.common.primitives.Longs;
 import com.microsoft.z3legacy.Native;
 import com.microsoft.z3legacy.Z3Exception;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -71,12 +70,17 @@ final class Z3LegacyFormulaManager extends AbstractFormulaManager<Long, Long, Lo
   }
 
   @Override
-  public Long distinctImpl(Collection<Long> pArgs) {
-    return Native.mkDistinct(getEnvironment(), pArgs.size(), Longs.toArray(pArgs));
+  public Long distinctImpl(Iterable<Long> pArgs) {
+    long[] array = Longs.toArray(ImmutableList.copyOf(pArgs));
+    if (array.length < 2) {
+      return Native.mkTrue(getEnvironment());
+    } else {
+      return Native.mkDistinct(getEnvironment(), array.length, array);
+    }
   }
 
   @Override
-  public Long parseImpl(String str) throws IllegalArgumentException {
+  protected List<Long> parseAllImpl(String pSmtScript) throws IllegalArgumentException {
 
     // Z3 does not access the existing symbols on its own,
     // but requires all symbols as part of the query.
@@ -101,7 +105,7 @@ final class Z3LegacyFormulaManager extends AbstractFormulaManager<Long, Long, Lo
         e =
             Native.parseSmtlib2String(
                 env,
-                str,
+                pSmtScript,
                 sorts.length,
                 sortSymbols,
                 sorts,
@@ -132,14 +136,16 @@ final class Z3LegacyFormulaManager extends AbstractFormulaManager<Long, Long, Lo
 
     Preconditions.checkState(e != 0, "parsing aborted");
     final int size = Native.astVectorSize(env, e);
-    Preconditions.checkState(
-        size == 1, "parsing expects exactly one asserted term, but got %s terms", size);
-    final long term = Native.astVectorGet(env, e, 0);
+    ImmutableList.Builder<Long> result = ImmutableList.builder();
+    for (int i = 0; i < size; i++) {
+      long term = Native.astVectorGet(env, e, i);
+      // last step: all parsed symbols need to be declared again to have them tracked in the
+      // creator.
+      declareAllSymbols(term);
+      result.add(term);
+    }
 
-    // last step: all parsed symbols need to be declared again to have them tracked in the creator.
-    declareAllSymbols(term);
-
-    return term;
+    return result.build();
   }
 
   @SuppressWarnings("CheckReturnValue")

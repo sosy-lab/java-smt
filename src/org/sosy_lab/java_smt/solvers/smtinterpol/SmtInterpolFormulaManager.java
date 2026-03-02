@@ -8,9 +8,7 @@
 
 package org.sosy_lab.java_smt.solvers.smtinterpol;
 
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.collect.Iterables.getOnlyElement;
-
+import com.google.common.collect.ImmutableList;
 import de.uni_freiburg.informatik.ultimate.logic.AnnotatedTerm;
 import de.uni_freiburg.informatik.ultimate.logic.ApplicationTerm;
 import de.uni_freiburg.informatik.ultimate.logic.FormulaLet;
@@ -27,11 +25,12 @@ import de.uni_freiburg.informatik.ultimate.smtinterpol.option.OptionMap;
 import de.uni_freiburg.informatik.ultimate.smtinterpol.smtlib2.ParseEnvironment;
 import java.io.StringReader;
 import java.util.ArrayDeque;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Deque;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+import org.sosy_lab.common.collect.Collections3;
 import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.FormulaType;
@@ -71,17 +70,27 @@ public class SmtInterpolFormulaManager
   }
 
   @Override
-  protected Term equalImpl(Collection<Term> pArgs) {
-    return getEnvironment().getTheory().equals(pArgs.toArray(new Term[0]));
+  protected Term equalImpl(Iterable<Term> pArgs) {
+    Term[] array = ImmutableList.copyOf(pArgs).toArray(new Term[0]);
+    if (array.length < 2) {
+      return getEnvironment().getTheory().mTrue;
+    } else {
+      return getEnvironment().term("=", array);
+    }
   }
 
   @Override
-  protected Term distinctImpl(Collection<Term> pArgs) {
-    return getEnvironment().getTheory().distinct(pArgs.toArray(new Term[0]));
+  protected Term distinctImpl(Iterable<Term> pArgs) {
+    Term[] array = ImmutableList.copyOf(pArgs).toArray(new Term[0]);
+    if (array.length < 2) {
+      return getEnvironment().getTheory().mTrue;
+    } else {
+      return getEnvironment().term("distinct", array);
+    }
   }
 
   @Override
-  public Term parseImpl(String pS) throws IllegalArgumentException {
+  protected List<Term> parseAllImpl(String pSmtScript) throws IllegalArgumentException {
     FormulaCollectionScript parseScript =
         new FormulaCollectionScript(getEnvironment(), getEnvironment().getTheory());
     LogProxy logProxy = new LogProxyForwarder(logger.withComponentName("SMTInterpol"));
@@ -97,17 +106,13 @@ public class SmtInterpolFormulaManager
         };
 
     try {
-      parseEnv.parseStream(new StringReader(pS), "<stdin>");
+      parseEnv.parseStream(new StringReader(pSmtScript), "<stdin>");
     } catch (SMTLIBException nested) {
       throw new IllegalArgumentException(nested);
     }
 
-    checkArgument(
-        parseScript.getAssertedTerms().size() == 1,
-        "Expected exactly one formula, but got %s",
-        parseScript.getAssertedTerms().size());
-    Term term = getOnlyElement(parseScript.getAssertedTerms());
-    return new FormulaUnLet().unlet(term);
+    return Collections3.transformedImmutableListCopy(
+        parseScript.getAssertedTerms(), new FormulaUnLet()::unlet);
   }
 
   @Override
