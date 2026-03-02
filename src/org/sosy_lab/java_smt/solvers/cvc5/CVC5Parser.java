@@ -251,7 +251,7 @@ class CVC5Parser {
    * cached one is recorded in the given substitutions map.
    */
   private void registerNewTermSymbols(Term declaration, Map<Term, Term> substitutions) {
-    final String parsedTermString = declaration.toString();
+    final String parsedTermString = creator.dequote(declaration.toString());
     final Sort parsedSort = declaration.getSort();
     final String parsedSortString = parsedSort.toString();
 

@@ -299,7 +299,7 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
     return new CVC4RegexFormula(pTerm);
   }
 
-  static String getName(Expr e) {
+  String getName(Expr e) {
     checkState(!e.isNull());
     if (!e.isConst() && !e.isVariable()) {
       e = e.getOperator();
