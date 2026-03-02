@@ -11,6 +11,7 @@ package org.sosy_lab.java_smt.test;
 import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.TruthJUnit.assume;
 import static org.junit.Assert.assertThrows;
+import static org.sosy_lab.java_smt.api.FormulaType.BooleanType;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
@@ -264,5 +265,24 @@ public class ParserTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
     } else {
       assertThrows(IllegalArgumentException.class, () -> mgr.parseAll(smt));
     }
+  }
+
+  @Test
+  public void testParseall_quotedSymbol() {
+    // Capture a variable from the context
+    var f = mgr.makeVariable(BooleanType, "my variable");
+    var g = mgr.parse("(assert |my variable|)");
+
+    assertThat(g).isEqualTo(f);
+  }
+
+  @Test
+  public void testParseall_quotedSymbol_reparse() {
+    // Parse a variable that was already defined in the context
+    var f = mgr.makeVariable(BooleanType, "my variable");
+    var str = mgr.dumpFormula(f).toString();
+    var g = mgr.parse(str);
+
+    assertThat(g).isEqualTo(f);
   }
 }
