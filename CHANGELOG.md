@@ -10,6 +10,81 @@ SPDX-License-Identifier: Apache-2.0
 
 # JavaSMT ChangeLog
 
+## JavaSMT 6.0.0
+
+#### Note: Version 6 will be the last mayor release for Java 11. We will move to Java 17 soon after and aim to subsequently adopt Java 21 still in 2026.
+
+#### We plan to resume our regular updating policy again, providing more small updates more regularly.
+
+### Breaking Changes
+- Visitation of quantified formulas has been reworked due to inconsistencies in regard to bound-variables:
+    - `visitBoundVariable()` has been deprecated due to solver specific inconsistencies.
+    - a combination of `visitQuantifier` (for the whole quantified formula) and `visitAtom` (for variables in the body) can be used instead. This provides consistent behavior in all solvers.
+- Many API calls in the `Model` and `ProverEnvironment` now throw `SolverException` and `InterruptedException`, as some solvers can throw these exceptions when executing the changed operations. MathSAT5 now throws a `SolverException` in cases in which model generation fails when requesting a model, instead of the previous `IllegalArgumentException`. Warning: `Model.iterator()` may throw the checked exceptions SolverException and InterruptedException although these exceptions are not declared with throws due to API restrictions.
+- Floating-Point theory, `FloatingPointNumber`, and `FloatingPointType` have been reworked:
+    - We now handle floating-point precisions as defined in the SMTLIB2 standard https://smt-lib.org/theories-FloatingPoint.shtml, i.e. output shows them now with the hidden bit included in the mantissa. Related documentation has been updated and extended to explain expected in- and output, i.e. `FloatingPointType.toSMTLIBString()`, `FloatingPointType.toString()`, and `FloatingPointType.fromString()`.
+    - API has been added to discern mantissas with hidden bit, from mantissas without hidden bit. The old API, implicitly expecting a mantissa without hidden bit, has been deprecated. E.g. `FloatingPointType.getMantissaSize()` has been deprecated, while `FloatingPointType.getMantissaSizeWithHiddenBit()` and `FloatingPointType.getMantissaSizeWithoutHiddenBit()` have been added.
+    - `FloatingPointNumber`s are now constructed using `FloatingPointType`, similar to how
+      `FloatingPointFormula`s are constructed.
+    - Public constants for single and double floating-point precisions that did not specify whether their mantissa includes the hidden bit have been deprecated, and new constants with more precise naming have been added.
+- Floating-Point rounding-mode has also been reworked: 2 methods have been added to `FloatingPointFormulaManager` to allow access to rounding-mode formulas, i.e. `FloatingPointRoundingModeFormula`, formula representing a rounding mode for floating-point operations.
+    - The old rounding-modes, `FP_ROUND_EVEN`, `FP_ROUND_AWAY`, `FP_ROUND_POSITIVE`, `FP_ROUND_NEGATIVE`, and `FP_ROUND_ZERO`, have been removed from `FunctionDeclarationKind`.
+    - Use `FloatingPointFormulaManager.fromRoundingModeFormula()` to get the rounding mode of a `FloatingPointRoundingModeFormula`, and `FloatingPointFormulaManager.makeRoundingMode()` to create new `FloatingPointRoundingModeFormula`s.
+    - The rounding-modes can now be accessed via `FloatingPointRoundingMode.getRoundingMode()`, but have been renamed: `FP_ROUND_AWAY` to `NEAREST_TIES_AWAY`, `FP_ROUND_AWAY` to `NEAREST_TIES_TO_EVEN`, `FP_ROUND_NEGATIVE` to `TOWARD_NEGATIVE`, `FP_ROUND_POSITIVE` to `TOWARD_POSITIVE`, and `FP_ROUND_ZERO` to `TOWARD_ZERO`.
+- Boolector: (broken) support for quantified formulas has been removed.
+- Unsat-core over assumptions generation now always requires the correct option `ProverOptions.GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS`. 
+  It was possible to use `ProverOptions.GENERATE_UNSAT_CORE` for unsat-core over assumption generation in MathSAT5 before.
+
+### Solver updates
+- Updated CVC5 from version 1.0.5 to daily release version 2026-02-26-d22638a (2 days 
+  after version 1.3.3)
+- Updated MathSAT5 from version 5.6.10 to 5.6.15
+- Updated OptiMathSAT from version 1.7.1 to 1.7.3
+- Updated Z3 from version 4.12.5 to 4.15.4
+- Updated Bitwuzla from version 0.4.0 to intermediate version based on Bitwuzlas main branch Feb 25, 2026 (version 0.8.2 + additional updates, e.g. interpolation)
+- Updated OpenSMT2 from version 2.6.0 to 2.9.0
+
+### New Additions
+- NEW SOLVER: Z3 (version 4.5.0) with interpolation support has been added as an solver, and can be used by choosing `Solvers.Z3_WITH_INTERPOLATION`. This version is distinct from the up-to-date version of Z3 (without interpolation support). This is currently experimental and still being worked on! Also, since this version of Z3 is more than 10 years old, it does not benefit from updates and developments in Z3 since then.
+- OpenSMT2: options to specify a wanted interpolation technique (e.g. `interpolation.algorithm.lraTheory`), as well as interpolant simplification (`interpolation.simplificationLevel`) has been added.
+- Bitwuzla: interpolation support has been added.
+- CVC5: SMTLIB2 parsing support has been added.
+- CVC4/5: added support for bitvector to IEEE 754 floating-point number conversion with `FloatingPointManager.fromIeeeBitvector()`.
+- Princess: support for the theory of Reals has been added.
+- Princess: support for array models with multiple indices has been added.
+- Princess: support for String theory has been added by incorporating Ostrich (version 2.0) into it.
+- Yices2: support for quantified formulas has been added.
+- String theory now supports Integer to code point and code point to Integer conversion (newly added methods: `StringFormulaManager.toCodePoint()` and `StringFormulaManager.fromCodePoint()`).
+- Bitvector rotation support has been added to the formula visitor.
+- Yices2: support for the theory of arrays has been added.
+- String theory: Clarified that Strings used in the `StringFormulaManager` API are indeed Java Strings and may contain Unicode characters. Escape sequences like `\u0020` will not be translated automatically. Use `AbstractStringFormulaManager.escapeUnicodeForSmtlib()` and `AbstractStringFormulaManager.unescapeUnicodeForSmtlib()` to handle escape sequences when translating from/to SMT/SMTLIB2.
+- Added `FormulaManager.makeEqual()` and `FormulaManager.makeDistinct()` as a more general way of creating equality (= ...) and distinct (distinct ...) formulas. The new methods are provided in addition of existing, theory specific, methods such as `IntegerFormulaManager.equal()` or `BitvectorFormulaManager.distinct()`. The API allows for an arbitrary number of arguments. The type of the arguments must match, except for formulas over Integer and Real theories, which may be mixed.
+- Multi-assertion SMTLIB2 parsing has been added and can be used via `FormulaManager.parseAll()`.
+
+### Updates
+- Documentation for `unsatCoreOverAssumptions()` has been updated to reflect that it calls `isUnsatOverAssumptions()` automatically, 
+  and does not require a call to `isUnsat()` or `isUnsatOverAssumptions()` directly preceding it.
+- We now ensure that all model generating API (i.e. `getModel()`, `lower()`, and `upper()`) is only
+  ever used directly after SAT has been returned by a solver. This ensures that no outdated models are retrieved.
+  All value assignments of a new model are now automatically cached for all solvers in the first call to `getModel()`.
+  Cached models are cleaned up automatically.
+- Memory leaks in CVC5 and Bitwuzla have been fixed.
+- Model generation in CVC5 and Bitwuzla has been optimized and should now be faster.
+- We now support multiple architectures for solver binaries, allowing us to support ARM64 architectures in addition to x64 architectures. The following pre-build solver binaries are now available for ARM64 in our dependency system:
+    - Linux ARM64: Bitwuzla, MathSAT5, CVC5, OpenSMT2, Princess, SMTInterpol, Z3, and Z3_WITH_INTERPOLATION
+    - Windows ARM64: CVC5, Princess, SMTInterpol, Z3
+    - MacOS ARM64: CVC5, Princess, SMTInterpol, Z3
+- Model generation: to avoid possible solver inconsistencies; value-assignments are now always computed up-front, i.e. when a model is requested for a particular query in a `ProverEnvironment` after a SAT check for the first time, and invalidated once the underlying context of its `ProverEnvironment` is changed.
+- Model generation: nested array support has been improved for Z3, CVC5, CVC4, Yices2, and Bitwuzla.
+- SMTLIB2 parsing consistency in general (for all solvers) has been improved.
+- Z3: a SEGFAULT caused by `IntegerFormulaManager.makeNumber()` for Integer theory has been fixed.
+- CVC5: interpolation support has been improved.
+- Separation-Logic: general improvements in the usability of the theory, as well as improved and extended documentation.
+- MathSAT5: support for Integer theory modulo has been added.
+- String theory: empty String ranges in `StringFormulaManager.range()` are now supported.
+- `FunctionDeclarationKind`s used in the formula visitor have been extended with cases needed for conversion between bitvector and integer terms.
+
+
 ## JavaSMT 5.0.1
 
 This patch release improves documentation and brings smaller improvements for CVC5.
