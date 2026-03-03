@@ -38,9 +38,9 @@ SPDX-License-Identifier: Apache-2.0
 ### Solver updates
 - Updated CVC5 from version 1.0.5 to daily release version 2026-02-26-d22638a (2 days 
   after version 1.3.3)
-- Updated MathSAT5 from version 5.6.10 to 5.6.15
+- Updated MathSAT5 from version 5.6.10 to 5.6.15 (system dependencies for this solver now require at least Ubuntu 24.04 or equivalently up-to-date packages to be installed)
 - Updated OptiMathSAT from version 1.7.1 to 1.7.3
-- Updated Z3 from version 4.12.5 to 4.15.4
+- Updated Z3 from version 4.12.5 to 4.15.4 (system dependencies for this solver now require at least Ubuntu 24.04 or equivalently up-to-date packages to be installed)
 - Updated Bitwuzla from version 0.4.0 to intermediate version based on Bitwuzlas main branch Feb 25, 2026 (version 0.8.2 + additional updates, e.g. interpolation)
 - Updated OpenSMT2 from version 2.6.0 to 2.9.0
 
@@ -83,7 +83,6 @@ SPDX-License-Identifier: Apache-2.0
 - MathSAT5: support for Integer theory modulo has been added.
 - String theory: empty String ranges in `StringFormulaManager.range()` are now supported.
 - `FunctionDeclarationKind`s used in the formula visitor have been extended with cases needed for conversion between bitvector and integer terms.
-
 
 ## JavaSMT 5.0.1
 
