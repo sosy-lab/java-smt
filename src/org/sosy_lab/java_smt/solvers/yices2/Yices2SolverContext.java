@@ -113,7 +113,7 @@ public class Yices2SolverContext extends AbstractSolverContext {
 
   @Override
   protected ProverEnvironment newProverEnvironment0(Set<ProverOptions> pOptions) {
-    return new Yices2TheoremProver(creator, pOptions, bfmgr, shutdownManager);
+    return new Yices2AbstractProver(creator, pOptions, bfmgr, shutdownManager);
   }
 
   @Override

@@ -55,7 +55,7 @@ import org.sosy_lab.java_smt.basicimpl.CachingModel;
  * incremental solving, but is more complex to implement. Let's keep this idea is future work for
  * optimization.
  */
-class Yices2TheoremProver extends AbstractProverWithAllSat<Void> implements ProverEnvironment {
+class Yices2AbstractProver extends AbstractProverWithAllSat<Void> implements ProverEnvironment {
 
   private static final int DEFAULT_PARAMS = 0; // use default setting in the solver
 
@@ -67,7 +67,7 @@ class Yices2TheoremProver extends AbstractProverWithAllSat<Void> implements Prov
   // Therefore, we need to keep track of all added constraints beyond that stack-level.
   private int stackSizeToUnsat = Integer.MAX_VALUE;
 
-  protected Yices2TheoremProver(
+  protected Yices2AbstractProver(
       Yices2FormulaCreator creator,
       Set<ProverOptions> pOptions,
       BooleanFormulaManager pBmgr,
