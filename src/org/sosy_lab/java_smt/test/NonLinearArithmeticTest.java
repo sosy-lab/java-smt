@@ -41,11 +41,7 @@ public class NonLinearArithmeticTest<T extends NumeralFormula> extends SolverBas
   // INFO: OpenSmt does not suport nonlinear arithmetic
   static final ImmutableSet<Solvers> SOLVER_WITHOUT_NONLINEAR_ARITHMETIC =
       ImmutableSet.of(
-          Solvers.SMTINTERPOL,
-          Solvers.MATHSAT5,
-          Solvers.BOOLECTOR,
-          Solvers.CVC4,
-          Solvers.OPENSMT);
+          Solvers.SMTINTERPOL, Solvers.MATHSAT5, Solvers.BOOLECTOR, Solvers.CVC4, Solvers.OPENSMT);
 
   @Parameters(name = "{0} {1} {2}")
   public static Iterable<Object[]> getAllSolversAndTheories() {

@@ -47,7 +47,7 @@ public class Yices2IntegerFormulaManager
 
   @Override
   public Integer modulo(Integer pParam1, Integer pParam2) {
-      return yices_imod(pParam1, pParam2);
+    return yices_imod(pParam1, pParam2);
   }
 
   @Override
