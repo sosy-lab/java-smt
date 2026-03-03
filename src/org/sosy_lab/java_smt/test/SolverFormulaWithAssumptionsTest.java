@@ -17,6 +17,7 @@ import com.google.common.collect.Lists;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.Test;
+import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
@@ -157,6 +158,11 @@ public class SolverFormulaWithAssumptionsTest
   @Test
   @SuppressWarnings("CheckReturnValue")
   public void assumptionsTest1() throws SolverException, InterruptedException {
+    assume()
+        .withMessage("Yices2 hangs in this test")
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.YICES2);
+
     /*
     (declare-fun A () Bool)
     (push 1)

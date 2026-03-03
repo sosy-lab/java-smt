@@ -124,10 +124,6 @@ public class SolverConcurrencyTest {
           .that(solver)
           .isNotEqualTo(Solvers.MATHSAT5);
     }
-    assume()
-        .withMessage("Yices2 with MCSAT support is not reentrant")
-        .that(solver)
-        .isNotEqualTo(Solvers.YICES2);
   }
 
   private void requireConcurrentMultipleStackSupport() {

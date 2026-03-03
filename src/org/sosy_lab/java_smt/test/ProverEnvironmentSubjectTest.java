@@ -9,6 +9,7 @@
 package org.sosy_lab.java_smt.test;
 
 import static com.google.common.truth.ExpectFailure.assertThat;
+import static com.google.common.truth.TruthJUnit.assume;
 import static org.sosy_lab.java_smt.test.ProverEnvironmentSubject.proverEnvironments;
 
 import com.google.common.base.Throwables;
@@ -17,6 +18,7 @@ import com.google.common.truth.ExpectFailure.SimpleSubjectBuilderCallback;
 import com.google.common.truth.SimpleSubjectBuilder;
 import org.junit.Before;
 import org.junit.Test;
+import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BasicProverEnvironment;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
@@ -53,6 +55,11 @@ public class ProverEnvironmentSubjectTest extends SolverBasedTest0.Parameterized
   @Test
   public void testIsSatisfiableNo() throws InterruptedException {
     requireUnsatCore();
+    assume()
+        .withMessage("Yices2 hangs in this test")
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.YICES2);
+
     try (ProverEnvironment env =
         context.newProverEnvironment(
             ProverOptions.GENERATE_MODELS, ProverOptions.GENERATE_UNSAT_CORE)) {

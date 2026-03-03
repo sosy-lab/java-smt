@@ -9,6 +9,7 @@
 package org.sosy_lab.java_smt.test;
 
 import static com.google.common.truth.ExpectFailure.assertThat;
+import static com.google.common.truth.TruthJUnit.assume;
 import static org.sosy_lab.java_smt.test.BooleanFormulaSubject.booleanFormulasOf;
 
 import com.google.common.base.Throwables;
@@ -17,6 +18,7 @@ import com.google.common.truth.ExpectFailure.SimpleSubjectBuilderCallback;
 import com.google.common.truth.SimpleSubjectBuilder;
 import org.junit.Before;
 import org.junit.Test;
+import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.SolverException;
 
@@ -65,6 +67,11 @@ public class BooleanFormulaSubjectTest extends SolverBasedTest0.ParameterizedSol
   @Test
   public void testIsSatisfiableNo() {
     requireUnsatCore();
+    assume()
+        .withMessage("Yices2 hangs in this test")
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.YICES2);
+
     AssertionError failure =
         expectFailure(whenTesting -> whenTesting.that(contradiction).isSatisfiable());
     assertThat(failure).factValue("which has unsat core").isNotEmpty();
