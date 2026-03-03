@@ -91,11 +91,7 @@ abstract class Yices2NumeralFormulaManager<
 
   @Override
   public Integer multiply(Integer pParam1, Integer pParam2) {
-    if (isNumeral(pParam1) || isNumeral(pParam2)) {
-      return yices_mul(pParam1, pParam2);
-    } else {
-      return super.multiply(pParam1, pParam2);
-    }
+    return yices_mul(pParam1, pParam2);
   }
 
   @Override

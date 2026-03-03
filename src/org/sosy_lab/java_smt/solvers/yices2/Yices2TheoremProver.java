@@ -75,8 +75,8 @@ class Yices2TheoremProver extends AbstractProverWithAllSat<Void> implements Prov
     super(pOptions, pBmgr, pShutdownNotifier);
     this.creator = creator;
     curCfg = yices_new_config();
-    yices_set_config(curCfg, "solver-type", "dpllt");
-    yices_set_config(curCfg, "mode", "push-pop");
+    yices_set_config(curCfg, "solver-type", "mcsat");
+    yices_set_config(curCfg, "mode", "interactive");
     curEnv = yices_new_context(curCfg);
   }
 

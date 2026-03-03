@@ -123,15 +123,20 @@ public class Yices2NativeApiTest {
 
   private long env;
 
+  private long newContext(boolean mcsat) {
+    var cfg = yices_new_config();
+    yices_set_config(cfg, "solver-type", mcsat ? "mcsat" : "dpllt");
+    yices_set_config(cfg, "mode", "interactive");
+    var context = yices_new_context(cfg);
+    yices_context_disable_option(context, "var-elim");
+    yices_free_config(cfg);
+    return context;
+  }
+
   @Before
   public void createEnvironment() {
     yices_init();
-    long cfg = yices_new_config();
-    yices_set_config(cfg, "solver-type", "dpllt");
-    yices_set_config(cfg, "mode", "push-pop");
-    env = yices_new_context(cfg);
-    yices_context_disable_option(env, "var-elim");
-    yices_free_config(cfg);
+    env = newContext(false);
   }
 
   @After
@@ -616,7 +621,7 @@ public class Yices2NativeApiTest {
 
   @Test
   public void hasMCSat() {
-    // Checkt that we compiled wiht --enable-mcsat
+    // Check that we compiled with --enable-mcsat
     assertThat(yices_has_mcsat()).isEqualTo(1);
   }
 

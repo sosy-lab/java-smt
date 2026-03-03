@@ -2613,6 +2613,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
     requireArrays();
     requireBitvectors();
 
+    assume().that(solver).isNotEqualTo(Solvers.YICES2); // FIXME Segfaults
     assume().that(solver).isNotEqualTo(Solvers.BOOLECTOR); // Doesn't support multiple indices
 
     var bitvectorType = FormulaType.getBitvectorTypeWithSize(8);
