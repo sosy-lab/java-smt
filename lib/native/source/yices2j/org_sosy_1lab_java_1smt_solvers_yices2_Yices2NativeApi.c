@@ -1662,3 +1662,28 @@ TERM_ARG(2)
 TERM_VECTOR_ARG(3)
 CALL3(int, model_term_support)
 TERM_VECTOR_ARG_RETURN(3)
+y
+__attribute__((visibility("default"))) jjterm Java_org_sosy_1lab_java_1smt_solvers_yices2_Yices2NativeApi_yices_1interpolate(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2) {
+  jint jresult = 0;
+  context_t *arg1 = 0;
+  context_t *arg2 = 0;
+  term_t result;
+
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(context_t **)&jarg1;
+  arg2 = *(context_t **)&jarg2;
+
+  interpolation_context_t context = {arg1, arg2, 0, 0};
+  smt_status_t c = yices_check_context_with_interpolation(&context, 0, 0);
+  if (c == YICES_STATUS_SAT) {
+    throwException(jenv, "java/lang/RuntimeException", "Problem is SAT");
+  }
+  if (c == YICES_STATUS_ERROR) {
+    throwEx ception(jenv, "java/lang/RuntimeException", "Error during interpolation");
+  }
+
+  result = context.interpolant;
+  jresult = (jint)result;
+  return jresult;
+}

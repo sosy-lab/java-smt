@@ -43,7 +43,6 @@ import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bvpower
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bvsum_component;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bvxor2;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_check_context;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_context_disable_option;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_eq;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_exists;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_exit;
@@ -61,6 +60,7 @@ import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_init;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_int32;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_int64;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_int_type;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_interpolate;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_is_thread_safe;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_mul;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_new_config;
@@ -127,8 +127,8 @@ public class Yices2NativeApiTest {
     var cfg = yices_new_config();
     yices_set_config(cfg, "solver-type", mcsat ? "mcsat" : "dpllt");
     yices_set_config(cfg, "mode", "interactive");
+    yices_set_config(cfg, "model-interpolation", "true");
     var context = yices_new_context(cfg);
-    yices_context_disable_option(context, "var-elim");
     yices_free_config(cfg);
     return context;
   }
@@ -637,6 +637,24 @@ public class Yices2NativeApiTest {
     assertThat(yices_term_constructor(forall)).isEqualTo(YICES_FORALL_TERM);
     assertThat(yices_term_constructor(exists)).isEqualTo(YICES_NOT_TERM);
     assertThat(yices_term_constructor(yices_term_child(exists, 0))).isEqualTo(YICES_FORALL_TERM);
+  }
+
+  @Test
+  public void booleanInterpolationTest() {
+    var boolType = yices_bool_type();
+    var a = yices_named_variable(boolType, "a");
+
+    var ctxA = newContext(true);
+    var ctxB = newContext(true);
+
+    yices_assert_formula(ctxA, a);
+    yices_assert_formula(ctxB, yices_not(a));
+    var itp = yices_interpolate(ctxA, ctxB);
+
+    assertThat(itp).isEqualTo(a);
+
+    yices_free_context(ctxB);
+    yices_free_context(ctxA);
   }
 
   /**

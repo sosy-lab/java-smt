@@ -860,4 +860,11 @@ public final class Yices2NativeApi {
    * @return term_vector (NOT int with error code) that is supported. Empty if error!
    */
   public static native int[] yices_model_term_support(long model, int term);
+
+  /**
+   * Calculate an interpolant.
+   *
+   * <p>Requires MCSAT, and expects the contexts to be unsatisfiable
+   */
+  public static native int yices_interpolate(long ctxA, long ctxB);
 }
