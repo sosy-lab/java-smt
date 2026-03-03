@@ -61,10 +61,10 @@ import org.sosy_lab.java_smt.basicimpl.AbstractModel;
 public class Yices2Model extends AbstractModel<Integer, Integer, Long> {
 
   private final long model;
-  private final Yices2AbstractProver prover;
+  private final Yices2AbstractProver<?> prover;
   private final Yices2FormulaCreator formulaCreator;
 
-  Yices2Model(long model, Yices2AbstractProver prover, Yices2FormulaCreator pCreator) {
+  Yices2Model(long model, Yices2AbstractProver<?> prover, Yices2FormulaCreator pCreator) {
     super(prover, pCreator);
     this.model = model;
     this.prover = prover;

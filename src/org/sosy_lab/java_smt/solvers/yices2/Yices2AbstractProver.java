@@ -25,18 +25,23 @@ import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_set_con
 
 import com.google.common.base.Preconditions;
 import com.google.common.primitives.Ints;
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Deque;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
-import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.ShutdownNotifier;
+import org.sosy_lab.common.UniqueIdGenerator;
+import org.sosy_lab.common.collect.PathCopyingPersistentTreeMap;
+import org.sosy_lab.common.collect.PersistentMap;
+import org.sosy_lab.java_smt.api.BasicProverEnvironment;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.BooleanFormulaManager;
 import org.sosy_lab.java_smt.api.Model;
-import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractProverWithAllSat;
@@ -55,7 +60,8 @@ import org.sosy_lab.java_smt.basicimpl.CachingModel;
  * incremental solving, but is more complex to implement. Let's keep this idea is future work for
  * optimization.
  */
-class Yices2AbstractProver extends AbstractProverWithAllSat<Void> implements ProverEnvironment {
+abstract class Yices2AbstractProver<T> extends AbstractProverWithAllSat<T>
+    implements BasicProverEnvironment<T> {
 
   private static final int DEFAULT_PARAMS = 0; // use default setting in the solver
 
@@ -66,6 +72,10 @@ class Yices2AbstractProver extends AbstractProverWithAllSat<Void> implements Pro
   // Yices does not allow to PUSH when the stack is UNSAT.
   // Therefore, we need to keep track of all added constraints beyond that stack-level.
   private int stackSizeToUnsat = Integer.MAX_VALUE;
+
+  private static final UniqueIdGenerator ID_GENERATOR = new UniqueIdGenerator();
+
+  protected final Deque<PersistentMap<Integer, Integer>> stack = new ArrayDeque<>();
 
   protected Yices2AbstractProver(
       Yices2FormulaCreator creator,
@@ -78,6 +88,8 @@ class Yices2AbstractProver extends AbstractProverWithAllSat<Void> implements Pro
     yices_set_config(curCfg, "solver-type", "mcsat");
     yices_set_config(curCfg, "mode", "interactive");
     curEnv = yices_new_context(curCfg);
+
+    stack.push(PathCopyingPersistentTreeMap.of());
   }
 
   boolean isClosed() {
@@ -98,14 +110,13 @@ class Yices2AbstractProver extends AbstractProverWithAllSat<Void> implements Pro
     }
   }
 
-  @Override
-  protected @Nullable Void addConstraintImpl(BooleanFormula pConstraint)
-      throws InterruptedException {
-    if (!generateUnsatCores) { // unsat core does not work with incremental mode
-      int constraint = creator.extractInfo(pConstraint);
-      yices_assert_formula(curEnv, constraint);
-    }
-    return null;
+  @CanIgnoreReturnValue
+  protected int addConstraint0(BooleanFormula constraint) {
+    var formula = creator.extractInfo(constraint);
+    var label = Yices2AbstractProver.ID_GENERATOR.getFreshId();
+    yices_assert_formula(curEnv, formula);
+    stack.push(stack.pop().putAndCopy(label, formula));
+    return label;
   }
 
   @Override
