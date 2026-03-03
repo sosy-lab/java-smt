@@ -1252,7 +1252,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
     requireArrays();
     requireArrayModel();
 
-    assume().that(solver).isNotEqualTo(Solvers.YICES2); // FIXME Broken in JavaSMT
+    assume().withMessage("Not supported with MCSAT").that(solver).isNotEqualTo(Solvers.YICES2);
 
     // (= (select (select (select arr 5) 3) 1) x)
     // (= x 123)"
@@ -1837,6 +1837,8 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
     requireIntegers();
     requireArrays();
     requireArrayModel();
+
+    assume().withMessage("Not supported with MCSAT").that(solver).isNotEqualTo(Solvers.YICES2);
 
     // Let's store N values into an array and check that each one is in the model.
     // The example array formula is: for x in [1...N]: arr = store(arr, i_x, x)
@@ -2683,6 +2685,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
 
     assume().that(solver).isNotEqualTo(Solvers.BOOLECTOR); // Doesn't support multiple indices
     assume().that(solver).isNotEqualTo(Solvers.CVC4); // FIXME Broken in JavaSMT
+    assume().withMessage("Not supported with MCSAT").that(solver).isNotEqualTo(Solvers.YICES2);
 
     var scalarType = FormulaType.getBitvectorTypeWithSize(8);
 
@@ -2806,7 +2809,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
     requireArrayModel();
     requireIntegers();
 
-    assume().that(solver).isNotEqualTo(Solvers.YICES2); // FIXME Broken in JavaSMT
+    assume().withMessage("Not supported with MCSAT").that(solver).isNotEqualTo(Solvers.YICES2);
 
     var array =
         amgr.makeArray("array", IntegerType, FormulaType.getArrayType(IntegerType, IntegerType));
@@ -2823,6 +2826,8 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
 
   @Test
   public void testArrayStore1IntIntInt() {
+    assume().withMessage("Not supported with MCSAT").that(solver).isNotEqualTo(Solvers.YICES2);
+
     // Test for 3d integer arrays with exactly one element
     // array = (Store (const ...) idxA (Store (const ..) idxB (Store (const ...) idx C val))
     requireArrays();
@@ -2865,7 +2870,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
     requireArrayModel();
     requireIntegers();
 
-    assume().that(solver).isNotEqualTo(Solvers.YICES2); // FIXME Broken in JavaSMT
+    assume().withMessage("Not supported with MCSAT").that(solver).isNotEqualTo(Solvers.YICES2);
 
     var array =
         amgr.makeArray("array", IntegerType, FormulaType.getArrayType(IntegerType, IntegerType));
