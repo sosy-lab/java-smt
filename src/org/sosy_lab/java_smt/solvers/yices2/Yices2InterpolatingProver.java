@@ -12,12 +12,8 @@ package org.sosy_lab.java_smt.solvers.yices2;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_assert_formulas;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_free_config;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_free_context;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_interpolate;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_new_config;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_new_context;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_set_config;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_true;
 
 import com.google.common.collect.FluentIterable;
@@ -50,16 +46,6 @@ public class Yices2InterpolatingProver extends Yices2AbstractProver<Integer>
   protected @Nullable Integer addConstraintImpl(BooleanFormula constraint)
       throws InterruptedException {
     return addConstraint0(constraint);
-  }
-
-  private long newContext(boolean mcsat) {
-    var cfg = yices_new_config();
-    yices_set_config(cfg, "solver-type", mcsat ? "mcsat" : "dpllt");
-    yices_set_config(cfg, "mode", "interactive");
-    yices_set_config(cfg, "model-interpolation", "true");
-    var context = yices_new_context(cfg);
-    yices_free_config(cfg);
-    return context;
   }
 
   @Override

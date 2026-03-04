@@ -67,7 +67,6 @@ abstract class Yices2AbstractProver<T> extends AbstractProverWithAllSat<T>
 
   protected final Yices2FormulaCreator creator;
   protected final long curEnv;
-  protected final long curCfg;
 
   // Yices does not allow to PUSH when the stack is UNSAT.
   // Therefore, we need to keep track of all added constraints beyond that stack-level.
@@ -78,17 +77,13 @@ abstract class Yices2AbstractProver<T> extends AbstractProverWithAllSat<T>
   protected final Deque<PersistentMap<Integer, Integer>> stack = new ArrayDeque<>();
 
   protected Yices2AbstractProver(
-      Yices2FormulaCreator creator,
+      Yices2FormulaCreator pCreator,
       Set<ProverOptions> pOptions,
       BooleanFormulaManager pBmgr,
       ShutdownNotifier pShutdownNotifier) {
     super(pOptions, pBmgr, pShutdownNotifier);
-    this.creator = creator;
-    curCfg = yices_new_config();
-    yices_set_config(curCfg, "solver-type", "mcsat");
-    yices_set_config(curCfg, "mode", "interactive");
-    curEnv = yices_new_context(curCfg);
-
+    creator = pCreator;
+    curEnv = newContext(!generateUnsatCores && !generateUnsatCoresOverAssumptions);
     stack.push(PathCopyingPersistentTreeMap.of());
   }
 
@@ -99,6 +94,16 @@ abstract class Yices2AbstractProver<T> extends AbstractProverWithAllSat<T>
   @Override
   protected boolean hasPersistentModel() {
     return false;
+  }
+
+  long newContext(boolean mcsat) {
+    var cfg = yices_new_config();
+    yices_set_config(cfg, "solver-type", mcsat ? "mcsat" : "dpllt");
+    yices_set_config(cfg, "mode", "interactive");
+    yices_set_config(cfg, "model-interpolation", "true");
+    var context = yices_new_context(cfg);
+    yices_free_config(cfg);
+    return context;
   }
 
   @Override
@@ -235,7 +240,6 @@ abstract class Yices2AbstractProver<T> extends AbstractProverWithAllSat<T>
   public void close() {
     if (!closed) {
       yices_free_context(curEnv);
-      yices_free_config(curCfg);
       stackSizeToUnsat = Integer.MAX_VALUE;
     }
     super.close();
