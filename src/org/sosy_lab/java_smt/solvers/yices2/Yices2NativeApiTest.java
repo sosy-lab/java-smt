@@ -51,8 +51,11 @@ import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_forall;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_free_config;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_free_context;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_function_type;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_get_major_version;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_get_patch_level;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_get_term_by_name;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_get_term_name;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_get_version;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_has_mcsat;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_idiv;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_iff;
@@ -623,6 +626,15 @@ public class Yices2NativeApiTest {
   public void hasMCSat() {
     // Check that we compiled with --enable-mcsat
     assertThat(yices_has_mcsat()).isEqualTo(1);
+  }
+
+  @Test
+  public void checkVersion() {
+    assertThat(
+            String.format(
+                "%s.%s.%s",
+                yices_get_version(), yices_get_major_version(), yices_get_patch_level()))
+        .isEqualTo("2.7.0");
   }
 
   @Test
