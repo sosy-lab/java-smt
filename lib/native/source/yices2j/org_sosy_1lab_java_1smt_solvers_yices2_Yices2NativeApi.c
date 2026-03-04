@@ -1677,10 +1677,10 @@ __attribute__((visibility("default"))) jjterm Java_org_sosy_1lab_java_1smt_solve
   interpolation_context_t context = {arg1, arg2, 0, 0};
   smt_status_t c = yices_check_context_with_interpolation(&context, 0, 0);
   if (c == YICES_STATUS_SAT) {
-    throwException(jenv, "java/lang/RuntimeException", "Problem is SAT");
+    throwException(jenv, "java/lang/IllegalArgumentException", "Could not interpolate, problem is SAT");
   }
   if (c == YICES_STATUS_ERROR) {
-    throwException(jenv, "java/lang/RuntimeException", "Error during interpolation");
+    throwException(jenv, "java/lang/RuntimeException", yices_error_string());
   }
 
   result = context.interpolant;
