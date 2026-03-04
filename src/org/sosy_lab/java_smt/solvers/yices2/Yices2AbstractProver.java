@@ -114,7 +114,11 @@ abstract class Yices2AbstractProver<T> extends AbstractProverWithAllSat<T>
   protected int addConstraint0(BooleanFormula constraint) {
     var formula = creator.extractInfo(constraint);
     var label = Yices2AbstractProver.ID_GENERATOR.getFreshId();
-    yices_assert_formula(curEnv, formula);
+    if (!generateUnsatCores) {
+      // Skip adding the assertion if we plan to use getUnsatCore. We'll later use assumptions
+      // solving to calculate an unsat core for the assertions
+      yices_assert_formula(curEnv, formula);
+    }
     stack.push(stack.pop().putAndCopy(label, formula));
     return label;
   }
@@ -135,7 +139,10 @@ abstract class Yices2AbstractProver<T> extends AbstractProverWithAllSat<T>
   @Override
   protected boolean isUnsatImpl() throws SolverException, InterruptedException {
     boolean unsat;
-    if (generateUnsatCores) { // unsat core does not work with incremental mode
+    if (generateUnsatCores) {
+      // Yices only tracks assumptions for unsat core. We keep the stack empty and then treat all
+      // assertions as assumptions while checking. If the result is 'unsat', we can then
+      // calculate an unsat core
       int[] allConstraints = getAllConstraints();
       unsat =
           !yices_check_sat_with_assumptions(
@@ -164,7 +171,6 @@ abstract class Yices2AbstractProver<T> extends AbstractProverWithAllSat<T>
     changedSinceLastSatQuery = false;
     wasLastSatCheckSatisfiable = false;
 
-    // TODO handle BooleanFormulaCollection / check for literals
     final boolean isUnsat =
         !yices_check_sat_with_assumptions(
             curEnv,
