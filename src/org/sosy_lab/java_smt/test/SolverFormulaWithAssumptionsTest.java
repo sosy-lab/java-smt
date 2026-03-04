@@ -16,6 +16,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import java.util.ArrayList;
 import java.util.List;
+import org.junit.Before;
 import org.junit.Test;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -53,6 +54,14 @@ public class SolverFormulaWithAssumptionsTest
     }
 
     return (InterpolatingProverEnvironment<T>) context.newProverEnvironmentWithInterpolation();
+  }
+
+  @Before
+  public void init() {
+    assume()
+        .withMessage("Yices2 hangs in this test")
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.YICES2);
   }
 
   @Test

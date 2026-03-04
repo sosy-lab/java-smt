@@ -118,8 +118,8 @@ public class Yices2SolverContext extends AbstractSolverContext {
 
   @Override
   protected InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation0(
-      Set<ProverOptions> pSet) {
-    throw new UnsupportedOperationException("Yices does not support interpolation");
+      Set<ProverOptions> pOptions) {
+    return new Yices2InterpolatingProver(creator, pOptions, bfmgr, shutdownManager);
   }
 
   @Override
