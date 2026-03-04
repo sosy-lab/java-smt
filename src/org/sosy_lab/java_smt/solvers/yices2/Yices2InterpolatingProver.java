@@ -11,7 +11,7 @@
 package org.sosy_lab.java_smt.solvers.yices2;
 
 import static com.google.common.base.Preconditions.checkArgument;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_assert_formula;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_assert_formulas;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_free_config;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_free_context;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_interpolate;
@@ -23,6 +23,7 @@ import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_true;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
+import com.google.common.primitives.Ints;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -61,12 +62,6 @@ public class Yices2InterpolatingProver extends Yices2AbstractProver<Integer>
     return context;
   }
 
-  private void assertAll(long ctx, Collection<Integer> partition) {
-    for (var f : partition) {
-      yices_assert_formula(ctx, f);
-    }
-  }
-
   @Override
   public BooleanFormula getInterpolant(Collection<Integer> formulasOfA)
       throws SolverException, InterruptedException {
@@ -88,8 +83,9 @@ public class Yices2InterpolatingProver extends Yices2AbstractProver<Integer>
     var ctxA = newContext(true);
     var ctxB = newContext(true);
 
-    assertAll(ctxA, setA);
-    assertAll(ctxB, setB);
+    yices_assert_formulas(ctxA, setA.size(), Ints.toArray(setA));
+    yices_assert_formulas(ctxB, setB.size(), Ints.toArray(setB));
+
     try {
       return yices_interpolate(ctxA, ctxB);
     } finally {
