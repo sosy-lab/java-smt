@@ -40,6 +40,7 @@ SPDX-License-Identifier: Apache-2.0
         <conf name="runtime-optimathsat" extends="core" description="only one solver included"/>
         <conf name="runtime-smtinterpol" extends="core" description="only one solver included"/>
         <conf name="runtime-princess" extends="core" description="only one solver included"/>
+        <conf name="runtime-eldarica" extends="core" description="only one solver included"/>
         <conf name="runtime-princess-with-javacup" extends="core" description="only one solver included"/>
         <conf name="runtime-z3" extends="runtime-z3-x64,runtime-z3-arm64" description="only one solver included"/>
         <conf name="runtime-z3-x64" extends="core" description="only one solver included"/>
@@ -171,6 +172,9 @@ SPDX-License-Identifier: Apache-2.0
 
         <!-- SmtInterpol -->
         <dependency org="de.uni-freiburg.informatik.ultimate" name="smtinterpol" rev="2.5-1242-g5c50fb6d" conf="runtime-smtinterpol->master; contrib->sources"/>
+
+        <!-- Eldarica -->
+        <dependency org="uuverifiers" name="eldarica_2.13" rev="2.2.1" conf="runtime-eldarica->master; contrib->sources"/>
 
         <!-- Princess and Ostrich for our Maven release -->
         <dependency org="io.github.uuverifiers" name="princess_2.13" rev="2025-11-17" conf="runtime-princess-with-javacup->default; contrib->sources"/>

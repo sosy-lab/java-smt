@@ -367,6 +367,7 @@ SPDX-License-Identifier: Apache-2.0
         <SOURCES />
       </library>
     </orderEntry>
+    <orderEntry type="library" name="runtime-eldarica" level="project" />
   </component>
   <component name="org.twodividedbyzero.idea.findbugs">
     <option name="_basePreferences">
