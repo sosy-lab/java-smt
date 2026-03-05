@@ -32,7 +32,9 @@ import com.google.common.primitives.Ints;
 import java.io.IOException;
 import java.util.Locale;
 import java.util.Map;
+import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
+import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager;
 
@@ -145,6 +147,14 @@ public class Yices2FormulaManager extends AbstractFormulaManager<Integer, Intege
     out.append("(assert ").append(yices_term_to_string(formula)).append(")");
 
     return out.toString();
+  }
+
+  @Override
+  public BooleanFormula translateFrom(BooleanFormula formula, FormulaManager otherManager) {
+    if (otherManager instanceof Yices2FormulaManager) {
+      return formula;
+    }
+    return super.translateFrom(formula, otherManager);
   }
 
   /**
