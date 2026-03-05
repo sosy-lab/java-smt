@@ -83,7 +83,7 @@ abstract class Yices2AbstractProver<T> extends AbstractProverWithAllSat<T>
       ShutdownNotifier pShutdownNotifier) {
     super(pOptions, pBmgr, pShutdownNotifier);
     creator = pCreator;
-    curEnv = newContext(!generateUnsatCores && !generateUnsatCoresOverAssumptions);
+    curEnv = newContext(true);
     stack.push(PathCopyingPersistentTreeMap.of());
   }
 

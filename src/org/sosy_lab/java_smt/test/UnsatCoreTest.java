@@ -109,11 +109,6 @@ public class UnsatCoreTest extends SolverBasedTest0.ParameterizedSolverBasedTest
   @Test
   public void unsatCoreOverAssumptionsThrowsForMissingOptionTest()
       throws InterruptedException, SolverException {
-    assume()
-        .withMessage("Yices need to use dpllt for unsat core if thread safety is enabled")
-        .that(solver)
-        .isNotEqualTo(Solvers.YICES2);
-
     requireUnsatCoreOverAssumptions();
     try (var prover = context.newProverEnvironment()) {
       var a = bmgr.makeVariable("a");
