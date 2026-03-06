@@ -113,6 +113,7 @@ abstract class Yices2AbstractProver<T> extends AbstractProverWithAllSat<T>
       // Reset stackSizeToUnsat to bring the stack into a pushable state if it was UNSAT before.
       stackSizeToUnsat = Integer.MAX_VALUE;
     }
+    stack.removeLast();
   }
 
   @CanIgnoreReturnValue
@@ -124,7 +125,7 @@ abstract class Yices2AbstractProver<T> extends AbstractProverWithAllSat<T>
       // solving to calculate an unsat core for the assertions
       yices_assert_formula(curEnv, formula);
     }
-    stack.push(stack.pop().putAndCopy(label, formula));
+    stack.addLast(stack.removeLast().putAndCopy(label, formula));
     return label;
   }
 
@@ -139,6 +140,7 @@ abstract class Yices2AbstractProver<T> extends AbstractProverWithAllSat<T>
       // not already set, set it to the current stack-size before pushing.
       stackSizeToUnsat = size();
     }
+    stack.addLast(stack.getLast());
   }
 
   @Override

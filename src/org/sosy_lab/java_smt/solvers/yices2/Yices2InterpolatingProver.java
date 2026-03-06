@@ -61,8 +61,8 @@ public class Yices2InterpolatingProver extends Yices2AbstractProver<Integer>
 
     return creator.encapsulateBoolean(
         interpolate(
-            FluentIterable.from(setA).transform(stack.peek()::get).toSet(),
-            FluentIterable.from(setB).transform(stack.peek()::get).toSet()));
+            FluentIterable.from(setA).transform(stack.peekLast()::get).toSet(),
+            FluentIterable.from(setB).transform(stack.peekLast()::get).toSet()));
   }
 
   private int interpolate(Collection<Integer> setA, Collection<Integer> setB) {
@@ -96,11 +96,11 @@ public class Yices2InterpolatingProver extends Yices2AbstractProver<Integer>
     for (int i = 1; i < n; i++) {
       Collection<Integer> formulasA =
           FluentIterable.from(partitions.get(i - 1))
-              .transform(stack.peek()::get)
+              .transform(stack.peekLast()::get)
               .append(new Integer[] {previousItp})
               .toSet();
       Collection<Integer> formulasB =
-          FluentIterable.concat(partitions.subList(i, n)).transform(stack.peek()::get).toSet();
+          FluentIterable.concat(partitions.subList(i, n)).transform(stack.peekLast()::get).toSet();
       var itp = interpolate(formulasA, formulasB);
       itps.add(creator.encapsulateBoolean(itp));
       previousItp = itp;
