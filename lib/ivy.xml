@@ -148,8 +148,8 @@ SPDX-License-Identifier: Apache-2.0
 
         <!-- Google error-prone
              Compiler adaptor with some useful checks for common errors. -->
-        <dependency org="com.google.errorprone" name="error_prone_core" rev="2.48.0" conf="build->default" />
-        <dependency org="com.google.errorprone" name="error_prone_annotations" rev="2.48.0" conf="build->default; contrib->sources" />
+        <dependency org="com.google.errorprone" name="error_prone_core" rev="2.41.0" conf="build->default" />
+        <dependency org="com.google.errorprone" name="error_prone_annotations" rev="2.41.0" conf="build->default; contrib->sources" />
 
         <!-- Eclipse JDT Compiler
              For additional compiler warnings. -->
@@ -167,7 +167,7 @@ SPDX-License-Identifier: Apache-2.0
 
         <!-- Checkstyle -->
         <dependency org="com.github.sevntu-checkstyle" name="sevntu-checks" rev="1.44.1" conf="checkstyle->default"/>
-        <dependency org="com.puppycrawl.tools" name="checkstyle" rev="13.3.0" conf="checkstyle->default"/>
+        <dependency org="com.puppycrawl.tools" name="checkstyle" rev="11.0.1" conf="checkstyle->default"/>
 
         <!-- SmtInterpol -->
         <dependency org="de.uni-freiburg.informatik.ultimate" name="smtinterpol" rev="2.5-1242-g5c50fb6d" conf="runtime-smtinterpol->master; contrib->sources"/>
