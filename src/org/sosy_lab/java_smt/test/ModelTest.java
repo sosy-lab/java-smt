@@ -108,17 +108,12 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   public void setup() {
     requireModel();
 
-    switch (solverToUse()) {
-      case SMTINTERPOL:
-      case Z3:
-        defaultValue = BigInteger.TWO;
-        break;
-      case BOOLECTOR:
-        defaultValue = BigInteger.valueOf(255);
-        break;
-      default:
-        defaultValue = BigInteger.ZERO;
-    }
+    defaultValue =
+        switch (solverToUse()) {
+          case SMTINTERPOL, Z3 -> BigInteger.TWO;
+          case BOOLECTOR -> BigInteger.valueOf(255);
+          default -> BigInteger.ZERO;
+        };
   }
 
   @Test
@@ -137,11 +132,11 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   @Test
   public void testModelAccessWithoutSatCheck() throws InterruptedException {
     try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
-      assertThrows(IllegalStateException.class, () -> prover.getModel());
+      assertThrows(IllegalStateException.class, prover::getModel);
       prover.push(bmgr.makeTrue());
-      assertThrows(IllegalStateException.class, () -> prover.getModel());
+      assertThrows(IllegalStateException.class, prover::getModel);
       prover.push(bmgr.makeVariable("x"));
-      assertThrows(IllegalStateException.class, () -> prover.getModel());
+      assertThrows(IllegalStateException.class, prover::getModel);
     }
   }
 
@@ -1227,21 +1222,23 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
 
     BooleanFormula f =
         mgr.parse(
-            "(declare-fun |pi@2| () Int)\n"
-                + "(declare-fun *unsigned_int@1 () (Array Int Int))\n"
-                + "(declare-fun |z2@2| () Int)\n"
-                + "(declare-fun |z1@2| () Int)\n"
-                + "(declare-fun |t@2| () Int)\n"
-                + "(declare-fun |__ADDRESS_OF_t| () Int)\n"
-                + "(declare-fun *char@1 () (Array Int Int))\n"
-                + "(assert"
-                + "    (and (= |t@2| 50)"
-                + "        (not (<= |__ADDRESS_OF_t| 0))"
-                + "        (= |z1@2| |__ADDRESS_OF_t|)"
-                + "        (= (select *char@1 |__ADDRESS_OF_t|) |t@2|)"
-                + "        (= |z2@2| |z1@2|)"
-                + "        (= |pi@2| |z2@2|)"
-                + "        (not (= (select *unsigned_int@1 |pi@2|) 50))))");
+            """
+            (declare-fun |pi@2| () Int)
+            (declare-fun *unsigned_int@1 () (Array Int Int))
+            (declare-fun |z2@2| () Int)
+            (declare-fun |z1@2| () Int)
+            (declare-fun |t@2| () Int)
+            (declare-fun |__ADDRESS_OF_t| () Int)
+            (declare-fun *char@1 () (Array Int Int))
+            (assert\
+                (and (= |t@2| 50)\
+                    (not (<= |__ADDRESS_OF_t| 0))\
+                    (= |z1@2| |__ADDRESS_OF_t|)\
+                    (= (select *char@1 |__ADDRESS_OF_t|) |t@2|)\
+                    (= |z2@2| |z1@2|)\
+                    (= |pi@2| |z2@2|)\
+                    (not (= (select *unsigned_int@1 |pi@2|) 50))))\
+            """);
 
     testModelIterator(f);
   }
@@ -1376,12 +1373,14 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
     // create formula for "arr[5][3][1]==x && x==123"
     BooleanFormula f =
         mgr.parse(
-            "(declare-fun x () Int)\n"
-                + "(declare-fun arr () (Array Int (Array Int (Array Int Int))))\n"
-                + "(assert (and"
-                + "    (= (select (select (select arr 5) 3) 1) x)"
-                + "    (= x 123)"
-                + "))");
+            """
+            (declare-fun x () Int)
+            (declare-fun arr () (Array Int (Array Int (Array Int Int))))
+            (assert (and\
+                (= (select (select (select arr 5) 3) 1) x)\
+                (= x 123)\
+            ))\
+            """);
 
     testModelIterator(f);
     testModelGetters(f, imgr.makeVariable("x"), BigInteger.valueOf(123), "x");
@@ -1414,12 +1413,14 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
     // create formula for "arr[5]==x && x==123"
     BooleanFormula f =
         mgr.parse(
-            "(declare-fun x () Int)\n"
-                + "(declare-fun arr () (Array Int Int))\n"
-                + "(assert (and"
-                + "    (= (select arr 5) x)"
-                + "    (= x 123)"
-                + "))");
+            """
+            (declare-fun x () Int)
+            (declare-fun arr () (Array Int Int))
+            (assert (and\
+                (= (select arr 5) x)\
+                (= x 123)\
+            ))\
+            """);
 
     testModelIterator(f);
     testModelGetters(f, imgr.makeVariable("x"), BigInteger.valueOf(123), "x");
@@ -1442,12 +1443,14 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
     // create formula for "arr[5]==x && x==123"
     BooleanFormula f =
         mgr.parse(
-            "(declare-fun x () Int)\n"
-                + "(declare-fun arr () (Array Int Int))\n"
-                + "(assert (and"
-                + "    (= (select arr 5) x)"
-                + "    (= x 123)"
-                + "))");
+            """
+            (declare-fun x () Int)
+            (declare-fun arr () (Array Int Int))
+            (assert (and\
+                (= (select arr 5) x)\
+                (= x 123)\
+            ))\
+            """);
 
     try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
       prover.push(f);
@@ -1471,12 +1474,14 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
     // create formula for "arr[5:6]==[x,x] && x==123"
     BooleanFormula f =
         mgr.parse(
-            "(declare-fun x () Int)\n"
-                + "(declare-fun arr () (Array Int Int))\n"
-                + "(assert (and"
-                + "    (= (select (store arr 6 x) 5) x)"
-                + "    (= x 123)"
-                + "))");
+            """
+            (declare-fun x () Int)
+            (declare-fun arr () (Array Int Int))
+            (assert (and\
+                (= (select (store arr 6 x) 5) x)\
+                (= x 123)\
+            ))\
+            """);
 
     testModelIterator(f);
     testModelGetters(f, imgr.makeVariable("x"), BigInteger.valueOf(123), "x");
@@ -1499,15 +1504,17 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
     // create formula for "arr[5]==x && arr[6]==x && x==123"
     BooleanFormula f =
         mgr.parse(
-            "(declare-fun x () Int)\n"
-                + "(declare-fun arrgh () (Array Int Int))\n"
-                + "(declare-fun ahoi () (Array Int Int))\n"
-                + "(assert (and"
-                + "    (= (select arrgh 5) x)"
-                + "    (= (select arrgh 6) x)"
-                + "    (= x 123)"
-                + "    (= (select (store ahoi 66 x) 55) x)"
-                + "))");
+            """
+            (declare-fun x () Int)
+            (declare-fun arrgh () (Array Int Int))
+            (declare-fun ahoi () (Array Int Int))
+            (assert (and\
+                (= (select arrgh 5) x)\
+                (= (select arrgh 6) x)\
+                (= x 123)\
+                (= (select (store ahoi 66 x) 55) x)\
+            ))\
+            """);
 
     testModelIterator(f);
     testModelGetters(f, imgr.makeVariable("x"), BigInteger.valueOf(123), "x");
@@ -1555,14 +1562,16 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
     // create formula for "arr[5:6]==[x,x] && x==123"
     BooleanFormula f =
         mgr.parse(
-            "(declare-fun x () Int)\n"
-                + "(declare-fun arrgh () (Array Int Int))\n"
-                + "(declare-fun ahoi () (Array Int Int))\n"
-                + "(assert (and"
-                + "    (= (select (store arrgh 6 x) 5) x)"
-                + "    (= (select (store ahoi 6 x) 5) x)"
-                + "    (= x 123)"
-                + "))");
+            """
+            (declare-fun x () Int)
+            (declare-fun arrgh () (Array Int Int))
+            (declare-fun ahoi () (Array Int Int))
+            (assert (and\
+                (= (select (store arrgh 6 x) 5) x)\
+                (= (select (store ahoi 6 x) 5) x)\
+                (= x 123)\
+            ))\
+            """);
 
     testModelIterator(f);
     testModelGetters(f, imgr.makeVariable("x"), BigInteger.valueOf(123), "x");
@@ -1592,14 +1601,16 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
     // create formula for "arr[5:6]==[x,x] && x==123"
     BooleanFormula f =
         mgr.parse(
-            "(declare-fun x () Int)\n"
-                + "(declare-fun arrgh () (Array Int Int))\n"
-                + "(declare-fun ahoi () (Array Int Int))\n"
-                + "(assert (and"
-                + "    (= (select (store arrgh 6 x) 5) x)"
-                + "    (= (select (store ahoi 6 x) 7) x)"
-                + "    (= x 123)"
-                + "))");
+            """
+            (declare-fun x () Int)
+            (declare-fun arrgh () (Array Int Int))
+            (declare-fun ahoi () (Array Int Int))
+            (assert (and\
+                (= (select (store arrgh 6 x) 5) x)\
+                (= (select (store ahoi 6 x) 7) x)\
+                (= x 123)\
+            ))\
+            """);
 
     testModelIterator(f);
     testModelGetters(f, imgr.makeVariable("x"), BigInteger.valueOf(123), "x");
@@ -1629,14 +1640,16 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
     // create formula for "arrgh[5:6]==[x,x] && ahoi[5,7] == [x,x] && x==123"
     BooleanFormula f =
         mgr.parse(
-            "(declare-fun x () Int)\n"
-                + "(declare-fun arrgh () (Array Int Int))\n"
-                + "(declare-fun ahoi () (Array Int Int))\n"
-                + "(assert (and"
-                + "    (= (select (store arrgh 6 x) 5) x)"
-                + "    (= (select (store ahoi 7 x) 5) x)"
-                + "    (= x 123)"
-                + "))");
+            """
+            (declare-fun x () Int)
+            (declare-fun arrgh () (Array Int Int))
+            (declare-fun ahoi () (Array Int Int))
+            (assert (and\
+                (= (select (store arrgh 6 x) 5) x)\
+                (= (select (store ahoi 7 x) 5) x)\
+                (= x 123)\
+            ))\
+            """);
 
     testModelIterator(f);
     testModelGetters(f, imgr.makeVariable("x"), BigInteger.valueOf(123), "x");
@@ -1666,16 +1679,18 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
     // create formula for "arrgh[5:6]==[x,x] && ahoi[5,6] == [x,y] && y = 125 && x==123"
     BooleanFormula f =
         mgr.parse(
-            "(declare-fun x () Int)\n"
-                + "(declare-fun y () Int)\n"
-                + "(declare-fun arrgh () (Array Int Int))\n"
-                + "(declare-fun ahoi () (Array Int Int))\n"
-                + "(assert (and"
-                + "    (= (select (store arrgh 6 x) 5) x)"
-                + "    (= (select (store ahoi 6 y) 5) x)"
-                + "    (= x 123)"
-                + "    (= y 125)"
-                + "))");
+            """
+            (declare-fun x () Int)
+            (declare-fun y () Int)
+            (declare-fun arrgh () (Array Int Int))
+            (declare-fun ahoi () (Array Int Int))
+            (assert (and\
+                (= (select (store arrgh 6 x) 5) x)\
+                (= (select (store ahoi 6 y) 5) x)\
+                (= x 123)\
+                (= y 125)\
+            ))\
+            """);
 
     testModelIterator(f);
     testModelGetters(f, imgr.makeVariable("x"), BigInteger.valueOf(123), "x");

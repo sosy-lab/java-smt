@@ -451,17 +451,17 @@ public abstract class SolverBasedTest0 {
       assertThat(prover).isSatisfiable();
 
       try (Model m = prover.getModel()) {
-        if (formula instanceof BooleanFormula) {
-          Truth.assertThat(m.evaluate((BooleanFormula) formula)).isIn(possibleExpectedValues);
+        if (formula instanceof BooleanFormula booleanFormula) {
+          Truth.assertThat(m.evaluate(booleanFormula)).isIn(possibleExpectedValues);
           Truth.assertThat(m.evaluate(formula)).isIn(possibleExpectedValues);
-        } else if (formula instanceof IntegerFormula) {
-          Truth.assertThat(m.evaluate((IntegerFormula) formula)).isIn(possibleExpectedValues);
+        } else if (formula instanceof IntegerFormula integerFormula) {
+          Truth.assertThat(m.evaluate(integerFormula)).isIn(possibleExpectedValues);
           Truth.assertThat(m.evaluate(formula)).isIn(possibleExpectedValues);
-        } else if (formula instanceof RationalFormula) {
-          Truth.assertThat(m.evaluate((RationalFormula) formula)).isIn(possibleExpectedValues);
+        } else if (formula instanceof RationalFormula rationalFormula) {
+          Truth.assertThat(m.evaluate(rationalFormula)).isIn(possibleExpectedValues);
           // assertThat(m.evaluate(formula)).isIn(possibleExpectedValues);
-        } else if (formula instanceof StringFormula) {
-          Truth.assertThat(m.evaluate((StringFormula) formula)).isIn(possibleExpectedValues);
+        } else if (formula instanceof StringFormula stringFormula) {
+          Truth.assertThat(m.evaluate(stringFormula)).isIn(possibleExpectedValues);
           Truth.assertThat(m.evaluate(formula)).isIn(possibleExpectedValues);
         } else {
           Truth.assertThat(m.evaluate(formula)).isIn(possibleExpectedValues);
@@ -472,15 +472,13 @@ public abstract class SolverBasedTest0 {
         Formula eval = m.eval(formula);
         if (eval != null) {
           switch (solverToUse()) {
-            case Z3:
-            case Z3_WITH_INTERPOLATION:
+            case Z3, Z3_WITH_INTERPOLATION -> {
               // ignore, Z3 provides arbitrary values
-              break;
-            case BOOLECTOR:
+            }
+            case BOOLECTOR -> {
               // ignore, Boolector provides no useful values
-              break;
-            default:
-              Truth.assertThat(eval).isIn(possibleExpectedFormulas);
+            }
+            default -> Truth.assertThat(eval).isIn(possibleExpectedFormulas);
           }
         }
       }
@@ -498,41 +496,41 @@ public abstract class SolverBasedTest0 {
   }
 
   protected Formula addNumber(Formula x, Formula y) {
-    if (x instanceof IntegerFormula && y instanceof IntegerFormula) {
-      return imgr.add((IntegerFormula) x, (IntegerFormula) y);
+    if (x instanceof IntegerFormula xInt && y instanceof IntegerFormula yInt) {
+      return imgr.add(xInt, yInt);
     }
-    if (x instanceof BitvectorFormula && y instanceof BitvectorFormula) {
-      return bvmgr.add((BitvectorFormula) x, (BitvectorFormula) y);
+    if (x instanceof BitvectorFormula xBv && y instanceof BitvectorFormula yBv) {
+      return bvmgr.add(xBv, yBv);
     }
     throw new IllegalArgumentException();
   }
 
   protected Formula multiplyNumber(Formula x, Formula y) {
-    if (x instanceof IntegerFormula && y instanceof IntegerFormula) {
-      return imgr.multiply((IntegerFormula) x, (IntegerFormula) y);
+    if (x instanceof IntegerFormula xInt && y instanceof IntegerFormula yInt) {
+      return imgr.multiply(xInt, yInt);
     }
-    if (x instanceof BitvectorFormula && y instanceof BitvectorFormula) {
-      return bvmgr.multiply((BitvectorFormula) x, (BitvectorFormula) y);
+    if (x instanceof BitvectorFormula xBv && y instanceof BitvectorFormula yBv) {
+      return bvmgr.multiply(xBv, yBv);
     }
     throw new IllegalArgumentException();
   }
 
   protected BooleanFormula lessThanNumber(Formula x, Formula y) {
-    if (x instanceof IntegerFormula && y instanceof IntegerFormula) {
-      return imgr.lessThan((IntegerFormula) x, (IntegerFormula) y);
+    if (x instanceof IntegerFormula xInt && y instanceof IntegerFormula yInt) {
+      return imgr.lessThan(xInt, yInt);
     }
-    if (x instanceof BitvectorFormula && y instanceof BitvectorFormula) {
-      return bvmgr.lessThan((BitvectorFormula) x, (BitvectorFormula) y, true);
+    if (x instanceof BitvectorFormula xBv && y instanceof BitvectorFormula yBv) {
+      return bvmgr.lessThan(xBv, yBv, true);
     }
     throw new IllegalArgumentException();
   }
 
   protected BooleanFormula greaterThanNumber(Formula x, Formula y) {
-    if (x instanceof IntegerFormula && y instanceof IntegerFormula) {
-      return imgr.greaterThan((IntegerFormula) x, (IntegerFormula) y);
+    if (x instanceof IntegerFormula xInt && y instanceof IntegerFormula yInt) {
+      return imgr.greaterThan(xInt, yInt);
     }
-    if (x instanceof BitvectorFormula && y instanceof BitvectorFormula) {
-      return bvmgr.greaterThan((BitvectorFormula) x, (BitvectorFormula) y, true);
+    if (x instanceof BitvectorFormula xBv && y instanceof BitvectorFormula yBv) {
+      return bvmgr.greaterThan(xBv, yBv, true);
     }
     throw new IllegalArgumentException();
   }

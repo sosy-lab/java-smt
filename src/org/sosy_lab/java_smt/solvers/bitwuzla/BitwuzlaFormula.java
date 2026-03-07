@@ -41,11 +41,8 @@ abstract class BitwuzlaFormula implements Formula {
     if (other == this) {
       return true;
     }
-    if (!(other instanceof BitwuzlaFormula)) {
-      return false;
-    }
-    Term otherTerm = ((BitwuzlaFormula) other).getTerm();
-    return bitwuzlaTerm.equals(otherTerm);
+    return (other instanceof BitwuzlaFormula otherFormula)
+        && bitwuzlaTerm.equals(otherFormula.getTerm());
   }
 
   /** returns a valid hashCode satisfying the constraints given by {@link #equals}. */

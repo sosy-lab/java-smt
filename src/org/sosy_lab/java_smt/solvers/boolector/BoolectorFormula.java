@@ -35,11 +35,9 @@ abstract class BoolectorFormula implements Formula {
     if (o == this) {
       return true;
     }
-    if (!(o instanceof BoolectorFormula)) {
-      return false;
-    }
-    BoolectorFormula other = (BoolectorFormula) o;
-    return btor == other.btor && btorTerm == other.btorTerm;
+    return (o instanceof BoolectorFormula other)
+        && btor == other.btor
+        && btorTerm == other.btorTerm;
   }
 
   @Override

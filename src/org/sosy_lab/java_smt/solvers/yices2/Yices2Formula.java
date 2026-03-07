@@ -48,10 +48,7 @@ abstract class Yices2Formula implements Formula {
     if (o == this) {
       return true;
     }
-    if (!(o instanceof Yices2Formula)) {
-      return false;
-    }
-    return yicesTerm == ((Yices2Formula) o).yicesTerm;
+    return o instanceof Yices2Formula other && yicesTerm == other.yicesTerm;
   }
 
   @Immutable

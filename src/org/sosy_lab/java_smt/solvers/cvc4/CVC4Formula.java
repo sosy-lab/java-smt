@@ -42,10 +42,7 @@ public class CVC4Formula implements Formula {
     if (o == this) {
       return true;
     }
-    if (!(o instanceof CVC4Formula)) {
-      return false;
-    }
-    return cvc4term.equals(((CVC4Formula) o).cvc4term);
+    return (o instanceof CVC4Formula other) && cvc4term.equals(other.cvc4term);
   }
 
   @Override

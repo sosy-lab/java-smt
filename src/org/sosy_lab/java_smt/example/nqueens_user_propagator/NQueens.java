@@ -42,12 +42,14 @@ import org.sosy_lab.java_smt.api.SolverException;
  */
 public class NQueens {
   private static final String HELP_TEXT =
-      "Please specify two numbers: the size N of the NQueens problem and a "
-          + "method M for solving it. The method M can be one of:\n"
-          + "0: plain SMT solving,\n"
-          + "1: plain SMT solving using ALL_SAT,\n"
-          + "2: with enumerating propagation,\n"
-          + "3: with more propagation";
+      """
+      Please specify two numbers: the size N of the NQueens problem and a \
+      method M for solving it. The method M can be one of:
+      0: plain SMT solving,
+      1: plain SMT solving using ALL_SAT,
+      2: with enumerating propagation,
+      3: with more propagation\
+      """;
 
   private enum Method {
     SMT(0),
@@ -111,30 +113,31 @@ public class NQueens {
 
       long timeSnapshot = System.currentTimeMillis();
       NQueens myQueen = new NQueens(context, n);
-      int solutions;
-      switch (method) {
-        case SMT:
-          System.out.println("Enumerating NQueens solutions with classical blocking clauses.");
-          solutions = myQueen.enumerateSolutionsClassic(prover);
-          break;
-        case SMT_ALL_SAT:
-          System.out.println(
-              "Enumerating NQueens solutions with classical blocking clauses using all-sat"
-                  + " iteration.");
-          solutions = myQueen.enumerateSolutionsClassicAllSat(prover);
-          break;
-        case ENUMERATING_PROPAGATOR:
-          System.out.println("Enumerating NQueens solutions with enumerating propagator.");
-          solutions = myQueen.enumerateSolutionsWithPropagator(prover);
-          break;
-        case CONSTRAINTS_PROPAGATOR:
-          System.out.println(
-              "Enumerating NQueens solutions with enumerating and constraining propagator.");
-          solutions = myQueen.enumerateSolutionsWithConstraintPropagator(prover);
-          break;
-        default:
-          throw new IllegalArgumentException("Unexpected method for solving  NQueens: " + method);
-      }
+      int solutions =
+          switch (method) {
+            case SMT -> {
+              System.out.println("Enumerating NQueens solutions with classical blocking clauses.");
+              yield myQueen.enumerateSolutionsClassic(prover);
+            }
+            case SMT_ALL_SAT -> {
+              System.out.println(
+                  "Enumerating NQueens solutions with classical blocking clauses using all-sat"
+                      + " iteration.");
+              yield myQueen.enumerateSolutionsClassicAllSat(prover);
+            }
+            case ENUMERATING_PROPAGATOR -> {
+              System.out.println("Enumerating NQueens solutions with enumerating propagator.");
+              yield myQueen.enumerateSolutionsWithPropagator(prover);
+            }
+            case CONSTRAINTS_PROPAGATOR -> {
+              System.out.println(
+                  "Enumerating NQueens solutions with enumerating and constraining propagator.");
+              yield myQueen.enumerateSolutionsWithConstraintPropagator(prover);
+            }
+            default ->
+                throw new IllegalArgumentException(
+                    "Unexpected method for solving  NQueens: " + method);
+          };
       long passedMillis = System.currentTimeMillis() - timeSnapshot;
       System.out.printf("Found %d solutions in %.2f seconds%n", solutions, (passedMillis / 1000d));
 

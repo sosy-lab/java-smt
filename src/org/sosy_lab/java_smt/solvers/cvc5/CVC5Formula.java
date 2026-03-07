@@ -43,10 +43,7 @@ public class CVC5Formula implements Formula {
     if (o == this) {
       return true;
     }
-    if (!(o instanceof CVC5Formula)) {
-      return false;
-    }
-    return cvc5term.equals(((CVC5Formula) o).cvc5term);
+    return (o instanceof CVC5Formula other) && cvc5term.equals(other.cvc5term);
   }
 
   @Override

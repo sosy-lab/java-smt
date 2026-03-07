@@ -689,16 +689,15 @@ public final class Yices2NativeApi {
   }
 
   private static boolean check_result(int result) {
-    switch (result) {
-      case YICES_STATUS_SAT:
-        return true;
-      case YICES_STATUS_UNSAT:
-        return false;
-      default:
+    return switch (result) {
+      case YICES_STATUS_SAT -> true;
+      case YICES_STATUS_UNSAT -> false;
+      default -> {
         // TODO Further ERROR CLARIFICATION
         String code = (result == YICES_STATUS_UNKNOWN) ? "\"unknown\"" : result + "";
         throw new IllegalStateException("Yices check returned:" + code);
-    }
+      }
+    };
   }
 
   /*

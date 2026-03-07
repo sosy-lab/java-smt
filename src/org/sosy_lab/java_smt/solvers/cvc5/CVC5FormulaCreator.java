@@ -874,21 +874,16 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, TermManager, 
   public FloatingPointRoundingMode getRoundingMode(Term pTerm) {
     checkArgument(pTerm.isRoundingModeValue(), "Term '%s' is not a rounding mode.", pTerm);
     try {
-      switch (pTerm.getRoundingModeValue()) {
-        case ROUND_NEAREST_TIES_TO_AWAY:
-          return FloatingPointRoundingMode.NEAREST_TIES_AWAY;
-        case ROUND_NEAREST_TIES_TO_EVEN:
-          return FloatingPointRoundingMode.NEAREST_TIES_TO_EVEN;
-        case ROUND_TOWARD_NEGATIVE:
-          return FloatingPointRoundingMode.TOWARD_NEGATIVE;
-        case ROUND_TOWARD_POSITIVE:
-          return FloatingPointRoundingMode.TOWARD_POSITIVE;
-        case ROUND_TOWARD_ZERO:
-          return FloatingPointRoundingMode.TOWARD_ZERO;
-        default:
-          throw new IllegalArgumentException(
-              String.format("Unknown rounding mode in Term '%s'.", pTerm));
-      }
+      return switch (pTerm.getRoundingModeValue()) {
+        case ROUND_NEAREST_TIES_TO_AWAY -> FloatingPointRoundingMode.NEAREST_TIES_AWAY;
+        case ROUND_NEAREST_TIES_TO_EVEN -> FloatingPointRoundingMode.NEAREST_TIES_TO_EVEN;
+        case ROUND_TOWARD_NEGATIVE -> FloatingPointRoundingMode.TOWARD_NEGATIVE;
+        case ROUND_TOWARD_POSITIVE -> FloatingPointRoundingMode.TOWARD_POSITIVE;
+        case ROUND_TOWARD_ZERO -> FloatingPointRoundingMode.TOWARD_ZERO;
+        default ->
+            throw new IllegalArgumentException(
+                String.format("Unknown rounding mode in Term '%s'.", pTerm));
+      };
     } catch (CVC5ApiException e) {
       throw new IllegalArgumentException(
           String.format("Failure trying to get the rounding mode of Term '%s'.", pTerm), e);
@@ -900,8 +895,8 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, TermManager, 
    * cache. Will throw a {@link NullPointerException} if no variable is known for the input!
    */
   private Term getFreeVariableFromCache(String name, Sort sort, FormulaVisitor<?> visitor) {
-    if (visitor instanceof BoundVariablesRegisteringRecursiveVisitor) {
-      ((BoundVariablesRegisteringRecursiveVisitor) visitor).registerBoundVariable(name, sort);
+    if (visitor instanceof BoundVariablesRegisteringRecursiveVisitor registeringVisitor) {
+      registeringVisitor.registerBoundVariable(name, sort);
     }
     Term existingVar = variablesCache.get(name, sort.toString());
     return checkNotNull(

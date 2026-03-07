@@ -48,14 +48,13 @@ abstract class SmtInterpolNumeralFormulaManager<
   protected final boolean isNumeral(Term t) {
     boolean is = false;
     // ConstantTerm with Number --> "123"
-    if (t instanceof ConstantTerm) {
-      Object value = ((ConstantTerm) t).getValue();
+    if (t instanceof ConstantTerm constantTerm) {
+      Object value = constantTerm.getValue();
       if (value instanceof Number || value instanceof Rational) {
         is = true;
       }
 
-    } else if (t instanceof ApplicationTerm) {
-      ApplicationTerm at = (ApplicationTerm) t;
+    } else if (t instanceof ApplicationTerm at) {
 
       // ApplicationTerm with negative Number --> "(- 123)"
       if ("-".equals(at.getFunction().getName())
@@ -94,8 +93,7 @@ abstract class SmtInterpolNumeralFormulaManager<
       }
       if (isNumeral(t)) {
         // true, skip and check others
-      } else if (t instanceof ApplicationTerm) {
-        final ApplicationTerm app = (ApplicationTerm) t;
+      } else if (t instanceof ApplicationTerm app) {
         final FunctionSymbol func = app.getFunction();
         final Term[] params = app.getParameters();
 

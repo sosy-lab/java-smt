@@ -44,8 +44,8 @@ public final class OpenSmtFormulaCreator extends FormulaCreator<PTRef, SRef, Log
     super(
         logic,
         logic.getSort_bool(),
-        (logic instanceof ArithLogic) ? ((ArithLogic) logic).getSort_int() : null,
-        (logic instanceof ArithLogic) ? ((ArithLogic) logic).getSort_real() : null,
+        (logic instanceof ArithLogic arithLogic) ? arithLogic.getSort_int() : null,
+        (logic instanceof ArithLogic arithLogic) ? arithLogic.getSort_real() : null,
         null,
         null);
 
@@ -57,38 +57,23 @@ public final class OpenSmtFormulaCreator extends FormulaCreator<PTRef, SRef, Log
   }
 
   private static Logic createLogic(Logics logicType) {
-    switch (logicType) {
-      case CORE:
-        return LogicFactory.getInstance(Logic_t.QF_BOOL);
-      case QF_AX:
-        return LogicFactory.getInstance(Logic_t.QF_AX);
-      case QF_UF:
-        return LogicFactory.getInstance(Logic_t.QF_UF);
-      case QF_IDL:
-        return LogicFactory.getLAInstance(Logic_t.QF_IDL);
-      case QF_RDL:
-        return LogicFactory.getLAInstance(Logic_t.QF_RDL);
-      case QF_LIA:
-        return LogicFactory.getLAInstance(Logic_t.QF_LIA);
-      case QF_LRA:
-        return LogicFactory.getLAInstance(Logic_t.QF_LRA);
-      case QF_ALIA:
-        return LogicFactory.getLAInstance(Logic_t.QF_ALIA);
-      case QF_ALRA:
-        return LogicFactory.getLAInstance(Logic_t.QF_ALRA);
-      case QF_UFLIA:
-        return LogicFactory.getLAInstance(Logic_t.QF_UFLIA);
-      case QF_UFLRA:
-        return LogicFactory.getLAInstance(Logic_t.QF_UFLRA);
-      case QF_AUFLIA:
-        return LogicFactory.getLAInstance(Logic_t.QF_AUFLIA);
-      case QF_AUFLRA:
-        return LogicFactory.getLAInstance(Logic_t.QF_AUFLRA);
-      case QF_AUFLIRA:
-        return LogicFactory.getLAInstance(Logic_t.QF_AUFLIRA);
-      default:
-        throw new AssertionError("no logic available");
-    }
+    return switch (logicType) {
+      case CORE -> LogicFactory.getInstance(Logic_t.QF_BOOL);
+      case QF_AX -> LogicFactory.getInstance(Logic_t.QF_AX);
+      case QF_UF -> LogicFactory.getInstance(Logic_t.QF_UF);
+      case QF_IDL -> LogicFactory.getLAInstance(Logic_t.QF_IDL);
+      case QF_RDL -> LogicFactory.getLAInstance(Logic_t.QF_RDL);
+      case QF_LIA -> LogicFactory.getLAInstance(Logic_t.QF_LIA);
+      case QF_LRA -> LogicFactory.getLAInstance(Logic_t.QF_LRA);
+      case QF_ALIA -> LogicFactory.getLAInstance(Logic_t.QF_ALIA);
+      case QF_ALRA -> LogicFactory.getLAInstance(Logic_t.QF_ALRA);
+      case QF_UFLIA -> LogicFactory.getLAInstance(Logic_t.QF_UFLIA);
+      case QF_UFLRA -> LogicFactory.getLAInstance(Logic_t.QF_UFLRA);
+      case QF_AUFLIA -> LogicFactory.getLAInstance(Logic_t.QF_AUFLIA);
+      case QF_AUFLRA -> LogicFactory.getLAInstance(Logic_t.QF_AUFLRA);
+      case QF_AUFLIRA -> LogicFactory.getLAInstance(Logic_t.QF_AUFLIRA);
+      default -> throw new AssertionError("no logic available");
+    };
   }
 
   Logics getLogic() {

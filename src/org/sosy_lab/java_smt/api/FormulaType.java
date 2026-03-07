@@ -188,11 +188,7 @@ public abstract class FormulaType<T extends Formula> {
       if (pObj == this) {
         return true;
       }
-      if (!(pObj instanceof BitvectorType)) {
-        return false;
-      }
-      BitvectorType other = (BitvectorType) pObj;
-      return size == other.size;
+      return (pObj instanceof BitvectorType other) && size == other.size;
     }
 
     @Override
@@ -386,11 +382,8 @@ public abstract class FormulaType<T extends Formula> {
       if (this == obj) {
         return true;
       }
-      if (!(obj instanceof FloatingPointType)) {
-        return false;
-      }
-      FloatingPointType other = (FloatingPointType) obj;
-      return this.exponentSize == other.exponentSize
+      return (obj instanceof FloatingPointType other)
+          && this.exponentSize == other.exponentSize
           && this.mantissaSizeWithoutHiddenBit == other.mantissaSizeWithoutHiddenBit;
     }
 
@@ -476,11 +469,9 @@ public abstract class FormulaType<T extends Formula> {
       if (this == obj) {
         return true;
       }
-      if (!(obj instanceof ArrayFormulaType)) {
-        return false;
-      }
-      ArrayFormulaType<?, ?> other = (ArrayFormulaType<?, ?>) obj;
-      return elementType.equals(other.elementType) && indexType.equals(other.indexType);
+      return (obj instanceof ArrayFormulaType<?, ?> other)
+          && elementType.equals(other.elementType)
+          && indexType.equals(other.indexType);
     }
 
     @Override
@@ -535,11 +526,9 @@ public abstract class FormulaType<T extends Formula> {
       if (this == obj) {
         return true;
       }
-      if (!(obj instanceof EnumerationFormulaType)) {
-        return false;
-      }
-      EnumerationFormulaType other = (EnumerationFormulaType) obj;
-      return name.equals(other.name) && elements.equals(other.elements);
+      return (obj instanceof EnumerationFormulaType other)
+          && name.equals(other.name)
+          && elements.equals(other.elements);
     }
 
     @Override

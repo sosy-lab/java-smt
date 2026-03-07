@@ -39,16 +39,18 @@ public class PrincessRationalFormulaManager
 
   @Override
   protected boolean isNumeral(IExpression value) {
-    if (value instanceof IFunApp) {
-      IFunApp app = (IFunApp) value;
-      switch (app.fun().name()) {
-        case "Rat_fromRing":
+    if (value instanceof IFunApp app) {
+      return switch (app.fun().name()) {
+        case "Rat_fromRing" -> {
           assert app.fun().arity() == 1;
-          return ifmgr.isNumeral(app.apply(0));
-        case "Rat_frac":
+          yield ifmgr.isNumeral(app.apply(0));
+        }
+        case "Rat_frac" -> {
           assert app.fun().arity() == 2;
-          return ifmgr.isNumeral(app.apply(0)) && ifmgr.isNumeral(app.apply(1));
-      }
+          yield ifmgr.isNumeral(app.apply(0)) && ifmgr.isNumeral(app.apply(1));
+        }
+        default -> false;
+      };
     }
     return false;
   }

@@ -1183,32 +1183,17 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
     assertThrows(IllegalArgumentException.class, () -> stack.getInterpolant(lst));
 
     // create an invalid interpolation token
-    final Object p3;
-    switch (solverToUse()) {
-      case CVC5:
-        p3 = ((CVC5BooleanFormulaManager) bmgr).makeVariableImpl("c");
-        break;
-      case MATHSAT5:
-        p3 = 12345;
-        break;
-      case OPENSMT:
-        p3 = 12347;
-        break;
-      case PRINCESS:
-        p3 = 12349;
-        break;
-      case SMTINTERPOL:
-        p3 = "some string";
-        break;
-      case Z3_WITH_INTERPOLATION:
-        p3 = 12350;
-        break;
-      case BITWUZLA:
-        p3 = -1;
-        break;
-      default:
-        p3 = null; // unexpected solver for interpolation
-    }
+    final Object p3 =
+        switch (solverToUse()) {
+          case CVC5 -> ((CVC5BooleanFormulaManager) bmgr).makeVariableImpl("c");
+          case MATHSAT5 -> 12345;
+          case OPENSMT -> 12347;
+          case PRINCESS -> 12349;
+          case SMTINTERPOL -> "some string";
+          case Z3_WITH_INTERPOLATION -> 12350;
+          case BITWUZLA -> -1;
+          default -> null; // unexpected solver for interpolation
+        };
 
     // and try to solve with the token
     assertThrows(

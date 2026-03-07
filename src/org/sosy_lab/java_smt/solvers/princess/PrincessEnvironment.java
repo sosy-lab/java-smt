@@ -327,14 +327,13 @@ class PrincessEnvironment {
       declaredFunctions.addAll(creator.extractVariablesAndUFs(f, true).values());
     }
     for (IExpression var : declaredFunctions.build()) {
-      if (var instanceof IConstant) {
-        sortedVariablesCache.put(((IConstant) var).c().name(), (ITerm) var);
-        addSymbol((IConstant) var);
-      } else if (var instanceof IAtom) {
-        boolVariablesCache.put(((IAtom) var).pred().name(), (IFormula) var);
-        addSymbol((IAtom) var);
-      } else if (var instanceof IFunApp) {
-        IFunApp app = (IFunApp) var;
+      if (var instanceof IConstant iConstant) {
+        sortedVariablesCache.put(iConstant.c().name(), iConstant);
+        addSymbol(iConstant);
+      } else if (var instanceof IAtom iAtom) {
+        boolVariablesCache.put(iAtom.pred().name(), iAtom);
+        addSymbol(iAtom);
+      } else if (var instanceof IFunApp app) {
         IFunction fun = app.fun();
         functionsCache.put(fun.name(), new PrincessIFunctionDeclaration(app));
         addFunction(fun);
@@ -498,9 +497,9 @@ class PrincessEnvironment {
             Set<IExpression> varsFromAbbrev = getVariablesFromAbbreviation(var);
             Sets.difference(varsFromAbbrev, allVars).forEach(waitlistSymbols::push);
             allVars.addAll(varsFromAbbrev);
-          } else if (var instanceof IFunApp) {
+          } else if (var instanceof IFunApp iFunApp) {
             Preconditions.checkState(!ufs.containsKey(name));
-            ufs.put(name, (IFunApp) var);
+            ufs.put(name, iFunApp);
           } else {
             Preconditions.checkState(!symbols.containsKey(name));
             symbols.put(name, var);
@@ -551,15 +550,15 @@ class PrincessEnvironment {
   }
 
   private static String getName(IExpression var) {
-    if (var instanceof IAtom) {
-      return ((IAtom) var).pred().name();
+    if (var instanceof IAtom iAtom) {
+      return iAtom.pred().name();
     } else if (var instanceof IConstant) {
       return var.toString();
-    } else if (var instanceof IFunApp) {
-      String fullStr = ((IFunApp) var).fun().toString();
+    } else if (var instanceof IFunApp iFunApp) {
+      String fullStr = iFunApp.fun().toString();
       return fullStr.substring(0, fullStr.indexOf('/'));
-    } else if (var instanceof IIntFormula) {
-      return getName(((IIntFormula) var).t());
+    } else if (var instanceof IIntFormula iIntFormula) {
+      return getName(iIntFormula.t());
     }
 
     throw new IllegalArgumentException("The given parameter is no variable or function");
@@ -596,9 +595,9 @@ class PrincessEnvironment {
       return FormulaType.StringType;
     } else if (sort == PrincessEnvironment.REGEX_SORT) {
       return FormulaType.RegexType;
-    } else if (sort instanceof ArraySort) {
-      Seq<Sort> indexSorts = ((ArraySort) sort).theory().indexSorts();
-      Sort elementSort = ((ArraySort) sort).theory().objSort();
+    } else if (sort instanceof ArraySort arraySort) {
+      Seq<Sort> indexSorts = arraySort.theory().indexSorts();
+      Sort elementSort = arraySort.theory().objSort();
       assert indexSorts.iterator().size() == 1 : "unexpected index type in Array type:" + sort;
       // assert indexSorts.size() == 1; // TODO Eclipse does not like simpler code.
       return FormulaType.getArrayType(
@@ -719,8 +718,7 @@ class PrincessEnvironment {
   }
 
   public boolean hasArrayType(IExpression exp) {
-    if (exp instanceof ITerm) {
-      final ITerm t = (ITerm) exp;
+    if (exp instanceof ITerm t) {
       return Sort$.MODULE$.sortOf(t) instanceof ArraySort;
     } else {
       return false;

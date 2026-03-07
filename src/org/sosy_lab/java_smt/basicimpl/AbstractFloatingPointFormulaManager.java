@@ -137,17 +137,12 @@ public abstract class AbstractFloatingPointFormulaManager<TFormulaInfo, TType, T
     if (n.startsWith("+")) {
       n = n.substring(1);
     }
-    switch (n) {
-      case "NaN":
-      case "-NaN":
-        return makeNaNImpl(type);
-      case "Infinity":
-        return makePlusInfinityImpl(type);
-      case "-Infinity":
-        return makeMinusInfinityImpl(type);
-      default:
-        return makeNumberAndRound(n, type, pFloatingPointRoundingMode);
-    }
+    return switch (n) {
+      case "NaN", "-NaN" -> makeNaNImpl(type);
+      case "Infinity" -> makePlusInfinityImpl(type);
+      case "-Infinity" -> makeMinusInfinityImpl(type);
+      default -> makeNumberAndRound(n, type, pFloatingPointRoundingMode);
+    };
   }
 
   @Override

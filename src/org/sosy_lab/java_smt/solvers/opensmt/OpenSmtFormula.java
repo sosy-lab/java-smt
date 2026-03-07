@@ -43,11 +43,9 @@ public class OpenSmtFormula implements Formula {
     if (o == this) {
       return true;
     }
-    if (!(o instanceof OpenSmtFormula)) {
-      return false;
-    }
-    OpenSmtFormula that = (OpenSmtFormula) o;
-    return this.osmtLogic.equals(that.osmtLogic) && this.osmtTerm.equals(that.osmtTerm);
+    return (o instanceof OpenSmtFormula that)
+        && this.osmtLogic.equals(that.osmtLogic)
+        && this.osmtTerm.equals(that.osmtTerm);
   }
 
   @Override

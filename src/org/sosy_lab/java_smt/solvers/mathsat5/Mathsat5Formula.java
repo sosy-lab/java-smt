@@ -39,10 +39,7 @@ abstract class Mathsat5Formula implements Formula {
     if (o == this) {
       return true;
     }
-    if (!(o instanceof Mathsat5Formula)) {
-      return false;
-    }
-    return msatTerm == ((Mathsat5Formula) o).msatTerm;
+    return (o instanceof Mathsat5Formula other) && msatTerm == other.msatTerm;
   }
 
   @Override

@@ -55,11 +55,8 @@ abstract class PrincessFunctionDeclaration {
 
     @Override
     public boolean equals(Object o) {
-      if (!(o instanceof AbstractDeclaration<?>)) {
-        return false;
-      }
-      AbstractDeclaration<?> other = (AbstractDeclaration<?>) o;
-      return declarationItem.equals(other.declarationItem);
+      return o instanceof AbstractDeclaration<?> other
+          && declarationItem.equals(other.declarationItem);
     }
 
     @Override

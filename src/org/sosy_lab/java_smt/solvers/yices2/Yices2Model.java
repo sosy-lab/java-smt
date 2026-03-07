@@ -87,17 +87,12 @@ public class Yices2Model extends AbstractModel<Integer, Integer, Long> {
     for (int term : termsInModel) {
       int[] yvalTag = yices_get_value(model, term);
       switch (yvalTag[1]) {
-        case YVAL_BOOL:
-        case YVAL_RATIONAL:
-        case YVAL_ALGEBRAIC:
-        case YVAL_BV:
-          assignments.add(getSimpleAssignment(term));
-          continue;
-        case YVAL_FUNCTION: // UFs and Arrays
-          assignments.addAll(getFunctionAssignment(term, yvalTag));
-          continue;
-        default:
-          throw new UnsupportedOperationException("YVAL with unexpected tag: " + yvalTag[1]);
+        case YVAL_BOOL, YVAL_RATIONAL, YVAL_ALGEBRAIC, YVAL_BV ->
+            assignments.add(getSimpleAssignment(term));
+        case YVAL_FUNCTION -> // UFs and Arrays
+            assignments.addAll(getFunctionAssignment(term, yvalTag));
+        default ->
+            throw new UnsupportedOperationException("YVAL with unexpected tag: " + yvalTag[1]);
       }
     }
 

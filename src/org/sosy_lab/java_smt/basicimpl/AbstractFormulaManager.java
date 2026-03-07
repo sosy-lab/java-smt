@@ -481,18 +481,13 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
   @Override
   public BooleanFormula applyTactic(BooleanFormula f, Tactic tactic)
       throws InterruptedException, SolverException {
-    switch (tactic) {
-      case ACKERMANNIZATION:
-        return applyUFEImpl(f);
-      case NNF:
-        return applyNNFImpl(f);
-      case TSEITIN_CNF:
-        return applyCNFImpl(f);
-      case QE_LIGHT:
-        return applyQELightImpl(f);
-      default:
-        throw new UnsupportedOperationException("Unexpected enum value");
-    }
+    return switch (tactic) {
+      case ACKERMANNIZATION -> applyUFEImpl(f);
+      case NNF -> applyNNFImpl(f);
+      case TSEITIN_CNF -> applyCNFImpl(f);
+      case QE_LIGHT -> applyQELightImpl(f);
+      default -> throw new UnsupportedOperationException("Unexpected enum value");
+    };
   }
 
   /** Eliminate UFs from the given input formula. */

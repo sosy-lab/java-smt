@@ -76,7 +76,7 @@ class PrincessModel extends AbstractModel<IExpression, Sort, PrincessEnvironment
   }
 
   private boolean isAbbrev(Set<Predicate> abbrevs, IExpression var) {
-    return var instanceof IAtom && abbrevs.contains(((IAtom) var).pred());
+    return var instanceof IAtom iAtom && abbrevs.contains(iAtom.pred());
   }
 
   private Collection<ValueAssignment> getAssignments(IExpression key, IExpression value) {
@@ -84,8 +84,8 @@ class PrincessModel extends AbstractModel<IExpression, Sort, PrincessEnvironment
     // first check array-access.
     // those cases can return multiple assignments per model entry.
     if (creator.getEnv().hasArrayType(key)) {
-      if (key instanceof IConstant && value instanceof IFunApp) {
-        return buildArrayAssignments((IConstant) key, (IFunApp) value);
+      if (key instanceof IConstant iConstant && value instanceof IFunApp iFunApp) {
+        return buildArrayAssignments(iConstant, iFunApp);
       } else {
         return ImmutableList.of();
       }
@@ -98,19 +98,18 @@ class PrincessModel extends AbstractModel<IExpression, Sort, PrincessEnvironment
       IFormula fAssignment;
       List<Object> argumentInterpretations = ImmutableList.of();
 
-      if (key instanceof IAtom) {
-        if (isArrayAccess(((IAtom) key).pred())) { // arrays are handled separately, see above
+      if (key instanceof IAtom iAtom) {
+        if (isArrayAccess(iAtom.pred())) { // arrays are handled separately, see above
           return ImmutableList.of();
         }
         name = key.toString();
-        fAssignment = new IBinFormula(IBinJunctor.Eqv(), (IAtom) key, (IFormula) value);
+        fAssignment = new IBinFormula(IBinJunctor.Eqv(), iAtom, (IFormula) value);
 
-      } else if (key instanceof IConstant) {
+      } else if (key instanceof IConstant iConstant) {
         name = key.toString();
-        fAssignment = ((IConstant) key).$eq$eq$eq((ITerm) value);
+        fAssignment = iConstant.$eq$eq$eq((ITerm) value);
 
-      } else if (key instanceof IFunApp) {
-        IFunApp cKey = (IFunApp) key;
+      } else if (key instanceof IFunApp cKey) {
         if (isArrayAccess(cKey.fun())) { // arrays are handled separately, see above
           return ImmutableList.of();
         }

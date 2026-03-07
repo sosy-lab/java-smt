@@ -385,33 +385,27 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
   @Override
   public <R> R visit(FormulaVisitor<R> pVisitor, Formula pFormula, Integer pF) {
     int constructor = yices_term_constructor(pF);
-    switch (constructor) {
-      case YICES_BOOL_CONST:
-        return pVisitor.visitConstant(pFormula, yices_bool_const_value(pF));
-      case YICES_ARITH_CONST:
-        return pVisitor.visitConstant(pFormula, convertValue(pF, pF));
-      case YICES_BV_CONST:
-        return pVisitor.visitConstant(pFormula, convertValue(pF, pF));
-      case YICES_LAMBDA_TERM:
-        // We use lambda terms as array constants
-        return pVisitor.visitFunction(
-            pFormula,
-            ImmutableList.of(encapsulateWithTypeOf(yices_term_child(pF, 1))),
-            FunctionDeclarationImpl.of(
-                "const",
-                FunctionDeclarationKind.CONST,
-                ImmutableList.of(getFormulaType(yices_term_child(pF, 1))),
-                getFormulaType(pF),
-                0));
-      case YICES_UNINTERPRETED_TERM:
-        return pVisitor.visitFreeVariable(pFormula, yices_get_term_name(pF));
-      case YICES_VARIABLE:
-        return pVisitor.visitBoundVariable(pFormula, 0);
-      case YICES_FORALL_TERM:
-        return visitQuantifier(pVisitor, pFormula, pF, Quantifier.FORALL);
-      default:
-        return visitFunctionApplication(pVisitor, pFormula, pF, constructor);
-    }
+    return switch (constructor) {
+      case YICES_BOOL_CONST -> pVisitor.visitConstant(pFormula, yices_bool_const_value(pF));
+      case YICES_ARITH_CONST -> pVisitor.visitConstant(pFormula, convertValue(pF, pF));
+      case YICES_BV_CONST -> pVisitor.visitConstant(pFormula, convertValue(pF, pF));
+      case YICES_LAMBDA_TERM ->
+          // We use lambda terms as array constants
+          pVisitor.visitFunction(
+              pFormula,
+              ImmutableList.of(encapsulateWithTypeOf(yices_term_child(pF, 1))),
+              FunctionDeclarationImpl.of(
+                  "const",
+                  FunctionDeclarationKind.CONST,
+                  ImmutableList.of(getFormulaType(yices_term_child(pF, 1))),
+                  getFormulaType(pF),
+                  0));
+      case YICES_UNINTERPRETED_TERM ->
+          pVisitor.visitFreeVariable(pFormula, yices_get_term_name(pF));
+      case YICES_VARIABLE -> pVisitor.visitBoundVariable(pFormula, 0);
+      case YICES_FORALL_TERM -> visitQuantifier(pVisitor, pFormula, pF, Quantifier.FORALL);
+      default -> visitFunctionApplication(pVisitor, pFormula, pF, constructor);
+    };
   }
 
   private <R> R visitQuantifier(
@@ -458,145 +452,103 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
     String functionName = null;
     List<Integer> functionArgs = null;
 
-    // filled directly when handling the function application
-    final FunctionDeclarationKind functionKind;
-
-    switch (constructor) {
-      case YICES_ITE_TERM:
-        functionKind = FunctionDeclarationKind.ITE;
-        break;
-      case YICES_APP_TERM:
-        var fun = yices_term_child(pF, 0);
-        if (ufSymbols.contains(fun)) {
-          functionKind = FunctionDeclarationKind.UF;
-          functionArgs = getArgs(pF);
-          functionName = yices_get_term_name(functionArgs.get(0));
-          functionDeclaration = functionArgs.get(0);
-          functionArgs.remove(0);
-        } else {
-          functionKind = FunctionDeclarationKind.SELECT;
-          functionArgs = getArgs(pF);
-          functionName = "select";
-          functionDeclaration = -YICES_ARRAY_SELECT;
-        }
-        break;
-      case YICES_UPDATE_TERM:
-        functionKind = FunctionDeclarationKind.STORE;
-        functionArgs =
-            ImmutableList.of(
-                yices_term_child(pF, 0), yices_term_child(pF, 1), yices_term_child(pF, 2));
-        functionDeclaration = -YICES_UPDATE_TERM;
-        break;
-      case YICES_EQ_TERM:
-        functionKind = FunctionDeclarationKind.EQ; // Covers all equivalences
-        break;
-      case YICES_DISTINCT_TERM:
-        functionKind = FunctionDeclarationKind.DISTINCT;
-        break;
-      case YICES_NOT_TERM:
-        if (isNestedExists(pF)) {
-          int existsTerm = Iterables.getOnlyElement(getArgs(pF));
-          return visitQuantifier(pVisitor, pFormula, existsTerm, Quantifier.EXISTS);
-        } else if (isNestedConjunction(pF)) {
-          functionKind = FunctionDeclarationKind.AND;
-          functionArgs = getNestedConjunctionArgs(pF);
-          functionDeclaration = -YICES_AND;
-        } else {
-          functionKind = FunctionDeclarationKind.NOT;
-        }
-        break;
-      case YICES_OR_TERM:
-        functionKind = FunctionDeclarationKind.OR;
-        break;
-      case YICES_XOR_TERM:
-        functionKind = FunctionDeclarationKind.XOR;
-        break;
-      case YICES_BV_DIV:
-        functionKind = FunctionDeclarationKind.BV_UDIV;
-        break;
-      case YICES_BV_REM:
-        functionKind = FunctionDeclarationKind.BV_UREM;
-        break;
-      case YICES_BV_SDIV:
-        functionKind = FunctionDeclarationKind.BV_SDIV;
-        break;
-      case YICES_BV_SREM:
-        functionKind = FunctionDeclarationKind.BV_SREM;
-        break;
-      case YICES_BV_SMOD:
-        functionKind = FunctionDeclarationKind.BV_SMOD;
-        break;
-      case YICES_BV_SHL:
-        functionKind = FunctionDeclarationKind.BV_SHL;
-        break;
-      case YICES_BV_LSHR:
-        functionKind = FunctionDeclarationKind.BV_LSHR;
-        break;
-      case YICES_BV_ASHR:
-        functionKind = FunctionDeclarationKind.BV_ASHR;
-        break;
-      case YICES_BV_GE_ATOM:
-        functionKind = FunctionDeclarationKind.BV_UGE;
-        break;
-      case YICES_BV_SGE_ATOM:
-        functionKind = FunctionDeclarationKind.BV_SGE;
-        break;
-      case YICES_ARITH_GE_ATOM:
-        functionKind = FunctionDeclarationKind.GTE;
-        break;
-      case YICES_FLOOR:
-        functionKind = FunctionDeclarationKind.FLOOR;
-        break;
-      case YICES_RDIV:
-        functionKind = FunctionDeclarationKind.DIV;
-        break;
-      case YICES_IDIV:
-        functionKind = FunctionDeclarationKind.DIV;
-        break;
-      case YICES_SELECT_TERM:
-        functionKind = FunctionDeclarationKind.SELECT;
-        break;
-      case YICES_BV_SUM:
-        if (yices_term_num_children(pF) == 1) {
-          functionKind = FunctionDeclarationKind.BV_MUL;
-          functionArgs = getMultiplyBvSumArgsFromSum(pF);
-          functionDeclaration = -YICES_BV_MUL;
-        } else {
-          functionKind = FunctionDeclarationKind.BV_ADD;
-          functionArgs = getBvSumArgs(pF);
-        }
-        break;
-      case YICES_ARITH_SUM:
-        if (yices_term_num_children(pF) == 1) {
-          functionKind = FunctionDeclarationKind.MUL;
-          functionArgs = getMultiplySumArgsFromSum(pF);
-          functionDeclaration = -YICES_POWER_PRODUCT;
-        } else {
-          functionKind = FunctionDeclarationKind.ADD;
-          functionArgs = getSumArgs(pF);
-        }
-        break;
-      case YICES_POWER_PRODUCT:
-        if (yices_type_is_bitvector(yices_type_of_term(pF))) {
-          functionKind = FunctionDeclarationKind.BV_MUL;
-          functionArgs = getMultiplyArgs(pF, true);
-          functionDeclaration = -YICES_BV_MUL;
-          // TODO Product of more then 2 bitvectors ?
-        } else {
-          functionKind = FunctionDeclarationKind.MUL;
-          functionArgs = getMultiplyArgs(pF, false);
-        }
-        break;
-      case YICES_BIT_TERM:
-        functionKind = FunctionDeclarationKind.BV_EXTRACT;
-        functionArgs = getBitArgs(pF);
-        break;
-      case YICES_BV_ARRAY:
-        functionKind = FunctionDeclarationKind.BV_CONCAT;
-        break;
-      default:
-        functionKind = FunctionDeclarationKind.OTHER;
+    if (constructor == YICES_NOT_TERM && isNestedExists(pF)) {
+      int existsTerm = Iterables.getOnlyElement(getArgs(pF));
+      return visitQuantifier(pVisitor, pFormula, existsTerm, Quantifier.EXISTS);
     }
+
+    // filled directly when handling the function application
+    final FunctionDeclarationKind functionKind =
+        switch (constructor) {
+          case YICES_ITE_TERM -> FunctionDeclarationKind.ITE;
+          case YICES_APP_TERM -> {
+            var fun = yices_term_child(pF, 0);
+            if (ufSymbols.contains(fun)) {
+              functionArgs = getArgs(pF);
+              functionName = yices_get_term_name(functionArgs.get(0));
+              functionDeclaration = functionArgs.get(0);
+              functionArgs.remove(0);
+              yield FunctionDeclarationKind.UF;
+            } else {
+              functionArgs = getArgs(pF);
+              functionName = "select";
+              functionDeclaration = -YICES_ARRAY_SELECT;
+              yield FunctionDeclarationKind.SELECT;
+            }
+          }
+          case YICES_UPDATE_TERM -> {
+            functionArgs =
+                ImmutableList.of(
+                    yices_term_child(pF, 0), yices_term_child(pF, 1), yices_term_child(pF, 2));
+            functionDeclaration = -YICES_UPDATE_TERM;
+            yield FunctionDeclarationKind.STORE;
+          }
+          case YICES_EQ_TERM -> FunctionDeclarationKind.EQ; // Covers all equivalences
+          case YICES_DISTINCT_TERM -> FunctionDeclarationKind.DISTINCT;
+          case YICES_NOT_TERM -> {
+            if (isNestedConjunction(pF)) {
+              functionArgs = getNestedConjunctionArgs(pF);
+              functionDeclaration = -YICES_AND;
+              yield FunctionDeclarationKind.AND;
+            } else {
+              yield FunctionDeclarationKind.NOT;
+            }
+          }
+          case YICES_OR_TERM -> FunctionDeclarationKind.OR;
+          case YICES_XOR_TERM -> FunctionDeclarationKind.XOR;
+          case YICES_BV_DIV -> FunctionDeclarationKind.BV_UDIV;
+          case YICES_BV_REM -> FunctionDeclarationKind.BV_UREM;
+          case YICES_BV_SDIV -> FunctionDeclarationKind.BV_SDIV;
+          case YICES_BV_SREM -> FunctionDeclarationKind.BV_SREM;
+          case YICES_BV_SMOD -> FunctionDeclarationKind.BV_SMOD;
+          case YICES_BV_SHL -> FunctionDeclarationKind.BV_SHL;
+          case YICES_BV_LSHR -> FunctionDeclarationKind.BV_LSHR;
+          case YICES_BV_ASHR -> FunctionDeclarationKind.BV_ASHR;
+          case YICES_BV_GE_ATOM -> FunctionDeclarationKind.BV_UGE;
+          case YICES_BV_SGE_ATOM -> FunctionDeclarationKind.BV_SGE;
+          case YICES_ARITH_GE_ATOM -> FunctionDeclarationKind.GTE;
+          case YICES_FLOOR -> FunctionDeclarationKind.FLOOR;
+          case YICES_RDIV -> FunctionDeclarationKind.DIV;
+          case YICES_IDIV -> FunctionDeclarationKind.DIV;
+          case YICES_SELECT_TERM -> FunctionDeclarationKind.SELECT;
+          case YICES_BV_SUM -> {
+            if (yices_term_num_children(pF) == 1) {
+              functionArgs = getMultiplyBvSumArgsFromSum(pF);
+              functionDeclaration = -YICES_BV_MUL;
+              yield FunctionDeclarationKind.BV_MUL;
+            } else {
+              functionArgs = getBvSumArgs(pF);
+              yield FunctionDeclarationKind.BV_ADD;
+            }
+          }
+          case YICES_ARITH_SUM -> {
+            if (yices_term_num_children(pF) == 1) {
+              functionArgs = getMultiplySumArgsFromSum(pF);
+              functionDeclaration = -YICES_POWER_PRODUCT;
+              yield FunctionDeclarationKind.MUL;
+            } else {
+              functionArgs = getSumArgs(pF);
+              yield FunctionDeclarationKind.ADD;
+            }
+          }
+          case YICES_POWER_PRODUCT -> {
+            if (yices_type_is_bitvector(yices_type_of_term(pF))) {
+              functionArgs = getMultiplyArgs(pF, true);
+              functionDeclaration = -YICES_BV_MUL;
+              // TODO Product of more then 2 bitvectors ?
+              yield FunctionDeclarationKind.BV_MUL;
+            } else {
+              functionArgs = getMultiplyArgs(pF, false);
+              yield FunctionDeclarationKind.MUL;
+            }
+          }
+          case YICES_BIT_TERM -> {
+            functionArgs = getBitArgs(pF);
+            yield FunctionDeclarationKind.BV_EXTRACT;
+          }
+          case YICES_BV_ARRAY -> FunctionDeclarationKind.BV_CONCAT;
+          default -> FunctionDeclarationKind.OTHER;
+        };
 
     if (functionName == null) {
       functionName = functionKind.toString();
@@ -758,109 +710,122 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
   @Override
   public Integer callFunctionImpl(Integer pDeclaration, List<Integer> pArgs) {
     if (pDeclaration < 0) { // is constant function application from API
-      switch (-pDeclaration) {
-        case YICES_ITE_TERM:
+      // TODO add more cases
+      // if something bad happens here,
+      // in most cases the solution is a fix in the method visitFunctionApplication
+      return switch (-pDeclaration) {
+        case YICES_ITE_TERM -> {
           checkArgsLength("YICES_ITE_TERM", pArgs, 3);
-          return yices_ite(pArgs.get(0), pArgs.get(1), pArgs.get(2));
-        case YICES_EQ_TERM:
+          yield yices_ite(pArgs.get(0), pArgs.get(1), pArgs.get(2));
+        }
+        case YICES_EQ_TERM -> {
           checkArgsLength("YICES_EQ_TERM", pArgs, 2);
-          return yices_eq(pArgs.get(0), pArgs.get(1));
-        case YICES_DISTINCT_TERM:
-          return yices_distinct(pArgs.size(), Ints.toArray(pArgs));
-        case YICES_NOT_TERM:
+          yield yices_eq(pArgs.get(0), pArgs.get(1));
+        }
+        case YICES_DISTINCT_TERM -> yices_distinct(pArgs.size(), Ints.toArray(pArgs));
+        case YICES_NOT_TERM -> {
           checkArgsLength("YICES_NOT_TERM", pArgs, 1);
-          return yices_not(pArgs.get(0));
-        case YICES_OR_TERM:
-          return yices_or(pArgs.size(), Ints.toArray(pArgs));
-        case YICES_XOR_TERM:
-          return yices_xor(pArgs.size(), Ints.toArray(pArgs));
-        case YICES_BV_DIV:
+          yield yices_not(pArgs.get(0));
+        }
+        case YICES_OR_TERM -> yices_or(pArgs.size(), Ints.toArray(pArgs));
+        case YICES_XOR_TERM -> yices_xor(pArgs.size(), Ints.toArray(pArgs));
+        case YICES_BV_DIV -> {
           checkArgsLength("YICES_BV_DIV", pArgs, 2);
-          return yices_bvdiv(pArgs.get(0), pArgs.get(1));
-        case YICES_BV_REM:
+          yield yices_bvdiv(pArgs.get(0), pArgs.get(1));
+        }
+        case YICES_BV_REM -> {
           checkArgsLength("YICES_BV_REM", pArgs, 2);
-          return yices_bvrem(pArgs.get(0), pArgs.get(1));
-        case YICES_BV_SDIV:
+          yield yices_bvrem(pArgs.get(0), pArgs.get(1));
+        }
+        case YICES_BV_SDIV -> {
           checkArgsLength("YICES_BV_SDIV", pArgs, 2);
-          return yices_bvsdiv(pArgs.get(0), pArgs.get(1));
-        case YICES_BV_SREM:
+          yield yices_bvsdiv(pArgs.get(0), pArgs.get(1));
+        }
+        case YICES_BV_SREM -> {
           checkArgsLength("YICES_BV_SREM", pArgs, 2);
-          return yices_bvsrem(pArgs.get(0), pArgs.get(1));
-        case YICES_BV_SMOD:
+          yield yices_bvsrem(pArgs.get(0), pArgs.get(1));
+        }
+        case YICES_BV_SMOD -> {
           checkArgsLength("YICES_BV_SMOD", pArgs, 2);
-          return yices_bvsmod(pArgs.get(0), pArgs.get(1));
-        case YICES_BV_SHL:
+          yield yices_bvsmod(pArgs.get(0), pArgs.get(1));
+        }
+        case YICES_BV_SHL -> {
           checkArgsLength("YICES_BV_SHL", pArgs, 2);
-          return yices_bvshl(pArgs.get(0), pArgs.get(1));
-        case YICES_BV_LSHR:
+          yield yices_bvshl(pArgs.get(0), pArgs.get(1));
+        }
+        case YICES_BV_LSHR -> {
           checkArgsLength("YICES_BV_LSHR", pArgs, 2);
-          return yices_bvlshr(pArgs.get(0), pArgs.get(1));
-        case YICES_BV_ASHR:
+          yield yices_bvlshr(pArgs.get(0), pArgs.get(1));
+        }
+        case YICES_BV_ASHR -> {
           checkArgsLength("YICES_BV_ASHR", pArgs, 2);
-          return yices_bvashr(pArgs.get(0), pArgs.get(1));
-        case YICES_BV_GE_ATOM:
+          yield yices_bvashr(pArgs.get(0), pArgs.get(1));
+        }
+        case YICES_BV_GE_ATOM -> {
           checkArgsLength("YICES_BV_GE_ATOM", pArgs, 2);
-          return yices_bvge_atom(pArgs.get(0), pArgs.get(1));
-        case YICES_BV_SGE_ATOM:
+          yield yices_bvge_atom(pArgs.get(0), pArgs.get(1));
+        }
+        case YICES_BV_SGE_ATOM -> {
           checkArgsLength("YICES_BV_SGE_ATOM", pArgs, 2);
-          return yices_bvsge_atom(pArgs.get(0), pArgs.get(1));
-        case YICES_ARITH_GE_ATOM:
+          yield yices_bvsge_atom(pArgs.get(0), pArgs.get(1));
+        }
+        case YICES_ARITH_GE_ATOM -> {
           checkArgsLength("YICES_ARITH_GE_ATOM", pArgs, 2);
-          return yices_arith_geq_atom(pArgs.get(0), pArgs.get(1));
-        case YICES_ABS:
+          yield yices_arith_geq_atom(pArgs.get(0), pArgs.get(1));
+        }
+        case YICES_ABS -> {
           checkArgsLength("YICES_ABS", pArgs, 1);
-          return yices_abs(pArgs.get(0));
-        case YICES_CEIL:
+          yield yices_abs(pArgs.get(0));
+        }
+        case YICES_CEIL -> {
           checkArgsLength("YICES_CEIL", pArgs, 1);
-          return yices_ceil(pArgs.get(0));
-        case YICES_FLOOR:
+          yield yices_ceil(pArgs.get(0));
+        }
+        case YICES_FLOOR -> {
           checkArgsLength("YICES_FLOOR", pArgs, 1);
-          return yices_floor(pArgs.get(0));
-        case YICES_RDIV:
+          yield yices_floor(pArgs.get(0));
+        }
+        case YICES_RDIV -> {
           checkArgsLength("YICES_RDIV", pArgs, 2);
-          return yices_division(pArgs.get(0), pArgs.get(1));
-        case YICES_IDIV:
+          yield yices_division(pArgs.get(0), pArgs.get(1));
+        }
+        case YICES_IDIV -> {
           checkArgsLength("YICES_IDIV", pArgs, 2);
-          return yices_idiv(pArgs.get(0), pArgs.get(1));
-        case YICES_IMOD:
+          yield yices_idiv(pArgs.get(0), pArgs.get(1));
+        }
+        case YICES_IMOD -> {
           checkArgsLength("YICES_IMOD", pArgs, 2);
-          return yices_imod(pArgs.get(0), pArgs.get(1));
-        case YICES_IS_INT_ATOM:
+          yield yices_imod(pArgs.get(0), pArgs.get(1));
+        }
+        case YICES_IS_INT_ATOM -> {
           checkArgsLength("YICES_IS_INT_ATOM", pArgs, 1);
-          return yices_is_int_atom(pArgs.get(0));
-        case YICES_DIVIDES_ATOM:
+          yield yices_is_int_atom(pArgs.get(0));
+        }
+        case YICES_DIVIDES_ATOM -> {
           checkArgsLength("YICES_DIVIDES_ATOM", pArgs, 2);
-          return yices_divides_atom(pArgs.get(0), pArgs.get(1));
-        case YICES_BV_SUM:
-          return yices_bvsum(pArgs.size(), Ints.toArray(pArgs));
-        case YICES_ARITH_SUM:
-          return yices_sum(pArgs.size(), Ints.toArray(pArgs));
-        case YICES_POWER_PRODUCT:
-          return yices_product(pArgs.size(), Ints.toArray(pArgs));
-        case YICES_BIT_TERM:
+          yield yices_divides_atom(pArgs.get(0), pArgs.get(1));
+        }
+        case YICES_BV_SUM -> yices_bvsum(pArgs.size(), Ints.toArray(pArgs));
+        case YICES_ARITH_SUM -> yices_sum(pArgs.size(), Ints.toArray(pArgs));
+        case YICES_POWER_PRODUCT -> yices_product(pArgs.size(), Ints.toArray(pArgs));
+        case YICES_BIT_TERM -> {
           checkArgsLength("YICES_BIT_TERM", pArgs, 2);
-          return yices_bitextract(pArgs.get(0), toInt(pArgs.get(1)));
-        case YICES_BV_ARRAY:
-          return yices_bvarray(pArgs.size(), Ints.toArray(pArgs));
-        case YICES_BV_MUL:
-          return yices_bvproduct(pArgs.size(), Ints.toArray(pArgs));
-        case YICES_AND:
-          return yices_and(pArgs.size(), Ints.toArray(pArgs));
-        case YICES_ARRAY_SELECT:
-          return yices_application(pArgs.get(0), 1, new int[] {pArgs.get(1)});
-        case YICES_UPDATE_TERM:
-          return yices_update(pArgs.get(0), 1, new int[] {pArgs.get(1)}, pArgs.get(2));
-        default:
-          // TODO add more cases
-          // if something bad happens here,
-          // in most cases the solution is a fix in the method visitFunctionApplication
-          throw new IllegalArgumentException(
-              String.format(
-                  "Unknown function declaration with constructor %d and arguments %s (%s)",
-                  -pDeclaration,
-                  pArgs,
-                  Lists.transform(pArgs, Yices2NativeApi::yices_term_to_string)));
-      }
+          yield yices_bitextract(pArgs.get(0), toInt(pArgs.get(1)));
+        }
+        case YICES_BV_ARRAY -> yices_bvarray(pArgs.size(), Ints.toArray(pArgs));
+        case YICES_BV_MUL -> yices_bvproduct(pArgs.size(), Ints.toArray(pArgs));
+        case YICES_AND -> yices_and(pArgs.size(), Ints.toArray(pArgs));
+        case YICES_ARRAY_SELECT -> yices_application(pArgs.get(0), 1, new int[] {pArgs.get(1)});
+        case YICES_UPDATE_TERM ->
+            yices_update(pArgs.get(0), 1, new int[] {pArgs.get(1)}, pArgs.get(2));
+        default ->
+            throw new IllegalArgumentException(
+                String.format(
+                    "Unknown function declaration with constructor %d and arguments %s (%s)",
+                    -pDeclaration,
+                    pArgs,
+                    Lists.transform(pArgs, Yices2NativeApi::yices_term_to_string)));
+      };
     } else { // is UF Application
       if (pArgs.isEmpty()) {
         return pDeclaration;

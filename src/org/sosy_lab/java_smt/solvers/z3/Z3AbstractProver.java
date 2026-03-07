@@ -71,14 +71,14 @@ abstract class Z3AbstractProver extends AbstractProverWithAllSat<Void> {
 
   void addParameter(long z3params, String key, Object value) {
     long keySymbol = Native.mkStringSymbol(z3context, key);
-    if (value instanceof Boolean) {
-      Native.paramsSetBool(z3context, z3params, keySymbol, (Boolean) value);
-    } else if (value instanceof Integer) {
-      Native.paramsSetUint(z3context, z3params, keySymbol, (Integer) value);
-    } else if (value instanceof Double) {
-      Native.paramsSetDouble(z3context, z3params, keySymbol, (Double) value);
-    } else if (value instanceof String) {
-      long valueSymbol = Native.mkStringSymbol(z3context, (String) value);
+    if (value instanceof Boolean b) {
+      Native.paramsSetBool(z3context, z3params, keySymbol, b);
+    } else if (value instanceof Integer i) {
+      Native.paramsSetUint(z3context, z3params, keySymbol, i);
+    } else if (value instanceof Double d) {
+      Native.paramsSetDouble(z3context, z3params, keySymbol, d);
+    } else if (value instanceof String string) {
+      long valueSymbol = Native.mkStringSymbol(z3context, string);
       Native.paramsSetSymbol(z3context, z3params, keySymbol, valueSymbol);
     } else {
       throw new IllegalArgumentException(

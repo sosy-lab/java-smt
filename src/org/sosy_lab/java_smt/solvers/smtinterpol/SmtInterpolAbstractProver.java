@@ -114,30 +114,29 @@ abstract class SmtInterpolAbstractProver<T> extends AbstractProver<T> {
     shutdownNotifier.shutdownIfNecessary();
 
     LBool result = env.checkSat();
-    switch (result) {
-      case SAT:
-        return false;
-      case UNSAT:
-        return true;
-      case UNKNOWN:
+    return switch (result) {
+      case SAT -> false;
+      case UNSAT -> true;
+      case UNKNOWN -> {
         Object reason = env.getInfo(":reason-unknown");
-        if (!(reason instanceof ReasonUnknown)) {
+        if (!(reason instanceof ReasonUnknown unknown)) {
           throw new SMTLIBException("checkSat returned UNKNOWN with unknown reason " + reason);
         }
-        switch ((ReasonUnknown) reason) {
-          case MEMOUT:
-            // SMTInterpol catches OOM, but we want to have it thrown.
-            throw new OutOfMemoryError("Out of memory during SMTInterpol operation");
-          case CANCELLED:
+        switch (unknown) {
+          case MEMOUT ->
+              // SMTInterpol catches OOM, but we want to have it thrown.
+              throw new OutOfMemoryError("Out of memory during SMTInterpol operation");
+          case CANCELLED -> {
             shutdownNotifier.shutdownIfNecessary(); // expected if we requested termination
             throw new SMTLIBException("checkSat returned UNKNOWN with unexpected reason " + reason);
-          default:
-            throw new SMTLIBException("checkSat returned UNKNOWN with unexpected reason " + reason);
+          }
+          default ->
+              throw new SMTLIBException(
+                  "checkSat returned UNKNOWN with unexpected reason " + reason);
         }
-
-      default:
-        throw new SMTLIBException("checkSat returned " + result);
-    }
+      }
+      default -> throw new SMTLIBException("checkSat returned " + result);
+    };
   }
 
   @SuppressWarnings("resource")

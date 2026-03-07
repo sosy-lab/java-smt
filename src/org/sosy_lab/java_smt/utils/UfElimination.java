@@ -211,27 +211,25 @@ public class UfElimination {
     }
   }
 
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({"unchecked", "rawtypes"})
   @CheckReturnValue
   private BooleanFormula makeEqual(Formula pLhs, Formula pRhs) {
     BooleanFormula t;
-    if (pLhs instanceof BooleanFormula && pRhs instanceof BooleanFormula) {
-      t = bfmgr.equivalence((BooleanFormula) pLhs, (BooleanFormula) pRhs);
-    } else if (pLhs instanceof IntegerFormula && pRhs instanceof IntegerFormula) {
-      t = fmgr.getIntegerFormulaManager().equal((IntegerFormula) pLhs, (IntegerFormula) pRhs);
-    } else if (pLhs instanceof StringFormula && pRhs instanceof StringFormula) {
-      t = fmgr.getStringFormulaManager().equal((StringFormula) pLhs, (StringFormula) pRhs);
-    } else if (pLhs instanceof NumeralFormula && pRhs instanceof NumeralFormula) {
-      t = fmgr.getRationalFormulaManager().equal((NumeralFormula) pLhs, (NumeralFormula) pRhs);
-    } else if (pLhs instanceof BitvectorFormula) {
-      t = fmgr.getBitvectorFormulaManager().equal((BitvectorFormula) pLhs, (BitvectorFormula) pRhs);
-    } else if (pLhs instanceof FloatingPointFormula && pRhs instanceof FloatingPointFormula) {
+    if (pLhs instanceof BooleanFormula lhs && pRhs instanceof BooleanFormula rhs) {
+      t = bfmgr.equivalence(lhs, rhs);
+    } else if (pLhs instanceof IntegerFormula lhs && pRhs instanceof IntegerFormula rhs) {
+      t = fmgr.getIntegerFormulaManager().equal(lhs, rhs);
+    } else if (pLhs instanceof StringFormula lhs && pRhs instanceof StringFormula rhs) {
+      t = fmgr.getStringFormulaManager().equal(lhs, rhs);
+    } else if (pLhs instanceof NumeralFormula lhs && pRhs instanceof NumeralFormula rhs) {
+      t = fmgr.getRationalFormulaManager().equal(lhs, rhs);
+    } else if (pLhs instanceof BitvectorFormula lhs && pRhs instanceof BitvectorFormula rhs) {
+      t = fmgr.getBitvectorFormulaManager().equal(lhs, rhs);
+    } else if (pLhs instanceof FloatingPointFormula lhs
+        && pRhs instanceof FloatingPointFormula rhs) {
       FloatingPointFormulaManager fpfmgr = fmgr.getFloatingPointFormulaManager();
-      t = fpfmgr.equalWithFPSemantics((FloatingPointFormula) pLhs, (FloatingPointFormula) pRhs);
-    } else if (pLhs instanceof ArrayFormula<?, ?> && pRhs instanceof ArrayFormula<?, ?>) {
-      ArrayFormula<?, ?> lhs = (ArrayFormula<?, ?>) pLhs;
-      @SuppressWarnings("rawtypes")
-      ArrayFormula rhs = (ArrayFormula) pRhs;
+      t = fpfmgr.equalWithFPSemantics(lhs, rhs);
+    } else if (pLhs instanceof ArrayFormula lhs && pRhs instanceof ArrayFormula rhs) {
       t = fmgr.getArrayFormulaManager().equivalence(lhs, rhs);
     } else {
       throw new IllegalArgumentException("Not supported interface");
