@@ -83,7 +83,6 @@ class Mathsat5FloatingPointFormulaManager
       case TOWARD_POSITIVE -> msat_make_fp_roundingmode_plus_inf(mathsatEnv);
       case TOWARD_NEGATIVE -> msat_make_fp_roundingmode_minus_inf(mathsatEnv);
       case TOWARD_ZERO -> msat_make_fp_roundingmode_zero(mathsatEnv);
-      default -> throw new AssertionError("Unexpected branch");
     };
   }
 

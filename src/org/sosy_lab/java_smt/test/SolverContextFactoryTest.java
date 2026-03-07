@@ -123,7 +123,6 @@ public class SolverContextFactoryTest {
           (IS_LINUX && isSufficientVersionOfLibcxx("mathsat5j")) || (IS_WINDOWS && !IS_ARCH_ARM64);
       case Z3 -> (IS_LINUX && isSufficientVersionOfLibcxx("z3")) || IS_WINDOWS || IS_MAC;
       case Z3_WITH_INTERPOLATION -> IS_LINUX;
-      default -> throw new AssertionError("unexpected solver: " + solverToUse());
     };
   }
 

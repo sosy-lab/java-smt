@@ -72,7 +72,6 @@ public final class OpenSmtFormulaCreator extends FormulaCreator<PTRef, SRef, Log
       case QF_AUFLIA -> LogicFactory.getLAInstance(Logic_t.QF_AUFLIA);
       case QF_AUFLRA -> LogicFactory.getLAInstance(Logic_t.QF_AUFLRA);
       case QF_AUFLIRA -> LogicFactory.getLAInstance(Logic_t.QF_AUFLIRA);
-      default -> throw new AssertionError("no logic available");
     };
   }
 

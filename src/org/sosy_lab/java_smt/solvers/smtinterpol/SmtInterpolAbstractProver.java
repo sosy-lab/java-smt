@@ -135,7 +135,6 @@ abstract class SmtInterpolAbstractProver<T> extends AbstractProver<T> {
                   "checkSat returned UNKNOWN with unexpected reason " + reason);
         }
       }
-      default -> throw new SMTLIBException("checkSat returned " + result);
     };
   }
 

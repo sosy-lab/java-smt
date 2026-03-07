@@ -66,7 +66,6 @@ public class CVC4FloatingPointFormulaManager
       case TOWARD_POSITIVE -> exprManager.mkConst(RoundingMode.roundTowardPositive);
       case TOWARD_NEGATIVE -> exprManager.mkConst(RoundingMode.roundTowardNegative);
       case TOWARD_ZERO -> exprManager.mkConst(RoundingMode.roundTowardZero);
-      default -> throw new AssertionError("Unexpected branch");
     };
   }
 

@@ -315,8 +315,6 @@ public class SolverContextFactory {
       case BITWUZLA ->
           BitwuzlaSolverContext.create(
               config, shutdownNotifier, logfile, randomSeed, floatingPointRoundingMode, loader);
-
-      default -> throw new AssertionError("no solver selected");
     };
   }
 

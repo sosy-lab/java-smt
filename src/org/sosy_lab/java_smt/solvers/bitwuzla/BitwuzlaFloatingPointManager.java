@@ -53,7 +53,6 @@ public class BitwuzlaFloatingPointManager
       case TOWARD_POSITIVE -> termManager.mk_rm_value(RoundingMode.RTP);
       case TOWARD_NEGATIVE -> termManager.mk_rm_value(RoundingMode.RTN);
       case TOWARD_ZERO -> termManager.mk_rm_value(RoundingMode.RTZ);
-      default -> throw new AssertionError("Unexpected value for Floating-Point rounding mode.");
     };
   }
 

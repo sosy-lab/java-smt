@@ -605,7 +605,6 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
 
           // Bound variable.
           "#" + Native.getSymbolInt(environment, symbol);
-      default -> throw new UnsupportedOperationException("Unexpected state");
     };
   }
 

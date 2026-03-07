@@ -56,9 +56,6 @@ public class CVC5FloatingPointFormulaManager
       case TOWARD_POSITIVE -> termManager.mkRoundingMode(RoundingMode.ROUND_TOWARD_POSITIVE);
       case TOWARD_NEGATIVE -> termManager.mkRoundingMode(RoundingMode.ROUND_TOWARD_NEGATIVE);
       case TOWARD_ZERO -> termManager.mkRoundingMode(RoundingMode.ROUND_TOWARD_ZERO);
-      default ->
-          throw new AssertionError(
-              "Unexpected rounding mode encountered: " + pFloatingPointRoundingMode);
     };
   }
 

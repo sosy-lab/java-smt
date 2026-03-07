@@ -49,7 +49,6 @@ class Z3FloatingPointFormulaManager
           case TOWARD_POSITIVE -> Native.mkFpaRoundTowardPositive(z3context);
           case TOWARD_NEGATIVE -> Native.mkFpaRoundTowardNegative(z3context);
           case TOWARD_ZERO -> Native.mkFpaRoundTowardZero(z3context);
-          default -> throw new AssertionError("Unexpected value");
         };
     Native.incRef(z3context, out);
     return out;

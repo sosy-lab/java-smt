@@ -134,9 +134,6 @@ public class NQueens {
                   "Enumerating NQueens solutions with enumerating and constraining propagator.");
               yield myQueen.enumerateSolutionsWithConstraintPropagator(prover);
             }
-            default ->
-                throw new IllegalArgumentException(
-                    "Unexpected method for solving  NQueens: " + method);
           };
       long passedMillis = System.currentTimeMillis() - timeSnapshot;
       System.out.printf("Found %d solutions in %.2f seconds%n", solutions, (passedMillis / 1000d));

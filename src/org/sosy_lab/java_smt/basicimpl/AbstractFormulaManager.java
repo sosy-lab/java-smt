@@ -486,7 +486,6 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
       case NNF -> applyNNFImpl(f);
       case TSEITIN_CNF -> applyCNFImpl(f);
       case QE_LIGHT -> applyQELightImpl(f);
-      default -> throw new UnsupportedOperationException("Unexpected enum value");
     };
   }
 

@@ -275,7 +275,6 @@ class Z3LegacyFormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
                   + sortKind);
         }
       }
-      default -> throw new UnsupportedOperationException("Unexpected state.");
     };
   }
 
@@ -613,7 +612,6 @@ class Z3LegacyFormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
 
           // Bound variable.
           "#" + Native.getSymbolInt(environment, symbol);
-      default -> throw new UnsupportedOperationException("Unexpected state");
     };
   }
 

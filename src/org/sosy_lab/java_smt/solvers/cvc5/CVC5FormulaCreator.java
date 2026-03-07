@@ -880,9 +880,6 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, TermManager, 
         case ROUND_TOWARD_NEGATIVE -> FloatingPointRoundingMode.TOWARD_NEGATIVE;
         case ROUND_TOWARD_POSITIVE -> FloatingPointRoundingMode.TOWARD_POSITIVE;
         case ROUND_TOWARD_ZERO -> FloatingPointRoundingMode.TOWARD_ZERO;
-        default ->
-            throw new IllegalArgumentException(
-                String.format("Unknown rounding mode in Term '%s'.", pTerm));
       };
     } catch (CVC5ApiException e) {
       throw new IllegalArgumentException(
