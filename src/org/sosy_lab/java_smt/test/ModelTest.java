@@ -32,7 +32,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.junit.Before;
 import org.junit.Test;
@@ -1940,7 +1939,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
                         assignment.getName().equals(varName)
                             && (ufArgs == null
                                 || assignment.getArgumentsInterpretation().equals(ufArgs)))
-                .collect(Collectors.toList());
+                .toList();
         assert_()
             .withMessage(
                 "No relevant assignment in model %s available for name '%s' with %s found.",
@@ -1954,7 +1953,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
           List<ValueAssignment> arrayAssignments =
               relevantAssignments.stream()
                   .filter(assignment -> expectedValue.equals(assignment.getValue()))
-                  .collect(Collectors.toList());
+                  .toList();
           assertThat(arrayAssignments)
               .isNotEmpty(); // at least one assignment should have the wanted value
 

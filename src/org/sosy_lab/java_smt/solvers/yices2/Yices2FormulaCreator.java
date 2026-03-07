@@ -145,7 +145,6 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.api.ArrayFormula;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
@@ -431,9 +430,7 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
     return pVisitor.visitQuantifier(
         (BooleanFormula) pFormula,
         pQuantifier,
-        Ints.asList(freeVars).stream()
-            .map(this::encapsulateWithTypeOf)
-            .collect(Collectors.toList()),
+        Ints.asList(freeVars).stream().map(this::encapsulateWithTypeOf).toList(),
         encapsulateBoolean(substBody));
   }
 

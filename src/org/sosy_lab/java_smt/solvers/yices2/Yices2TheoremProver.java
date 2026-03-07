@@ -24,13 +24,11 @@ import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_push;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_set_config;
 
 import com.google.common.base.Preconditions;
-import com.google.common.primitives.Ints;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -141,8 +139,11 @@ class Yices2TheoremProver extends AbstractProverWithAllSat<Void> implements Prov
   }
 
   private int[] getAllConstraints() {
-    return Ints.toArray(
-        getAssertedFormulas().stream().map(creator::extractInfo).collect(Collectors.toSet()));
+    return getAssertedFormulas().stream()
+        .map(creator::extractInfo)
+        .distinct()
+        .mapToInt(Integer::intValue)
+        .toArray();
   }
 
   @Override

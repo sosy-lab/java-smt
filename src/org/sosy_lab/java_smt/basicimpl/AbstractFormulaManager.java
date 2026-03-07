@@ -26,7 +26,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.Appender;
 import org.sosy_lab.common.Appenders;
@@ -371,12 +370,9 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
     // which is not very efficient, but it works for simple cases and is better than nothing
     List<String> tokens = Tokenizer.tokenize(formulaStr);
 
-    List<String> declarationTokens =
-        tokens.stream().filter(Tokenizer::isDeclarationToken).collect(Collectors.toList());
-    List<String> definitionTokens =
-        tokens.stream().filter(Tokenizer::isDefinitionToken).collect(Collectors.toList());
-    List<String> assertTokens =
-        tokens.stream().filter(Tokenizer::isAssertToken).collect(Collectors.toList());
+    List<String> declarationTokens = tokens.stream().filter(Tokenizer::isDeclarationToken).toList();
+    List<String> definitionTokens = tokens.stream().filter(Tokenizer::isDefinitionToken).toList();
+    List<String> assertTokens = tokens.stream().filter(Tokenizer::isAssertToken).toList();
     String definitions =
         Joiner.on("").join(declarationTokens) + Joiner.on("").join(definitionTokens);
 
@@ -447,7 +443,7 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
   public List<BooleanFormula> parseAll(String formulaStr) throws IllegalArgumentException {
     return parseAllImpl(sanitize(formulaStr)).stream()
         .map(formulaCreator::encapsulateBoolean)
-        .collect(Collectors.toList());
+        .toList();
   }
 
   protected abstract String dumpFormulaImpl(TFormulaInfo t) throws IOException;

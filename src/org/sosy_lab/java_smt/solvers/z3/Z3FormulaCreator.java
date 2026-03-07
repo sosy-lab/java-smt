@@ -31,7 +31,6 @@ import java.math.BigInteger;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.configuration.Configuration;
@@ -633,9 +632,7 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
     return pVisitor.visitQuantifier(
         pFormula,
         q,
-        Longs.asList(freeVars).stream()
-            .map(this::encapsulateWithTypeOf)
-            .collect(Collectors.toList()),
+        Longs.asList(freeVars).stream().map(this::encapsulateWithTypeOf).toList(),
         encapsulateBoolean(substBody));
   }
 

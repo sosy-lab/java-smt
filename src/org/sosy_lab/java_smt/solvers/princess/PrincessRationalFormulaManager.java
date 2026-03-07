@@ -17,7 +17,6 @@ import com.google.common.collect.ImmutableList;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.List;
-import java.util.stream.Collectors;
 import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.api.NumeralFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
@@ -150,7 +149,7 @@ public class PrincessRationalFormulaManager
 
   @Override
   protected IExpression distinctImpl(List<IExpression> operands) {
-    List<IExpression> castedOps = operands.stream().map(this::toType).collect(Collectors.toList());
+    List<IExpression> castedOps = operands.stream().map(op -> (IExpression) toType(op)).toList();
     return super.distinctImpl(castedOps);
   }
 

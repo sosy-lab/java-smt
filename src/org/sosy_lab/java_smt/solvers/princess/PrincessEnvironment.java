@@ -67,7 +67,6 @@ import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
 import java.util.TreeMap;
-import java.util.stream.Collectors;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.Appender;
 import org.sosy_lab.common.Appenders;
@@ -752,8 +751,7 @@ class PrincessEnvironment {
   }
 
   static Seq<ITerm> toITermSeq(List<IExpression> exprs) {
-    return PrincessEnvironment.toSeq(
-        exprs.stream().map(e -> (ITerm) e).collect(Collectors.toList()));
+    return PrincessEnvironment.toSeq(exprs.stream().map(e -> (ITerm) e).toList());
   }
 
   static Seq<ITerm> toITermSeq(IExpression... exprs) {
