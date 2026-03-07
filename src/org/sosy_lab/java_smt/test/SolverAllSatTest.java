@@ -134,7 +134,7 @@ public class SolverAllSatTest extends SolverBasedTest0 {
           @Override
           public void apply(List<BooleanFormula> pModel) {
             assert_()
-                .withMessage("Formula is unsat, but all-sat callback called with model " + pModel)
+                .withMessage("Formula is unsat, but all-sat callback called with model %s", pModel)
                 .fail();
           }
         };

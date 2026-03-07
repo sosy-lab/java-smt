@@ -578,9 +578,8 @@ public class SolverConcurrencyTest {
 
               assertWithMessage(
                       "Test continuousRunningThreadFormulaTransferTranslateTest() "
-                          + "failed isUnsat() in thread with id: "
-                          + id
-                          + ".")
+                          + "failed isUnsat() in thread with id: %s.",
+                      id)
                   .that(stack.isUnsat())
                   .isTrue();
 
@@ -713,11 +712,11 @@ public class SolverConcurrencyTest {
               });
     }
     try {
-      assertWithMessage("Timeout initializing the Threads for " + testName)
+      assertWithMessage("Timeout initializing the Threads for %s", testName)
           .that(allExecutorThreadsReady.await(NUMBER_OF_THREADS * 20, TimeUnit.MILLISECONDS))
           .isTrue();
       afterInitBlocker.countDown();
-      assertWithMessage("Timeout in " + testName)
+      assertWithMessage("Timeout in %s", testName)
           .that(allDone.await(TIMEOUT_SECONDS, TimeUnit.SECONDS))
           .isTrue();
     } catch (Throwable e) {

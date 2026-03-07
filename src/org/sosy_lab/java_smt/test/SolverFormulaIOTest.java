@@ -397,7 +397,7 @@ public class SolverFormulaIOTest extends SolverBasedTest0.ParameterizedSolverBas
     int count = Iterables.size(Splitter.on(">=").split(formDump)) - 1;
     int count2 = Iterables.size(Splitter.on("<=").split(formDump)) - 1;
     // Please avoid exponential overhead when printing a formula.
-    assertWithMessage(formDump + " does not contain <= or >= only once.")
+    assertWithMessage("%s does not contain <= or >= only once.", formDump)
         .that(count == 1 || count2 == 1)
         .isTrue();
   }
@@ -532,8 +532,8 @@ public class SolverFormulaIOTest extends SolverBasedTest0.ParameterizedSolverBas
     TruthJUnit.assume().that(solver).isNotEqualTo(Solvers.BOOLECTOR);
 
     String lastCommand = getLast(Tokenizer.tokenize(dump));
-    assertWithMessage("last line(s) of <\n" + dump + ">").that(lastCommand).startsWith("(assert ");
-    assertWithMessage("last line(s) of <\n" + dump + ">").that(lastCommand).endsWith(")");
+    assertWithMessage("last line(s) of <\n%s>", dump).that(lastCommand).startsWith("(assert ");
+    assertWithMessage("last line(s) of <\n%s>", dump).that(lastCommand).endsWith(")");
   }
 
   @SuppressWarnings("CheckReturnValue")
