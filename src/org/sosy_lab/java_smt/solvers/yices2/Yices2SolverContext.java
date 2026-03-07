@@ -8,12 +8,7 @@
 
 package org.sosy_lab.java_smt.solvers.yices2;
 
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_exit;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_get_major_version;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_get_patch_level;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_get_version;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_init;
-
+import com.sri.yices.Yices;
 import java.util.Set;
 import java.util.function.Consumer;
 import org.sosy_lab.common.ShutdownNotifier;
@@ -51,14 +46,14 @@ public class Yices2SolverContext extends AbstractSolverContext {
       ShutdownNotifier pShutdownManager,
       Consumer<String> pLoader) {
 
-    pLoader.accept("yices2j");
+    pLoader.accept("yices2java");
 
     synchronized (Yices2SolverContext.class) {
       if (numLoadedInstances == 0) {
         // Avoid loading and initializing twice,
         // because this would make all existing terms and types unavailable,
         // which is bad behavior and a potential memory leak.
-        yices_init();
+        Yices.isReady();
       }
       numLoadedInstances++;
     }
@@ -89,8 +84,7 @@ public class Yices2SolverContext extends AbstractSolverContext {
 
   @Override
   public String getVersion() {
-    return String.format(
-        "Yices %d.%d.%d", yices_get_version(), yices_get_major_version(), yices_get_patch_level());
+    return "Yices " + Yices.version();
   }
 
   @Override
@@ -105,7 +99,7 @@ public class Yices2SolverContext extends AbstractSolverContext {
       synchronized (Yices2SolverContext.class) {
         numLoadedInstances--;
         if (numLoadedInstances == 0) {
-          yices_exit();
+          // TODO Garbage collect?
         }
       }
     }

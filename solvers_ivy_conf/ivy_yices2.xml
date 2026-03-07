@@ -22,11 +22,20 @@ SPDX-License-Identifier: Apache-2.0
     </info>
 
     <configurations>
-        <conf name="solver-yices2" />
+        <!-- default config, provides only x64 for backwards-compatibility -->
+        <conf name="solver-yices2" extends="solver-yices2-x64"/>
+
+        <!-- main configurations -->
+        <conf name="solver-yices2-x64" extends="solver-yices2-linux-x64"/>
+
+        <!-- basic configurations -->
+        <conf name="solver-yices2-linux-x64" extends="solver-yices2-common"/>
+        <conf name="solver-yices2-common" visibility="private"/>
     </configurations>
 
     <publications defaultconf="solver-yices2">
-        <artifact name="libyices2j" conf="solver-yices2" type="shared-object" ext="so" />
+        <artifact name="libyices2java" conf="solver-yices2-linux-x64" e:arch="x64" type="shared-object" ext="so"/>
+        <artifact name="yices" conf="solver-yices2-common" ext="jar"/>
     </publications>
 
     <dependencies></dependencies>

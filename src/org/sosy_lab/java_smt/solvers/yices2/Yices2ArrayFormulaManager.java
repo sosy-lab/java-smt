@@ -10,15 +10,10 @@
 
 package org.sosy_lab.java_smt.solvers.yices2;
 
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_application;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_eq;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_function_type;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_lambda;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_new_variable;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_update;
-
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
+import com.sri.yices.Terms;
+import com.sri.yices.Types;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.basicimpl.AbstractArrayFormulaManager;
@@ -41,19 +36,18 @@ public class Yices2ArrayFormulaManager
 
   @Override
   protected Integer select(Integer pArray, Integer pIndex) {
-    return yices_application(pArray, 1, new int[] {pIndex});
+    return Terms.funApplication(pArray, pIndex);
   }
 
   @Override
   protected Integer store(Integer pArray, Integer pIndex, Integer pValue) {
-    return yices_update(pArray, 1, new int[] {pIndex}, pValue);
+    return Terms.functionUpdate1(pArray, pIndex, pValue);
   }
 
   @Override
   protected <TI extends Formula, TE extends Formula> Integer internalMakeArray(
       String pName, FormulaType<TI> pIndexType, FormulaType<TE> pElementType) {
-    var yicesFuncType =
-        yices_function_type(1, new int[] {toSolverType(pIndexType)}, toSolverType(pElementType));
+    var yicesFuncType = Types.functionType(toSolverType(pIndexType), toSolverType(pElementType));
     return ((Yices2FormulaCreator) getFormulaCreator()).createNamedVariable(yicesFuncType, pName);
   }
 
@@ -64,7 +58,7 @@ public class Yices2ArrayFormulaManager
     var constantArray = constCache.get(arraySort, defaultElement);
     if (constantArray == null) {
       constantArray =
-          yices_lambda(1, new int[] {yices_new_variable(toSolverType(pIndexType))}, defaultElement);
+          Terms.lambda(new int[] {Terms.newVariable(toSolverType(pIndexType))}, defaultElement);
       constCache.put(arraySort, defaultElement, constantArray);
     }
     return constantArray;
@@ -72,6 +66,6 @@ public class Yices2ArrayFormulaManager
 
   @Override
   protected Integer equivalence(Integer pArray1, Integer pArray2) {
-    return yices_eq(pArray1, pArray2);
+    return Terms.eq(pArray1, pArray2);
   }
 }

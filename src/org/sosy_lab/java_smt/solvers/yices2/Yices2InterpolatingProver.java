@@ -11,15 +11,14 @@
 package org.sosy_lab.java_smt.solvers.yices2;
 
 import static com.google.common.base.Preconditions.checkArgument;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_assert_formulas;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_free_context;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_interpolate;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_true;
 
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 import com.google.common.primitives.Ints;
+import com.sri.yices.InterpolationContext;
+import com.sri.yices.Status;
+import com.sri.yices.Terms;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -66,17 +65,21 @@ public class Yices2InterpolatingProver extends Yices2AbstractProver<Integer>
   }
 
   private int interpolate(Collection<Integer> setA, Collection<Integer> setB) {
-    var ctxA = newContext(true);
-    var ctxB = newContext(true);
+    try (var ctxA = newContext(true);
+        var ctxB = newContext(true)) {
 
-    yices_assert_formulas(ctxA, setA.size(), Ints.toArray(setA));
-    yices_assert_formulas(ctxB, setB.size(), Ints.toArray(setB));
+      ctxA.assertFormulas(Ints.toArray(setA));
+      ctxB.assertFormulas(Ints.toArray(setB));
+      var context = new InterpolationContext(ctxA, ctxB);
 
-    try {
-      return yices_interpolate(ctxA, ctxB);
-    } finally {
-      yices_free_context(ctxB);
-      yices_free_context(ctxA);
+      // TODO How to abort this?
+      var status = context.check(DEFAULT_PARAMS, false);
+      if (status == Status.UNSAT) {
+        return context.getInterpolant();
+      } else {
+        // TODO
+        throw new IllegalArgumentException();
+      }
     }
   }
 
@@ -92,7 +95,7 @@ public class Yices2InterpolatingProver extends Yices2AbstractProver<Integer>
 
     final int n = partitions.size();
     final List<BooleanFormula> itps = new ArrayList<>();
-    var previousItp = yices_true();
+    var previousItp = Terms.mkTrue();
     for (int i = 1; i < n; i++) {
       Collection<Integer> formulasA =
           FluentIterable.from(partitions.get(i - 1))

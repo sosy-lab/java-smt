@@ -9,26 +9,15 @@
 package org.sosy_lab.java_smt.solvers.yices2;
 
 import static com.google.common.base.CharMatcher.inRange;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_APP_TERM;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bvtype_size;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_distinct;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_eq;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_parse_term;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_term_child;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_term_constructor;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_term_to_string;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_true;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_type_children;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_type_is_bitvector;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_type_num_children;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_type_of_term;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_type_to_string;
 
 import com.google.common.base.CharMatcher;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
 import com.google.common.primitives.Ints;
+import com.sri.yices.Constructor;
+import com.sri.yices.Terms;
+import com.sri.yices.Types;
 import java.io.IOException;
 import java.util.Locale;
 import java.util.Map;
@@ -77,31 +66,31 @@ public class Yices2FormulaManager extends AbstractFormulaManager<Integer, Intege
 
   @Override
   protected Integer equalImpl(Integer pArg1, Integer pArgs) {
-    return yices_eq(pArg1, pArgs);
+    return Terms.eq(pArg1, pArgs);
   }
 
   @Override
   protected Integer distinctImpl(Iterable<Integer> pArgs) {
     int[] array = Ints.toArray(ImmutableList.copyOf(pArgs));
     if (array.length < 2) {
-      return yices_true();
+      return Terms.mkTrue();
     } else {
-      return yices_distinct(array.length, array);
+      return Terms.distinct(array);
     }
   }
 
   @Override
   protected Integer parseImpl(String pSmtScript) throws IllegalArgumentException {
-    // TODO Might expect Yices input language instead of smt-lib2 notation
-    return yices_parse_term(pSmtScript);
+    // Yices uses its own input language and can't parse smt-lib2
+    throw new UnsupportedOperationException();
   }
 
   /** Helper function to (pretty) print yices2 sorts. */
   private String getTypeRepr(int type) {
-    if (yices_type_is_bitvector(type)) {
-      return "(_ BitVec " + yices_bvtype_size(type) + ")";
+    if (Types.isBitvector(type)) {
+      return "(_ BitVec " + Types.bvSize(type) + ")";
     }
-    String typeRepr = yices_type_to_string(type);
+    String typeRepr = Types.toString(type);
     return typeRepr.substring(0, 1).toUpperCase(Locale.getDefault()) + typeRepr.substring(1);
   }
 
@@ -116,17 +105,17 @@ public class Yices2FormulaManager extends AbstractFormulaManager<Integer, Intege
     for (Map.Entry<String, Formula> entry : varsAndUFs.entrySet()) {
       final int term = ((Yices2Formula) entry.getValue()).getTerm();
       final int type;
-      if (yices_term_constructor(term) == YICES_APP_TERM) {
+      if (Terms.constructor(term) == Constructor.APP_TERM) {
         // Is an UF. Correct type is carried by first child.
-        type = yices_type_of_term(yices_term_child(term, 0));
+        type = Terms.typeOf(Terms.child(term, 0));
       } else {
-        type = yices_type_of_term(term);
+        type = Terms.typeOf(term);
       }
       final int[] types;
-      if (yices_type_num_children(type) == 0) {
+      if (Types.numChildren(type) == 0) {
         types = new int[] {type};
       } else {
-        types = yices_type_children(type); // adds children types and then return type
+        types = Types.children(type); // adds children types and then return type
       }
       if (types.length > 0) {
         out.append("(declare-fun ");
@@ -144,7 +133,7 @@ public class Yices2FormulaManager extends AbstractFormulaManager<Integer, Intege
       }
     }
     // TODO fold formula to avoid exp. overhead
-    out.append("(assert ").append(yices_term_to_string(formula)).append(")");
+    out.append("(assert ").append(Terms.toString(formula)).append(")");
 
     return out.toString();
   }

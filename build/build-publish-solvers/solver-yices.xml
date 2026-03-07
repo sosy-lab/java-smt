@@ -12,37 +12,37 @@ SPDX-License-Identifier: Apache-2.0
 
 <!-- vim: set tabstop=8 shiftwidth=4 expandtab sts=4 filetype=ant fdm=marker: -->
 <project name="publish-solvers-yices" basedir="." xmlns:ivy="antlib:org.apache.ivy.ant">
-
     <import file="macros.xml"/>
 
-    <target name="compile-yices2-bindings"
-        description="Compile Yices2 bindings">
-        <sequential>
-            <checkPathOption pathOption="yices2.path" defaultPath="/path/to/yices2" targetName="Yices2 source folder"/>
-            <checkPathOption pathOption="gmp.path" defaultPath="/path/to/gmp" targetName="GMP source folder"/>
-            <checkPathOption pathOption="libpoly.path" defaultPath="/path/to/libpoly" targetName="Libpoly source folder"/>
-            <checkPathOption pathOption="cudd.path" defaultPath="/path/to/cudd" targetName="CUDD source folder"/>
+    <property name="yices2.distDir" value="${ivy.solver.dist.dir}/yices"/>
 
-            <exec executable="lib/native/source/yices2j/compile.sh" failonerror="true">
-                <arg value="${yices2.path}"/>
-                <arg value="${gmp.path}"/>
-                <arg value="${libpoly.path}"/>
-                <arg value="${cudd.path}"/>
-           </exec>
-       </sequential>
-    </target>
-
-    <target name="publish-yices2" depends="compile-yices2-bindings, load-ivy"
+    <target name="publish-yices2" depends="load-ivy"
         description="Publish Yices2 binaries to Ivy repo.">
         <sequential>
+            <checkPathOption pathOption="yices2_java.path" defaultPath="/path/to/yices2_java_bindings" targetName="Yices2 Java bindings source folder"/>
+
             <fail unless="yices2.version">
                 Please specify the Yices2 version with the flag -Dyices2.version=... .
             </fail>
 
-            <copy file="lib/native/source/yices2j/libyices2j.so" tofile="libyices2j-${yices2.version}.so"/>
+            <copy file="${yices2_java.path}/dist/lib/libyices2java.so" tofile="${yices2.distDir}/x64/libyices2java-${yices2.version}.so"/>
+            <copy file="${yices2_java.path}/dist/lib/yices.jar" tofile="${yices2.distDir}/yices-${yices2.version}.jar"/>
 
             <ivy:resolve conf="solver-yices2" file="solvers_ivy_conf/ivy_yices2.xml" />
-            <publishToRepository solverName="Yices" solverVersion="${yices2.version}"/>
+
+            <publishToRepository solverName="Yices" solverVersion="${yices2.version}" distDir="${yices2.distDir}"/>
+
+            <!--
+              We additionally provide x64-files without arch-attribute for backwards compatibility,
+              such that applications can load dependencies without changing their Ivy configuration.
+              Those files are not part of any direct configuration, but will be resolved if the
+              arch-attribute is not used.
+            -->
+            <copy todir="repository/${ivy.organisation}/${ivy.module}/">
+                <fileset dir="repository/${ivy.organisation}/${ivy.module}/x64/">
+                    <include name="*-${yices2.version}.*"/>
+                </fileset>
+            </copy>
         </sequential>
     </target>
 
@@ -52,8 +52,6 @@ SPDX-License-Identifier: Apache-2.0
     <target name="publish-artifacts-yices2" depends="load-ivy, determine-version, dist-yices2"
          description="Publish Java bindings for Yices2 to Ivy repo.">
         <sequential>
-            <fail unless="version.publishable"
-                  message="Cannot publish version ${version}, only unmodified working copies may be published." />
             <ivy:resolve conf="runtime" file="solvers_ivy_conf/ivy_javasmt_yices2.xml" />
             <publishToRepository solverName="Yices" solverVersion="${version}"/>
         </sequential>
