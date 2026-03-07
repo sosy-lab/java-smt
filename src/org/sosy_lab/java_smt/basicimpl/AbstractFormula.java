@@ -67,6 +67,7 @@ abstract class AbstractFormula<TFormulaInfo> implements Formula {
   }
 
   /** Simple ArrayFormula implementation. */
+  @Immutable(containerOf = {"TI", "TE", "TFormulaInfo"})
   static final class ArrayFormulaImpl<TI extends Formula, TE extends Formula, TFormulaInfo>
       extends AbstractFormula<TFormulaInfo> implements ArrayFormula<TI, TE> {
 
@@ -89,6 +90,7 @@ abstract class AbstractFormula<TFormulaInfo> implements Formula {
   }
 
   /** Simple BooleanFormula implementation. Just tracing the size and the sign-treatment */
+  @Immutable(containerOf = "TFormulaInfo")
   static final class BitvectorFormulaImpl<TFormulaInfo> extends AbstractFormula<TFormulaInfo>
       implements BitvectorFormula {
     BitvectorFormulaImpl(TFormulaInfo info) {
@@ -97,6 +99,7 @@ abstract class AbstractFormula<TFormulaInfo> implements Formula {
   }
 
   /** Simple FloatingPointFormula implementation. */
+  @Immutable(containerOf = "TFormulaInfo")
   static final class FloatingPointFormulaImpl<TFormulaInfo> extends AbstractFormula<TFormulaInfo>
       implements FloatingPointFormula {
     FloatingPointFormulaImpl(TFormulaInfo info) {
@@ -105,6 +108,7 @@ abstract class AbstractFormula<TFormulaInfo> implements Formula {
   }
 
   /** Simple FloatingPointRoundingModeFormula implementation. */
+  @Immutable(containerOf = "TFormulaInfo")
   static final class FloatingPointRoundingModeFormulaImpl<TFormulaInfo>
       extends AbstractFormula<TFormulaInfo> implements FloatingPointRoundingModeFormula {
     FloatingPointRoundingModeFormulaImpl(TFormulaInfo info) {
@@ -113,6 +117,7 @@ abstract class AbstractFormula<TFormulaInfo> implements Formula {
   }
 
   /** Simple BooleanFormula implementation. */
+  @Immutable(containerOf = "TFormulaInfo")
   static final class BooleanFormulaImpl<TFormulaInfo> extends AbstractFormula<TFormulaInfo>
       implements BooleanFormula {
     BooleanFormulaImpl(TFormulaInfo pT) {
@@ -121,6 +126,7 @@ abstract class AbstractFormula<TFormulaInfo> implements Formula {
   }
 
   /** Simple IntegerFormula implementation. */
+  @Immutable(containerOf = "TFormulaInfo")
   static final class IntegerFormulaImpl<TFormulaInfo> extends AbstractFormula<TFormulaInfo>
       implements IntegerFormula {
     IntegerFormulaImpl(TFormulaInfo pTerm) {
@@ -129,6 +135,7 @@ abstract class AbstractFormula<TFormulaInfo> implements Formula {
   }
 
   /** Simple RationalFormula implementation. */
+  @Immutable(containerOf = "TFormulaInfo")
   static final class RationalFormulaImpl<TFormulaInfo> extends AbstractFormula<TFormulaInfo>
       implements RationalFormula {
     RationalFormulaImpl(TFormulaInfo pTerm) {
@@ -137,6 +144,7 @@ abstract class AbstractFormula<TFormulaInfo> implements Formula {
   }
 
   /** Simple StringFormula implementation. */
+  @Immutable(containerOf = "TFormulaInfo")
   static final class StringFormulaImpl<TFormulaInfo> extends AbstractFormula<TFormulaInfo>
       implements StringFormula {
     StringFormulaImpl(TFormulaInfo pT) {
@@ -145,6 +153,7 @@ abstract class AbstractFormula<TFormulaInfo> implements Formula {
   }
 
   /** Simple RegexFormula implementation. */
+  @Immutable(containerOf = "TFormulaInfo")
   static final class RegexFormulaImpl<TFormulaInfo> extends AbstractFormula<TFormulaInfo>
       implements RegexFormula {
     RegexFormulaImpl(TFormulaInfo pT) {
@@ -153,6 +162,7 @@ abstract class AbstractFormula<TFormulaInfo> implements Formula {
   }
 
   /** Simple EnumerationFormula implementation. */
+  @Immutable(containerOf = "TFormulaInfo")
   static final class EnumerationFormulaImpl<TFormulaInfo> extends AbstractFormula<TFormulaInfo>
       implements EnumerationFormula {
     EnumerationFormulaImpl(TFormulaInfo pT) {
