@@ -257,6 +257,7 @@ public class FormulaClassifier {
       return 0;
     }
 
+    @SuppressWarnings("fallthrough")
     @Override
     public Integer visitFunction(
         Formula pF, List<Formula> args, FunctionDeclaration<?> pFunctionDeclaration) {

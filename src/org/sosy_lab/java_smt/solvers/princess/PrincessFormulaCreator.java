@@ -244,7 +244,6 @@ class PrincessFormulaCreator
         case "str_empty", "str_cons" -> {
           return strToString(app);
         }
-        default -> {}
       }
     }
 

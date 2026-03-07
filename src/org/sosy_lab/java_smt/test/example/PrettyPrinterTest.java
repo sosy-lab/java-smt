@@ -192,6 +192,7 @@ public class PrettyPrinterTest extends ParameterizedSolverBasedTest0 {
     assertThat(pp.formulaToString(mgr.parse(VARS + QUERY_1))).isEqualTo(expected);
   }
 
+  @SuppressWarnings("checkstyle:LineLength")
   @Test
   public void testDotOnlyBoolean() {
     requireParser();
