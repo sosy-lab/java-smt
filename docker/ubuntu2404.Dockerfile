@@ -21,7 +21,7 @@ ENV LANGUAGE=en_US.UTF-8
 RUN apt-get update \
  && apt-get install -y \
         wget curl git build-essential cmake pkg-config patchelf unzip \
-        openjdk-11-jdk ant maven \
+        openjdk-17-jdk ant maven \
         gcc-mingw-w64-x86-64-posix g++-mingw-w64-x86-64-posix mingw-w64-tools \
         gcc-aarch64-linux-gnu g++-aarch64-linux-gnu \
         binutils-aarch64-linux-gnu libc6-dev-arm64-cross \

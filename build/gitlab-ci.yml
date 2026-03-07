@@ -18,7 +18,7 @@ stages:
   - deploy
 
 # Default image for non-JDK-specific jobs
-image: ${CI_REGISTRY_IMAGE}/test:jdk-11
+image: ${CI_REGISTRY_IMAGE}/test:jdk-17
 
 variables:
   IVY_CACHE_DIR: "${CI_PROJECT_DIR}/.ivy2"
@@ -54,7 +54,6 @@ build-dependencies:
       - "hs_err_pid*.log"
       - "core.*"
 
-build:jdk-11: { extends: .build, image: "${CI_REGISTRY_IMAGE}/test:jdk-11" }
 build:jdk-17: { extends: .build, image: "${CI_REGISTRY_IMAGE}/test:jdk-17" }
 build:jdk-21: { extends: .build, image: "${CI_REGISTRY_IMAGE}/test:jdk-21" }
 build:jdk-24: { extends: .build, image: "${CI_REGISTRY_IMAGE}/test:jdk-24" }
@@ -101,7 +100,7 @@ javadoc:
   script: "ant $ANT_PROPS_CHECKS javadoc"
   needs:
     - build-dependencies
-    - build:jdk-11
+    - build:jdk-17
   artifacts:
     paths:
       - "Javadoc/"
@@ -113,7 +112,7 @@ spotbugs:
     - 'test \! -f SpotBugs.html'
   needs:
     - build-dependencies
-    - build:jdk-11
+    - build:jdk-17
   artifacts:
     paths:
       - "SpotBugs.html"
@@ -144,10 +143,6 @@ spotbugs:
     paths:
       - "JUnit.html" # no coverage files available
 
-unit-tests:x86_64:jdk-11:
-  extends: .unit-tests
-  needs: [ build-dependencies, build:jdk-11 ]
-  image: "${CI_REGISTRY_IMAGE}/test:jdk-11"
 unit-tests:x86_64:jdk-17:
   extends: .unit-tests
   needs: [ build-dependencies, build:jdk-17 ]
@@ -161,10 +156,6 @@ unit-tests:x86_64:jdk-24:
   needs: [ build-dependencies, build:jdk-24 ]
   image: "${CI_REGISTRY_IMAGE}/test:jdk-24"
 
-unit-tests:arm64:jdk-11:
-  extends: .unit-tests-quick
-  needs: [ build-dependencies, build:jdk-11 ]
-  image: { name: "${CI_REGISTRY_IMAGE}/test:jdk-11-arm64", docker: { platform: linux/arm64 } }
 unit-tests:arm64:jdk-17:
   extends: .unit-tests-quick
   needs: [ build-dependencies, build:jdk-17 ]
@@ -220,7 +211,7 @@ deploy-gh-pages:
   stage: deploy
   script: "build/deploy-gh-pages.sh"
   needs:
-    - build:jdk-11
+    - build:jdk-17
     - javadoc
   environment: deploy/gh-pages
   rules:
@@ -261,12 +252,10 @@ deploy-gh-pages:
   variables:
     IMAGE: "test:$JDK_VERSION-arm64" # override image name for arm64
 
-build-docker:x86_64:jdk-11: { extends: .build-docker, variables: { JDK_VERSION: jdk-11 } }
 build-docker:x86_64:jdk-17: { extends: .build-docker, variables: { JDK_VERSION: jdk-17 } }
 build-docker:x86_64:jdk-21: { extends: .build-docker, variables: { JDK_VERSION: jdk-21 } }
 build-docker:x86_64:jdk-24: { extends: .build-docker, variables: { JDK_VERSION: jdk-24 } }
 
-build-docker:arm64:jdk-11: { extends: .build-docker:arm64, variables: { JDK_VERSION: jdk-11 } }
 build-docker:arm64:jdk-17: { extends: .build-docker:arm64, variables: { JDK_VERSION: jdk-17 } }
 build-docker:arm64:jdk-21: { extends: .build-docker:arm64, variables: { JDK_VERSION: jdk-21 } }
 build-docker:arm64:jdk-24: { extends: .build-docker:arm64, variables: { JDK_VERSION: jdk-24 } }
