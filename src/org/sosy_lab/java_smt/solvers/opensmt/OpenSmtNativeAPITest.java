@@ -472,10 +472,10 @@ public class OpenSmtNativeAPITest {
 
     String expected =
         """
-        (proof
+        (proof\s
         (let (cls_13 q1 )
         (let (cls_9 (or q2 (not q1) ))
-        ; q2
+        ; q2\s
         (let (cls_16 (res cls_9 cls_13 q1))
         (let (cls_19 (not q2) )
         ; -
