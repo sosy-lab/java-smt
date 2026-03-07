@@ -449,6 +449,7 @@ public class OpenSmtNativeAPITest {
     assertThat(core).containsExactly(b1, nb1);
   }
 
+  @SuppressWarnings("MisleadingEscapedSpace")
   @Test
   public void proofTest() {
     Logic logic = LogicFactory.getInstance(Logic_t.QF_UF);
