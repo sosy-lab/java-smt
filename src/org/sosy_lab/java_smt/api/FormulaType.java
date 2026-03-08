@@ -513,7 +513,7 @@ public abstract class FormulaType<T extends Formula> {
 
     @Override
     public String toString() {
-      return "%s (%s)".formatted(name, Joiner.on(".formatted(").join(elements));
+      return "%s (%s)".formatted(name, Joiner.on(", ").join(elements));
     }
 
     @Override
