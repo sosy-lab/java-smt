@@ -834,7 +834,10 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
         builder.add(bit ? 1 : 0);
       }
       var factor = Terms.bvConst(builder.build());
-      var term = component.getTerm() == Terms.NULL_TERM ? Terms.one() : component.getTerm();
+      var term =
+          component.getTerm() == Terms.NULL_TERM
+              ? Terms.bvOne(Terms.bitSize(parent))
+              : component.getTerm();
 
       terms.add(Terms.bvMul(factor, term));
     }
