@@ -18,7 +18,10 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Table;
 import com.google.common.primitives.Ints;
+import com.sri.yices.BigRational;
 import com.sri.yices.Constructor;
+import com.sri.yices.ProductComponent;
+import com.sri.yices.SumComponent;
 import com.sri.yices.Terms;
 import com.sri.yices.Types;
 import java.math.BigInteger;
@@ -790,87 +793,82 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
   }
 
   private static List<Integer> getSumArgs(int parent) {
-    /*
-    List<Integer> children = new ArrayList<>();
+    // TODO Refactor me
+    ImmutableList.Builder<Integer> terms = ImmutableList.builder();
     for (int i = 0; i < Terms.numChildren(parent); i++) {
-      String[] child = yices_sum_component(parent, i);
-      String coeff = child[0];
-      int term = Integer.parseInt(child[1]);
-      if (term == -1) { // No term just a number
-        children.add(yices_parse_rational(coeff));
-      } else {
-        int coeffTerm = yices_parse_rational(coeff);
-        children.add(yices_mul(coeffTerm, term));
-      }
+      SumComponent<BigRational> component = (SumComponent<BigRational>) Terms.projSum(parent, i);
+
+      var factor =
+          Terms.rationalConst(
+              component.getFactor().getNumerator(), component.getFactor().getDenominator());
+      var term = component.getTerm() == Terms.NULL_TERM ? Terms.one() : component.getTerm();
+
+      terms.add(Terms.mul(factor, term));
     }
-    return children;
-    */
-    throw new UnsupportedOperationException("arith sum not supported");
+    return terms.build();
   }
 
   /** extract -1 and X from the sum of one element [-1*x]. */
   private static List<Integer> getMultiplySumArgsFromSum(int parent) {
-    /*
+    // TODO Refactor me
     checkArgument(Terms.numChildren(parent) == 1);
-    String[] child = yices_sum_component(parent, 0);
-    int term = Integer.parseInt(child[1]);
-    checkArgument(term != -1, "unexpected constant coeff without variable");
-    int coeffTerm = yices_parse_rational(child[0]);
-    return ImmutableList.of(coeffTerm, term);
-     */
-    throw new UnsupportedOperationException("arith sum not supported");
+
+    SumComponent<BigRational> component = (SumComponent<BigRational>) Terms.projSum(parent, 0);
+    var factor =
+        Terms.rationalConst(
+            component.getFactor().getNumerator(), component.getFactor().getDenominator());
+    checkArgument(component.getTerm() != Terms.NULL_TERM);
+
+    return ImmutableList.of(factor, component.getTerm());
   }
 
   /** extract all entries of a BV sum like "3*x + 2*y + 1". */
   private static List<Integer> getBvSumArgs(int parent) {
-    /*List<Integer> children = new ArrayList<>();
-    int bitsize = Terms.bitSize(parent);
+    // TODO Refactor me
+    ImmutableList.Builder<Integer> terms = ImmutableList.builder();
     for (int i = 0; i < Terms.numChildren(parent); i++) {
-      int[] component = yices_bvsum_component(parent, i, bitsize);
-      assert component.length == bitsize + 1;
-      // the components consist of coefficient (as bits) and variable (if missing: -1)
-      int coeff = yices_bvconst_from_array(bitsize, Arrays.copyOfRange(component, 0, bitsize));
-      int term = component[component.length - 1];
-      if (term == -1) { // No term
-        children.add(coeff);
-      } else {
-        children.add(yices_bvmul(coeff, term));
+      SumComponent<boolean[]> component = (SumComponent<boolean[]>) Terms.projSum(parent, i);
+
+      ImmutableList.Builder<Integer> builder = ImmutableList.builder();
+      for (var bit : component.getFactor()) {
+        builder.add(bit ? 1 : 0);
       }
+      var factor = Terms.bvConst(builder.build());
+      var term = component.getTerm() == Terms.NULL_TERM ? Terms.one() : component.getTerm();
+
+      terms.add(Terms.bvMul(factor, term));
     }
-    return children;
-    */
-    throw new UnsupportedOperationException("bvsum not supported");
+    return terms.build();
   }
 
   /** extract -1 and X from the sum of one element [-1*x]. */
   private static List<Integer> getMultiplyBvSumArgsFromSum(int parent) {
-    /*
+    // TODO Refactor me
     checkArgument(Terms.numChildren(parent) == 1);
-    int bitsize = Terms.bitSize(parent);
-    int[] component = yices_bvsum_component(parent, 0, bitsize);
-    int coeff = yices_bvconst_from_array(bitsize, Arrays.copyOfRange(component, 0, bitsize));
-    int term = component[component.length - 1];
-    checkArgument(term != -1, "unexpected constant coeff without variable");
-    return ImmutableList.of(coeff, term);
-     */
-    throw new UnsupportedOperationException("bvsum not supported");
+    SumComponent<boolean[]> component = (SumComponent<boolean[]>) Terms.projSum(parent, 0);
+
+    ImmutableList.Builder<Integer> builder = ImmutableList.builder();
+    for (var bit : component.getFactor()) {
+      builder.add(bit ? 1 : 0);
+    }
+    var factor = Terms.bvConst(builder.build());
+    checkArgument(component.getTerm() != Terms.NULL_TERM);
+
+    return ImmutableList.of(factor, component.getTerm());
   }
 
   private static List<Integer> getMultiplyArgs(int parent, boolean isBV) {
-    /*
-    // TODO Add exponent?
-    List<Integer> result = new ArrayList<>();
+    // TODO Refactor me
+    ImmutableList.Builder<Integer> builder = ImmutableList.builder();
     for (int i = 0; i < Terms.numChildren(parent); i++) {
-      int[] component = yices_product_component(parent, i);
+      ProductComponent component = Terms.projProduct(parent, i);
       if (isBV) {
-        result.add(yices_bvpower(component[0], component[1]));
+        builder.add(Terms.bvPower(component.getTerm(), component.getPower()));
       } else {
-        result.add(yices_power(component[0], component[1])); // add term, ignore exponent
+        builder.add(Terms.power(component.getTerm(), component.getPower()));
       }
     }
-    return result;
-    */
-    throw new UnsupportedOperationException("product not supported");
+    return builder.build();
   }
 
   /** get "index" and "b" from "(bit index b)". */
