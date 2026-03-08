@@ -313,8 +313,7 @@ class Z3LegacyFormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
     assert pType.equals(getFormulaType(pTerm))
             || (pType.equals(FormulaType.RationalType)
                 && getFormulaType(pTerm).equals(FormulaType.IntegerType))
-        : String.format(
-            "Trying to encapsulate formula of type %s as %s", getFormulaType(pTerm), pType);
+        : "Trying to encapsulate formula of type %s as %s".formatted(getFormulaType(pTerm), pType);
     cleanupReferences();
     if (pType.isBooleanType()) {
       return (T) storePhantomReference(new Z3BooleanLegacyFormula(getEnv(), pTerm), pTerm);
@@ -380,10 +379,10 @@ class Z3LegacyFormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
   @Override
   protected StringFormula encapsulateString(Long pTerm) {
     assert getFormulaType(pTerm).isStringType()
-        : String.format(
-            "Term %s has unexpected type %s.",
-            Native.astToString(getEnv(), pTerm),
-            Native.sortToString(getEnv(), Native.getSort(getEnv(), pTerm)));
+        : "Term %s has unexpected type %s."
+            .formatted(
+                Native.astToString(getEnv(), pTerm),
+                Native.sortToString(getEnv(), Native.getSort(getEnv(), pTerm)));
     cleanupReferences();
     return storePhantomReference(new Z3StringLegacyFormula(getEnv(), pTerm), pTerm);
   }
@@ -391,10 +390,10 @@ class Z3LegacyFormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
   @Override
   protected RegexFormula encapsulateRegex(Long pTerm) {
     assert getFormulaType(pTerm).isRegexType()
-        : String.format(
-            "Term %s has unexpected type %s.",
-            Native.astToString(getEnv(), pTerm),
-            Native.sortToString(getEnv(), Native.getSort(getEnv(), pTerm)));
+        : "Term %s has unexpected type %s."
+            .formatted(
+                Native.astToString(getEnv(), pTerm),
+                Native.sortToString(getEnv(), Native.getSort(getEnv(), pTerm)));
     cleanupReferences();
     return storePhantomReference(new Z3RegexLegacyFormula(getEnv(), pTerm), pTerm);
   }
@@ -402,10 +401,10 @@ class Z3LegacyFormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
   @Override
   protected EnumerationFormula encapsulateEnumeration(Long pTerm) {
     assert getFormulaType(pTerm).isEnumerationType()
-        : String.format(
-            "Term %s has unexpected type %s.",
-            Native.astToString(getEnv(), pTerm),
-            Native.sortToString(getEnv(), Native.getSort(getEnv(), pTerm)));
+        : "Term %s has unexpected type %s."
+            .formatted(
+                Native.astToString(getEnv(), pTerm),
+                Native.sortToString(getEnv(), Native.getSort(getEnv(), pTerm)));
     cleanupReferences();
     return storePhantomReference(new Z3EnumerationLegacyFormula(getEnv(), pTerm), pTerm);
   }
@@ -653,9 +652,8 @@ class Z3LegacyFormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
         Z3_decl_kind.fromInt(Native.getDeclKind(environment, Native.getAppDecl(environment, f)));
 
     assert (arity > 0) || (arity == 0 && decl == Z3_OP_DISTINCT)
-        : String.format(
-            "Unexpected arity '%s' for formula '%s' for handling a function application.",
-            arity, Native.astToString(environment, f));
+        : "Unexpected arity '%s' for formula '%s' for handling a function application."
+            .formatted(arity, Native.astToString(environment, f));
 
     return switch (decl) {
       case Z3_OP_AND -> FunctionDeclarationKind.AND;

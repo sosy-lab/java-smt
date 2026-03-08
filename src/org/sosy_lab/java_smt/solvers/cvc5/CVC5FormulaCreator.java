@@ -261,7 +261,7 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, TermManager, 
     } else {
       try {
         throw new AssertionError(
-            String.format("Encountered unhandled Type '%s' %s.", sort, sort.getKind()));
+            "Encountered unhandled Type '%s' %s.".formatted(sort, sort.getKind()));
       } catch (CVC5ApiException exception) {
         throw new AssertionError("Unexpected error when accessing sort.", exception);
       }
@@ -274,8 +274,8 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, TermManager, 
     assert pType.equals(getFormulaType(pTerm))
             || (pType.equals(FormulaType.RationalType)
                 && getFormulaType(pTerm).equals(FormulaType.IntegerType))
-        : String.format(
-            "Cannot encapsulate formula %s of Type %s as %s", pTerm, getFormulaType(pTerm), pType);
+        : "Cannot encapsulate formula %s of Type %s as %s"
+            .formatted(pTerm, getFormulaType(pTerm), pType);
     if (pType.isBooleanType()) {
       return (T) new CVC5BooleanFormula(pTerm);
     } else if (pType.isIntegerType()) {
@@ -308,31 +308,29 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, TermManager, 
   @Override
   public BooleanFormula encapsulateBoolean(Term pTerm) {
     assert getFormulaType(pTerm).isBooleanType()
-        : String.format(
-            "%s is not boolean, but %s (%s)", pTerm, pTerm.getSort(), getFormulaType(pTerm));
+        : "%s is not boolean, but %s (%s)".formatted(pTerm, pTerm.getSort(), getFormulaType(pTerm));
     return new CVC5BooleanFormula(pTerm);
   }
 
   @Override
   public BitvectorFormula encapsulateBitvector(Term pTerm) {
     assert getFormulaType(pTerm).isBitvectorType()
-        : String.format("%s is no BV, but %s (%s)", pTerm, pTerm.getSort(), getFormulaType(pTerm));
+        : "%s is no BV, but %s (%s)".formatted(pTerm, pTerm.getSort(), getFormulaType(pTerm));
     return new CVC5BitvectorFormula(pTerm);
   }
 
   @Override
   protected FloatingPointFormula encapsulateFloatingPoint(Term pTerm) {
     assert getFormulaType(pTerm).isFloatingPointType()
-        : String.format("%s is no FP, but %s (%s)", pTerm, pTerm.getSort(), getFormulaType(pTerm));
+        : "%s is no FP, but %s (%s)".formatted(pTerm, pTerm.getSort(), getFormulaType(pTerm));
     return new CVC5FloatingPointFormula(pTerm);
   }
 
   @Override
   protected FloatingPointRoundingModeFormula encapsulateRoundingMode(Term pTerm) {
     assert getFormulaType(pTerm).isFloatingPointRoundingModeType()
-        : String.format(
-            "%s is no FP rounding mode, but %s (%s)",
-            pTerm, pTerm.getSort(), getFormulaType(pTerm));
+        : "%s is no FP rounding mode, but %s (%s)"
+            .formatted(pTerm, pTerm.getSort(), getFormulaType(pTerm));
     return new CVC5FloatingPointRoundingModeFormula(pTerm);
   }
 
@@ -341,16 +339,14 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, TermManager, 
   protected <TI extends Formula, TE extends Formula> ArrayFormula<TI, TE> encapsulateArray(
       Term pTerm, FormulaType<TI> pIndexType, FormulaType<TE> pElementType) {
     assert getFormulaType(pTerm).equals(FormulaType.getArrayType(pIndexType, pElementType))
-        : String.format(
-            "%s is no array, but %s (%s)", pTerm, pTerm.getSort(), getFormulaType(pTerm));
+        : "%s is no array, but %s (%s)".formatted(pTerm, pTerm.getSort(), getFormulaType(pTerm));
     return new CVC5ArrayFormula<>(pTerm, pIndexType, pElementType);
   }
 
   @Override
   protected StringFormula encapsulateString(Term pTerm) {
     assert getFormulaType(pTerm).isStringType()
-        : String.format(
-            "%s is no String, but %s (%s)", pTerm, pTerm.getSort(), getFormulaType(pTerm));
+        : "%s is no String, but %s (%s)".formatted(pTerm, pTerm.getSort(), getFormulaType(pTerm));
     return new CVC5StringFormula(pTerm);
   }
 
@@ -852,9 +848,8 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, TermManager, 
       }
     } catch (CVC5ApiException e) {
       throw new IllegalArgumentException(
-          String.format(
-              "Failure trying to convert constant %s with type %s to type %s.",
-              value, valueType, type),
+          "Failure trying to convert constant %s with type %s to type %s."
+              .formatted(value, valueType, type),
           e);
     }
   }
@@ -883,7 +878,7 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, TermManager, 
       };
     } catch (CVC5ApiException e) {
       throw new IllegalArgumentException(
-          String.format("Failure trying to get the rounding mode of Term '%s'.", pTerm), e);
+          "Failure trying to get the rounding mode of Term '%s'.".formatted(pTerm), e);
     }
   }
 

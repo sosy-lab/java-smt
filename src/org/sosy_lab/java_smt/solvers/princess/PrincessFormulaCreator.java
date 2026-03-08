@@ -482,7 +482,7 @@ class PrincessFormulaCreator
         solverDeclaration = new PrincessBitvectorToBitvectorDeclaration(iFunApp.fun());
       } else {
         throw new AssertionError(
-            String.format("unexpected bitvector operation '%s' for formula '%s'", kind, input));
+            "unexpected bitvector operation '%s' for formula '%s'".formatted(kind, input));
       }
     } else if (input instanceof IFunApp iFunApp) {
       if (kind == FunctionDeclarationKind.UF) {

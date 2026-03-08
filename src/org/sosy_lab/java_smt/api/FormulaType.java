@@ -456,7 +456,7 @@ public abstract class FormulaType<T extends Formula> {
 
     @Override
     public String toString() {
-      return String.format("Array<%s,%s>", indexType, elementType);
+      return "Array<%s,%s>".formatted(indexType, elementType);
     }
 
     @Override
@@ -513,7 +513,7 @@ public abstract class FormulaType<T extends Formula> {
 
     @Override
     public String toString() {
-      return String.format("%s (%s)", name, Joiner.on(", ").join(elements));
+      return "%s (%s)".formatted(name, Joiner.on(".formatted(").join(elements));
     }
 
     @Override

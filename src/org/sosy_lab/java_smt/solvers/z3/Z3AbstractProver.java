@@ -82,9 +82,8 @@ abstract class Z3AbstractProver extends AbstractProverWithAllSat<Void> {
       Native.paramsSetSymbol(z3context, z3params, keySymbol, valueSymbol);
     } else {
       throw new IllegalArgumentException(
-          String.format(
-              "unexpected type '%s' with value '%s' for parameter '%s'",
-              value.getClass(), value, key));
+          "unexpected type '%s' with value '%s' for parameter '%s'"
+              .formatted(value.getClass(), value, key));
     }
   }
 
@@ -131,7 +130,7 @@ abstract class Z3AbstractProver extends AbstractProverWithAllSat<Void> {
     long e = creator.extractInfo(f);
     try {
       if (storedConstraints != null) { // Unsat core generation is on.
-        String varName = String.format("Z3_UNSAT_CORE_%d", trackId.getFreshId());
+        String varName = "Z3_UNSAT_CORE_%d".formatted(trackId.getFreshId());
         BooleanFormula t = mgr.getBooleanFormulaManager().makeVariable(varName);
         assertContraintAndTrack(e, creator.extractInfo(t));
         storedConstraints.push(storedConstraints.pop().putAndCopy(varName, f));
@@ -219,9 +218,8 @@ abstract class Z3AbstractProver extends AbstractProverWithAllSat<Void> {
         builder.put(key, Double.toString(Native.statsGetDoubleValue(z3context, stats, i)));
       } else {
         throw new IllegalStateException(
-            String.format(
-                "Unknown data entry value for key %s at position %d in statistics '%s'",
-                key, i, Native.statsToString(z3context, stats)));
+            "Unknown data entry value for key %s at position %d in statistics '%s'"
+                .formatted(key, i, Native.statsToString(z3context, stats)));
       }
     }
 

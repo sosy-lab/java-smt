@@ -216,10 +216,8 @@ public class SolverContextFactory {
       context = generateContext0(solverToCreate);
     } catch (UnsatisfiedLinkError | NoClassDefFoundError e) {
       throw new InvalidConfigurationException(
-          String.format(
-              "The SMT solver %s is not available on this machine because of missing libraries"
-                  + " (%s).",
-              solverToCreate, e.getMessage()),
+          "The SMT solver %s is not available on this machine because of missing libraries (%s)."
+              .formatted(solverToCreate, e.getMessage()),
           e);
     }
 

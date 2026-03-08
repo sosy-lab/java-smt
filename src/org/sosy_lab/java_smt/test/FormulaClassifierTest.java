@@ -24,21 +24,25 @@ public class FormulaClassifierTest extends SolverBasedTest0.ParameterizedSolverB
       "(declare-fun x () Bool)" + "(declare-fun foo (Bool) Bool)";
 
   private static final String NUMERAL_VARS =
-      "(declare-fun x () Int)"
-          + "(declare-fun xx () Int)"
-          + "(declare-fun y () Real)"
-          + "(declare-fun yy () Real)"
-          + "(declare-fun arr () (Array Int Int))"
-          + "(declare-fun arr2 () (Array Int Int))"
-          + "(declare-fun foo (Int) Int)"
-          + "(declare-fun bar (Real) Real)";
+      """
+      (declare-fun x () Int)\
+      (declare-fun xx () Int)\
+      (declare-fun y () Real)\
+      (declare-fun yy () Real)\
+      (declare-fun arr () (Array Int Int))\
+      (declare-fun arr2 () (Array Int Int))\
+      (declare-fun foo (Int) Int)\
+      (declare-fun bar (Real) Real)\
+      """;
 
   private static final String BV_VARS =
-      "(declare-fun bv () (_ BitVec 4))"
-          + "(declare-fun bv2 () (_ BitVec 4))"
-          + "(declare-fun bvarr () (Array (_ BitVec 4) (_ BitVec 4)))"
-          + "(declare-fun bvarr2 () (Array (_ BitVec 4) (_ BitVec 4)))"
-          + "(declare-fun bvfoo ((_ BitVec 4)) (_ BitVec 4))";
+      """
+      (declare-fun bv () (_ BitVec 4))\
+      (declare-fun bv2 () (_ BitVec 4))\
+      (declare-fun bvarr () (Array (_ BitVec 4) (_ BitVec 4)))\
+      (declare-fun bvarr2 () (Array (_ BitVec 4) (_ BitVec 4)))\
+      (declare-fun bvfoo ((_ BitVec 4)) (_ BitVec 4))\
+      """;
 
   @Before
   public void init() {

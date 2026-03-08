@@ -153,7 +153,7 @@ class CVC5FormulaManager extends AbstractFormulaManager<Term, Sort, TermManager,
       // escaping is stolen from SMTInterpol, lets hope this remains consistent
       String qName = PrintTerm.quoteIdentifier(name);
       String args = Joiner.on(" ").join(childrenTypes);
-      declarations.append(String.format("(declare-fun %s (%s) %s)%n", qName, args, returnType));
+      declarations.append("(declare-fun %s (%s) %s)%n".formatted(qName, args, returnType));
     }
     return declarations;
   }

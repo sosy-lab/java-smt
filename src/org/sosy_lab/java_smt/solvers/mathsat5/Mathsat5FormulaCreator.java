@@ -265,8 +265,7 @@ class Mathsat5FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
     assert pType.equals(getFormulaType(pTerm))
             || (pType.equals(FormulaType.RationalType)
                 && getFormulaType(pTerm).equals(FormulaType.IntegerType))
-        : String.format(
-            "Trying to encapsulate formula of type %s as %s", getFormulaType(pTerm), pType);
+        : "Trying to encapsulate formula of type %s as %s".formatted(getFormulaType(pTerm), pType);
     if (pType.isBooleanType()) {
       return (T) new Mathsat5BooleanFormula(pTerm);
     } else if (pType.isIntegerType()) {
@@ -408,7 +407,7 @@ class Mathsat5FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
       return FloatingPointRoundingMode.TOWARD_ZERO;
     } else {
       throw new IllegalArgumentException(
-          String.format("Unknown rounding mode in Term '%s'.", msat_term_repr(f)));
+          "Unknown rounding mode in Term '%s'.".formatted(msat_term_repr(f)));
     }
   }
 

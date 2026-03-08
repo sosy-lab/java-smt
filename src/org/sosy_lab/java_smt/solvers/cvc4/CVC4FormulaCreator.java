@@ -204,7 +204,7 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
       return FormulaType.RegexType;
     } else {
       throw new AssertionError(
-          String.format("Unhandled type '%s' with base type '%s'.", t, t.getBaseType()));
+          "Unhandled type '%s' with base type '%s'.".formatted(t, t.getBaseType()));
     }
   }
 
@@ -214,9 +214,8 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
     assert pType.equals(getFormulaType(pTerm))
             || (pType.equals(FormulaType.RationalType)
                 && getFormulaType(pTerm).equals(FormulaType.IntegerType))
-        : String.format(
-            "Trying to encapsulate formula %s of type %s as %s",
-            pTerm, getFormulaType(pTerm), pType);
+        : "Trying to encapsulate formula %s of type %s as %s"
+            .formatted(pTerm, getFormulaType(pTerm), pType);
     if (pType.isBooleanType()) {
       return (T) new CVC4BooleanFormula(pTerm);
     } else if (pType.isIntegerType()) {
@@ -247,31 +246,29 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
   @Override
   public BooleanFormula encapsulateBoolean(Expr pTerm) {
     assert getFormulaType(pTerm).isBooleanType()
-        : String.format(
-            "%s is not boolean, but %s (%s)", pTerm, pTerm.getType(), getFormulaType(pTerm));
+        : "%s is not boolean, but %s (%s)".formatted(pTerm, pTerm.getType(), getFormulaType(pTerm));
     return new CVC4BooleanFormula(pTerm);
   }
 
   @Override
   public BitvectorFormula encapsulateBitvector(Expr pTerm) {
     assert getFormulaType(pTerm).isBitvectorType()
-        : String.format("%s is no BV, but %s (%s)", pTerm, pTerm.getType(), getFormulaType(pTerm));
+        : "%s is no BV, but %s (%s)".formatted(pTerm, pTerm.getType(), getFormulaType(pTerm));
     return new CVC4BitvectorFormula(pTerm);
   }
 
   @Override
   protected FloatingPointFormula encapsulateFloatingPoint(Expr pTerm) {
     assert getFormulaType(pTerm).isFloatingPointType()
-        : String.format("%s is no FP, but %s (%s)", pTerm, pTerm.getType(), getFormulaType(pTerm));
+        : "%s is no FP, but %s (%s)".formatted(pTerm, pTerm.getType(), getFormulaType(pTerm));
     return new CVC4FloatingPointFormula(pTerm);
   }
 
   @Override
   protected FloatingPointRoundingModeFormula encapsulateRoundingMode(Expr pTerm) {
     assert getFormulaType(pTerm).isFloatingPointRoundingModeType()
-        : String.format(
-            "%s is no FP rounding mode, but %s (%s)",
-            pTerm, pTerm.getType(), getFormulaType(pTerm));
+        : "%s is no FP rounding mode, but %s (%s)"
+            .formatted(pTerm, pTerm.getType(), getFormulaType(pTerm));
     return new CVC4FloatingPointRoundingModeFormula(pTerm);
   }
 
@@ -280,16 +277,14 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
   protected <TI extends Formula, TE extends Formula> ArrayFormula<TI, TE> encapsulateArray(
       Expr pTerm, FormulaType<TI> pIndexType, FormulaType<TE> pElementType) {
     assert getFormulaType(pTerm).equals(FormulaType.getArrayType(pIndexType, pElementType))
-        : String.format(
-            "%s is no array, but %s (%s)", pTerm, pTerm.getType(), getFormulaType(pTerm));
+        : "%s is no array, but %s (%s)".formatted(pTerm, pTerm.getType(), getFormulaType(pTerm));
     return new CVC4ArrayFormula<>(pTerm, pIndexType, pElementType);
   }
 
   @Override
   protected StringFormula encapsulateString(Expr pTerm) {
     assert getFormulaType(pTerm).isStringType()
-        : String.format(
-            "%s is no String, but %s (%s)", pTerm, pTerm.getType(), getFormulaType(pTerm));
+        : "%s is no String, but %s (%s)".formatted(pTerm, pTerm.getType(), getFormulaType(pTerm));
     return new CVC4StringFormula(pTerm);
   }
 
@@ -707,8 +702,7 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
     } else if (rm.equals(RoundingMode.roundTowardZero)) {
       return FloatingPointRoundingMode.TOWARD_ZERO;
     } else {
-      throw new IllegalArgumentException(
-          String.format("Unknown rounding mode in Term '%s'.", pExpr));
+      throw new IllegalArgumentException("Unknown rounding mode in Term '%s'.".formatted(pExpr));
     }
   }
 }

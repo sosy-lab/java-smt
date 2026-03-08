@@ -429,7 +429,7 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
           throw new UnsupportedOperationException();
         }
         throw new IllegalArgumentException(
-            String.format("SMTLIB command '%s' is not supported when parsing formulas.", message));
+            "SMTLIB command '%s' is not supported when parsing formulas.".formatted(message));
 
       } else {
         // Remove everything else, such as unknown or solver-specific commands, comments, etc.

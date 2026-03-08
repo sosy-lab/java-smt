@@ -428,10 +428,10 @@ class PrincessEnvironment {
         // declare normal symbols
         for (Entry<String, IExpression> symbol : symbols.entrySet()) {
           out.append(
-              String.format(
-                  "(declare-fun %s () %s)%n",
-                  SMTLineariser.quoteIdentifier(symbol.getKey()),
-                  getFormulaType(symbol.getValue()).toSMTLIBString()));
+              "(declare-fun %s () %s)%n"
+                  .formatted(
+                      SMTLineariser.quoteIdentifier(symbol.getKey()),
+                      getFormulaType(symbol.getValue()).toSMTLIBString()));
         }
 
         // declare UFs
@@ -440,11 +440,11 @@ class PrincessEnvironment {
               Lists.transform(
                   asJava(function.getValue().args()), a -> getFormulaType(a).toSMTLIBString());
           out.append(
-              String.format(
-                  "(declare-fun %s (%s) %s)%n",
-                  SMTLineariser.quoteIdentifier(function.getKey()),
-                  Joiner.on(" ").join(argSorts),
-                  getFormulaType(function.getValue()).toSMTLIBString()));
+              "(declare-fun %s (%s) %s)%n"
+                  .formatted(
+                      SMTLineariser.quoteIdentifier(function.getKey()),
+                      Joiner.on(" ").join(argSorts),
+                      getFormulaType(function.getValue()).toSMTLIBString()));
         }
 
         // now every symbol from the formula or from abbreviations are declared,
@@ -453,11 +453,11 @@ class PrincessEnvironment {
           IExpression abbrevFormula = usedAbbrevs.get(abbrev);
           IExpression fullFormula = abbrevMap.get(abbrevFormula);
           out.append(
-              String.format(
-                  "(define-fun %s () %s %s)%n",
-                  SMTLineariser.quoteIdentifier(abbrev),
-                  getFormulaType(fullFormula).toSMTLIBString(),
-                  SMTLineariser.asString(fullFormula)));
+              "(define-fun %s () %s %s)%n"
+                  .formatted(
+                      SMTLineariser.quoteIdentifier(abbrev),
+                      getFormulaType(fullFormula).toSMTLIBString(),
+                      SMTLineariser.asString(fullFormula)));
         }
 
         // now add the final assert
@@ -573,9 +573,8 @@ class PrincessEnvironment {
       } catch (IllegalArgumentException e) {
         // add more info about the formula, then rethrow
         throw new IllegalArgumentException(
-            String.format(
-                "Unknown formula type '%s' of sort '%s' for formula '%s'.",
-                pFormula.getClass(), sort.toString(), pFormula),
+            "Unknown formula type '%s' of sort '%s' for formula '%s'."
+                .formatted(pFormula.getClass(), sort.toString(), pFormula),
             e);
       }
     }
@@ -612,7 +611,7 @@ class PrincessEnvironment {
       } else {
         // Otherwise, fail
         throw new IllegalArgumentException(
-            String.format("Unknown formula type '%s' for sort '%s'.", sort.getClass(), sort));
+            "Unknown formula type '%s' for sort '%s'.".formatted(sort.getClass(), sort));
       }
     }
   }

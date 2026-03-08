@@ -172,7 +172,7 @@ public final class OpenSmtFormulaCreator extends FormulaCreator<PTRef, SRef, Log
     if (alogic.isSortReal(sort)) {
       return FormulaType.RationalType;
     }
-    throw new AssertionError(String.format("Encountered unhandled Type '%s'.", sort));
+    throw new AssertionError("Encountered unhandled Type '%s'.".formatted(sort));
   }
 
   @SuppressWarnings("unchecked")
@@ -181,8 +181,8 @@ public final class OpenSmtFormulaCreator extends FormulaCreator<PTRef, SRef, Log
     assert pType.equals(getFormulaType(pTerm))
             || (pType.equals(FormulaType.RationalType)
                 && getFormulaType(pTerm).equals(FormulaType.IntegerType))
-        : String.format(
-            "Cannot encapsulate formula %s of Type %s as %s", pTerm, getFormulaType(pTerm), pType);
+        : "Cannot encapsulate formula %s of Type %s as %s"
+            .formatted(pTerm, getFormulaType(pTerm), pType);
     if (pType.isBooleanType()) {
       return (T) new OpenSmtBooleanFormula(getEnv(), pTerm);
     }
@@ -207,9 +207,8 @@ public final class OpenSmtFormulaCreator extends FormulaCreator<PTRef, SRef, Log
   @Override
   public BooleanFormula encapsulateBoolean(PTRef pTerm) {
     assert getFormulaType(pTerm).isBooleanType()
-        : String.format(
-            "%s is not boolean, but %s (%s)",
-            pTerm, getEnv().getSortRef(pTerm), getFormulaType(pTerm));
+        : "%s is not boolean, but %s (%s)"
+            .formatted(pTerm, getEnv().getSortRef(pTerm), getFormulaType(pTerm));
     return new OpenSmtBooleanFormula(getEnv(), pTerm);
   }
 
@@ -218,9 +217,8 @@ public final class OpenSmtFormulaCreator extends FormulaCreator<PTRef, SRef, Log
   protected <TI extends Formula, TE extends Formula> ArrayFormula<TI, TE> encapsulateArray(
       PTRef pTerm, FormulaType<TI> pIndexType, FormulaType<TE> pElementType) {
     assert getFormulaType(pTerm).equals(FormulaType.getArrayType(pIndexType, pElementType))
-        : String.format(
-            "%s is no array, but %s (%s)",
-            pTerm, getEnv().getSortRef(pTerm), getFormulaType(pTerm));
+        : "%s is no array, but %s (%s)"
+            .formatted(pTerm, getEnv().getSortRef(pTerm), getFormulaType(pTerm));
     return new OpenSmtArrayFormula<>(getEnv(), pTerm, pIndexType, pElementType);
   }
 

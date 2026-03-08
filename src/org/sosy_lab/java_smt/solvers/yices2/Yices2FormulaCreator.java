@@ -241,9 +241,8 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
             || (FormulaType.RationalType.equals(pType)
                 && FormulaType.IntegerType.equals(getFormulaType(pTerm)))
             || pType.equals(getFormulaType(pTerm))
-        : String.format(
-            "Trying to encapsulate formula %s of type %s as %s",
-            yices_term_to_string(pTerm), getFormulaType(pTerm), pType);
+        : "Trying to encapsulate formula %s of type %s as %s"
+            .formatted(yices_term_to_string(pTerm), getFormulaType(pTerm), pType);
     if (pType.isBooleanType()) {
       return (T) new Yices2BooleanFormula(pTerm);
     } else if (pType.isIntegerType()) {
@@ -316,7 +315,7 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
       return FormulaType.getArrayType(convertType(domain), convertType(range));
     }
     throw new IllegalArgumentException(
-        String.format("Unknown formula type '%s'", yices_type_to_string(pType)));
+        "Unknown formula type '%s'".formatted(yices_type_to_string(pType)));
   }
 
   /** Creates a named, free variable. Might retrieve it from the cache if created prior. */
@@ -441,9 +440,8 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
     int functionDeclaration = -constructor;
 
     assert !CONSTANT_AND_VARIABLE_CONSTRUCTORS.contains(constructor)
-        : String.format(
-            "Term %s with constructor %d should be handled somewhere else",
-            yices_term_to_string(pF), constructor);
+        : "Term %s with constructor %d should be handled somewhere else"
+            .formatted(yices_term_to_string(pF), constructor);
 
     // filled later, except for some special function applications
     String functionName = null;
@@ -817,11 +815,11 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
             yices_update(pArgs.get(0), 1, new int[] {pArgs.get(1)}, pArgs.get(2));
         default ->
             throw new IllegalArgumentException(
-                String.format(
-                    "Unknown function declaration with constructor %d and arguments %s (%s)",
-                    -pDeclaration,
-                    pArgs,
-                    Lists.transform(pArgs, Yices2NativeApi::yices_term_to_string)));
+                "Unknown function declaration with constructor %d and arguments %s (%s)"
+                    .formatted(
+                        -pDeclaration,
+                        pArgs,
+                        Lists.transform(pArgs, Yices2NativeApi::yices_term_to_string)));
       };
     } else { // is UF Application
       if (pArgs.isEmpty()) {

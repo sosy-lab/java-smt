@@ -123,7 +123,7 @@ class PrincessModel extends AbstractModel<IExpression, Sort, PrincessEnvironment
 
       } else {
         throw new AssertionError(
-            String.format("unknown type of key: %s -> %s (%s)", key, value, key.getClass()));
+            "unknown type of key: %s -> %s (%s)".formatted(key, value, key.getClass()));
       }
 
       return ImmutableList.of(

@@ -89,8 +89,8 @@ public class Yices2SolverContext extends AbstractSolverContext {
 
   @Override
   public String getVersion() {
-    return String.format(
-        "Yices %d.%d.%d", yices_get_version(), yices_get_major_version(), yices_get_patch_level());
+    return "Yices %d.%d.%d"
+        .formatted(yices_get_version(), yices_get_major_version(), yices_get_patch_level());
   }
 
   @Override

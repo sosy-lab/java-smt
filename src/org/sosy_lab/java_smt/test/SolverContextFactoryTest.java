@@ -246,8 +246,7 @@ public class SolverContextFactoryTest {
         .that(thrown)
         .hasMessageThat()
         .startsWith(
-            String.format(
-                "The SMT solver %s is not available on this machine because of missing libraries ",
-                solverToUse()));
+            "The SMT solver %s is not available on this machine because of missing libraries "
+                .formatted(solverToUse()));
   }
 }

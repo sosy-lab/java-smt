@@ -208,13 +208,12 @@ public final class PrettyPrinter {
     }
 
     private String formatNode(Formula f, String label, String shape, String color) {
-      return String.format(
-          "  %d [label=\"%s\", shape=\"%s\", style=\"filled\", fillcolor=\"%s\"];%n",
-          getId(f), label, shape, color);
+      return "  %d [label=\"%s\", shape=\"%s\", style=\"filled\", fillcolor=\"%s\"];%n"
+          .formatted(getId(f), label, shape, color);
     }
 
     private String formatEdge(Formula from, Formula to, String label) {
-      return String.format("  %d -> %d [label=\"%s\"];%n", getId(from), getId(to), label);
+      return "  %d -> %d [label=\"%s\"];%n".formatted(getId(from), getId(to), label);
     }
 
     @Override

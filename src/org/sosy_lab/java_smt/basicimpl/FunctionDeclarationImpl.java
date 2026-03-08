@@ -38,6 +38,6 @@ public record FunctionDeclarationImpl<F extends Formula, T>(
 
   @Override
   public String toString() {
-    return String.format("%s (%s)", getKind(), getName());
+    return "%s (%s)".formatted(getKind(), getName());
   }
 }

@@ -125,15 +125,15 @@ public class BitwuzlaFormulaCreator
   @Override
   protected FloatingPointFormula encapsulateFloatingPoint(Term pTerm) {
     assert getFormulaType(pTerm).isFloatingPointType()
-        : String.format("%s is no FP, but %s (%s)", pTerm, pTerm.sort(), getFormulaType(pTerm));
+        : "%s is no FP, but %s (%s)".formatted(pTerm, pTerm.sort(), getFormulaType(pTerm));
     return new BitwuzlaFloatingPointFormula(pTerm);
   }
 
   @Override
   protected FloatingPointRoundingModeFormula encapsulateRoundingMode(Term pTerm) {
     assert getFormulaType(pTerm).isFloatingPointRoundingModeType()
-        : String.format(
-            "%s is no FP rounding mode, but %s (%s)", pTerm, pTerm.sort(), getFormulaType(pTerm));
+        : "%s is no FP rounding mode, but %s (%s)"
+            .formatted(pTerm, pTerm.sort(), getFormulaType(pTerm));
     return new BitwuzlaFloatingPointRoundingModeFormula(pTerm);
   }
 
@@ -351,8 +351,7 @@ public class BitwuzlaFormulaCreator
   @Override
   public <T extends Formula> T encapsulate(FormulaType<T> pType, Term pTerm) {
     assert pType.equals(getFormulaType(pTerm))
-        : String.format(
-            "Trying to encapsulate formula of type %s as %s", getFormulaType(pTerm), pType);
+        : "Trying to encapsulate formula of type %s as %s".formatted(getFormulaType(pTerm), pType);
     if (pType.isBooleanType()) {
       return (T) new BitwuzlaBooleanFormula(pTerm);
     } else if (pType.isArrayType()) {
@@ -649,8 +648,7 @@ public class BitwuzlaFormulaCreator
     } else if (term.is_rm_value_rtz()) {
       return FloatingPointRoundingMode.TOWARD_ZERO;
     } else {
-      throw new IllegalArgumentException(
-          String.format("Unknown rounding mode in Term '%s'.", term));
+      throw new IllegalArgumentException("Unknown rounding mode in Term '%s'.".formatted(term));
     }
   }
 }

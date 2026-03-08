@@ -260,9 +260,8 @@ public abstract class AbstractFloatingPointFormulaManager<TFormulaInfo, TType, T
         bvType.getSize() == pTargetType.getTotalSize(),
         MoreStrings.lazyString(
             () ->
-                String.format(
-                    "The total size %s of type %s has to match the size %s of type %s.",
-                    pTargetType.getTotalSize(), pTargetType, bvType.getSize(), bvType)));
+                "The total size %s of type %s has to match the size %s of type %s."
+                    .formatted(pTargetType.getTotalSize(), pTargetType, bvType.getSize(), bvType)));
     return wrap(fromIeeeBitvectorImpl(extractInfo(pNumber), pTargetType));
   }
 

@@ -240,9 +240,8 @@ class SmtInterpolFormulaCreator extends FormulaCreator<Term, Sort, Script, Funct
       // TODO: support for quantifiers and bound variables
 
       throw new UnsupportedOperationException(
-          String.format(
-              "Unexpected SMTInterpol formula of type %s: %s",
-              input.getClass().getSimpleName(), input));
+          "Unexpected SMTInterpol formula of type %s: %s"
+              .formatted(input.getClass().getSimpleName(), input));
     }
   }
 
