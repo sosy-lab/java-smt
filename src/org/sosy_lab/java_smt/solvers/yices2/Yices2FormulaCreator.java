@@ -796,6 +796,7 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
     // TODO Refactor me
     ImmutableList.Builder<Integer> terms = ImmutableList.builder();
     for (int i = 0; i < Terms.numChildren(parent); i++) {
+      @SuppressWarnings("unchecked")
       SumComponent<BigRational> component = (SumComponent<BigRational>) Terms.projSum(parent, i);
 
       var factor =
@@ -812,7 +813,7 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
   private static List<Integer> getMultiplySumArgsFromSum(int parent) {
     // TODO Refactor me
     checkArgument(Terms.numChildren(parent) == 1);
-
+    @SuppressWarnings("unchecked")
     SumComponent<BigRational> component = (SumComponent<BigRational>) Terms.projSum(parent, 0);
     var factor =
         Terms.rationalConst(
@@ -827,6 +828,7 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
     // TODO Refactor me
     ImmutableList.Builder<Integer> terms = ImmutableList.builder();
     for (int i = 0; i < Terms.numChildren(parent); i++) {
+      @SuppressWarnings("unchecked")
       SumComponent<boolean[]> component = (SumComponent<boolean[]>) Terms.projSum(parent, i);
 
       ImmutableList.Builder<Integer> builder = ImmutableList.builder();
@@ -848,6 +850,7 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
   private static List<Integer> getMultiplyBvSumArgsFromSum(int parent) {
     // TODO Refactor me
     checkArgument(Terms.numChildren(parent) == 1);
+    @SuppressWarnings("unchecked")
     SumComponent<boolean[]> component = (SumComponent<boolean[]>) Terms.projSum(parent, 0);
 
     ImmutableList.Builder<Integer> builder = ImmutableList.builder();
