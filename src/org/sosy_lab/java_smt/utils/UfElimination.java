@@ -12,7 +12,6 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.collect.Maps.difference;
 
-import com.google.auto.value.AutoValue;
 import com.google.common.base.Verify;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableList;
@@ -328,19 +327,13 @@ public class UfElimination {
     return fmgr.makeVariable(pType, prefix + UNIQUE_ID_GENERATOR.getFreshId());
   }
 
-  @AutoValue
-  abstract static class UninterpretedFunctionApplication {
+  record UninterpretedFunctionApplication(
+      Formula getFormula, ImmutableList<Formula> getArguments, Formula getSubstitution) {
 
     static UninterpretedFunctionApplication create(
         Formula pF, List<Formula> pArguments, Formula pSubstitution) {
-      return new AutoValue_UfElimination_UninterpretedFunctionApplication(
+      return new UninterpretedFunctionApplication(
           pF, ImmutableList.copyOf(pArguments), pSubstitution);
     }
-
-    abstract Formula getFormula();
-
-    abstract ImmutableList<Formula> getArguments();
-
-    abstract Formula getSubstitution();
   }
 }
