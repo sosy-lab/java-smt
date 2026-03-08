@@ -2,11 +2,13 @@
 // an API wrapper for a collection of SMT solvers:
 // https://github.com/sosy-lab/java-smt
 //
-// SPDX-FileCopyrightText: 2022 Dirk Beyer <https://www.sosy-lab.org>
+// SPDX-FileCopyrightText: 2026 Dirk Beyer <https://www.sosy-lab.org>
 //
 // SPDX-License-Identifier: Apache-2.0
 
 package org.sosy_lab.java_smt.basicimpl;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.ImmutableList;
 import com.google.errorprone.annotations.Immutable;
@@ -25,6 +27,14 @@ public record FunctionDeclarationImpl<F extends Formula, T>(
     ImmutableList<FormulaType<?>> getArgumentTypes,
     T getSolverDeclaration)
     implements FunctionDeclaration<F> {
+
+  public FunctionDeclarationImpl {
+    checkNotNull(getKind);
+    checkNotNull(getName);
+    checkNotNull(getType);
+    checkNotNull(getArgumentTypes);
+    checkNotNull(getSolverDeclaration);
+  }
 
   public static <F extends Formula, T> FunctionDeclarationImpl<F, T> of(
       String name,
