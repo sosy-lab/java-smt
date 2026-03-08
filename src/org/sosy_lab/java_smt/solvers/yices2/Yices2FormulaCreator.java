@@ -881,7 +881,11 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
 
   @Override
   public Integer callFunctionImpl(Integer pDeclaration, List<Integer> pArgs) {
-    checkArgument(Types.numChildren(Terms.typeOf(pDeclaration)) == 1 + pArgs.size());
+    checkArgument(
+        Types.numChildren(Terms.typeOf(pDeclaration)) == 1 + pArgs.size(),
+        "Expecting %s arguments, but %s were given",
+        Types.numChildren(Terms.typeOf(pDeclaration)) - 1,
+        pArgs.size());
     if (pArgs.isEmpty()) {
       return pDeclaration;
     } else {
