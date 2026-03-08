@@ -57,8 +57,7 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
     assume()
         .withMessage("Solver %s runs into timeout on this test", solverToUse())
         .that(solverToUse())
-        .isNotEqualTo(Solvers.CVC5);
-    assume().that(solver).isNotEqualTo(Solvers.YICES2);
+        .isNoneOf(Solvers.CVC5, Solvers.YICES2);
 
     try (InterpolatingProverEnvironment<T> prover = newEnvironmentForTest()) {
       Formula x = makeVariable("x");
@@ -88,7 +87,7 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
   @Test
   @SuppressWarnings("unchecked")
   public <T> void emptyInterpolationGroup() throws SolverException, InterruptedException {
-    assume().that(solver).isNotEqualTo(Solvers.YICES2);
+    assertThat(solver).isNotEqualTo(Solvers.YICES2);
     try (InterpolatingProverEnvironment<T> prover = newEnvironmentForTest()) {
       Formula x = makeVariable("x");
       Formula y = makeVariable("y");
@@ -464,7 +463,6 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
   @Test
   public <T> void sequentialBVInterpolation() throws SolverException, InterruptedException {
     assertThat(solver).isNotEqualTo(Solvers.YICES2); // FIXME
-
     requireBitvectors();
 
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
@@ -1050,7 +1048,6 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
   public <T> void bigSeqInterpolationTest() throws InterruptedException, SolverException {
     requireBitvectors();
     requireInterpolation();
-    assume().that(solver).isNotEqualTo(Solvers.YICES2);
 
     assume()
         .withMessage("Solver %s does not support interpolation over bitvectors", solverToUse())
@@ -1059,7 +1056,7 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
     assume()
         .withMessage("Solver %s runs into timeout on this test", solverToUse())
         .that(solverToUse())
-        .isNotEqualTo(Solvers.CVC5);
+        .isNoneOf(Solvers.CVC5, Solvers.YICES2);
 
     int bvWidth = 32;
     BitvectorFormula bv0 = bvmgr.makeBitvector(bvWidth, 0);
