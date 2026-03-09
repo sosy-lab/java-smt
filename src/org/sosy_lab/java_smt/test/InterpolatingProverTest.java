@@ -54,21 +54,31 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
   @Test
   @SuppressWarnings("CheckReturnValue")
   public <T> void simpleInterpolation() throws SolverException, InterruptedException {
+    try (InterpolatingProverEnvironment<T> prover = newEnvironmentForTest()) {
+      var f1 = lessThanNumber(makeVariable("x"), makeNumber(0));
+      var f2 = greaterThanNumber(makeVariable("x"), makeNumber(0));
+
+      prover.push(f1);
+      T id2 = prover.push(f2);
+
+      assertThatEnvironment(prover).isUnsatisfiable();
+      prover.getInterpolant(ImmutableList.of(id2));
+      // we actually only check for a successful execution here, the result is irrelevant.
+    }
+  }
+
+  @Test
+  @SuppressWarnings("CheckReturnValue")
+  public <T> void notSoSimpleInterpolation() throws SolverException, InterruptedException {
     assume()
         .withMessage("Solver %s runs into timeout on this test", solverToUse())
         .that(solverToUse())
-        .isNoneOf(Solvers.CVC5, Solvers.YICES2);
+        .isNoneOf(Solvers.CVC5, Solvers.YICES2, Solvers.OPENSMT);
 
     try (InterpolatingProverEnvironment<T> prover = newEnvironmentForTest()) {
       Formula x = makeVariable("x");
       Formula y = makeVariable("y");
-      /* INFO: Due to limitations in OpenSMT we need to use a simpler formular for this solver
-       * Setting z=x means that the original formula `2x ≠ 1+2z`simplifies to `0 ≠ 1`,
-       * which is trivially true.
-       *
-       * https://github.com/usi-verification-and-security/opensmt/issues/638
-       */
-      Formula z = solverToUse() == Solvers.OPENSMT ? x : makeVariable("z");
+      Formula z = makeVariable("z");
 
       BooleanFormula f1 = mgr.makeEqual(y, multiplyNumber(makeNumber(2), x));
       BooleanFormula f2 =
@@ -76,32 +86,19 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
 
       prover.push(f1);
       T id2 = prover.push(f2);
-      boolean check = prover.isUnsat();
 
-      assertWithMessage("formulas must be contradicting").that(check).isTrue();
+      assertThatEnvironment(prover).isUnsatisfiable();
       prover.getInterpolant(ImmutableList.of(id2));
       // we actually only check for a successful execution here, the result is irrelevant.
     }
   }
 
   @Test
-  @SuppressWarnings("unchecked")
   public <T> void emptyInterpolationGroup() throws SolverException, InterruptedException {
-    assertThat(solver).isNotEqualTo(Solvers.YICES2);
     try (InterpolatingProverEnvironment<T> prover = newEnvironmentForTest()) {
-      Formula x = makeVariable("x");
-      Formula y = makeVariable("y");
-      /* INFO: Due to limitations in OpenSMT we need to use a simpler formula for this solver
-       * Setting z=x means that the original formula `2x ≠ 1+2z`simplifies to `0 ≠ 1`,
-       * which is trivially true.
-       *
-       * https://github.com/usi-verification-and-security/opensmt/issues/638
-       */
-      Formula z = solverToUse() == Solvers.OPENSMT ? x : makeVariable("z");
+      var f1 = lessThanNumber(makeVariable("x"), makeNumber(0));
+      var f2 = greaterThanNumber(makeVariable("x"), makeNumber(0));
 
-      BooleanFormula f1 = mgr.makeEqual(y, multiplyNumber(makeNumber(2), x));
-      BooleanFormula f2 =
-          mgr.makeEqual(y, addNumber(makeNumber(1), multiplyNumber(z, makeNumber(2))));
       T id1 = prover.push(f1);
       T id2 = prover.push(f2);
       assertThat(prover.isUnsat()).isTrue();
