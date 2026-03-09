@@ -133,7 +133,7 @@ public class Yices2FormulaManager extends AbstractFormulaManager<Integer, Intege
       }
     }
     // TODO fold formula to avoid exp. overhead
-    out.append("(assert ").append(Terms.toString(formula)).append(")");
+    out.append("(assert ").append(Terms.toString(formula, 100000, 1)).append(")");
 
     return out.toString();
   }
