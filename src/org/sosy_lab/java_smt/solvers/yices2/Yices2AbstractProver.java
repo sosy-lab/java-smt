@@ -72,10 +72,10 @@ abstract class Yices2AbstractProver<T> extends AbstractProverWithAllSat<T>
       Set<ProverOptions> pOptions,
       BooleanFormulaManager pBmgr,
       ShutdownNotifier pShutdownNotifier,
-      boolean pForceMCSat) {
+      String pSolverType) {
     super(pOptions, pBmgr, pShutdownNotifier);
     creator = pCreator;
-    curEnv = newContext(pForceMCSat);
+    curEnv = newContext(pSolverType);
     stack.push(PathCopyingPersistentTreeMap.of());
   }
 
@@ -88,9 +88,9 @@ abstract class Yices2AbstractProver<T> extends AbstractProverWithAllSat<T>
     return false;
   }
 
-  Context newContext(boolean mcsat) {
+  Context newContext(String solverType) {
     try (var cfg = new Config()) {
-      cfg.set("solver-type", mcsat ? "mcsat" : "dpllt");
+      cfg.set("solver-type", solverType);
       cfg.set("mode", "interactive");
       cfg.set("model-interpolation", "true");
       return new Context(cfg);

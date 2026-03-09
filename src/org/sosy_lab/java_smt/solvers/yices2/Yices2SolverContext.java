@@ -12,6 +12,8 @@ import com.sri.yices.Yices;
 import java.util.Set;
 import java.util.function.Consumer;
 import org.sosy_lab.common.ShutdownNotifier;
+import org.sosy_lab.common.configuration.Configuration;
+import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.common.configuration.Option;
 import org.sosy_lab.common.configuration.Options;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
@@ -23,36 +25,48 @@ import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.basicimpl.AbstractNumeralFormulaManager.NonLinearArithmetic;
 import org.sosy_lab.java_smt.basicimpl.AbstractSolverContext;
 
-@Options(prefix = "solver.yices2")
 public class Yices2SolverContext extends AbstractSolverContext {
+
+  @Options(prefix = "solver.yices2")
+  private static class Yices2Parameters {
+    @Option(
+        secure = true,
+        description = "Backend to use for the solver",
+        values = {"dpllt", "mcsat"})
+    String solverType = "mcsat";
+
+    Yices2Parameters(Configuration config) throws InvalidConfigurationException {
+      config.inject(this);
+    }
+  }
 
   private final Yices2FormulaCreator creator;
   private final BooleanFormulaManager bfmgr;
   private final ShutdownNotifier shutdownManager;
+  private final Yices2Parameters parameters;
 
   private static int numLoadedInstances = 0;
   private boolean closed = false;
 
-  @Option(
-      secure = true,
-      description = "Always use MCSat solver, instead of the normal DPLLT based solver.")
-  private boolean forceMCSat = true;
-
-  public Yices2SolverContext(
+  private Yices2SolverContext(
       FormulaManager pFmgr,
       Yices2FormulaCreator creator,
       BooleanFormulaManager pBfmgr,
-      ShutdownNotifier pShutdownManager) {
+      ShutdownNotifier pShutdownManager,
+      Yices2Parameters pParameters) {
     super(pFmgr);
     this.creator = creator;
     bfmgr = pBfmgr;
     shutdownManager = pShutdownManager;
+    parameters = pParameters;
   }
 
   public static Yices2SolverContext create(
+      Configuration pConfig,
       NonLinearArithmetic pNonLinearArithmetic,
       ShutdownNotifier pShutdownManager,
-      Consumer<String> pLoader) {
+      Consumer<String> pLoader)
+      throws InvalidConfigurationException {
 
     pLoader.accept("yices2java");
 
@@ -65,6 +79,8 @@ public class Yices2SolverContext extends AbstractSolverContext {
       }
       numLoadedInstances++;
     }
+
+    Yices2Parameters params = new Yices2Parameters(pConfig);
 
     Yices2FormulaCreator creator = new Yices2FormulaCreator();
     Yices2UFManager functionTheory = new Yices2UFManager(creator);
@@ -87,7 +103,7 @@ public class Yices2SolverContext extends AbstractSolverContext {
             bitvectorTheory,
             quantTheory,
             arrayTheory);
-    return new Yices2SolverContext(manager, creator, booleanTheory, pShutdownManager);
+    return new Yices2SolverContext(manager, creator, booleanTheory, pShutdownManager, params);
   }
 
   @Override
@@ -115,13 +131,14 @@ public class Yices2SolverContext extends AbstractSolverContext {
 
   @Override
   protected ProverEnvironment newProverEnvironment0(Set<ProverOptions> pOptions) {
-    return new Yices2Prover(creator, pOptions, bfmgr, shutdownManager, forceMCSat);
+    return new Yices2Prover(creator, pOptions, bfmgr, shutdownManager, parameters.solverType);
   }
 
   @Override
   protected InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation0(
       Set<ProverOptions> pOptions) {
-    return new Yices2InterpolatingProver(creator, pOptions, bfmgr, shutdownManager, forceMCSat);
+    return new Yices2InterpolatingProver(
+        creator, pOptions, bfmgr, shutdownManager, parameters.solverType);
   }
 
   @Override

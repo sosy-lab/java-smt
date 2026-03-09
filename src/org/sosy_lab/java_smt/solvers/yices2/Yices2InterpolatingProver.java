@@ -38,8 +38,8 @@ public class Yices2InterpolatingProver extends Yices2AbstractProver<Integer>
       Set<ProverOptions> pOptions,
       BooleanFormulaManager pBmgr,
       ShutdownNotifier pShutdownNotifier,
-      boolean pForceMCSat) {
-    super(creator, pOptions, pBmgr, pShutdownNotifier, pForceMCSat);
+      String pSolverType) {
+    super(creator, pOptions, pBmgr, pShutdownNotifier, pSolverType);
   }
 
   @Override
@@ -66,8 +66,8 @@ public class Yices2InterpolatingProver extends Yices2AbstractProver<Integer>
   }
 
   private int interpolate(Collection<Integer> setA, Collection<Integer> setB) {
-    try (var ctxA = newContext(true);
-        var ctxB = newContext(true)) {
+    try (var ctxA = newContext("mcsat");
+        var ctxB = newContext("mcsat")) {
 
       ctxA.assertFormulas(Ints.toArray(setA));
       ctxB.assertFormulas(Ints.toArray(setB));
