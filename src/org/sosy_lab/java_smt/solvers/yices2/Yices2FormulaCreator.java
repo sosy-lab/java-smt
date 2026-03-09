@@ -259,6 +259,16 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
     return bound;
   }
 
+  /**
+   * Returns the name of a variable or uf term.
+   *
+   * <p>Will return an abstract value name if the term has no name. Yices may introduce unnamed
+   * terms while rewriting bv operations
+   */
+  private String lookupName(int term) {
+    return Terms.getName(term) == null ? "@" + term : Terms.getName(term);
+  }
+
   @SuppressWarnings("deprecation")
   @Override
   public <R> R visit(FormulaVisitor<R> pVisitor, Formula pFormula, Integer pF) {
@@ -284,7 +294,7 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
       case FORALL_TERM:
         return visitQuantifier(pVisitor, pFormula, pF, Quantifier.FORALL);
       case UNINTERPRETED_TERM:
-        return pVisitor.visitFreeVariable(pFormula, Terms.getName(pF));
+        return pVisitor.visitFreeVariable(pFormula, lookupName(pF));
       default:
         return visitFunctionApplication(pVisitor, pFormula, pF, constructor);
     }
@@ -343,7 +353,7 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
           var args = getArgs(pF);
           var f = args.get(0);
           var x = FluentIterable.from(args).skip(1).toList();
-          functionName = Terms.getName(f);
+          functionName = lookupName(f);
           functionDeclaration = f;
           functionArgs = x;
         } else {
@@ -460,10 +470,13 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
         }
         break;
       case BIT_TERM:
+        // FIXME Not really "extract"
         functionKind = FunctionDeclarationKind.BV_EXTRACT;
-        functionArgs = getBitArgs(pF);
+        functionIndex = ImmutableList.of(Terms.projIndex(pF));
+        functionArgs = ImmutableList.of(Terms.projArg(pF));
         break;
       case BV_ARRAY:
+        // FIXME Not really "concat"
         functionKind = FunctionDeclarationKind.BV_CONCAT;
         break;
       default:
@@ -614,10 +627,14 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
         throw new UnsupportedOperationException("INT_TO_BV not supported");
       case BV_EXTRACT:
         checkArgument(args.size() == 1);
-        f = Terms.bvExtract(args.get(0), pIndex.get(0), pIndex.get(1));
+        f = Terms.bvExtractBit(args.get(0), pIndex.get(0));
+        // FIXME Should be:
+        // f = Terms.bvExtract(args.get(0), pIndex.get(0), pIndex.get(1));
         break;
       case BV_CONCAT:
-        f = Terms.bvConcat(args);
+        f = Terms.bvFromBoolArray(args);
+        // FIXME Should be:
+        // f = Terms.bvConcat(args);
         break;
       case BV_SIGN_EXTENSION:
         checkArgument(args.size() == 1);
