@@ -71,10 +71,11 @@ abstract class Yices2AbstractProver<T> extends AbstractProverWithAllSat<T>
       Yices2FormulaCreator pCreator,
       Set<ProverOptions> pOptions,
       BooleanFormulaManager pBmgr,
-      ShutdownNotifier pShutdownNotifier) {
+      ShutdownNotifier pShutdownNotifier,
+      boolean pForceMCSat) {
     super(pOptions, pBmgr, pShutdownNotifier);
     creator = pCreator;
-    curEnv = newContext(true);
+    curEnv = newContext(pForceMCSat);
     stack.push(PathCopyingPersistentTreeMap.of());
   }
 

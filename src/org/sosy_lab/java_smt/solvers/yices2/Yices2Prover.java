@@ -23,8 +23,9 @@ public class Yices2Prover extends Yices2AbstractProver<Void> implements ProverEn
       Yices2FormulaCreator creator,
       Set<ProverOptions> pOptions,
       BooleanFormulaManager pBmgr,
-      ShutdownNotifier pShutdownNotifier) {
-    super(creator, pOptions, pBmgr, pShutdownNotifier);
+      ShutdownNotifier pShutdownNotifier,
+      boolean pForceMCSat) {
+    super(creator, pOptions, pBmgr, pShutdownNotifier, pForceMCSat);
   }
 
   @Override

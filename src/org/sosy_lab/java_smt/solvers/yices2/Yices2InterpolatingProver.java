@@ -37,8 +37,9 @@ public class Yices2InterpolatingProver extends Yices2AbstractProver<Integer>
       Yices2FormulaCreator creator,
       Set<ProverOptions> pOptions,
       BooleanFormulaManager pBmgr,
-      ShutdownNotifier pShutdownNotifier) {
-    super(creator, pOptions, pBmgr, pShutdownNotifier);
+      ShutdownNotifier pShutdownNotifier,
+      boolean pForceMCSat) {
+    super(creator, pOptions, pBmgr, pShutdownNotifier, pForceMCSat);
   }
 
   @Override

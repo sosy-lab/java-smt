@@ -12,6 +12,8 @@ import com.sri.yices.Yices;
 import java.util.Set;
 import java.util.function.Consumer;
 import org.sosy_lab.common.ShutdownNotifier;
+import org.sosy_lab.common.configuration.Option;
+import org.sosy_lab.common.configuration.Options;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BooleanFormulaManager;
 import org.sosy_lab.java_smt.api.FormulaManager;
@@ -21,6 +23,7 @@ import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.basicimpl.AbstractNumeralFormulaManager.NonLinearArithmetic;
 import org.sosy_lab.java_smt.basicimpl.AbstractSolverContext;
 
+@Options(prefix = "solver.yices2")
 public class Yices2SolverContext extends AbstractSolverContext {
 
   private final Yices2FormulaCreator creator;
@@ -29,6 +32,11 @@ public class Yices2SolverContext extends AbstractSolverContext {
 
   private static int numLoadedInstances = 0;
   private boolean closed = false;
+
+  @Option(
+      secure = true,
+      description = "Always use MCSat solver, instead of the normal DPLLT based solver.")
+  private boolean forceMCSat = true;
 
   public Yices2SolverContext(
       FormulaManager pFmgr,
@@ -107,13 +115,13 @@ public class Yices2SolverContext extends AbstractSolverContext {
 
   @Override
   protected ProverEnvironment newProverEnvironment0(Set<ProverOptions> pOptions) {
-    return new Yices2Prover(creator, pOptions, bfmgr, shutdownManager);
+    return new Yices2Prover(creator, pOptions, bfmgr, shutdownManager, forceMCSat);
   }
 
   @Override
   protected InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation0(
       Set<ProverOptions> pOptions) {
-    return new Yices2InterpolatingProver(creator, pOptions, bfmgr, shutdownManager);
+    return new Yices2InterpolatingProver(creator, pOptions, bfmgr, shutdownManager, forceMCSat);
   }
 
   @Override
