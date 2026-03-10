@@ -1038,11 +1038,10 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
   }
 
   private Sign getSign(Long pValue) {
-    Native.IntPtr signPtr = new Native.IntPtr();
+    Native.BoolPtr signPtr = new Native.BoolPtr();
     Preconditions.checkState(
         Native.fpaGetNumeralSign(environment, pValue, signPtr), "Sign is not a Boolean value");
-    var sign = signPtr.value != 0;
-    return Sign.of(sign);
+    return Sign.of(signPtr.value);
   }
 
   @Override
