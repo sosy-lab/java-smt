@@ -341,14 +341,14 @@ ant publish-optimathsat \
 Yices2 consists of two components: the solver binary and the Java components in JavaSMT.
 The Java components were split from the rest of JavaSMT because of the GPL.
 
-#### Publishing the solver binary for Yices2
+#### 1. Publishing the solver binary for Yices2
 
 We recommend using one of our Ubuntu docker images for building Yices2 as the container already
 contains one of the dependencies (`gmp`) in a precompiled version. The following instructions will
 still work without the image, however, some of the paths may have to be adjusted, and `gmp`
 needs to be downloaded and compiled (with `PIC` support) separately
 
-#### MCSAT build
+#### a) Dependencies
 
 First we need to fetch and build two dependencies:
 
@@ -378,19 +378,30 @@ make -j
 make install
 ```
 
-#### Yices
+#### b) Yices
 
 Then we can build the actual solver:
 
 ```shell
+git clone https://github.com/SRI-CSL/yices2.git
+cd yices2
 LDFLAGS="-L/dependencies/gmp-6.3.0/install/x64-linux/lib -L/workspace/libpoly/install/lib -L/workspace/cudd/install/lib" \
 CFLAGS="-I/dependencies/gmp-6.3.0/install/x64-linux/include -I/workspace/libpoly/install/include -I/workspace/cudd/install/include" \
-./configure --enable-mcsat --prefix=/workspace/yices2/install
+./configure --enable-mcsat --enable-thread-safety --prefix=/workspace/yices2/install
 make -j
 make install
 ```
 
-#### JavaSMT solver binary
+#### c) Yices Java bindings
+
+```shell
+git clone https://github.com/daniel-raffler/yices2_java_bindings.git
+cd yices2_java_bindings
+# Patch the Makefile
+ant install
+```
+
+#### d) JavaSMT solver binary
 
 First, get the version of Yices2:
 ```bash
@@ -400,17 +411,12 @@ git describe --tags
 Then publish the solver binary from within JavaSMT:
 
 ```shell
-ant publish-yices2 \
-  -Dyices2.path=/workspace/yices2/install \
-  -Dgmp.path=/dependencies/gmp-6.3.0/install/x64-linux \
-  -Dlibpoly.path=/workspace/libpoly/install \
-  -Dcudd.path=/workspace/cudd/install \ 
-  -Dyices2.version=${VERSION}
+ant publish-yices2 -Dyices2_java.path=/workspace/yices2_java_bindings -Dyices2.version=${VERSION}
 ```
 
 Afterward, you need to update the version number in `solvers_ivy_conf/ivy_javasmt_yices2.xml` and publish new Java components for Yices2.
 
-#### Publish the Java components for Yices2
+#### 2. Publish the Java components for Yices2
 
 Info: There is a small cyclic dependency: JavaSMT itself depends on the Java components of Yices2.
 
