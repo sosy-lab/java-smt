@@ -15,9 +15,9 @@ on:
     branches: [ master ]
 
 env:
-  # Use a project-local directory for the Ivy cache to make it easy to share across platforms.
+  # Use a project-local relative directory for the Ivy cache to make it easy to share across platforms.
   # We place it inside the workspace so it's identical for Linux, macOS, and Windows.
-  IVY_CACHE_DIR: ${{ github.workspace }}/.ivy2-cache
+  IVY_CACHE_DIR: .ivy2-cache
 
 jobs:
   dependencies:
