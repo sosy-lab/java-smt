@@ -41,7 +41,7 @@ jobs:
           key: ivy-shared-${{ github.run_id }}
           restore-keys: |
             ivy-shared-
-          enable-cross-os-archive: true
+          enableCrossOsArchive: true
 
       - name: Install Ant
         run: |
@@ -79,7 +79,7 @@ jobs:
           key: ivy-shared-${{ github.run_id }}
           restore-keys: |
             ivy-shared-
-          enable-cross-os-archive: true
+          enableCrossOsArchive: true
 
       - name: Install Ant
         run: |
@@ -137,7 +137,7 @@ jobs:
           key: ivy-shared-${{ github.run_id }}
           restore-keys: |
             ivy-shared-
-          enable-cross-os-archive: true
+          enableCrossOsArchive: true
 
       - name: Install Ant
         run: brew install ant
@@ -202,7 +202,7 @@ jobs:
           key: ivy-shared-${{ github.run_id }}
           restore-keys: |
             ivy-shared-
-          enable-cross-os-archive: true
+          enableCrossOsArchive: true
 
       - name: Install Ant
         run: choco install ant -y
