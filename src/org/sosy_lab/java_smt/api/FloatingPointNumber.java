@@ -26,6 +26,13 @@ import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
 public record FloatingPointNumber(
     Sign mathSign, BigInteger exponent, BigInteger mantissa, FloatingPointType floatingPointType) {
 
+  public FloatingPointNumber {
+    checkNotNull(mathSign);
+    checkNotNull(exponent);
+    checkNotNull(mantissa);
+    checkNotNull(floatingPointType);
+  }
+
   // TODO: remove deprecated constants from public API after 6.0 release (and delete the unused).
   @Deprecated(since = "6.0", forRemoval = true)
   public static final int SINGLE_PRECISION_EXPONENT_SIZE = 8;
