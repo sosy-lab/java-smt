@@ -894,11 +894,6 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
     return builder.build();
   }
 
-  /** get "index" and "b" from "(bit index b)". */
-  private static List<Integer> getBitArgs(int parent) {
-    return ImmutableList.of(Terms.projArg(parent), Terms.intConst(Terms.projIndex(parent)));
-  }
-
   @Override
   public Integer callFunctionImpl(Integer pDeclaration, List<Integer> pArgs) {
     if (Terms.isFunction(pDeclaration)) {
