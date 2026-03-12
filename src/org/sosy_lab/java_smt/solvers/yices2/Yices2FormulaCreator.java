@@ -953,7 +953,8 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
    *
    * <p>Assumes "little endian" encoding
    */
-  BigInteger bitsToInteger(boolean[] bits) {
+  static BigInteger bitsToInteger(boolean[] bits) {
+    // FIXME We're treating the bv as unsigned. Should we return a signed value instead?
     var value = BigInteger.ZERO;
     for (var p = 0; p < bits.length; p++) {
       if (bits[p]) {
@@ -968,7 +969,7 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
    *
    * <p>Inverse of {@link #bitsToInteger}
    */
-  boolean[] integerToBits(int bitsize, BigInteger value) {
+  static boolean[] integerToBits(int bitsize, BigInteger value) {
     checkArgument(bitsize >= value.bitLength());
 
     var bits = new boolean[bitsize];

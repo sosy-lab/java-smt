@@ -11,12 +11,16 @@ package org.sosy_lab.java_smt.solvers.yices2;
 import static com.google.common.truth.Truth.assertThat;
 import static org.junit.Assert.assertThrows;
 
+import com.google.common.collect.ImmutableList;
+import com.sri.yices.BigRational;
 import com.sri.yices.Config;
 import com.sri.yices.Constructor;
 import com.sri.yices.Context;
 import com.sri.yices.InterpolationContext;
 import com.sri.yices.Parameters;
+import com.sri.yices.ProductComponent;
 import com.sri.yices.Status;
+import com.sri.yices.SumComponent;
 import com.sri.yices.Terms;
 import com.sri.yices.Types;
 import com.sri.yices.Yices;
@@ -138,15 +142,11 @@ public class Yices2NativeApiTest {
 
   @Test
   public void testRange() {
-    /*
-    int intmax = yices_int32(Integer.MAX_VALUE);
-    int longmax = yices_int64(Long.MAX_VALUE);
-    int gt = yices_arith_gt_atom(longmax, intmax);
+    int longmax = Terms.intConst(Long.MAX_VALUE);
+    int verylong = Terms.intConst(BigInteger.valueOf(Long.MAX_VALUE).add(BigInteger.ONE));
+    int gt = Terms.arithGt(verylong, longmax);
     env.assertFormula(gt);
-    assertThat(env.check()).isEqualTo(SAT);
-
-    */
-    throw new AssertionError("yices_int32 not supported");
+    assertThat(env.check()).isEqualTo(Status.SAT);
   }
 
   @Test
@@ -395,80 +395,56 @@ public class Yices2NativeApiTest {
 
   @Test
   public void sumComponents() {
-    /*
     int three = Terms.intConst(3);
-    int rat = Terms.parseRational("3/2");
-    int x = Terms.newUninterpretedTerm(Types.intType(), "x");
-    int[] oneX = {three, x};
-    int sumOneX = yices_sum(2, oneX);
-    for (int i = 0; i < Terms.numChildren(sumOneX); i++) {
-      assertThat(Terms.toString(sumOneX)).isNotNull();
-      assertThat(Arrays.toString(yices_sum_component(sumOneX, i))).isNotNull();
-    }
-    int[] twoX = {three, x, x};
-    int sumTwoX = yices_sum(3, twoX);
-    for (int i = 0; i < Terms.numChildren(sumTwoX); i++) {
-      assertThat(Terms.toString(sumTwoX)).isNotNull();
-      assertThat(Arrays.toString(yices_sum_component(sumTwoX, i))).isNotNull();
-    }
-    int[] twoThrees = {three, x, three};
-    int sumTwoThrees = yices_sum(3, twoThrees);
-    for (int i = 0; i < Terms.numChildren(sumTwoThrees); i++) {
-      assertThat(Terms.toString(sumTwoThrees)).isNotNull();
-      assertThat(Arrays.toString(yices_sum_component(sumTwoThrees, i))).isNotNull();
-    }
-    int xTimesRational = Terms.bvMul(rat, x);
-    int[] ratSum = {three, xTimesRational};
-    int sumRatX = yices_sum(2, ratSum);
-    for (int i = 0; i < Terms.numChildren(sumRatX); i++) {
-      assertThat(Terms.toString(sumRatX)).isNotNull();
-      assertThat(Arrays.toString(yices_sum_component(sumRatX, i))).isNotNull();
-    }
-    */
-    throw new AssertionError("sums not supported");
+    int x = Terms.newUninterpretedTerm("x", Types.intType());
+    int xTimesRational = Terms.mul(x, Terms.parseRational("3/2"));
+
+    int add = Terms.add(ImmutableList.of(three, xTimesRational));
+
+    assertThat(Terms.constructor(add)).isEqualTo(Constructor.ARITH_SUM);
+    assertThat(Terms.numChildren(add)).isEqualTo(2);
+
+    @SuppressWarnings("unchecked")
+    SumComponent<BigRational> component1 = (SumComponent<BigRational>) Terms.projSum(add, 0);
+    // Coefficient is 3
+    assertThat(component1.getFactor()).isEqualTo(new BigRational("3"));
+    // Term id is NULL (-1) for i = 0
+    assertThat(component1.getTerm()).isEqualTo(-1);
+
+    @SuppressWarnings("unchecked")
+    SumComponent<BigRational> component2 = (SumComponent<BigRational>) Terms.projSum(add, 1);
+    // Coefficient is 3/2
+    assertThat(component2.getFactor()).isEqualTo(new BigRational("3/2"));
+    // Term is x for i = 1
+    assertThat(component2.getTerm()).isEqualTo(x);
   }
 
   @Test
   public void bvSumComponents() {
-    /*
     String bv1StringValue = "00101";
     int bv1 = Terms.parseBvBin(bv1StringValue);
-    int bv5type = Types.bvType(5);
-    int x = Terms.newUninterpretedTerm(bv5type, "x");
+    int x = Terms.newUninterpretedTerm("x", Types.bvType(5));
     int negativeX = Terms.bvMul(Terms.bvMinusOne(5), x);
     int add = Terms.bvAdd(bv1, negativeX);
+
+    assertThat(Terms.constructor(add)).isEqualTo(Constructor.BV_SUM);
     assertThat(Terms.numChildren(add)).isEqualTo(2);
-    assertThat(Terms.toString(add)).isNotNull();
 
-    int[] component1 = yices_bvsum_component(add, 0, Terms.bitSize(add));
-    String value1 =
-        Joiner.on("")
-            .join(
-                Lists.reverse(
-                    Ints.asList(Arrays.copyOfRange(component1, 0, component1.length - 1))));
-    int term1 = component1[component1.length - 1];
-    // Value of coefficient
-    assertThat(value1).isEqualTo(bv1StringValue);
+    @SuppressWarnings("unchecked")
+    SumComponent<boolean[]> component1 = (SumComponent<boolean[]>) Terms.projSum(add, 0);
+    BigInteger coeff1 = Yices2FormulaCreator.bitsToInteger(component1.getFactor());
     // Coefficient as BigInt
-    assertThat(new BigInteger(value1, 2)).isEqualTo(BigInteger.valueOf(5));
+    assertThat(coeff1).isEqualTo(new BigInteger(bv1StringValue, 2));
     // Term id is NULL (-1) for i = 0
-    assertThat(term1).isEqualTo(-1);
+    assertThat(component1.getTerm()).isEqualTo(-1);
 
-    int[] component2 = yices_bvsum_component(add, 1, Terms.bitSize(add));
-    String value2 =
-        Joiner.on("")
-            .join(
-                Lists.reverse(
-                    Ints.asList(Arrays.copyOfRange(component2, 0, component2.length - 1))));
-    int term2 = component2[component2.length - 1];
-    // Value of coefficient (-1 == 11111)
-    assertThat(value2).isEqualTo("11111");
+    @SuppressWarnings("unchecked")
+    SumComponent<boolean[]> component2 = (SumComponent<boolean[]>) Terms.projSum(add, 1);
+    BigInteger coeff2 = Yices2FormulaCreator.bitsToInteger(component2.getFactor());
     // Coefficient as BigInt (31 because it has no sign bit, and -1 is max for bv)
-    assertThat(new BigInteger(value2, 2)).isEqualTo(BigInteger.valueOf(31));
-    // Term id is NULL (-1) for i = 0
-    assertThat(term2).isEqualTo(x);
-    */
-    throw new AssertionError("sums not supported");
+    assertThat(coeff2).isEqualTo(BigInteger.valueOf(31));
+    // Term is x for i = 1
+    assertThat(component2.getTerm()).isEqualTo(x);
   }
 
   @SuppressWarnings("CheckReturnValue")
@@ -480,12 +456,9 @@ public class Yices2NativeApiTest {
     int signExtendedX = Terms.bvSignExtend(x, extendBy);
     int zeroExtendedX = Terms.bvZeroExtend(x, extendBy);
 
-    assertThat(Terms.toString(x)).isNotNull();
     assertThat(Terms.numChildren(x)).isEqualTo(0);
     assertThat(Terms.numChildren(signExtendedX)).isEqualTo(initialSize + extendBy);
-    assertThat(Terms.toString(signExtendedX)).isNotNull();
     assertThat(Terms.numChildren(zeroExtendedX)).isEqualTo(initialSize + extendBy);
-    assertThat(Terms.toString(zeroExtendedX)).isNotNull();
 
     int bvSignExt = Terms.projArg(Terms.child(signExtendedX, 0));
     int bvSizeSignExt = Terms.bitSize(bvSignExt);
@@ -523,18 +496,16 @@ public class Yices2NativeApiTest {
 
   @Test
   public void bvMul() {
-    /*
     int type = Types.bvType(5);
-    int bv2 = Terms.newUninterpretedTerm(type, "x");
+    int bv2 = Terms.newUninterpretedTerm("x", type);
     int mul = Terms.bvMul(bv2, bv2);
     assertThat(Terms.constructor(mul)).isEqualTo(Constructor.POWER_PRODUCT);
-    // bv2 + bv2 == bv2²
-    int[] component = yices_product_component(mul, 0);
-    assertThat(component[0]).isEqualTo(bv2);
-    assertThat(component[1]).isEqualTo(2);
-    assertThat(Terms.constructor(yices_bvpower(component[0], component[1]))).isGreaterThan(0);
-    */
-    throw new AssertionError("products not supported");
+    // bv2 * bv2 == bv2²
+    ProductComponent component = Terms.projProduct(mul, 0);
+    assertThat(component.getTerm()).isEqualTo(bv2);
+    assertThat(component.getPower()).isEqualTo(2);
+    assertThat(Terms.constructor(Terms.bvPower(component.getTerm(), component.getPower())))
+        .isEqualTo(Constructor.POWER_PRODUCT);
   }
 
   @Test

@@ -134,7 +134,7 @@ public class Yices2Model extends AbstractModel<Integer, Integer, Long> {
           return Rational.of(rational.getNumerator(), rational.getDenominator());
         }
       case BV:
-        return formulaCreator.bitsToInteger(model.bvValue(value));
+        return Yices2FormulaCreator.bitsToInteger(model.bvValue(value));
       default:
         throw new IllegalArgumentException("Unexpected value type: " + value.tag);
     }
@@ -150,7 +150,8 @@ public class Yices2Model extends AbstractModel<Integer, Integer, Long> {
       var rational = (Rational) value;
       return Terms.rationalConst(rational.getNum(), rational.getDen());
     } else if (Types.isBitvector(type)) {
-      return Terms.bvConst(formulaCreator.integerToBits(Types.bvSize(type), (BigInteger) value));
+      return Terms.bvConst(
+          Yices2FormulaCreator.integerToBits(Types.bvSize(type), (BigInteger) value));
     } else {
       throw new IllegalArgumentException("Unexpected type: " + Types.toString(type));
     }
