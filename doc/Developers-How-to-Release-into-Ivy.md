@@ -156,6 +156,42 @@ ant publish-cvc5 -Dcvc5.version=2025-03-31-34518c3
 During the build process, our script automatically fetches binaries for Windows, Linux, and
 maxOS on x64 and arm64 and repackages them to be used in JavaSMT.
 
+### Publishing LeanSMT
+
+LeanSMT is published as an explicit opt-in runtime profile for Linux x64.
+
+Prerequisites:
+
+- LeanSMT checkout from <https://github.com/ufmg-smite/lean-smt> that builds successfully (`lake build`).
+- JavaSMT checkout.
+
+Recommended sequence:
+
+1. Build LeanSMT runtime in the LeanSMT checkout:
+   ```bash
+   cd /absolute/path/to/lean-smt
+   lake build
+   ```
+2. Refresh packaged LeanSMT runtime files in JavaSMT:
+   ```bash
+   cd /absolute/path/to/java-smt
+   ./build/build-publish-solvers/package-leansmt-runtime.sh /absolute/path/to/lean-smt
+   ```
+3. Validate integration:
+   ```bash
+   ant -q build-project
+   ant unit-tests-leansmt
+   ```
+4. Publish LeanSMT runtime binaries to the Ivy repository:
+   ```bash
+   ant publish-leansmt -Dleansmt.version=$LEANSMT_VERSION
+   ```
+
+Notes:
+
+- `publish-leansmt` packages runtime libraries from `lib/native/x86_64-linux`.
+- The published Ivy solver artifact contains LeanSMT shared libraries (`.so`); `cvc5` executable is not published as part of this solver artifact.
+
 
 ### Publishing OpenSMT
 

@@ -99,25 +99,18 @@ For publishing LeanSMT, we stage `javasmt-solver-leansmt` (Linux x64 `.so` class
 
 Prerequisites:
 
-- LeanSMT checkout from <https://github.com/ufmg-smite/lean-smt> that builds successfully (`lake build`).
-- JavaSMT checkout with LeanSMT runtime files packaged into `lib/native/x86_64-linux`.
+- LeanSMT runtime already published to Ivy (see `doc/Developers-How-to-Release-into-Ivy.md`).
+- JavaSMT checkout with `runtime-leansmt` dependency configured (or provide `-Dstage.revision=...`).
 - Maven credentials, GPG setup, and Maven Ant task setup (see requirements above).
 
 Recommended sequence (run in JavaSMT root):
 
 ```bash
-# 1) Refresh LeanSMT runtime files from a local LeanSMT checkout.
-./build/build-publish-solvers/package-leansmt-runtime.sh /absolute/path/to/lean-smt
-
-# 2) Validate LeanSMT integration before staging.
-ant -q build-project
-ant unit-tests-leansmt
-
-# 3) Stage LeanSMT solver package to Maven Central staging area.
-# Preferred: use revision from runtime-leansmt Ivy metadata.
+# Stage LeanSMT solver package to Maven Central staging area.
+# Preferred: resolve revision from runtime-leansmt Ivy metadata.
 ant stage-leansmt
 
-# Fallback: force explicit revision if metadata resolution is unavailable.
+# Fallback: pass explicit revision if metadata resolution is unavailable.
 ant -Dstage.revision=$LEANSMT_VERSION stage-leansmt
 ```
 
