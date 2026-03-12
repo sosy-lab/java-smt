@@ -93,9 +93,9 @@ For publishing binary solvers like Boolector, CVC4, MathSAT5, Yices2, or Z3, the
 - Later `release` your staged bundle.
   After some delay (a few hours) the release is automatically synced to Maven Central.
 
-### LeanSMT staging on Maven
+### Publishing LeanSMT
 
-LeanSMT staging publishes `javasmt-solver-leansmt` (Linux x64 `.so` classifiers).
+For publishing LeanSMT, we stage `javasmt-solver-leansmt` (Linux x64 `.so` classifiers).
 
 Prerequisites:
 
