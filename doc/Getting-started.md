@@ -109,7 +109,7 @@ dependencies (example for Linux x64):
 ```
 
 The XML snippets for other solvers available via Maven,
-such as `Boolector`, `CVC4`, `CVC5`, `OpenSMT`, `Princess`, and `Yices2`,
+such as `Boolector`, `CVC4`, `CVC5`, `LeanSMT`, `OpenSMT`, `Princess`, and `Yices2`,
 can be found in the [`POM file`](Example-Maven-Project/pom.xml) of our [`Example-Maven-Project`](Example-Maven-Project).
 
 If you are not using Linux and we provide a solver binary for your system,

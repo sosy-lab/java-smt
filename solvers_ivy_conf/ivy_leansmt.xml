@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+This file is part of JavaSMT,
+an API wrapper for a collection of SMT solvers:
+https://github.com/sosy-lab/java-smt
+
+SPDX-FileCopyrightText: 2026 Dirk Beyer <https://www.sosy-lab.org>
+
+SPDX-License-Identifier: Apache-2.0
+-->
+
+<ivy-module version="2.0"
+            xmlns:e="http://ant.apache.org/ivy/extra"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xsi:noNamespaceSchemaLocation="http://ant.apache.org/ivy/schemas/ivy.xsd">
+    <info organisation="org.sosy_lab" module="javasmt-solver-leansmt">
+      <license name="Apache License, Version 2.0" url="https://www.apache.org/licenses/LICENSE-2.0.txt"/>
+        <description>
+            LeanSMT JNI runtime for JavaSMT on Linux x64.
+            The package contains native LeanSMT shared libraries.
+            The cvc5 executable is expected in PATH.
+        </description>
+    </info>
+
+    <configurations>
+        <!-- default config, provides only x64 for backwards-compatibility -->
+        <conf name="solver-leansmt" extends="solver-leansmt-x64"/>
+
+        <!-- main configurations -->
+        <conf name="solver-leansmt-x64" extends="solver-leansmt-linux-x64"/>
+
+        <!-- basic configurations -->
+        <conf name="solver-leansmt-linux-x64" extends="solver-leansmt-common"/>
+
+        <conf name="solver-leansmt-common" visibility="private"/>
+    </configurations>
+
+    <publications defaultconf="solver-leansmt">
+        <artifact name="libleansmt_jni" conf="solver-leansmt-linux-x64" e:arch="x64" type="shared-object" ext="so"/>
+        <artifact name="libAuto" conf="solver-leansmt-linux-x64" e:arch="x64" type="shared-object" ext="so"/>
+        <artifact name="libQq" conf="solver-leansmt-linux-x64" e:arch="x64" type="shared-object" ext="so"/>
+        <artifact name="libSmt" conf="solver-leansmt-linux-x64" e:arch="x64" type="shared-object" ext="so"/>
+        <artifact name="libSmtJNI" conf="solver-leansmt-linux-x64" e:arch="x64" type="shared-object" ext="so"/>
+        <artifact name="libcvc5" conf="solver-leansmt-linux-x64" e:arch="x64" type="shared-object" ext="so"/>
+        <artifact name="libleanshared" conf="solver-leansmt-linux-x64" e:arch="x64" type="shared-object" ext="so"/>
+    </publications>
+
+    <dependencies></dependencies>
+
+</ivy-module>

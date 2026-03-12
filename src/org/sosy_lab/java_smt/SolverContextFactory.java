@@ -35,6 +35,7 @@ import org.sosy_lab.java_smt.solvers.boolector.BoolectorSolverContext;
 import org.sosy_lab.java_smt.solvers.cvc4.CVC4SolverContext;
 import org.sosy_lab.java_smt.solvers.cvc5.CVC5SolverContext;
 import org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5SolverContext;
+import org.sosy_lab.java_smt.solvers.leansmt.LeanSmtSolverContext;
 import org.sosy_lab.java_smt.solvers.opensmt.OpenSmtSolverContext;
 import org.sosy_lab.java_smt.solvers.princess.PrincessSolverContext;
 import org.sosy_lab.java_smt.solvers.smtinterpol.SmtInterpolSolverContext;
@@ -62,7 +63,8 @@ public class SolverContextFactory {
     CVC4,
     CVC5,
     YICES2,
-    BITWUZLA
+    BITWUZLA,
+    LEANSMT
   }
 
   @Option(secure = true, description = "Export solver queries in SmtLib format into a file.")
@@ -119,9 +121,11 @@ public class SolverContextFactory {
   private final ShutdownNotifier shutdownNotifier;
   private final Configuration config;
   private final Consumer<String> loader;
+  private final boolean allowLeanSmtBundledLibraryFallback;
 
   /**
    * This constructor uses the default JavaSMT loader for accessing native libraries.
+   * LeanSMT may also use bundled absolute-path lookup as an additional fallback.
    *
    * @see #SolverContextFactory(Configuration, LogManager, ShutdownNotifier, Consumer)
    */
@@ -164,6 +168,7 @@ public class SolverContextFactory {
     shutdownNotifier = checkNotNull(pShutdownNotifier);
     config = pConfig;
     loader = checkNotNull(pLoader);
+    allowLeanSmtBundledLibraryFallback = true;
 
     if (!logAllQueries) {
       logfile = null;
@@ -316,6 +321,13 @@ public class SolverContextFactory {
       case BITWUZLA:
         return BitwuzlaSolverContext.create(
             config, shutdownNotifier, logfile, randomSeed, floatingPointRoundingMode, loader);
+
+      case LEANSMT:
+        return LeanSmtSolverContext.create(
+            shutdownNotifier,
+            nonLinearArithmetic,
+            loader,
+            allowLeanSmtBundledLibraryFallback);
 
       default:
         throw new AssertionError("no solver selected");

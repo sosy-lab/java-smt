@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!--
+This file is part of JavaSMT,
+an API wrapper for a collection of SMT solvers:
+https://github.com/sosy-lab/java-smt
+
+SPDX-FileCopyrightText: 2026 Dirk Beyer <https://www.sosy-lab.org>
+
+SPDX-License-Identifier: Apache-2.0
+-->
+
+<!-- vim: set tabstop=8 shiftwidth=4 expandtab sts=4 filetype=ant fdm=marker: -->
+<project name="publish-solvers-leansmt" basedir="." xmlns:ivy="antlib:org.apache.ivy.ant">
+
+    <import file="macros.xml"/>
+
+    <property name="leansmt.libDir" value="lib/native/x86_64-linux"/>
+    <property name="leansmt.distDir" value="build/leansmt-dist"/>
+
+    <target name="clean-leansmt-dist">
+        <delete dir="${leansmt.distDir}" quiet="true"/>
+    </target>
+
+    <target name="package-leansmt" depends="clean-leansmt-dist">
+        <fail unless="leansmt.version">
+            Please specify the LeanSMT release version with -Dleansmt.version=...
+            Example: -Dleansmt.version=0.1.0-lean1
+        </fail>
+
+        <mkdir dir="${leansmt.distDir}/x64"/>
+
+        <copy file="${leansmt.libDir}/libleansmt_jni.so"
+              tofile="${leansmt.distDir}/x64/libleansmt_jni-${leansmt.version}.so"/>
+        <copy file="${leansmt.libDir}/libAuto.so"
+              tofile="${leansmt.distDir}/x64/libAuto-${leansmt.version}.so"/>
+        <copy file="${leansmt.libDir}/libQq.so"
+              tofile="${leansmt.distDir}/x64/libQq-${leansmt.version}.so"/>
+        <copy file="${leansmt.libDir}/libSmt.so"
+              tofile="${leansmt.distDir}/x64/libSmt-${leansmt.version}.so"/>
+        <copy file="${leansmt.libDir}/libSmtJNI.so"
+              tofile="${leansmt.distDir}/x64/libSmtJNI-${leansmt.version}.so"/>
+        <copy file="${leansmt.libDir}/libcvc5.so"
+              tofile="${leansmt.distDir}/x64/libcvc5-${leansmt.version}.so"/>
+        <copy file="${leansmt.libDir}/libleanshared.so"
+              tofile="${leansmt.distDir}/x64/libleanshared-${leansmt.version}.so"/>
+    </target>
+
+    <target name="publish-leansmt" depends="package-leansmt, load-ivy"
+            description="Publish LeanSMT runtime binaries to Ivy repository.">
+        <ivy:resolve conf="solver-leansmt,solver-leansmt-x64" file="solvers_ivy_conf/ivy_leansmt.xml"/>
+        <publishToRepository solverName="LeanSMT" solverVersion="${leansmt.version}" distDir="${leansmt.distDir}"/>
+    </target>
+</project>

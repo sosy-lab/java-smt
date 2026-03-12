@@ -78,6 +78,7 @@ SPDX-License-Identifier: Apache-2.0
     <boolector.version>3.2.2-g1a89c229</boolector.version>
     <cvc4.version>1.8-prerelease-2020-06-24-g7825d8f28</cvc4.version>
     <cvc5.version>1.0.5-g4cb2ab9eb</cvc5.version>
+    <leansmt.version>0.1.0-lean1</leansmt.version>
     <mathsat.version>5.6.11-glibc2.27</mathsat.version>
     <opensmt.version>2.8.0-sosy0-ge831bf23</opensmt.version>
     <javasmt-yices.version>4.1.1-734-g3732f7e08</javasmt-yices.version>
@@ -232,6 +233,58 @@ SPDX-License-Identifier: Apache-2.0
       <version>${cvc5.version}</version>
       <type>so</type>
       <classifier>libpolyxx</classifier>
+    </dependency>
+
+    <!-- LeanSMT has seven dependencies (on Linux x64).
+         The cvc5 executable must also be available (bundled with runtime files or in PATH). -->
+    <dependency>
+      <groupId>org.sosy-lab</groupId>
+      <artifactId>javasmt-solver-leansmt</artifactId>
+      <version>${leansmt.version}</version>
+      <type>so</type>
+      <classifier>libleansmt_jni-x64</classifier>
+    </dependency>
+    <dependency>
+      <groupId>org.sosy-lab</groupId>
+      <artifactId>javasmt-solver-leansmt</artifactId>
+      <version>${leansmt.version}</version>
+      <type>so</type>
+      <classifier>libAuto-x64</classifier>
+    </dependency>
+    <dependency>
+      <groupId>org.sosy-lab</groupId>
+      <artifactId>javasmt-solver-leansmt</artifactId>
+      <version>${leansmt.version}</version>
+      <type>so</type>
+      <classifier>libQq-x64</classifier>
+    </dependency>
+    <dependency>
+      <groupId>org.sosy-lab</groupId>
+      <artifactId>javasmt-solver-leansmt</artifactId>
+      <version>${leansmt.version}</version>
+      <type>so</type>
+      <classifier>libSmt-x64</classifier>
+    </dependency>
+    <dependency>
+      <groupId>org.sosy-lab</groupId>
+      <artifactId>javasmt-solver-leansmt</artifactId>
+      <version>${leansmt.version}</version>
+      <type>so</type>
+      <classifier>libSmtJNI-x64</classifier>
+    </dependency>
+    <dependency>
+      <groupId>org.sosy-lab</groupId>
+      <artifactId>javasmt-solver-leansmt</artifactId>
+      <version>${leansmt.version}</version>
+      <type>so</type>
+      <classifier>libcvc5-x64</classifier>
+    </dependency>
+    <dependency>
+      <groupId>org.sosy-lab</groupId>
+      <artifactId>javasmt-solver-leansmt</artifactId>
+      <version>${leansmt.version}</version>
+      <type>so</type>
+      <classifier>libleanshared-x64</classifier>
     </dependency>
 
     <!-- Yices2 has two dependencies (on Linux) -->
@@ -470,6 +523,57 @@ SPDX-License-Identifier: Apache-2.0
                 <type>so</type>
                 <classifier>libpolyxx</classifier>
                 <destFileName>libpolyxx.so</destFileName>
+              </artifactItem>
+
+              <!-- LeanSMT has seven dependencies (on Linux x64). -->
+              <artifactItem>
+                <groupId>org.sosy-lab</groupId>
+                <artifactId>javasmt-solver-leansmt</artifactId>
+                <type>so</type>
+                <classifier>libleansmt_jni-x64</classifier>
+                <destFileName>libleansmt_jni.so</destFileName>
+              </artifactItem>
+              <artifactItem>
+                <groupId>org.sosy-lab</groupId>
+                <artifactId>javasmt-solver-leansmt</artifactId>
+                <type>so</type>
+                <classifier>libAuto-x64</classifier>
+                <destFileName>libAuto.so</destFileName>
+              </artifactItem>
+              <artifactItem>
+                <groupId>org.sosy-lab</groupId>
+                <artifactId>javasmt-solver-leansmt</artifactId>
+                <type>so</type>
+                <classifier>libQq-x64</classifier>
+                <destFileName>libQq.so</destFileName>
+              </artifactItem>
+              <artifactItem>
+                <groupId>org.sosy-lab</groupId>
+                <artifactId>javasmt-solver-leansmt</artifactId>
+                <type>so</type>
+                <classifier>libSmt-x64</classifier>
+                <destFileName>libSmt.so</destFileName>
+              </artifactItem>
+              <artifactItem>
+                <groupId>org.sosy-lab</groupId>
+                <artifactId>javasmt-solver-leansmt</artifactId>
+                <type>so</type>
+                <classifier>libSmtJNI-x64</classifier>
+                <destFileName>libSmtJNI.so</destFileName>
+              </artifactItem>
+              <artifactItem>
+                <groupId>org.sosy-lab</groupId>
+                <artifactId>javasmt-solver-leansmt</artifactId>
+                <type>so</type>
+                <classifier>libcvc5-x64</classifier>
+                <destFileName>libcvc5.so</destFileName>
+              </artifactItem>
+              <artifactItem>
+                <groupId>org.sosy-lab</groupId>
+                <artifactId>javasmt-solver-leansmt</artifactId>
+                <type>so</type>
+                <classifier>libleanshared-x64</classifier>
+                <destFileName>libleanshared.so</destFileName>
               </artifactItem>
 
               <!-- Yices2 has two dependencies (on Linux),

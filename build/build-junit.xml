@@ -81,6 +81,7 @@ SPDX-License-Identifier: Apache-2.0
             <include name="**/solvers/boolector/BoolectorNativeApiTest.*"/>
             <include name="**/solvers/cvc4/CVC4NativeAPITest.*"/>
             <include name="**/solvers/cvc5/CVC5NativeAPITest.*"/>
+            <include name="**/solvers/leansmt/LeanSmtNativeApiTest.*"/>
             <include name="**/solvers/mathsat5/Mathsat5AbstractNativeApiTest.*"/>
             <include name="**/solvers/mathsat5/Mathsat5NativeApiTest.*"/>
             <include name="**/solvers/mathsat5/Mathsat5OptimizationNativeApiTest.*"/>
@@ -102,6 +103,27 @@ SPDX-License-Identifier: Apache-2.0
         <patternset id="test.sources">
             <include name="**/*Test.*"/>
             <exclude name="**/*$*Test.*"/>
+        </patternset>
+        <run-junit-tests/>
+    </target>
+
+    <target name="unit-tests-leansmt" depends="build, load-junit, init-unit-tests"
+            description="Run LeanSMT-focused JUnit tests">
+        <patternset id="test.sources">
+            <include name="**/solvers/leansmt/LeanSmtNativeApiTest.*"/>
+            <include name="**/solvers/leansmt/LeanSmtTheoremProverResultHandlingTest.*"/>
+            <include name="**/test/LeanSmtRegressionTest.*"/>
+            <include name="**/test/LeanSmtLifecycleTest.*"/>
+        </patternset>
+        <run-junit-tests/>
+    </target>
+
+    <target name="unit-tests-filter" depends="build, load-junit, init-unit-tests"
+            description="Run JUnit tests matching a custom include pattern (for example **/test/FooTest.*)">
+        <fail unless="test.filter"
+              message="Missing -Dtest.filter. Example: -Dtest.filter=**/test/BitvectorFormulaManagerTest.*"/>
+        <patternset id="test.sources">
+            <include name="${test.filter}"/>
         </patternset>
         <run-junit-tests/>
     </target>

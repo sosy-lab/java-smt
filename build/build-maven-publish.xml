@@ -242,6 +242,32 @@ SPDX-License-Identifier: Apache-2.0
         <stage-solver-file filename="libcvc5jni" classifier="libcvc5jni-arm64" filedirectory="${libDir.arm64}" fileending="dylib"/>
     </target>
 
+    <target name="stage-leansmt" depends="build-dependencies"
+            description="deploy current version of LeanSMT runtime to Maven staging repository">
+        <!-- Resolve explicit LeanSMT runtime conf because default runtime does not include it. -->
+        <ivy:resolve conf="runtime-leansmt"/>
+        <ivy:artifactproperty name="[artifact].revision" value="[revision]" conf="runtime-leansmt"/>
+        <condition property="stage.revision" value="${libleansmt_jni.revision}">
+            <isset property="libleansmt_jni.revision"/>
+        </condition>
+        <fail unless="stage.revision"
+              message="Missing LeanSMT solver revision. Configure runtime-leansmt dependency or pass -Dstage.revision=..."/>
+        <property name="stage.solver" value="leansmt"/>
+        <property name="libDir.x64" value="lib/native/x86_64-linux"/>
+        <!-- prepare the pom-file -->
+        <generate-solver-pom-file/>
+        <!-- then publish the files -->
+        <stage-solver-file filename="libleansmt_jni" classifier="libleansmt_jni-x64" filedirectory="${libDir.x64}" fileending="so"/>
+        <stage-solver-file filename="libAuto" classifier="libAuto-x64" filedirectory="${libDir.x64}" fileending="so"/>
+        <stage-solver-file filename="libQq" classifier="libQq-x64" filedirectory="${libDir.x64}" fileending="so"/>
+        <stage-solver-file filename="libSmt" classifier="libSmt-x64" filedirectory="${libDir.x64}" fileending="so"/>
+        <stage-solver-file filename="libSmtJNI" classifier="libSmtJNI-x64" filedirectory="${libDir.x64}" fileending="so"/>
+        <stage-solver-file filename="libcvc5" classifier="libcvc5-x64" filedirectory="${libDir.x64}" fileending="so"/>
+        <stage-solver-file filename="libleanshared" classifier="libleanshared-x64" filedirectory="${libDir.x64}" fileending="so"/>
+        <!-- The cvc5 executable is not staged here because Maven classifiers require file extensions;
+             runtime deployments must provide cvc5 separately (or via PATH fallback). -->
+    </target>
+
     <!--
     Yices2 consists of two parts:
      - we release our JavaSMT-based bindings for Yices2.
