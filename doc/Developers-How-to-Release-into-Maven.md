@@ -93,11 +93,40 @@ For publishing binary solvers like Boolector, CVC4, MathSAT5, Yices2, or Z3, the
 - Later `release` your staged bundle.
   After some delay (a few hours) the release is automatically synced to Maven Central.
 
-### LeanSMT
+### LeanSMT staging on Maven
 
-LeanSMT has its own release/setup documentation in
-[`src/org/sosy_lab/java_smt/solvers/leansmt/README.md`](../src/org/sosy_lab/java_smt/solvers/leansmt/README.md)
-to keep solver-specific staging details out of this general Maven release guide.
+LeanSMT staging publishes `javasmt-solver-leansmt` (Linux x64 `.so` classifiers).
+
+Prerequisites:
+
+- LeanSMT checkout from <https://github.com/ufmg-smite/lean-smt> that builds successfully (`lake build`).
+- JavaSMT checkout with LeanSMT runtime files packaged into `lib/native/x86_64-linux`.
+- Maven credentials, GPG setup, and Maven Ant task setup (see requirements above).
+
+Recommended sequence (run in JavaSMT root):
+
+```bash
+# 1) Refresh LeanSMT runtime files from a local LeanSMT checkout.
+./build/build-publish-solvers/package-leansmt-runtime.sh /absolute/path/to/lean-smt
+
+# 2) Validate LeanSMT integration before staging.
+ant -q build-project
+ant unit-tests-leansmt
+
+# 3) Stage LeanSMT solver package to Maven Central staging area.
+# Preferred: use revision from runtime-leansmt Ivy metadata.
+ant stage-leansmt
+
+# Fallback: force explicit revision if metadata resolution is unavailable.
+ant -Dstage.revision=$LEANSMT_VERSION stage-leansmt
+```
+
+Notes:
+
+- `stage-leansmt` resolves Ivy config `runtime-leansmt` explicitly (LeanSMT is opt-in, not part of default runtime).
+- The staged Maven package contains LeanSMT shared libraries only; `cvc5` executable is not part of this artifact.
+- For local build/setup details (outside release flow), see
+  [`src/org/sosy_lab/java_smt/solvers/leansmt/README.md`](../src/org/sosy_lab/java_smt/solvers/leansmt/README.md).
 Additional instructions are available at the official [OSSRH][] page and
 the [documentation](http://central.sonatype.org/pages/releasing-the-deployment.html).
 
