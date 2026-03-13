@@ -16,9 +16,9 @@ import org.sosy_lab.java_smt.solvers.bitwuzla.api.Term;
 
 // Declarations sometimes need the info of a Term, but mostly those of Kinds.
 // We can not discern between the two however, hence this wrapper
-public record BitwuzlaDeclaration(@Nullable Term getTerm, @Nullable Kind getKind) {
+record BitwuzlaDeclaration(@Nullable Term getTerm, @Nullable Kind getKind) {
 
-  public BitwuzlaDeclaration {
+  BitwuzlaDeclaration {
     checkArgument(
         (getTerm == null) != (getKind == null), "Exactly one of term and kind must be non-null");
   }
