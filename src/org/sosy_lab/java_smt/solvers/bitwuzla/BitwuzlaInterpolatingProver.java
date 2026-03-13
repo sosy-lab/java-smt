@@ -31,9 +31,10 @@ import org.sosy_lab.java_smt.solvers.bitwuzla.api.Options;
 import org.sosy_lab.java_smt.solvers.bitwuzla.api.Vector_Term;
 import org.sosy_lab.java_smt.solvers.bitwuzla.api.Vector_Vector_Term;
 
-public class BitwuzlaInterpolatingProver extends BitwuzlaAbstractProver<Integer>
+class BitwuzlaInterpolatingProver extends BitwuzlaAbstractProver<Integer>
     implements InterpolatingProverEnvironment<Integer> {
-  protected BitwuzlaInterpolatingProver(
+
+  BitwuzlaInterpolatingProver(
       BitwuzlaFormulaManager pManager,
       BitwuzlaFormulaCreator pCreator,
       ShutdownNotifier pShutdownNotifier,

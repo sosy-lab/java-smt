@@ -56,7 +56,7 @@ class CVC4TheoremProver extends AbstractProverWithAllSat<Void>
   // CVC4 does not support separation logic in incremental mode.
   private final boolean incremental;
 
-  protected CVC4TheoremProver(
+  CVC4TheoremProver(
       CVC4FormulaCreator pFormulaCreator,
       ShutdownNotifier pShutdownNotifier,
       int pRandomSeed,
