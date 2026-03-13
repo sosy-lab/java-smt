@@ -8,7 +8,6 @@
 
 package org.sosy_lab.java_smt.test;
 
-import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.TruthJUnit.assume;
 import static org.sosy_lab.java_smt.api.FormulaType.IntegerType;
 import static org.sosy_lab.java_smt.api.FormulaType.RationalType;
@@ -250,9 +249,7 @@ public class ArrayFormulaManagerTest extends SolverBasedTest0.ParameterizedSolve
 
   @Test
   public void testArrayWithManyValues() throws SolverException, InterruptedException {
-    // FIXME Regression after the bug fix (used to be slow already..)
-    assertThat(solver).isNotEqualTo(Solvers.YICES2);
-
+   
     requireIntegers();
     requireArrays();
 
