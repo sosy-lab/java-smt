@@ -8,8 +8,10 @@
 
 package org.sosy_lab.java_smt.solvers.bitwuzla;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import org.sosy_lab.common.UniqueIdGenerator;
 import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.api.FloatingPointFormula;
 import org.sosy_lab.java_smt.api.FloatingPointNumber.Sign;
@@ -30,7 +32,7 @@ class BitwuzlaFloatingPointManager
   private final Term roundingMode;
 
   // Keeps track of the temporary variables that are created for fp-to-bv casts
-  private static int counter = 0;
+  private static final UniqueIdGenerator counter = new UniqueIdGenerator();
 
   BitwuzlaFloatingPointManager(
       BitwuzlaFormulaCreator pCreator, FloatingPointRoundingMode pFloatingPointRoundingMode) {
@@ -222,7 +224,7 @@ class BitwuzlaFloatingPointManager
 
     // TODO creating our own utility variables might eb unexpected from the user.
     //   We might need to exclude such variables in models and formula traversal.
-    String newVariable = "__JAVASMT__CAST_FROM_BV_" + counter++;
+    String newVariable = "__JAVASMT__CAST_FROM_BV_" + counter.getFreshId();
     Term bvVar = termManager.mk_const(bvSort, newVariable);
     Term equal =
         termManager.mk_term(
