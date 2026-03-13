@@ -1252,8 +1252,6 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
     requireArrays();
     requireArrayModel();
 
-    assertThat(solver).isNotEqualTo(Solvers.YICES2); // FIXME
-
     // (= (select (select (select arr 5) 3) 1) x)
     // (= x 123)"
     ArrayFormulaType<IntegerFormula, IntegerFormula> innerType =
@@ -1837,8 +1835,6 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
     requireIntegers();
     requireArrays();
     requireArrayModel();
-
-    assertThat(solver).isNotEqualTo(Solvers.YICES2); // FIXME
 
     // Let's store N values into an array and check that each one is in the model.
     // The example array formula is: for x in [1...N]: arr = store(arr, i_x, x)
@@ -2615,7 +2611,6 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
     requireArrays();
     requireBitvectors();
 
-    assertThat(solver).isNotEqualTo(Solvers.YICES2); // FIXME Segfaults
     assume().that(solver).isNotEqualTo(Solvers.BOOLECTOR); // Doesn't support multiple indices
 
     var bitvectorType = FormulaType.getBitvectorTypeWithSize(8);
@@ -2639,7 +2634,6 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
     requireBitvectors();
 
     assume().that(solver).isNotEqualTo(Solvers.BOOLECTOR); // Doesn't support multiple indices
-    assume().that(solver).isNotEqualTo(Solvers.YICES2); // Yices does not give nested array models
 
     // Test for 2d bitvector arrays with formula like:
     //     array[1][7] = 10  and  array[3][2] = 5  and  array[5][4] = 20
@@ -2685,6 +2679,10 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
 
     assume().that(solver).isNotEqualTo(Solvers.BOOLECTOR); // Doesn't support multiple indices
     assume().that(solver).isNotEqualTo(Solvers.CVC4); // FIXME Broken in JavaSMT
+    assume()
+        .withMessage("Yices does not support constant arrays when mcsat is used")
+        .that(solver)
+        .isNotEqualTo(Solvers.YICES2);
 
     var scalarType = FormulaType.getBitvectorTypeWithSize(8);
 
@@ -2726,8 +2724,10 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
     requireBitvectors();
 
     assume().that(solver).isNotEqualTo(Solvers.BOOLECTOR); // Doesn't support multiple indices
-    assume().that(solver).isNotEqualTo(Solvers.YICES2); // Yices does not give nested array models
-
+    assume()
+        .withMessage("Yices does not support constant arrays when mcsat is used")
+        .that(solver)
+        .isNotEqualTo(Solvers.YICES2);
     // FIXME CVC4 array model is sometimes broken in JavaSMT. Unfixable in CVC4, fixed in CVC5.
     assume().that(solver).isNotEqualTo(Solvers.CVC4);
 
@@ -2808,8 +2808,6 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
     requireArrayModel();
     requireIntegers();
 
-    assertThat(solver).isNotEqualTo(Solvers.YICES2); // FIXME
-
     var array =
         amgr.makeArray("array", IntegerType, FormulaType.getArrayType(IntegerType, IntegerType));
 
@@ -2832,6 +2830,10 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
     requireConstArrays();
 
     assume().that(solver).isNotEqualTo(Solvers.CVC4); // FIXME Broken in JavaSMT
+    assume()
+        .withMessage("Yices does not support constant arrays when mcsat is used")
+        .that(solver)
+        .isNotEqualTo(Solvers.YICES2);
 
     var scalarType = FormulaType.IntegerType;
 
@@ -2866,8 +2868,6 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
     requireArrays();
     requireArrayModel();
     requireIntegers();
-
-    assertThat(solver).isNotEqualTo(Solvers.YICES2); // FIXME
 
     var array =
         amgr.makeArray("array", IntegerType, FormulaType.getArrayType(IntegerType, IntegerType));
