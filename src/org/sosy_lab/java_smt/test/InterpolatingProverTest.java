@@ -29,7 +29,6 @@ import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverException;
-import org.sosy_lab.java_smt.solvers.cvc5.CVC5BooleanFormulaManager;
 import org.sosy_lab.java_smt.solvers.opensmt.Logics;
 
 /** This class contains some simple Junit-tests to check the interpolation-API of our solvers. */
@@ -1185,7 +1184,7 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
     // create an invalid interpolation token
     final Object p3 =
         switch (solverToUse()) {
-          case CVC5 -> ((CVC5BooleanFormulaManager) bmgr).makeVariableImpl("c");
+          case CVC5 -> bmgr.makeVariable("c");
           case MATHSAT5 -> 12345;
           case OPENSMT -> 12347;
           case PRINCESS -> 12349;

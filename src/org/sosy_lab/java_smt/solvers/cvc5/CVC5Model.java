@@ -27,7 +27,7 @@ import java.util.List;
 import java.util.Set;
 import org.sosy_lab.java_smt.basicimpl.AbstractModel;
 
-public class CVC5Model extends AbstractModel<Term, Sort, TermManager> {
+class CVC5Model extends AbstractModel<Term, Sort, TermManager> {
 
   private final ImmutableList<ValueAssignment> model;
   private final TermManager termManager;

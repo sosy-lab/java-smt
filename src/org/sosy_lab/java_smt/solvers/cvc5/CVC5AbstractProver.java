@@ -62,7 +62,7 @@ abstract class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
   //  our own stack for asserted terms, and use a different solver instance for each sat check.
   protected final boolean incremental;
 
-  protected CVC5AbstractProver(
+  CVC5AbstractProver(
       CVC5FormulaCreator pFormulaCreator,
       ShutdownNotifier pShutdownNotifier,
       int pRandomSeed,

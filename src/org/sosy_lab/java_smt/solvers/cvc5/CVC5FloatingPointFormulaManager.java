@@ -27,14 +27,14 @@ import org.sosy_lab.java_smt.api.FormulaType.BitvectorType;
 import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
 import org.sosy_lab.java_smt.basicimpl.AbstractFloatingPointFormulaManager;
 
-public class CVC5FloatingPointFormulaManager
+class CVC5FloatingPointFormulaManager
     extends AbstractFloatingPointFormulaManager<Term, Sort, TermManager, Term> {
 
   private final TermManager termManager;
   private final Solver solver;
   private final Term roundingMode;
 
-  protected CVC5FloatingPointFormulaManager(
+  CVC5FloatingPointFormulaManager(
       CVC5FormulaCreator pCreator, FloatingPointRoundingMode pFloatingPointRoundingMode) {
     super(pCreator);
     termManager = pCreator.getEnv();

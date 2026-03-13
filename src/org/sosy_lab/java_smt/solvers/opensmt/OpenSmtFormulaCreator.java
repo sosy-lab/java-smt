@@ -36,7 +36,7 @@ import org.sosy_lab.java_smt.solvers.opensmt.api.SymRef;
 import org.sosy_lab.java_smt.solvers.opensmt.api.VectorPTRef;
 import org.sosy_lab.java_smt.solvers.opensmt.api.VectorSRef;
 
-public final class OpenSmtFormulaCreator extends FormulaCreator<PTRef, SRef, Logic, SymRef> {
+final class OpenSmtFormulaCreator extends FormulaCreator<PTRef, SRef, Logic, SymRef> {
 
   private final Logics logicToUse;
 
@@ -52,7 +52,7 @@ public final class OpenSmtFormulaCreator extends FormulaCreator<PTRef, SRef, Log
     logicToUse = logicType;
   }
 
-  public static OpenSmtFormulaCreator create(Logics logicType) {
+  static OpenSmtFormulaCreator create(Logics logicType) {
     return new OpenSmtFormulaCreator(logicType, createLogic(logicType));
   }
 

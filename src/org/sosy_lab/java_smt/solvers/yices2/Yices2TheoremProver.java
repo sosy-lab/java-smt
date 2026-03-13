@@ -65,7 +65,7 @@ class Yices2TheoremProver extends AbstractProverWithAllSat<Void> implements Prov
   // Therefore, we need to keep track of all added constraints beyond that stack-level.
   private int stackSizeToUnsat = Integer.MAX_VALUE;
 
-  protected Yices2TheoremProver(
+  Yices2TheoremProver(
       Yices2FormulaCreator creator,
       Set<ProverOptions> pOptions,
       BooleanFormulaManager pBmgr,

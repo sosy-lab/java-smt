@@ -17,7 +17,7 @@ import org.sosy_lab.java_smt.api.EnumerationFormulaManager;
 import org.sosy_lab.java_smt.api.FormulaType.EnumerationFormulaType;
 import org.sosy_lab.java_smt.api.SolverContext;
 
-public class SynchronizedEnumerationFormulaManager implements EnumerationFormulaManager {
+class SynchronizedEnumerationFormulaManager implements EnumerationFormulaManager {
 
   private final EnumerationFormulaManager delegate;
   private final SolverContext sync;

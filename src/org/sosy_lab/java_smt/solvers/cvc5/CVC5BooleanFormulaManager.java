@@ -20,14 +20,14 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 import org.sosy_lab.java_smt.basicimpl.AbstractBooleanFormulaManager;
 
-public class CVC5BooleanFormulaManager
+class CVC5BooleanFormulaManager
     extends AbstractBooleanFormulaManager<Term, Sort, TermManager, Term> {
 
   private final TermManager termManager;
   private final Term pTrue;
   private final Term pFalse;
 
-  protected CVC5BooleanFormulaManager(CVC5FormulaCreator pCreator) {
+  CVC5BooleanFormulaManager(CVC5FormulaCreator pCreator) {
     super(pCreator);
     termManager = pCreator.getEnv();
     pTrue = termManager.mkBoolean(true);

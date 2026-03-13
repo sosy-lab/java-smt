@@ -36,8 +36,7 @@ import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager;
 
-public class SmtInterpolFormulaManager
-    extends AbstractFormulaManager<Term, Sort, Script, FunctionSymbol> {
+class SmtInterpolFormulaManager extends AbstractFormulaManager<Term, Sort, Script, FunctionSymbol> {
 
   private final LogManager logger;
 

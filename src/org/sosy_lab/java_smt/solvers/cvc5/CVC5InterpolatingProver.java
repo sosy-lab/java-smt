@@ -32,7 +32,7 @@ import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 
-public class CVC5InterpolatingProver extends CVC5AbstractProver<String>
+class CVC5InterpolatingProver extends CVC5AbstractProver<String>
     implements InterpolatingProverEnvironment<String> {
 
   private final TermManager termManager = creator.getEnv();

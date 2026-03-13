@@ -66,7 +66,7 @@ import org.sosy_lab.java_smt.solvers.cvc4.CVC4Formula.CVC4RationalFormula;
 import org.sosy_lab.java_smt.solvers.cvc4.CVC4Formula.CVC4RegexFormula;
 import org.sosy_lab.java_smt.solvers.cvc4.CVC4Formula.CVC4StringFormula;
 
-public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, Expr> {
+class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, Expr> {
 
   private static final Pattern FLOATING_POINT_PATTERN =
       Pattern.compile("^\\(fp #b(?<sign>\\d) #b(?<exp>\\d+) #b(?<mant>\\d+)$");
@@ -75,7 +75,7 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
   private final Map<String, Expr> functionsCache = new HashMap<>();
   private final ExprManager exprManager;
 
-  protected CVC4FormulaCreator(ExprManager pExprManager) {
+  CVC4FormulaCreator(ExprManager pExprManager) {
     super(
         pExprManager,
         pExprManager.booleanType(),

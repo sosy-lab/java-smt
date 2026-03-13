@@ -53,7 +53,7 @@ abstract class PrincessAbstractProver<E> extends AbstractProverWithAllSat<E> {
 
   private final PrincessFormulaCreator creator;
 
-  protected PrincessAbstractProver(
+  PrincessAbstractProver(
       PrincessFormulaManager pMgr,
       PrincessFormulaCreator creator,
       SimpleAPI pApi,

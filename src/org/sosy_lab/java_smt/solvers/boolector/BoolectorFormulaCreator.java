@@ -31,7 +31,7 @@ import org.sosy_lab.java_smt.solvers.boolector.BoolectorFormula.BoolectorArrayFo
 import org.sosy_lab.java_smt.solvers.boolector.BoolectorFormula.BoolectorBitvectorFormula;
 import org.sosy_lab.java_smt.solvers.boolector.BoolectorFormula.BoolectorBooleanFormula;
 
-public class BoolectorFormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
+class BoolectorFormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
 
   // Boolector can give back 'x' for an arbitrary value that we change to this
   private static final char ARBITRARY_VALUE = '1';

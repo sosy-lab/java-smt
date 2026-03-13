@@ -36,7 +36,7 @@ abstract class BoolectorAbstractProver<T> extends AbstractProverWithAllSat<T> {
   private final long terminationCallbackHelper;
 
   // Used/Built by TheoremProver
-  protected BoolectorAbstractProver(
+  BoolectorAbstractProver(
       BoolectorFormulaManager manager,
       BoolectorFormulaCreator creator,
       long btor,
