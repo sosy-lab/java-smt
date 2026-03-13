@@ -57,7 +57,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.basicimpl.AbstractModel;
 
-public class Yices2Model extends AbstractModel<Integer, Integer, Long> {
+class Yices2Model extends AbstractModel<Integer, Integer, Long> {
 
   private final long model;
   private final Yices2TheoremProver prover;

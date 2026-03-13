@@ -20,7 +20,7 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 import org.sosy_lab.java_smt.basicimpl.AbstractBooleanFormulaManager;
 
-public class CVC5BooleanFormulaManager
+class CVC5BooleanFormulaManager
     extends AbstractBooleanFormulaManager<Term, Sort, TermManager, Term> {
 
   private final TermManager termManager;

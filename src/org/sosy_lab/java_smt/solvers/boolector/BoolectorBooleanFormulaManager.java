@@ -20,8 +20,7 @@ import static org.sosy_lab.java_smt.solvers.boolector.BtorJNI.boolector_xor;
 import com.google.common.primitives.Longs;
 import org.sosy_lab.java_smt.basicimpl.AbstractBooleanFormulaManager;
 
-public class BoolectorBooleanFormulaManager
-    extends AbstractBooleanFormulaManager<Long, Long, Long, Long> {
+class BoolectorBooleanFormulaManager extends AbstractBooleanFormulaManager<Long, Long, Long, Long> {
 
   private final long btor;
   private final long pTrue;

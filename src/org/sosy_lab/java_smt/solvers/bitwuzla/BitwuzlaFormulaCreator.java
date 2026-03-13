@@ -59,8 +59,7 @@ import org.sosy_lab.java_smt.solvers.bitwuzla.api.Vector_Int;
 import org.sosy_lab.java_smt.solvers.bitwuzla.api.Vector_Sort;
 import org.sosy_lab.java_smt.solvers.bitwuzla.api.Vector_Term;
 
-public class BitwuzlaFormulaCreator
-    extends FormulaCreator<Term, Sort, TermManager, BitwuzlaDeclaration> {
+class BitwuzlaFormulaCreator extends FormulaCreator<Term, Sort, TermManager, BitwuzlaDeclaration> {
 
   private final Table<String, Sort, Term> formulaCache = HashBasedTable.create();
 

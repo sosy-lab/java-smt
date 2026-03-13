@@ -38,7 +38,7 @@ import org.sosy_lab.java_smt.solvers.opensmt.api.SymRef;
 import org.sosy_lab.java_smt.solvers.opensmt.api.Symbol;
 import org.sosy_lab.java_smt.solvers.opensmt.api.sstat;
 
-public abstract class OpenSmtAbstractProver<T> extends AbstractProverWithAllSat<T> {
+abstract class OpenSmtAbstractProver<T> extends AbstractProverWithAllSat<T> {
 
   protected final OpenSmtFormulaCreator creator;
   protected final MainSolver osmtSolver;

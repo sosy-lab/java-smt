@@ -21,7 +21,7 @@ import org.sosy_lab.java_smt.solvers.bitwuzla.api.TermManager;
 import org.sosy_lab.java_smt.solvers.bitwuzla.api.Vector_Int;
 import org.sosy_lab.java_smt.solvers.bitwuzla.api.Vector_Term;
 
-public class BitwuzlaQuantifiedFormulaManager
+class BitwuzlaQuantifiedFormulaManager
     extends AbstractQuantifiedFormulaManager<Term, Sort, TermManager, BitwuzlaDeclaration> {
   private final TermManager termManager;
 

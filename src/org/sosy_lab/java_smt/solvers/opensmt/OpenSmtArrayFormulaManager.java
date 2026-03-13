@@ -17,8 +17,7 @@ import org.sosy_lab.java_smt.solvers.opensmt.api.SRef;
 import org.sosy_lab.java_smt.solvers.opensmt.api.SymRef;
 
 @SuppressWarnings("MethodTypeParameterName")
-public class OpenSmtArrayFormulaManager
-    extends AbstractArrayFormulaManager<PTRef, SRef, Logic, SymRef> {
+class OpenSmtArrayFormulaManager extends AbstractArrayFormulaManager<PTRef, SRef, Logic, SymRef> {
 
   private final Logic logic;
 

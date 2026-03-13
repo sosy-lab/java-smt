@@ -14,7 +14,7 @@ import edu.stanford.CVC4.Kind;
 import edu.stanford.CVC4.Type;
 import org.sosy_lab.java_smt.basicimpl.AbstractSLFormulaManager;
 
-public class CVC4SLFormulaManager extends AbstractSLFormulaManager<Expr, Type, ExprManager, Expr> {
+class CVC4SLFormulaManager extends AbstractSLFormulaManager<Expr, Type, ExprManager, Expr> {
 
   private final ExprManager exprManager;
 

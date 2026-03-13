@@ -19,7 +19,7 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 import org.sosy_lab.java_smt.basicimpl.AbstractBooleanFormulaManager;
 
-public class CVC4BooleanFormulaManager
+class CVC4BooleanFormulaManager
     extends AbstractBooleanFormulaManager<Expr, Type, ExprManager, Expr> {
 
   private final Expr cvc4True;
