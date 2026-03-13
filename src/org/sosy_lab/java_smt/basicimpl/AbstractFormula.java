@@ -32,7 +32,7 @@ import org.sosy_lab.java_smt.api.StringFormula;
  */
 @Immutable(containerOf = "TFormulaInfo")
 @SuppressWarnings("ClassTypeParameterName")
-abstract class AbstractFormula<TFormulaInfo> implements Formula {
+abstract sealed class AbstractFormula<TFormulaInfo> implements Formula {
 
   private final TFormulaInfo formulaInfo;
 
