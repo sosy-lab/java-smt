@@ -8,7 +8,6 @@
 
 package org.sosy_lab.java_smt.solvers.bitwuzla;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import org.sosy_lab.common.UniqueIdGenerator;
