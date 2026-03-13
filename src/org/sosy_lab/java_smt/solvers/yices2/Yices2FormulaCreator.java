@@ -213,7 +213,6 @@ class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long, Intege
     // Names in Yices2 behave like a stack. The last variable named is retrieved when asking for
     // a term with a specific name. Since we substitute free vars with bound for quantifiers,
     // this sometimes mixes them up, hence we track them ourselves.
-    // FIXME Should we even set it then?
     Terms.setName(var, name);
     formulaCache.put(name, type, var);
     return var;
@@ -269,7 +268,6 @@ class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long, Intege
     return Terms.getName(term) == null ? "@" + term : Terms.getName(term);
   }
 
-  @SuppressWarnings("deprecation")
   @Override
   public <R> R visit(FormulaVisitor<R> pVisitor, Formula pFormula, Integer pF) {
     Constructor constructor = Terms.constructor(pF);
@@ -330,12 +328,9 @@ class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long, Intege
 
   private <R> R visitFunctionApplication(
       FormulaVisitor<R> pVisitor, Formula pFormula, int pF, final Constructor constructor) {
-
-    // throw new UnsupportedOperationException(String.format("Constructor %s", constructor));
-    Integer functionDeclaration = null;
-
     // filled later, except for some special function applications
     String functionName = null;
+    Integer functionDeclaration = null;
     List<Integer> functionArgs = null;
     List<Integer> functionIndex = ImmutableList.of();
 
@@ -517,15 +512,13 @@ class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long, Intege
 
   private int buildDeclaration(
       FunctionDeclarationKind pKind, List<Integer> pIndex, List<Integer> pArgs) {
-    // FIXME
-    // var args = Lists.transform(pArgs, p -> Terms.newVariable(Terms.typeOf(p)));
     ImmutableList.Builder<Integer> builder = ImmutableList.builder();
     int c = 0;
     for (var arg : pArgs) {
       builder.add(Terms.newVariable("var" + c++, Terms.typeOf(arg)));
     }
     var args = builder.build();
-    Integer f = null;
+    int f;
     switch (pKind) {
       case AND:
         f = Terms.and(args);

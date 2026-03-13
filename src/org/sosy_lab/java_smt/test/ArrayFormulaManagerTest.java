@@ -249,7 +249,6 @@ public class ArrayFormulaManagerTest extends SolverBasedTest0.ParameterizedSolve
 
   @Test
   public void testArrayWithManyValues() throws SolverException, InterruptedException {
-   
     requireIntegers();
     requireArrays();
 
