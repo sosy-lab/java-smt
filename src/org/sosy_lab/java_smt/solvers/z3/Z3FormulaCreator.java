@@ -513,10 +513,10 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
   @SuppressWarnings("deprecation")
   @Override
   public <R> R visit(FormulaVisitor<R> visitor, final Formula formula, final Long f) {
-    switch (Z3_ast_kind.fromInt(Native.getAstKind(environment, f))) {
-      case Z3_NUMERAL_AST:
-        return visitor.visitConstant(formula, convertValue(f));
-      case Z3_APP_AST:
+    return switch (Z3_ast_kind.fromInt(Native.getAstKind(environment, f))) {
+      case Z3_NUMERAL_AST -> visitor.visitConstant(formula, convertValue(f));
+
+      case Z3_APP_AST -> {
         int arity = Native.getAppNumArgs(environment, f);
         int declKind = Native.getDeclKind(environment, Native.getAppDecl(environment, f));
 
@@ -525,30 +525,30 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
           Object value = Z3_CONSTANTS.get(declKind);
           int sortKind = Native.getSortKind(environment, Native.getSort(environment, f));
           if (value != null) {
-            return visitor.visitConstant(formula, value);
+            yield visitor.visitConstant(formula, value);
 
           } else if (Z3_FP_CONSTANTS.contains(declKind)) {
-            return visitor.visitConstant(formula, convertValue(f));
+            yield visitor.visitConstant(formula, convertValue(f));
 
             // Rounding mode
           } else if (declKind == Z3_decl_kind.Z3_OP_FPA_NUM.toInt()) {
-            return visitor.visitConstant(formula, convertValue(f));
+            yield visitor.visitConstant(formula, convertValue(f));
           } else if (sortKind == Z3_sort_kind.Z3_ROUNDING_MODE_SORT.toInt()) {
-            return visitor.visitConstant(formula, getRoundingMode(f));
+            yield visitor.visitConstant(formula, getRoundingMode(f));
 
             // string constant
           } else if (declKind == Z3_decl_kind.Z3_OP_INTERNAL.toInt()
               && sortKind == Z3_sort_kind.Z3_SEQ_SORT.toInt()) {
-            return visitor.visitConstant(formula, convertValue(f));
+            yield visitor.visitConstant(formula, convertValue(f));
 
             // Free variable
           } else if (declKind == Z3_decl_kind.Z3_OP_UNINTERPRETED.toInt()
               || declKind == Z3_decl_kind.Z3_OP_INTERNAL.toInt()) {
-            return visitor.visitFreeVariable(formula, getAppName(f));
+            yield visitor.visitFreeVariable(formula, getAppName(f));
 
             // enumeration constant
           } else if (declKind == Z3_decl_kind.Z3_OP_DT_CONSTRUCTOR.toInt()) {
-            return visitor.visitConstant(formula, convertValue(f));
+            yield visitor.visitConstant(formula, convertValue(f));
           } // else: fall-through with a function application
 
         } else if (arity == 3) {
@@ -559,7 +559,7 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
             final var expoBv = Native.getAppArg(environment, f, 1);
             final var mantBv = Native.getAppArg(environment, f, 2);
             if (isConstant(signBv) && isConstant(expoBv) && isConstant(mantBv)) {
-              return visitor.visitConstant(formula, convertValue(f));
+              yield visitor.visitConstant(formula, convertValue(f));
             }
           }
         }
@@ -573,7 +573,7 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
           args.add(encapsulate(argumentType, arg));
           argTypes.add(argumentType);
         }
-        return visitor.visitFunction(
+        yield visitor.visitFunction(
             formula,
             args.build(),
             FunctionDeclarationImpl.of(
@@ -582,18 +582,13 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
                 argTypes.build(),
                 getFormulaType(f),
                 Native.getAppDecl(environment, f)));
-      case Z3_VAR_AST:
-        int deBruijnIdx = Native.getIndexValue(environment, f);
-        return visitor.visitBoundVariable(formula, deBruijnIdx);
-      case Z3_QUANTIFIER_AST:
-        return visitQuantifier(visitor, (BooleanFormula) formula, f);
-      case Z3_SORT_AST:
-      case Z3_FUNC_DECL_AST:
-      case Z3_UNKNOWN_AST:
-      default:
-        throw new UnsupportedOperationException(
-            "Input should be a formula AST, " + "got unexpected type instead");
-    }
+      }
+      case Z3_VAR_AST -> visitor.visitBoundVariable(formula, Native.getIndexValue(environment, f));
+      case Z3_QUANTIFIER_AST -> visitQuantifier(visitor, (BooleanFormula) formula, f);
+      case Z3_SORT_AST, Z3_FUNC_DECL_AST, Z3_UNKNOWN_AST ->
+          throw new UnsupportedOperationException(
+              "Input should be a formula AST, got unexpected type instead");
+    };
   }
 
   protected String symbolToString(long symbol) {
