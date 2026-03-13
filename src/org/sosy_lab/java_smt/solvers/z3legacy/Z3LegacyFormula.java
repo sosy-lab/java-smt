@@ -29,7 +29,7 @@ import org.sosy_lab.java_smt.api.RegexFormula;
 import org.sosy_lab.java_smt.api.StringFormula;
 
 @Immutable
-abstract class Z3LegacyFormula implements Formula {
+abstract sealed class Z3LegacyFormula implements Formula {
 
   private final long z3expr;
   private final long z3context;

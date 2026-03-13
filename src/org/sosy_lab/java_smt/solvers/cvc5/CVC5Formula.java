@@ -24,7 +24,7 @@ import org.sosy_lab.java_smt.api.RegexFormula;
 import org.sosy_lab.java_smt.api.StringFormula;
 
 @Immutable
-abstract class CVC5Formula implements Formula {
+abstract sealed class CVC5Formula implements Formula {
 
   @SuppressWarnings("Immutable")
   private final Term cvc5term;

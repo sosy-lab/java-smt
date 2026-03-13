@@ -21,7 +21,7 @@ import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
 
 @Immutable
-abstract class Yices2Formula implements Formula {
+abstract sealed class Yices2Formula implements Formula {
 
   private final int yicesTerm;
 

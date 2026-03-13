@@ -21,7 +21,7 @@ import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
 
 @Immutable
-abstract class Mathsat5Formula implements Formula {
+abstract sealed class Mathsat5Formula implements Formula {
 
   private final long msatTerm;
 

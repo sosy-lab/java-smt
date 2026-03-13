@@ -20,7 +20,7 @@ import org.sosy_lab.java_smt.solvers.opensmt.api.Logic;
 import org.sosy_lab.java_smt.solvers.opensmt.api.PTRef;
 
 @Immutable
-abstract class OpenSmtFormula implements Formula {
+abstract sealed class OpenSmtFormula implements Formula {
 
   @SuppressWarnings("Immutable")
   private final Logic osmtLogic;

@@ -19,7 +19,7 @@ import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.solvers.bitwuzla.api.Term;
 
 @Immutable
-abstract class BitwuzlaFormula implements Formula {
+abstract sealed class BitwuzlaFormula implements Formula {
   @SuppressWarnings("Immutable")
   private final Term bitwuzlaTerm;
 
