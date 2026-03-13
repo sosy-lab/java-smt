@@ -267,6 +267,10 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   @Test
   public void testGetBvUfs() throws SolverException, InterruptedException {
     requireBitvectors();
+    assume()
+        .withMessage("Yices uses a default value for the function and returns no mappings")
+        .that(solver)
+        .isNotEqualTo(Solvers.YICES2);
     // Some names are specifically chosen to test the Boolector model
     // Use 1 instead of 0 or max bv value, as solvers tend to use 0, min or max as default
     for (String ufName : VARIABLE_NAMES) {
@@ -380,6 +384,10 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
 
   @Test
   public void testGetUFwithMoreParams() throws Exception {
+    assume()
+        .withMessage("Yices uses a default value for the function and returns no mappings")
+        .that(solver)
+        .isNotEqualTo(Solvers.YICES2);
     // Boolector does not support integers
     if (imgr != null) {
       IntegerFormula x =
