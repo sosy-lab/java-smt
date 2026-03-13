@@ -23,7 +23,7 @@ class CVC4ArrayFormulaManager extends AbstractArrayFormulaManager<Expr, Type, Ex
 
   private final ExprManager exprManager;
 
-  public CVC4ArrayFormulaManager(CVC4FormulaCreator pFormulaCreator) {
+  CVC4ArrayFormulaManager(CVC4FormulaCreator pFormulaCreator) {
     super(pFormulaCreator);
     exprManager = pFormulaCreator.getEnv();
   }

@@ -35,7 +35,7 @@ class Yices2ArrayFormulaManager
    */
   private final Table<Integer, Integer, Integer> constCache = HashBasedTable.create();
 
-  public Yices2ArrayFormulaManager(Yices2FormulaCreator pCreator) {
+  Yices2ArrayFormulaManager(Yices2FormulaCreator pCreator) {
     super(pCreator);
   }
 

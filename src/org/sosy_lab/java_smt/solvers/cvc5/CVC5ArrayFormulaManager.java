@@ -21,7 +21,7 @@ class CVC5ArrayFormulaManager extends AbstractArrayFormulaManager<Term, Sort, Te
 
   private final TermManager termManager;
 
-  public CVC5ArrayFormulaManager(CVC5FormulaCreator pFormulaCreator) {
+  CVC5ArrayFormulaManager(CVC5FormulaCreator pFormulaCreator) {
     super(pFormulaCreator);
     termManager = pFormulaCreator.getEnv();
   }

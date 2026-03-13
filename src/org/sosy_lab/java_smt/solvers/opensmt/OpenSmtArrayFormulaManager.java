@@ -21,7 +21,7 @@ class OpenSmtArrayFormulaManager extends AbstractArrayFormulaManager<PTRef, SRef
 
   private final Logic logic;
 
-  public OpenSmtArrayFormulaManager(OpenSmtFormulaCreator pFormulaCreator) {
+  OpenSmtArrayFormulaManager(OpenSmtFormulaCreator pFormulaCreator) {
     super(pFormulaCreator);
     logic = pFormulaCreator.getEnv();
   }
