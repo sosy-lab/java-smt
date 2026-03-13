@@ -25,7 +25,7 @@ class BitwuzlaQuantifiedFormulaManager
     extends AbstractQuantifiedFormulaManager<Term, Sort, TermManager, BitwuzlaDeclaration> {
   private final TermManager termManager;
 
-  protected BitwuzlaQuantifiedFormulaManager(BitwuzlaFormulaCreator pCreator) {
+  BitwuzlaQuantifiedFormulaManager(BitwuzlaFormulaCreator pCreator) {
     super(pCreator);
     termManager = pCreator.getEnv();
   }

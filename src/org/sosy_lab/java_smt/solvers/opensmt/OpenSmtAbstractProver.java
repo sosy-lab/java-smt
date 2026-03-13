@@ -44,7 +44,7 @@ abstract class OpenSmtAbstractProver<T> extends AbstractProverWithAllSat<T> {
   protected final MainSolver osmtSolver;
   protected final SMTConfig osmtConfig;
 
-  protected OpenSmtAbstractProver(
+  OpenSmtAbstractProver(
       OpenSmtFormulaCreator pFormulaCreator,
       FormulaManager pMgr,
       ShutdownNotifier pShutdownNotifier,

@@ -21,7 +21,7 @@ class BitwuzlaBitvectorFormulaManager
 
   private final TermManager termManager;
 
-  protected BitwuzlaBitvectorFormulaManager(
+  BitwuzlaBitvectorFormulaManager(
       BitwuzlaFormulaCreator pCreator,
       AbstractBooleanFormulaManager<Term, Sort, TermManager, BitwuzlaDeclaration> pBmgr) {
     super(pCreator, pBmgr);

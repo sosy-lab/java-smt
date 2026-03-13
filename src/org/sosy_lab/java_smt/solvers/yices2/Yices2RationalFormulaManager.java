@@ -19,7 +19,7 @@ class Yices2RationalFormulaManager
     extends Yices2NumeralFormulaManager<NumeralFormula, RationalFormula>
     implements RationalFormulaManager {
 
-  protected Yices2RationalFormulaManager(
+  Yices2RationalFormulaManager(
       Yices2FormulaCreator pCreator, NonLinearArithmetic pNonLinearArithmetic) {
     super(pCreator, pNonLinearArithmetic);
   }

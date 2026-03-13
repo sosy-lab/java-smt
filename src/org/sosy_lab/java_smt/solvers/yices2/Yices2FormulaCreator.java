@@ -190,7 +190,7 @@ class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long, Intege
    */
   private final Set<Integer> ufSymbols = new HashSet<>();
 
-  protected Yices2FormulaCreator() {
+  Yices2FormulaCreator() {
     super(null, yices_bool_type(), yices_int_type(), yices_real_type(), null, null);
   }
 

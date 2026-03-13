@@ -23,8 +23,7 @@ import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 class Yices2QuantifiedFormulaManager
     extends AbstractQuantifiedFormulaManager<Integer, Integer, Long, Integer> {
 
-  protected Yices2QuantifiedFormulaManager(
-      FormulaCreator<Integer, Integer, Long, Integer> pCreator) {
+  Yices2QuantifiedFormulaManager(FormulaCreator<Integer, Integer, Long, Integer> pCreator) {
     super(pCreator);
   }
 

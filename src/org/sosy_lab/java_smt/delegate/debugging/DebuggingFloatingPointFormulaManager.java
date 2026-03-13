@@ -22,7 +22,7 @@ import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
 
-public class DebuggingFloatingPointFormulaManager implements FloatingPointFormulaManager {
+class DebuggingFloatingPointFormulaManager implements FloatingPointFormulaManager {
   private final FloatingPointFormulaManager delegate;
   private final DebuggingAssertions debugging;
 

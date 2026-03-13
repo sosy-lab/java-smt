@@ -75,7 +75,7 @@ class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, Expr> {
   private final Map<String, Expr> functionsCache = new HashMap<>();
   private final ExprManager exprManager;
 
-  protected CVC4FormulaCreator(ExprManager pExprManager) {
+  CVC4FormulaCreator(ExprManager pExprManager) {
     super(
         pExprManager,
         pExprManager.booleanType(),

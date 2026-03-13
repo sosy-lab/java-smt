@@ -26,7 +26,7 @@ class CVC5QuantifiedFormulaManager
   private final TermManager termManager;
   private final Solver solver;
 
-  protected CVC5QuantifiedFormulaManager(CVC5FormulaCreator pFormulaCreator, Solver pSolver) {
+  CVC5QuantifiedFormulaManager(CVC5FormulaCreator pFormulaCreator, Solver pSolver) {
     super(pFormulaCreator);
     termManager = pFormulaCreator.getEnv();
     solver = pSolver;

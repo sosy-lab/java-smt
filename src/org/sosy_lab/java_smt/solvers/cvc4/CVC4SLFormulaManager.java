@@ -18,7 +18,7 @@ class CVC4SLFormulaManager extends AbstractSLFormulaManager<Expr, Type, ExprMana
 
   private final ExprManager exprManager;
 
-  protected CVC4SLFormulaManager(CVC4FormulaCreator pCreator) {
+  CVC4SLFormulaManager(CVC4FormulaCreator pCreator) {
     super(pCreator);
     exprManager = pCreator.getEnv();
   }

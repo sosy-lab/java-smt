@@ -21,7 +21,7 @@ class BitwuzlaBooleanFormulaManager
   private final Term pTrue;
   private final Term pFalse;
 
-  protected BitwuzlaBooleanFormulaManager(BitwuzlaFormulaCreator pCreator) {
+  BitwuzlaBooleanFormulaManager(BitwuzlaFormulaCreator pCreator) {
     super(pCreator);
     termManager = pCreator.getEnv();
     pTrue = termManager.mk_true();

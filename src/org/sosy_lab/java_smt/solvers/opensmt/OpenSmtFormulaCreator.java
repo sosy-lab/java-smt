@@ -52,7 +52,7 @@ final class OpenSmtFormulaCreator extends FormulaCreator<PTRef, SRef, Logic, Sym
     logicToUse = logicType;
   }
 
-  public static OpenSmtFormulaCreator create(Logics logicType) {
+  static OpenSmtFormulaCreator create(Logics logicType) {
     return new OpenSmtFormulaCreator(logicType, createLogic(logicType));
   }
 

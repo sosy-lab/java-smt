@@ -37,7 +37,7 @@ class BitwuzlaModel extends AbstractModel<Term, Sort, TermManager> {
   private final BitwuzlaAbstractProver<?> prover;
   private final ImmutableList<ValueAssignment> model;
 
-  protected BitwuzlaModel(
+  BitwuzlaModel(
       Bitwuzla bitwuzlaEnv,
       BitwuzlaAbstractProver<?> prover,
       BitwuzlaFormulaCreator bitwuzlaCreator,

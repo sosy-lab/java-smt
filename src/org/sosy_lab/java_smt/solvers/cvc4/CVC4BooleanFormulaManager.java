@@ -26,7 +26,7 @@ class CVC4BooleanFormulaManager
   private final Expr cvc4False;
   private final ExprManager exprManager;
 
-  protected CVC4BooleanFormulaManager(CVC4FormulaCreator pCreator) {
+  CVC4BooleanFormulaManager(CVC4FormulaCreator pCreator) {
     super(pCreator);
     exprManager = pCreator.getEnv();
     cvc4True = exprManager.mkConst(true);

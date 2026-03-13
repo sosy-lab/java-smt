@@ -18,7 +18,7 @@ class CVC5SLFormulaManager extends AbstractSLFormulaManager<Term, Sort, TermMana
 
   private final TermManager termManager;
 
-  protected CVC5SLFormulaManager(CVC5FormulaCreator pCreator) {
+  CVC5SLFormulaManager(CVC5FormulaCreator pCreator) {
     super(pCreator);
     termManager = pCreator.getEnv();
   }

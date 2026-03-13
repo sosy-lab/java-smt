@@ -27,7 +27,7 @@ class CVC5BooleanFormulaManager
   private final Term pTrue;
   private final Term pFalse;
 
-  protected CVC5BooleanFormulaManager(CVC5FormulaCreator pCreator) {
+  CVC5BooleanFormulaManager(CVC5FormulaCreator pCreator) {
     super(pCreator);
     termManager = pCreator.getEnv();
     pTrue = termManager.mkBoolean(true);

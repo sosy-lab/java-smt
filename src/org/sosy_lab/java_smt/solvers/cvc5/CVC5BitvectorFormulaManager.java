@@ -23,8 +23,7 @@ class CVC5BitvectorFormulaManager
 
   private final TermManager termManager;
 
-  protected CVC5BitvectorFormulaManager(
-      CVC5FormulaCreator pCreator, CVC5BooleanFormulaManager pBmgr) {
+  CVC5BitvectorFormulaManager(CVC5FormulaCreator pCreator, CVC5BooleanFormulaManager pBmgr) {
     super(pCreator, pBmgr);
     termManager = pCreator.getEnv();
   }

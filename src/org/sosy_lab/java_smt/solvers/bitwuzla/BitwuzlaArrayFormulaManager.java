@@ -21,7 +21,7 @@ class BitwuzlaArrayFormulaManager
     extends AbstractArrayFormulaManager<Term, Sort, TermManager, BitwuzlaDeclaration> {
   private final TermManager termManager;
 
-  protected BitwuzlaArrayFormulaManager(BitwuzlaFormulaCreator pCreator) {
+  BitwuzlaArrayFormulaManager(BitwuzlaFormulaCreator pCreator) {
     super(pCreator);
     termManager = pCreator.getEnv();
   }
