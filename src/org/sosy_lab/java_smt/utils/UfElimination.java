@@ -330,6 +330,12 @@ public class UfElimination {
   record UninterpretedFunctionApplication(
       Formula getFormula, ImmutableList<Formula> getArguments, Formula getSubstitution) {
 
+    public UninterpretedFunctionApplication {
+      checkNotNull(getFormula);
+      checkNotNull(getArguments);
+      checkNotNull(getSubstitution);
+    }
+
     static UninterpretedFunctionApplication create(
         Formula pF, List<Formula> pArguments, Formula pSubstitution) {
       return new UninterpretedFunctionApplication(
