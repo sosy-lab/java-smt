@@ -65,7 +65,8 @@ public class Yices2InterpolatingProver extends Yices2AbstractProver<Integer>
             FluentIterable.from(setB).transform(stack.peekLast()::get).toSet()));
   }
 
-  private int interpolate(Collection<Integer> setA, Collection<Integer> setB) {
+  private int interpolate(Collection<Integer> setA, Collection<Integer> setB)
+      throws InterruptedException {
     try (var ctxA = newContext("mcsat");
         var ctxB = newContext("mcsat")) {
 
@@ -74,12 +75,14 @@ public class Yices2InterpolatingProver extends Yices2AbstractProver<Integer>
       var context = new InterpolationContext(ctxA, ctxB);
 
       // TODO How to abort this?
+      // For now, let's just check before and after the call:
+      shutdownNotifier.shutdownIfNecessary();
       var status = context.check(DEFAULT_PARAMS, false);
+      shutdownNotifier.shutdownIfNecessary();
       if (status == Status.UNSAT) {
         return context.getInterpolant();
       } else {
-        // TODO
-        throw new IllegalArgumentException();
+        throw new IllegalArgumentException("Solver state must be unsat");
       }
     }
   }
