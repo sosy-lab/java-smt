@@ -52,7 +52,7 @@ abstract class BitwuzlaAbstractProver<T> extends AbstractProverWithAllSat<T> {
   protected final BitwuzlaFormulaCreator creator;
   protected final Bitwuzla env;
 
-  protected BitwuzlaAbstractProver(
+  BitwuzlaAbstractProver(
       BitwuzlaFormulaManager pManager,
       BitwuzlaFormulaCreator pCreator,
       ShutdownNotifier pShutdownNotifier,

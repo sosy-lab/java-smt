@@ -27,7 +27,7 @@ import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager;
 
-public class Yices2FormulaManager extends AbstractFormulaManager<Integer, Integer, Long, Integer> {
+class Yices2FormulaManager extends AbstractFormulaManager<Integer, Integer, Long, Integer> {
 
   private static final CharMatcher LETTERS = inRange('a', 'z').or(inRange('A', 'Z'));
   private static final CharMatcher DIGITS = inRange('0', '9');

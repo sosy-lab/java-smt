@@ -14,7 +14,7 @@ import java.math.BigInteger;
 import org.sosy_lab.java_smt.api.IntegerFormulaManager;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 
-public class Yices2IntegerFormulaManager
+class Yices2IntegerFormulaManager
     extends Yices2NumeralFormulaManager<IntegerFormula, IntegerFormula>
     implements IntegerFormulaManager {
 

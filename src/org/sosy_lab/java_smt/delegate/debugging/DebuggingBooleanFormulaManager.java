@@ -21,7 +21,7 @@ import org.sosy_lab.java_smt.api.visitors.BooleanFormulaTransformationVisitor;
 import org.sosy_lab.java_smt.api.visitors.BooleanFormulaVisitor;
 import org.sosy_lab.java_smt.api.visitors.TraversalProcess;
 
-public class DebuggingBooleanFormulaManager implements BooleanFormulaManager {
+class DebuggingBooleanFormulaManager implements BooleanFormulaManager {
   private final BooleanFormulaManager delegate;
   private final DebuggingAssertions debugging;
 

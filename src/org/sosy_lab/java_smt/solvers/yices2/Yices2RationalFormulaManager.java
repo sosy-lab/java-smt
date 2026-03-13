@@ -14,11 +14,11 @@ import org.sosy_lab.java_smt.api.NumeralFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
 import org.sosy_lab.java_smt.api.RationalFormulaManager;
 
-public class Yices2RationalFormulaManager
+class Yices2RationalFormulaManager
     extends Yices2NumeralFormulaManager<NumeralFormula, RationalFormula>
     implements RationalFormulaManager {
 
-  protected Yices2RationalFormulaManager(
+  Yices2RationalFormulaManager(
       Yices2FormulaCreator pCreator, NonLinearArithmetic pNonLinearArithmetic) {
     super(pCreator, pNonLinearArithmetic);
   }

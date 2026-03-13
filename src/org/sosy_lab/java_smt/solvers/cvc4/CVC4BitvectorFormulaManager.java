@@ -27,13 +27,12 @@ import java.util.List;
 import org.sosy_lab.java_smt.api.FormulaType.BitvectorType;
 import org.sosy_lab.java_smt.basicimpl.AbstractBitvectorFormulaManager;
 
-public class CVC4BitvectorFormulaManager
+class CVC4BitvectorFormulaManager
     extends AbstractBitvectorFormulaManager<Expr, Type, ExprManager, Expr> {
 
   private final ExprManager exprManager;
 
-  protected CVC4BitvectorFormulaManager(
-      CVC4FormulaCreator pCreator, CVC4BooleanFormulaManager pBmgr) {
+  CVC4BitvectorFormulaManager(CVC4FormulaCreator pCreator, CVC4BooleanFormulaManager pBmgr) {
     super(pCreator, pBmgr);
     exprManager = pCreator.getEnv();
   }

@@ -50,7 +50,7 @@ import org.sosy_lab.java_smt.solvers.yices2.Yices2Formula.Yices2IntegerFormula;
 import org.sosy_lab.java_smt.solvers.yices2.Yices2Formula.Yices2RationalFormula;
 
 @SuppressWarnings({"ClassTypeParameterName", "MethodTypeParameterName"})
-public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long, Integer> {
+class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long, Integer> {
 
   /**
    * Maps a name and a free variable or function type to a concrete formula node. We allow only 1
@@ -66,7 +66,7 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
    */
   private final Set<Integer> ufSymbols = new HashSet<>();
 
-  protected Yices2FormulaCreator() {
+  Yices2FormulaCreator() {
     super(null, Types.boolType(), Types.intType(), Types.realType(), null, null);
   }
 

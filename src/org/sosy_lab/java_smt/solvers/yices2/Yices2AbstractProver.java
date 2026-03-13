@@ -67,7 +67,7 @@ abstract class Yices2AbstractProver<T> extends AbstractProverWithAllSat<T>
 
   protected final Deque<PersistentMap<Integer, Integer>> stack = new ArrayDeque<>();
 
-  protected Yices2AbstractProver(
+  Yices2AbstractProver(
       Yices2FormulaCreator pCreator,
       Set<ProverOptions> pOptions,
       BooleanFormulaManager pBmgr,

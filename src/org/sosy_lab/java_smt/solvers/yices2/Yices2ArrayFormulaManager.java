@@ -19,7 +19,7 @@ import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.basicimpl.AbstractArrayFormulaManager;
 
 @SuppressWarnings({"ClassTypeParameterName", "MethodTypeParameterName"})
-public class Yices2ArrayFormulaManager
+class Yices2ArrayFormulaManager
     extends AbstractArrayFormulaManager<Integer, Integer, Long, Integer> {
 
   /**
@@ -30,7 +30,7 @@ public class Yices2ArrayFormulaManager
    */
   private final Table<Integer, Integer, Integer> constCache = HashBasedTable.create();
 
-  public Yices2ArrayFormulaManager(Yices2FormulaCreator pCreator) {
+  Yices2ArrayFormulaManager(Yices2FormulaCreator pCreator) {
     super(pCreator);
   }
 

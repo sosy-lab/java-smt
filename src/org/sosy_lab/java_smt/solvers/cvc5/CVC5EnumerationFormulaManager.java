@@ -18,7 +18,7 @@ import io.github.cvc5.TermManager;
 import org.sosy_lab.java_smt.api.FormulaType.EnumerationFormulaType;
 import org.sosy_lab.java_smt.basicimpl.AbstractEnumerationFormulaManager;
 
-public class CVC5EnumerationFormulaManager
+class CVC5EnumerationFormulaManager
     extends AbstractEnumerationFormulaManager<Term, Sort, TermManager, Term> {
 
   private final TermManager termManager;

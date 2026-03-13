@@ -14,11 +14,10 @@ import com.sri.yices.Terms;
 import java.math.BigInteger;
 import org.sosy_lab.java_smt.basicimpl.AbstractBitvectorFormulaManager;
 
-public class Yices2BitvectorFormulaManager
+class Yices2BitvectorFormulaManager
     extends AbstractBitvectorFormulaManager<Integer, Integer, Long, Integer> {
 
-  protected Yices2BitvectorFormulaManager(
-      Yices2FormulaCreator pCreator, Yices2BooleanFormulaManager pBmgr) {
+  Yices2BitvectorFormulaManager(Yices2FormulaCreator pCreator, Yices2BooleanFormulaManager pBmgr) {
     super(pCreator, pBmgr);
   }
 

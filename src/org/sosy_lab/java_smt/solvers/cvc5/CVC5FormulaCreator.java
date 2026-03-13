@@ -76,7 +76,7 @@ import org.sosy_lab.java_smt.solvers.cvc5.CVC5Formula.CVC5RationalFormula;
 import org.sosy_lab.java_smt.solvers.cvc5.CVC5Formula.CVC5RegexFormula;
 import org.sosy_lab.java_smt.solvers.cvc5.CVC5Formula.CVC5StringFormula;
 
-public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, TermManager, Term> {
+class CVC5FormulaCreator extends FormulaCreator<Term, Sort, TermManager, Term> {
 
   /** CVC5 does not allow using some key-functions from SMTLIB2 as identifiers. */
   private static final ImmutableSet<String> UNSUPPORTED_IDENTIFIERS = ImmutableSet.of("let");

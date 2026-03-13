@@ -20,7 +20,7 @@ import org.sosy_lab.java_smt.api.FormulaType.EnumerationFormulaType;
 import org.sosy_lab.java_smt.basicimpl.AbstractEnumerationFormulaManager;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 
-public class Mathsat5EnumerationFormulaManager
+class Mathsat5EnumerationFormulaManager
     extends AbstractEnumerationFormulaManager<Long, Long, Long, Long> {
 
   private final long mathsatEnv;

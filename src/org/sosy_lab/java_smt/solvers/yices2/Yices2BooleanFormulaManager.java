@@ -11,10 +11,10 @@ package org.sosy_lab.java_smt.solvers.yices2;
 import com.sri.yices.Terms;
 import org.sosy_lab.java_smt.basicimpl.AbstractBooleanFormulaManager;
 
-public class Yices2BooleanFormulaManager
+class Yices2BooleanFormulaManager
     extends AbstractBooleanFormulaManager<Integer, Integer, Long, Integer> {
 
-  protected Yices2BooleanFormulaManager(Yices2FormulaCreator pCreator) {
+  Yices2BooleanFormulaManager(Yices2FormulaCreator pCreator) {
     super(pCreator);
   }
 

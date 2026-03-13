@@ -25,7 +25,7 @@ import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.basicimpl.AbstractNumeralFormulaManager.NonLinearArithmetic;
 import org.sosy_lab.java_smt.basicimpl.AbstractSolverContext;
 
-public class Yices2SolverContext extends AbstractSolverContext {
+public final class Yices2SolverContext extends AbstractSolverContext {
 
   @Options(prefix = "solver.yices2")
   private static class Yices2Parameters {
