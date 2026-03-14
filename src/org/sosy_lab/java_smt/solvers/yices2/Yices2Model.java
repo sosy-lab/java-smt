@@ -9,6 +9,8 @@
 package org.sosy_lab.java_smt.solvers.yices2;
 
 import com.google.common.base.Preconditions;
+import com.google.common.base.Verify;
+import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableList;
 import com.sri.yices.Model;
 import com.sri.yices.Terms;
@@ -60,7 +62,11 @@ class Yices2Model extends AbstractModel<Integer, Integer, Long> {
           assignments.add(getSimpleAssignment(term));
           continue;
         case FUNCTION: // UFs and Arrays
-          assignments.addAll(getFunctionAssignment(term, yval));
+          if (formulaCreator.isArrayVariable(term)) {
+            assignments.addAll(getArrayAssignment(term, yval));
+          } else {
+            assignments.addAll(getFunctionAssignment(term, yval));
+          }
           continue;
         default:
           throw new UnsupportedOperationException("YVAL with unexpected tag: " + yval.tag);
@@ -107,6 +113,57 @@ class Yices2Model extends AbstractModel<Integer, Integer, Long> {
               builderValues.build()));
     }
     return assignments.build();
+  }
+
+  private List<ValueAssignment> getArrayAssignment0(
+      int f, Iterable<Integer> arguments, Iterable<Object> values, int type, YVal value) {
+    if (Types.isFunction(type)) {
+      var signature = Types.children(type);
+      Verify.verify(signature.length == 2);
+      var leftType = signature[0];
+      var rightType = signature[1];
+
+      ImmutableList.Builder<ValueAssignment> assignments = ImmutableList.builder();
+      for (var map : model.expandFunction(value).vector) {
+        var app = model.expandMapping(map);
+        Verify.verify(app.vector.length == 1);
+
+        // Build term for the current index
+        var leftValue = toValue(app.vector[0], leftType);
+        var leftTerm = constantValue(leftValue, leftType);
+
+        // Add it to the argument list
+        var newArguments = FluentIterable.concat(arguments, ImmutableList.of(leftTerm));
+        var newValue = FluentIterable.concat(values, ImmutableList.of(leftValue));
+
+        assignments.addAll(getArrayAssignment0(f, newArguments, newValue, rightType, app.value));
+      }
+      return assignments.build();
+
+    } else {
+      // Build term for the left side of the assignment
+      var app = f;
+      for (var arg : arguments) {
+        app = Terms.funApplication(app, arg);
+      }
+
+      // Build term for the value
+      var rightValue = toValue(value, type);
+      var rightTerm = constantValue(rightValue, type);
+
+      return ImmutableList.of(
+          new ValueAssignment(
+              creator.encapsulateWithTypeOf(app),
+              creator.encapsulateWithTypeOf(rightTerm),
+              creator.encapsulateBoolean(Terms.eq(app, rightTerm)),
+              Terms.getName(f),
+              rightValue,
+              ImmutableList.copyOf(values)));
+    }
+  }
+
+  private List<ValueAssignment> getArrayAssignment(int f, YVal value) {
+    return getArrayAssignment0(f, ImmutableList.of(), ImmutableList.of(), Terms.typeOf(f), value);
   }
 
   private ValueAssignment getSimpleAssignment(int t) {

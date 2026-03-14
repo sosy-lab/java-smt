@@ -978,6 +978,12 @@ class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long, Intege
     return bitsToInteger(Terms.bvConstValue(pF));
   }
 
+  public boolean isArrayVariable(int term) {
+    checkArgument(Terms.isFunction(term));
+    checkArgument(Terms.isUninterpreted(term));
+    return !ufSymbols.contains(term);
+  }
+
   @Override
   public Object convertValue(Integer typeKey, Integer pF) {
     FormulaType<?> type = getFormulaType(typeKey);
