@@ -253,10 +253,6 @@ abstract class Yices2AbstractProver<T> extends AbstractProverWithAllSat<T>
   @Override
   public List<BooleanFormula> getUnsatCore() {
     checkGenerateUnsatCores();
-    return getUnsatCore0();
-  }
-
-  private List<BooleanFormula> getUnsatCore0() {
     return encapsulate(curEnv.getUnsatCore());
   }
 
@@ -265,7 +261,7 @@ abstract class Yices2AbstractProver<T> extends AbstractProverWithAllSat<T>
       Collection<BooleanFormula> pAssumptions) throws SolverException, InterruptedException {
     checkGenerateUnsatCoresOverAssumptions();
     boolean sat = !isUnsatWithAssumptions(pAssumptions);
-    return sat ? Optional.empty() : Optional.of(getUnsatCore0());
+    return sat ? Optional.empty() : Optional.of(encapsulate(curEnv.getUnsatCore()));
   }
 
   @Override
