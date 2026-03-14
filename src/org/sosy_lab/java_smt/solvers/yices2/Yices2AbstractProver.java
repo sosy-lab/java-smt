@@ -85,7 +85,7 @@ abstract class Yices2AbstractProver<T> extends AbstractProverWithAllSat<T>
 
   @Override
   protected boolean hasPersistentModel() {
-    return false;
+    return true;
   }
 
   Context newContext(String solverType) {
