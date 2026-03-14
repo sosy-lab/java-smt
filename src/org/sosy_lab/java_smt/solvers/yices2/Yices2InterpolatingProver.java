@@ -31,9 +31,9 @@ import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 
-public class Yices2InterpolatingProver extends Yices2AbstractProver<Integer>
+class Yices2InterpolatingProver extends Yices2AbstractProver<Integer>
     implements InterpolatingProverEnvironment<Integer> {
-  protected Yices2InterpolatingProver(
+  Yices2InterpolatingProver(
       Yices2FormulaCreator creator,
       Set<ProverOptions> pOptions,
       BooleanFormulaManager pBmgr,

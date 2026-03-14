@@ -18,8 +18,8 @@ import org.sosy_lab.java_smt.api.BooleanFormulaManager;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 
-public class Yices2Prover extends Yices2AbstractProver<Void> implements ProverEnvironment {
-  protected Yices2Prover(
+class Yices2Prover extends Yices2AbstractProver<Void> implements ProverEnvironment {
+  Yices2Prover(
       Yices2FormulaCreator creator,
       Set<ProverOptions> pOptions,
       BooleanFormulaManager pBmgr,
