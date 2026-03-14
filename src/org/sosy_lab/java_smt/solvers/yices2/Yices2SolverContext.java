@@ -149,6 +149,6 @@ public final class Yices2SolverContext extends AbstractSolverContext {
 
   @Override
   protected boolean supportsAssumptionSolving() {
-    return true;
+    return false;
   }
 }
