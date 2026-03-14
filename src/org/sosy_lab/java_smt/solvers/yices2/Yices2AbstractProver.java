@@ -219,7 +219,18 @@ abstract class Yices2AbstractProver<T> extends AbstractProverWithAllSat<T>
   @SuppressWarnings("resource")
   @Override
   protected Yices2Model getEvaluatorWithoutChecks() {
-    return new Yices2Model(curEnv.getModel(), this, creator);
+    if (generateUnsatCores) {
+      // We didn't push the assertions when we were planning to use getUnsatCore. Because of that
+      // the SAT check now needs to be repeated to get a model
+      curEnv.push();
+      curEnv.assertFormulas(getAllConstraints());
+      curEnv.check();
+      var model = curEnv.getModel();
+      curEnv.pop();
+      return new Yices2Model(model, this, creator);
+    } else {
+      return new Yices2Model(curEnv.getModel(), this, creator);
+    }
   }
 
   private List<BooleanFormula> encapsulate(int[] terms) {
