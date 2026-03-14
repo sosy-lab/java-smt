@@ -34,15 +34,3 @@ new file mode 100644
 +  global: Java_*;
 +  local: *;
 +};
-Index: src/main/java/com/sri/yices/Yices.java
-diff --git a/src/main/java/com/sri/yices/Yices.java b/src/main/java/com/sri/yices/Yices.java
---- a/src/main/java/com/sri/yices/Yices.java	(revision 2be85e119b6004cc489172568398582268a4f59d)
-+++ b/src/main/java/com/sri/yices/Yices.java	(date 1773078497837)
-@@ -13,7 +13,6 @@
-      */
-     static {
-         try {
--            System.loadLibrary("yices2java");
-             init();
-             is_ready = true;
-         } catch (LinkageError e) {

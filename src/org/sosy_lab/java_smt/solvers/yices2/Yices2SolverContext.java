@@ -75,6 +75,7 @@ public final class Yices2SolverContext extends AbstractSolverContext {
         // Avoid loading and initializing twice,
         // because this would make all existing terms and types unavailable,
         // which is bad behavior and a potential memory leak.
+        System.setProperty("yices.skipAutoloader", "true");
         Yices.isReady();
       }
       numLoadedInstances++;
