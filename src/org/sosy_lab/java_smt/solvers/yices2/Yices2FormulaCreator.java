@@ -439,29 +439,29 @@ class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long, Intege
       case BV_SUM:
         if (Terms.numChildren(pF) == 1) {
           functionKind = FunctionDeclarationKind.BV_MUL;
-          functionArgs = getMultiplyBvSumArgsFromSum(pF);
+          functionArgs = getOnlySumTerm(pF);
         } else {
           functionKind = FunctionDeclarationKind.BV_ADD;
-          functionArgs = getBvSumArgs(pF);
+          functionArgs = getSumTerms(pF);
         }
         break;
       case ARITH_SUM:
         if (Terms.numChildren(pF) == 1) {
           functionKind = FunctionDeclarationKind.MUL;
-          functionArgs = getMultiplySumArgsFromSum(pF);
+          functionArgs = getOnlySumTerm(pF);
         } else {
           functionKind = FunctionDeclarationKind.ADD;
-          functionArgs = getSumArgs(pF);
+          functionArgs = getSumTerms(pF);
         }
         break;
       case POWER_PRODUCT:
         if (Terms.isBitvector(pF)) {
           functionKind = FunctionDeclarationKind.BV_MUL;
-          functionArgs = getMultiplyArgs(pF, true);
+          functionArgs = getProductFactors(pF);
           // TODO Product of more then 2 bitvectors ?
         } else {
           functionKind = FunctionDeclarationKind.MUL;
-          functionArgs = getMultiplyArgs(pF, false);
+          functionArgs = getProductFactors(pF);
         }
         break;
       case BIT_TERM:
@@ -488,7 +488,8 @@ class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long, Intege
       functionDeclaration = buildDeclaration(functionKind, functionIndex, functionArgs);
     }
 
-    final ImmutableList<FormulaType<?>> argTypes = ImmutableList.copyOf(toType(functionArgs));
+    final ImmutableList<FormulaType<?>> argTypes =
+        ImmutableList.copyOf(Lists.transform(functionArgs, this::getFormulaType));
 
     Preconditions.checkState(
         functionArgs.size() == argTypes.size(),
@@ -757,10 +758,6 @@ class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long, Intege
     return Terms.lambda(args, f);
   }
 
-  private List<FormulaType<?>> toType(final List<Integer> args) {
-    return Lists.transform(args, this::getFormulaType);
-  }
-
   /**
    * Yices transforms <code>EXISTS(x, body)</code> into <code>NOT(FORALL(x, NOT(body)))</code>. See
    * <a
@@ -802,87 +799,104 @@ class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long, Intege
     return children.build();
   }
 
-  private static List<Integer> getSumArgs(int parent) {
-    // TODO Refactor me
-    ImmutableList.Builder<Integer> terms = ImmutableList.builder();
-    for (int i = 0; i < Terms.numChildren(parent); i++) {
-      @SuppressWarnings("unchecked")
-      SumComponent<BigRational> component = (SumComponent<BigRational>) Terms.projSum(parent, i);
-
-      var factor =
-          Terms.rationalConst(
-              component.getFactor().getNumerator(), component.getFactor().getDenominator());
-      var term = component.getTerm() == Terms.NULL_TERM ? Terms.one() : component.getTerm();
-
-      terms.add(Terms.mul(factor, term));
+  /** <code>1</code> for the given theory. */
+  private static int mkOne(int type) {
+    if (Types.isArithmetic(type)) {
+      return Terms.one();
+    } else if (Types.isBitvector(type)) {
+      return Terms.bvOne(Types.bvSize(type));
+    } else {
+      throw new IllegalArgumentException();
     }
-    return terms.build();
   }
 
-  /** extract -1 and X from the sum of one element [-1*x]. */
-  private static List<Integer> getMultiplySumArgsFromSum(int parent) {
-    // TODO Refactor me
-    checkArgument(Terms.numChildren(parent) == 1);
-    @SuppressWarnings("unchecked")
-    SumComponent<BigRational> component = (SumComponent<BigRational>) Terms.projSum(parent, 0);
-    var factor =
-        Terms.rationalConst(
-            component.getFactor().getNumerator(), component.getFactor().getDenominator());
-    checkArgument(component.getTerm() != Terms.NULL_TERM);
-
-    return ImmutableList.of(factor, component.getTerm());
-  }
-
-  /** extract all entries of a BV sum like "3*x + 2*y + 1". */
-  private static List<Integer> getBvSumArgs(int parent) {
-    // TODO Refactor me
-    ImmutableList.Builder<Integer> terms = ImmutableList.builder();
-    for (int i = 0; i < Terms.numChildren(parent); i++) {
-      @SuppressWarnings("unchecked")
-      SumComponent<boolean[]> component = (SumComponent<boolean[]>) Terms.projSum(parent, i);
-
+  /** Convert value to constant term. */
+  private static int toConstant(Object value) {
+    if (value instanceof BigRational) {
+      var rational = (BigRational) value;
+      if (rational.isInteger()) {
+        return Terms.intConst(rational.getNumerator());
+      } else {
+        return Terms.rationalConst(rational);
+      }
+    } else if (value instanceof boolean[]) {
+      var array = (boolean[]) value;
       ImmutableList.Builder<Integer> builder = ImmutableList.builder();
-      for (var bit : component.getFactor()) {
+      for (var bit : array) {
         builder.add(bit ? 1 : 0);
       }
-      var factor = Terms.bvConst(builder.build());
+      return Terms.bvConst(builder.build());
+    } else {
+      throw new IllegalArgumentException();
+    }
+  }
+
+  /** Multiply two arithmetic or bv terms. */
+  private static int mkMultiply(int a, int b) {
+    if (Terms.isArithmetic(a) && Terms.isArithmetic(b)) {
+      return Terms.mul(a, b);
+    } else if (Terms.isBitvector(a) && Terms.isBitvector(b)) {
+      return Terms.bvMul(a, b);
+    } else {
+      throw new IllegalArgumentException();
+    }
+  }
+
+  /* Power of a bv or an arithmetic term. */
+  private static int mkPower(int term, int exponent) {
+    if (Terms.isArithmetic(term)) {
+      return Terms.power(term, exponent);
+    } else if (Terms.isBitvector(term)) {
+      return Terms.bvPower(term, exponent);
+    } else {
+      throw new IllegalArgumentException();
+    }
+  }
+
+  /**
+   * Returns a list of terms for a sum.
+   *
+   * <p>Splits a sum <code>a*t1 + b*t2 + ...</code> into a list of terms <code>a*t1</code>, <code>
+   * b*t2</code>, ...
+   */
+  private static List<Integer> getSumTerms(int parent) {
+    ImmutableList.Builder<Integer> terms = ImmutableList.builder();
+    for (int i = 0; i < Terms.numChildren(parent); i++) {
+      SumComponent<?> component = Terms.projSum(parent, i);
+      var factor = toConstant(component.getFactor());
       var term =
           component.getTerm() == Terms.NULL_TERM
-              ? Terms.bvOne(Terms.bitSize(parent))
+              ? mkOne(Terms.typeOf(parent))
               : component.getTerm();
 
-      terms.add(Terms.bvMul(factor, term));
+      terms.add(mkMultiply(factor, term));
     }
     return terms.build();
   }
 
-  /** extract -1 and X from the sum of one element [-1*x]. */
-  private static List<Integer> getMultiplyBvSumArgsFromSum(int parent) {
-    // TODO Refactor me
+  /**
+   * Returns coefficient and term for a sum with only a single term.
+   *
+   * <p>Splits the sum term <code>Σ a*t</code> into <code>a</code> and <code>t</code>
+   */
+  private static List<Integer> getOnlySumTerm(int parent) {
     checkArgument(Terms.numChildren(parent) == 1);
-    @SuppressWarnings("unchecked")
-    SumComponent<boolean[]> component = (SumComponent<boolean[]>) Terms.projSum(parent, 0);
-
-    ImmutableList.Builder<Integer> builder = ImmutableList.builder();
-    for (var bit : component.getFactor()) {
-      builder.add(bit ? 1 : 0);
-    }
-    var factor = Terms.bvConst(builder.build());
+    SumComponent<?> component = Terms.projSum(parent, 0);
     checkArgument(component.getTerm() != Terms.NULL_TERM);
-
-    return ImmutableList.of(factor, component.getTerm());
+    return ImmutableList.of(toConstant(component.getFactor()), component.getTerm());
   }
 
-  private static List<Integer> getMultiplyArgs(int parent, boolean isBV) {
-    // TODO Refactor me
+  /**
+   * Returns a list of factors for a product term.
+   *
+   * <p>Splits a product <code>a^m * b^n * ...</code> into a list of monomials <code>a^m</code>,
+   * <code>b^n</code>, ...
+   */
+  private static List<Integer> getProductFactors(int parent) {
     ImmutableList.Builder<Integer> builder = ImmutableList.builder();
     for (int i = 0; i < Terms.numChildren(parent); i++) {
       ProductComponent component = Terms.projProduct(parent, i);
-      if (isBV) {
-        builder.add(Terms.bvPower(component.getTerm(), component.getPower()));
-      } else {
-        builder.add(Terms.power(component.getTerm(), component.getPower()));
-      }
+      builder.add(mkPower(component.getTerm(), component.getPower()));
     }
     return builder.build();
   }
