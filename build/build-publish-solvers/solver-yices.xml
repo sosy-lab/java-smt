@@ -72,7 +72,6 @@ SPDX-License-Identifier: Apache-2.0
         </exec>
     </target>
 
-
     <target name="download-libpoly" depends="build-initialize" unless="libpoly.downloaded">
         <exec executable="git" dir="${yices2.buildDir}" failonerror="true">
             <arg value="clone"/>
@@ -115,6 +114,12 @@ SPDX-License-Identifier: Apache-2.0
             <arg value="install"/>
         </exec>
     </target>
+    <target name="clean-yices2" depends="build-initialize, clean-yices2-java" if="yices.downloaded">
+        <delete dir="${yices2.buildDir}/yices2/install"/>
+        <exec executable="make" dir="${yices2.buildDir}/yices2" failonerror="true">
+            <arg value="clean"/>
+        </exec>
+    </target>
 
     <target name="download-yices2-java" depends="build-initialize" unless="yices-java.downloaded">
         <exec executable="git" dir="${yices2.buildDir}" failonerror="true">
@@ -122,9 +127,16 @@ SPDX-License-Identifier: Apache-2.0
             <arg value="https://github.com/daniel-raffler/yices2_java_bindings.git"/>
         </exec>
     </target>
-    <target name="patch-yices2-java" depends="build-yices2, download-yices2-java" unless="yices-java.patched">
+    <target name="patch-yices2-java" depends="download-yices2-java" unless="yices-java.patched">
         <exec executable="git" dir="${yices2.buildDir}/yices2_java_bindings" failonerror="true">
             <arg value="apply"/>
+            <arg value="${basedir}/lib/native/source/yices2/yices2.patch"/>
+        </exec>
+    </target>
+    <target name="unpatch-yices2-java" depends="build-initialize" if="yices-java.patched">
+        <exec executable="git" dir="${yices2.buildDir}/yices2_java_bindings" failonerror="true">
+            <arg value="apply"/>
+            <arg value="-R"/>
             <arg value="${basedir}/lib/native/source/yices2/yices2.patch"/>
         </exec>
     </target>
@@ -136,6 +148,12 @@ SPDX-License-Identifier: Apache-2.0
             <env key="YICES_PATH" value="${yices2.buildDir}/yices2/install"/>
             <arg value="install"/>
         </exec>
+    </target>
+    <target name="clean-yices2-java" depends="build-initialize, unpatch-yices2-java" if="yices-java.downloaded">
+        <exec executable="ant" dir="${yices2.buildDir}/yices2_java_bindings" failonerror="true">
+            <arg value="clean"/>
+        </exec>
+        <delete dir="${yices2.buildDir}/yices2_java_bindings/dist/lib"/>
     </target>
 
     <target name="publish-yices2" depends="load-ivy, build-yices2-java"

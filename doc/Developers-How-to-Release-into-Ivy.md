@@ -358,6 +358,35 @@ ant publish-yices2 -Dyices2.version=2.8.0-prerelease
 The script will fetch all dependencies, download and compile Yices, and then build the JNI bindings
 that are needed to use the solver from Java
 
+We provide additional `ant` targets for a more fine-grained build:
+
+* `ant build-yices2-java` will build all binaries, but not publish them
+* `ant clean-yices2-java` will undo the last build step and delete the JNI bindings
+* `ant clean-yices2` will undo the last two build step and delete the Yices binaries and the JNI
+  bindings
+
+Changes can then be made to the downloaded source in `downloads` before publishing the binaries
+with `ant publish-yices2`. For instance, we could switch to a different branch for Yices:
+
+``` shell
+ant build-yices2-java
+ant clean-yices2
+cd downloads/yices2
+git checkout my-branch
+cd ../..
+ant publish-yices2 -Dyices2.version=2.8.0-prerelease
+```
+
+It's also possible to only download the dependencies:
+
+* `ant download-cudd`
+* `ant download-poly`
+* `ant download-yices2`
+* `ant download-yices2-java`
+
+Changes can then be made to the downloaded source before publishing. Compared to the first
+method, this avoids the needless initial build
+
 #### 2. Build the JavaSMT backend
 
 In `solvers_ivy_conf/ivy_javasmt_yices2.xml` update the version of the `javasmt-solver-yices2`
