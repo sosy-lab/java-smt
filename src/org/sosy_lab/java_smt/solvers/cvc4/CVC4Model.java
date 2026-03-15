@@ -120,7 +120,7 @@ public class CVC4Model extends AbstractModel<Expr, Type, ExprManager> {
         creator.encapsulateWithTypeOf(pKeyExpr),
         creator.encapsulateWithTypeOf(valueExpr),
         creator.encapsulateBoolean(creator.getEnv().mkExpr(Kind.EQUAL, pKeyExpr, valueExpr)),
-        ((CVC4FormulaCreator) creator).getName(pKeyExpr),
+        CVC4FormulaCreator.getName(pKeyExpr),
         creator.convertValue(pKeyExpr, valueExpr),
         argumentInterpretationBuilder.build());
   }
@@ -211,7 +211,7 @@ public class CVC4Model extends AbstractModel<Expr, Type, ExprManager> {
             creator.encapsulateWithTypeOf(pKeyExpr),
             creator.encapsulateWithTypeOf(valueExpr),
             creator.encapsulateBoolean(creator.getEnv().mkExpr(Kind.EQUAL, pKeyExpr, valueExpr)),
-            ((CVC4FormulaCreator) creator).getName(pKeyExpr),
+            CVC4FormulaCreator.getName(pKeyExpr),
             creator.convertValue(pKeyExpr, valueExpr),
             argumentInterpretationBuilder.build()));
   }

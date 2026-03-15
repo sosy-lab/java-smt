@@ -33,6 +33,7 @@ import org.sosy_lab.java_smt.api.FunctionDeclarationKind;
 import org.sosy_lab.java_smt.api.visitors.FormulaVisitor;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 import org.sosy_lab.java_smt.basicimpl.FunctionDeclarationImpl;
+import org.sosy_lab.java_smt.basicimpl.Tokenizer;
 
 class SmtInterpolFormulaCreator extends FormulaCreator<Term, Sort, Script, FunctionSymbol> {
 
@@ -212,7 +213,7 @@ class SmtInterpolFormulaCreator extends FormulaCreator<Term, Sort, Script, Funct
         } else if (app.equals(environment.getTheory().mFalse)) {
           return visitor.visitConstant(f, false);
         } else if (func.getDefinition() == null) {
-          return visitor.visitFreeVariable(f, dequote(input.toString()));
+          return visitor.visitFreeVariable(f, Tokenizer.dequote(input.toString()));
         } else {
           throw new UnsupportedOperationException("Unexpected nullary function " + input);
         }
@@ -254,7 +255,7 @@ class SmtInterpolFormulaCreator extends FormulaCreator<Term, Sort, Script, Funct
       assert t instanceof ApplicationTerm;
       return ((ApplicationTerm) t).getFunction().getName();
     } else {
-      return dequote(t.toString());
+      return Tokenizer.dequote(t.toString());
     }
   }
 

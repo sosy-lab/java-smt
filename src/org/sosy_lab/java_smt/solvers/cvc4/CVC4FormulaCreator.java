@@ -56,6 +56,7 @@ import org.sosy_lab.java_smt.api.StringFormula;
 import org.sosy_lab.java_smt.api.visitors.FormulaVisitor;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 import org.sosy_lab.java_smt.basicimpl.FunctionDeclarationImpl;
+import org.sosy_lab.java_smt.basicimpl.Tokenizer;
 import org.sosy_lab.java_smt.solvers.cvc4.CVC4Formula.CVC4ArrayFormula;
 import org.sosy_lab.java_smt.solvers.cvc4.CVC4Formula.CVC4BitvectorFormula;
 import org.sosy_lab.java_smt.solvers.cvc4.CVC4Formula.CVC4BooleanFormula;
@@ -299,12 +300,12 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
     return new CVC4RegexFormula(pTerm);
   }
 
-  String getName(Expr e) {
+  static String getName(Expr e) {
     checkState(!e.isNull());
     if (!e.isConst() && !e.isVariable()) {
       e = e.getOperator();
     }
-    return dequote(e.toString());
+    return Tokenizer.dequote(e.toString());
   }
 
   @SuppressWarnings("deprecation")

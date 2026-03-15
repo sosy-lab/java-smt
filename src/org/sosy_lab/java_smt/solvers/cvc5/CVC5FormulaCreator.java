@@ -65,6 +65,7 @@ import org.sosy_lab.java_smt.api.visitors.FormulaVisitor;
 import org.sosy_lab.java_smt.api.visitors.TraversalProcess;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 import org.sosy_lab.java_smt.basicimpl.FunctionDeclarationImpl;
+import org.sosy_lab.java_smt.basicimpl.Tokenizer;
 import org.sosy_lab.java_smt.solvers.cvc5.CVC5Formula.CVC5ArrayFormula;
 import org.sosy_lab.java_smt.solvers.cvc5.CVC5Formula.CVC5BitvectorFormula;
 import org.sosy_lab.java_smt.solvers.cvc5.CVC5Formula.CVC5BooleanFormula;
@@ -383,10 +384,10 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, TermManager, 
       // Functions are packaged like this: (functionName arg1 arg2 ...)
       // But can use |(name)| to enable () inside of the variable name
       // TODO what happens for function names containing whitespace?
-      String dequoted = dequote(repr);
+      String dequoted = Tokenizer.dequote(repr);
       return Iterables.get(Splitter.on(' ').split(dequoted.substring(1)), 0);
     } else {
-      return dequote(repr);
+      return Tokenizer.dequote(repr);
     }
   }
 
@@ -457,7 +458,7 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, TermManager, 
         return visitor.visitQuantifier((BooleanFormula) formula, quant, freeVars, fBody);
 
       } else if (f.getKind() == Kind.CONSTANT) {
-        return visitor.visitFreeVariable(formula, dequote(f.toString()));
+        return visitor.visitFreeVariable(formula, Tokenizer.dequote(f.toString()));
 
       } else if (f.getKind() == Kind.APPLY_CONSTRUCTOR) {
         checkState(
