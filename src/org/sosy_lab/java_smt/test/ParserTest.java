@@ -32,13 +32,13 @@ public class ParserTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   }
 
   @Test
-  public void testParseAll_valid_simpleBoolean() {
+  public void parseAllSimpleBooleanTest() {
     String smt = "(assert true)";
     assertThat(mgr.parseAll(smt)).containsExactly(bmgr.makeTrue());
   }
 
   @Test
-  public void testParseAll_valid_simpleInteger() {
+  public void parseAllSimpleIntegerTest() {
     requireIntegers();
     String smt = "(declare-fun x () Int)(assert (= x 1))";
     assertThat(mgr.parseAll(smt))
@@ -46,7 +46,7 @@ public class ParserTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   }
 
   @Test
-  public void testParseAll_valid_defineFun() throws SolverException, InterruptedException {
+  public void parseAllDefineFunTest() throws SolverException, InterruptedException {
     requireIntegers();
     assume()
         .withMessage("Solver %s does not support parsing function definitions", solverToUse())
@@ -80,7 +80,7 @@ public class ParserTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   }
 
   @Test
-  public void testParseAll_valid_multipleAssertions() {
+  public void parseAllMultipleAssertionsTest() {
     requireIntegers();
     String smt = "(declare-fun x () Int)(assert (> x 0))(assert (< x 10))";
     BooleanFormula gt = imgr.greaterThan(imgr.makeVariable("x"), imgr.makeNumber(0));
@@ -89,7 +89,7 @@ public class ParserTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   }
 
   @Test
-  public void testParseAll_valid_differentTypes() {
+  public void parseAllDifferentTypesTest() {
     requireIntegers();
     String smt = "(declare-fun x () Int)(declare-fun y () Bool)(assert (= x 1))(assert y)";
     BooleanFormula intEq = imgr.equal(imgr.makeVariable("x"), imgr.makeNumber(1));
@@ -98,7 +98,7 @@ public class ParserTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   }
 
   @Test
-  public void testParseAll_valid_functionApplication() {
+  public void parseAllFunctionApplicationTest() {
     requireIntegers();
     String smt = "(declare-fun f (Int) Int)(declare-fun x () Int)(assert (= (f x) 1))";
     IntegerFormula x = imgr.makeVariable("x");
@@ -108,7 +108,7 @@ public class ParserTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   }
 
   @Test
-  public void testParseAll_valid_bitvector() throws SolverException, InterruptedException {
+  public void parseAllBitvectorTest() throws SolverException, InterruptedException {
     requireBitvectors();
     String smt = "(declare-fun x () (_ BitVec 8))(assert (= x #x01))";
     List<BooleanFormula> parsed = mgr.parseAll(smt);
@@ -118,7 +118,7 @@ public class ParserTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   }
 
   @Test
-  public void testParseAll_valid_quantifier() {
+  public void parseAllQuantifierTest() {
     requireQuantifiers();
     requireIntegers();
     String smt = "(declare-fun p (Int) Bool)(assert (forall ((x Int)) (p x)))";
@@ -130,7 +130,7 @@ public class ParserTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   }
 
   @Test
-  public void testParseAll_valid_string() throws SolverException, InterruptedException {
+  public void parseAllStringTest() throws SolverException, InterruptedException {
     requireStrings();
     assume()
         .withMessage("Solver %s does not support parsing strings", solverToUse())
@@ -145,7 +145,7 @@ public class ParserTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   }
 
   @Test
-  public void testParseAll_valid_floatingPointFromInt() {
+  public void parseAllFloatingPointFromIntTest() {
     requireFloats();
     requireIntegers();
     String smt = "(declare-fun x () Int)(assert (= x 1.0))";
@@ -154,7 +154,7 @@ public class ParserTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   }
 
   @Test
-  public void testParseAll_valid_floatingPointFromReal() {
+  public void parseAllFloatingPointFromRealTest() {
     requireFloats();
     requireRationals();
     String smt = "(declare-fun x () Real)(assert (= x 1.0))";
@@ -163,7 +163,7 @@ public class ParserTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   }
 
   @Test
-  public void testParseAll_valid_complexNested() {
+  public void parseAllComplexNestedTest() {
     requireIntegers();
     String smt =
         "(declare-fun x () Int)(declare-fun y () Int)(assert (or (= x 1) (and (> y 0) (< y 10))))";
@@ -178,7 +178,7 @@ public class ParserTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   }
 
   @Test
-  public void testParseAll_valid_letBinding() {
+  public void parseAllLetBindingTest() {
     requireIntegers();
     String smt = "(declare-fun x () Int)(assert (let ((a x)) (= a 1)))";
     // For now, just check if it parses without error and returns a formula.
@@ -188,19 +188,19 @@ public class ParserTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   }
 
   @Test
-  public void testParseAll_invalid_syntaxError() {
+  public void parseAllSyntaxErrorTest() {
     String smt = "(assert (= x 1)"; // Missing closing parenthesis
     assertThrows(IllegalArgumentException.class, () -> mgr.parseAll(smt));
   }
 
   @Test
-  public void testParseAll_invalid_undeclaredVariable() {
+  public void parseAllUndeclaredVariableTest() {
     String smt = "(assert (= x 1))"; // 'x' not declared
     assertThrows(IllegalArgumentException.class, () -> mgr.parseAll(smt));
   }
 
   @Test
-  public void testParseAll_invalid_typeMismatch() throws SolverException, InterruptedException {
+  public void parseAllTypeMismatchTest() throws SolverException, InterruptedException {
     requireIntegers();
     String smt = "(declare-fun x () Int)(assert (= x true))"; // Int vs Bool
     if (solverToUse() == Solvers.Z3) {
@@ -215,45 +215,45 @@ public class ParserTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   }
 
   @Test
-  public void testParseAll_invalid_unknownCommandWithAssertion() {
+  public void parseAllUnknownCommandWithAssertionTest() {
     String smt = "(unknown-command)(assert true)";
     assertThat(mgr.parseAll(smt)).hasSize(1);
     assertThat(mgr.parseAll(smt).get(0)).isEqualTo(bmgr.makeTrue());
   }
 
   @Test
-  public void testParseAll_invalid_unknownCommand() {
+  public void parseAllUnknownCommandTest() {
     String smt = "(unknown-command)";
     assertThat(mgr.parseAll(smt)).isEmpty();
   }
 
   @Test
-  public void testParseAll_invalid_emptyString() {
+  public void parseAllEmptyStringTest() {
     String smt = "";
     assertThat(mgr.parseAll(smt)).isEmpty();
   }
 
   @Test
-  public void testParseAll_invalid_emptyString2() {
+  public void parseAllEmptyString2Test() {
     String smt = "   ";
     assertThat(mgr.parseAll(smt)).isEmpty();
   }
 
   @Test
-  public void testParseAll_invalid_emptyString3() {
+  public void parseAllEmptyString3Test() {
     String smt = "\n\t  \n";
     assertThat(mgr.parseAll(smt)).isEmpty();
   }
 
   @Test
-  public void testParseAll_invalid_incorrectFunctionArity() {
+  public void parseAllIncorrectFunctionArityTest() {
     requireIntegers();
     String smt = "(declare-fun f (Int) Int)(assert (f))"; // f expects 1 arg, got 0
     assertThrows(IllegalArgumentException.class, () -> mgr.parseAll(smt));
   }
 
   @Test
-  public void testParseAll_invalid_reservedKeyword() throws SolverException, InterruptedException {
+  public void parseAllReservedKeywordTest() throws SolverException, InterruptedException {
     requireIntegers();
     // 'assert' is a reserved keyword, cannot be used as a function name in most solvers
     String smt = "(declare-fun assert () Int)(assert (= assert 1))";
@@ -268,7 +268,7 @@ public class ParserTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   }
 
   @Test
-  public void testParseall_quotedSymbol() {
+  public void parseAllQuotedSymbolTest() {
     // Capture a variable from the context
     var f = mgr.makeVariable(BooleanType, "my variable");
     var g = mgr.parse("(assert |my variable|)");
@@ -277,7 +277,7 @@ public class ParserTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   }
 
   @Test
-  public void testParseall_quotedSymbol_reparse() {
+  public void parseAllQuotedSymbolRedefinitionTest() {
     // Parse a variable that was already defined in the context
     var f = mgr.makeVariable(BooleanType, "my variable");
     var str = "(declare-fun |my variable| () Bool) (assert |my variable|)";
