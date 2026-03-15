@@ -280,7 +280,7 @@ public class ParserTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   public void testParseall_quotedSymbol_reparse() {
     // Parse a variable that was already defined in the context
     var f = mgr.makeVariable(BooleanType, "my variable");
-    var str = mgr.dumpFormula(f).toString();
+    var str = "(declare-fun |my variable| () Bool) (assert |my variable|)";
     var g = mgr.parse(str);
 
     assertThat(g).isEqualTo(f);
