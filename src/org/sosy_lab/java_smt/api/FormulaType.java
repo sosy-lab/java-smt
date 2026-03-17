@@ -412,25 +412,29 @@ public interface FormulaType<T extends Formula> {
     }
   }
 
+  @SuppressWarnings("ClassInitializationDeadlock")
   FormulaType<FloatingPointRoundingModeFormula> FloatingPointRoundingModeType =
-      new FormulaType<>() {
+      new FloatingPointRoundingModeType();
 
-        @Override
-        public boolean isFloatingPointRoundingModeType() {
-          return true;
-        }
+  final class FloatingPointRoundingModeType
+      implements FormulaType<FloatingPointRoundingModeFormula> {
 
-        @Override
-        public String toString() {
-          return "FloatingPointRoundingMode";
-        }
+    @Override
+    public boolean isFloatingPointRoundingModeType() {
+      return true;
+    }
 
-        @Override
-        public String toSMTLIBString() {
-          throw new UnsupportedOperationException(
-              "rounding mode is not expected in symbol declarations");
-        }
-      };
+    @Override
+    public String toString() {
+      return "FloatingPointRoundingMode";
+    }
+
+    @Override
+    public String toSMTLIBString() {
+      throw new UnsupportedOperationException(
+          "rounding mode is not expected in symbol declarations");
+    }
+  }
 
   @SuppressWarnings("MethodTypeParameterName")
   static <TD extends Formula, TR extends Formula> ArrayFormulaType<TD, TR> getArrayType(
