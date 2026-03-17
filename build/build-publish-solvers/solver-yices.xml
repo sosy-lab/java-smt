@@ -171,7 +171,7 @@ SPDX-License-Identifier: Apache-2.0
             <arg value="--prefix=${yices2.buildDir}/yices2/install/x64-windows"/>
         </exec>
         <exec executable="make" dir="${yices2.buildDir}/yices2" failonerror="true">
-            <arg value="-j"/>
+            <arg value="-j8"/>
             <arg value="OPTION=mingw32"/>
         </exec>
         <exec executable="make" dir="${yices2.buildDir}/yices2" failonerror="true">
