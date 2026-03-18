@@ -207,7 +207,9 @@ class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long, Intege
         !formulaCache.containsRow(name),
         "Symbol '%s' already used for a variable of type '%s'",
         name,
-        formulaCache.row(name));
+        formulaCache.containsRow(name)
+            ? Types.toString(formulaCache.row(name).keySet().iterator().next())
+            : "");
 
     int var = Terms.newUninterpretedTerm(type);
     // Names in Yices2 behave like a stack. The last variable named is retrieved when asking for
