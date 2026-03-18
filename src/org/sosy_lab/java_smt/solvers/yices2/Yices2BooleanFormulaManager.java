@@ -8,7 +8,9 @@
 
 package org.sosy_lab.java_smt.solvers.yices2;
 
+import com.google.common.collect.ImmutableList;
 import com.sri.yices.Terms;
+import java.util.Collection;
 import org.sosy_lab.java_smt.basicimpl.AbstractBooleanFormulaManager;
 
 class Yices2BooleanFormulaManager
@@ -44,8 +46,18 @@ class Yices2BooleanFormulaManager
   }
 
   @Override
+  protected Integer andImpl(Collection<Integer> pParams) {
+    return Terms.and(ImmutableList.copyOf(pParams));
+  }
+
+  @Override
   protected Integer or(Integer pParam1, Integer pParam2) {
     return Terms.or(pParam1, pParam2);
+  }
+
+  @Override
+  protected Integer orImpl(Collection<Integer> pParams) {
+    return Terms.or(ImmutableList.copyOf(pParams));
   }
 
   @Override
