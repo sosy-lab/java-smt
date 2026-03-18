@@ -479,14 +479,45 @@ class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long, Intege
         }
         break;
       case BIT_TERM:
-        // FIXME Not really "extract"
-        functionKind = FunctionDeclarationKind.BV_EXTRACT;
-        functionIndex = ImmutableList.of(Terms.projIndex(pF));
-        functionArgs = ImmutableList.of(Terms.projArg(pF));
+        // Yices rewrites most "bitwise" operations on bitvectors, f.ex bvand(a,b) becomes
+        // (bool-to-bv (and (bit a k) (bit b k)) (and (bit a k-1) (bit b k-1)) ...)
+        // Here (bit a k) returns the k-th bit of the bitvector as a boolean, and bool-to-bv is
+        // used to (re)construct the bitvector from a vector of boolean terms
+        // Since "bit" and "bool-to-bv" are not supported by the visitor, we have to undo the
+        // transformation here
+
+        // Rewrite (bit x n) to (= (extract x n n) #b1). Yices will then further simplify to
+        // (= (bool-to-bv (bit x n)) #b1)
+        // We visit the outer "=" and handle the rest in the arguments
+        functionKind = FunctionDeclarationKind.EQ;
+        functionArgs =
+            ImmutableList.of(
+                Terms.bvExtract(Terms.projArg(pF), Terms.projIndex(pF), Terms.projIndex(pF)),
+                Terms.bvConst(1, 1));
         break;
       case BV_ARRAY:
-        // FIXME Not really "concat"
-        functionKind = FunctionDeclarationKind.BV_CONCAT;
+        if (Terms.numChildren(pF) == 1) {
+          if (Terms.constructor(Terms.child(pF, 0)) == Constructor.BIT_TERM) {
+            // Rewrite (bool-to-bv (bit x n)) to (extract x n n)
+            functionKind = FunctionDeclarationKind.BV_EXTRACT;
+            functionIndex =
+                ImmutableList.of(
+                    Terms.projIndex(Terms.child(pF, 0)), Terms.projIndex(Terms.child(pF, 0)));
+            functionArgs = ImmutableList.of(Terms.projArg(Terms.child(pF, 0)));
+          } else {
+            // Rewrite (bool-to-bv _) to (ite _ #1 #0)
+            functionKind = FunctionDeclarationKind.ITE;
+            functionArgs =
+                ImmutableList.of(Terms.child(pF, 0), Terms.bvConst(1, 1), Terms.bvConst(1, 0));
+          }
+        } else {
+          // Rewrite (bool-to-bv a b ...) to (concat ... (ite b #1 #0) (ite a #1 #0))
+          functionKind = FunctionDeclarationKind.BV_CONCAT;
+          functionArgs =
+              FluentIterable.from(Lists.reverse(getArgs(pF)))
+                  .transform(p -> Terms.ifThenElse(p, Terms.bvConst(1, 1), Terms.bvConst(1, 0)))
+                  .toList();
+        }
         break;
       default:
         throw new UnsupportedOperationException(constructor.toString());
@@ -633,15 +664,11 @@ class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long, Intege
       case INT_TO_BV:
         throw new UnsupportedOperationException("INT_TO_BV not supported");
       case BV_EXTRACT:
-        checkArgument(args.size() == 1);
-        f = Terms.bvExtractBit(args.get(0), pIndex.get(0));
-        // FIXME Should be:
-        // f = Terms.bvExtract(args.get(0), pIndex.get(0), pIndex.get(1));
+        checkArgument(args.size() == 1 && pIndex.size() == 2);
+        f = Terms.bvExtract(args.get(0), pIndex.get(0), pIndex.get(1));
         break;
       case BV_CONCAT:
-        f = Terms.bvFromBoolArray(args);
-        // FIXME Should be:
-        // f = Terms.bvConcat(args);
+        f = Terms.bvConcat(args);
         break;
       case BV_SIGN_EXTENSION:
         checkArgument(args.size() == 1);
