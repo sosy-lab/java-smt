@@ -1029,6 +1029,24 @@ public class TraceFormulaManager implements FormulaManager {
   }
 
   @Override
+  public BooleanFormula makeEqual(Iterable<Formula> pArgs) {
+    return rebuild(
+        logger.logDef(
+            "mgr",
+            String.format("makeEqual(%s)", logger.toVariables(pArgs)),
+            () -> delegate.makeEqual(pArgs)));
+  }
+
+  @Override
+  public BooleanFormula makeDistinct(Iterable<Formula> pArgs) {
+    return rebuild(
+        logger.logDef(
+            "mgr",
+            String.format("makeDistinct(%s)", logger.toVariables(pArgs)),
+            () -> delegate.makeDistinct(pArgs)));
+  }
+
+  @Override
   public <T extends Formula> FormulaType<T> getFormulaType(T formula) {
     return logger.logDefDiscard(
         "mgr",
