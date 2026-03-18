@@ -37,6 +37,7 @@ public class Yices2NativeApiTest {
 
   @BeforeClass
   public static void loadYices() {
+    System.setProperty("yices.skipAutoloader", "true");
     NativeLibraries.loadLibrary("yices2java");
     Yices.isReady();
   }
