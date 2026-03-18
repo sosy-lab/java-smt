@@ -435,6 +435,9 @@ class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long, Intege
       case IDIV:
         functionKind = FunctionDeclarationKind.DIV;
         break;
+      case IMOD:
+        functionKind = FunctionDeclarationKind.MODULO;
+        break;
       case SELECT_TERM:
         functionKind = FunctionDeclarationKind.SELECT;
         break;
@@ -477,7 +480,7 @@ class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long, Intege
         functionKind = FunctionDeclarationKind.BV_CONCAT;
         break;
       default:
-        functionKind = FunctionDeclarationKind.OTHER;
+        throw new UnsupportedOperationException(constructor.toString());
     }
 
     if (functionName == null) {
