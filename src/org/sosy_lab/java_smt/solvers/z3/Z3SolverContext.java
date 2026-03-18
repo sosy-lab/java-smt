@@ -420,6 +420,8 @@ public final class Z3SolverContext extends AbstractSolverContext {
    * be called after the context has been set up, as otherwise we don't get the solver info we need.
    */
   private ImmutableMap<String, Object> getAdditionalOptions(ExtraOptions pExtraOptions) {
+    // TODO: this is overkill due to very few options taking double! We can extract those cases
+    //  and assume all numbers to be int except for those!
     List<String> additionalOptions =
         Splitter.on(',')
             .splitToList(
