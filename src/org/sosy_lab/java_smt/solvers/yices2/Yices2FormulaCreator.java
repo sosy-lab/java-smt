@@ -447,7 +447,12 @@ class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long, Intege
           functionArgs = getOnlySumTerm(pF);
         } else {
           functionKind = FunctionDeclarationKind.BV_ADD;
-          functionArgs = getSumTerms(pF);
+          var terms = getSumTerms(pF);
+          var right =
+              terms.size() > 2
+                  ? Terms.bvAdd(FluentIterable.from(terms).skip(1).toList())
+                  : terms.get(1);
+          functionArgs = ImmutableList.of(terms.get(0), right);
         }
         break;
       case ARITH_SUM:
@@ -462,8 +467,12 @@ class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long, Intege
       case POWER_PRODUCT:
         if (Terms.isBitvector(pF)) {
           functionKind = FunctionDeclarationKind.BV_MUL;
-          functionArgs = getProductFactors(pF);
-          // TODO Product of more then 2 bitvectors ?
+          var factors = getProductFactors(pF);
+          var right = factors.get(1);
+          for (var p = 2; p < factors.size(); p++) {
+            right = Terms.bvMul(right, factors.get(p));
+          }
+          functionArgs = ImmutableList.of(factors.get(0), right);
         } else {
           functionKind = FunctionDeclarationKind.MUL;
           functionArgs = getProductFactors(pF);
@@ -582,8 +591,7 @@ class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long, Intege
         f = Terms.div(args.get(0), args.get(1));
         break;
       case MUL:
-        checkArgument(args.size() == 2);
-        f = Terms.mul(args.get(0), args.get(1));
+        f = Terms.mul(args);
         break;
       case MODULO:
         checkArgument(args.size() == 2);
