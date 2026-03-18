@@ -293,8 +293,8 @@ class TraceLogger {
     if (pType.isFloatingPointType()) {
       FloatingPointType fpType = (FloatingPointType) pType;
       return String.format(
-          "FormulaType.getFloatingPointType(%s, %s)",
-          fpType.getExponentSize(), fpType.getMantissaSize());
+          "FormulaType.getFloatingPointTypeFromSizesWithHiddenBit((%s, %s)",
+          fpType.getExponentSize(), fpType.getMantissaSizeWithHiddenBit());
     }
     if (pType.isStringType()) {
       return "FormulaType.StringType";
