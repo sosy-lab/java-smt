@@ -41,7 +41,14 @@ class Z3TheoremProver extends Z3AbstractProver implements ProverEnvironment {
       @Nullable PathCounterTemplate pLogfile,
       ShutdownNotifier pShutdownNotifier) {
     super(creator, pMgr, pOptions, pLogfile, pShutdownNotifier);
-    z3solver = Native.mkSolver(z3context);
+    if (pSolverOptions.containsKey("engine") && pSolverOptions.containsValue("spacer")) {
+      // mkSolverForLogic() is needed for switching to CHC solving (pre-requisite for spacer)
+      // It also allows setting logics, but they can also be set via options
+      long horn = Native.mkStringSymbol(z3context, "HORN");
+      z3solver = Native.mkSolverForLogic(z3context, horn);
+    } else {
+      z3solver = Native.mkSolver(z3context);
+    }
     Native.solverIncRef(z3context, z3solver);
 
     interruptListener = reason -> Native.solverInterrupt(z3context, z3solver);
