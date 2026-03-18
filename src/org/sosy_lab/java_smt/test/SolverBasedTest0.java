@@ -135,8 +135,29 @@ public abstract class SolverBasedTest0 {
 
   @Before
   public final void initSolver() throws InvalidConfigurationException {
-    config = createTestConfigBuilder().build();
+    Configuration configuration = createTestConfigBuilder().build();
 
+    initSolverWith(configuration);
+  }
+
+  /**
+   * Adds the given option to the config (all other options are retained) and re-initializes the
+   * current solver with this configuration. No solver object created before calling this is valid
+   * after executing this!
+   */
+  protected void setAdditionalConfigOptionForSolver(String optionName, String optionValue)
+      throws InvalidConfigurationException {
+    Configuration configWithLogicQF_LIA =
+        Configuration.builder().copyFrom(config).setOption(optionName, optionValue).build();
+    initSolverWith(configWithLogicQF_LIA);
+  }
+
+  /**
+   * Initializes the currently set solver with the config given. All relevant fields are
+   * automatically (re)assigned.
+   */
+  private void initSolverWith(Configuration pConfiguration) throws InvalidConfigurationException {
+    config = pConfiguration;
     factory = new SolverContextFactory(config, logger, shutdownNotifierToUse());
     try {
       context = factory.generateContext();
