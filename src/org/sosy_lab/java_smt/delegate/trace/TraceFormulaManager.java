@@ -1062,6 +1062,15 @@ public class TraceFormulaManager implements FormulaManager {
   }
 
   @Override
+  public List<BooleanFormula> parseAll(String s) throws IllegalArgumentException {
+    return rebuildAll(
+        logger.logDefDiscard(
+            "mgr",
+            String.format("parseAll(%s)", logger.printString(s)),
+            () -> delegate.parseAll(s)));
+  }
+
+  @Override
   public Appender dumpFormula(BooleanFormula pT) {
     return logger.logDefDiscard(
         "mgr",
