@@ -8,14 +8,26 @@
 
 package org.sosy_lab.java_smt.solvers.z3;
 
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
+
 import com.google.common.base.Preconditions;
+import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import com.microsoft.z3.Native;
 import com.microsoft.z3.enumerations.Z3_ast_print_mode;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
+import java.util.AbstractMap.SimpleEntry;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
@@ -48,9 +60,60 @@ public final class Z3SolverContext extends AbstractSolverContext {
   private final Z3FormulaCreator creator;
   private final Z3FormulaManager manager;
   private final AtomicBoolean closed = new AtomicBoolean(false);
+  private Optional<Map<String, String>> optionNamesAndTypes = Optional.empty();
+
+  // Note: the options with : are named slightly differently when used normally
+  private static final String RND_SEED_CONFIG_KEY = ":random-seed";
+  private static final String UNSAT_CORE_CONFIG_KEY = ":unsat_core";
+  private static final String MODEL_CONFIG_KEY = ":model";
 
   private static final String OPT_ENGINE_CONFIG_KEY = "optsmt_engine";
   private static final String OPT_PRIORITY_CONFIG_KEY = "priority";
+
+  private static final String ENGINE_CONFIG_KEY = "engine";
+  private static final String LOGIC_CONFIG_KEY = "logic";
+  private static final String SPACER_LOGIC_CONFIG_KEY = "spacer.logic";
+
+  private static final ImmutableSet<String> OPTIONS_HANDLED_BY_DEDICATED_OPTIONS =
+      ImmutableSet.of(
+          "model",
+          "unsat_core",
+          "random_seed",
+          ENGINE_CONFIG_KEY,
+          LOGIC_CONFIG_KEY,
+          SPACER_LOGIC_CONFIG_KEY,
+          OPT_PRIORITY_CONFIG_KEY,
+          OPT_ENGINE_CONFIG_KEY);
+
+  private static final Set<String> Z3_OPTION_TYPES =
+      ImmutableSet.of("unsigned int", "bool", "double", "symbol", "string");
+
+  enum Z3_ENGINE {
+    DEFAULT {
+      @Override
+      public String toString() {
+        return "auto-config";
+      }
+    },
+    SPACER {
+      @Override
+      public String toString() {
+        return "spacer";
+      }
+    },
+    BMC {
+      @Override
+      public String toString() {
+        return "bmc";
+      }
+    },
+    DATALOG {
+      @Override
+      public String toString() {
+        return "datalog";
+      }
+    }
+  }
 
   @Options(prefix = "solver.z3")
   private static class ExtraOptions {
@@ -73,11 +136,38 @@ public final class Z3SolverContext extends AbstractSolverContext {
         values = {"basic", "farkas", "symba"})
     String optimizationEngine = "basic";
 
+    // Uses option
     @Option(
         secure = true,
         description = "Ordering for objectives in the optimization context",
         values = {"lex", "pareto", "box"})
     String objectivePrioritizationMode = "box";
+
+    @Option(
+        secure = true,
+        description =
+            "Further options for Bitwuzla in addition to the default options. "
+                + "Format:  \"option.name=value\" with ’,’ to separate options. "
+                + "Option names and values can be found in the Bitwuzla documentation online: "
+                + "https://bitwuzla.github.io/docs/cpp/enums/option.html#_CPPv4N8bitwuzla6OptionE "
+                + "Example: \"smt.arith.solver=1,smt.relevancy=0\"")
+    private String furtherOptions = "";
+
+    @Option(
+        secure = true,
+        description =
+            "Sets the engine to be used by this Z3 context, corresponding to Z3 option 'engine=.."
+                + ".'",
+        values = {"auto-config", "datalog", "bmc", "spacer"})
+    private String engine = "auto-config";
+
+    private final Z3_ENGINE usedEngine;
+
+    // Uses option 'smt.logic=...' for normal Z3, and 'spacer.logic=...' if spacer is used.
+    @Option(
+        secure = true,
+        description = "SMT-LIB logic to configure the SMT solvers of this context")
+    private String logic = "ALL";
 
     private final @Nullable PathCounterTemplate logfile;
 
@@ -86,8 +176,37 @@ public final class Z3SolverContext extends AbstractSolverContext {
     ExtraOptions(Configuration config, @Nullable PathCounterTemplate pLogfile, int pRandomSeed)
         throws InvalidConfigurationException {
       config.inject(this);
+
       randomSeed = pRandomSeed;
       logfile = pLogfile;
+      usedEngine = processEngineOption();
+      logic = processLogicString();
+    }
+
+    /** Preprocesses the engine option string to {@link Z3_ENGINE}. */
+    private Z3_ENGINE processEngineOption() {
+      String processedEngine = checkNotNull(engine).toUpperCase(Locale.getDefault()).strip();
+      if (processedEngine.equals("AUTO-CONFIG")) {
+        return Z3_ENGINE.DEFAULT;
+      }
+      return Z3_ENGINE.valueOf(processedEngine);
+    }
+
+    Z3_ENGINE getEngine() {
+      return checkNotNull(usedEngine);
+    }
+
+    String processLogicString() {
+      // TODO: validate
+      return checkNotNull(logic).toUpperCase(Locale.getDefault()).strip();
+    }
+
+    String getLogic() {
+      return logic;
+    }
+
+    String getFurtherOptions() {
+      return furtherOptions;
     }
   }
 
@@ -217,18 +336,7 @@ public final class Z3SolverContext extends AbstractSolverContext {
   @Override
   protected ProverEnvironment newProverEnvironment0(Set<ProverOptions> options) {
     Preconditions.checkState(!closed.get(), "solver context is already closed");
-    final ImmutableMap<String, Object> solverOptions =
-        ImmutableMap.<String, Object>builder()
-            .put(":random-seed", extraOptions.randomSeed)
-            .put(
-                ":model",
-                options.contains(ProverOptions.GENERATE_MODELS)
-                    || options.contains(ProverOptions.GENERATE_ALL_SAT))
-            .put(
-                ":unsat_core",
-                options.contains(ProverOptions.GENERATE_UNSAT_CORE)
-                    || options.contains(ProverOptions.GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS))
-            .buildOrThrow();
+    final ImmutableMap<String, Object> solverOptions = buildSolverOptions(options);
     return new Z3TheoremProver(
         creator, manager, options, solverOptions, extraOptions.logfile, shutdownNotifier);
   }
@@ -243,12 +351,7 @@ public final class Z3SolverContext extends AbstractSolverContext {
   public OptimizationProverEnvironment newOptimizationProverEnvironment0(
       Set<ProverOptions> options) {
     Preconditions.checkState(!closed.get(), "solver context is already closed");
-    final ImmutableMap<String, Object> solverOptions =
-        ImmutableMap.<String, Object>builder()
-            // .put(":random-seed", extraOptions.randomSeed) // not supported here
-            .put(OPT_ENGINE_CONFIG_KEY, extraOptions.optimizationEngine)
-            .put(OPT_PRIORITY_CONFIG_KEY, extraOptions.objectivePrioritizationMode)
-            .build();
+    final ImmutableMap<String, Object> solverOptions = buildOptimizationSolverOptions();
     return new Z3OptimizationProver(
         creator, logger, manager, options, solverOptions, extraOptions.logfile, shutdownNotifier);
   }
@@ -282,5 +385,177 @@ public final class Z3SolverContext extends AbstractSolverContext {
   @Override
   protected boolean supportsAssumptionSolving() {
     return true;
+  }
+
+  private ImmutableMap<String, Object> buildSolverOptions(Set<ProverOptions> options) {
+    return ImmutableMap.<String, Object>builder()
+        .put(RND_SEED_CONFIG_KEY, extraOptions.randomSeed)
+        .put(
+            MODEL_CONFIG_KEY,
+            options.contains(ProverOptions.GENERATE_MODELS)
+                || options.contains(ProverOptions.GENERATE_ALL_SAT))
+        .put(
+            UNSAT_CORE_CONFIG_KEY,
+            options.contains(ProverOptions.GENERATE_UNSAT_CORE)
+                || options.contains(ProverOptions.GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS))
+        .putAll(transformEngineOption(extraOptions))
+        .putAll(transformLogicOption(extraOptions))
+        .putAll(getAdditionalOptions(extraOptions))
+        .buildOrThrow();
+  }
+
+  private ImmutableMap<String, Object> buildOptimizationSolverOptions() {
+    return ImmutableMap.<String, Object>builder()
+        // .put(":random-seed", extraOptions.randomSeed) // not supported here
+        .put(OPT_ENGINE_CONFIG_KEY, extraOptions.optimizationEngine)
+        .put(OPT_PRIORITY_CONFIG_KEY, extraOptions.objectivePrioritizationMode)
+        .putAll(transformEngineOption(extraOptions))
+        .putAll(transformLogicOption(extraOptions))
+        .putAll(getAdditionalOptions(extraOptions))
+        .buildOrThrow();
+  }
+
+  /**
+   * Resolves additional options set via the configuration (in the furtherOptions option). This must
+   * be called after the context has been set up, as otherwise we don't get the solver info we need.
+   */
+  private ImmutableMap<String, Object> getAdditionalOptions(ExtraOptions pExtraOptions) {
+    List<String> additionalOptions =
+        Splitter.on(',')
+            .splitToList(
+                checkNotNull(pExtraOptions.getFurtherOptions())
+                    .toLowerCase(Locale.getDefault())
+                    .strip());
+    if (additionalOptions.isEmpty()
+        || (additionalOptions.size() == 1 && additionalOptions.get(0).isEmpty())) {
+      // No extra options, ignore
+      return ImmutableMap.of();
+    }
+    ImmutableMap.Builder<String, Object> optionsBuilder = ImmutableMap.builder();
+    // Validate that options were not given twice!
+    for (String option : additionalOptions) {
+      checkArgument(option.contains("="));
+      checkArgument(!option.contains(","));
+      List<String> optionKeyAndValue = Splitter.on('=').splitToList(option);
+      checkArgument(optionKeyAndValue.size() == 2);
+      String key = optionKeyAndValue.get(0);
+      String value = optionKeyAndValue.get(1);
+      checkArgument(!key.isEmpty(), "Empty key for additional option with value: " + value);
+      checkArgument(!value.isEmpty(), "Empty value for additional option with key: " + key);
+      checkArgument(
+          !OPTIONS_HANDLED_BY_DEDICATED_OPTIONS.contains(key),
+          "Please handle option " + key + " " + "by its dedicated option in solver.z3");
+
+      // Transform value to its proper type
+      optionsBuilder.put(key, transformZ3OptionValueToCorrectType(key, value));
+    }
+    return optionsBuilder.buildOrThrow();
+  }
+
+  private ImmutableMap<String, Object> transformLogicOption(ExtraOptions pExtraOptions) {
+    String chosenLogic = pExtraOptions.getLogic();
+    if (chosenLogic.equals("all")) {
+      // Default, ignore
+      return ImmutableMap.of();
+    }
+    // boolean useSpacer = pExtraOptions.getEngine().equals(Z3_ENGINE.SPACER);
+    return ImmutableMap.of(LOGIC_CONFIG_KEY, chosenLogic);
+  }
+
+  private ImmutableMap<String, Object> transformEngineOption(ExtraOptions pExtraOptions) {
+    String engine = pExtraOptions.getEngine().toString();
+    if (engine.equals("auto-config")) {
+      // Default, ignore
+      return ImmutableMap.of();
+    }
+
+    return ImmutableMap.of(ENGINE_CONFIG_KEY, engine);
+  }
+
+  private Object transformZ3OptionValueToCorrectType(String optionName, String optionValue) {
+    if (optionValue.equalsIgnoreCase("true") || optionValue.equalsIgnoreCase("false")) {
+      return Boolean.valueOf(optionValue);
+    }
+
+    // Only retrieve the options and types if we need to and cache for re-use
+    if (optionNamesAndTypes.isEmpty()) {
+      optionNamesAndTypes = Optional.of(resolveOptionsAndTheirTypes(manager));
+      for (Entry<String, String> bla : optionNamesAndTypes.orElseThrow().entrySet()) {
+        System.out.println(bla.getKey() + " : " + bla.getValue());
+      }
+    }
+    String typeAsString = optionNamesAndTypes.orElseThrow().get(checkNotNull(optionName));
+    if (typeAsString == null) {
+      throw new IllegalArgumentException(
+          "Z3 option " + optionName + " could not be resolved" + ". Is it spelled correctly?");
+    }
+
+    if (typeAsString.equals("double")) {
+      return Double.valueOf(optionValue);
+    } else if (typeAsString.equals("symbol") || typeAsString.equals("string")) {
+      return optionValue; // Strings
+    } else if (typeAsString.equals("unsigned int")) {
+      // TODO: unsigned int > int in Java! This is a Z3 problem (their API takes int), report!
+      return Integer.valueOf(optionValue);
+    } else {
+      throw new IllegalArgumentException(
+          "The type for Z3 option "
+              + optionName
+              + " could not be resolved (expected to be "
+              + typeAsString
+              + ")");
+    }
+  }
+
+  /**
+   * Resolves all options relevant for the user and their types (as strings for error messages).
+   * This requires a fully formed Z3FormulaManager!
+   */
+  private Map<String, String> resolveOptionsAndTheirTypes(Z3FormulaManager manager) {
+    ImmutableMap.Builder<String, String> builder = ImmutableMap.builder();
+    resolveZ3OptionsFromString(manager.getAllZ3SolverOptions(), builder);
+    resolveZ3OptionsFromString(manager.getAllZ3Options(), builder);
+    resolveZ3OptionsFromString(manager.getSimplifierOptions(), builder);
+    return builder.buildKeepingLast(); // There may be duplicates (1:1)
+  }
+
+  private static void resolveZ3OptionsFromString(
+      String solverOptions, ImmutableMap.Builder<String, String> builder) {
+    if (solverOptions == null) {
+      // Null checks in case of unforeseen (system) language interactions so that JavaSMT does
+      // not crash
+      return;
+    }
+    for (String line : Splitter.on('\n').split(solverOptions)) {
+      // Ex: core.minimize (bool) minimize unsat core produced by SMT context (default: false)
+      // Ex2: core.extend_patterns.max_distance (unsigned int) limits the distance of a
+      // pattern-extended unsat core (default: 4294967295)
+      // Ex3: mul_to_power (bool) collpase (* t ... t) into (^ t k), it is ignored if
+      // expand_power is true. (default: false)
+      if (line == null || line.isEmpty()) {
+        continue;
+      }
+      // Split by first space to get the option name (first item) and type (in brackets) + the rest
+      // of string. Then split the second item by closing round bracket ), remove the first char,
+      // and take the first item as type.
+      List<String> itemsPerLine = Splitter.on(' ').limit(2).splitToList(line);
+      checkState(
+          itemsPerLine.size() == 2,
+          "Cloud not split Z3 provided option into option name and type: " + line);
+      String optionName = itemsPerLine.get(0);
+      List<String> itemsPerLineWithoutOption =
+          Splitter.on(')').limit(2).splitToList(itemsPerLine.get(1).substring(1));
+      checkArgument(
+          itemsPerLineWithoutOption.size() == 2,
+          "Cloud not split Z3 provided option " + "type: " + line);
+      String optionType = itemsPerLineWithoutOption.get(0);
+      checkArgument(
+          Z3_OPTION_TYPES.contains(optionType),
+          "Could not determine Java equivalent for Z3 provided option type: "
+              + optionType
+              + " for option named: "
+              + optionName);
+      builder.put(new SimpleEntry<>(optionName, optionType));
+    }
   }
 }
