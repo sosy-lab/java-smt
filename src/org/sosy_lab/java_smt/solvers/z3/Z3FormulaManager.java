@@ -8,6 +8,9 @@
 
 package org.sosy_lab.java_smt.solvers.z3;
 
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Verify.verify;
+
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.primitives.Longs;
@@ -205,6 +208,51 @@ final class Z3FormulaManager extends AbstractFormulaManager<Long, Long, Long, Lo
     String serialized = Native.solverToString(getEnvironment(), z3solver);
     Native.solverDecRef(getEnvironment(), z3solver);
     return serialized;
+  }
+
+  /**
+   * Options string for all available options tied to solving (including fixed-point options like
+   * BMC and Spacer options). The options are returned 1 per line, with the pattern:
+   *
+   * <p>optionName{.detailedName} (type) infoText that may include brackets (default: defaultValue)
+   *
+   * <p>e.g.: arith.nl.horner_frequency (unsigned int) horner's call frequency (default: 4)
+   */
+  String getAllZ3SolverOptions() {
+    long z3solver = Native.mkSolver(getEnvironment());
+    Native.solverIncRef(getEnvironment(), z3solver);
+    String options = Native.solverGetHelp(getEnvironment(), z3solver);
+    verify(options.endsWith("\n"));
+    options += Native.fixedpointGetHelp(getEnvironment(), z3solver);
+    verify(options.endsWith("\n"));
+    options += Native.optimizeGetHelp(getEnvironment(), z3solver);
+    checkArgument(
+        Native.solverGetNumScopes(getEnvironment(), z3solver) >= 0,
+        "a negative number of scopes is not allowed");
+    Native.solverReset(getEnvironment(), z3solver); // just to be sure
+    Native.solverDecRef(getEnvironment(), z3solver);
+    return options;
+  }
+
+  // TODO: get tactic options as well (we don't allow them currently, so it is not important)
+  String getSimplifierOptions() {
+    long simplifier = Native.mkSimplifier(getEnvironment(), "propagate-values");
+    Native.simplifierIncRef(getEnvironment(), simplifier);
+    String options = Native.simplifierGetHelp(getEnvironment(), simplifier);
+    Native.simplifierDecRef(getEnvironment(), simplifier);
+    return options;
+  }
+
+  /**
+   * Options string for all available options tied to the environment of the solver. The options are
+   * returned 1 per line, with the pattern:
+   *
+   * <p>optionName{.detailedName} (type) infoText that may include brackets (default: defaultValue)
+   *
+   * <p>e.g.: local_ctx (bool) perform local (i.e., cheap) context simplifications (default: false)
+   */
+  String getAllZ3Options() {
+    return Native.simplifyGetHelp(getEnvironment());
   }
 
   @Override
