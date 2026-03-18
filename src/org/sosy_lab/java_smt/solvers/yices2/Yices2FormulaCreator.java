@@ -847,17 +847,6 @@ class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long, Intege
     }
   }
 
-  /* Power of a bv or an arithmetic term. */
-  private static int mkPower(int term, int exponent) {
-    if (Terms.isArithmetic(term)) {
-      return Terms.power(term, exponent);
-    } else if (Terms.isBitvector(term)) {
-      return Terms.bvPower(term, exponent);
-    } else {
-      throw new IllegalArgumentException();
-    }
-  }
-
   /**
    * Returns a list of terms for a sum.
    *
@@ -894,14 +883,16 @@ class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long, Intege
   /**
    * Returns a list of factors for a product term.
    *
-   * <p>Splits a product <code>a^m * b^n * ...</code> into a list of monomials <code>a^m</code>,
-   * <code>b^n</code>, ...
+   * <p>Splits a product <code>a^m * b^n * ...</code> into a list of individual factors <code>a
+   * </code> * ... * <code>b</code> * ...
    */
   private static List<Integer> getProductFactors(int parent) {
     ImmutableList.Builder<Integer> builder = ImmutableList.builder();
     for (int i = 0; i < Terms.numChildren(parent); i++) {
       ProductComponent component = Terms.projProduct(parent, i);
-      builder.add(mkPower(component.getTerm(), component.getPower()));
+      for (int k = 0; k < component.getPower(); k++) {
+        builder.add(component.getTerm());
+      }
     }
     return builder.build();
   }
