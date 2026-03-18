@@ -9,7 +9,6 @@
 package org.sosy_lab.java_smt.solvers.opensmt;
 
 import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkState;
 
 import com.google.common.collect.ImmutableSet;
 import java.util.ArrayDeque;
@@ -74,7 +73,7 @@ class OpenSmtInterpolatingProver extends OpenSmtAbstractProver<Integer>
 
   @Override
   public BooleanFormula getInterpolant(Collection<Integer> formulasOfA) {
-    checkState(!closed);
+    checkGenerateInterpolants();
     checkArgument(
         getAssertedConstraintIds().containsAll(formulasOfA),
         "interpolation can only be done over previously asserted formulas.");
@@ -86,7 +85,7 @@ class OpenSmtInterpolatingProver extends OpenSmtAbstractProver<Integer>
   @Override
   public List<BooleanFormula> getSeqInterpolants(
       List<? extends Collection<Integer>> partitionedFormulas) {
-    checkState(!closed);
+    checkGenerateInterpolants();
     checkArgument(!partitionedFormulas.isEmpty(), "Interpolation sequence must not be empty");
     final ImmutableSet<Integer> assertedConstraintIds = getAssertedConstraintIds();
     checkArgument(

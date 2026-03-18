@@ -38,7 +38,7 @@ abstract class Yices2NumeralFormulaManager<
     extends AbstractNumeralFormulaManager<
         Integer, Integer, Long, ParamFormulaType, ResultFormulaType, Integer> {
 
-  protected Yices2NumeralFormulaManager(
+  Yices2NumeralFormulaManager(
       Yices2FormulaCreator pCreator, NonLinearArithmetic pNonLinearArithmetic) {
     super(pCreator, pNonLinearArithmetic);
   }

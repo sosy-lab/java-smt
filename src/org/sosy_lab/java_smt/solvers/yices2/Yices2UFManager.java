@@ -12,7 +12,7 @@ import org.sosy_lab.java_smt.basicimpl.AbstractUFManager;
 
 class Yices2UFManager extends AbstractUFManager<Integer, Integer, Integer, Long> {
 
-  protected Yices2UFManager(Yices2FormulaCreator pCreator) {
+  Yices2UFManager(Yices2FormulaCreator pCreator) {
     super(pCreator);
   }
 }

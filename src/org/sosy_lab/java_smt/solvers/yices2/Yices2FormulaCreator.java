@@ -166,7 +166,7 @@ import org.sosy_lab.java_smt.solvers.yices2.Yices2Formula.Yices2IntegerFormula;
 import org.sosy_lab.java_smt.solvers.yices2.Yices2Formula.Yices2RationalFormula;
 
 @SuppressWarnings({"ClassTypeParameterName", "MethodTypeParameterName"})
-public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long, Integer> {
+class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long, Integer> {
 
   private static final ImmutableSet<Integer> CONSTANT_AND_VARIABLE_CONSTRUCTORS =
       ImmutableSet.of(
@@ -190,7 +190,7 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
    */
   private final Set<Integer> ufSymbols = new HashSet<>();
 
-  protected Yices2FormulaCreator() {
+  Yices2FormulaCreator() {
     super(null, yices_bool_type(), yices_int_type(), yices_real_type(), null, null);
   }
 
@@ -489,6 +489,9 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
         break;
       case YICES_EQ_TERM:
         functionKind = FunctionDeclarationKind.EQ; // Covers all equivalences
+        break;
+      case YICES_DISTINCT_TERM:
+        functionKind = FunctionDeclarationKind.DISTINCT;
         break;
       case YICES_NOT_TERM:
         if (isNestedExists(pF)) {

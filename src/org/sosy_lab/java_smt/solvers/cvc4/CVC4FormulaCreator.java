@@ -10,6 +10,7 @@ package org.sosy_lab.java_smt.solvers.cvc4;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkState;
+import static org.sosy_lab.java_smt.api.FormulaType.getFloatingPointTypeFromSizesWithoutHiddenBit;
 import static org.sosy_lab.java_smt.basicimpl.AbstractStringFormulaManager.unescapeUnicodeForSmtlib;
 
 import com.google.common.base.Preconditions;
@@ -65,7 +66,7 @@ import org.sosy_lab.java_smt.solvers.cvc4.CVC4Formula.CVC4RationalFormula;
 import org.sosy_lab.java_smt.solvers.cvc4.CVC4Formula.CVC4RegexFormula;
 import org.sosy_lab.java_smt.solvers.cvc4.CVC4Formula.CVC4StringFormula;
 
-public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, Expr> {
+class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, Expr> {
 
   private static final Pattern FLOATING_POINT_PATTERN =
       Pattern.compile("^\\(fp #b(?<sign>\\d) #b(?<exp>\\d+) #b(?<mant>\\d+)$");
@@ -74,7 +75,7 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
   private final Map<String, Expr> functionsCache = new HashMap<>();
   private final ExprManager exprManager;
 
-  protected CVC4FormulaCreator(ExprManager pExprManager) {
+  CVC4FormulaCreator(ExprManager pExprManager) {
     super(
         pExprManager,
         pExprManager.booleanType(),
@@ -117,7 +118,7 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
   @Override
   public Type getFloatingPointType(FloatingPointType pType) {
     return exprManager.mkFloatingPointType(
-        pType.getExponentSize(), pType.getMantissaSize() + 1); // plus sign bit
+        pType.getExponentSize(), pType.getMantissaSizeWithHiddenBit());
   }
 
   @Override
@@ -157,9 +158,8 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
           t.isFloatingPoint(), "FloatingPointFormula with actual type %s: %s", t, pFormula);
       edu.stanford.CVC4.FloatingPointType fpType = new edu.stanford.CVC4.FloatingPointType(t);
       return (FormulaType<T>)
-          FormulaType.getFloatingPointType(
-              (int) fpType.getExponentSize(),
-              (int) fpType.getSignificandSize() - 1); // without sign bit
+          FormulaType.getFloatingPointTypeFromSizesWithHiddenBit(
+              (int) fpType.getExponentSize(), (int) fpType.getSignificandSize()); // with hidden bit
 
     } else if (pFormula instanceof ArrayFormula<?, ?>) {
       FormulaType<T> arrayIndexType = getArrayFormulaIndexType((ArrayFormula<T, T>) pFormula);
@@ -185,9 +185,8 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
       return FormulaType.getBitvectorTypeWithSize((int) new BitVectorType(t).getSize());
     } else if (t.isFloatingPoint()) {
       edu.stanford.CVC4.FloatingPointType fpType = new edu.stanford.CVC4.FloatingPointType(t);
-      return FormulaType.getFloatingPointType(
-          (int) fpType.getExponentSize(),
-          (int) fpType.getSignificandSize() - 1); // without sign bit
+      return FormulaType.getFloatingPointTypeFromSizesWithHiddenBit(
+          (int) fpType.getExponentSize(), (int) fpType.getSignificandSize()); // with hidden bit
     } else if (t.isRoundingMode()) {
       return FormulaType.FloatingPointRoundingModeType;
     } else if (t.isReal()) {
@@ -579,7 +578,13 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
   @Override
   public Expr callFunctionImpl(Expr pDeclaration, List<Expr> pArgs) {
     if (pArgs.isEmpty()) {
-      return exprManager.mkExpr(pDeclaration);
+      if (exprManager.getType(pDeclaration).isFunction()) {
+        // Builtin operator
+        return exprManager.mkExpr(pDeclaration);
+      } else {
+        // Uf
+        return pDeclaration;
+      }
     } else {
       vectorExpr args = new vectorExpr();
       for (Expr expr : pArgs) {
@@ -591,6 +596,9 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
 
   @Override
   public Expr declareUFImpl(String pName, Type pReturnType, List<Type> pArgTypes) {
+    if (pArgTypes.isEmpty()) {
+      return makeVariable(pReturnType, pName);
+    }
     Expr exp = functionsCache.get(pName);
     if (exp == null) {
       vectorType args = new vectorType();
@@ -599,6 +607,20 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
       }
       exp = exprManager.mkVar(pName, exprManager.mkFunctionType(args, pReturnType));
       functionsCache.put(pName, exp);
+    } else {
+      // We can't cast the cached type to FormulaType, even though it is a function type, due to a
+      // bug in the CVC4 Java bindings. As a workaround we create another function type for the
+      // current arguments and then compare it to the type from the cache
+      vectorType args = new vectorType();
+      for (Type t : pArgTypes) {
+        args.add(t);
+      }
+      var argumentType = exprManager.mkFunctionType(args, pReturnType);
+      var cachedType = exp.getType();
+      Preconditions.checkArgument(
+          cachedType.equals(argumentType),
+          "Function %s already defined with different types or a different number of arguments",
+          pName);
     }
     return exp;
   }
@@ -656,7 +678,8 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
     final var fp = fpExpr.getConstFloatingPoint();
     final var fpType = fp.getT();
     final var expWidth = Ints.checkedCast(fpType.exponentWidth());
-    final var mantWidth = Ints.checkedCast(fpType.significandWidth() - 1); // without sign bit
+    // CVC4 returns the mantissa with the hidden bit, hence - 1
+    final var mantWidthWithoutHiddenBit = Ints.checkedCast(fpType.significandWidth() - 1);
 
     final var sign = matcher.group("sign");
     final var exp = matcher.group("exp");
@@ -664,14 +687,13 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
 
     Preconditions.checkArgument("1".equals(sign) || "0".equals(sign));
     Preconditions.checkArgument(exp.length() == expWidth);
-    Preconditions.checkArgument(mant.length() == mantWidth);
+    Preconditions.checkArgument(mant.length() == mantWidthWithoutHiddenBit);
 
     return FloatingPointNumber.of(
         Sign.of(sign.charAt(0) == '1'),
         new BigInteger(exp, 2),
         new BigInteger(mant, 2),
-        expWidth,
-        mantWidth);
+        getFloatingPointTypeFromSizesWithoutHiddenBit(expWidth, mantWidthWithoutHiddenBit));
   }
 
   @Override

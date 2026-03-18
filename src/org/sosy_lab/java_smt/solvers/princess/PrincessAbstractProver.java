@@ -23,9 +23,7 @@ import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Deque;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -35,7 +33,6 @@ import org.sosy_lab.common.UniqueIdGenerator;
 import org.sosy_lab.common.collect.PathCopyingPersistentTreeMap;
 import org.sosy_lab.common.collect.PersistentMap;
 import org.sosy_lab.java_smt.api.BooleanFormula;
-import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
@@ -50,22 +47,13 @@ abstract class PrincessAbstractProver<E> extends AbstractProverWithAllSat<E> {
   protected final PrincessFormulaManager mgr;
   protected final Deque<Level> trackingStack = new ArrayDeque<>(); // symbols on all levels
 
-  /**
-   * Values returned by {@link Model#evaluate(Formula)}.
-   *
-   * <p>We need to record these to make sure that the values returned by the evaluator are
-   * consistent. Calling {@link #isUnsat()} will reset this list as the underlying model has been
-   * updated.
-   */
-  protected final Set<IFormula> evaluatedTerms = new LinkedHashSet<>();
-
   // assign a unique partition number for eah added constraint, for unsat-core and interpolation.
   protected final UniqueIdGenerator idGenerator = new UniqueIdGenerator();
   protected final Deque<PersistentMap<Integer, BooleanFormula>> partitions = new ArrayDeque<>();
 
   private final PrincessFormulaCreator creator;
 
-  protected PrincessAbstractProver(
+  PrincessAbstractProver(
       PrincessFormulaManager pMgr,
       PrincessFormulaCreator creator,
       SimpleAPI pApi,
@@ -91,13 +79,8 @@ abstract class PrincessAbstractProver<E> extends AbstractProverWithAllSat<E> {
    */
   @Override
   protected boolean isUnsatImpl() throws SolverException {
-    evaluatedTerms.clear();
     final Value result = api.checkSat(true);
     if (result.equals(SimpleAPI.ProverStatus$.MODULE$.Sat())) {
-      if (this.generateModels || this.generateAllSat) {
-        // we only build the model if we have set the correct options
-        evaluatedTerms.add(callOrThrow(api::partialModelAsFormula));
-      }
       return false;
     } else if (result.equals(SimpleAPI.ProverStatus$.MODULE$.Unsat())) {
       return true;
@@ -143,22 +126,6 @@ abstract class PrincessAbstractProver<E> extends AbstractProverWithAllSat<E> {
       trackingStack.peek().mergeWithHigher(level);
     }
     partitions.pop();
-  }
-
-  /**
-   * Get all terms that have been evaluated in the current model. The formulas are assignments that
-   * extend the original model.
-   */
-  Collection<IFormula> getEvaluatedTerms() {
-    Preconditions.checkState(
-        this.generateModels || this.generateAllSat,
-        "Model generation was not enabled, no evaluated terms available.");
-    return Collections.unmodifiableSet(evaluatedTerms);
-  }
-
-  /** Track an assignment `term == value` for an evaluated term and its value. */
-  void addEvaluatedTerm(IFormula pFormula) {
-    evaluatedTerms.add(pFormula);
   }
 
   @SuppressWarnings("resource")
@@ -209,7 +176,7 @@ abstract class PrincessAbstractProver<E> extends AbstractProverWithAllSat<E> {
   @Override
   public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(
       Collection<BooleanFormula> assumptions) {
-    throw new UnsupportedOperationException(ASSUMPTION_SOLVING_NOT_SUPPORTED);
+    throw new UnsupportedOperationException(UNSAT_CORE_WITH_ASSUMPTIONS_NOT_SUPPORTED);
   }
 
   @Override

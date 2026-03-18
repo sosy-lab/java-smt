@@ -20,16 +20,16 @@ import java.util.List;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractQuantifiedFormulaManager;
 
-public class CVC5QuantifiedFormulaManager
+class CVC5QuantifiedFormulaManager
     extends AbstractQuantifiedFormulaManager<Term, Sort, TermManager, Term> {
 
   private final TermManager termManager;
   private final Solver solver;
 
-  protected CVC5QuantifiedFormulaManager(CVC5FormulaCreator pFormulaCreator) {
+  CVC5QuantifiedFormulaManager(CVC5FormulaCreator pFormulaCreator, Solver pSolver) {
     super(pFormulaCreator);
     termManager = pFormulaCreator.getEnv();
-    solver = new Solver(termManager);
+    solver = pSolver;
   }
 
   /*

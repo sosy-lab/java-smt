@@ -13,10 +13,13 @@ import com.google.common.collect.Iterables;
 import de.uni_freiburg.informatik.ultimate.logic.PrintTerm;
 import edu.stanford.CVC4.Expr;
 import edu.stanford.CVC4.ExprManager;
+import edu.stanford.CVC4.Kind;
 import edu.stanford.CVC4.Type;
+import edu.stanford.CVC4.vectorExpr;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
@@ -64,8 +67,26 @@ class CVC4FormulaManager extends AbstractFormulaManager<Expr, Type, ExprManager,
   }
 
   @Override
-  public Expr parseImpl(String formulaStr) throws IllegalArgumentException {
-    throw new UnsupportedOperationException();
+  public Expr equalImpl(Expr pArg1, Expr pArgs) {
+    return getEnvironment().mkExpr(Kind.EQUAL, pArg1, pArgs);
+  }
+
+  @Override
+  public Expr distinctImpl(Iterable<Expr> pArgs) {
+    vectorExpr vec = new vectorExpr();
+    for (Expr e : pArgs) {
+      vec.add(e);
+    }
+    if (vec.size() < 2) {
+      return getEnvironment().mkConst(true);
+    } else {
+      return getEnvironment().mkExpr(Kind.DISTINCT, vec);
+    }
+  }
+
+  @Override
+  protected List<Expr> parseAllImpl(String pSmtScript) throws IllegalArgumentException {
+    throw new UnsupportedOperationException(API_METHOD_NOT_IMPLEMENTED);
   }
 
   @Override

@@ -242,8 +242,8 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
         return FormulaType.getArrayType(
             getFormulaTypeFromSort(domainSort), getFormulaTypeFromSort(rangeSort));
       case Z3_FLOATING_POINT_SORT:
-        return FormulaType.getFloatingPointType(
-            Native.fpaGetEbits(z3context, pSort), Native.fpaGetSbits(z3context, pSort) - 1);
+        return FormulaType.getFloatingPointTypeFromSizesWithHiddenBit(
+            Native.fpaGetEbits(z3context, pSort), Native.fpaGetSbits(z3context, pSort));
       case Z3_ROUNDING_MODE_SORT:
         return FormulaType.FloatingPointRoundingModeType;
       case Z3_RE_SORT:
@@ -454,7 +454,8 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
 
   @Override
   public Long getFloatingPointType(FormulaType.FloatingPointType type) {
-    long fpSort = Native.mkFpaSort(getEnv(), type.getExponentSize(), type.getMantissaSize() + 1);
+    long fpSort =
+        Native.mkFpaSort(getEnv(), type.getExponentSize(), type.getMantissaSizeWithHiddenBit());
     Native.incRef(getEnv(), Native.sortToAst(getEnv(), fpSort));
     return fpSort;
   }
@@ -997,12 +998,7 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
       assert "0".equals(sign) || "1".equals(sign);
       final var expo = new BigInteger(Native.getNumeralString(environment, expoBv));
       final var mant = new BigInteger(Native.getNumeralString(environment, mantBv));
-      return FloatingPointNumber.of(
-          Sign.of(sign.charAt(0) == '1'),
-          expo,
-          mant,
-          pType.getExponentSize(),
-          pType.getMantissaSize());
+      return FloatingPointNumber.of(Sign.of(sign.charAt(0) == '1'), expo, mant, pType);
 
     } else if (Native.fpaIsNumeralInf(environment, pValue)) {
       // Floating Point Inf uses:
@@ -1011,9 +1007,10 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
       //  - "00..00" as mantissa.
       String sign = getSign(pValue).isNegative() ? "1" : "0";
       return FloatingPointNumber.of(
-          sign + "1".repeat(pType.getExponentSize()) + "0".repeat(pType.getMantissaSize()),
-          pType.getExponentSize(),
-          pType.getMantissaSize());
+          sign
+              + "1".repeat(pType.getExponentSize())
+              + "0".repeat(pType.getMantissaSizeWithoutHiddenBit()),
+          pType);
 
     } else if (Native.fpaIsNumeralNan(environment, pValue)) {
       // TODO We are underspecified here and choose several bits on our own.
@@ -1023,9 +1020,10 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
       //  - "11..11" as exponent,
       //  - an unspecified mantissa (we choose all "1").
       return FloatingPointNumber.of(
-          "0" + "1".repeat(pType.getExponentSize()) + "1".repeat(pType.getMantissaSize()),
-          pType.getExponentSize(),
-          pType.getMantissaSize());
+          "0"
+              + "1".repeat(pType.getExponentSize())
+              + "1".repeat(pType.getMantissaSizeWithoutHiddenBit()),
+          pType);
 
     } else {
       Sign sign = getSign(pValue);
@@ -1034,20 +1032,15 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
       var mantissaBv = Native.fpaGetNumeralSignificandBv(environment, pValue);
       var mantissa = Native.getNumeralString(environment, mantissaBv);
       return FloatingPointNumber.of(
-          sign,
-          new BigInteger(exponent),
-          new BigInteger(mantissa),
-          pType.getExponentSize(),
-          pType.getMantissaSize());
+          sign, new BigInteger(exponent), new BigInteger(mantissa), pType);
     }
   }
 
   private Sign getSign(Long pValue) {
-    Native.IntPtr signPtr = new Native.IntPtr();
+    Native.BoolPtr signPtr = new Native.BoolPtr();
     Preconditions.checkState(
         Native.fpaGetNumeralSign(environment, pValue, signPtr), "Sign is not a Boolean value");
-    var sign = signPtr.value != 0;
-    return Sign.of(sign);
+    return Sign.of(signPtr.value);
   }
 
   @Override

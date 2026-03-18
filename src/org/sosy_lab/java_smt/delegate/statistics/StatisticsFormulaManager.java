@@ -122,6 +122,20 @@ class StatisticsFormulaManager implements FormulaManager {
   }
 
   @Override
+  public BooleanFormula makeEqual(Iterable<Formula> pArgs) {
+    // can be more than one operation, however, we count only once
+    stats.booleanOperations.getAndIncrement();
+    return delegate.makeEqual(pArgs);
+  }
+
+  @Override
+  public BooleanFormula makeDistinct(Iterable<Formula> pArgs) {
+    // can be more than one operation, however, we count only once
+    stats.booleanOperations.getAndIncrement();
+    return delegate.makeDistinct(pArgs);
+  }
+
+  @Override
   public <T extends Formula> FormulaType<T> getFormulaType(T pFormula) {
     return delegate.getFormulaType(pFormula);
   }
@@ -129,6 +143,11 @@ class StatisticsFormulaManager implements FormulaManager {
   @Override
   public BooleanFormula parse(String pS) throws IllegalArgumentException {
     return delegate.parse(pS);
+  }
+
+  @Override
+  public List<BooleanFormula> parseAll(String pS) throws IllegalArgumentException {
+    return delegate.parseAll(pS);
   }
 
   @Override

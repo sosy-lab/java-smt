@@ -67,7 +67,7 @@ class Yices2TheoremProver extends AbstractProverWithAllSat<Void> implements Prov
   // Therefore, we need to keep track of all added constraints beyond that stack-level.
   private int stackSizeToUnsat = Integer.MAX_VALUE;
 
-  protected Yices2TheoremProver(
+  Yices2TheoremProver(
       Yices2FormulaCreator creator,
       Set<ProverOptions> pOptions,
       BooleanFormulaManager pBmgr,
@@ -151,9 +151,20 @@ class Yices2TheoremProver extends AbstractProverWithAllSat<Void> implements Prov
     Preconditions.checkState(!closed);
     Preconditions.checkNotNull(pAssumptions);
     changedSinceLastSatQuery = false;
+    wasLastSatCheckSatisfiable = false;
+
     // TODO handle BooleanFormulaCollection / check for literals
-    return !yices_check_sat_with_assumptions(
-        curEnv, DEFAULT_PARAMS, pAssumptions.size(), uncapsulate(pAssumptions), shutdownNotifier);
+    final boolean isUnsat =
+        !yices_check_sat_with_assumptions(
+            curEnv,
+            DEFAULT_PARAMS,
+            pAssumptions.size(),
+            uncapsulate(pAssumptions),
+            shutdownNotifier);
+    if (!isUnsat) {
+      wasLastSatCheckSatisfiable = true;
+    }
+    return isUnsat;
   }
 
   @SuppressWarnings("resource")

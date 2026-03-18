@@ -62,9 +62,19 @@ public class BitwuzlaNativeApiTest {
 
   @After
   public void freeEnvironment() {
-    if (bitwuzla != null) {
-      bitwuzla.delete();
-    }
+    TermManager.deleteReferences();
+  }
+
+  @Test
+  public void equalityOverDifferentSorts() {
+    assertThrows(
+        IllegalArgumentException.class,
+        () ->
+            bitwuzla.assert_formula(
+                termManager.mk_term(
+                    Kind.EQUAL,
+                    termManager.mk_fp_pos_inf(termManager.mk_fp_sort(5, 11)),
+                    termManager.mk_fp_neg_inf(termManager.mk_fp_sort(4, 12)))));
   }
 
   @Test
@@ -90,21 +100,6 @@ public class BitwuzlaNativeApiTest {
   public void boolType() {
     Sort pBoolType = termManager.mk_bool_sort();
     assertThat(pBoolType.is_bool()).isTrue();
-  }
-
-  @Test
-  public void repeatedTermCreationInMultipleSolversTest() {
-    Term tru1 = termManager.mk_true();
-    Term tru12 = termManager.mk_true();
-    assertThat(tru1.is_true()).isTrue();
-    assertThat(tru12.is_true()).isTrue();
-
-    new Thread(
-            () -> {
-              assertThat(tru1.is_true()).isTrue();
-              assertThat(tru12.is_true()).isTrue();
-            })
-        .start();
   }
 
   @Test

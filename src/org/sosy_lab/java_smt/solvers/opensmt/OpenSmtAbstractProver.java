@@ -38,13 +38,13 @@ import org.sosy_lab.java_smt.solvers.opensmt.api.SymRef;
 import org.sosy_lab.java_smt.solvers.opensmt.api.Symbol;
 import org.sosy_lab.java_smt.solvers.opensmt.api.sstat;
 
-public abstract class OpenSmtAbstractProver<T> extends AbstractProverWithAllSat<T> {
+abstract class OpenSmtAbstractProver<T> extends AbstractProverWithAllSat<T> {
 
   protected final OpenSmtFormulaCreator creator;
   protected final MainSolver osmtSolver;
   protected final SMTConfig osmtConfig;
 
-  protected OpenSmtAbstractProver(
+  OpenSmtAbstractProver(
       OpenSmtFormulaCreator pFormulaCreator,
       FormulaManager pMgr,
       ShutdownNotifier pShutdownNotifier,
@@ -258,7 +258,7 @@ public abstract class OpenSmtAbstractProver<T> extends AbstractProverWithAllSat<
   @Override
   public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(
       Collection<BooleanFormula> pAssumptions) throws SolverException, InterruptedException {
-    throw new UnsupportedOperationException(ASSUMPTION_SOLVING_NOT_SUPPORTED);
+    throw new UnsupportedOperationException(UNSAT_CORE_WITH_ASSUMPTIONS_NOT_SUPPORTED);
   }
 
   @Override

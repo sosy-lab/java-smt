@@ -42,19 +42,31 @@ public final class OpenSmtSolverContext extends AbstractSolverContext {
 
   private boolean closed = false;
 
-  @Options(prefix = "solver.opensmt")
+  @Options(prefix = "solver.opensmt", deprecatedPrefix = "solver.opensmt")
   static class OpenSMTOptions {
 
     @Option(secure = true, description = "SMT-LIB2 name of the logic to be used by the solver.")
     Logics logic = Logics.QF_AUFLIRA;
 
-    @Option(secure = true, description = "Algorithm for boolean interpolation")
+    @Option(
+        secure = true,
+        description = "Interpolation algorithm for boolean theory",
+        name = "interpolation.algorithm.booleanTheory",
+        deprecatedName = "algBool")
     Core algBool = Core.MCMILLAN;
 
-    @Option(secure = true, description = "Algorithm for UF interpolation")
+    @Option(
+        secure = true,
+        description = "Interpolation algorithm for UF theory",
+        name = "interpolation.algorithm.ufTheory",
+        deprecatedName = "algUf")
     UF algUf = UF.STRONG;
 
-    @Option(secure = true, description = "Algorithm for LRA interpolation")
+    @Option(
+        secure = true,
+        description = "Interpolation algorithm for LRA theory",
+        name = "interpolation.algorithm.lraTheory",
+        deprecatedName = "algLra")
     LA algLra = LA.STRONG;
 
     /**
@@ -68,7 +80,9 @@ public final class OpenSmtSolverContext extends AbstractSolverContext {
         secure = true,
         description =
             "Level of simplification for interpolants,"
-                + "ranging from 0 (no simplification) to 4 (maximum simplification).")
+                + "ranging from 0 (no simplification) to 4 (maximum simplification).",
+        name = "interpolation.simplificationLevel",
+        deprecatedName = "simplifyInterpolants")
     int simplifyInterpolants = 0;
 
     final int randomSeed;

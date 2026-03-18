@@ -17,7 +17,7 @@ import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 class BoolectorTheoremProver extends BoolectorAbstractProver<Void> implements ProverEnvironment {
   // Used as standard prover. Built by method newProverEnvironment0 in BtorSolverContext
 
-  protected BoolectorTheoremProver(
+  BoolectorTheoremProver(
       BoolectorFormulaManager manager,
       BoolectorFormulaCreator creator,
       long btor,
