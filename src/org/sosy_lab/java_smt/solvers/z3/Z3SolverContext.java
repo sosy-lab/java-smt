@@ -10,7 +10,6 @@ package org.sosy_lab.java_smt.solvers.z3;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.base.Preconditions.checkState;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Splitter;
@@ -22,12 +21,8 @@ import com.microsoft.z3.enumerations.Z3_ast_print_mode;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
-import java.util.AbstractMap.SimpleEntry;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
@@ -60,7 +55,17 @@ public final class Z3SolverContext extends AbstractSolverContext {
   private final Z3FormulaCreator creator;
   private final Z3FormulaManager manager;
   private final AtomicBoolean closed = new AtomicBoolean(false);
-  private Optional<Map<String, String>> optionNamesAndTypes = Optional.empty();
+
+  // Options that require arguments of type double
+  private static final ImmutableSet<String> doubleOptions =
+      ImmutableSet.of(
+          "arith.epsilon",
+          "dack.factor",
+          "dack.gc_inv_decay",
+          "qi.eager_threshold",
+          "qi.lazy_threshold",
+          "restart_factor",
+          "spacer.dump_threshold");
 
   // Note: the options with : are named slightly differently when used normally
   private static final String RND_SEED_CONFIG_KEY = ":random-seed";
@@ -84,9 +89,6 @@ public final class Z3SolverContext extends AbstractSolverContext {
           SPACER_LOGIC_CONFIG_KEY,
           OPT_PRIORITY_CONFIG_KEY,
           OPT_ENGINE_CONFIG_KEY);
-
-  private static final Set<String> Z3_OPTION_TYPES =
-      ImmutableSet.of("unsigned int", "bool", "double", "symbol", "string");
 
   enum Z3_ENGINE {
     DEFAULT {
@@ -477,87 +479,29 @@ public final class Z3SolverContext extends AbstractSolverContext {
   private Object transformZ3OptionValueToCorrectType(String optionName, String optionValue) {
     if (optionValue.equalsIgnoreCase("true") || optionValue.equalsIgnoreCase("false")) {
       return Boolean.valueOf(optionValue);
-    }
-
-    // Only retrieve the options and types if we need to and cache for re-use
-    if (optionNamesAndTypes.isEmpty()) {
-      optionNamesAndTypes = Optional.of(resolveOptionsAndTheirTypes(manager));
-      for (Entry<String, String> bla : optionNamesAndTypes.orElseThrow().entrySet()) {
-        System.out.println(bla.getKey() + " : " + bla.getValue());
-      }
-    }
-    String typeAsString = optionNamesAndTypes.orElseThrow().get(checkNotNull(optionName));
-    if (typeAsString == null) {
-      throw new IllegalArgumentException(
-          "Z3 option " + optionName + " could not be resolved" + ". Is it spelled correctly?");
-    }
-
-    if (typeAsString.equals("double")) {
+    } else if (doubleOptions.contains(optionName)) {
+      // Numbers are either double or int
       return Double.valueOf(optionValue);
-    } else if (typeAsString.equals("symbol") || typeAsString.equals("string")) {
-      return optionValue; // Strings
-    } else if (typeAsString.equals("unsigned int")) {
-      // TODO: unsigned int > int in Java! This is a Z3 problem (their API takes int), report!
+    }
+
+    try {
       return Integer.valueOf(optionValue);
-    } else {
-      throw new IllegalArgumentException(
-          "The type for Z3 option "
-              + optionName
-              + " could not be resolved (expected to be "
-              + typeAsString
-              + ")");
+    } catch (NumberFormatException e) {
+      return optionValue; // string or symbol (both as String)
     }
   }
 
   /**
-   * Resolves all options relevant for the user and their types (as strings for error messages).
-   * This requires a fully formed Z3FormulaManager!
+   * Returns a {@link String} with all Z3 options (except tactic options as we can't use them).
+   * Options are provided line by line (one option per line) with input types, information about the
+   * option, and default values. This requires a fully formed Z3FormulaManager!
    */
-  private Map<String, String> resolveOptionsAndTheirTypes(Z3FormulaManager manager) {
-    ImmutableMap.Builder<String, String> builder = ImmutableMap.builder();
-    resolveZ3OptionsFromString(manager.getAllZ3SolverOptions(), builder);
-    resolveZ3OptionsFromString(manager.getAllZ3Options(), builder);
-    resolveZ3OptionsFromString(manager.getSimplifierOptions(), builder);
-    return builder.buildKeepingLast(); // There may be duplicates (1:1)
-  }
-
-  private static void resolveZ3OptionsFromString(
-      String solverOptions, ImmutableMap.Builder<String, String> builder) {
-    if (solverOptions == null) {
-      // Null checks in case of unforeseen (system) language interactions so that JavaSMT does
-      // not crash
-      return;
-    }
-    for (String line : Splitter.on('\n').split(solverOptions)) {
-      // Ex: core.minimize (bool) minimize unsat core produced by SMT context (default: false)
-      // Ex2: core.extend_patterns.max_distance (unsigned int) limits the distance of a
-      // pattern-extended unsat core (default: 4294967295)
-      // Ex3: mul_to_power (bool) collpase (* t ... t) into (^ t k), it is ignored if
-      // expand_power is true. (default: false)
-      if (line == null || line.isEmpty()) {
-        continue;
-      }
-      // Split by first space to get the option name (first item) and type (in brackets) + the rest
-      // of string. Then split the second item by closing round bracket ), remove the first char,
-      // and take the first item as type.
-      List<String> itemsPerLine = Splitter.on(' ').limit(2).splitToList(line);
-      checkState(
-          itemsPerLine.size() == 2,
-          "Cloud not split Z3 provided option into option name and type: " + line);
-      String optionName = itemsPerLine.get(0);
-      List<String> itemsPerLineWithoutOption =
-          Splitter.on(')').limit(2).splitToList(itemsPerLine.get(1).substring(1));
-      checkArgument(
-          itemsPerLineWithoutOption.size() == 2,
-          "Cloud not split Z3 provided option " + "type: " + line);
-      String optionType = itemsPerLineWithoutOption.get(0);
-      checkArgument(
-          Z3_OPTION_TYPES.contains(optionType),
-          "Could not determine Java equivalent for Z3 provided option type: "
-              + optionType
-              + " for option named: "
-              + optionName);
-      builder.put(new SimpleEntry<>(optionName, optionType));
-    }
+  String getZ3Options() {
+    // Useful for retrieving all relevant Z3 options and their types
+    // TODO: add a test that we know all 'double' option arguments.
+    // TODO: add a public method that returns solver options?
+    return manager.getAllZ3SolverOptions()
+        + manager.getAllZ3Options()
+        + manager.getSimplifierOptions();
   }
 }
