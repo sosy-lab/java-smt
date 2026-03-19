@@ -100,13 +100,13 @@ abstract class CmdLineArgument implements Comparable<CmdLineArgument> {
     final void apply0(Map<String, String> properties, String currentArg, Iterator<String> args)
         throws InvalidCmdlineArgumentException {
       if (args.hasNext()) {
-        handleArg(properties, currentArg, args.next());
+        handleArg(properties, args.next());
       } else {
         throw new InvalidCmdlineArgumentException(currentArg + " argument missing.");
       }
     }
 
-    void handleArg(Map<String, String> pProperties, String pCurrentArg, String pArgValue)
+    void handleArg(Map<String, String> pProperties, String pArgValue)
         throws InvalidCmdlineArgumentException {
       checkState(option != null);
       putIfNotExistent(pProperties, option, pArgValue);
