@@ -14,7 +14,7 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableMap;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -91,7 +91,7 @@ public class JavaSMTMain {
       return;
     }
 
-    if (!Files.isReadable(Paths.get(options.smt2File))) {
+    if (!Files.isReadable(Path.of(options.smt2File))) {
       throw Output.fatalError(
           "Please provide a valid, readable SMT2 file: %s", options.smt2File);
     }
@@ -141,7 +141,7 @@ public class JavaSMTMain {
 
     String input;
     try {
-      input = Files.readString(Paths.get(options.smt2File));
+      input = Files.readString(Path.of(options.smt2File));
     } catch (IOException e) {
       throw Output.fatalError("Could not read SMT2 file: %s", e.getMessage());
     }

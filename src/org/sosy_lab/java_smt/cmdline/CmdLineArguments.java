@@ -14,7 +14,6 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableSortedSet;
 import java.io.PrintStream;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -75,7 +74,7 @@ public final class CmdLineArguments {
                     + " and "
                     + arg);
           }
-          Path file = Paths.get(arg);
+          Path file = Path.of(arg);
           properties.put("smt2.file", file.toString());
         }
       }
