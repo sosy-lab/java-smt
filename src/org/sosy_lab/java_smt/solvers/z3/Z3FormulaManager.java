@@ -8,8 +8,6 @@
 
 package org.sosy_lab.java_smt.solvers.z3;
 
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Verify.verify;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
@@ -208,49 +206,6 @@ final class Z3FormulaManager extends AbstractFormulaManager<Long, Long, Long, Lo
     String serialized = Native.solverToString(getEnvironment(), z3solver);
     Native.solverDecRef(getEnvironment(), z3solver);
     return serialized;
-  }
-
-  /**
-   * Options string for all available options tied to solving (including fixed-point options like
-   * BMC and Spacer options). The options are returned 1 per line, with the pattern:
-   *
-   * <p>optionName{.detailedName} (type) infoText that may include brackets (default: defaultValue)
-   *
-   * <p>e.g.: arith.nl.horner_frequency (unsigned int) horner's call frequency (default: 4)
-   */
-  String getAllZ3SolverOptions() {
-    long z3solver = Native.mkSolver(getEnvironment());
-    Native.solverIncRef(getEnvironment(), z3solver);
-    String options = Native.solverGetHelp(getEnvironment(), z3solver);
-    verify(options.endsWith("\n"));
-    options += Native.fixedpointGetHelp(getEnvironment(), z3solver);
-    verify(options.endsWith("\n"));
-    options += Native.optimizeGetHelp(getEnvironment(), z3solver);
-    checkArgument(
-        Native.solverGetNumScopes(getEnvironment(), z3solver) >= 0,
-        "a negative number of scopes is not allowed");
-    Native.solverReset(getEnvironment(), z3solver); // just to be sure
-    Native.solverDecRef(getEnvironment(), z3solver);
-    return options;
-  }
-
-  // TODO: do we allow tactic options currently?
-  @SuppressWarnings("unused")
-  String getTacticOptions() {
-    long tactic = Native.mkTactic(getEnvironment(), "simplify");
-    Native.simplifierIncRef(getEnvironment(), tactic);
-    String options = Native.tacticGetHelp(getEnvironment(), tactic);
-    Native.simplifierDecRef(getEnvironment(), tactic);
-    return options;
-  }
-
-  // TODO: get tactic options as well (we don't allow them currently, so it is not important)
-  String getSimplifierOptions() {
-    long simplifier = Native.mkSimplifier(getEnvironment(), "propagate-values");
-    Native.simplifierIncRef(getEnvironment(), simplifier);
-    String options = Native.simplifierGetHelp(getEnvironment(), simplifier);
-    Native.simplifierDecRef(getEnvironment(), simplifier);
-    return options;
   }
 
   /**
