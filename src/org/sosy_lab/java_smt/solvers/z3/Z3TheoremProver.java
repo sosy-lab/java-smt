@@ -8,6 +8,8 @@
 
 package org.sosy_lab.java_smt.solvers.z3;
 
+import static com.google.common.base.Preconditions.checkArgument;
+
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import com.microsoft.z3.Native;
@@ -41,12 +43,18 @@ class Z3TheoremProver extends Z3AbstractProver implements ProverEnvironment {
       @Nullable PathCounterTemplate pLogfile,
       ShutdownNotifier pShutdownNotifier) {
     super(creator, pMgr, pOptions, pLogfile, pShutdownNotifier);
-    if (pSolverOptions.containsKey("engine") && pSolverOptions.containsValue("spacer")) {
-      // mkSolverForLogic() is needed for switching to CHC solving (pre-requisite for spacer)
-      // It also allows setting logics, but they can also be set via options
-      long horn = Native.mkStringSymbol(z3context, "HORN");
-      z3solver = Native.mkSolverForLogic(z3context, horn);
+    if (pSolverOptions.containsKey("logic") && !pSolverOptions.get("logic").equals("all")) {
+      // mkSolverForLogic() allows setting logics, which seem to be getting ignored if set via
+      // options
+      String logicString = (String) pSolverOptions.get("logic");
+      checkArgument(
+          !(pSolverOptions.containsKey("engine") && pSolverOptions.get("engine").equals("spacer"))
+              || logicString.equalsIgnoreCase("HORN"));
+      long logic = Native.mkStringSymbol(z3context, (String) pSolverOptions.get("logic"));
+      z3solver = Native.mkSolverForLogic(z3context, logic);
     } else {
+      checkArgument(
+          !(pSolverOptions.containsKey("engine") && pSolverOptions.get("engine").equals("spacer")));
       z3solver = Native.mkSolver(z3context);
     }
     Native.solverIncRef(z3context, z3solver);
@@ -194,7 +202,7 @@ class Z3TheoremProver extends Z3AbstractProver implements ProverEnvironment {
   @Override
   public void close() {
     if (!closed) {
-      Preconditions.checkArgument(
+      checkArgument(
           Native.solverGetNumScopes(z3context, z3solver) >= 0,
           "a negative number of scopes is not allowed");
 
