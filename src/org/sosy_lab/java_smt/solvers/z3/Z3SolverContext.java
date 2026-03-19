@@ -402,7 +402,7 @@ public final class Z3SolverContext extends AbstractSolverContext {
                 || options.contains(ProverOptions.GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS))
         .putAll(transformEngineOption(extraOptions))
         .putAll(transformLogicOption(extraOptions))
-        .putAll(getAdditionalOptions(extraOptions))
+        .putAll(transformAdditionalOptions(extraOptions))
         .buildOrThrow();
   }
 
@@ -413,7 +413,7 @@ public final class Z3SolverContext extends AbstractSolverContext {
         .put(OPT_PRIORITY_CONFIG_KEY, extraOptions.objectivePrioritizationMode)
         .putAll(transformEngineOption(extraOptions))
         .putAll(transformLogicOption(extraOptions))
-        .putAll(getAdditionalOptions(extraOptions))
+        .putAll(transformAdditionalOptions(extraOptions))
         .buildOrThrow();
   }
 
@@ -421,9 +421,7 @@ public final class Z3SolverContext extends AbstractSolverContext {
    * Resolves additional options set via the configuration (in the furtherOptions option). This must
    * be called after the context has been set up, as otherwise we don't get the solver info we need.
    */
-  private ImmutableMap<String, Object> getAdditionalOptions(ExtraOptions pExtraOptions) {
-    // TODO: this is overkill due to very few options taking double! We can extract those cases
-    //  and assume all numbers to be int except for those!
+  private ImmutableMap<String, Object> transformAdditionalOptions(ExtraOptions pExtraOptions) {
     List<String> additionalOptions =
         Splitter.on(',')
             .splitToList(
