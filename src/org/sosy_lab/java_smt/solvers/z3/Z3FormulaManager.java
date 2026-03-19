@@ -234,6 +234,16 @@ final class Z3FormulaManager extends AbstractFormulaManager<Long, Long, Long, Lo
     return options;
   }
 
+  // TODO: do we allow tactic options currently?
+  @SuppressWarnings("unused")
+  String getTacticOptions() {
+    long tactic = Native.mkTactic(getEnvironment(), "simplify");
+    Native.simplifierIncRef(getEnvironment(), tactic);
+    String options = Native.tacticGetHelp(getEnvironment(), tactic);
+    Native.simplifierDecRef(getEnvironment(), tactic);
+    return options;
+  }
+
   // TODO: get tactic options as well (we don't allow them currently, so it is not important)
   String getSimplifierOptions() {
     long simplifier = Native.mkSimplifier(getEnvironment(), "propagate-values");
