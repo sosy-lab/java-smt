@@ -43,7 +43,7 @@ import org.sosy_lab.java_smt.api.SolverException;
  * and reports the result (sat/unsat/unknown).
  */
 @SuppressForbidden("System.out in this class is ok")
-public class JavaSMTMain {
+public final class JavaSMTMain {
 
   static final int ERROR_EXIT_CODE = 1;
 
