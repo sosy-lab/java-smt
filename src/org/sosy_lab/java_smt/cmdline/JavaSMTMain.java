@@ -92,8 +92,7 @@ public final class JavaSMTMain {
     }
 
     if (!Files.isReadable(Path.of(options.smt2File))) {
-      throw Output.fatalError(
-          "Please provide a valid, readable SMT2 file: %s", options.smt2File);
+      throw Output.fatalError("Please provide a valid, readable SMT2 file: %s", options.smt2File);
     }
 
     run(config, logManager, options);
