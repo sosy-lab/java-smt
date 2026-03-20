@@ -417,7 +417,7 @@ public class OpenSmtNativeAPITest {
     mainSolver.push();
     mainSolver.insertFormula(f1);
 
-    mainSolver.stop();
+    mainSolver.notifyStop();
 
     sstat r = mainSolver.check();
     assertThat(r).isEqualTo(sstat.Undef());
