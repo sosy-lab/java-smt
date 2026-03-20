@@ -399,9 +399,17 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
     int pos = 0; // index of the current token
 
     for (String token : tokens) {
-      if (Tokenizer.isSetLogicToken(token)) {
-        // Skip the (set-logic ...) command at the beginning of the input
-        Preconditions.checkArgument(pos == 0);
+      if (pos == 0 && Tokenizer.isSetInfoToken(token)) {
+        // set-info call is allowed to be the very first command in the benchmark, but can also
+        // appear repeatedly throughout a SMT2 program
+        // Technically it is even required to be the very first command, and it must set the
+        //  :smt-lib-version attribute. See SMT-LIB 2.7 §3.11.3
+        // TODO: check that version >= 2?
+        Preconditions.checkArgument(token.contains(":smt-lib-version"));
+
+      } else if (Tokenizer.isSetLogicToken(token)) {
+        // Skip (set-logic ...) commands for now. They may appear throughout an SMT-LIB2 program
+        // to set the 'current logic' to a new logic. Default (no command needed): ALL.
 
       } else if (Tokenizer.isExitToken(token)) {
         // Skip the (exit) command at the end of the input
