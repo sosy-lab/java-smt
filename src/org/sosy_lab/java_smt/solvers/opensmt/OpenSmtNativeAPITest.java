@@ -98,6 +98,7 @@ public class OpenSmtNativeAPITest {
     PTRef f = logic.mkEq(varA, varB);
 
     SMTConfig config = new SMTConfig();
+    config.setOption(":produce-models", new SMTOption(true));
     MainSolver mainSolver = new MainSolver(logic, config, "opensmt-test");
 
     mainSolver.push();
