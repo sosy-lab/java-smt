@@ -10,10 +10,13 @@
 
 package org.sosy_lab.java_smt.test;
 
+import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.TruthJUnit.assume;
 import static org.junit.Assert.assertThrows;
 
+import com.google.common.collect.ImmutableSet;
 import java.util.List;
+import java.util.Set;
 import org.junit.Test;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
@@ -22,33 +25,86 @@ import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.SolverException;
+import org.sosy_lab.java_smt.solvers.z3.Z3SolverContext;
 
 public class SolverNativeOptionsTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
 
+  // TODO: HORN test(s) will be moved once we have a dedicated HORN prover and tests
   @Test
-  public void z3EngineTest()
+  public void simpleHornSolvingTimeoutTest() throws InterruptedException {
+    assume().that(solver).isEqualTo(Solvers.Z3);
+
+    // Normal Z3 runs endlessly for this HORN task, so we shut it down after a few seconds
+    // (Do not ever use @Test(timeout = ...) on Z3! It SIGSEGVs!
+    Thread killerThread =
+        new Thread(
+            () -> {
+              try {
+                Thread.sleep(3000); // 3s
+                shutdownManager.requestShutdown("Shutdown Request");
+              } catch (InterruptedException exception) {
+                throw new UnsupportedOperationException("Unexpected interrupt", exception);
+              }
+            });
+
+    List<BooleanFormula> parsedCHC = mgr.parseAll(HORN_SMT2);
+    try (BasicProverEnvironment<?> pe = context.newProverEnvironment()) {
+      for (BooleanFormula hc : parsedCHC) {
+        pe.addConstraint(hc);
+      }
+      killerThread.start();
+      assertThrows(InterruptedException.class, pe::isUnsat);
+    }
+  }
+
+  // TODO: HORN test(s) will be moved once we have a dedicated HORN prover and tests
+  @Test
+  public void simpleHornSolvingTest()
       throws InvalidConfigurationException, SolverException, InterruptedException {
     assume().that(solver).isEqualTo(Solvers.Z3);
 
-    // Normal Z3 returns UNKNOWN for this CHC task
+    // HORN program of simpleHornSolvingTimeoutTest() succeeds with HORN in Z3
+    setAdditionalConfigOptionForSolver("solver.z3.logic", "HORN");
+
+    List<BooleanFormula> parsedCHC = mgr.parseAll(HORN_SMT2);
+    // Z3 with HORN can solve this basically instantly!
     try (BasicProverEnvironment<?> pe = context.newProverEnvironment()) {
-      List<BooleanFormula> parsedCHC = mgr.parseAll(CHC2);
-      for (BooleanFormula parsedFormula : parsedCHC) {
-        pe.addConstraint(parsedFormula);
+      for (BooleanFormula hc : parsedCHC) {
+        pe.addConstraint(hc);
       }
-      assertThrows(SolverException.class, pe::isUnsat);
+      assertThat(pe.isUnsat()).isFalse();
     }
-
-    // Switch to CHC solving (and build a new context, as the old one is stopped)
-    setAdditionalConfigOptionForSolver("solver.z3.engine", "spacer");
-    setAdditionalConfigOptionForSolver(
-        "solver.z3.furtherOptions",
-        "spacer.order_children=2,xform.inline_eager=false,xform.inline_linear=false,xform.slice=false,spacer.max_level=10");
-
-    List<BooleanFormula> parsedCHC = mgr.parseAll(CHC2);
-    assertThatFormula(bmgr.and(parsedCHC)).isSatisfiable();
   }
 
+  // TODO: HORN test(s) will be moved once we have a dedicated HORN prover and tests
+  @Test
+  public void simpleHornSolvingWithSpacerTest()
+      throws InvalidConfigurationException, SolverException, InterruptedException {
+    assume().that(solver).isEqualTo(Solvers.Z3);
+
+    // HORN program of simpleHornSolvingTimeoutTest() succeeds with HORN in Spacer (Z3)
+    // Note: seems like we don't need the option spacer.logic=HORN
+    // The options are recommended for this kind of problem, but not needed in general.
+    setAdditionalConfigOptionForSolver(
+        "solver.z3.logic",
+        "HORN",
+        "solver.z3.engine",
+        "spacer",
+        "solver.z3.furtherOptions",
+        "spacer.order_children=2,xform.inline_eager=false,xform"
+            + ".inline_linear=false,xform.slice=false,spacer.max_level=10");
+
+    List<BooleanFormula> parsedCHC = mgr.parseAll(HORN_SMT2);
+    // Spacer can solve this basically instantly!
+    try (BasicProverEnvironment<?> pe = context.newProverEnvironment()) {
+      for (BooleanFormula hc : parsedCHC) {
+        pe.addConstraint(hc);
+      }
+      assertThat(pe.isUnsat()).isFalse();
+    }
+  }
+
+  // TODO: generalize this for all solvers that support "additional" options
   @Test
   public void additionalOptionsTest() throws InvalidConfigurationException {
     assume().that(solver).isEqualTo(Solvers.Z3);
@@ -58,40 +114,48 @@ public class SolverNativeOptionsTest extends SolverBasedTest0.ParameterizedSolve
     // Now 2
     setAdditionalConfigOptionForSolver(
         "solver.z3.furtherOptions", "arith.epsilon=2," + "restart_factor=2");
-
-    // Multiple are also tested in the engine test
+    // With spaces
+    setAdditionalConfigOptionForSolver(
+        "solver.z3.furtherOptions", "arith.epsilon = 2," + " restart_factor = 2");
+    // Capitalized
+    setAdditionalConfigOptionForSolver(
+        "solver.z3.furtherOptions", "arith.Epsilon=2," + "Restart_facTor=2");
   }
 
+  @Test
+  public void additionalOptionsDoubleTest() {
+    assume().that(solver).isEqualTo(Solvers.Z3);
+    assertThrows(
+        IllegalArgumentException.class,
+        () ->
+            setAdditionalConfigOptionForSolver(
+                "solver.z3.furtherOptions", "restart_factor=2,arith.epsilon=2,restart_factor=3"));
+  }
+
+  // TODO: generalize this for all solvers that support "additional" options
   @Test
   public void additionalOptionsFailTest() {
     assume().that(solver).isEqualTo(Solvers.Z3);
     // Z3 disallows certain option combinations
-    assertThrows(
-        IllegalArgumentException.class,
-        () -> setAdditionalConfigOptionForSolver("solver.z3.furtherOptions", "engine=spacer"));
-    assertThrows(
-        IllegalArgumentException.class,
-        () -> setAdditionalConfigOptionForSolver("solver.z3.furtherOptions", "optsmt_engine=true"));
-    assertThrows(
-        IllegalArgumentException.class,
-        () -> setAdditionalConfigOptionForSolver("solver.z3.furtherOptions", "priority=box"));
-    assertThrows(
-        IllegalArgumentException.class,
-        () -> setAdditionalConfigOptionForSolver("solver.z3.furtherOptions", "logic=ALL"));
-    assertThrows(
-        IllegalArgumentException.class,
-        () -> setAdditionalConfigOptionForSolver("solver.z3.furtherOptions", "spacer.logic=ALL"));
+    Set<String> disallowedConfigurationOptionsZ3 =
+        ImmutableSet.of(
+            "engine=spacer",
+            "optsmt_engine=true",
+            "priority=box",
+            "logic=ALL",
+            "unsat_core=true",
+            "model=true",
+            "random_seed=42",
+            "smt.random_seed=42",
+            "proof=true");
+    for (final String optionWithValue : disallowedConfigurationOptionsZ3) {
+      assertThrows(
+          IllegalArgumentException.class,
+          () -> setAdditionalConfigOptionForSolver("solver.z3.furtherOptions", optionWithValue));
+    }
   }
 
-  @Test
-  public void z3AllLogicTest()
-      throws InvalidConfigurationException, SolverException, InterruptedException {
-    setAdditionalConfigOptionForSolver("solver.z3.logic", "all");
-
-    BitvectorFormula zero = bvmgr.makeBitvector(8, 0);
-    assertThatFormula(bvmgr.equal(bvmgr.smodulo(zero, zero), zero)).isTautological();
-  }
-
+  // TODO: generalize LOGIC tests and move into their own test class once more solvers support this!
   @Test
   public void z3QFLIALogicTest()
       throws InvalidConfigurationException, SolverException, InterruptedException {
@@ -101,74 +165,14 @@ public class SolverNativeOptionsTest extends SolverBasedTest0.ParameterizedSolve
     IntegerFormula zeroInt = imgr.makeNumber(0);
     assertThatFormula(imgr.equal(imgr.add(zeroInt, zeroInt), zeroInt)).isTautological();
 
-    // TODO: is Z3 just ignoring the set logics?
+    // TODO: is Z3 just ignoring the set logics and solves all if we diverge from it?
     BitvectorFormula zeroBv = bvmgr.makeBitvector(8, 0);
     assertThatFormula(bvmgr.equal(bvmgr.smodulo(zeroBv, zeroBv), zeroBv)).isTautological();
   }
 
-  // From
-  // https://github.com/chc-comp/chc-comp25-benchmarks/blob/main/extra-small-lia/bouncy_two_counters_merged_000.smt2
-  @SuppressWarnings("unused")
-  private static final String CHC_SMT2 =
-      "(set-logic HORN)\n"
-          + "(declare-fun |itp1| ( Int Int Int ) Bool)\n"
-          + "(assert\n"
-          + "  (forall ( (A Int) (B Int) (C Int) ) \n"
-          + "    (=>\n"
-          + "      (and\n"
-          + "        (and (= B 0) (= A 0) (= C 0))\n"
-          + "      )\n"
-          + "      (itp1 A B C)\n"
-          + "    )\n"
-          + "  )\n"
-          + ")\n"
-          + "(assert\n"
-          + "  (forall ( (A Int) (B Int) (C Int) (D Int) (E Int) (F Int) ) \n"
-          + "    (=>\n"
-          + "      (and\n"
-          + "        (itp1 B A C)\n"
-          + "        (or (and (= D B) (= E (+ 1 A)) (= F (+ (- 1) C)))\n"
-          + "    (and (= D (+ 1 B)) (= E A) (= F (+ 1 C))))\n"
-          + "      )\n"
-          + "      (itp1 D E F)\n"
-          + "    )\n"
-          + "  )\n"
-          + ")\n";
-
-  // https://github.com/chc-comp/chc-comp25-benchmarks/blob/main/extra-small-lia/yz_plus_minus_1_000.smt2
-  private static final String CHC2 =
-      "(declare-fun |inv| ( Int Int Int ) Bool)\n"
-          + "\n"
-          + "(assert\n"
-          + "  (forall ( (v_0 Int) (v_1 Int) (v_2 Int) ) \n"
-          + "    (=>\n"
-          + "      (and\n"
-          + "        (and true (= 0 v_0) (= 0 v_1) (= 0 v_2))\n"
-          + "      )\n"
-          + "      (inv v_0 v_1 v_2)\n"
-          + "    )\n"
-          + "  )\n"
-          + ")\n"
-          + "(assert\n"
-          + "  (forall ( (A Int) (B Int) (C Int) (D Int) (E Int) (F Int) ) \n"
-          + "    (=>\n"
-          + "      (and\n"
-          + "        (inv A C B)\n"
-          + "        (and (= E (+ 1 B)) (= D (+ A C)) (not (<= 100 A)) (= F (+ (- 1) C)))\n"
-          + "      )\n"
-          + "      (inv D E F)\n"
-          + "    )\n"
-          + "  )\n"
-          + ")\n"
-          + "(assert\n"
-          + "  (forall ( (A Int) (B Int) (C Int) ) \n"
-          + "    (=>\n"
-          + "      (and\n"
-          + "        (inv C A B)\n"
-          + "        (not (>= C 0))\n"
-          + "      )\n"
-          + "      false\n"
-          + "    )\n"
-          + "  )\n"
-          + ")";
+  // Small HORN problem in SMT2
+  private static final String HORN_SMT2 =
+      "(declare-fun Itp (Int Int) Bool)\n"
+          + "(assert (forall ((a Int) (x Int) (b Int)) (=> (and (< a x) (< x b)) (Itp a b))))\n"
+          + "(assert (forall ((a Int) (b Int)) (=> (Itp a b) (not (< b a)))))";
 }
