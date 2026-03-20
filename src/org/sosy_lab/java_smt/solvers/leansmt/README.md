@@ -1,56 +1,108 @@
 # LeanSMT Local Setup (JavaSMT)
 
-This README is for running JavaSMT with LeanSMT locally.
+LeanSMT upstream: <https://github.com/ufmg-smite/lean-smt>
 
-LeanSMT upstream: https://github.com/ufmg-smite/lean-smt
+## Linux x64 Setup
 
-## What you need
+### 1. Install system dependencies
 
-- JavaSMT checkout
-- LeanSMT checkout
-- Lean toolchain (elan/lake)
-- cvc5 executable available on PATH
+```bash
+sudo apt-get install -y git curl unzip
+sudo apt-get install -y build-essential gcc g++
+sudo apt-get install -y openjdk-17-jdk-headless ant
+sudo apt-get install -y swig patchelf ripgrep
+```
 
-## Quickstart (copy/paste)
+### 2. Install the Lean toolchain
 
-1. Build LeanSMT
+```bash
+curl https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh -sSf | sh -s -- -y
+export PATH="$HOME/.elan/bin:$PATH"
+```
 
-cd /absolute/path/to/lean-smt
-lake build
+### 3. Clone JavaSMT and LeanSMT
 
-2. Package LeanSMT runtime into JavaSMT
+```bash
+git clone https://github.com/sosy-lab/java-smt.git java-smt
+git clone https://github.com/ufmg-smite/lean-smt.git
+cd java-smt
+```
 
-cd /absolute/path/to/java-smt
-./build/build-publish-solvers/package-leansmt-runtime.sh /absolute/path/to/lean-smt
+### 4. Build and package the LeanSMT runtime
 
-3. Verify cvc5 is available
+```bash
+export PATH="$HOME/.elan/bin:$PATH"
+build/build-publish-solvers/build-leansmt-runtime-from-source.sh /absolute/path/to/lean-smt
+```
 
-which cvc5
-cvc5 --version
+This populates `lib/native/x86_64-linux/` with the packaged LeanSMT runtime, including:
 
-4. Build JavaSMT and run LeanSMT tests
+- `libleansmt_jni.so`
+- `libleansmt_jni.real.so`
+- `libSmtJNI.so`
+- `libSmt.so`
+- `libAuto.so`
+- `libQq.so`
+- `libcvc5.so`
+- `libleanshared.so`
+- `cvc5`
 
+### 5. Verify the runtime
+
+```bash
+./lib/native/x86_64-linux/cvc5 --version
+ldd ./lib/native/x86_64-linux/libleansmt_jni.real.so
+```
+
+`ldd` should resolve the LeanSMT dependencies from `lib/native/x86_64-linux/`.
+
+### 6. Run LeanSMT tests
+
+```bash
 ant -q build-project
+```
+
+LeanSMT-specific backend tests:
+
+```bash
 ant unit-tests-leansmt
+```
+
+Normal JavaSMT shared tests with LeanSMT only:
+
+```bash
+ant -Dtest.solver=LEANSMT tests
+```
+
+To run the full JavaSMT suite for all solvers, use:
+
+```bash
+ant tests
+```
+
+## Refreshing the packaged runtime
+
+If the LeanSMT runtime has already been built in another checkout, repackage it with:
+
+```bash
+build/build-publish-solvers/package-leansmt-runtime.sh /absolute/path/to/runtime-source
+```
 
 ## Use LeanSMT in JavaSMT
 
-In code, select Solvers.LEANSMT.
+In code, select `Solvers.LEANSMT`.
 
 Minimal example file:
-src/org/sosy_lab/java_smt/example/LeanSmtBasicExample.java
+`src/org/sosy_lab/java_smt/example/LeanSmtBasicExample.java`
 
-## Backend notes
+## Current limitations
 
-- Platform/runtime: packaged for Linux x64.
-- External executable: LeanSMT needs cvc5 available.
-- Supported: booleans, integers, rationals, bitvectors, UF, SAT/UNSAT, assumptions,
-  unsat cores, model generation/evaluation, SMT-LIB parse/dump subset.
-- Not supported: floating points, arrays, strings/regex, interpolation, optimization, proofs.
-- Threading: do not use one context/prover concurrently from multiple threads.
+- Platform/runtime: Linux x64 only.
+- `ubv_to_int` and `sbv_to_int` are not supported.
+- Floating points, arrays, strings/regex, interpolation, and optimization are not supported.
+- Do not use one LeanSMT context or prover concurrently from multiple threads.
 
 ## Related release docs
 
-- Ivy release flow: doc/Developers-How-to-Release-into-Ivy.md
-- Maven staging flow: doc/Developers-How-to-Release-into-Maven.md
-
+- Ivy release flow: `doc/Developers-How-to-Release-into-Ivy.md`
+- Maven staging flow: `doc/Developers-How-to-Release-into-Maven.md`

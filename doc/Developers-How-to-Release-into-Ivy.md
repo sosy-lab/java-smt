@@ -162,27 +162,25 @@ LeanSMT is published as an explicit opt-in runtime profile for Linux x64.
 
 Prerequisites:
 
-- LeanSMT checkout from <https://github.com/ufmg-smite/lean-smt> that builds successfully (`lake build`).
 - JavaSMT checkout.
+- LeanSMT runtime source that already includes the JavaSMT JNI wrapper
+  `libleansmt_jni.so` and the transitive LeanSMT runtime libraries.
+  A plain upstream `lean-smt` checkout built only with `lake build` is currently not
+  sufficient by itself for JavaSMT packaging.
 
 Recommended sequence:
 
-1. Build LeanSMT runtime in the LeanSMT checkout:
-   ```bash
-   cd /absolute/path/to/lean-smt
-   lake build
-   ```
-2. Refresh packaged LeanSMT runtime files in JavaSMT:
+1. Package LeanSMT runtime files into JavaSMT:
    ```bash
    cd /absolute/path/to/java-smt
-   ./build/build-publish-solvers/package-leansmt-runtime.sh /absolute/path/to/lean-smt
+   ./build/build-publish-solvers/package-leansmt-runtime.sh /absolute/path/to/runtime-source
    ```
-3. Validate integration:
+2. Validate integration:
    ```bash
    ant -q build-project
    ant unit-tests-leansmt
    ```
-4. Publish LeanSMT runtime binaries to the Ivy repository:
+3. Publish LeanSMT runtime binaries to the Ivy repository:
    ```bash
    ant publish-leansmt -Dleansmt.version=$LEANSMT_VERSION
    ```
@@ -190,6 +188,9 @@ Recommended sequence:
 Notes:
 
 - `publish-leansmt` packages runtime libraries from `lib/native/x86_64-linux`.
+- `package-leansmt-runtime.sh` normalizes the JNI wrapper `RUNPATH` to `$ORIGIN`,
+  so `libleansmt_jni.so` resolves `libSmtJNI.so` and the other LeanSMT `.so` files
+  from JavaSMT's native directory instead of from an older machine-specific path.
 - The published Ivy solver artifact contains LeanSMT shared libraries (`.so`); `cvc5` executable is not published as part of this solver artifact.
 
 
