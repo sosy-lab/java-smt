@@ -10,6 +10,7 @@ package org.sosy_lab.java_smt.solvers.leansmt;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -187,8 +188,8 @@ final class LeanSmtTheoremProver extends AbstractProverWithAllSat<Void> implemen
     if (lastModelRaw == null) {
       lastModelRaw = LeanSmtNativeApi.getModel(currentSolver);
     }
-    Map<String, Long> variables = creator.getKnownUserVariableHandles();
-    return new LeanSmtModel(this, creator, variables, lastModelRaw);
+    Map<String, Long> variables = creator.getKnownVariableHandles();
+    return new LeanSmtModel(this, creator, variables, lastModelRaw, getRelevantModelHandles());
   }
 
   @Override
@@ -244,6 +245,27 @@ final class LeanSmtTheoremProver extends AbstractProverWithAllSat<Void> implemen
     assertedRationalConstConstraintsInCurrentSolver.clear();
     creator.redeclareMissingVariables(solver, declaredVariablesInCurrentSolver);
     return solver;
+  }
+
+  private Set<Long> getRelevantModelHandles() {
+    ImmutableSet.Builder<Long> relevant = ImmutableSet.builder();
+    Set<Long> visited = new HashSet<>();
+    for (BooleanFormula constraint : getAssertedFormulas()) {
+      collectRelevantModelHandles(creator.extractInfoFromFormula(constraint), visited, relevant);
+    }
+    return relevant.build();
+  }
+
+  private void collectRelevantModelHandles(
+      long handle, Set<Long> visited, ImmutableSet.Builder<Long> relevant) {
+    if (!visited.add(handle)) {
+      return;
+    }
+    relevant.add(handle);
+    LeanSmtFormulaCreator.Expr expr = creator.getExpression(handle);
+    for (long arg : expr.arguments) {
+      collectRelevantModelHandles(arg, visited, relevant);
+    }
   }
 
   /**

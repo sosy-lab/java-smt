@@ -17,7 +17,6 @@ import org.junit.AssumptionViolatedException;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.sosy_lab.common.NativeLibraries;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FunctionDeclarationKind;
 import org.sosy_lab.java_smt.api.SolverException;
@@ -30,7 +29,7 @@ public class LeanSmtNativeApiTest {
   @BeforeClass
   public static void loadLeanSmt() {
     try {
-      LeanSmtNativeApi.loadLibrary(NativeLibraries::loadLibrary);
+      LeanSmtNativeApi.loadLibrary();
       LeanSmtNativeApi.initialize();
     } catch (UnsatisfiedLinkError | SolverException e) {
       throw new AssumptionViolatedException("LeanSMT is not available", e);
@@ -44,8 +43,8 @@ public class LeanSmtNativeApiTest {
   }
 
   @After
-  public void freeEnvironment() {
-    LeanSmtNativeApi.deleteSolverAsync(solver);
+  public void freeEnvironment() throws SolverException {
+    LeanSmtNativeApi.deleteSolver(solver);
     solver = 0L;
   }
 

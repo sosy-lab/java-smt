@@ -13,13 +13,11 @@ import java.math.BigInteger;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.LinkedHashSet;
-import java.util.Locale;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Consumer;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.NativeLibraries;
 import org.sosy_lab.java_smt.api.SolverException;
@@ -38,33 +36,28 @@ final class LeanSmtNativeApi {
 
   private LeanSmtNativeApi() {}
 
-  static void loadLibrary(Consumer<String> loader) {
-    loadLibrary(loader, /* allowBundledPathFallback= */ true);
-  }
-
-  static void loadLibrary(Consumer<String> loader, boolean allowBundledPathFallback) {
-    // Preload transitive runtime dependencies when available; missing entries are tolerated
-    // because the final JNI load may still resolve them through platform linker paths.
-    for (String dependency : dependencyCandidates()) {
-      tryLoadLibraryBestEffort(loader, dependency);
+  static void loadLibrary() {
+    Path absoluteLibrary =
+        NativeLibraries.getNativeLibraryPath()
+            .resolve("libleansmt_jni.so")
+            .toAbsolutePath()
+            .normalize();
+    if (!Files.exists(absoluteLibrary)) {
+      throw new UnsatisfiedLinkError(
+          "Failed to load LeanSMT JNI library. Expected packaged runtime at " + absoluteLibrary);
     }
 
-    UnsatisfiedLinkError primaryError =
-        loadLibraryWithFallback(loader, "leansmt_jni", allowBundledPathFallback);
     try {
-      loadLibraryOrThrow(loader, "libleansmt_jni", allowBundledPathFallback);
+      System.load(absoluteLibrary.toString());
       configureBundledSolverPathPrefix();
-      return;
-    } catch (UnsatisfiedLinkError fallbackError) {
-      if (primaryError != null) {
-        fallbackError.addSuppressed(primaryError);
-      }
+    } catch (UnsatisfiedLinkError error) {
       throw new UnsatisfiedLinkError(
           "Failed to load LeanSMT JNI library. "
-              + "Expected packaged runtime libs in JavaSMT native lookup paths "
-              + "(e.g., libleansmt_jni.so and transitive LeanSMT dependencies). "
+              + "Expected packaged runtime libs in JavaSMT native directory "
+              + absoluteLibrary.getParent()
+              + ". "
               + "Original error: "
-              + fallbackError.getMessage());
+              + error.getMessage());
     }
   }
 
@@ -88,144 +81,6 @@ final class LeanSmtNativeApi {
         // Ignore missing helper and proceed with default process PATH.
       }
     }
-  }
-
-  private static void tryLoadLibraryBestEffort(Consumer<String> loader, String libName) {
-    try {
-      loadLibraryOrThrow(loader, libName);
-    } catch (UnsatisfiedLinkError ignored) {
-      // Optional pre-load for robustness; unresolved entries are retried indirectly
-      // when loading the final JNI library.
-    }
-  }
-
-  private static UnsatisfiedLinkError loadLibraryWithFallback(
-      Consumer<String> loader, String libName, boolean allowBundledPathFallback) {
-    try {
-      loadLibraryOrThrow(loader, libName, allowBundledPathFallback);
-      return null;
-    } catch (UnsatisfiedLinkError e) {
-      return e;
-    }
-  }
-
-  private static void loadLibraryOrThrow(
-      Consumer<String> loader, String libName, boolean allowBundledPathFallback) {
-    @Nullable UnsatisfiedLinkError bundledPathError = null;
-    if (allowBundledPathFallback) {
-      bundledPathError = loadBundledLibraryByAbsolutePath(libName);
-      if (bundledPathError == null) {
-        return;
-      }
-    }
-
-    try {
-      loader.accept(libName);
-      return;
-    } catch (UnsatisfiedLinkError namedLoadError) {
-      if (bundledPathError != null) {
-        bundledPathError.addSuppressed(namedLoadError);
-        throw bundledPathError;
-      }
-      throw namedLoadError;
-    }
-  }
-
-  private static void loadLibraryOrThrow(Consumer<String> loader, String libName) {
-    loadLibraryOrThrow(loader, libName, /* allowBundledPathFallback= */ false);
-  }
-
-  private static @Nullable UnsatisfiedLinkError loadBundledLibraryByAbsolutePath(String libName) {
-    Set<Path> candidates = new LinkedHashSet<>();
-    addDefaultPathCandidates(candidates, libName);
-
-    UnsatisfiedLinkError lastError = null;
-    for (Path candidate : candidates) {
-      Path absolute = candidate.toAbsolutePath().normalize();
-      if (!Files.exists(absolute)) {
-        continue;
-      }
-      try {
-        System.load(absolute.toString());
-        return null;
-      } catch (UnsatisfiedLinkError e) {
-        lastError = e;
-      }
-    }
-
-    if (lastError != null) {
-      return lastError;
-    }
-    return new UnsatisfiedLinkError(
-        "Library "
-            + libName
-            + " was not found in JavaSMT native paths. Checked "
-            + candidates.size()
-            + " path candidates.");
-  }
-
-  private static void addDefaultPathCandidates(Set<Path> candidates, String libName) {
-    Path nativeDir = NativeLibraries.getNativeLibraryPath();
-    for (String fileName : possibleLibraryFileNames(libName)) {
-      candidates.add(nativeDir.resolve(fileName));
-    }
-  }
-
-  private static Set<String> possibleLibraryFileNames(String libName) {
-    Set<String> names = new LinkedHashSet<>();
-    String ext = nativeLibraryExtension();
-    String bare = withoutLibraryExtension(libName);
-    String noPrefix = withoutLibPrefix(bare);
-
-    names.add(bare + ext);
-    names.add("lib" + noPrefix + ext);
-    if (!libName.endsWith(ext)) {
-      names.add(libName);
-    }
-    return names;
-  }
-
-  private static String withoutLibPrefix(String name) {
-    if (name.startsWith("lib") && name.length() > 3) {
-      return name.substring(3);
-    }
-    return name;
-  }
-
-  private static String withoutLibraryExtension(String name) {
-    for (String ext : new String[] {".so", ".dylib", ".dll"}) {
-      if (name.endsWith(ext) && name.length() > ext.length()) {
-        return name.substring(0, name.length() - ext.length());
-      }
-    }
-    return name;
-  }
-
-  private static String nativeLibraryExtension() {
-    String os = System.getProperty("os.name", "").toLowerCase(Locale.ROOT);
-    if (os.contains("win")) {
-      return ".dll";
-    } else if (os.contains("mac")) {
-      return ".dylib";
-    }
-    return ".so";
-  }
-
-  private static Set<String> dependencyCandidates() {
-    LinkedHashSet<String> names = new LinkedHashSet<>();
-    names.add("SmtJNI");
-    names.add("Smt");
-    names.add("Auto");
-    names.add("Qq");
-    names.add("cvc5");
-    names.add("leanshared");
-    names.add("libSmtJNI");
-    names.add("libSmt");
-    names.add("libAuto");
-    names.add("libQq");
-    names.add("libcvc5");
-    names.add("libleanshared");
-    return names;
   }
 
   static synchronized void initialize() throws SolverException {
@@ -265,13 +120,28 @@ final class LeanSmtNativeApi {
     }
   }
 
-  static synchronized long createSolverCvc5() throws SolverException {
-    BigInteger handle = LeanSMT.leansmt_wrapper_create_solver(LeanSMTConstants.LEANSMT_SOLVER_CVC5);
-    long solver = toLong(handle);
-    if (solver == 0L) {
-      throw new SolverException(errorOrDefault("Failed to create LeanSMT solver"));
+  private static void drainPendingCleanupQueue() {
+    Future<?> queueBarrier;
+    synchronized (CLEANUP_QUEUE_LOCK) {
+      queueBarrier = CLEANUP_EXECUTOR.submit(() -> {});
     }
-    return solver;
+    awaitCleanupQueueBarrier(queueBarrier);
+  }
+
+  static long createSolverCvc5() throws SolverException {
+    // Solver handles may be reused by the native runtime. Make sure older asynchronous deletes
+    // have finished before creating a fresh solver, otherwise a queued delete can invalidate the
+    // newly returned handle before its first use.
+    drainPendingCleanupQueue();
+    synchronized (LeanSmtNativeApi.class) {
+      BigInteger handle =
+          LeanSMT.leansmt_wrapper_create_solver(LeanSMTConstants.LEANSMT_SOLVER_CVC5);
+      long solver = toLong(handle);
+      if (solver == 0L) {
+        throw new SolverException(errorOrDefault("Failed to create LeanSMT solver"));
+      }
+      return solver;
+    }
   }
 
   static synchronized void deleteSolver(long solver) throws SolverException {
@@ -288,11 +158,12 @@ final class LeanSmtNativeApi {
   /**
    * Best-effort cleanup path for asynchronous teardown.
    *
-   * <p>We intentionally do not synchronize this call on {@link LeanSmtNativeApi}. In some recovery
-   * scenarios the native delete can block; holding the class monitor would then stall all future
-   * solver operations in this JVM.
+   * <p>The delete still runs on a background thread, but the actual JNI call is serialized with
+   * all other LeanSMT JNI operations. The Lean-side runtime keeps global mutable solver/term
+   * tables, so overlapping native deletes with term creation can otherwise invalidate freshly
+   * created handles or lose term-table updates.
    */
-  private static void deleteSolverBestEffortNoLock(long solver) {
+  private static synchronized void deleteSolverBestEffort(long solver) {
     try {
       deleteSolverNative(solver);
     } catch (RuntimeException | UnsatisfiedLinkError ignored) {
@@ -308,7 +179,7 @@ final class LeanSmtNativeApi {
       if (cleanupInProgress) {
         return;
       }
-      CLEANUP_EXECUTOR.execute(() -> deleteSolverBestEffortNoLock(solver));
+      CLEANUP_EXECUTOR.execute(() -> deleteSolverBestEffort(solver));
     }
   }
 

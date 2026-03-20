@@ -11,6 +11,7 @@ package org.sosy_lab.java_smt.solvers.leansmt;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -36,6 +37,70 @@ final class LeanSmtFormulaCreator
     extends FormulaCreator<Long, LeanSmtType, Long, LeanSmtFunctionDecl> {
   // Keep chunks comfortably within 32-bit signed range for robust native interop.
   private static final BigInteger INT_CHUNK_BASE = BigInteger.TEN.pow(9);
+  private static final ImmutableSet<String> RESERVED_IDENTIFIERS =
+      ImmutableSet.of(
+          "true",
+          "false",
+          "and",
+          "or",
+          "select",
+          "store",
+          "xor",
+          "distinct",
+          "let",
+          "forall",
+          "exists",
+          "match",
+          "Bool",
+          "continued-execution",
+          "error",
+          "immediate-exit",
+          "incomplete",
+          "logic",
+          "memout",
+          "sat",
+          "success",
+          "theory",
+          "unknown",
+          "unsupported",
+          "unsat",
+          "_",
+          "as",
+          "BINARY",
+          "DECIMAL",
+          "HEXADECIMAL",
+          "NUMERAL",
+          "par",
+          "STRING",
+          "assert",
+          "check-sat",
+          "check-sat-assuming",
+          "declare-const",
+          "declare-datatype",
+          "declare-datatypes",
+          "declare-fun",
+          "declare-sort",
+          "define-fun",
+          "define-fun-rec",
+          "define-sort",
+          "echo",
+          "exit",
+          "get-assertions",
+          "get-assignment",
+          "get-info",
+          "get-model",
+          "get-option",
+          "get-proof",
+          "get-unsat-assumptions",
+          "get-unsat-core",
+          "get-value",
+          "pop",
+          "push",
+          "reset",
+          "reset-assertions",
+          "set-info",
+          "set-logic",
+          "set-option");
 
   enum ExprKind {
     VARIABLE,
@@ -70,6 +135,7 @@ final class LeanSmtFormulaCreator
   private final Map<Long, Expr> expressions = new ConcurrentHashMap<>();
   private final Map<String, LeanSmtType> declaredVariables = new LinkedHashMap<>();
   private final Map<String, Long> latestVariableHandles = new LinkedHashMap<>();
+  private final Map<String, LeanSmtFunctionDecl> declaredUfDeclarations = new LinkedHashMap<>();
   private final Map<Long, LeanSmtFunctionDecl> booleanVarDeclarations = new ConcurrentHashMap<>();
   private final Map<BigInteger, Long> intConstantHandles = new HashMap<>();
   private final Map<Rational, Long> realConstantHandles = new HashMap<>();
@@ -135,15 +201,16 @@ final class LeanSmtFormulaCreator
       }
 
       try {
+        String encodedName = encodeIdentifier(varName);
         final long handle;
         if (type.isBool()) {
-          handle = LeanSmtNativeApi.mkBoolVar(getEnv(), varName);
+          handle = LeanSmtNativeApi.mkBoolVar(getEnv(), encodedName);
         } else if (type.isInt()) {
-          handle = LeanSmtNativeApi.mkIntVar(getEnv(), varName);
+          handle = LeanSmtNativeApi.mkIntVar(getEnv(), encodedName);
         } else if (type.isReal()) {
-          handle = LeanSmtNativeApi.mkRealVar(getEnv(), varName);
+          handle = LeanSmtNativeApi.mkRealVar(getEnv(), encodedName);
         } else if (type.isBitvector()) {
-          handle = LeanSmtNativeApi.mkBvVar(getEnv(), varName, type.getBitvectorSize());
+          handle = LeanSmtNativeApi.mkBvVar(getEnv(), encodedName, type.getBitvectorSize());
         } else {
           throw new AssertionError("Unexpected LeanSMT type " + type);
         }
@@ -223,7 +290,7 @@ final class LeanSmtFormulaCreator
       }
       try {
         long handle;
-        if (fitsInLong(value)) {
+        if (fitsInLong(value) && value.signum() >= 0) {
           handle = LeanSmtNativeApi.mkIntConst(value.longValue());
         } else {
           handle = buildBigIntegerTerm(value);
@@ -251,9 +318,7 @@ final class LeanSmtFormulaCreator
         long handle;
         BigInteger num = value.getNum();
         BigInteger den = value.getDen();
-        if (fitsInLong(num) && fitsInLong(den)) {
-          handle = LeanSmtNativeApi.mkRealConst(num.longValue(), den.longValue());
-        } else if (den.equals(BigInteger.ONE)) {
+        if (den.equals(BigInteger.ONE)) {
           handle = buildBigRealFromNonNegativeInteger(num.abs());
           if (num.signum() < 0) {
             handle =
@@ -265,6 +330,8 @@ final class LeanSmtFormulaCreator
                     LeanSmtNativeApi::mkNeg);
           }
         } else {
+          // Avoid the native small-rational constructor for now: LeanSMT's check-sat path still
+          // serializes some short fractions like 3/2 and -7/3 into invalid SMT-LIB atoms.
           handle = makeConstrainedRationalConstant(value);
         }
         registerConstant(handle, FormulaType.RationalType, value);
@@ -413,7 +480,14 @@ final class LeanSmtFormulaCreator
     }
     if (expr.kind == ExprKind.CONSTANT) {
       Object value = expr.constantValue;
-      if (value instanceof Boolean || value instanceof BigInteger || value instanceof Rational) {
+      if (value instanceof Rational) {
+        Rational rational = (Rational) value;
+        if (rational.getDen().equals(BigInteger.ONE)) {
+          return rational.getNum();
+        }
+        return rational;
+      }
+      if (value instanceof Boolean || value instanceof BigInteger) {
         return value;
       }
     }
@@ -428,7 +502,7 @@ final class LeanSmtFormulaCreator
         return visitor.visitFreeVariable(formula, expr.symbol);
 
       case CONSTANT:
-        return visitor.visitConstant(formula, expr.constantValue);
+        return visitor.visitConstant(formula, normalizeConstantForVisitor(expr.constantValue));
 
       case APPLICATION:
         ImmutableList.Builder<FormulaType<?>> argTypes = ImmutableList.builder();
@@ -463,9 +537,15 @@ final class LeanSmtFormulaCreator
     if (declaration.getKind() != FunctionDeclarationKind.UF) {
       return callBuiltInFunction(declaration, args);
     }
+    if (args.isEmpty()) {
+      // Most JavaSMT backends model nullary UFs like named constants/variables. Reuse the same
+      // symbol handle so equality, extraction, and visitor behavior line up with the shared suite.
+      return makeVariable(declaration.getReturnType(), declaration.getName());
+    }
 
     synchronized (ufApplications) {
-      ApplicationKey key = new ApplicationKey(declaration, ImmutableList.copyOf(args));
+      ImmutableList<Long> normalizedArgs = normalizeUfArguments(declaration, args);
+      ApplicationKey key = new ApplicationKey(declaration, normalizedArgs);
       Long existing = ufApplications.get(key);
       if (existing != null) {
         return existing;
@@ -490,8 +570,30 @@ final class LeanSmtFormulaCreator
   @Override
   public LeanSmtFunctionDecl declareUFImpl(
       String name, LeanSmtType returnType, List<LeanSmtType> argTypes) {
-    return new LeanSmtFunctionDecl(
-        name, FunctionDeclarationKind.UF, returnType, ImmutableList.copyOf(argTypes));
+    synchronized (declaredUfDeclarations) {
+      LeanSmtFunctionDecl declaration =
+          new LeanSmtFunctionDecl(
+              name, FunctionDeclarationKind.UF, returnType, ImmutableList.copyOf(argTypes));
+      LeanSmtFunctionDecl existing = declaredUfDeclarations.get(name);
+      if (existing == null) {
+        declaredUfDeclarations.put(name, declaration);
+        return declaration;
+      }
+      if (!existing.equals(declaration)) {
+        throw new IllegalArgumentException(
+            "Conflicting declaration for UF '"
+                + name
+                + "': existing return type "
+                + existing.getReturnType()
+                + " with arguments "
+                + existing.getArgumentTypes()
+                + ", new return type "
+                + declaration.getReturnType()
+                + " with arguments "
+                + declaration.getArgumentTypes());
+      }
+      return existing;
+    }
   }
 
   @Override
@@ -527,14 +629,15 @@ final class LeanSmtFormulaCreator
 
   private void declareVariableOnSolver(long solver, String name, LeanSmtType type) {
     try {
+      String encodedName = encodeIdentifier(name);
       if (type.isBool()) {
-        LeanSmtNativeApi.mkBoolVar(solver, name);
+        LeanSmtNativeApi.mkBoolVar(solver, encodedName);
       } else if (type.isInt()) {
-        LeanSmtNativeApi.mkIntVar(solver, name);
+        LeanSmtNativeApi.mkIntVar(solver, encodedName);
       } else if (type.isReal()) {
-        LeanSmtNativeApi.mkRealVar(solver, name);
+        LeanSmtNativeApi.mkRealVar(solver, encodedName);
       } else if (type.isBitvector()) {
-        LeanSmtNativeApi.mkBvVar(solver, name, type.getBitvectorSize());
+        LeanSmtNativeApi.mkBvVar(solver, encodedName, type.getBitvectorSize());
       } else {
         throw new AssertionError("Unexpected LeanSMT type " + type);
       }
@@ -543,11 +646,51 @@ final class LeanSmtFormulaCreator
     }
   }
 
+  static String encodeIdentifier(String id) {
+    if (!id.isEmpty()
+        && !id.startsWith("@")
+        && !id.startsWith(".")
+        && !id.startsWith(":")
+        && !RESERVED_IDENTIFIERS.contains(id)
+        && id.matches("[a-zA-Z~!@$%^&*_+=<>.?/-][a-zA-Z0-9~!@$%^&*_+=<>.?/-]*")) {
+      return id;
+    }
+    return "|" + id.replace("|", "||") + "|";
+  }
+
   private void registerConstant(long handle, FormulaType<?> type, Object value) {
     expressions.put(
         handle,
         new Expr(
             ExprKind.CONSTANT, type, value.toString(), value, FunctionDeclarationKind.CONST, ImmutableList.of()));
+  }
+
+  private static Object normalizeConstantForVisitor(Object value) {
+    if (value instanceof Rational) {
+      Rational rational = (Rational) value;
+      if (rational.getDen().equals(BigInteger.ONE)) {
+        return rational.getNum();
+      }
+    }
+    return value;
+  }
+
+  private ImmutableList<Long> normalizeUfArguments(
+      LeanSmtFunctionDecl declaration, List<Long> args) {
+    ImmutableList.Builder<Long> normalizedArgs = ImmutableList.builderWithExpectedSize(args.size());
+    List<LeanSmtType> parameterTypes = declaration.getArgumentTypes();
+    for (int i = 0; i < args.size(); i++) {
+      long arg = args.get(i);
+      LeanSmtType expectedType = parameterTypes.get(i);
+      if (expectedType.isReal()
+          && FormulaType.IntegerType.equals(getFormulaType(arg))
+          && convertValue(arg) instanceof BigInteger) {
+        normalizedArgs.add(makeRealConstant(Rational.ofBigInteger((BigInteger) convertValue(arg))));
+      } else {
+        normalizedArgs.add(arg);
+      }
+    }
+    return normalizedArgs.build();
   }
 
   private static boolean fitsInLong(BigInteger value) {

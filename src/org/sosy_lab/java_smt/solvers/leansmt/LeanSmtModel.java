@@ -15,18 +15,22 @@ import java.math.BigInteger;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.api.FormulaType;
+import org.sosy_lab.java_smt.api.FunctionDeclarationKind;
 import org.sosy_lab.java_smt.basicimpl.AbstractModel;
 
 final class LeanSmtModel extends AbstractModel<Long, LeanSmtType, Long> {
 
   private final LeanSmtFormulaCreator leanCreator;
   private final Map<String, Long> variablesByName;
-  private final Map<String, Value> values;
+  private final Map<Long, Value> valuesByHandle;
+  private final Set<Long> relevantHandles;
 
   private static final class Value {
     private final LeanSmtType type;
@@ -52,19 +56,25 @@ final class LeanSmtModel extends AbstractModel<Long, LeanSmtType, Long> {
       LeanSmtTheoremProver pProver,
       LeanSmtFormulaCreator pCreator,
       Map<String, Long> pVariablesByName,
-      String pRawModel) {
+      String pRawModel,
+      Set<Long> pRelevantHandles) {
     super(pProver, pCreator);
     leanCreator = pCreator;
     variablesByName = pVariablesByName;
-    values = parseModel(pRawModel);
+    relevantHandles = Set.copyOf(pRelevantHandles);
+    valuesByHandle = indexValuesByHandle(parseModel(pRawModel, pVariablesByName.keySet()));
   }
 
   @Override
   public ImmutableList<ValueAssignment> asList() {
-    ImmutableList.Builder<ValueAssignment> out = ImmutableList.builder();
-    for (Map.Entry<String, Value> e : values.entrySet()) {
-      Long variableHandle = variablesByName.get(e.getKey());
-      if (variableHandle == null) {
+    java.util.LinkedHashSet<ValueAssignment> out = new java.util.LinkedHashSet<>();
+    for (Map.Entry<Long, Value> e : valuesByHandle.entrySet()) {
+      long variableHandle = e.getKey();
+      if (!relevantHandles.contains(variableHandle)) {
+        continue;
+      }
+      LeanSmtFormulaCreator.Expr expr = leanCreator.getExpression(variableHandle);
+      if (isHiddenHelperVariable(expr)) {
         continue;
       }
       long valueHandle = makeValueFormula(e.getValue());
@@ -82,43 +92,53 @@ final class LeanSmtModel extends AbstractModel<Long, LeanSmtType, Long> {
               leanCreator.encapsulateWithTypeOf(variableHandle),
               leanCreator.encapsulateWithTypeOf(valueHandle),
               leanCreator.encapsulateBoolean(assignmentHandle),
-              e.getKey(),
-              e.getValue().value,
-              List.of()));
+              expr.symbol,
+              toUserValue(e.getValue()),
+              getArgumentInterpretation(expr)));
     }
-    return out.build();
+    return ImmutableList.copyOf(out);
   }
 
   @Override
   protected @Nullable Long evalImpl(Long pFormula) {
-    Object value = evaluate(pFormula);
+    Value value = evaluateValue(pFormula);
     if (value == null) {
       return null;
     }
-    return makeValueFormula(
-        new Value(LeanSmtFormulaCreator.fromFormulaType(leanCreator.getFormulaType(pFormula)), value));
+    return makeValueFormula(value);
   }
 
-  private @Nullable Object evaluate(long handle) {
+  private @Nullable Value evaluateValue(long handle) {
+    Value directValue = valuesByHandle.get(handle);
+    if (directValue != null) {
+      return directValue;
+    }
+
     LeanSmtFormulaCreator.Expr expr = leanCreator.getExpression(handle);
     switch (expr.kind) {
       case VARIABLE:
-        Value v = values.get(expr.symbol);
-        return v == null ? null : v.value;
+        return defaultValue(expr.type);
 
       case CONSTANT:
-        return expr.constantValue;
+        return new Value(LeanSmtFormulaCreator.fromFormulaType(expr.type), expr.constantValue);
 
       case APPLICATION:
         List<Object> args = new ArrayList<>(expr.arguments.size());
         for (long arg : expr.arguments) {
-          Object value = evaluate(arg);
+          Value value = evaluateValue(arg);
           if (value == null) {
             return null;
           }
-          args.add(value);
+          args.add(value.value);
         }
-        return apply(expr, args);
+        if (expr.declarationKind == FunctionDeclarationKind.UF) {
+          return findCongruentUfValue(expr, args);
+        }
+        Object result = apply(expr, args);
+        if (result == null) {
+          return null;
+        }
+        return new Value(LeanSmtFormulaCreator.fromFormulaType(expr.type), result);
 
       default:
         return null;
@@ -459,8 +479,20 @@ final class LeanSmtModel extends AbstractModel<Long, LeanSmtType, Long> {
     throw new AssertionError("Unexpected LeanSMT type " + v.type);
   }
 
-  private static Map<String, Value> parseModel(String rawModel) {
-    java.util.LinkedHashMap<String, Value> out = new java.util.LinkedHashMap<>();
+  private Map<Long, Value> indexValuesByHandle(Map<String, Value> parsedValues) {
+    Map<Long, Value> out = new LinkedHashMap<>();
+    for (Map.Entry<String, Value> entry : parsedValues.entrySet()) {
+      Long handle = variablesByName.get(entry.getKey());
+      if (handle != null) {
+        out.put(handle, entry.getValue());
+      }
+    }
+    return out;
+  }
+
+  private static Map<String, Value> parseModel(
+      String rawModel, java.util.Collection<String> knownIdentifiers) {
+    LinkedHashMap<String, Value> out = new LinkedHashMap<>();
     for (String definition : splitTopLevelDefinitions(rawModel)) {
       List<String> tokens = tokenizeSExpr(definition);
       if (tokens.size() < 7) {
@@ -473,7 +505,7 @@ final class LeanSmtModel extends AbstractModel<Long, LeanSmtType, Long> {
         continue;
       }
 
-      String name = decodeIdentifier(tokens.get(2));
+      String name = resolveModelIdentifier(decodeIdentifier(tokens.get(2)), knownIdentifiers);
       ParsedModelSort parsedSort = parseModelSort(tokens, 5);
       if (parsedSort == null) {
         continue;
@@ -495,6 +527,20 @@ final class LeanSmtModel extends AbstractModel<Long, LeanSmtType, Long> {
       }
     }
     return out;
+  }
+
+  private static String resolveModelIdentifier(
+      String name, java.util.Collection<String> knownIdentifiers) {
+    if (knownIdentifiers.contains(name)) {
+      return name;
+    }
+    if (name.length() >= 2 && name.startsWith("_") && name.endsWith("_")) {
+      String inner = name.substring(1, name.length() - 1);
+      if (knownIdentifiers.contains(inner)) {
+        return inner;
+      }
+    }
+    return name;
   }
 
   private static @Nullable ParsedModelSort parseModelSort(List<String> tokens, int startIndex) {
@@ -545,9 +591,20 @@ final class LeanSmtModel extends AbstractModel<Long, LeanSmtType, Long> {
 
         int depth = 1;
         int end = i + 1;
+        boolean inQuotedIdentifier = false;
         while (end < rawModel.length() && depth > 0) {
           char ch = rawModel.charAt(end);
-          if (ch == '(') {
+          if (inQuotedIdentifier) {
+            if (ch == '|') {
+              if (end + 1 < rawModel.length() && rawModel.charAt(end + 1) == '|') {
+                end++;
+              } else {
+                inQuotedIdentifier = false;
+              }
+            }
+          } else if (ch == '|') {
+            inQuotedIdentifier = true;
+          } else if (ch == '(') {
             depth++;
           } else if (ch == ')') {
             depth--;
@@ -749,6 +806,81 @@ final class LeanSmtModel extends AbstractModel<Long, LeanSmtType, Long> {
       return token.substring(1, token.length() - 1).replace("||", "|");
     }
     return token;
+  }
+
+  private static Value defaultValue(FormulaType<?> type) {
+    LeanSmtType leanType = LeanSmtFormulaCreator.fromFormulaType(type);
+    if (leanType.isBool()) {
+      return new Value(leanType, false);
+    }
+    if (leanType.isInt()) {
+      return new Value(leanType, BigInteger.ZERO);
+    }
+    if (leanType.isReal()) {
+      return new Value(leanType, Rational.ofBigInteger(BigInteger.ZERO));
+    }
+    if (leanType.isBitvector()) {
+      return new Value(leanType, BigInteger.ZERO);
+    }
+    throw new AssertionError("Unexpected LeanSMT type " + leanType);
+  }
+
+  private static Object toUserValue(Value value) {
+    if (value.value instanceof Rational) {
+      Rational rational = (Rational) value.value;
+      if (rational.getDen().equals(BigInteger.ONE)) {
+        return rational.getNum();
+      }
+    }
+    return value.value;
+  }
+
+  private List<Object> getArgumentInterpretation(LeanSmtFormulaCreator.Expr expr) {
+    if (expr.declarationKind != FunctionDeclarationKind.UF) {
+      return List.of();
+    }
+    List<Object> out = new ArrayList<>(expr.arguments.size());
+    for (long arg : expr.arguments) {
+      Value value = evaluateValue(arg);
+      if (value == null) {
+        return List.of();
+      }
+      out.add(toUserValue(value));
+    }
+    return out;
+  }
+
+  private static boolean isHiddenHelperVariable(LeanSmtFormulaCreator.Expr expr) {
+    return expr.kind == LeanSmtFormulaCreator.ExprKind.VARIABLE
+        && (expr.symbol.startsWith("__floor#")
+            || expr.symbol.startsWith("__int2bv#")
+            || expr.symbol.startsWith("__ratc#"));
+  }
+
+  private @Nullable Value findCongruentUfValue(
+      LeanSmtFormulaCreator.Expr expr, List<Object> interpretedArgs) {
+    for (Map.Entry<Long, Value> entry : valuesByHandle.entrySet()) {
+      LeanSmtFormulaCreator.Expr candidate = leanCreator.getExpression(entry.getKey());
+      if (candidate.declarationKind != FunctionDeclarationKind.UF
+          || !candidate.symbol.equals(expr.symbol)
+          || candidate.arguments.size() != expr.arguments.size()) {
+        continue;
+      }
+      List<Object> candidateArgs = new ArrayList<>(candidate.arguments.size());
+      boolean known = true;
+      for (long argHandle : candidate.arguments) {
+        Value candidateArgValue = evaluateValue(argHandle);
+        if (candidateArgValue == null) {
+          known = false;
+          break;
+        }
+        candidateArgs.add(candidateArgValue.value);
+      }
+      if (known && candidateArgs.equals(interpretedArgs)) {
+        return entry.getValue();
+      }
+    }
+    return null;
   }
 
   private static int compare(Object a, Object b) {

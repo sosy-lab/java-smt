@@ -121,13 +121,9 @@ public class SolverContextFactory {
   private final ShutdownNotifier shutdownNotifier;
   private final Configuration config;
   private final Consumer<String> loader;
-  private final boolean allowLeanSmtBundledLibraryFallback;
 
   /**
    * This constructor uses the default JavaSMT loader for accessing native libraries.
-   * LeanSMT may also use bundled absolute-path lookup as an additional fallback.
-   *
-   * @see #SolverContextFactory(Configuration, LogManager, ShutdownNotifier, Consumer)
    */
   public SolverContextFactory(
       Configuration pConfig, LogManager pLogger, ShutdownNotifier pShutdownNotifier)
@@ -168,7 +164,6 @@ public class SolverContextFactory {
     shutdownNotifier = checkNotNull(pShutdownNotifier);
     config = pConfig;
     loader = checkNotNull(pLoader);
-    allowLeanSmtBundledLibraryFallback = true;
 
     if (!logAllQueries) {
       logfile = null;
@@ -323,11 +318,7 @@ public class SolverContextFactory {
             config, shutdownNotifier, logfile, randomSeed, floatingPointRoundingMode, loader);
 
       case LEANSMT:
-        return LeanSmtSolverContext.create(
-            shutdownNotifier,
-            nonLinearArithmetic,
-            loader,
-            allowLeanSmtBundledLibraryFallback);
+        return LeanSmtSolverContext.create(shutdownNotifier, nonLinearArithmetic);
 
       default:
         throw new AssertionError("no solver selected");
