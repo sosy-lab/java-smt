@@ -248,7 +248,9 @@ but in the normal system environment, where some testing can be applied by the d
 We prefer to use our own Bitwuzla binaries and SWIG-based Java bindings.
 We prefer to build directly on Ubuntu 22.04, where CMake, SWIG, and Meson are sufficiently up-to-date.
 For simple usage, we provide a Docker definition/environment under `/docker`,
-in which the following command can be run.
+in which the following command can be run. While it's possible to build without the container, some
+paths in the build script (`build/build-publish-solvers/solver-bitwuzla.xml`) are hardwired
+and would have to be updated first
 
 To publish Bitwuzla, checkout the [Bitwuzla repository](https://github.com/bitwuzla/bitwuzla). Then
 execute the following command in the JavaSMT directory:
