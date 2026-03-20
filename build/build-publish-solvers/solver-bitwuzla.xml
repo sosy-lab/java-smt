@@ -13,20 +13,7 @@ SPDX-License-Identifier: Apache-2.0
 <!-- vim: set tabstop=8 shiftwidth=4 expandtab sts=4 filetype=ant fdm=marker: -->
 <project name="publish-solvers-bitwuzla" basedir="." xmlns:ivy="antlib:org.apache.ivy.ant">
 
-    <!-- TODO Change these paths when building outside of the container. We need static version of gmp and mpfr with `-fPIC` enabled -->
-    <property name="jdk-linux-arm64.path" value="/dependencies/jdk17-linux-aarch64"/>
-    <property name="jdk-windows-x64.path" value="/dependencies/jdk11-windows-x64"/>
-
-    <property name="gmp.x64-linux" location="/dependencies/gmp-6.3.0/install/x64-linux/"/>
-    <property name="gmp.x64-windows" location="/dependencies/gmp-6.3.0/install/x64-windows/"/>
-    <property name="gmp.arm64-linux" location="/dependencies/gmp-6.3.0/install/arm64-linux/"/>
-
-    <property name="mpfr.x64-linux" location="/dependencies/mpfr-4.2.2/install/x64-linux/"/>
-    <property name="mpfr.x64-windows" location="/dependencies/mpfr-4.2.2/install/x64-windows/"/>
-    <property name="mpfr.arm64-linux" location="/dependencies/mpfr-4.2.2/install/arm64-linux/"/>
-
     <property name="bitwuzla.dist.dir" value="${ivy.solver.dist.dir}/bitwuzla"/>
-    <property name="source.path" location="lib/native/source"/>
 
     <import file="macros.xml"/>
 
@@ -37,6 +24,18 @@ SPDX-License-Identifier: Apache-2.0
             The custom revision should be a version number of Bitwuzla.
             The script will append the git revision.
         </fail>
+
+        <!-- TODO Change these paths when building outside of the container. We need static version of gmp and mpfr with `-fPIC` enabled -->
+        <property name="jdk-linux-arm64.path" value="/dependencies/jdk17-linux-aarch64"/>
+        <property name="jdk-windows-x64.path" value="/dependencies/jdk11-windows-x64"/>
+
+        <property name="gmp.x64-linux" location="/dependencies/gmp-6.3.0/install/x64-linux/"/>
+        <property name="gmp.x64-windows" location="/dependencies/gmp-6.3.0/install/x64-windows/"/>
+        <property name="gmp.arm64-linux" location="/dependencies/gmp-6.3.0/install/arm64-linux/"/>
+
+        <property name="mpfr.x64-linux" location="/dependencies/mpfr-4.2.2/install/x64-linux/"/>
+        <property name="mpfr.x64-windows" location="/dependencies/mpfr-4.2.2/install/x64-windows/"/>
+        <property name="mpfr.arm64-linux" location="/dependencies/mpfr-4.2.2/install/arm64-linux/"/>
 
         <!-- get a naive version -->
         <exec executable="git" dir="${bitwuzla.path}" outputproperty="bitwuzla.revision"
@@ -51,10 +50,14 @@ SPDX-License-Identifier: Apache-2.0
         <property name="install.x64-linux" location="${bitwuzla.path}/install/x64-linux"/>
         <property name="install.x64-windows" location="${bitwuzla.path}/install/x64-windows"/>
         <property name="install.arm64-linux" location="${bitwuzla.path}/install/arm64-linux"/>
+
+        <property name="source.path" location="lib/native/source"/>
     </target>
 
     <target name="bitwuzla-generate-jni" description="Generate JNI headers for Bitwuzla">
         <checkPathOption pathOption="bitwuzla.path" defaultPath="/path/to/bitwuzla" targetName="Bitwuzla source folder (git checkout from 'https://github.com/bitwuzla/bitwuzla)"/>
+
+        <property name="source.path" location="lib/native/source"/>
 
         <!-- Create output directory for the swig proxies -->
         <delete dir="${source.path}/libbitwuzla/src" quiet="true"/>
