@@ -15,17 +15,17 @@ import static com.google.common.truth.TruthJUnit.assume;
 import static org.junit.Assert.assertThrows;
 
 import com.google.common.collect.ImmutableSet;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Set;
 import org.junit.Test;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BasicProverEnvironment;
-import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
-import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.SolverException;
-import org.sosy_lab.java_smt.solvers.z3.Z3SolverContext;
 
 public class SolverNativeOptionsTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
 
@@ -157,17 +157,45 @@ public class SolverNativeOptionsTest extends SolverBasedTest0.ParameterizedSolve
 
   // TODO: generalize LOGIC tests and move into their own test class once more solvers support this!
   @Test
-  public void z3QFLIALogicTest()
-      throws InvalidConfigurationException, SolverException, InterruptedException {
+  public void z3AllLogicOnBvProblemTest()
+      throws SolverException, InterruptedException, IOException {
     assume().that(solver).isEqualTo(Solvers.Z3);
 
-    setAdditionalConfigOptionForSolver("solver.z3.logic", "QF_LIA");
-    IntegerFormula zeroInt = imgr.makeNumber(0);
-    assertThatFormula(imgr.equal(imgr.add(zeroInt, zeroInt), zeroInt)).isTautological();
+    List<BooleanFormula> bvFormulaWithoutLogic =
+        context
+            .getFormulaManager()
+            .parseAll(
+                Files.readString(Path.of("src/org/sosy_lab/java_smt/test/manyRegReads.smt2")));
 
-    // TODO: is Z3 just ignoring the set logics and solves all if we diverge from it?
-    BitvectorFormula zeroBv = bvmgr.makeBitvector(8, 0);
-    assertThatFormula(bvmgr.equal(bvmgr.smodulo(zeroBv, zeroBv), zeroBv)).isTautological();
+    try (BasicProverEnvironment<?> pe = context.newProverEnvironment()) {
+      for (BooleanFormula hc : bvFormulaWithoutLogic) {
+        pe.addConstraint(hc);
+      }
+      assertThat(pe.isUnsat()).isTrue();
+    }
+  }
+
+  // TODO: generalize LOGIC tests and move into their own test class once more solvers support this!
+  @Test
+  public void z3QFBVLogicOnBvProblemTest()
+      throws InvalidConfigurationException, SolverException, InterruptedException, IOException {
+    assume().that(solver).isEqualTo(Solvers.Z3);
+
+    // QF_BV solves this problem much faster than ALL
+    setAdditionalConfigOptionForSolver("solver.z3.logic", "QF_BV");
+
+    List<BooleanFormula> bvFormulasWithLogic =
+        context
+            .getFormulaManager()
+            .parseAll(
+                Files.readString(Path.of("src/org/sosy_lab/java_smt/test/manyRegReads.smt2")));
+
+    try (BasicProverEnvironment<?> pe = context.newProverEnvironment()) {
+      for (BooleanFormula hc : bvFormulasWithLogic) {
+        pe.addConstraint(hc);
+      }
+      assertThat(pe.isUnsat()).isTrue();
+    }
   }
 
   // Small HORN problem in SMT2
