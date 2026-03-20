@@ -296,8 +296,6 @@ actual binaries:
 ```bash
 ant publish-bitwuzla \
     -Dbitwuzla.path=/workspace/bitwuzla \
-    -Djdk-linux-arm64.path=/workspace/jdk-11.0.25_linux-aarch64/jdk-11.0.25 \
-    -Djdk-windows-x64.path=/workspace/jdk-11.0.25-windows-x64/jdk-11.0.25+9 \
     -Dbitwuzla.customRev=0.9.0
 ```
 
