@@ -54,9 +54,9 @@ namespace bitwuzla {
 %ignore option::Exception;
 }
 
-%include "include/bitwuzla/enums.h"
-%include "include/bitwuzla/option.h"
-%include "include/bitwuzla/result.h"
+%include "bitwuzla/enums.h"
+%include "bitwuzla/option.h"
+%include "bitwuzla/result.h"
 
 namespace bitwuzla {
 /** Terminator */
@@ -66,7 +66,7 @@ namespace bitwuzla {
 %feature("director") Terminator;
 }
 
-%include "include/bitwuzla/cpp/terminator.h"
+%include "bitwuzla/cpp/terminator.h"
 
 namespace bitwuzla {
 /** Output streams */
@@ -326,7 +326,7 @@ namespace bitwuzla {
 %ignore SatSolverFactory;
 }
 
-%include "include/bitwuzla/cpp/bitwuzla.h"
+%include "bitwuzla/cpp/bitwuzla.h"
 
 namespace bitwuzla::parser {
 %ignore Parser::Parser(TermManager&, SatSolverFactory&, Options&, const std::string& language, std::ostream* out);
@@ -343,4 +343,4 @@ namespace bitwuzla::parser {
 %ignore Exception;
 }
 
-%include "include/bitwuzla/cpp/parser.h"
+%include "bitwuzla/cpp/parser.h"
