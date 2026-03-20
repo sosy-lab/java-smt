@@ -24,6 +24,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
@@ -56,11 +57,13 @@ public final class Z3SolverContext extends AbstractSolverContext {
   private final Z3FormulaCreator creator;
   private final Z3FormulaManager manager;
   private final AtomicBoolean closed = new AtomicBoolean(false);
+  private final Z3_ENGINE engine;
+  private final Optional<String> logic;
 
   private final ImmutableMap<String, Object> solverOptionsFromConfig;
 
   // Options that require arguments of type double
-  private static final ImmutableSet<String> doubleOptions =
+  static final ImmutableSet<String> doubleOptions =
       ImmutableSet.of(
           "arith.epsilon",
           "dack.factor",
@@ -80,20 +83,19 @@ public final class Z3SolverContext extends AbstractSolverContext {
   private static final String OPT_ENGINE_CONFIG_KEY = "optsmt_engine";
   private static final String OPT_PRIORITY_CONFIG_KEY = "priority";
 
-  private static final String ENGINE_CONFIG_KEY = "engine";
-  private static final String LOGIC_CONFIG_KEY = "logic";
-  private static final String SPACER_LOGIC_CONFIG_KEY = "spacer.logic";
+  static final String ENGINE_CONFIG_KEY = "engine";
+  private static final String SOLVER_LOGIC_CONFIG_KEY = "logic";
 
+  // All options need to be lowercase only!
   private static final ImmutableSet<String> OPTIONS_HANDLED_BY_DEDICATED_OPTIONS =
       ImmutableSet.of(
           "model",
           "unsat_core",
           "random_seed",
           SMT_RND_SEED_CONFIG_KEY, // NOT equal to "random_seed"!
-          PROOF_GENERATION_CONFIG_KEY,
+          PROOF_GENERATION_CONFIG_KEY.toLowerCase(Locale.getDefault()),
           ENGINE_CONFIG_KEY,
-          LOGIC_CONFIG_KEY,
-          SPACER_LOGIC_CONFIG_KEY,
+          SOLVER_LOGIC_CONFIG_KEY,
           OPT_PRIORITY_CONFIG_KEY,
           OPT_ENGINE_CONFIG_KEY);
 
@@ -155,27 +157,38 @@ public final class Z3SolverContext extends AbstractSolverContext {
     @Option(
         secure = true,
         description =
-            "Further options for Bitwuzla in addition to the default options. "
-                + "Format:  \"option.name=value\" with ’,’ to separate options. "
-                + "Option names and values can be found in the Bitwuzla documentation online: "
-                + "https://bitwuzla.github.io/docs/cpp/enums/option.html#_CPPv4N8bitwuzla6OptionE "
-                + "Example: \"smt.arith.solver=1,smt.relevancy=0\"")
+            "Further options for Z3 in addition to the default options. "
+                + "Format:  \"option.name=value\" with ’,’ to separate options. Spaces, as well "
+                + "as capitalization in the options are allowed. "
+                + "Option names and values can be found in the Z3 documentation online: "
+                + "https://microsoft.github.io/z3guide/programming/Parameters/ "
+                + "Example: \"spacer.order_children = 2, xform.inline_eager = FALSE, xform"
+                + ".inline_linear=false,xform.slice=false,spacer.max_level=10\". Please use "
+                + "the dedicated "
+                + "configuration options, and not this option, for the following Z3 options: "
+                + "logic, engine, optsmt_engine, priority, smt.random_seed, and random_seed. "
+                + "Further, please do "
+                + "not configure the following options, which are specified via JavaSMTs "
+                + "ProverOptions: model, proof, unsat_core.")
     private String furtherOptions = "";
 
     @Option(
         secure = true,
         description =
             "Sets the engine to be used by this Z3 context, corresponding to Z3 option 'engine=.."
-                + ".'",
+                + ".'. Default: auto-config",
         values = {"auto-config", "datalog", "bmc", "spacer"})
     private String engine = "auto-config";
 
-    private final Z3_ENGINE usedEngine;
-
-    // Uses option 'smt.logic=...' for normal Z3, and 'spacer.logic=...' if spacer is used.
+    // Used when creating a solver. Note: Spacer requires the option 'spacer.logic=...'
+    // if used, but that needs to be specified by the users!
     @Option(
         secure = true,
-        description = "SMT-LIB logic to configure the SMT solvers of this context")
+        description =
+            "SMT-LIB logic to configure the SMT solvers (i.e. all Provers created from a"
+                + " SolverContext with this option) with. Default: ALL. Note: this option does not"
+                + " cover specialized logic selection, e.g. 'spacer.logic'! Please use"
+                + " 'furtherOptions' for those.")
     private String logic = "ALL";
 
     private final @Nullable PathCounterTemplate logfile;
@@ -188,30 +201,31 @@ public final class Z3SolverContext extends AbstractSolverContext {
 
       randomSeed = pRandomSeed;
       logfile = pLogfile;
-      usedEngine = processEngineOption();
-      logic = processLogicString();
     }
 
-    /** Preprocesses the engine option string to {@link Z3_ENGINE}. */
-    private Z3_ENGINE processEngineOption() {
-      String processedEngine = checkNotNull(engine).toUpperCase(Locale.getDefault()).strip();
-      if (processedEngine.equals("AUTO-CONFIG")) {
-        return Z3_ENGINE.DEFAULT;
+    /**
+     * Preprocesses the engine option string to {@link Z3_ENGINE}. Will also check for the correct
+     * settings (as far as they are known) for non-default engines.
+     */
+    Z3_ENGINE getZ3Engine() {
+      Z3_ENGINE z3Engine = Z3_ENGINE.DEFAULT;
+      if (engine != null && !engine.strip().equalsIgnoreCase("AUTO-CONFIG")) {
+        z3Engine = Z3_ENGINE.valueOf(engine.toUpperCase(Locale.getDefault()).strip());
       }
-      return Z3_ENGINE.valueOf(processedEngine);
+      // Spacer needs HORN logic
+      // Note: seems like it does not need the option spacer.logic=HORN
+      checkArgument(
+          z3Engine != Z3_ENGINE.SPACER || getLogic().orElse("ALL").equalsIgnoreCase("HORN"),
+          "Spacer requires HORN logic to be set");
+      return z3Engine;
     }
 
-    Z3_ENGINE getEngine() {
-      return checkNotNull(usedEngine);
-    }
-
-    String processLogicString() {
-      // TODO: validate
-      return checkNotNull(logic).toUpperCase(Locale.getDefault()).strip();
-    }
-
-    String getLogic() {
-      return logic;
+    Optional<String> getLogic() {
+      if (logic == null) {
+        return Optional.empty();
+      }
+      // TODO: validate that this is a valid logic
+      return Optional.of(logic.toUpperCase(Locale.getDefault()).strip());
     }
 
     String getFurtherOptions() {
@@ -237,6 +251,8 @@ public final class Z3SolverContext extends AbstractSolverContext {
     // Building the configuration based options right away allows us to throw immediately in case
     // of problems and not confuse the user
     solverOptionsFromConfig = buildSolverOptionsFromConfig(extraOptions);
+    logic = extraOptions.getLogic();
+    engine = extraOptions.getZ3Engine();
   }
 
   @SuppressWarnings("ParameterNumber")
@@ -351,6 +367,8 @@ public final class Z3SolverContext extends AbstractSolverContext {
     return new Z3TheoremProver(
         creator,
         manager,
+        logic,
+        engine,
         options,
         buildSolverOptions(options),
         extraOptions.logfile,
@@ -371,6 +389,8 @@ public final class Z3SolverContext extends AbstractSolverContext {
         creator,
         logger,
         manager,
+        logic,
+        engine,
         options,
         buildOptimizationSolverOptions(),
         extraOptions.logfile,
@@ -410,11 +430,13 @@ public final class Z3SolverContext extends AbstractSolverContext {
 
   private static ImmutableMap<String, Object> buildSolverOptionsFromConfig(
       ExtraOptions pExtraOptions) {
-    return ImmutableMap.<String, Object>builder()
-        .putAll(transformEngineOption(pExtraOptions))
-        .putAll(transformLogicOption(pExtraOptions))
-        .putAll(transformAdditionalOptions(pExtraOptions))
-        .buildOrThrow();
+    ImmutableMap.Builder<String, Object> options = ImmutableMap.builder();
+    Optional<String> maybeLogic = pExtraOptions.getLogic();
+    if (!maybeLogic.orElse("ALL").equalsIgnoreCase("ALL")) {
+      // Ignore default logic
+      options.put(SOLVER_LOGIC_CONFIG_KEY, maybeLogic.orElseThrow());
+    }
+    return options.putAll(transformAdditionalOptions(pExtraOptions)).buildOrThrow();
   }
 
   private ImmutableMap<String, Object> buildSolverOptions(Set<ProverOptions> options) {
@@ -471,32 +493,12 @@ public final class Z3SolverContext extends AbstractSolverContext {
       checkArgument(!value.isEmpty(), "Empty value for additional option with key: " + key);
       checkArgument(
           !OPTIONS_HANDLED_BY_DEDICATED_OPTIONS.contains(key),
-          "Please handle option " + key + " " + "by its dedicated option in solver.z3");
+          "Please handle option " + key + " by its dedicated configuration option or ProverOption");
 
       // Transform value to its proper type
       optionsBuilder.put(key, transformZ3OptionValueToCorrectType(key, value));
     }
     return optionsBuilder.buildOrThrow();
-  }
-
-  private static ImmutableMap<String, Object> transformLogicOption(ExtraOptions pExtraOptions) {
-    String chosenLogic = pExtraOptions.getLogic();
-    if (chosenLogic.equals("all")) {
-      // Default, ignore
-      return ImmutableMap.of();
-    }
-    // boolean useSpacer = pExtraOptions.getEngine().equals(Z3_ENGINE.SPACER);
-    return ImmutableMap.of(LOGIC_CONFIG_KEY, chosenLogic);
-  }
-
-  private static ImmutableMap<String, Object> transformEngineOption(ExtraOptions pExtraOptions) {
-    String engine = pExtraOptions.getEngine().toString();
-    if (engine.equals("auto-config")) {
-      // Default, ignore
-      return ImmutableMap.of();
-    }
-
-    return ImmutableMap.of(ENGINE_CONFIG_KEY, engine);
   }
 
   private static Object transformZ3OptionValueToCorrectType(String optionName, String optionValue) {
@@ -519,7 +521,7 @@ public final class Z3SolverContext extends AbstractSolverContext {
    * Options are provided line by line (one option per line) with input types, information about the
    * option, and default values. This requires a fully formed Z3FormulaCreator to work!
    */
-  String getZ3Options() {
+  String getAllZ3Options() {
     // Useful for retrieving all relevant Z3 options and their types
     // TODO: add a test that we know all 'double' option arguments.
     // TODO: add a public method that returns solver options?
@@ -528,7 +530,8 @@ public final class Z3SolverContext extends AbstractSolverContext {
 
   /**
    * Options string for all available options tied to solving (including fixed-point options like
-   * BMC and Spacer options). The options are returned 1 per line, with the pattern:
+   * BMC and Spacer options, and optimization options). The options are returned 1 per line, with
+   * the pattern:
    *
    * <p>optionName{.detailedName} (type) infoText that may include brackets (default: defaultValue)
    *
