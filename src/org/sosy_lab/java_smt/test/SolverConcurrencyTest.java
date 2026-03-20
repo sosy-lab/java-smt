@@ -167,6 +167,7 @@ public class SolverConcurrencyTest {
             Solvers.PRINCESS,
             Solvers.CVC4,
             Solvers.CVC5,
+            Solvers.LEANSMT,
             Solvers.YICES2,
             Solvers.BITWUZLA,
             Solvers.OPENSMT,

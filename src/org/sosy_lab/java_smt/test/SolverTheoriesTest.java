@@ -1111,6 +1111,7 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
           Solvers.CVC5,
           Solvers.BOOLECTOR,
           Solvers.PRINCESS,
+          Solvers.LEANSMT,
           Solvers.YICES2,
           Solvers.OPENSMT);
 

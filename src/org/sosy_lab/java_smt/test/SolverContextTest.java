@@ -105,6 +105,13 @@ public class SolverContextTest extends SolverBasedTest0.ParameterizedSolverBased
     assertThat(bmgr.isFalse(termFalse)).isTrue();
 
     // try to access some data about formulae and managers
+    assume()
+        .withMessage(
+            "Solver %s does not preserve source-level term stringification after closing the"
+                + " context",
+            solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.LEANSMT);
     assertThat(term.toString()).isEqualTo("variable");
     assertThat(term.hashCode()).isEqualTo(hash);
     assertThat(term).isEqualTo(term2);

@@ -253,7 +253,7 @@ public abstract class SolverBasedTest0 {
             "Solver %s does not yet support the conversion between bitvectors and integers",
             solverToUse())
         .that(solverToUse())
-        .isNotEqualTo(Solvers.YICES2);
+        .isNotIn(java.util.List.of(Solvers.YICES2, Solvers.LEANSMT));
   }
 
   @SuppressWarnings("CheckReturnValue")
@@ -495,6 +495,10 @@ public abstract class SolverBasedTest0 {
 
     @Parameters(name = "{0}")
     public static Solvers[] getAllSolvers() {
+      String selectedSolver = System.getProperty("test.solver");
+      if (selectedSolver != null && !selectedSolver.isBlank()) {
+        return new Solvers[] {Solvers.valueOf(selectedSolver)};
+      }
       return Solvers.values();
     }
 

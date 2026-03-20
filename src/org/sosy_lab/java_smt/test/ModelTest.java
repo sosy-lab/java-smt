@@ -96,6 +96,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   private static final ImmutableList<Solvers> SOLVERS_WITH_PERSISTENT_MODEL =
       ImmutableList.of(
           Solvers.MATHSAT5,
+          Solvers.LEANSMT,
           Solvers.Z3,
           Solvers.Z3_WITH_INTERPOLATION,
           Solvers.SMTINTERPOL,
@@ -3272,7 +3273,8 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
     BooleanFormula f = bmgr.makeVariable("basis");
 
     // if every solver is fast enough, we could increase this number up to 100.
-    int maxDepth = solverToUse() == Solvers.BITWUZLA ? 17 : 30;
+    int maxDepth =
+        (solverToUse() == Solvers.BITWUZLA || solverToUse() == Solvers.LEANSMT) ? 17 : 30;
 
     for (int depth = 0; depth < maxDepth; depth++) {
       T var = makeVar.apply(depth);

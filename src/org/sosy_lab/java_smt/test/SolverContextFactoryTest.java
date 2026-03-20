@@ -195,6 +195,12 @@ public class SolverContextFactoryTest {
   public void createSolverContextFactoryWithSystemLoader() throws InvalidConfigurationException {
     requireNativeLibrary();
     requirePlatformSupported();
+    assume()
+        .withMessage(
+            "LeanSMT keeps its native runtime initialized for process lifetime, so loader-only"
+                + " failure cannot be retested reliably in this shared JVM")
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.LEANSMT);
 
     // we assume that no native solvers are installed on the testing machine by default.
     SolverContextFactory factory =

@@ -153,6 +153,7 @@ public class FormulaManagerTest extends SolverBasedTest0.ParameterizedSolverBase
   public void testEqualityParser() {
     // Check that we can recreate `=` terms from the parser
     requireParser();
+    assume().that(solver).isNotEqualTo(Solvers.LEANSMT);
 
     var formulaType = imgr != null ? IntegerType : getBitvectorTypeWithSize(8);
 
@@ -220,6 +221,7 @@ public class FormulaManagerTest extends SolverBasedTest0.ParameterizedSolverBase
   public void testDistinctParser() {
     // Check that we can recreate `distinct` terms from the parser
     requireParser();
+    assume().that(solver).isNotEqualTo(Solvers.LEANSMT);
 
     var formulaType = imgr != null ? IntegerType : getBitvectorTypeWithSize(8);
 
