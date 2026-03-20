@@ -9,6 +9,7 @@
 package org.sosy_lab.java_smt.solvers.z3;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static org.sosy_lab.java_smt.solvers.z3.Z3SolverContext.ENGINE_CONFIG_KEY;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
@@ -17,6 +18,7 @@ import com.microsoft.z3.Z3Exception;
 import com.microsoft.z3.enumerations.Z3_lbool;
 import java.util.Collection;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.Set;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.ShutdownNotifier;
@@ -27,6 +29,7 @@ import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.api.UserPropagator;
+import org.sosy_lab.java_smt.solvers.z3.Z3SolverContext.Z3_ENGINE;
 
 class Z3TheoremProver extends Z3AbstractProver implements ProverEnvironment {
 
@@ -38,23 +41,19 @@ class Z3TheoremProver extends Z3AbstractProver implements ProverEnvironment {
   Z3TheoremProver(
       Z3FormulaCreator creator,
       Z3FormulaManager pMgr,
+      Optional<String> pLogic,
+      Z3_ENGINE pEngine,
       Set<ProverOptions> pOptions,
       ImmutableMap<String, Object> pSolverOptions,
       @Nullable PathCounterTemplate pLogfile,
       ShutdownNotifier pShutdownNotifier) {
-    super(creator, pMgr, pOptions, pLogfile, pShutdownNotifier);
-    if (pSolverOptions.containsKey("logic") && !pSolverOptions.get("logic").equals("all")) {
-      // mkSolverForLogic() allows setting logics, which seem to be getting ignored if set via
-      // options
-      String logicString = (String) pSolverOptions.get("logic");
-      checkArgument(
-          !(pSolverOptions.containsKey("engine") && pSolverOptions.get("engine").equals("spacer"))
-              || logicString.equalsIgnoreCase("HORN"));
-      long logic = Native.mkStringSymbol(z3context, (String) pSolverOptions.get("logic"));
-      z3solver = Native.mkSolverForLogic(z3context, logic);
+    super(creator, pMgr, pLogic, pEngine, pOptions, pLogfile, pShutdownNotifier);
+    if (!logic.orElse("ALL").equalsIgnoreCase("ALL")) {
+      // mkSolverForLogic() allows setting logics,
+      // which seem to be getting ignored if set via options
+      long logicSymbol = Native.mkStringSymbol(z3context, logic.orElseThrow());
+      z3solver = Native.mkSolverForLogic(z3context, logicSymbol);
     } else {
-      checkArgument(
-          !(pSolverOptions.containsKey("engine") && pSolverOptions.get("engine").equals("spacer")));
       z3solver = Native.mkSolver(z3context);
     }
     Native.solverIncRef(z3context, z3solver);
@@ -64,6 +63,9 @@ class Z3TheoremProver extends Z3AbstractProver implements ProverEnvironment {
 
     long z3params = Native.mkParams(z3context);
     Native.paramsIncRef(z3context, z3params);
+    if (engine != Z3_ENGINE.DEFAULT) {
+      addParameter(z3params, ENGINE_CONFIG_KEY, engine.toString());
+    }
     for (Entry<String, Object> entry : pSolverOptions.entrySet()) {
       addParameter(z3params, entry.getKey(), entry.getValue());
     }
