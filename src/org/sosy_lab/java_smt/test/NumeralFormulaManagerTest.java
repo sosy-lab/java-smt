@@ -124,7 +124,7 @@ public class NumeralFormulaManagerTest extends SolverBasedTest0.ParameterizedSol
       constraints.add(imgr.lessOrEquals(zero, symbol));
       constraints.add(imgr.lessOrEquals(symbol, four));
     }
-    assertThatFormula(bmgr.and(imgr.distinct(symbols), bmgr.and(constraints))).isSatisfiable();
+    assertThatFormulas(imgr.distinct(symbols), bmgr.and(constraints)).isSatisfiable();
   }
 
   @Test
@@ -140,7 +140,7 @@ public class NumeralFormulaManagerTest extends SolverBasedTest0.ParameterizedSol
       constraints.add(imgr.lessOrEquals(zero, symbol));
       constraints.add(imgr.lessThan(symbol, four));
     }
-    assertThatFormula(bmgr.and(imgr.distinct(symbols), bmgr.and(constraints))).isUnsatisfiable();
+    assertThatFormulas(imgr.distinct(symbols), bmgr.and(constraints)).isUnsatisfiable();
   }
 
   @Test

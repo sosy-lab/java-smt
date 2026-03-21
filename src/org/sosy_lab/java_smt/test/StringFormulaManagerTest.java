@@ -392,13 +392,11 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
     StringFormula suffix = smgr.makeVariable("suffix");
     StringFormula concat = smgr.makeVariable("concat");
 
-    assertThatFormula(
-            bmgr.and(
-                smgr.prefix(prefix, concat),
-                smgr.suffix(suffix, concat),
-                imgr.equal(
-                    smgr.length(concat), imgr.add(smgr.length(prefix), smgr.length(suffix)))))
-        .implies(smgr.equal(concat, smgr.concat(prefix, suffix)));
+    assertThatFormulas(
+            smgr.prefix(prefix, concat),
+            smgr.suffix(suffix, concat),
+            imgr.equal(smgr.length(concat), imgr.add(smgr.length(prefix), smgr.length(suffix))))
+        .imply(smgr.equal(concat, smgr.concat(prefix, suffix)));
   }
 
   @Test
@@ -407,16 +405,14 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
     StringFormula prefix = smgr.makeVariable("prefix");
     StringFormula suffix = smgr.makeVariable("suffix");
 
-    assertThatFormula(bmgr.and(smgr.prefix(prefix, suffix), smgr.suffix(suffix, prefix)))
-        .implies(smgr.equal(prefix, suffix));
-    assertThatFormula(
-            bmgr.and(
-                smgr.prefix(prefix, suffix), imgr.equal(smgr.length(prefix), smgr.length(suffix))))
-        .implies(smgr.equal(prefix, suffix));
-    assertThatFormula(
-            bmgr.and(
-                smgr.suffix(suffix, prefix), imgr.equal(smgr.length(prefix), smgr.length(suffix))))
-        .implies(smgr.equal(prefix, suffix));
+    assertThatFormulas(smgr.prefix(prefix, suffix), smgr.suffix(suffix, prefix))
+        .imply(smgr.equal(prefix, suffix));
+    assertThatFormulas(
+            smgr.prefix(prefix, suffix), imgr.equal(smgr.length(prefix), smgr.length(suffix)))
+        .imply(smgr.equal(prefix, suffix));
+    assertThatFormulas(
+            smgr.suffix(suffix, prefix), imgr.equal(smgr.length(prefix), smgr.length(suffix)))
+        .imply(smgr.equal(prefix, suffix));
   }
 
   @Test

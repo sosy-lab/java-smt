@@ -604,7 +604,7 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
     BooleanFormula restrict = bmgr.not(imgr.equal(aa, one));
     // x != 1 && exists x . (x == 1)
     BooleanFormula f = qmgr.exists(ImmutableList.of(aa), imgr.equal(aa, one));
-    assertThatFormula(bmgr.and(f, restrict)).isSatisfiable();
+    assertThatFormulas(f, restrict).isSatisfiable();
   }
 
   @Test
@@ -624,7 +624,7 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
     BooleanFormula restrict = bmgr.not(bvmgr.equal(aa, one));
     // x != 1 && exists x . (x == 1)
     BooleanFormula f = qmgr.exists(ImmutableList.of(aa), bvmgr.equal(aa, one));
-    assertThatFormula(bmgr.and(f, restrict)).isSatisfiable();
+    assertThatFormulas(f, restrict).isSatisfiable();
   }
 
   @Test
@@ -930,20 +930,16 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
     BooleanFormula forallXbx0 = qmgr.forall(x, bAtXEq0);
 
     // (exists x in [10..20] . b[x] = 1) AND (forall x . b[x] = 0) is UNSAT
-    assertThatFormula(bmgr.and(exists10to20bx1, forallXbx0)).isUnsatisfiable();
+    assertThatFormulas(exists10to20bx1, forallXbx0).isUnsatisfiable();
 
     // (exists x in [10..20] . b[x] = 1) AND (b[10] = 0) is SAT
-    assertThatFormula(
-            bmgr.and(
-                exists10to20bx1,
-                imgr.equal(amgr.select(b, imgr.makeNumber(10)), imgr.makeNumber(0))))
+    assertThatFormulas(
+            exists10to20bx1, imgr.equal(amgr.select(b, imgr.makeNumber(10)), imgr.makeNumber(0)))
         .isSatisfiable();
 
     // (exists x in [10..20] . b[x] = 1) AND (b[1000] = 0) is SAT
-    assertThatFormula(
-            bmgr.and(
-                exists10to20bx1,
-                imgr.equal(amgr.select(b, imgr.makeNumber(1000)), imgr.makeNumber(0))))
+    assertThatFormulas(
+            exists10to20bx1, imgr.equal(amgr.select(b, imgr.makeNumber(1000)), imgr.makeNumber(0)))
         .isSatisfiable();
   }
 
@@ -966,10 +962,10 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
     BooleanFormula forallXbx0 = qmgr.forall(x, bAtXEq0);
 
     // (exists x in [10..20] . b[x] = 0) AND (forall x . b[x] = 0) is SAT
-    assertThatFormula(bmgr.and(exists10to20bx0, forallXbx0)).isSatisfiable();
+    assertThatFormulas(exists10to20bx0, forallXbx0).isSatisfiable();
 
     // (exists x in [10..20] . b[x] = 1) AND (forall x . b[x] = 1) is SAT
-    assertThatFormula(bmgr.and(exists10to20bx1, forallXbx1)).isSatisfiable();
+    assertThatFormulas(exists10to20bx1, forallXbx1).isSatisfiable();
   }
 
   @Test
@@ -983,22 +979,18 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
     BooleanFormula forall10to20bx1 = forall(x, imgr.makeNumber(10), imgr.makeNumber(20), bAtXEq1);
 
     // (forall x in [10..20] . b[x] = 1) AND (exits x in [15..17] . b[x] = 0) is UNSAT
-    assertThatFormula(
-            bmgr.and(forall10to20bx1, exists(x, imgr.makeNumber(15), imgr.makeNumber(17), bAtXEq0)))
+    assertThatFormulas(
+            forall10to20bx1, exists(x, imgr.makeNumber(15), imgr.makeNumber(17), bAtXEq0))
         .isUnsatisfiable();
 
     // (forall x in [10..20] . b[x] = 1) AND b[10] = 0 is UNSAT
-    assertThatFormula(
-            bmgr.and(
-                forall10to20bx1,
-                imgr.equal(amgr.select(b, imgr.makeNumber(10)), imgr.makeNumber(0))))
+    assertThatFormulas(
+            forall10to20bx1, imgr.equal(amgr.select(b, imgr.makeNumber(10)), imgr.makeNumber(0)))
         .isUnsatisfiable();
 
     // (forall x in [10..20] . b[x] = 1) AND b[20] = 0 is UNSAT
-    assertThatFormula(
-            bmgr.and(
-                forall10to20bx1,
-                imgr.equal(amgr.select(b, imgr.makeNumber(20)), imgr.makeNumber(0))))
+    assertThatFormulas(
+            forall10to20bx1, imgr.equal(amgr.select(b, imgr.makeNumber(20)), imgr.makeNumber(0)))
         .isUnsatisfiable();
   }
 
@@ -1019,30 +1011,24 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
     BooleanFormula forall10to20bx1 = forall(x, imgr.makeNumber(10), imgr.makeNumber(20), bAtXEq1);
 
     // (forall x in [10..20] . b[x] = 0) AND (forall x . b[x] = 0) is SAT
-    assertThatFormula(bmgr.and(forall10to20bx0, qmgr.forall(x, bAtXEq0))).isSatisfiable();
+    assertThatFormulas(forall10to20bx0, qmgr.forall(x, bAtXEq0)).isSatisfiable();
 
     // (forall x in [10..20] . b[x] = 1) AND b[9] = 0 is SAT
-    assertThatFormula(
-            bmgr.and(
-                forall10to20bx1,
-                imgr.equal(amgr.select(b, imgr.makeNumber(9)), imgr.makeNumber(0))))
+    assertThatFormulas(
+            forall10to20bx1, imgr.equal(amgr.select(b, imgr.makeNumber(9)), imgr.makeNumber(0)))
         .isSatisfiable();
 
     // (forall x in [10..20] . b[x] = 1) AND b[21] = 0 is SAT
-    assertThatFormula(
-            bmgr.and(
-                forall10to20bx1,
-                imgr.equal(amgr.select(b, imgr.makeNumber(21)), imgr.makeNumber(0))))
+    assertThatFormulas(
+            forall10to20bx1, imgr.equal(amgr.select(b, imgr.makeNumber(21)), imgr.makeNumber(0)))
         .isSatisfiable();
 
     // (forall x in [10..20] . b[x] = 1) AND (forall x in [0..20] . b[x] = 0) is UNSAT
-    assertThatFormula(
-            bmgr.and(forall10to20bx1, forall(x, imgr.makeNumber(0), imgr.makeNumber(20), bAtXEq0)))
+    assertThatFormulas(forall10to20bx1, forall(x, imgr.makeNumber(0), imgr.makeNumber(20), bAtXEq0))
         .isUnsatisfiable();
 
     // (forall x in [10..20] . b[x] = 1) AND (forall x in [0..9] . b[x] = 0) is SAT
-    assertThatFormula(
-            bmgr.and(forall10to20bx1, forall(x, imgr.makeNumber(0), imgr.makeNumber(9), bAtXEq0)))
+    assertThatFormulas(forall10to20bx1, forall(x, imgr.makeNumber(0), imgr.makeNumber(9), bAtXEq0))
         .isSatisfiable();
   }
 
