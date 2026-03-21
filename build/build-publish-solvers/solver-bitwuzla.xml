@@ -78,6 +78,7 @@ SPDX-License-Identifier: Apache-2.0
         </exec>
 
         <!-- Store the unpatched bindings -->
+        <delete dir="${source.path}/libbitwuzla.nopatch" quiet="true"/>
         <copy todir="${source.path}/libbitwuzla.nopatch">
             <fileset dir="${source.path}/libbitwuzla"/>
         </copy>

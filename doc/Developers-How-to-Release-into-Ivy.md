@@ -267,21 +267,22 @@ git status
 git diff
 ```
 
-Also check if there are any new Java files in the `src` folder under
+Also check if there are any new Java files in the `src` folder under 
 `lib/source/native/libbitwuzla`. Normally, the changes for an update should be minimal, and
 there should be no new files. If you find any `SWIGTYPE_p` classes, it means SWIG ran into a
 class that it didn't understand, and simply created an opaque wrapper for the C++ object. Most
 of the time, this is not what we want, and some updates to the SWIG script (`bitwuzla.i`) will
-be necessary
+be necessary. 
 
-Often the problem is a new method that was added to the API with an argument or return type that is
-not handled correctly. The simple solution may then be to remove the new method by adding an
+While editing `bitwuzla.i`, you can rerun the command from above at any time to check your changes.
+The command will also produce an updated patch containing the latest changes.
+If there are more changes than just whitespace and timestamps, please commit the changes to JavaSMT.
+
+Often, the problem is a new method that was added to the API with an argument or return type that 
+is not handled correctly. The simple solution may then be to remove the new method by adding an
 `%ignore` to the SWIG script. If the method is actually interesting to us, and we want to keep it,
 it might be necessary to instantiate a `%template` or otherwise wrap the method to help SWIG handle
-the types
-
-Note, that while editing `bitwuzla.i` you can rerun the command from above at any time to check out
-you changes
+the types.
 
 Often there will be no new files left once `bitwuzla.i` has been fixed. If there are still new
 files left, they have to be added to git. Also remember to add the copyright header to all new
@@ -289,10 +290,9 @@ files, and make sure that new classes implement the `Reference` interface to all
 garbage collection. Normal classes can extend `AbstractReference` for convenience, see `Term.
 java` for an example. If the class wraps a `std::vector` or similar, it will already extend a
 different class. In that case the `Reference` interface can be implemented similar to how it's
-done in `Vector_Int.java`
+done in `Vector_Int.java`.
 
-Once the SWIG script has been fully fixed, we "commit" our changes, and start building the
-actual binaries:
+Once the SWIG script has been fully fixed, we "commit" our changes, and build the actual binaries:
 ```bash
 ant publish-bitwuzla \
     -Dbitwuzla.path=/workspace/bitwuzla \
@@ -303,11 +303,12 @@ This command will first try to build the Java code for the bindings. If there is
 aborts, and you can go back to the last step to fix the generated code. Otherwise, the script
 continues to build binaries for all platforms, which can take several minutes. Dependencies like
 GMP are handled automatically, and the script will add a git hash to the `customRev` version
-string before finally publishing the binaries
+string before finally publishing the binaries.
 
 Finally, follow the instructions shown in the message at the end of the command.
-The instructions for publication via SVN into the Ivy repository are not intended to be executed in the Docker environment,
-but in the normal system environment, where some testing can be applied by the developer before the commit.
+The instructions for publication via SVN into the Ivy repository are not intended to be executed
+in the Docker environment, but in the normal system environment, where some testing can be 
+applied by the developer before the commit.
 
 
 ### Publishing (Opti)-MathSAT5
