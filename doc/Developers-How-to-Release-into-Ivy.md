@@ -201,9 +201,9 @@ Example:
 ```bash
 ant publish-opensmt \
     -Dopensmt.path=/workspace/solvers/opensmt/opensmt \
-    -Dopensmt.customRev=2.9.0 \
-    -Dgmp-linux-x64.path=/dependencies/gmp-6.2.1/install/x64-linux \
-    -Dgmp-linux-arm64.path=/dependencies/gmp-6.2.1/install/arm64-linux \
+    -Dopensmt.customRev=2.9.2 \
+    -Dgmp-linux-x64.path=/dependencies/gmp-6.3.0/install/x64-linux \
+    -Dgmp-linux-arm64.path=/dependencies/gmp-6.3.0/install/arm64-linux \
     -Djdk-linux-arm64.path=/dependencies/jdk17-linux-aarch64
 ```
 The build scripts for OpenSMT ... :
