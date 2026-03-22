@@ -80,6 +80,7 @@ SPDX-License-Identifier: Apache-2.0
               -DGMP_LIBRARY=${gmp-linux-x64.path}/lib/libgmp.a
               -DGMPXX_LIBRARY=${gmp-linux-x64.path}/lib/libgmpxx.a
               -DGMP_INCLUDE_DIR=${gmp-linux-x64.path}/include"/>
+            <arg value="-j8"/>
             <arg value="install"/>
         </exec>
 
@@ -129,6 +130,7 @@ SPDX-License-Identifier: Apache-2.0
               -DGMP_LIBRARY=${gmp-linux-arm64.path}/lib/libgmp.a
               -DGMPXX_LIBRARY=${gmp-linux-arm64.path}/lib/libgmpxx.a
               -DGMP_INCLUDE_DIR=${gmp-linux-arm64.path}/include"/>
+            <arg value="-j8"/>
             <arg value="install"/>
         </exec>
 
