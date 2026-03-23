@@ -9,6 +9,7 @@
 package org.sosy_lab.java_smt.solvers.yices2;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static org.sosy_lab.common.collect.Collections3.transformedImmutableListCopy;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.FluentIterable;
@@ -514,9 +515,10 @@ class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long, Intege
           // Rewrite (bool-to-bv a b ...) to (concat ... (ite b #1 #0) (ite a #1 #0))
           functionKind = FunctionDeclarationKind.BV_CONCAT;
           functionArgs =
-              FluentIterable.from(Lists.reverse(getArgs(pF)))
-                  .transform(p -> Terms.ifThenElse(p, Terms.bvConst(1, 1), Terms.bvConst(1, 0)))
-                  .toList();
+              transformedImmutableListCopy(
+                      getArgs(pF),
+                      p -> Terms.ifThenElse(p, Terms.bvConst(1, 1), Terms.bvConst(1, 0)))
+                  .reverse();
         }
         break;
       default:

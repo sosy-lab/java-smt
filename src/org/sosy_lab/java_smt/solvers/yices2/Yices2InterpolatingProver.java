@@ -11,6 +11,7 @@
 package org.sosy_lab.java_smt.solvers.yices2;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static org.sosy_lab.common.collect.Collections3.transformedImmutableSetCopy;
 
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableSet;
@@ -61,8 +62,8 @@ class Yices2InterpolatingProver extends Yices2AbstractProver<Integer>
 
     return creator.encapsulateBoolean(
         interpolate(
-            FluentIterable.from(setA).transform(stack.peekLast()::get).toSet(),
-            FluentIterable.from(setB).transform(stack.peekLast()::get).toSet()));
+            transformedImmutableSetCopy(setA, stack.peekLast()::get),
+            transformedImmutableSetCopy(setB, stack.peekLast()::get)));
   }
 
   private int interpolate(Collection<Integer> setA, Collection<Integer> setB)
