@@ -469,7 +469,7 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
 
     // This check makes only sense as long as we don't allow 'reset'!
     checkArgument(
-        smtLibStateMachine.state != START_MODE || true,
+        smtLibStateMachine.state != START_MODE,
         "The processed SMT-LIB2 program does not include assertions");
     return builder.toString();
   }
