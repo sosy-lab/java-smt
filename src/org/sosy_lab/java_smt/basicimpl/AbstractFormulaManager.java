@@ -860,7 +860,7 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
      * State after 'exit' has been called. No operations are possible anymore and everything ends in
      * an error.
      */
-    EXITED_STATE;
+    EXITED_STATE
   }
 
   /**
@@ -902,13 +902,19 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
       strictLogicSelectionRequired = pRequiresStrictLogicSelection;
     }
 
-    /** Transitions into the state after the 'exit' command, that disallows any further commands. */
+    /**
+     * Transitions into the SMTLIB2 program state after the 'exit' command, that disallows any
+     * further commands.
+     */
     void applyExitCommand() {
       checkArgument(state != EXITED_STATE, EXIT_ERROR_MSG);
       state = EXITED_STATE;
     }
 
-    /** Used to get the new parsing state for commands: assert, declare-*, define-* */
+    /**
+     * Used to get the new SMTLIB2 program state for commands: 'declare-*', 'define-*', and
+     * 'assert'.
+     */
     void applyAssertDeclareCommands() {
       checkArgument(state != EXITED_STATE, EXIT_ERROR_MSG);
       if (state != START_MODE) {
@@ -924,7 +930,7 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
       }
     }
 
-    /** Used to get the new parsing state for command: check-sat */
+    /** Used to get the new SMTLIB2 program state for command: 'check-sat'. */
     void applyCheckSatCommand() {
       checkArgument(state != EXITED_STATE, EXIT_ERROR_MSG);
       if (state != START_MODE || !strictLogicSelectionRequired) {
@@ -940,14 +946,14 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
     }
 
     /**
-     * Used to get the new parsing state for command: echo. This options transition always into the
-     * current state and calling this method is not necessary.
+     * Used to get the new SMTLIB2 program state for the 'echo' command. This options transition
+     * always into the current state and calling this method is not necessary.
      */
     void applyEchoCommand() {
       checkArgument(state != EXITED_STATE, EXIT_ERROR_MSG);
     }
 
-    /** Used to get the new parsing state for commands: get-assertion */
+    /** Used to transition into the new SMTLIB2 program state for the 'get-assertion' command. */
     void applyGetAssertionCommand() {
       checkArgument(state != EXITED_STATE, EXIT_ERROR_MSG);
       // Funnily, you are allowed to use 'get-assertion' without asserting something.
@@ -965,7 +971,10 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
        */
     }
 
-    /** Used to get the new parsing state for commands: get-assignment, get-model, get-value */
+    /**
+     * Used to transition into the new SMTLIB2 program state for commands: 'get-assignment',
+     * 'get-model', and 'get-value'.
+     */
     void applyGAMVCommand() {
       checkArgument(state != EXITED_STATE, EXIT_ERROR_MSG);
       checkArgument(
@@ -975,25 +984,27 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
     }
 
     /**
-     * Used to get the new parsing state for commands: get-info, get-option, set-info, set-option.
-     * These options transition always into the current state and calling this method is not
-     * necessary.
+     * Used to transition into the new SMTLIB2 program state for commands: 'get-info', 'get-option',
+     * 'set-info', 'set-option'. These options transition always into the current state and calling
+     * this method is not necessary.
      */
     void applyGSIOCommand() {
       checkArgument(state != EXITED_STATE, EXIT_ERROR_MSG);
     }
 
-    /** Used to get the new parsing state for commands: get-proof, get-unsat-* */
+    /**
+     * Used to transition into the new SMTLIB2 program state for commands: 'get-unsat-*',
+     * 'get-proof'.
+     */
     void applyGPUCommand() {
       checkArgument(state != EXITED_STATE, EXIT_ERROR_MSG);
-      if (state != UNSAT_MODE && state != RESULT_MODE) {
-        throw new IllegalArgumentException(
-            "SMT-LIB2 command 'get-proof' and all 'get-unsat-*' commands are only allowed to be"
-                + " used after 'check-sat' has been called and returned UNSAT");
-      }
+      checkArgument(
+          state == UNSAT_MODE || state == RESULT_MODE,
+          "SMT-LIB2 command 'get-proof' and all 'get-unsat-*' commands are only allowed to be"
+              + " used after 'check-sat' has been called and returned UNSAT");
     }
 
-    /** Used to get the new parsing state for commands: push, pop */
+    /** Used to transition into the new SMTLIB2 program state for the 'push' and 'pop' commands. */
     void applyPCommand() {
       checkArgument(state != EXITED_STATE, EXIT_ERROR_MSG);
       if (state != START_MODE || !strictLogicSelectionRequired) {
@@ -1005,13 +1016,13 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
       }
     }
 
-    /** Used to get the new parsing state for command: reset */
+    /** Used to transition into the new SMTLIB2 program state for the 'reset' command. */
     void applyResetCommand() {
       checkArgument(state != EXITED_STATE, EXIT_ERROR_MSG);
       state = START_MODE;
     }
 
-    /** Used to get the new parsing state for command: reset-assertions */
+    /** Used to transition into the new SMTLIB2 program state for the 'reset-assertions' command. */
     void applyResetAssertionsCommand() {
       checkArgument(state != EXITED_STATE, EXIT_ERROR_MSG);
       if (state != START_MODE && state != ASSERT_MODE) {
@@ -1019,7 +1030,7 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
       }
     }
 
-    /** Applies the 'set-logic' command on the current parsing-state. */
+    /** Used to transition into the new SMTLIB2 program state for the 'set-logic' command. */
     void applySetLogicCommand() {
       checkArgument(state != EXITED_STATE, EXIT_ERROR_MSG);
       if (state == START_MODE) {
