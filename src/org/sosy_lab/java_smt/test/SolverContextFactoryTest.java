@@ -119,7 +119,8 @@ public class SolverContextFactoryTest {
       case CVC4:
         return IS_LINUX && !IS_ARCH_ARM64;
       case YICES2:
-        return (IS_LINUX && !IS_ARCH_ARM64) || (IS_WINDOWS && !IS_ARCH_ARM64);
+        return (IS_LINUX && !IS_ARCH_ARM64 && isSufficientVersionOfLibcxx("yices2java"))
+            || (IS_WINDOWS && !IS_ARCH_ARM64);
       case CVC5:
         return (IS_LINUX && isSufficientVersionOfLibcxx("cvc5jni")) || IS_WINDOWS || IS_MAC;
       case OPENSMT:
@@ -168,6 +169,8 @@ public class SolverContextFactoryTest {
         return new String[] {"GLIBC_2.33", "GLIBC_2.38"};
       case "cvc5jni":
         return new String[] {"GLIBC_2.32"};
+      case "yices2java":
+        return new String[] {"GLIBC_2.34"};
       default:
         return new String[] {};
     }

@@ -27,6 +27,7 @@ import com.sri.yices.Yices;
 import com.sri.yices.YicesException;
 import java.math.BigInteger;
 import org.junit.After;
+import org.junit.AssumptionViolatedException;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -37,9 +38,13 @@ public class Yices2NativeApiTest {
 
   @BeforeClass
   public static void loadYices() {
-    System.setProperty("yices.skipAutoloader", "true");
-    NativeLibraries.loadLibrary("yices2java");
-    Yices.isReady();
+    try {
+      System.setProperty("yices.skipAutoloader", "true");
+      NativeLibraries.loadLibrary("yices2java");
+      Yices.isReady();
+    } catch (UnsatisfiedLinkError e) {
+      throw new AssumptionViolatedException("Yices2 is not available", e);
+    }
   }
 
   private Context env;
