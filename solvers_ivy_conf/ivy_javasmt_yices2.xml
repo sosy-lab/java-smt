@@ -5,7 +5,7 @@ This file is part of JavaSMT,
 an API wrapper for a collection of SMT solvers:
 https://github.com/sosy-lab/java-smt
 
-SPDX-FileCopyrightText: 2020 Dirk Beyer <https://www.sosy-lab.org>
+SPDX-FileCopyrightText: 2026 Dirk Beyer <https://www.sosy-lab.org>
 
 SPDX-License-Identifier: Apache-2.0
 -->
@@ -23,7 +23,18 @@ SPDX-License-Identifier: Apache-2.0
     </info>
 
     <configurations>
-      <conf name="runtime"/>
+      <!-- default config, provides only x64 for backwards-compatibility -->
+      <conf name="runtime" extends="runtime-x64"/>
+
+      <!-- main configurations -->
+      <conf name="runtime-x64" extends="runtime-linux-x64, runtime-windows-x64"/>
+
+      <!-- basic configurations -->
+      <conf name="runtime-linux-x64" extends="runtime-common"/>
+      <conf name="runtime-windows-x64" extends="runtime-common"/>
+
+      <conf name="runtime-common" visibility="private"/>
+
       <conf name="sources" description="sources of JavaSMT's component for Yices2" />
     </configurations>
 
@@ -33,19 +44,23 @@ SPDX-License-Identifier: Apache-2.0
     </publications>
 
     <dependencies>
-        <dependency org="org.sosy_lab" name="javasmt-solver-yices2" rev="2.7.0" conf="runtime->solver-yices2"/>
+        <dependency org="org.sosy_lab" name="javasmt-solver-yices2" rev="2.7.0-gdc5687ca"
+                    conf="runtime-linux-x64->solver-yices2-linux-x64; runtime-windows-x64->solver-yices2-windows-x64"/>
 
         <!-- keep the following dependencies synchronized with the default lib/ivy.xml and build-jar-yices2.xml -->
 
         <!-- SoSy-Lab Common Library -->
-        <dependency org="org.sosy_lab" name="common" rev="0.3000-609-g90a352c" conf="runtime->runtime; sources->sources"/>
+        <dependency org="org.sosy_lab" name="common" rev="0.3000-609-g90a352c"
+                    conf="runtime-common->runtime; sources->sources"/>
 
         <!-- Google Core Libraries for Java
              Contains a lot of helpful data structures. -->
-        <dependency org="com.google.guava" name="guava" rev="33.4.0-jre" conf="runtime->default; sources->sources"/>
+        <dependency org="com.google.guava" name="guava" rev="33.4.8-jre"
+                    conf="runtime-common->default; sources->sources"/>
 
         <!-- Annotations we use for @Nullable etc. -->
-        <dependency org="org.checkerframework" name="checker-qual" rev="3.48.4" conf="runtime->default; sources->sources"/>
+        <dependency org="org.checkerframework" name="checker-qual" rev="3.51.0"
+                    conf="runtime-common->default; sources->sources"/>
 
     </dependencies>
 
