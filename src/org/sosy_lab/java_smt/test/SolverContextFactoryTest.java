@@ -117,8 +117,9 @@ public class SolverContextFactoryTest {
         return true;
       case BOOLECTOR:
       case CVC4:
+        return IS_LINUX && !IS_ARCH_ARM64;
       case YICES2:
-        return (IS_LINUX && !IS_ARCH_ARM64) || IS_WINDOWS;
+        return (IS_LINUX && !IS_ARCH_ARM64) || (IS_WINDOWS && !IS_ARCH_ARM64);
       case CVC5:
         return (IS_LINUX && isSufficientVersionOfLibcxx("cvc5jni")) || IS_WINDOWS || IS_MAC;
       case OPENSMT:
