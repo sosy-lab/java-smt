@@ -544,8 +544,10 @@ public class VariableNamesTest extends SolverBasedTest0.ParameterizedSolverBased
 
     // What is happening internally is that the input is returned as "(= java-smt java-smt)",
     // which is thrown away by our sanitization due to no assertion
-    assume().withMessage("Boolector simplifies the input so much that it gives out no "
-        + "assertions").that(solverToUse()).isNotEqualTo(Solvers.BOOLECTOR);
+    assume()
+        .withMessage("Boolector simplifies the input so much that it gives out no " + "assertions")
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.BOOLECTOR);
     for (String name : getAllNames()) {
       BooleanFormula var = createVariableWith(bmgr::makeVariable, name);
       if (var != null) {
