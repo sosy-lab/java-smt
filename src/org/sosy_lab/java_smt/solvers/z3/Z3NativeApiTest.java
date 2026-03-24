@@ -60,12 +60,12 @@ public class Z3NativeApiTest {
       Expr<IntSort> b = env.mkIntConst("b");
       Expr<IntSort> x = env.mkIntConst("x");
 
-      Expr<BoolSort> A = env.mkAnd(env.mkLt(a, x), env.mkLt(x, b));
-      Expr<BoolSort> B = env.mkLt(b, a);
+      Expr<BoolSort> formulasA = env.mkAnd(env.mkLt(a, x), env.mkLt(x, b));
+      Expr<BoolSort> formulasB = env.mkLt(b, a);
 
-      Expr<BoolSort> I = interpolate(env, A, B);
+      Expr<BoolSort> interpolant = interpolate(env, formulasA, formulasB);
 
-      assertThat(validate(env, A, B, I)).isTrue();
+      assertThat(validate(env, formulasA, formulasB, interpolant)).isTrue();
     }
   }
 
@@ -139,9 +139,10 @@ public class Z3NativeApiTest {
     return solver.getModel();
   }
 
-  private Expr<BoolSort> interpolate(Context env, Expr<BoolSort> A, Expr<BoolSort> B) {
-    Set<Expr<?>> varsA = getFreeVars(A);
-    Set<Expr<?>> varsB = getFreeVars(B);
+  private Expr<BoolSort> interpolate(
+      Context env, Expr<BoolSort> formulasA, Expr<BoolSort> formulasB) {
+    Set<Expr<?>> varsA = getFreeVars(formulasA);
+    Set<Expr<?>> varsB = getFreeVars(formulasB);
 
     Expr<?>[] shared = Sets.intersection(varsA, varsB).toArray(new Expr<?>[0]);
 
@@ -152,12 +153,18 @@ public class Z3NativeApiTest {
 
     Expr<BoolSort> left =
         env.mkForall(
-            varsA.toArray(Expr<?>[]::new), env.mkImplies(A, constant), 1, null, null, null, null);
+            varsA.toArray(Expr<?>[]::new),
+            env.mkImplies(formulasA, constant),
+            1,
+            null,
+            null,
+            null,
+            null);
 
     Expr<BoolSort> right =
         env.mkForall(
             varsB.toArray(Expr<?>[]::new),
-            env.mkImplies(constant, env.mkNot(B)),
+            env.mkImplies(constant, env.mkNot(formulasB)),
             1,
             null,
             null,
@@ -168,11 +175,15 @@ public class Z3NativeApiTest {
     return model.eval(constant, false);
   }
 
-  /** Validate that I is an interpolant for A and B */
-  private boolean validate(Context env, Expr<BoolSort> A, Expr<BoolSort> B, Expr<BoolSort> I) {
+  /** Validate that itp is an interpolant for formula(s) A and formula(s) B. */
+  private boolean validate(
+      Context env, Expr<BoolSort> formulasA, Expr<BoolSort> formulasB, Expr<BoolSort> itp) {
     Solver solver = env.mkSolver("QF_LIA");
-    return solver.check(env.mkNot(env.mkImplies(A, I))).equals(Status.UNSATISFIABLE)
-        && solver.check(env.mkNot(env.mkImplies(I, env.mkNot(B)))).equals(Status.UNSATISFIABLE)
-        && Sets.intersection(getFreeVars(A), getFreeVars(B)).containsAll(getFreeVars(I));
+    return solver.check(env.mkNot(env.mkImplies(formulasA, itp))).equals(Status.UNSATISFIABLE)
+        && solver
+            .check(env.mkNot(env.mkImplies(itp, env.mkNot(formulasB))))
+            .equals(Status.UNSATISFIABLE)
+        && Sets.intersection(getFreeVars(formulasA), getFreeVars(formulasB))
+            .containsAll(getFreeVars(itp));
   }
 }
