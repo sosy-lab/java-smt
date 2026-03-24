@@ -194,10 +194,8 @@ public abstract class SolverBasedTest0 {
    */
   protected void setAdditionalConfigOptionForSolver(Map<String, String> optionsMap)
       throws InvalidConfigurationException {
-    Configuration configWithLogicQF_LIA =
-        Configuration.builder().copyFrom(config).setOptions(optionsMap).build();
     context.close();
-    initSolverWith(configWithLogicQF_LIA);
+    initSolverWith(Configuration.builder().copyFrom(config).setOptions(optionsMap).build());
   }
 
   /**
