@@ -183,6 +183,43 @@ public class SolverNativeOptionsTest extends SolverBasedTest0.ParameterizedSolve
     }
   }
 
+  // Z3 solves the given query in roughly ~9s normally, but by setting an option, it is much faster
+  @Test
+  public void z3FasterWithOptionsTest()
+      throws SolverException, InterruptedException, IOException, InvalidConfigurationException {
+    assume().that(solver).isEqualTo(Solvers.Z3);
+
+    // 'arith.solver=6' conforms to LRA (default) and solving takes about ~9s
+    // 'arith.solver=2' uses a Simplex-based solver and solving takes roughly ~4.5s for this task
+    // 'arith.solver=5' uses infinitary LRA and solving takes roughly ~4.5s
+    // 'arith.solver=3', uses Floyd-Warshall, which solves in ~3s (3x faster than LRA)
+    // The times might change over time due to Z3 updates and are based on when this test was
+    // implemented! You can set the different options in the config line below to test this out!
+    // Original source: https://github.com/Z3Prover/z3/issues/8940#issuecomment-4106152740
+    setAdditionalConfigOptionForSolver("solver.z3.furtherOptions", "arith.solver=2");
+
+    List<BooleanFormula> fs =
+        context
+            .getFormulaManager()
+            .parseAll(
+                Files.readString(Path.of("src/org/sosy_lab/java_smt/test/client.smt2")));
+    assertThat(fs.size()).isEqualTo(8);
+
+    try (BasicProverEnvironment<?> pe = context.newProverEnvironment()) {
+        // The program used incremental solving that we can't parse currently.
+        // The stack was pushed once with the second to last assertion
+        // Before asserting the last assert, the stack was popd.
+      for (int i = 0; i < fs.size() - 2; i++) {
+        pe.addConstraint(fs.get(i));
+      }
+      pe.push(fs.get(fs.size() - 2));
+      pe.pop();
+      pe.addConstraint(fs.get(fs.size() - 1));
+
+      assertThat(pe.isUnsat()).isTrue();
+    }
+  }
+
   // Small HORN problem in SMT2
   private static final String HORN_SMT2 =
       "(declare-fun Itp (Int Int) Bool)\n"
