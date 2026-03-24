@@ -489,11 +489,12 @@ public final class Z3SolverContext extends AbstractSolverContext {
       checkArgument(optionKeyAndValue.size() == 2);
       String key = optionKeyAndValue.get(0);
       String value = optionKeyAndValue.get(1);
-      checkArgument(!key.isEmpty(), "Empty key for additional option with value: " + value);
-      checkArgument(!value.isEmpty(), "Empty value for additional option with key: " + key);
+      checkArgument(!key.isEmpty(), "Empty key for additional option with value: %s", value);
+      checkArgument(!value.isEmpty(), "Empty value for additional option with key: %s", key);
       checkArgument(
           !OPTIONS_HANDLED_BY_DEDICATED_OPTIONS.contains(key),
-          "Please handle option " + key + " by its dedicated configuration option or ProverOption");
+          "Please handle option %s by its dedicated configuration option or ProverOption",
+          key);
 
       // Transform value to its proper type
       optionsBuilder.put(key, transformZ3OptionValueToCorrectType(key, value));
