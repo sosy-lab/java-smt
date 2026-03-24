@@ -1,5 +1,5 @@
-(set-info :smt-lib-version 2.6)
-(set-logic QF_BV)
+; (set-info :smt-lib-version 2.6) // Commented out for JavaSMT
+; (set-logic QF_BV) // Commented out for JavaSMT
 (set-info :category "industrial")
 (set-info :source |
 Generated on: 2026-03-20
