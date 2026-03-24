@@ -29,7 +29,7 @@ import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.api.UserPropagator;
-import org.sosy_lab.java_smt.solvers.z3.Z3SolverContext.Z3_ENGINE;
+import org.sosy_lab.java_smt.solvers.z3.Z3SolverContext.ENGINE;
 
 class Z3TheoremProver extends Z3AbstractProver implements ProverEnvironment {
 
@@ -42,7 +42,7 @@ class Z3TheoremProver extends Z3AbstractProver implements ProverEnvironment {
       Z3FormulaCreator creator,
       Z3FormulaManager pMgr,
       Optional<String> pLogic,
-      Z3_ENGINE pEngine,
+      ENGINE pEngine,
       Set<ProverOptions> pOptions,
       ImmutableMap<String, Object> pSolverOptions,
       @Nullable PathCounterTemplate pLogfile,
@@ -63,7 +63,7 @@ class Z3TheoremProver extends Z3AbstractProver implements ProverEnvironment {
 
     long z3params = Native.mkParams(z3context);
     Native.paramsIncRef(z3context, z3params);
-    if (engine != Z3_ENGINE.DEFAULT) {
+    if (engine != ENGINE.DEFAULT) {
       addParameter(z3params, ENGINE_CONFIG_KEY, engine.toString());
     }
     for (Entry<String, Object> entry : pSolverOptions.entrySet()) {
