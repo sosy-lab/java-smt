@@ -122,6 +122,7 @@ public class SolverNativeOptionsTest extends SolverBasedTest0.ParameterizedSolve
         "solver.z3.furtherOptions", "arith.Epsilon=2," + "Restart_facTor=2");
   }
 
+  // Test that options are not allowed to be existing twice
   @Test
   public void additionalOptionsDoubleTest() {
     assume().that(solver).isEqualTo(Solvers.Z3);
@@ -156,32 +157,14 @@ public class SolverNativeOptionsTest extends SolverBasedTest0.ParameterizedSolve
   }
 
   // TODO: generalize LOGIC tests and move into their own test class once more solvers support this!
-  @Test
-  public void z3AllLogicOnBvProblemTest()
-      throws SolverException, InterruptedException, IOException {
-    assume().that(solver).isEqualTo(Solvers.Z3);
-
-    List<BooleanFormula> bvFormulaWithoutLogic =
-        context
-            .getFormulaManager()
-            .parseAll(
-                Files.readString(Path.of("src/org/sosy_lab/java_smt/test/manyRegReads.smt2")));
-
-    try (BasicProverEnvironment<?> pe = context.newProverEnvironment()) {
-      for (BooleanFormula hc : bvFormulaWithoutLogic) {
-        pe.addConstraint(hc);
-      }
-      assertThat(pe.isUnsat()).isTrue();
-    }
-  }
-
-  // TODO: generalize LOGIC tests and move into their own test class once more solvers support this!
+  // Z3 solves the query from z3AllLogicOnBvProblemTest() much faster if we set the logic
   @Test
   public void z3QFBVLogicOnBvProblemTest()
       throws InvalidConfigurationException, SolverException, InterruptedException, IOException {
     assume().that(solver).isEqualTo(Solvers.Z3);
 
-    // QF_BV solves this problem much faster than ALL
+    // QF_BV solves this problem in ~2s, much faster than ALL (~17s)
+    // You can test this by commenting out the following line:
     setAdditionalConfigOptionForSolver("solver.z3.logic", "QF_BV");
 
     List<BooleanFormula> bvFormulasWithLogic =
@@ -192,7 +175,9 @@ public class SolverNativeOptionsTest extends SolverBasedTest0.ParameterizedSolve
 
     try (BasicProverEnvironment<?> pe = context.newProverEnvironment()) {
       for (BooleanFormula hc : bvFormulasWithLogic) {
-        pe.addConstraint(hc);
+        // We need incremental solving to see the difference
+        // (which is only active after pushing something)
+        pe.push(hc);
       }
       assertThat(pe.isUnsat()).isTrue();
     }
