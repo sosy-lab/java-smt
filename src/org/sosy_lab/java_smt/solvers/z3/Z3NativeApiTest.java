@@ -33,15 +33,21 @@ import java.util.Deque;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
+import org.junit.AssumptionViolatedException;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.sosy_lab.common.NativeLibraries;
 
 public class Z3NativeApiTest {
+
   @BeforeClass
   public static void loadLibraries() {
-    NativeLibraries.loadLibrary("z3");
-    NativeLibraries.loadLibrary("z3java");
+    try {
+      NativeLibraries.loadLibrary("z3");
+      NativeLibraries.loadLibrary("z3java");
+    } catch (UnsatisfiedLinkError e) {
+      throw new AssumptionViolatedException("Z3 is not available", e);
+    }
 
     System.setProperty("z3.skipLibraryLoad", "true");
   }
