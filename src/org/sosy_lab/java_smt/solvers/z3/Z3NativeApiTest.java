@@ -30,6 +30,7 @@ import com.microsoft.z3.Sort;
 import com.microsoft.z3.Status;
 import java.util.ArrayDeque;
 import java.util.Deque;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
@@ -108,7 +109,7 @@ public class Z3NativeApiTest {
     Deque<Expr<?>> worklist = new ArrayDeque<>();
     worklist.push(expr);
 
-    Set<Expr<?>> vars = Sets.newHashSet();
+    Set<Expr<?>> vars = new HashSet<>();
 
     while (!worklist.isEmpty()) {
       Expr<?> f = worklist.removeFirst();
@@ -159,7 +160,7 @@ public class Z3NativeApiTest {
 
     Expr<BoolSort> left =
         env.mkForall(
-            varsA.toArray(Expr<?>[]::new),
+            varsA.toArray(new Expr<?>[0]),
             env.mkImplies(formulasA, constant),
             1,
             null,
@@ -169,7 +170,7 @@ public class Z3NativeApiTest {
 
     Expr<BoolSort> right =
         env.mkForall(
-            varsB.toArray(Expr<?>[]::new),
+            varsB.toArray(new Expr<?>[0]),
             env.mkImplies(constant, env.mkNot(formulasB)),
             1,
             null,
