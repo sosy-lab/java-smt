@@ -21,6 +21,7 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Set;
 import org.junit.Test;
+import org.sosy_lab.common.ShutdownManager;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BasicProverEnvironment;
@@ -34,25 +35,14 @@ public class SolverNativeOptionsTest extends SolverBasedTest0.ParameterizedSolve
   public void simpleHornSolvingTimeoutTest() throws InterruptedException {
     assume().that(solver).isEqualTo(Solvers.Z3);
 
-    // Normal Z3 runs endlessly for this HORN task, so we shut it down after a few seconds
     // (Do not ever use @Test(timeout = ...) on Z3! It SIGSEGVs!
-    Thread killerThread =
-        new Thread(
-            () -> {
-              try {
-                Thread.sleep(3000); // 3s
-                shutdownManager.requestShutdown("Shutdown Request");
-              } catch (InterruptedException exception) {
-                throw new UnsupportedOperationException("Unexpected interrupt", exception);
-              }
-            });
-
     List<BooleanFormula> parsedCHC = mgr.parseAll(HORN_SMT2);
     try (BasicProverEnvironment<?> pe = context.newProverEnvironment()) {
       for (BooleanFormula hc : parsedCHC) {
         pe.addConstraint(hc);
       }
-      killerThread.start();
+      // Default Z3 runs endlessly for this HORN task
+      buildShutdownThreadWith(shutdownManager, 3000).start();
       assertThrows(InterruptedException.class, pe::isUnsat);
     }
   }
@@ -68,11 +58,13 @@ public class SolverNativeOptionsTest extends SolverBasedTest0.ParameterizedSolve
 
     List<BooleanFormula> parsedCHC = mgr.parseAll(HORN_SMT2);
     // Z3 with HORN can solve this basically instantly!
-    try (BasicProverEnvironment<?> pe = context.newProverEnvironment()) {
-      for (BooleanFormula hc : parsedCHC) {
-        pe.addConstraint(hc);
+    try (BasicProverEnvironment<?> prover = context.newProverEnvironment()) {
+      for (BooleanFormula formula : parsedCHC) {
+        prover.addConstraint(formula);
       }
-      assertThat(pe.isUnsat()).isFalse();
+      // Default Z3 runs endlessly for this HORN task, but setting logic HORN makes it finish
+      buildShutdownThreadWith(shutdownManager, 5000).start();
+      assertThat(prover.isUnsat()).isFalse();
     }
   }
 
@@ -100,6 +92,9 @@ public class SolverNativeOptionsTest extends SolverBasedTest0.ParameterizedSolve
       for (BooleanFormula hc : parsedCHC) {
         pe.addConstraint(hc);
       }
+      // Default Z3 runs endlessly for this HORN task, but setting logic HORN and using Spacer makes
+      // it finish fast (faster than without using Spacer)
+      buildShutdownThreadWith(shutdownManager, 5000).start();
       assertThat(pe.isUnsat()).isFalse();
     }
   }
@@ -138,7 +133,7 @@ public class SolverNativeOptionsTest extends SolverBasedTest0.ParameterizedSolve
   public void additionalOptionsFailTest() {
     assume().that(solver).isEqualTo(Solvers.Z3);
     // Z3 disallows certain option combinations
-    Set<String> disallowedConfigurationOptionsZ3 =
+    final Set<String> disallowedConfigurationOptionsZ3 =
         ImmutableSet.of(
             "engine=spacer",
             "optsmt_engine=true",
@@ -157,7 +152,7 @@ public class SolverNativeOptionsTest extends SolverBasedTest0.ParameterizedSolve
   }
 
   // TODO: generalize LOGIC tests and move into their own test class once more solvers support this!
-  // Z3 solves the query from z3AllLogicOnBvProblemTest() much faster if we set the logic
+  // Z3 solves the query from z3AllLogicOnBvProblemTest() much faster if we set the logic.
   @Test
   public void z3QFBVLogicOnBvProblemTest()
       throws InvalidConfigurationException, SolverException, InterruptedException, IOException {
@@ -179,6 +174,8 @@ public class SolverNativeOptionsTest extends SolverBasedTest0.ParameterizedSolve
         // (which is only active after pushing something)
         pe.push(hc);
       }
+      // Finishes in ~2s with logic QF_BV, but takes 17s+ with default (ALL).
+      buildShutdownThreadWith(shutdownManager, 4000).start();
       assertThat(pe.isUnsat()).isTrue();
     }
   }
@@ -201,14 +198,13 @@ public class SolverNativeOptionsTest extends SolverBasedTest0.ParameterizedSolve
     List<BooleanFormula> fs =
         context
             .getFormulaManager()
-            .parseAll(
-                Files.readString(Path.of("src/org/sosy_lab/java_smt/test/client.smt2")));
+            .parseAll(Files.readString(Path.of("src/org/sosy_lab/java_smt/test/client.smt2")));
     assertThat(fs.size()).isEqualTo(8);
 
     try (BasicProverEnvironment<?> pe = context.newProverEnvironment()) {
-        // The program used incremental solving that we can't parse currently.
-        // The stack was pushed once with the second to last assertion
-        // Before asserting the last assert, the stack was popd.
+      // The program used incremental solving that we can't parse currently.
+      // The stack was pushed once with the second to last assertion
+      // Before asserting the last assert, the stack was popd.
       for (int i = 0; i < fs.size() - 2; i++) {
         pe.addConstraint(fs.get(i));
       }
@@ -216,6 +212,9 @@ public class SolverNativeOptionsTest extends SolverBasedTest0.ParameterizedSolve
       pe.pop();
       pe.addConstraint(fs.get(fs.size() - 1));
 
+      // The query should be solved in ~3s with the correct (non-default) option set, but takes
+      // ~9s for default options
+      buildShutdownThreadWith(shutdownManager, 5000).start();
       assertThat(pe.isUnsat()).isTrue();
     }
   }
@@ -225,4 +224,24 @@ public class SolverNativeOptionsTest extends SolverBasedTest0.ParameterizedSolve
       "(declare-fun Itp (Int Int) Bool)\n"
           + "(assert (forall ((a Int) (x Int) (b Int)) (=> (and (< a x) (< x b)) (Itp a b))))\n"
           + "(assert (forall ((a Int) (b Int)) (=> (Itp a b) (not (< b a)))))";
+
+  // TODO: either move to SolverBasedTest0 or even better include into the assertion framework
+  /**
+   * Creates and returns a new {@link Thread}, that has not been started, with a sleep of
+   * millisTillShutdown in milliseconds before a shutdown is requested by the given {@link
+   * ShutdownManager}.
+   */
+  private static Thread buildShutdownThreadWith(
+      ShutdownManager pShutdownManager, long millisTillShutdown) {
+    // (Do not ever use @Test(timeout = ...) on Z3! It SIGSEGVs!
+    return new Thread(
+        () -> {
+          try {
+            Thread.sleep(millisTillShutdown);
+            pShutdownManager.requestShutdown("Shutdown Request");
+          } catch (InterruptedException exception) {
+            throw new UnsupportedOperationException("Unexpected interrupt", exception);
+          }
+        });
+  }
 }
