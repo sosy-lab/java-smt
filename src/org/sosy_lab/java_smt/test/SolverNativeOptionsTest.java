@@ -199,7 +199,7 @@ public class SolverNativeOptionsTest extends SolverBasedTest0.ParameterizedSolve
         context
             .getFormulaManager()
             .parseAll(Files.readString(Path.of("src/org/sosy_lab/java_smt/test/client.smt2")));
-    assertThat(fs.size()).isEqualTo(8);
+    assertThat(fs).hasSize(8);
 
     try (BasicProverEnvironment<?> pe = context.newProverEnvironment()) {
       // The program used incremental solving that we can't parse currently.
