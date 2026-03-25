@@ -271,6 +271,9 @@ class TraceLogger implements AutoCloseable {
         case '\n':
           builder.append("\\n");
           break;
+        case '\r':
+          builder.append("\\r");
+          break;
         case '\t':
           builder.append("\\t");
           break;

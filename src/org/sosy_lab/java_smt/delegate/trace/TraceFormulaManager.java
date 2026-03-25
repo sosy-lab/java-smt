@@ -22,7 +22,9 @@ import java.math.BigInteger;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
 import org.sosy_lab.common.Appender;
+import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.api.ArrayFormula;
 import org.sosy_lab.java_smt.api.ArrayFormulaManager;
@@ -65,9 +67,11 @@ import org.sosy_lab.java_smt.api.visitors.TraversalProcess;
 class TraceFormulaManager implements FormulaManager {
   private final FormulaManager delegate;
   private TraceLogger logger;
+  private final LogManager logManager;
 
-  TraceFormulaManager(FormulaManager pDelegate) {
+  TraceFormulaManager(FormulaManager pDelegate, LogManager pLogManager) {
     delegate = pDelegate;
+    logManager = pLogManager;
   }
 
   void setLogger(TraceLogger pLogger) {
@@ -172,7 +176,7 @@ class TraceFormulaManager implements FormulaManager {
                   "Unsupported value: Formula=%s, Value=%s",
                   delegate.getFormulaType(f), value.getClass().getName()));
         }
-        Preconditions.checkArgument(g.equals(f));
+        Preconditions.checkArgument(g.equals(f), "%s (should be: %s)", g, f);
       }
       return f;
     }
@@ -183,7 +187,9 @@ class TraceFormulaManager implements FormulaManager {
         Formula f, List<Formula> args, FunctionDeclaration<?> functionDeclaration) {
       if (!logger.isTracked(f)) {
         Formula g = makeApplication(functionDeclaration, args);
-        Preconditions.checkArgument(g.equals(f), "%s (should be: %s)", g, f);
+        if (!g.equals(f)) { // can happen after simplifications, bad for tracing, but happens.
+          logManager.log(Level.WARNING, "Formula '%s' is not an identity of '%s'.", g, f);
+        }
       }
       return f;
     }
@@ -549,7 +555,7 @@ class TraceFormulaManager implements FormulaManager {
           } else {
             throw new UnsupportedOperationException(
                 String.format(
-                    "EQ not supported for theory " + "%s", declaration.getArgumentTypes().get(0)));
+                    "EQ not supported for theory %s", declaration.getArgumentTypes().get(0)));
           }
         case EQ_ZERO:
           if (args.get(0) instanceof IntegerFormula) {

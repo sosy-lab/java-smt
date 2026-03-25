@@ -239,7 +239,7 @@ public class SolverContextFactory {
       context = new DebuggingSolverContext(solverToCreate, config, context);
     }
     if (trace) {
-      context = new TraceSolverContext(solverToCreate, config, context);
+      context = new TraceSolverContext(solverToCreate, config, context, logger);
     }
     if (collectStatistics) {
       // statistics need to be the most outer wrapping layer.

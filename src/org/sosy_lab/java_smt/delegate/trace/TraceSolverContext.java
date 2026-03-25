@@ -27,6 +27,7 @@ import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.common.configuration.Option;
 import org.sosy_lab.common.configuration.Options;
 import org.sosy_lab.common.io.PathTemplate;
+import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
@@ -48,11 +49,12 @@ public class TraceSolverContext implements SolverContext {
   private @Nullable PathTemplate tracefileTemplate =
       PathTemplate.ofFormatString("traces/trace_%s.java");
 
-  public TraceSolverContext(Solvers pSolver, Configuration config, SolverContext pDelegate)
+  public TraceSolverContext(
+      Solvers pSolver, Configuration config, SolverContext pDelegate, LogManager pLogManager)
       throws InvalidConfigurationException {
     config.inject(this);
     delegate = pDelegate;
-    mgr = new TraceFormulaManager(delegate.getFormulaManager());
+    mgr = new TraceFormulaManager(delegate.getFormulaManager(), pLogManager);
 
     // initialize the trace logger and create the trace file,
     // nanotime is used to avoid collisions, and it is sorted by time.
