@@ -22,7 +22,7 @@ import org.sosy_lab.java_smt.api.visitors.BooleanFormulaTransformationVisitor;
 import org.sosy_lab.java_smt.api.visitors.BooleanFormulaVisitor;
 import org.sosy_lab.java_smt.api.visitors.TraversalProcess;
 
-public class TraceBooleanFormulaManager implements BooleanFormulaManager {
+class TraceBooleanFormulaManager implements BooleanFormulaManager {
   private final BooleanFormulaManager delegate;
 
   private final TraceFormulaManager mgr;

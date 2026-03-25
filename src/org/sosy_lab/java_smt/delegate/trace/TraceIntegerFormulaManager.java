@@ -15,8 +15,7 @@ import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.IntegerFormulaManager;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 
-public class TraceIntegerFormulaManager
-    extends TraceNumeralFormulaManager<IntegerFormula, IntegerFormula>
+class TraceIntegerFormulaManager extends TraceNumeralFormulaManager<IntegerFormula, IntegerFormula>
     implements IntegerFormulaManager {
   private final IntegerFormulaManager delegate;
   private final TraceLogger logger;

@@ -26,7 +26,7 @@ import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
 import org.sosy_lab.java_smt.api.StringFormula;
 
-public class TraceModel implements Model {
+class TraceModel implements Model {
   private final Model delegate;
 
   private final TraceFormulaManager mgr;

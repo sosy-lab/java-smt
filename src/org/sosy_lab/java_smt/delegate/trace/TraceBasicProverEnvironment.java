@@ -19,7 +19,7 @@ import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.SolverException;
 
-public class TraceBasicProverEnvironment<T> implements BasicProverEnvironment<T> {
+class TraceBasicProverEnvironment<T> implements BasicProverEnvironment<T> {
   private final BasicProverEnvironment<T> delegate;
 
   private final TraceFormulaManager mgr;

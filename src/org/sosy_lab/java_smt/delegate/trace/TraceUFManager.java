@@ -21,7 +21,7 @@ import org.sosy_lab.java_smt.api.FunctionDeclaration;
 import org.sosy_lab.java_smt.api.FunctionDeclarationKind;
 import org.sosy_lab.java_smt.api.UFManager;
 
-public class TraceUFManager implements UFManager {
+class TraceUFManager implements UFManager {
   private final UFManager delegate;
 
   private final FormulaManager mgr;

@@ -14,7 +14,7 @@ import org.sosy_lab.java_smt.api.NumeralFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
 import org.sosy_lab.java_smt.api.RationalFormulaManager;
 
-public class TraceRationalFormulaManager
+class TraceRationalFormulaManager
     extends TraceNumeralFormulaManager<NumeralFormula, RationalFormula>
     implements RationalFormulaManager {
   final RationalFormulaManager delegate;

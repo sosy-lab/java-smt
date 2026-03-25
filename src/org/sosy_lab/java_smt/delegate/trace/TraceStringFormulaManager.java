@@ -17,7 +17,7 @@ import org.sosy_lab.java_smt.api.RegexFormula;
 import org.sosy_lab.java_smt.api.StringFormula;
 import org.sosy_lab.java_smt.api.StringFormulaManager;
 
-public class TraceStringFormulaManager implements StringFormulaManager {
+class TraceStringFormulaManager implements StringFormulaManager {
 
   private final StringFormulaManager delegate;
   private final TraceLogger logger;

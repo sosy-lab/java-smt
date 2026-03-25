@@ -16,7 +16,7 @@ import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.QuantifiedFormulaManager;
 import org.sosy_lab.java_smt.api.SolverException;
 
-public class TraceQuantifiedFormulaManager implements QuantifiedFormulaManager {
+class TraceQuantifiedFormulaManager implements QuantifiedFormulaManager {
 
   private final QuantifiedFormulaManager delegate;
   private final TraceFormulaManager mgr;

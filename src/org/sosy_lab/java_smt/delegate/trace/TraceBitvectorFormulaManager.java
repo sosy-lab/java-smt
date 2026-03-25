@@ -19,7 +19,7 @@ import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.BitvectorType;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 
-public class TraceBitvectorFormulaManager implements BitvectorFormulaManager {
+class TraceBitvectorFormulaManager implements BitvectorFormulaManager {
   private final BitvectorFormulaManager delegate;
   private final TraceLogger logger;
 

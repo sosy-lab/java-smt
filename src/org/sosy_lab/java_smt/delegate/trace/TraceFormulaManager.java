@@ -62,7 +62,7 @@ import org.sosy_lab.java_smt.api.visitors.FormulaTransformationVisitor;
 import org.sosy_lab.java_smt.api.visitors.FormulaVisitor;
 import org.sosy_lab.java_smt.api.visitors.TraversalProcess;
 
-public class TraceFormulaManager implements FormulaManager {
+class TraceFormulaManager implements FormulaManager {
   private final FormulaManager delegate;
   private TraceLogger logger;
 

@@ -21,7 +21,7 @@ import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.NumeralFormulaManager;
 
 @SuppressWarnings("ClassTypeParameterName")
-public abstract class TraceNumeralFormulaManager<
+abstract class TraceNumeralFormulaManager<
         ParamFormulaType extends NumeralFormula, ResultFormulaType extends NumeralFormula>
     implements NumeralFormulaManager<ParamFormulaType, ResultFormulaType> {
   private final NumeralFormulaManager<ParamFormulaType, ResultFormulaType> delegate;

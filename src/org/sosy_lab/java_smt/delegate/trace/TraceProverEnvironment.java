@@ -13,7 +13,7 @@ package org.sosy_lab.java_smt.delegate.trace;
 import org.sosy_lab.java_smt.api.BasicProverEnvironment;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
 
-public class TraceProverEnvironment extends TraceBasicProverEnvironment<Void>
+class TraceProverEnvironment extends TraceBasicProverEnvironment<Void>
     implements ProverEnvironment {
   TraceProverEnvironment(
       BasicProverEnvironment<Void> pDelegate,

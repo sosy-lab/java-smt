@@ -16,7 +16,7 @@ import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.SLFormulaManager;
 
 @SuppressWarnings("MethodTypeParameterName")
-public class TraceSLFormulaManager implements SLFormulaManager {
+class TraceSLFormulaManager implements SLFormulaManager {
 
   private final SLFormulaManager delegate;
   private final TraceLogger logger;

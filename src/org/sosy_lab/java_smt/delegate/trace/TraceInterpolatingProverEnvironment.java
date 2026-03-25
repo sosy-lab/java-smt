@@ -20,7 +20,7 @@ import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverException;
 
-public class TraceInterpolatingProverEnvironment<T> extends TraceBasicProverEnvironment<T>
+class TraceInterpolatingProverEnvironment<T> extends TraceBasicProverEnvironment<T>
     implements InterpolatingProverEnvironment<T> {
   private final InterpolatingProverEnvironment<T> delegate;
   private final TraceFormulaManager mgr;

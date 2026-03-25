@@ -18,7 +18,7 @@ import org.sosy_lab.java_smt.api.EnumerationFormula;
 import org.sosy_lab.java_smt.api.EnumerationFormulaManager;
 import org.sosy_lab.java_smt.api.FormulaType.EnumerationFormulaType;
 
-public class TraceEnumerationFormulaManager implements EnumerationFormulaManager {
+class TraceEnumerationFormulaManager implements EnumerationFormulaManager {
 
   private final EnumerationFormulaManager delegate;
   private final TraceLogger logger;

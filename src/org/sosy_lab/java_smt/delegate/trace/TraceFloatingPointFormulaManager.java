@@ -24,7 +24,7 @@ import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
 
-public class TraceFloatingPointFormulaManager implements FloatingPointFormulaManager {
+class TraceFloatingPointFormulaManager implements FloatingPointFormulaManager {
   private final FloatingPointFormulaManager delegate;
   private final TraceLogger logger;
 
