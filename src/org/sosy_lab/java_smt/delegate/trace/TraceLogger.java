@@ -55,7 +55,7 @@ class TraceLogger {
   }
 
   /** Returns a fresh variable. */
-  public String newVariable() {
+  public synchronized String newVariable() {
     return "var" + id.getFreshId();
   }
 
@@ -64,12 +64,12 @@ class TraceLogger {
    *
    * <p>Use {@link #toVariable(Object)} to get the variable name for a tracked object
    */
-  public void mapVariable(String pVar, Object f) {
+  public synchronized void mapVariable(String pVar, Object f) {
     valueMap.putIfAbsent(f, pVar);
   }
 
   /** Returns <code>true</code> if the object is tracked. */
-  public boolean isTracked(Object f) {
+  public synchronized boolean isTracked(Object f) {
     return valueMap.containsKey(f);
   }
 
@@ -78,19 +78,19 @@ class TraceLogger {
    *
    * <p>Use {@link #mapVariable(String, Object)} to bind an object to a variable
    */
-  public String toVariable(Object f) {
+  public synchronized String toVariable(Object f) {
     String r = valueMap.get(f);
     Preconditions.checkArgument(r != null, "Object not tracked: %s", f);
     return r;
   }
 
   /** Returns a comma-separated list of variable names for the given objects. */
-  public String toVariables(Iterable<?> objects) {
+  public synchronized String toVariables(Iterable<?> objects) {
     return FluentIterable.from(objects).transform(this::toVariable).join(Joiner.on(", "));
   }
 
   /** Add a definition of a new object to the log. */
-  public void appendDef(String pVar, String pExpr) {
+  public synchronized void appendDef(String pVar, String pExpr) {
     try {
       lastLines.push(output.length());
       output.write(String.format("var %s = %s;%n", pVar, pExpr).getBytes(StandardCharsets.UTF_8));
@@ -100,7 +100,7 @@ class TraceLogger {
   }
 
   /** Add a statement to the log. */
-  public void appendStmt(String pStmt) {
+  public synchronized void appendStmt(String pStmt) {
     try {
       lastLines.push(output.length());
       output.write(String.format("%s;%n", pStmt).getBytes(StandardCharsets.UTF_8));
@@ -110,7 +110,7 @@ class TraceLogger {
   }
 
   /** Undo the last line and remove it from the trace. */
-  public void undoLast() {
+  public synchronized void undoLast() {
     Preconditions.checkArgument(
         !lastLines.isEmpty(), "Cannot undo last trace, no undo points found");
     try {
@@ -135,7 +135,7 @@ class TraceLogger {
   }
 
   /** Remove an undo point and permanently commit the line to the trace. */
-  public void keepLast() {
+  public synchronized void keepLast() {
     Preconditions.checkArgument(
         !lastLines.isEmpty(), "Cannot remove undo point, list is already empty");
     lastLines.pop();
@@ -147,7 +147,8 @@ class TraceLogger {
   }
 
   /** Log an API call with return value. */
-  public <R extends Formula> R logDef(String prefix, String method, Callable<R> closure) {
+  public synchronized <R extends Formula> R logDef(
+      String prefix, String method, Callable<R> closure) {
     String var = newVariable();
     try {
       appendDef(var, prefix + "." + method);
@@ -171,7 +172,7 @@ class TraceLogger {
    *
    * <p>Use this version if the called function has side effects
    */
-  public <R> R logDefKeep(String prefix, String method, Callable<R> closure) {
+  public synchronized <R> R logDefKeep(String prefix, String method, Callable<R> closure) {
     String var = newVariable();
     try {
       appendDef(var, prefix + "." + method);
@@ -189,7 +190,7 @@ class TraceLogger {
    * Variant of {@link #logDef(String, String, Callable)} that will always remove the call from the
    * log after it returned successfully.
    */
-  public <R> R logDefDiscard(String prefix, String method, Callable<R> closure) {
+  public synchronized <R> R logDefDiscard(String prefix, String method, Callable<R> closure) {
     String var = newVariable();
     try {
       appendDef(var, prefix + "." + method);
@@ -208,7 +209,7 @@ class TraceLogger {
   }
 
   /** Log an API call without return value. */
-  public void logStmt(String prefix, String method, CheckedRunnable closure) {
+  public synchronized void logStmt(String prefix, String method, CheckedRunnable closure) {
     try {
       appendStmt(prefix + "." + method);
       closure.run();
@@ -222,7 +223,7 @@ class TraceLogger {
    * Variant of {@link #logStmt(String, String, CheckedRunnable)} that will remove the call from the
    * log after it returned successfully.
    */
-  public void logStmtDiscard(String prefix, String method, CheckedRunnable closure) {
+  public synchronized void logStmtDiscard(String prefix, String method, CheckedRunnable closure) {
     try {
       appendStmt(prefix + "." + method);
       closure.run();
@@ -237,7 +238,7 @@ class TraceLogger {
    *
    * <p>Adds quotes around the literal and escapes special characters.
    */
-  public String printString(String pString) {
+  public synchronized String printString(String pString) {
     StringBuilder builder = new StringBuilder();
     builder.append("\"");
     for (var c : pString.codePoints().toArray()) {
@@ -270,7 +271,7 @@ class TraceLogger {
    *
    * <p>Returns a Java expression that will construct the type.
    */
-  public <T extends Formula> String printFormulaType(FormulaType<T> pType) {
+  public synchronized <T extends Formula> String printFormulaType(FormulaType<T> pType) {
     if (pType.isBooleanType()) {
       return "FormulaType.BooleanType";
     }
