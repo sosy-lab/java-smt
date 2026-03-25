@@ -466,6 +466,9 @@ public class BitvectorFormulaManagerTest extends SolverBasedTest0.ParameterizedS
   public void bvRotateByBV() throws SolverException, InterruptedException {
     int[] bitsizes;
     switch (solverToUse()) {
+      case YICES2:
+        bitsizes = new int[] {2, 3, 4, 8};
+        break;
       case PRINCESS:
         bitsizes = new int[] {2, 3}; // Princess is too slow for larger bitvectors
         break;

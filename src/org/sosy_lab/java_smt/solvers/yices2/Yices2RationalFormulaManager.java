@@ -8,8 +8,7 @@
 
 package org.sosy_lab.java_smt.solvers.yices2;
 
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_division;
-
+import com.sri.yices.Terms;
 import java.math.BigDecimal;
 import org.sosy_lab.java_smt.api.NumeralFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
@@ -41,10 +40,6 @@ class Yices2RationalFormulaManager
 
   @Override
   public Integer divide(Integer pParam1, Integer pParam2) {
-    if (isNumeral(pParam2)) {
-      return yices_division(pParam1, pParam2);
-    } else {
-      return super.divide(pParam1, pParam2);
-    }
+    return Terms.div(pParam1, pParam2);
   }
 }

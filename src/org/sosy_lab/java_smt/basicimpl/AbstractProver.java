@@ -39,7 +39,7 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
   protected final boolean generateModels;
   protected final boolean generateAllSat;
   protected final boolean generateUnsatCores;
-  private final boolean generateUnsatCoresOverAssumptions;
+  protected final boolean generateUnsatCoresOverAssumptions;
   protected final boolean enableSL;
 
   // flags for status
