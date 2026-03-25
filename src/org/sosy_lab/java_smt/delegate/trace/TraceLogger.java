@@ -27,14 +27,16 @@ import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.ArrayFormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.BitvectorType;
+import org.sosy_lab.java_smt.api.FormulaType.EnumerationFormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
 
-class TraceLogger {
+class TraceLogger implements AutoCloseable {
   private final TraceFormulaManager mgr;
   private final UniqueIdGenerator id = new UniqueIdGenerator();
 
   private final Map<Object, String> valueMap = new HashMap<>();
   private final RandomAccessFile output;
+  private boolean isClosed = false;
 
   /**
    * Contains lines that were recently added to the log. Entries on this list are preliminary and
@@ -52,6 +54,20 @@ class TraceLogger {
     } catch (IOException e) {
       throw new IllegalArgumentException(e);
     }
+  }
+
+  @Override
+  public synchronized void close() {
+    try {
+      output.close();
+      isClosed = true;
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  boolean isClosed() {
+    return isClosed;
   }
 
   /** Returns a fresh variable. */
@@ -117,7 +133,7 @@ class TraceLogger {
       var start = lastLines.pop();
       output.seek(start);
       var line = output.readLine();
-      if (start + line.length() + 1 == output.length()) {
+      if (start + line.length() + System.lineSeparator().length() == output.length()) {
         // We need to remove the last line of the trace
         // Just truncate the file
         output.setLength(start);
@@ -300,7 +316,16 @@ class TraceLogger {
     if (pType.isStringType()) {
       return "FormulaType.StringType";
     }
-    // FIXME Handle other cases
+    if (pType.isRegexType()) {
+      return "FormulaType.RegexType";
+    }
+    if (pType.isEnumerationType()) {
+      EnumerationFormulaType enumType = (EnumerationFormulaType) pType;
+      return String.format(
+          "FormulaType.getEnumerationType(%s, Set.of(%s))",
+          enumType.getName(), Joiner.on(", ").join(enumType.getElements()));
+    }
+    // FIXME Handle other cases like SLFormulaType, Function types, etc.
     throw new IllegalArgumentException(
         String.format("Unsupported formula type %s of class %s.", pType, pType.getClass()));
   }

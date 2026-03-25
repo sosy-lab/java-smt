@@ -17,8 +17,9 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.io.MoreFiles;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.configuration.Configuration;
 import org.sosy_lab.common.configuration.FileOption;
@@ -68,23 +69,13 @@ public class TraceSolverContext implements SolverContext {
 
   /** Write the header code for using JavaSMT, e.g., to initialize the context and solver. */
   private void initializeJavaSMT(Configuration config, Solvers pSolver) {
-    // Get relevant options from the configuration
-    String props = config.asPropertiesString();
-    ImmutableMap.Builder<String, String> options = ImmutableMap.builder();
-    for (String s : props.lines().toArray(String[]::new)) {
-      List<String> parts = Splitter.on(" = ").splitToList(s);
-      if (parts.get(0).startsWith("solver")
-          && !parts.get(0).equals("solver.trace")
-          && !parts.get(0).equals("solver.solver")) {
-        options.put(parts.get(0), parts.get(1));
-      }
-    }
+    Map<String, String> configurationOptions = getOptionsForTracing(config);
 
     // Write code for creating a solver context to the trace log
     logger.appendDef(
         "config",
         "Configuration.builder()"
-            + FluentIterable.from(options.buildOrThrow().entrySet())
+            + FluentIterable.from(configurationOptions.entrySet())
                 .transform(
                     (Entry<String, String> e) ->
                         String.format(".setOption(\"%s\", \"%s\")", e.getKey(), e.getValue()))
@@ -99,6 +90,30 @@ public class TraceSolverContext implements SolverContext {
             + pSolver.name()
             + ")");
     logger.appendDef("mgr", "context.getFormulaManager()");
+  }
+
+  private ImmutableMap<String, String> getOptionsForTracing(Configuration config) {
+    ImmutableMap.Builder<String, String> options = ImmutableMap.builder();
+
+    // convert the configuration to a map of options, aka reverse Configuration#asPropertiesString.
+    // TODO kind of expensive, but the configuration does not support this directly
+    Map<String, String> properties =
+        Splitter.on("\n")
+            .trimResults()
+            .omitEmptyStrings()
+            .withKeyValueSeparator(" = ")
+            .split(config.asPropertiesString());
+
+    // filtering for those properties that start with "solver" (relevant for JavaSMT),
+    // exclude trace-related properties.
+    Set<String> traceConfigKeys = Set.of("solver.trace", "solver.tracefile", "solver.solver");
+    for (String key : properties.keySet()) {
+      if (key.startsWith("solver") && !traceConfigKeys.contains(key)) {
+        options.put(key, properties.get(key));
+      }
+    }
+
+    return options.buildOrThrow();
   }
 
   @Override
@@ -153,6 +168,9 @@ public class TraceSolverContext implements SolverContext {
 
   @Override
   public void close() {
-    logger.logStmt("context", "close()", delegate::close);
+    if (!logger.isClosed()) { // avoid logging if already closed
+      logger.logStmt("context", "close()", delegate::close);
+    }
+    logger.close();
   }
 }
