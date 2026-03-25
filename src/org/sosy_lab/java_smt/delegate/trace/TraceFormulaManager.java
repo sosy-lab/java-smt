@@ -210,7 +210,10 @@ class TraceFormulaManager implements FormulaManager {
   }
 
   public <T extends Formula> T rebuild(T f) {
-    return delegate.transformRecursively(f, new TraceFormulaManager.Rebuilder(this));
+    if (logger.isTracked(f)) { // avoid unnecessary recursion for already tracked formulas
+      return f;
+    }
+    return delegate.transformRecursively(f, new Rebuilder(this));
   }
 
   public <T extends Formula> List<T> rebuildAll(List<T> formulas) {
