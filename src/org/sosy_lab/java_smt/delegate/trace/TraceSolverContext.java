@@ -3,7 +3,7 @@
  * an API wrapper for a collection of SMT solvers:
  * https://github.com/sosy-lab/java-smt
  *
- * SPDX-FileCopyrightText: 2025 Dirk Beyer <https://www.sosy-lab.org>
+ * SPDX-FileCopyrightText: 2026 Dirk Beyer <https://www.sosy-lab.org>
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -126,11 +126,7 @@ public class TraceSolverContext implements SolverContext {
   public ProverEnvironment newProverEnvironment(ProverOptions... options) {
     return logger.logDefKeep(
         "context",
-        String.format(
-            "newProverEnvironment(%s)",
-            FluentIterable.from(options)
-                .transform(v -> "SolverContext.ProverOptions." + v.name())
-                .join(Joiner.on(", "))),
+        String.format("newProverEnvironment(%s)", getOptionsForLogging(options)),
         () -> new TraceProverEnvironment(delegate.newProverEnvironment(options), mgr, logger));
   }
 
@@ -140,11 +136,7 @@ public class TraceSolverContext implements SolverContext {
       ProverOptions... options) {
     return logger.logDefKeep(
         "context",
-        String.format(
-            "newProverEnvironmentWithInterpolation(%s)",
-            FluentIterable.from(options)
-                .transform(v -> "SolverContext.ProverOptions." + v.name())
-                .join(Joiner.on(", "))),
+        String.format("newProverEnvironmentWithInterpolation(%s)", getOptionsForLogging(options)),
         () ->
             new TraceInterpolatingProverEnvironment<>(
                 delegate.newProverEnvironmentWithInterpolation(options), mgr, logger));
@@ -153,7 +145,18 @@ public class TraceSolverContext implements SolverContext {
   @SuppressWarnings("resource")
   @Override
   public OptimizationProverEnvironment newOptimizationProverEnvironment(ProverOptions... options) {
-    throw new UnsupportedOperationException();
+    return logger.logDefKeep(
+        "context",
+        String.format("newOptimizationProverEnvironment(%s)", getOptionsForLogging(options)),
+        () ->
+            new TraceOptimizationProverEnvironment(
+                delegate.newOptimizationProverEnvironment(options), mgr, logger));
+  }
+
+  private static String getOptionsForLogging(ProverOptions[] options) {
+    return FluentIterable.from(options)
+        .transform(v -> "SolverContext.ProverOptions." + v.name())
+        .join(Joiner.on(", "));
   }
 
   @Override
