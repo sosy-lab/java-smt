@@ -415,28 +415,18 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
 
       } else if (Tokenizer.isForbiddenToken(token)) {
         // Throw an exception if the script contains commands like (pop) or (reset) that change the
-        // state of the assertion stack.
-        // We could keep track of the state of the stack and only consider the formulas that remain
-        // on the stack at the end of the script. However, this does not seem worth it at the
-        // moment. If needed, this feature can still be added later.
-        String message;
-        if (Tokenizer.isPushToken(token)) {
-          message = "(push ...)";
-        } else if (Tokenizer.isPopToken(token)) {
-          message = "(pop ...)";
-        } else if (Tokenizer.isResetAssertionsToken(token)) {
-          message = "(reset-assertions)";
-        } else if (Tokenizer.isResetToken(token)) {
-          message = "(reset)";
-        } else {
-          // Should be unreachable
-          throw new UnsupportedOperationException();
-        }
+        // state of the assertion stack, or if the command is not supported by JavaSMT
         throw new IllegalArgumentException(
-            String.format("SMTLIB command '%s' is not supported when parsing formulas.", message));
+            String.format(
+                "SMTLIB command '%s' is not supported when parsing formulas.",
+                Tokenizer.getCommand(token)));
+
+      } else if (Tokenizer.isIgnoredToken(token)) {
+        // We can safely skip this token
 
       } else {
-        // Remove everything else, such as unknown or solver-specific commands, comments, etc.
+        // Throw an error for everything else
+        throw new IllegalArgumentException(String.format("Unexpected input: %s", token));
       }
       pos++;
     }
