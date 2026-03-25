@@ -13,10 +13,10 @@ package org.sosy_lab.java_smt.test.delegate;
 import static com.google.common.truth.Truth.assertThat;
 import static org.sosy_lab.java_smt.api.FormulaType.BooleanType;
 
+import com.google.common.collect.ImmutableList;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.List;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -78,6 +78,7 @@ public class TraceTest {
 
   @Test
   public void testTraceCreation() throws IOException {
+    @SuppressWarnings("unused")
     var unused = bmgr.makeTrue();
     context.close();
 
@@ -87,6 +88,7 @@ public class TraceTest {
 
   @Test
   public void testMakeVariable() throws IOException {
+    @SuppressWarnings("unused")
     var unused = mgr.makeVariable(BooleanType, "x");
     context.close();
 
@@ -107,6 +109,7 @@ public class TraceTest {
   public void testTraceProverEnvironment() throws Exception {
     try (var prover = context.newProverEnvironment()) {
       prover.push(bmgr.makeTrue());
+      @SuppressWarnings("unused")
       var unused = prover.isUnsat();
     }
     context.close();
@@ -168,8 +171,9 @@ public class TraceTest {
   public void testTraceUFManager() throws Exception {
     var uf =
         mgr.getUFManager()
-            .declareUF("f", FormulaType.BooleanType, List.of(FormulaType.BooleanType));
-    var unused = mgr.getUFManager().callUF(uf, List.of(bmgr.makeTrue()));
+            .declareUF("f", FormulaType.BooleanType, ImmutableList.of(FormulaType.BooleanType));
+    @SuppressWarnings("unused")
+    var unused = mgr.getUFManager().callUF(uf, ImmutableList.of(bmgr.makeTrue()));
     context.close();
 
     assertThat(Files.exists(traceFile)).isTrue();
@@ -192,14 +196,16 @@ public class TraceTest {
   public void testVisitor() throws Exception {
     IntegerFormulaManager imgr = mgr.getIntegerFormulaManager();
     BooleanFormula query = imgr.equal(imgr.makeVariable("x"), imgr.makeNumber(42));
-    mgr.visit(
-        query,
-        new DefaultFormulaVisitor<Formula>() {
-          @Override
-          protected Formula visitDefault(Formula f) {
-            return f;
-          }
-        });
+    @SuppressWarnings("unused")
+    Formula query2 =
+        mgr.visit(
+            query,
+            new DefaultFormulaVisitor<>() {
+              @Override
+              protected Formula visitDefault(Formula f) {
+                return f;
+              }
+            });
 
     assertThat(Files.exists(traceFile)).isTrue();
     assertThat(Files.readAllLines(traceFile))

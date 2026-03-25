@@ -107,9 +107,9 @@ public class TraceSolverContext implements SolverContext {
     // filtering for those properties that start with "solver" (relevant for JavaSMT),
     // exclude trace-related properties.
     Set<String> traceConfigKeys = Set.of("solver.trace", "solver.tracefile", "solver.solver");
-    for (String key : properties.keySet()) {
-      if (key.startsWith("solver") && !traceConfigKeys.contains(key)) {
-        options.put(key, properties.get(key));
+    for (Entry<String, String> entry : properties.entrySet()) {
+      if (entry.getKey().startsWith("solver") && !traceConfigKeys.contains(entry.getKey())) {
+        options.put(entry.getKey(), entry.getValue());
       }
     }
 
