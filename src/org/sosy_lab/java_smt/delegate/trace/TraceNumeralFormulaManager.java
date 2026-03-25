@@ -63,7 +63,7 @@ abstract class TraceNumeralFormulaManager<
   public ResultFormulaType makeNumber(BigDecimal number) {
     return logger.logDef(
         getPrefix(),
-        String.format("makeNumber(new BigInteger(\"%s\"))", number),
+        String.format("makeNumber(new BigDecimal(\"%s\"))", number),
         () -> delegate.makeNumber(number));
   }
 
