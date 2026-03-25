@@ -62,7 +62,7 @@ public class TraceSolverContext implements SolverContext {
     } catch (IOException e) {
       throw new InvalidConfigurationException("Could not create directory for trace files", e);
     }
-    logger = new TraceLogger(mgr, tracefile.toFile());
+    logger = new TraceLogger(mgr, tracefile);
 
     this.initializeJavaSMT(config, pSolver);
   }

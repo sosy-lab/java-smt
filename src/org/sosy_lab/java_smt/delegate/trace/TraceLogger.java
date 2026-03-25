@@ -13,10 +13,10 @@ package org.sosy_lab.java_smt.delegate.trace;
 import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.FluentIterable;
-import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.HashMap;
@@ -44,13 +44,13 @@ class TraceLogger implements AutoCloseable {
    */
   private final Deque<Long> lastLines = new ArrayDeque<>();
 
-  TraceLogger(TraceFormulaManager pMgr, File pFile) {
+  TraceLogger(TraceFormulaManager pMgr, Path pTracefile) {
     mgr = pMgr;
     mgr.setLogger(this);
 
-    // FIXME Check if the file already exists -> quite unlikely, lets ignore this case.
     try {
-      output = new RandomAccessFile(pFile, "rw");
+      output = new RandomAccessFile(pTracefile.toFile(), "rw");
+      output.setLength(0); // clear existing file and override
     } catch (IOException e) {
       throw new IllegalArgumentException(e);
     }
