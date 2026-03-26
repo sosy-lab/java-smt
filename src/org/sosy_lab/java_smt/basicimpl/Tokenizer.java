@@ -290,17 +290,19 @@ public final class Tokenizer {
    * <p>The list of ignored tokens contains:
    *
    * <ul>
-   *   <li>echo,
-   *   <li>get-assertions,
-   *   <li>get-assignment,
-   *   <li>get-info,
-   *   <li>get-option,
-   *   <li>get-model,
-   *   <li>get-proof,
-   *   <li>get-unsat-assumptions,
-   *   <li>get-unsat-core,
-   *   <li>get-value,
-   *   <li>check-sat,
+   *   <li>echo
+   *   <li>set-info
+   *   <li>set-option
+   *   <li>get-assertions
+   *   <li>get-assignment
+   *   <li>get-info
+   *   <li>get-option
+   *   <li>get-model
+   *   <li>get-proof
+   *   <li>get-unsat-assumptions
+   *   <li>get-unsat-core
+   *   <li>get-value
+   *   <li>check-sat
    *   <li>check-sat-assuming
    * </ul>
    *
