@@ -450,15 +450,16 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
           .map(formulaCreator::encapsulateBoolean)
           .collect(Collectors.toList());
     } catch (IllegalArgumentException illegalArgumentException) {
-      if (illegalArgumentException.getMessage() != null
-          && (illegalArgumentException.getMessage().contains("to_ieee_bv")
-              || illegalArgumentException.getMessage().contains("as_ieee_bv"))) {
-        String additionalMessage =
-            "; Note: operations 'to_ieee_bv' and 'as_ieee_bv' are not supported in most SMT"
-                + " solvers. You can try using the SMTLIB2 standards preferred way to encode this"
-                + " operation by utilizing the 'to_fp' operation.";
-        throw new IllegalArgumentException(
-            illegalArgumentException.getMessage() + additionalMessage, illegalArgumentException);
+      if (illegalArgumentException.getMessage() != null) {
+        final String msg = illegalArgumentException.getMessage();
+        if (msg != null && (msg.contains("to_ieee_bv") || msg.contains("as_ieee_bv"))) {
+          // Better error message for certain cases, explaining common problems
+          final String additionalMessage =
+              "; Note: operations 'to_ieee_bv' and 'as_ieee_bv' are not supported in most SMT"
+                  + " solvers. You can try using the SMTLIB2 standards preferred way to encode this"
+                  + " operation by utilizing the 'to_fp' operation.";
+          throw new IllegalArgumentException(msg + additionalMessage, illegalArgumentException);
+        }
       }
       throw illegalArgumentException;
     }
