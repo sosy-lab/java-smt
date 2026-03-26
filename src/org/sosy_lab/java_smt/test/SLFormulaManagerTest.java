@@ -318,6 +318,7 @@ public class SLFormulaManagerTest extends SolverBasedTest0.ParameterizedSolverBa
 
   @Test
   public void testVisitSL() {
+    IntegerFormula num0 = imgr.makeNumber(0);
     IntegerFormula num42 = imgr.makeNumber(42);
     IntegerFormula p = imgr.makeVariable("p");
     BooleanFormula pointsTo = slmgr.makePointsTo(p, num42);
@@ -344,6 +345,11 @@ public class SLFormulaManagerTest extends SolverBasedTest0.ParameterizedSolverBa
           }
         });
     assertThat(kinds).containsExactly(SEP_STAR, SEP_EMP, SEP_PTO);
-    assertThat(visited).containsExactly(heap, pointsTo, emptyHeap, num42, p);
+    if (solverToUse() == Solvers.CVC4) {
+      // CVC4 uses a ground-term-based encoding for EMP, which introduces an additional term ZERO.
+      assertThat(visited).containsExactly(heap, pointsTo, emptyHeap, num0, num42, p);
+    } else {
+      assertThat(visited).containsExactly(heap, pointsTo, emptyHeap, num42, p);
+    }
   }
 }
