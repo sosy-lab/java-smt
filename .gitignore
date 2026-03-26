@@ -76,5 +76,6 @@ build.properties
 /repository
 /dist
 /downloads
+/output
 
 pom.xml
