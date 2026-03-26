@@ -9,22 +9,18 @@
 package org.sosy_lab.java_smt.solvers.yices2;
 
 import static com.google.common.base.Preconditions.checkArgument;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_exists;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_forall;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_subst_term;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_term_to_string;
 
 import com.google.common.primitives.Ints;
+import com.sri.yices.Terms;
 import java.util.List;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractQuantifiedFormulaManager;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 
-public class Yices2QuantifiedFormulaManager
+class Yices2QuantifiedFormulaManager
     extends AbstractQuantifiedFormulaManager<Integer, Integer, Long, Integer> {
 
-  protected Yices2QuantifiedFormulaManager(
-      FormulaCreator<Integer, Integer, Long, Integer> pCreator) {
+  Yices2QuantifiedFormulaManager(FormulaCreator<Integer, Integer, Long, Integer> pCreator) {
     super(pCreator);
   }
 
@@ -40,15 +36,15 @@ public class Yices2QuantifiedFormulaManager
         !pVars.isEmpty(),
         "Missing variables for quantifier '%s' and body '%s'.",
         pQ,
-        yices_term_to_string(pBody));
+        Terms.toString(pBody));
 
     Yices2FormulaCreator creator = (Yices2FormulaCreator) formulaCreator;
     int[] vars = pVars.stream().mapToInt(creator::createBoundVariableFromFreeVariable).toArray();
-    int substBody = yices_subst_term(vars.length, Ints.toArray(pVars), vars, pBody);
+    int substBody = Terms.subst(pBody, Ints.toArray(pVars), vars);
     if (pQ == Quantifier.FORALL) {
-      return yices_forall(vars.length, vars, substBody);
+      return Terms.forall(vars, substBody);
     } else {
-      return yices_exists(vars.length, vars, substBody);
+      return Terms.exists(vars, substBody);
     }
   }
 }

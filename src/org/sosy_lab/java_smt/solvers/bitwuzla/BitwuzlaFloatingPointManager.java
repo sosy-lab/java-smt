@@ -23,13 +23,13 @@ import org.sosy_lab.java_smt.solvers.bitwuzla.api.Sort;
 import org.sosy_lab.java_smt.solvers.bitwuzla.api.Term;
 import org.sosy_lab.java_smt.solvers.bitwuzla.api.TermManager;
 
-public class BitwuzlaFloatingPointManager
+class BitwuzlaFloatingPointManager
     extends AbstractFloatingPointFormulaManager<Term, Sort, TermManager, BitwuzlaDeclaration> {
 
   private final TermManager termManager;
   private final Term roundingMode;
 
-  protected BitwuzlaFloatingPointManager(
+  BitwuzlaFloatingPointManager(
       BitwuzlaFormulaCreator pCreator,
       FloatingPointRoundingMode pFloatingPointRoundingMode,
       BitwuzlaBitvectorFormulaManager pBvMgr) {

@@ -27,7 +27,7 @@ import org.sosy_lab.java_smt.api.FormulaType.BitvectorType;
 import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
 import org.sosy_lab.java_smt.basicimpl.AbstractFloatingPointFormulaManager;
 
-public class CVC5FloatingPointFormulaManager
+class CVC5FloatingPointFormulaManager
     extends AbstractFloatingPointFormulaManager<Term, Sort, TermManager, Term> {
 
   private final TermManager termManager;

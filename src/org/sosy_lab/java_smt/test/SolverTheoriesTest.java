@@ -283,11 +283,6 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
 
     // SMTLIB allows any value for division-by-zero.
     switch (solverToUse()) {
-      case YICES2:
-        assertThrows(
-            IllegalArgumentException.class,
-            () -> assertThatFormula(buildDivision(num10, num0, num10)).isSatisfiable());
-        break;
       case OPENSMT: // INFO: OpenSMT does not allow division by zero
         assertThrows(
             UnsupportedOperationException.class,
@@ -308,11 +303,6 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
     }
 
     switch (solverToUse()) {
-      case YICES2:
-        assertThrows(
-            IllegalArgumentException.class,
-            () -> assertThatFormula(buildModulo(num10, num0, num10)).isSatisfiable());
-        break;
       case OPENSMT: // INFO: OpenSMT does not allow division by zero
         assertThrows(UnsupportedOperationException.class, () -> buildModulo(num10, num0, num10));
         break;
@@ -354,7 +344,6 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
     switch (solverToUse()) {
       case OPENSMT: // INFO: OpenSmt does not allow nonlinear terms
       case SMTINTERPOL:
-      case YICES2:
         assertThrows(UnsupportedOperationException.class, () -> buildDivision(a, b, num5));
         assertThrows(UnsupportedOperationException.class, () -> buildModulo(a, b, num0));
         break;
@@ -1180,18 +1169,10 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
   }
 
   @Test
-  public void testVariableAndUFWithEqualSort() {
-    assume()
-        .withMessage("Solver %s does not support UFs without arguments", solverToUse())
-        .that(solverToUse())
-        .isNoneOf(Solvers.BOOLECTOR, Solvers.CVC5, Solvers.BITWUZLA);
-
+  public void testVariableAndUFWithEqualSort() throws SolverException, InterruptedException {
     BooleanFormula z1 = bmgr.makeVariable("z");
     BooleanFormula z2 = fmgr.declareAndCallUF("z", FormulaType.BooleanType);
-    if (ImmutableSet.of(Solvers.CVC4, Solvers.PRINCESS).contains(solverToUse())) {
-      assertThat(z1).isNotEqualTo(z2);
-    } else {
-      assertThat(z1).isEqualTo(z2);
-    }
+    assertThat(z1).isEqualTo(z2);
+    assertThatFormula(mgr.makeDistinct(z1, z2)).isUnsatisfiable();
   }
 }

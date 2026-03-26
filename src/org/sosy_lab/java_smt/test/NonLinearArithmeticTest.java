@@ -41,12 +41,7 @@ public class NonLinearArithmeticTest<T extends NumeralFormula> extends SolverBas
   // INFO: OpenSmt does not suport nonlinear arithmetic
   static final ImmutableSet<Solvers> SOLVER_WITHOUT_NONLINEAR_ARITHMETIC =
       ImmutableSet.of(
-          Solvers.SMTINTERPOL,
-          Solvers.MATHSAT5,
-          Solvers.BOOLECTOR,
-          Solvers.CVC4,
-          Solvers.YICES2,
-          Solvers.OPENSMT);
+          Solvers.SMTINTERPOL, Solvers.MATHSAT5, Solvers.BOOLECTOR, Solvers.CVC4, Solvers.OPENSMT);
 
   @Parameters(name = "{0} {1} {2}")
   public static Iterable<Object[]> getAllSolversAndTheories() {
@@ -204,7 +199,7 @@ public class NonLinearArithmeticTest<T extends NumeralFormula> extends SolverBas
     assume()
         .withMessage("Solver %s does not support division by zero", solverToUse())
         .that(solverToUse())
-        .isNoneOf(Solvers.YICES2, Solvers.OPENSMT);
+        .isNotEqualTo(Solvers.OPENSMT);
 
     T a = nmgr.makeVariable("a");
     T b = nmgr.makeVariable("b");

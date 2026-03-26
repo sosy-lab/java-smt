@@ -339,7 +339,9 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
     // Yices does not support integer to bitvector conversions
     assume().that(solver).isNotEqualTo(Solvers.YICES2);
     // CVC4, CVC5 and Z3 will rewrite SBV_TO_INT to a term that only uses unsigned integers
-    assume().that(solver).isNoneOf(Solvers.Z3, Solvers.CVC4, Solvers.CVC5);
+    assume()
+        .that(solver)
+        .isNoneOf(Solvers.Z3, Solvers.Z3_WITH_INTERPOLATION, Solvers.CVC4, Solvers.CVC5);
     // Princess uses mod_casts internally, which makes it hard to figure out when conversion happen
     assume().that(solver).isNotEqualTo(Solvers.PRINCESS);
 
@@ -1492,13 +1494,9 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
     assertThat(mapping).containsEntry("v", v);
     assertThat(mapping).containsEntry("q", q);
 
-    // some solvers distinguish between nullary UFs and variables and do not provide variables
-    if (ImmutableList.of(Solvers.CVC4, Solvers.PRINCESS).contains(solverToUse())) {
-      assertThat(mapping2).isEmpty();
-    } else {
-      assertThat(mapping2).hasSize(1);
-      assertThat(mapping2).containsEntry("v", v);
-    }
+    // for nullary UFs we expect a single symbol
+    assertThat(mapping2).hasSize(1);
+    assertThat(mapping2).containsEntry("v", v);
   }
 
   private final FormulaVisitor<Formula> plainFunctionVisitor =

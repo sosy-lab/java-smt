@@ -21,7 +21,7 @@ import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractQuantifiedFormulaManager;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 
-public class CVC4QuantifiedFormulaManager
+class CVC4QuantifiedFormulaManager
     extends AbstractQuantifiedFormulaManager<Expr, Type, ExprManager, Expr> {
 
   private final ExprManager exprManager;

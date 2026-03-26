@@ -28,7 +28,7 @@ import org.sosy_lab.java_smt.solvers.opensmt.api.Symbol;
 import org.sosy_lab.java_smt.solvers.opensmt.api.TemplateFunction;
 import org.sosy_lab.java_smt.solvers.opensmt.api.VectorPTRef;
 
-public class OpenSmtModel extends AbstractModel<PTRef, SRef, Logic> {
+class OpenSmtModel extends AbstractModel<PTRef, SRef, Logic> {
 
   private final Logic osmtLogic;
   private final Model osmtModel;

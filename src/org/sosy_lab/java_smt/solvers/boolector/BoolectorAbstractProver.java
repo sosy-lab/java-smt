@@ -36,7 +36,7 @@ abstract class BoolectorAbstractProver<T> extends AbstractProverWithAllSat<T> {
   private final long terminationCallbackHelper;
 
   // Used/Built by TheoremProver
-  protected BoolectorAbstractProver(
+  BoolectorAbstractProver(
       BoolectorFormulaManager manager,
       BoolectorFormulaCreator creator,
       long btor,
@@ -117,9 +117,11 @@ abstract class BoolectorAbstractProver<T> extends AbstractProverWithAllSat<T> {
   public boolean isUnsatWithAssumptions(Collection<BooleanFormula> pAssumptions)
       throws SolverException, InterruptedException {
     Preconditions.checkState(!closed);
+
     for (BooleanFormula assumption : pAssumptions) {
       BtorJNI.boolector_assume(btor, BoolectorFormulaManager.getBtorTerm(assumption));
     }
+    // We don't need to update wasLastSatCheckSatisfiable etc. as isUnsat() does it automatically
     return isUnsat();
   }
 
@@ -148,7 +150,7 @@ abstract class BoolectorAbstractProver<T> extends AbstractProverWithAllSat<T> {
   @Override
   public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(
       Collection<BooleanFormula> pAssumptions) throws SolverException, InterruptedException {
-    throw new UnsupportedOperationException(UNSAT_CORE_NOT_SUPPORTED);
+    throw new UnsupportedOperationException(UNSAT_CORE_WITH_ASSUMPTIONS_NOT_SUPPORTED);
   }
 
   @Override

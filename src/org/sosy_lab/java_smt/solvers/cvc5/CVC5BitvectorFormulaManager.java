@@ -18,13 +18,12 @@ import java.math.BigInteger;
 import java.util.List;
 import org.sosy_lab.java_smt.basicimpl.AbstractBitvectorFormulaManager;
 
-public class CVC5BitvectorFormulaManager
+class CVC5BitvectorFormulaManager
     extends AbstractBitvectorFormulaManager<Term, Sort, TermManager, Term> {
 
   private final TermManager termManager;
 
-  protected CVC5BitvectorFormulaManager(
-      CVC5FormulaCreator pCreator, CVC5BooleanFormulaManager pBmgr) {
+  CVC5BitvectorFormulaManager(CVC5FormulaCreator pCreator, CVC5BooleanFormulaManager pBmgr) {
     super(pCreator, pBmgr);
     termManager = pCreator.getEnv();
   }

@@ -73,6 +73,7 @@ SPDX-License-Identifier: Apache-2.0
              It keeps old build commands and previous cmake-flags. -->
         <delete dir="${opensmt.path}/build" quiet="true"/>
         <exec executable="make" dir="${opensmt.path}" failonerror="false" resultproperty="build.returnCode">
+            <env key="CMAKE_BUILD_PARALLEL_LEVEL" value="8"/>
             <arg value="INSTALL_DIR=${opensmt.installPath}"/>
             <!-- The next arg is ONE large parameter. If executed manually outside of ant, please wrap it in quotes. -->
             <arg value="CMAKE_FLAGS=
@@ -120,6 +121,7 @@ SPDX-License-Identifier: Apache-2.0
              It keeps old build commands and previous cmake-flags. -->
         <delete dir="${opensmt.path}/build" quiet="true"/>
         <exec executable="make" dir="${opensmt.path}" failonerror="false" resultproperty="build.returnCode">
+            <env key="CMAKE_BUILD_PARALLEL_LEVEL" value="8"/>
             <arg value="INSTALL_DIR=${opensmt.installPath}"/>
             <!-- The next arg is ONE large parameter. If executed manually outside of ant, please wrap it in quotes. -->
             <arg value="CMAKE_FLAGS=

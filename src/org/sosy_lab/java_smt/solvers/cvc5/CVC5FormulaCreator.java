@@ -76,7 +76,7 @@ import org.sosy_lab.java_smt.solvers.cvc5.CVC5Formula.CVC5RationalFormula;
 import org.sosy_lab.java_smt.solvers.cvc5.CVC5Formula.CVC5RegexFormula;
 import org.sosy_lab.java_smt.solvers.cvc5.CVC5Formula.CVC5StringFormula;
 
-public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, TermManager, Term> {
+class CVC5FormulaCreator extends FormulaCreator<Term, Sort, TermManager, Term> {
 
   /** CVC5 does not allow using some key-functions from SMTLIB2 as identifiers. */
   private static final ImmutableSet<String> UNSUPPORTED_IDENTIFIERS = ImmutableSet.of("let");
@@ -773,16 +773,16 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, TermManager, 
 
   @Override
   public Term declareUFImpl(String pName, Sort pReturnType, List<Sort> pArgTypes) {
+    if (pArgTypes.isEmpty()) {
+      // Ufs in CVC5 can't have 0 arity. We just use a variable as a workaround.
+      return makeVariable(pReturnType, pName);
+    }
     checkSymbol(pName);
 
     Term exp = functionsCache.get(pName);
 
     if (exp == null) {
-      // Ufs in CVC5 can't have 0 arity. We just use a variable as a workaround.
-      Sort sort =
-          pArgTypes.isEmpty()
-              ? pReturnType
-              : termManager.mkFunctionSort(pArgTypes.toArray(new Sort[0]), pReturnType);
+      Sort sort = termManager.mkFunctionSort(pArgTypes.toArray(new Sort[0]), pReturnType);
       exp = termManager.mkConst(sort, pName);
       functionsCache.put(pName, exp);
 

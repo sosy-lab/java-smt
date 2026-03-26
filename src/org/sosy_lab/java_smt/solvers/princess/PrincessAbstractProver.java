@@ -53,7 +53,7 @@ abstract class PrincessAbstractProver<E> extends AbstractProverWithAllSat<E> {
 
   private final PrincessFormulaCreator creator;
 
-  protected PrincessAbstractProver(
+  PrincessAbstractProver(
       PrincessFormulaManager pMgr,
       PrincessFormulaCreator creator,
       SimpleAPI pApi,
@@ -176,7 +176,7 @@ abstract class PrincessAbstractProver<E> extends AbstractProverWithAllSat<E> {
   @Override
   public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(
       Collection<BooleanFormula> assumptions) {
-    throw new UnsupportedOperationException(ASSUMPTION_SOLVING_NOT_SUPPORTED);
+    throw new UnsupportedOperationException(UNSAT_CORE_WITH_ASSUMPTIONS_NOT_SUPPORTED);
   }
 
   @Override

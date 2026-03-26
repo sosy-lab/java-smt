@@ -2,7 +2,7 @@
 // an API wrapper for a collection of SMT solvers:
 // https://github.com/sosy-lab/java-smt
 //
-// SPDX-FileCopyrightText: 2024 Dirk Beyer <https://www.sosy-lab.org>
+// SPDX-FileCopyrightText: 2026 Dirk Beyer <https://www.sosy-lab.org>
 //
 // SPDX-License-Identifier: Apache-2.0
 
@@ -81,6 +81,14 @@ public class Bitwuzla extends AbstractReference {
 
   public Term get_value(Term term) {
     return new Term(BitwuzlaNativeJNI.Bitwuzla_get_value(swigCPtr, this, Term.getCPtr(term), term), true);
+  }
+
+  public Term get_interpolant(Vector_Term A) {
+    return new Term(BitwuzlaNativeJNI.Bitwuzla_get_interpolant(swigCPtr, this, Vector_Term.getCPtr(A), A), true);
+  }
+
+  public Vector_Term get_interpolants(Vector_Vector_Term A) {
+    return new Vector_Term(BitwuzlaNativeJNI.Bitwuzla_get_interpolants(swigCPtr, this, Vector_Vector_Term.getCPtr(A), A), true);
   }
 
   public TermManager term_mgr() {

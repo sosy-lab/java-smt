@@ -66,6 +66,18 @@ public class BitwuzlaNativeApiTest {
   }
 
   @Test
+  public void equalityOverDifferentSorts() {
+    assertThrows(
+        IllegalArgumentException.class,
+        () ->
+            bitwuzla.assert_formula(
+                termManager.mk_term(
+                    Kind.EQUAL,
+                    termManager.mk_fp_pos_inf(termManager.mk_fp_sort(5, 11)),
+                    termManager.mk_fp_neg_inf(termManager.mk_fp_sort(4, 12)))));
+  }
+
+  @Test
   public void signedFunctions() {
     Sort sortbv4 = termManager.mk_bv_sort(4);
     Sort sortbv8 = termManager.mk_bv_sort(8);

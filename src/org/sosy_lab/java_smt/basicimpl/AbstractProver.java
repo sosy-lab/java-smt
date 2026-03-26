@@ -39,12 +39,12 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
   protected final boolean generateModels;
   protected final boolean generateAllSat;
   protected final boolean generateUnsatCores;
-  private final boolean generateUnsatCoresOverAssumptions;
+  protected final boolean generateUnsatCoresOverAssumptions;
   protected final boolean enableSL;
 
   // flags for status
   protected boolean closed = false;
-  private boolean wasLastSatCheckSatisfiable = true; // assume SAT for an empty prover
+  protected boolean wasLastSatCheckSatisfiable = true; // assume SAT for an empty prover
   protected boolean changedSinceLastSatQuery = true; // assume changed for an empty prover
 
   private final Set<Evaluator> evaluators = new LinkedHashSet<>();
@@ -94,7 +94,6 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
         generateUnsatCoresOverAssumptions,
         TEMPLATE,
         ProverOptions.GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS);
-    Preconditions.checkState(!wasLastSatCheckSatisfiable);
   }
 
   protected final void checkGenerateInterpolants() {

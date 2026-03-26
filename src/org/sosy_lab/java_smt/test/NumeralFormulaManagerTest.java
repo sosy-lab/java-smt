@@ -31,7 +31,7 @@ public class NumeralFormulaManagerTest extends SolverBasedTest0.ParameterizedSol
   @Test
   public void divZeroTest() throws SolverException, InterruptedException {
     requireIntegers();
-    assume().that(solver).isNoneOf(Solvers.OPENSMT, Solvers.YICES2); // No division by zero
+    assume().that(solver).isNotEqualTo(Solvers.OPENSMT); // No division by zero
 
     IntegerFormula zero = imgr.makeNumber(0);
     IntegerFormula three = imgr.makeNumber(3);
@@ -67,7 +67,7 @@ public class NumeralFormulaManagerTest extends SolverBasedTest0.ParameterizedSol
   @Test
   public void modZeroTest() throws SolverException, InterruptedException {
     requireIntegers();
-    assume().that(solver).isNoneOf(Solvers.OPENSMT, Solvers.YICES2); // No division by zero
+    assume().that(solver).isNotEqualTo(Solvers.OPENSMT); // No division by zero
 
     IntegerFormula zero = imgr.makeNumber(0);
     IntegerFormula three = imgr.makeNumber(3);

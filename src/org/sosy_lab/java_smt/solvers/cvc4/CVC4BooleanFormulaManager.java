@@ -19,14 +19,14 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 import org.sosy_lab.java_smt.basicimpl.AbstractBooleanFormulaManager;
 
-public class CVC4BooleanFormulaManager
+class CVC4BooleanFormulaManager
     extends AbstractBooleanFormulaManager<Expr, Type, ExprManager, Expr> {
 
   private final Expr cvc4True;
   private final Expr cvc4False;
   private final ExprManager exprManager;
 
-  protected CVC4BooleanFormulaManager(CVC4FormulaCreator pCreator) {
+  CVC4BooleanFormulaManager(CVC4FormulaCreator pCreator) {
     super(pCreator);
     exprManager = pCreator.getEnv();
     cvc4True = exprManager.mkConst(true);
