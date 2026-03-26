@@ -63,22 +63,6 @@ class BitwuzlaFormulaCreator extends FormulaCreator<Term, Sort, TermManager, Bit
 
   private final Table<String, Sort, Term> formulaCache = HashBasedTable.create();
 
-  /**
-   * This mapping stores symbols and their constraints, such as from fp-to-bv casts with their
-   * defining equation.
-   *
-   * <p>Bitwuzla does not support casts from floating-point to bitvector natively. The reason given
-   * is that the value is undefined for NaN and that the SMT-LIB standard also does not include such
-   * an operation. We try to work around this limitation by introducing a fresh variable <code>
-   * __CAST_FROM_BV_XXX</code>for the result and then adding the constraint <code>
-   * fp.to_fp(__CAST_FROM_BV_XXX) = &lt;float-term&gt;</code> as a side-condition. This is also what
-   * is recommended by the SMT-LIB2 standard. The map <code>variableCasts</code> is used to store
-   * these side-conditions so that they can later be added as assertions. The keys of the map are
-   * the newly introduced variable symbols and the values are the defining equations as mentioned
-   * above.
-   */
-  private final Map<String, Term> constraintsForVariables = new HashMap<>();
-
   BitwuzlaFormulaCreator(TermManager pTermManager) {
     super(pTermManager, pTermManager.mk_bool_sort(), null, null, null, null);
   }
