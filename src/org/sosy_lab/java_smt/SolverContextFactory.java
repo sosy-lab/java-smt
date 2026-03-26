@@ -308,7 +308,8 @@ public class SolverContextFactory {
             logger, config, shutdownNotifier, logfile, (int) randomSeed, nonLinearArithmetic);
 
       case YICES2:
-        return Yices2SolverContext.create(logger, nonLinearArithmetic, shutdownNotifier, loader);
+        return Yices2SolverContext.create(
+            logger, config, nonLinearArithmetic, shutdownNotifier, loader);
 
       case BOOLECTOR:
         return BoolectorSolverContext.create(
