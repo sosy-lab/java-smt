@@ -541,7 +541,6 @@ public class VariableNamesTest extends SolverBasedTest0.ParameterizedSolverBased
   @Test
   public void testEqBoolVariableDump() {
     // FIXME: Rewrite test? Most solvers will simplify the formula to `true`.
-    assume().that(solverToUse()).isNotEqualTo(Solvers.BOOLECTOR);
     for (String name : getAllNames()) {
       BooleanFormula var = createVariableWith(bmgr::makeVariable, name);
       if (var != null) {

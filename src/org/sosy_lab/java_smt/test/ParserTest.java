@@ -216,13 +216,14 @@ public class ParserTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   @Test
   public void testParseAll_invalid_unknownCommandWithAssertion() {
     String smt = "(unknown-command)(assert true)";
-    assertThrows(IllegalArgumentException.class, () -> mgr.parseAll(smt));
+    assertThat(mgr.parseAll(smt)).hasSize(1);
+    assertThat(mgr.parseAll(smt).get(0)).isEqualTo(bmgr.makeTrue());
   }
 
   @Test
   public void testParseAll_invalid_unknownCommand() {
     String smt = "(unknown-command)";
-    assertThrows(IllegalArgumentException.class, () -> mgr.parseAll(smt));
+    assertThat(mgr.parseAll(smt)).isEmpty();
   }
 
   @Test
