@@ -17,6 +17,7 @@ import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_init;
 import java.util.Set;
 import java.util.function.Consumer;
 import org.sosy_lab.common.ShutdownNotifier;
+import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BooleanFormulaManager;
 import org.sosy_lab.java_smt.api.FormulaManager;
@@ -47,6 +48,7 @@ public final class Yices2SolverContext extends AbstractSolverContext {
   }
 
   public static Yices2SolverContext create(
+      LogManager pLogger,
       NonLinearArithmetic pNonLinearArithmetic,
       ShutdownNotifier pShutdownManager,
       Consumer<String> pLoader) {
@@ -76,6 +78,7 @@ public final class Yices2SolverContext extends AbstractSolverContext {
     Yices2ArrayFormulaManager arrayTheory = new Yices2ArrayFormulaManager(creator);
     Yices2FormulaManager manager =
         new Yices2FormulaManager(
+            pLogger,
             creator,
             functionTheory,
             booleanTheory,

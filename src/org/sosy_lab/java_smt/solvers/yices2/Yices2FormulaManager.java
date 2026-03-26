@@ -32,6 +32,7 @@ import com.google.common.primitives.Ints;
 import java.io.IOException;
 import java.util.Locale;
 import java.util.Map;
+import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager;
@@ -46,6 +47,7 @@ class Yices2FormulaManager extends AbstractFormulaManager<Integer, Integer, Long
 
   @SuppressWarnings("checkstyle:parameternumber")
   Yices2FormulaManager(
+      LogManager pLogger,
       Yices2FormulaCreator pFormulaCreator,
       Yices2UFManager pFunctionManager,
       Yices2BooleanFormulaManager pBooleanManager,
@@ -55,6 +57,7 @@ class Yices2FormulaManager extends AbstractFormulaManager<Integer, Integer, Long
       Yices2QuantifiedFormulaManager pQuantifiedFormulaManager,
       Yices2ArrayFormulaManager pArrayFormulaManager) {
     super(
+        pLogger,
         pFormulaCreator,
         pFunctionManager,
         pBooleanManager,

@@ -26,11 +26,13 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.stream.Collectors;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.Appender;
 import org.sosy_lab.common.Appenders;
 import org.sosy_lab.common.collect.Collections3;
+import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.java_smt.api.ArrayFormulaManager;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.EnumerationFormulaManager;
@@ -107,6 +109,8 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
 
   private static final char ESCAPE = '$'; // just some allowed symbol, can be any char
 
+  private final LogManager logger;
+
   private final @Nullable AbstractArrayFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl>
       arrayManager;
 
@@ -140,6 +144,7 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
   /** Builds a solver from the given theory implementations. */
   @SuppressWarnings("checkstyle:parameternumber")
   protected AbstractFormulaManager(
+      LogManager logger,
       FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> pFormulaCreator,
       AbstractUFManager<TFormulaInfo, ?, TType, TEnv> functionManager,
       AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl> booleanManager,
@@ -156,6 +161,8 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
       @Nullable AbstractStringFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl> strManager,
       @Nullable AbstractEnumerationFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl>
           enumManager) {
+
+    this.logger = logger;
 
     this.arrayManager = arrayManager;
     this.quantifiedManager = quantifiedManager;
@@ -425,8 +432,8 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
         // We can safely skip this token
 
       } else {
-        // Throw an error for everything else
-        throw new IllegalArgumentException(String.format("Unexpected input: %s", token));
+        // Skip unsupported or solver specific commands
+        logger.logf(Level.WARNING, "Unexpected input: %s", token);
       }
       pos++;
     }

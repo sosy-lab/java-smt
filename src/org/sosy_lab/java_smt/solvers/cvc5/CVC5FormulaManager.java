@@ -25,6 +25,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager;
@@ -35,6 +36,7 @@ class CVC5FormulaManager extends AbstractFormulaManager<Term, Sort, TermManager,
 
   @SuppressWarnings("checkstyle:parameternumber")
   CVC5FormulaManager(
+      LogManager pLogger,
       CVC5FormulaCreator pFormulaCreator,
       CVC5UFManager pFfmgr,
       CVC5BooleanFormulaManager pBfmgr,
@@ -48,6 +50,7 @@ class CVC5FormulaManager extends AbstractFormulaManager<Term, Sort, TermManager,
       CVC5StringFormulaManager pStrmgr,
       CVC5EnumerationFormulaManager pEfmgr) {
     super(
+        pLogger,
         pFormulaCreator,
         pFfmgr,
         pBfmgr,

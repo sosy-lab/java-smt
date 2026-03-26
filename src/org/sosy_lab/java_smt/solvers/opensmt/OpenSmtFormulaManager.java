@@ -11,6 +11,7 @@ package org.sosy_lab.java_smt.solvers.opensmt;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 import java.util.Map;
+import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager;
 import org.sosy_lab.java_smt.solvers.opensmt.api.Logic;
@@ -25,6 +26,7 @@ class OpenSmtFormulaManager extends AbstractFormulaManager<PTRef, SRef, Logic, S
   private final Logic osmtLogic;
 
   OpenSmtFormulaManager(
+      LogManager pLogger,
       OpenSmtFormulaCreator pFormulaCreator,
       OpenSmtUFManager pFfmgr,
       OpenSmtBooleanFormulaManager pBfmgr,
@@ -32,6 +34,7 @@ class OpenSmtFormulaManager extends AbstractFormulaManager<PTRef, SRef, Logic, S
       OpenSmtRationalFormulaManager pRfmgr,
       OpenSmtArrayFormulaManager pAfmgr) {
     super(
+        pLogger,
         pFormulaCreator,
         pFfmgr,
         pBfmgr,

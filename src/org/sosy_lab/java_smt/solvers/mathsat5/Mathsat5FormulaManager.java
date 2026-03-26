@@ -20,6 +20,7 @@ import com.google.common.collect.Collections2;
 import com.google.common.primitives.Longs;
 import java.util.Collection;
 import java.util.Map;
+import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaManager;
@@ -33,6 +34,7 @@ final class Mathsat5FormulaManager extends AbstractFormulaManager<Long, Long, Lo
 
   @SuppressWarnings("checkstyle:parameternumber")
   Mathsat5FormulaManager(
+      LogManager pLogger,
       Mathsat5FormulaCreator creator,
       Mathsat5UFManager pFunctionManager,
       Mathsat5BooleanFormulaManager pBooleanManager,
@@ -45,6 +47,7 @@ final class Mathsat5FormulaManager extends AbstractFormulaManager<Long, Long, Lo
       boolean pDumpExtendedOutput,
       boolean pDumpLetExpressions) {
     super(
+        pLogger,
         creator,
         pFunctionManager,
         pBooleanManager,

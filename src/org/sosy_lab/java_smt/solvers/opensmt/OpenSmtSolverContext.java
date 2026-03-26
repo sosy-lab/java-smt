@@ -137,7 +137,13 @@ public final class OpenSmtSolverContext extends AbstractSolverContext {
     // Build the central FormulaManager object
     OpenSmtFormulaManager manager =
         new OpenSmtFormulaManager(
-            creator, functionTheory, booleanTheory, integerTheory, rationalTheory, arrayTheory);
+            pLogger,
+            creator,
+            functionTheory,
+            booleanTheory,
+            integerTheory,
+            rationalTheory,
+            arrayTheory);
 
     return new OpenSmtSolverContext(creator, manager, pLogger, pShutdownNotifier, solverOptions);
   }

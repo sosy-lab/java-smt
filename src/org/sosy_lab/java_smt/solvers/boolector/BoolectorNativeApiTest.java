@@ -18,13 +18,13 @@ import org.junit.After;
 import org.junit.AssumptionViolatedException;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.sosy_lab.common.NativeLibraries;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.configuration.Configuration;
 import org.sosy_lab.common.configuration.ConfigurationBuilder;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
+import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.BooleanFormulaManager;
 import org.sosy_lab.java_smt.api.FormulaManager;
@@ -110,8 +110,10 @@ public class BoolectorNativeApiTest {
     for (SatSolver satsolver : BoolectorSolverContext.SatSolver.values()) {
       ConfigurationBuilder config =
           Configuration.builder().setOption("solver.boolector.satSolver", satsolver.name());
+      LogManager logger = LogManager.createTestLogManager();
       try (BoolectorSolverContext context =
           BoolectorSolverContext.create(
+              logger,
               config.build(),
               ShutdownNotifier.createDummy(),
               null,
@@ -134,8 +136,10 @@ public class BoolectorNativeApiTest {
   @Test
   public void dumpVariableTest() throws InvalidConfigurationException {
     ConfigurationBuilder config = Configuration.builder();
+    LogManager logger = LogManager.createTestLogManager();
     try (BoolectorSolverContext context =
         BoolectorSolverContext.create(
+            logger,
             config.build(),
             ShutdownNotifier.createDummy(),
             null,
@@ -156,8 +160,10 @@ public class BoolectorNativeApiTest {
   public void dumpVariableWithAssertionsOnStackTest()
       throws InvalidConfigurationException, InterruptedException {
     ConfigurationBuilder config = Configuration.builder();
+    LogManager logger = LogManager.createTestLogManager();
     try (BoolectorSolverContext context =
         BoolectorSolverContext.create(
+            logger,
             config.build(),
             ShutdownNotifier.createDummy(),
             null,
@@ -182,13 +188,13 @@ public class BoolectorNativeApiTest {
     }
   }
 
-  @Ignore
   @Test
   public void repeatedDumpFormulaTest() throws InvalidConfigurationException {
-    // FIXME Disabled until printing is fixed
     ConfigurationBuilder config = Configuration.builder();
+    LogManager logger = LogManager.createTestLogManager();
     try (BoolectorSolverContext context =
         BoolectorSolverContext.create(
+            logger,
             config.build(),
             ShutdownNotifier.createDummy(),
             null,

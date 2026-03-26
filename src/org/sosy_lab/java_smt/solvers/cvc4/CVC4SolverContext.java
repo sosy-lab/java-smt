@@ -94,6 +94,7 @@ public final class CVC4SolverContext extends AbstractSolverContext {
     CVC4StringFormulaManager strTheory = new CVC4StringFormulaManager(creator);
     CVC4FormulaManager manager =
         new CVC4FormulaManager(
+            pLogger,
             creator,
             functionTheory,
             booleanTheory,
