@@ -207,11 +207,15 @@ public abstract class AbstractNumeralFormulaManager<
   }
 
   protected TFormulaInfo sumImpl(List<TFormulaInfo> operands) {
-    TFormulaInfo result = makeNumberImpl(0);
-    for (TFormulaInfo operand : operands) {
-      result = add(result, operand);
+    if (operands.isEmpty()) {
+      return makeNumberImpl(0);
+    } else {
+      TFormulaInfo result = operands.get(0);
+      for (TFormulaInfo operand : operands.subList(1, operands.size())) {
+        result = add(result, operand);
+      }
+      return result;
     }
-    return result;
   }
 
   @Override
