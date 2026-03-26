@@ -9,7 +9,6 @@
 package org.sosy_lab.java_smt.solvers.bitwuzla;
 
 import static com.google.common.base.Preconditions.checkArgument;
-import static org.sosy_lab.common.collect.Collections3.transformedImmutableSetCopy;
 import static org.sosy_lab.java_smt.api.FormulaType.getFloatingPointTypeFromSizesWithHiddenBit;
 
 import com.google.common.base.Preconditions;
@@ -17,18 +16,11 @@ import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Table;
 import java.math.BigInteger;
-import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Deque;
-import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
-import java.util.Set;
 import org.sosy_lab.java_smt.api.ArrayFormula;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -583,37 +575,6 @@ class BitwuzlaFormulaCreator extends FormulaCreator<Term, Sort, TermManager, Bit
           getFloatingPointTypeFromSizesWithHiddenBit(exponentSize, mantissaSizeWithHiddenBit));
     }
     throw new AssertionError("Unknown value type.");
-  }
-
-  /** Add a constraint that is pushed onto the prover stack whenever the variable is used. */
-  public void addConstraintForVariable(String variable, Term constraint) {
-    constraintsForVariables.put(variable, constraint);
-  }
-
-  /**
-   * Returns a set of additional constraints (side-conditions) that are needed to use some variables
-   * from the given term, such as utility variables from casts.
-   *
-   * <p>Bitwuzla does not support fp-to-bv conversion natively. We have to use side-conditions as a
-   * workaround. When a term containing fp-to-bv casts is added to the assertion stack these
-   * side-conditions need to be collected by calling this method and then also adding them to the
-   * assertion stack.
-   */
-  public Collection<Term> getConstraintsForTerm(Term pTerm) {
-    final Set<String> usedConstraintVariables = new LinkedHashSet<>();
-    final Deque<String> waitlist = new ArrayDeque<>(extractVariablesAndUFs(pTerm, false).keySet());
-    while (!waitlist.isEmpty()) {
-      String current = waitlist.pop();
-      if (constraintsForVariables.containsKey(current)) { // ignore variables without constraints
-        if (usedConstraintVariables.add(current)) {
-          // if we found a new variable with constraint, get transitive variables from constraint
-          Term constraint = constraintsForVariables.get(current);
-          waitlist.addAll(extractVariablesAndUFs(constraint, false).keySet());
-        }
-      }
-    }
-
-    return transformedImmutableSetCopy(usedConstraintVariables, constraintsForVariables::get);
   }
 
   @Override

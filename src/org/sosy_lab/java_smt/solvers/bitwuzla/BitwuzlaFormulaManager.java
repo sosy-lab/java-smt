@@ -230,9 +230,6 @@ final class BitwuzlaFormulaManager
       return "(assert " + pTerm + ")";
     }
     Bitwuzla bitwuzla = new Bitwuzla(creator.getEnv());
-    for (Term t : creator.getConstraintsForTerm(pTerm)) {
-      bitwuzla.assert_formula(t);
-    }
     bitwuzla.assert_formula(pTerm);
     return bitwuzla.print_formula();
   }
