@@ -366,22 +366,27 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
 
   @ForOverride
   protected List<TFormulaInfo> parseAllImpl(String formulaStr) throws IllegalArgumentException {
-    // The fallback implementation splits the input into declarations and assertions,
-    // and parses each assertion separately,
-    // which is not very efficient, but it works for simple cases and is better than nothing
-    List<String> tokens = Tokenizer.tokenize(formulaStr);
+    try {
+      // The fallback implementation splits the input into declarations and assertions,
+      // and parses each assertion separately,
+      // which is not very efficient, but it works for simple cases and is better than nothing
+      List<String> tokens = Tokenizer.tokenize(formulaStr);
 
-    List<String> declarationTokens =
-        tokens.stream().filter(Tokenizer::isDeclarationToken).collect(Collectors.toList());
-    List<String> definitionTokens =
-        tokens.stream().filter(Tokenizer::isDefinitionToken).collect(Collectors.toList());
-    List<String> assertTokens =
-        tokens.stream().filter(Tokenizer::isAssertToken).collect(Collectors.toList());
-    String definitions =
-        Joiner.on("").join(declarationTokens) + Joiner.on("").join(definitionTokens);
+      List<String> declarationTokens =
+          tokens.stream().filter(Tokenizer::isDeclarationToken).collect(Collectors.toList());
+      List<String> definitionTokens =
+          tokens.stream().filter(Tokenizer::isDefinitionToken).collect(Collectors.toList());
+      List<String> assertTokens =
+          tokens.stream().filter(Tokenizer::isAssertToken).collect(Collectors.toList());
+      String definitions =
+          Joiner.on("").join(declarationTokens) + Joiner.on("").join(definitionTokens);
 
-    return Collections3.transformedImmutableListCopy(
-        assertTokens, assertion -> parseImpl(definitions + assertion));
+      return Collections3.transformedImmutableListCopy(
+          assertTokens, assertion -> parseImpl(definitions + assertion));
+
+    } catch (IllegalArgumentException illegalArgumentException) {
+      throw throwIllegalArgumentExceptionWithBetterErrorMessage(illegalArgumentException);
+    }
   }
 
   /**
@@ -445,22 +450,9 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
 
   @Override
   public List<BooleanFormula> parseAll(String formulaStr) throws IllegalArgumentException {
-    try {
-      return parseAllImpl(sanitize(formulaStr)).stream()
-          .map(formulaCreator::encapsulateBoolean)
-          .collect(Collectors.toList());
-    } catch (IllegalArgumentException illegalArgumentException) {
-      final String msg = illegalArgumentException.getMessage();
-      if (msg != null && (msg.contains("to_ieee_bv") || msg.contains("as_ieee_bv"))) {
-        // Better error message for certain cases, explaining common problems
-        final String additionalMessage =
-            "; Note: operations 'to_ieee_bv' and 'as_ieee_bv' are not supported in most SMT"
-                + " solvers. You can try using the SMTLIB2 standards preferred way to encode this"
-                + " operation by utilizing the 'to_fp' operation.";
-        throw new IllegalArgumentException(msg + additionalMessage, illegalArgumentException);
-      }
-      throw illegalArgumentException;
-    }
+    return parseAllImpl(sanitize(formulaStr)).stream()
+        .map(formulaCreator::encapsulateBoolean)
+        .collect(Collectors.toList());
   }
 
   protected abstract String dumpFormulaImpl(TFormulaInfo t) throws IOException;
@@ -823,5 +815,30 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
       return str.toString();
     }
     return pVar; // unchanged
+  }
+
+  /**
+   * Returns the given {@link IllegalArgumentException} with a potentially improved error message.
+   * For example: the 'as_ieee_bv' and 'to_ieee_bv' operations are not supported by all SMT solvers,
+   * as the standard does not define those. We add an explanation to error messages containing those
+   * operations that explain how to build SMTLIB2 conforming and well accepted SMTLIB2.
+   *
+   * @param illegalArgumentException original {@link IllegalArgumentException} wrapping a solvers or
+   *     our initial error message from parsing SMTLIB2.
+   * @return a {@link IllegalArgumentException} that should be thrown in all cases. Might be the
+   *     original exception.
+   */
+  private IllegalArgumentException throwIllegalArgumentExceptionWithBetterErrorMessage(
+      IllegalArgumentException illegalArgumentException) throws IllegalArgumentException {
+    final String msg = illegalArgumentException.getMessage();
+    if (msg != null && (msg.contains("to_ieee_bv") || msg.contains("as_ieee_bv"))) {
+      // Better error message for certain cases, explaining common problems
+      final String additionalMessage =
+          "; Note: operations 'to_ieee_bv' and 'as_ieee_bv' are not supported in most SMT"
+              + " solvers. You can try using the SMTLIB2 standards preferred way to encode this"
+              + " operation by utilizing the 'to_fp' operation.";
+      return new IllegalArgumentException(msg + additionalMessage, illegalArgumentException);
+    }
+    return illegalArgumentException;
   }
 }
