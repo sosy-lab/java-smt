@@ -49,12 +49,19 @@ public class TraceSolverContext implements SolverContext {
   private @Nullable PathTemplate tracefileTemplate =
       PathTemplate.ofFormatString("traces/trace_%s.java");
 
+  @Option(
+      secure = true,
+      name = "error",
+      description = "Sets how tracing errors should be handled",
+      values = {"log", "fail"})
+  private String error = "log";
+
   public TraceSolverContext(
       Solvers pSolver, Configuration config, SolverContext pDelegate, LogManager pLogManager)
       throws InvalidConfigurationException {
     config.inject(this);
     delegate = pDelegate;
-    mgr = new TraceFormulaManager(delegate.getFormulaManager(), pLogManager);
+    mgr = new TraceFormulaManager(delegate.getFormulaManager(), pLogManager, error.equals("fail"));
 
     // initialize the trace logger and create the trace file,
     // nanotime is used to avoid collisions, and it is sorted by time.

@@ -68,10 +68,12 @@ class TraceFormulaManager implements FormulaManager {
   private final FormulaManager delegate;
   private TraceLogger logger;
   private final LogManager logManager;
+  private final boolean failOnError;
 
-  TraceFormulaManager(FormulaManager pDelegate, LogManager pLogManager) {
+  TraceFormulaManager(FormulaManager pDelegate, LogManager pLogManager, boolean pFailOnError) {
     delegate = pDelegate;
     logManager = pLogManager;
+    failOnError = pFailOnError;
   }
 
   void setLogger(TraceLogger pLogger) {
@@ -143,7 +145,12 @@ class TraceFormulaManager implements FormulaManager {
       if (!logger.isTracked(f)) {
         var g = makeVariable(delegate.getFormulaType(f), name);
         if (!g.equals(f)) { // can happen after simplifications, bad for tracing, but happens.
-          logManager.logf(Level.WARNING, "Formula '%s' is not an identity of '%s'.", g, f);
+          var msg = String.format("Formula '%s' is not an identity of '%s'.", g, f);
+          if (failOnError) {
+            throw new IllegalArgumentException(msg);
+          } else {
+            logManager.log(Level.WARNING, msg);
+          }
           logger.mapVariable(logger.toVariable(g), f);
         }
       }
@@ -180,7 +187,12 @@ class TraceFormulaManager implements FormulaManager {
                   delegate.getFormulaType(f), value.getClass().getName()));
         }
         if (!g.equals(f)) { // can happen after simplifications, bad for tracing, but happens.
-          logManager.logf(Level.WARNING, "Formula '%s' is not an identity of '%s'.", g, f);
+          var msg = String.format("Formula '%s' is not an identity of '%s'.", g, f);
+          if (failOnError) {
+            throw new IllegalArgumentException(msg);
+          } else {
+            logManager.log(Level.WARNING, msg);
+          }
           logger.mapVariable(logger.toVariable(g), f);
         }
       }
@@ -194,7 +206,12 @@ class TraceFormulaManager implements FormulaManager {
       if (!logger.isTracked(f)) {
         Formula g = makeApplication(functionDeclaration, args);
         if (!g.equals(f)) { // can happen after simplifications, bad for tracing, but happens.
-          logManager.logf(Level.WARNING, "Formula '%s' is not an identity of '%s'.", g, f);
+          var msg = String.format("Formula '%s' is not an identity of '%s'.", g, f);
+          if (failOnError) {
+            throw new IllegalArgumentException(msg);
+          } else {
+            logManager.log(Level.WARNING, msg);
+          }
           logger.mapVariable(logger.toVariable(g), f);
         }
       }
@@ -217,7 +234,12 @@ class TraceFormulaManager implements FormulaManager {
           g = getQuantifiedFormulaManager().forall(bound, body);
         }
         if (!g.equals(f)) { // can happen after simplifications, bad for tracing, but happens.
-          logManager.logf(Level.WARNING, "Formula '%s' is not an identity of '%s'.", g, f);
+          var msg = String.format("Formula '%s' is not an identity of '%s'.", g, f);
+          if (failOnError) {
+            throw new IllegalArgumentException(msg);
+          } else {
+            logManager.log(Level.WARNING, msg);
+          }
           logger.mapVariable(logger.toVariable(g), f);
         }
       }
