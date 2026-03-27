@@ -35,7 +35,7 @@ import org.sosy_lab.java_smt.api.OptimizationProverEnvironment;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext;
 
-@Options(prefix = "trace")
+@Options
 public class TraceSolverContext implements SolverContext {
   private final SolverContext delegate;
   private final TraceLogger logger;
@@ -43,7 +43,7 @@ public class TraceSolverContext implements SolverContext {
 
   @Option(
       secure = true,
-      name = "file",
+      name = "solver.tracefile",
       description = "Export solver interaction as Java code into a file.")
   @FileOption(FileOption.Type.OUTPUT_FILE)
   private @Nullable PathTemplate tracefileTemplate =
@@ -115,7 +115,7 @@ public class TraceSolverContext implements SolverContext {
 
     // filtering for those properties that start with "solver" (relevant for JavaSMT),
     // exclude trace-related properties.
-    Set<String> traceConfigKeys = Set.of("solver.trace", "solver.solver");
+    Set<String> traceConfigKeys = Set.of("solver.trace", "solver.tracefile", "solver.solver");
     for (Entry<String, String> entry : properties.entrySet()) {
       if (entry.getKey().startsWith("solver") && !traceConfigKeys.contains(entry.getKey())) {
         options.put(entry.getKey(), entry.getValue());

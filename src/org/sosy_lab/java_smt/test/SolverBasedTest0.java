@@ -140,7 +140,7 @@ public abstract class SolverBasedTest0 {
           String.format(
               "traces/%s/trace_%s_%s.java",
               this.getClass().getSimpleName(), testName.getMethodName(), System.nanoTime());
-      newConfig.setOption("solver.trace", "true").setOption("trace.file", tracefile);
+      newConfig.setOption("solver.trace", "true").setOption("solver.tracefile", tracefile);
       Configuration configForFiles = Configuration.builder().setOption("output.path", "./").build();
       FileTypeConverter fileTypeConverter = FileTypeConverter.create(configForFiles);
       Configuration.getDefaultConverters().put(FileOption.class, fileTypeConverter);
