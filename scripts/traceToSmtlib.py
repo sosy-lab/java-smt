@@ -1465,7 +1465,7 @@ def translate(prog: List[Definition]):
                 arg2 = stmt.value[-1].args[1]
                 arg3 = stmt.value[-1].args[2]
                 sortMap[stmt.variable] = BooleanType()
-                if arg3 is []:
+                if arg2 is []:
                     log(Def(stmt.variable, sortMap[stmt.variable], toVar(arg3)))
                 else:
                     log(Def(stmt.variable, sortMap[stmt.variable],
