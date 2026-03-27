@@ -298,12 +298,12 @@ def litBitvectorType():
 
 @generate
 def litFloatType():
-    yield string("FormulaType.getFloatingPointType(") >> whitespace.optional()
+    yield string("FormulaType.getFloatingPointTypeFromSizesWithHiddenBit(") >> whitespace.optional()
     exponent = yield litInt
     yield whitespace.optional() << string(",") << whitespace.optional()
     significand = yield litInt
     yield whitespace.optional() << string(")")
-    return FloatType(exponent, 1 + significand)
+    return FloatType(exponent, significand)
 
 
 @generate
@@ -325,6 +325,7 @@ def test_type():
     assert litType.parse("FormulaType.BooleanType") == BooleanType()
     assert litType.parse("FormulaType.IntegerType") == IntegerType()
     assert litType.parse("FormulaType.getBitvectorTypeWithSize(8)") == BitvectorType(8)
+    assert litType.parse("FormulaType.getFloatingPointTypeFromSizesWithHiddenBit(8, 24)") == FloatType(8, 24)
     assert (litType.parse("FormulaType.getArrayType(FormulaType.IntegerType, FormulaType.IntegerType)")
             == ArrayType(IntegerType(), IntegerType()))
 
