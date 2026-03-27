@@ -314,7 +314,9 @@ class SmtInterpolFormulaCreator extends FormulaCreator<Term, Sort, Script, Funct
       case "+":
         return FunctionDeclarationKind.ADD;
       case "-":
-        return FunctionDeclarationKind.SUB;
+        var arity = input.getParameters().length;
+        checkArgument(arity > 0);
+        return arity == 1 ? FunctionDeclarationKind.UMINUS : FunctionDeclarationKind.SUB;
       case "/":
       case "div":
         return FunctionDeclarationKind.DIV;
