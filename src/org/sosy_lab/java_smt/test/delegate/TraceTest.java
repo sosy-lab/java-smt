@@ -57,7 +57,7 @@ public class TraceTest {
     Configuration config =
         Configuration.builder()
             .setOption("solver.trace", "true")
-            .setOption("solver.tracefile", traceFile.toString())
+            .setOption("trace.file", traceFile.toString())
             .addConverter(FileOption.class, fileTypeConverter)
             .build();
 
