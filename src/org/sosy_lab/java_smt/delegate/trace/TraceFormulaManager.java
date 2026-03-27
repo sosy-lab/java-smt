@@ -142,7 +142,10 @@ class TraceFormulaManager implements FormulaManager {
     public Formula visitFreeVariable(Formula f, String name) {
       if (!logger.isTracked(f)) {
         var g = makeVariable(delegate.getFormulaType(f), name);
-        Preconditions.checkArgument(g.equals(f), "%s (should be: %s)", g, f);
+        if (!g.equals(f)) { // can happen after simplifications, bad for tracing, but happens.
+          logManager.logf(Level.WARNING, "Formula '%s' is not an identity of '%s'.", g, f);
+          logger.mapVariable(logger.toVariable(g), f);
+        }
       }
       return f;
     }
@@ -176,7 +179,10 @@ class TraceFormulaManager implements FormulaManager {
                   "Unsupported value: Formula=%s, Value=%s",
                   delegate.getFormulaType(f), value.getClass().getName()));
         }
-        Preconditions.checkArgument(g.equals(f), "%s (should be: %s)", g, f);
+        if (!g.equals(f)) { // can happen after simplifications, bad for tracing, but happens.
+          logManager.logf(Level.WARNING, "Formula '%s' is not an identity of '%s'.", g, f);
+          logger.mapVariable(logger.toVariable(g), f);
+        }
       }
       return f;
     }
@@ -188,7 +194,8 @@ class TraceFormulaManager implements FormulaManager {
       if (!logger.isTracked(f)) {
         Formula g = makeApplication(functionDeclaration, args);
         if (!g.equals(f)) { // can happen after simplifications, bad for tracing, but happens.
-          logManager.log(Level.WARNING, "Formula '%s' is not an identity of '%s'.", g, f);
+          logManager.logf(Level.WARNING, "Formula '%s' is not an identity of '%s'.", g, f);
+          logger.mapVariable(logger.toVariable(g), f);
         }
       }
       return f;
@@ -209,7 +216,10 @@ class TraceFormulaManager implements FormulaManager {
         } else {
           g = getQuantifiedFormulaManager().forall(bound, body);
         }
-        Preconditions.checkArgument(g.equals(f), "%s (should be: %s)", g, f);
+        if (!g.equals(f)) { // can happen after simplifications, bad for tracing, but happens.
+          logManager.logf(Level.WARNING, "Formula '%s' is not an identity of '%s'.", g, f);
+          logger.mapVariable(logger.toVariable(g), f);
+        }
       }
       return f;
     }
