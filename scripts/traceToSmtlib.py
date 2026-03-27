@@ -1533,13 +1533,28 @@ def translate(prog: List[Definition]):
         elif stmt.getCalls()[-1] == "isUnsat":
             log(toConst('(check-sat)'))
 
-        elif stmt.getCalls() == ["mgr", "makeVariable"]:
-            arg1 = stmt.value[-1].args[0]
-            arg2 = stmt.value[-1].args[1]
-            if '|' in arg2:
-                continue  # Skip illegal names
-            sortMap[stmt.variable] = arg1
-            log(Def(stmt.variable, sortMap[stmt.variable], None))
+        elif stmt.getCalls()[:-1] == ["mgr"]:
+            if stmt.getCalls()[-1] == "makeVariable":
+                arg1 = stmt.value[-1].args[0]
+                arg2 = stmt.value[-1].args[1]
+                if '|' in arg2:
+                    continue  # Skip illegal names
+                sortMap[stmt.variable] = arg1
+                log(Def(stmt.variable, sortMap[stmt.variable], None))
+            elif stmt.getCalls()[-1] == "makeEqual":
+                arg1 = stmt.value[-1].args[0]
+                arg2 = stmt.value[-1].args[1]
+                sortMap[stmt.variable] = BooleanType()
+                log(Def(stmt.variable, sortMap[stmt.variable], toExpr('=', arg1, arg2)))
+            elif stmt.getCalls()[-1] == "makeDistinct":
+                args = stmt.value[-1].args
+                sortMap[stmt.variable] = BooleanType()
+                if len(args) < 2:
+                    log(Def(stmt.variable, sortMap[stmt.variable], toConst('true')))
+                else:
+                    log(Def(stmt.variable, sortMap[stmt.variable], toExpr('distinct', *args)))
+            else:
+                raise Exception(f'Unsupported call: {stmt.getCalls()}')
 
         elif stmt.getCalls()[-1] == "newProverEnvironment":
             pass
