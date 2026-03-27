@@ -1551,10 +1551,12 @@ def translate(prog: List[Definition]):
                 sortMap[stmt.variable] = arg1
                 log(Def(stmt.variable, sortMap[stmt.variable], None))
             elif stmt.getCalls()[-1] == "makeEqual":
-                arg1 = stmt.value[-1].args[0]
-                arg2 = stmt.value[-1].args[1]
+                args = stmt.value[-1].args
                 sortMap[stmt.variable] = BooleanType()
-                log(Def(stmt.variable, sortMap[stmt.variable], toExpr('=', arg1, arg2)))
+                if len(args) < 2:
+                   log(Def(stmt.variable, sortMap[stmt.variable], toConst('true')))
+                else:
+                   log(Def(stmt.variable, sortMap[stmt.variable], toExpr('=', *args)))
             elif stmt.getCalls()[-1] == "makeDistinct":
                 args = stmt.value[-1].args
                 sortMap[stmt.variable] = BooleanType()
