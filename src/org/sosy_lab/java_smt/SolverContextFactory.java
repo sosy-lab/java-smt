@@ -250,6 +250,7 @@ public class SolverContextFactory {
       case CVC4:
         return CVC4SolverContext.create(
             logger,
+            config,
             shutdownNotifier,
             (int) randomSeed,
             nonLinearArithmetic,

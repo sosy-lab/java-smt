@@ -63,6 +63,7 @@ public final class PrincessSolverContext extends AbstractSolverContext {
     PrincessFormulaManager manager =
         new PrincessFormulaManager(
             pLogger,
+            config,
             creator,
             functionTheory,
             booleanTheory,

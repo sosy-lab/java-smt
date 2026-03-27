@@ -138,6 +138,7 @@ public final class BitwuzlaSolverContext extends AbstractSolverContext {
     BitwuzlaFormulaManager manager =
         new BitwuzlaFormulaManager(
             pLogger,
+            config,
             creator,
             functionTheory,
             booleanTheory,

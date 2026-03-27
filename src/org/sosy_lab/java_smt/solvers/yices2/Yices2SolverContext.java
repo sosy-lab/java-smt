@@ -99,6 +99,7 @@ public final class Yices2SolverContext extends AbstractSolverContext {
     Yices2FormulaManager manager =
         new Yices2FormulaManager(
             pLogger,
+            pConfig,
             creator,
             functionTheory,
             booleanTheory,

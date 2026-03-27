@@ -11,6 +11,8 @@ package org.sosy_lab.java_smt.solvers.opensmt;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 import java.util.Map;
+import org.sosy_lab.common.configuration.Configuration;
+import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager;
@@ -27,14 +29,17 @@ class OpenSmtFormulaManager extends AbstractFormulaManager<PTRef, SRef, Logic, S
 
   OpenSmtFormulaManager(
       LogManager pLogger,
+      Configuration pConfiguration,
       OpenSmtFormulaCreator pFormulaCreator,
       OpenSmtUFManager pFfmgr,
       OpenSmtBooleanFormulaManager pBfmgr,
       OpenSmtIntegerFormulaManager pIfmgr,
       OpenSmtRationalFormulaManager pRfmgr,
-      OpenSmtArrayFormulaManager pAfmgr) {
+      OpenSmtArrayFormulaManager pAfmgr)
+      throws InvalidConfigurationException {
     super(
         pLogger,
+        pConfiguration,
         pFormulaCreator,
         pFfmgr,
         pBfmgr,

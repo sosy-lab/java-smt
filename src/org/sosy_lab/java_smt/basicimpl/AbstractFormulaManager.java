@@ -32,6 +32,10 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.Appender;
 import org.sosy_lab.common.Appenders;
 import org.sosy_lab.common.collect.Collections3;
+import org.sosy_lab.common.configuration.Configuration;
+import org.sosy_lab.common.configuration.InvalidConfigurationException;
+import org.sosy_lab.common.configuration.Option;
+import org.sosy_lab.common.configuration.Options;
 import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.java_smt.api.ArrayFormulaManager;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -65,6 +69,21 @@ import org.sosy_lab.java_smt.utils.SolverUtils;
 @SuppressWarnings("ClassTypeParameterName")
 public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl>
     implements FormulaManager {
+
+  @Options(prefix = "parser")
+  private static class ParserOptions {
+    @Option(
+        secure = true,
+        description = "Sets how unknown commands should be handled while parsing",
+        values = {"ignore", "log", "fail"})
+    String illegalInput = "ignore";
+
+    ParserOptions(Configuration config) throws InvalidConfigurationException {
+      config.inject(this);
+    }
+  }
+
+  private final ParserOptions options;
 
   /**
    * Avoid using basic mathematical or logical operators of SMT-LIB2 as names for symbols.
@@ -145,6 +164,7 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
   @SuppressWarnings("checkstyle:parameternumber")
   protected AbstractFormulaManager(
       LogManager logger,
+      Configuration config,
       FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> pFormulaCreator,
       AbstractUFManager<TFormulaInfo, ?, TType, TEnv> functionManager,
       AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl> booleanManager,
@@ -159,9 +179,10 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
       @Nullable AbstractArrayFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl> arrayManager,
       @Nullable AbstractSLFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl> slManager,
       @Nullable AbstractStringFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl> strManager,
-      @Nullable AbstractEnumerationFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl>
-          enumManager) {
+      @Nullable AbstractEnumerationFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl> enumManager)
+      throws InvalidConfigurationException {
 
+    this.options = new ParserOptions(config);
     this.logger = logger;
 
     this.arrayManager = arrayManager;
@@ -432,8 +453,16 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
         // We can safely skip this token
 
       } else {
-        // Skip unsupported or solver specific commands
-        logger.logf(Level.WARNING, "Unexpected input: %s", token);
+        // We've encountered an illegal command
+        // Skip, report or crash, depending on value of the 'parser.illegalInput' option
+        var msg = String.format("Unexpected input: %s", token);
+        if (options.illegalInput.equals("fail")) {
+          throw new IllegalArgumentException(msg);
+        } else if (options.illegalInput.equals("log")) {
+          logger.log(Level.WARNING, msg);
+        } else {
+          // Ignore
+        }
       }
       pos++;
     }

@@ -201,6 +201,7 @@ public final class Z3SolverContext extends AbstractSolverContext {
     Z3FormulaManager manager =
         new Z3FormulaManager(
             logger,
+            config,
             creator,
             functionTheory,
             booleanTheory,

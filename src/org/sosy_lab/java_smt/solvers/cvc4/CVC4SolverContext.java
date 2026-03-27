@@ -17,6 +17,7 @@ import java.util.Set;
 import java.util.function.Consumer;
 import java.util.logging.Level;
 import org.sosy_lab.common.ShutdownNotifier;
+import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.FloatingPointRoundingMode;
@@ -47,11 +48,13 @@ public final class CVC4SolverContext extends AbstractSolverContext {
 
   public static SolverContext create(
       LogManager pLogger,
+      org.sosy_lab.common.configuration.Configuration pConfiguration,
       ShutdownNotifier pShutdownNotifier,
       int randomSeed,
       NonLinearArithmetic pNonLinearArithmetic,
       FloatingPointRoundingMode pFloatingPointRoundingMode,
-      Consumer<String> pLoader) {
+      Consumer<String> pLoader)
+      throws InvalidConfigurationException {
 
     pLoader.accept("cvc4jni");
 
@@ -95,6 +98,7 @@ public final class CVC4SolverContext extends AbstractSolverContext {
     CVC4FormulaManager manager =
         new CVC4FormulaManager(
             pLogger,
+            pConfiguration,
             creator,
             functionTheory,
             booleanTheory,

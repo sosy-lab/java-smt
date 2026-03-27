@@ -138,6 +138,7 @@ public final class OpenSmtSolverContext extends AbstractSolverContext {
     OpenSmtFormulaManager manager =
         new OpenSmtFormulaManager(
             pLogger,
+            config,
             creator,
             functionTheory,
             booleanTheory,

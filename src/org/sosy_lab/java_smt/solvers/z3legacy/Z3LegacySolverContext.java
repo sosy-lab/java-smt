@@ -191,6 +191,7 @@ public final class Z3LegacySolverContext extends AbstractSolverContext {
     Z3LegacyFormulaManager manager =
         new Z3LegacyFormulaManager(
             logger,
+            config,
             creator,
             functionTheory,
             booleanTheory,

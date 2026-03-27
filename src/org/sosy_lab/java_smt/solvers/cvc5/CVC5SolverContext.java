@@ -167,6 +167,7 @@ public final class CVC5SolverContext extends AbstractSolverContext {
     CVC5FormulaManager manager =
         new CVC5FormulaManager(
             pLogger,
+            pConfig,
             pCreator,
             functionTheory,
             booleanTheory,

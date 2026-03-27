@@ -99,7 +99,7 @@ public final class BoolectorSolverContext extends AbstractSolverContext {
     BoolectorArrayFormulaManager arrayTheory = new BoolectorArrayFormulaManager(creator);
     BoolectorFormulaManager manager =
         new BoolectorFormulaManager(
-            pLogger, creator, functionTheory, booleanTheory, bitvectorTheory, arrayTheory);
+            pLogger, config, creator, functionTheory, booleanTheory, bitvectorTheory, arrayTheory);
     return new BoolectorSolverContext(manager, creator, pShutdownNotifier);
   }
 

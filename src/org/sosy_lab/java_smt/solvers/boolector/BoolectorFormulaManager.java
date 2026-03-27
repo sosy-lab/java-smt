@@ -9,6 +9,8 @@
 package org.sosy_lab.java_smt.solvers.boolector;
 
 import java.util.List;
+import org.sosy_lab.common.configuration.Configuration;
+import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager;
@@ -17,13 +19,16 @@ final class BoolectorFormulaManager extends AbstractFormulaManager<Long, Long, L
 
   BoolectorFormulaManager(
       LogManager pLogger,
+      Configuration pConfiguration,
       BoolectorFormulaCreator pFormulaCreator,
       BoolectorUFManager pFunctionManager,
       BoolectorBooleanFormulaManager pBooleanManager,
       BoolectorBitvectorFormulaManager pBitvectorManager,
-      BoolectorArrayFormulaManager pArrayManager) {
+      BoolectorArrayFormulaManager pArrayManager)
+      throws InvalidConfigurationException {
     super(
         pLogger,
+        pConfiguration,
         pFormulaCreator,
         pFunctionManager,
         pBooleanManager,

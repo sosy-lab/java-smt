@@ -21,6 +21,8 @@ import java.io.OutputStream;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import org.sosy_lab.common.configuration.Configuration;
+import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
@@ -33,6 +35,7 @@ class CVC4FormulaManager extends AbstractFormulaManager<Expr, Type, ExprManager,
   @SuppressWarnings("checkstyle:parameternumber")
   CVC4FormulaManager(
       LogManager pLogger,
+      Configuration pConfiguration,
       CVC4FormulaCreator pFormulaCreator,
       CVC4UFManager pFfmgr,
       CVC4BooleanFormulaManager pBfmgr,
@@ -43,9 +46,11 @@ class CVC4FormulaManager extends AbstractFormulaManager<Expr, Type, ExprManager,
       CVC4QuantifiedFormulaManager pQfmgr,
       CVC4ArrayFormulaManager pAfmgr,
       CVC4SLFormulaManager pSLfmgr,
-      CVC4StringFormulaManager pStrmgr) {
+      CVC4StringFormulaManager pStrmgr)
+      throws InvalidConfigurationException {
     super(
         pLogger,
+        pConfiguration,
         pFormulaCreator,
         pFfmgr,
         pBfmgr,
