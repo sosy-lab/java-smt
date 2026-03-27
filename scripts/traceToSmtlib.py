@@ -1487,6 +1487,10 @@ def translate(prog: List[Definition]):
             # TODO
             raise Exception(f'Separation logic is not supported yet')
 
+        elif stmt.getCalls()[-1] == "newOptimizationProverEnvironment":
+            # TODO
+            raise Exception(f'Optimization is not supported yet')
+
         elif stmt.getCalls()[:-1] == ["mgr", "getUFManager"]:
             if stmt.getCalls()[-1] == "callUF":
                 arg0 = stmt.value[-1].args[0]
