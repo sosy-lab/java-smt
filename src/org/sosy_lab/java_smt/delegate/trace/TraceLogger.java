@@ -313,7 +313,7 @@ class TraceLogger implements AutoCloseable {
     if (pType.isFloatingPointType()) {
       FloatingPointType fpType = (FloatingPointType) pType;
       return String.format(
-          "FormulaType.getFloatingPointTypeFromSizesWithHiddenBit((%s, %s)",
+          "FormulaType.getFloatingPointTypeFromSizesWithHiddenBit(%s, %s)",
           fpType.getExponentSize(), fpType.getMantissaSizeWithHiddenBit());
     }
     if (pType.isStringType()) {
