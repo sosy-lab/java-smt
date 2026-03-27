@@ -1538,6 +1538,10 @@ def translate(prog: List[Definition]):
         elif stmt.getCalls()[-1] == "isUnsat":
             log(toConst('(check-sat)'))
 
+        elif stmt.getCalls()[-1] == "isUnsatWithAssumptions":
+            # TODO Smtlib has a 'check-sat-assuming' for this. However, it only supports literals
+            raise Exception('Checking with assumptions is not supported yet')
+
         elif stmt.getCalls()[:-1] == ["mgr"]:
             if stmt.getCalls()[-1] == "makeVariable":
                 arg1 = stmt.value[-1].args[0]
