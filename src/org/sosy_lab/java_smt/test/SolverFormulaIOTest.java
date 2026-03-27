@@ -557,9 +557,7 @@ public class SolverFormulaIOTest extends SolverBasedTest0.ParameterizedSolverBas
     if (ImmutableSet.of(Solvers.Z3, Solvers.CVC4).contains(solverToUse())) {
       checkThatDumpIsParseableWithCurrentSolver(TO_IEEE_BV_DUMP_Z3);
     } else {
-      assertThrows(
-          IllegalArgumentException.class,
-          () -> checkThatDumpIsParseableWithCurrentSolver(TO_IEEE_BV_DUMP_Z3));
+      assertThatDumpThrowsWhenParsingWithCurrentSolver(TO_IEEE_BV_DUMP_Z3);
     }
   }
 
@@ -573,9 +571,7 @@ public class SolverFormulaIOTest extends SolverBasedTest0.ParameterizedSolverBas
     if (ImmutableSet.of(Solvers.MATHSAT5, Solvers.CVC4).contains(solverToUse())) {
       checkThatDumpIsParseableWithCurrentSolver(TO_IEEE_BV_DUMP_MATHSAT5);
     } else {
-      assertThrows(
-          IllegalArgumentException.class,
-          () -> checkThatDumpIsParseableWithCurrentSolver(TO_IEEE_BV_DUMP_MATHSAT5));
+      assertThatDumpThrowsWhenParsingWithCurrentSolver(TO_IEEE_BV_DUMP_MATHSAT5);
     }
   }
 
@@ -653,6 +649,20 @@ public class SolverFormulaIOTest extends SolverBasedTest0.ParameterizedSolverBas
     try {
       requireParser();
       mgr.parse(dump);
+    } catch (AssumptionViolatedException ave) {
+      // ignore, i.e., do not report test-case as skipped.
+    }
+  }
+
+  /**
+   * Asserts that parsing the given dump in the current solver throws a {@link
+   * IllegalArgumentException}.
+   */
+  @SuppressWarnings("CheckReturnValue")
+  private void assertThatDumpThrowsWhenParsingWithCurrentSolver(String dump) {
+    try {
+      requireParser();
+      assertThrows(IllegalArgumentException.class, () -> mgr.parse(dump));
     } catch (AssumptionViolatedException ave) {
       // ignore, i.e., do not report test-case as skipped.
     }
