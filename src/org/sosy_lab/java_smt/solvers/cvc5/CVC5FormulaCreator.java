@@ -554,6 +554,7 @@ class CVC5FormulaCreator extends FormulaCreator<Term, Sort, TermManager, Term> {
           .put(Kind.XOR, FunctionDeclarationKind.XOR)
           .put(Kind.ITE, FunctionDeclarationKind.ITE)
           .put(Kind.APPLY_UF, FunctionDeclarationKind.UF)
+          .put(Kind.NEG, FunctionDeclarationKind.UMINUS)
           .put(Kind.ADD, FunctionDeclarationKind.ADD)
           .put(Kind.MULT, FunctionDeclarationKind.MUL)
           .put(Kind.SUB, FunctionDeclarationKind.SUB)
