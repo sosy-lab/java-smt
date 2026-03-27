@@ -436,18 +436,7 @@ class TraceFormulaManager implements FormulaManager {
               getBooleanFormulaManager()
                   .implication((BooleanFormula) args.get(0), (BooleanFormula) args.get(1));
         case DISTINCT:
-          if (declaration.getType().isIntegerType()) {
-            return (T) getIntegerFormulaManager().distinct((List<IntegerFormula>) args);
-          } else if (declaration.getType().isRationalType()) {
-            return (T) getRationalFormulaManager().distinct((List<NumeralFormula>) args);
-          } else if (declaration.getType().isBitvectorType()) {
-            return (T) getBitvectorFormulaManager().distinct((List<BitvectorFormula>) args);
-          } else {
-            // FIXME JavaSMT only supports 'distinct' for some of its theories
-            throw new UnsupportedOperationException(
-                String.format(
-                    "Operator 'distinct' not " + "supported for %ss", declaration.getType()));
-          }
+          return (T) makeDistinct((Iterable<Formula>) args);
         case STORE:
           return (T)
               getArrayFormulaManager().store((ArrayFormula) args.get(0), args.get(1), args.get(2));
@@ -527,46 +516,7 @@ class TraceFormulaManager implements FormulaManager {
               getRationalFormulaManager()
                   .greaterOrEquals((NumeralFormula) args.get(0), (NumeralFormula) args.get(1));
         case EQ:
-          // FIXME Add a case for enum formulas
-          Preconditions.checkArgument(args.size() == 2);
-          if (declaration.getArgumentTypes().get(0).isBooleanType()) {
-            return (T)
-                getBooleanFormulaManager()
-                    .equivalence((BooleanFormula) args.get(0), (BooleanFormula) args.get(1));
-          } else if (declaration.getArgumentTypes().get(1).isNumeralType()) {
-            if (declaration.getArgumentTypes().get(0).isRationalType()
-                || declaration.getArgumentTypes().get(1).isRationalType()) {
-              return (T)
-                  getRationalFormulaManager()
-                      .equal((NumeralFormula) args.get(0), (NumeralFormula) args.get(1));
-            } else {
-              return (T)
-                  getIntegerFormulaManager()
-                      .equal((IntegerFormula) args.get(0), (IntegerFormula) args.get(1));
-            }
-          } else if (declaration.getArgumentTypes().get(0).isStringType()) {
-            return (T)
-                getStringFormulaManager()
-                    .equal((StringFormula) args.get(0), (StringFormula) args.get(1));
-
-          } else if (declaration.getArgumentTypes().get(0).isBitvectorType()) {
-            return (T)
-                getBitvectorFormulaManager()
-                    .equal((BitvectorFormula) args.get(0), (BitvectorFormula) args.get(1));
-          } else if (declaration.getArgumentTypes().get(0).isFloatingPointType()) {
-            return (T)
-                getFloatingPointFormulaManager()
-                    .assignment(
-                        (FloatingPointFormula) args.get(0), (FloatingPointFormula) args.get(1));
-          } else if (declaration.getArgumentTypes().get(0).isArrayType()) {
-            return (T)
-                getArrayFormulaManager()
-                    .equivalence((ArrayFormula) args.get(0), (ArrayFormula) args.get(1));
-          } else {
-            throw new UnsupportedOperationException(
-                String.format(
-                    "EQ not supported for theory %s", declaration.getArgumentTypes().get(0)));
-          }
+          return (T) makeEqual((Iterable<Formula>) args);
         case EQ_ZERO:
           if (args.get(0) instanceof IntegerFormula) {
             return (T)
