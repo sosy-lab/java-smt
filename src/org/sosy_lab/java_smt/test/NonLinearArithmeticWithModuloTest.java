@@ -22,6 +22,7 @@ import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
 import org.sosy_lab.common.configuration.ConfigurationBuilder;
+import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
@@ -53,7 +54,7 @@ public class NonLinearArithmeticWithModuloTest extends SolverBasedTest0 {
   public NonLinearArithmetic nonLinearArithmetic;
 
   @Override
-  protected ConfigurationBuilder createTestConfigBuilder() {
+  protected ConfigurationBuilder createTestConfigBuilder() throws InvalidConfigurationException {
     return super.createTestConfigBuilder()
         .setOption("solver.nonLinearArithmetic", nonLinearArithmetic.name());
   }
