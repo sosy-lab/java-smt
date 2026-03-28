@@ -28,8 +28,8 @@ import org.sosy_lab.java_smt.api.SolverException;
  */
 class InterpolatingProverDelegate<T> implements InterpolatingProverEnvironment<T> {
 
-  InterpolatingProverEnvironment<T> itpProver;
-  AbstractProver<T> abstractProver;
+  private final InterpolatingProverEnvironment<T> itpProver;
+  private final AbstractProver<T> abstractProver;
 
   @SuppressWarnings("unchecked")
   InterpolatingProverDelegate(InterpolatingProverEnvironment<T> pBaseProver) {
