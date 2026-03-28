@@ -29,7 +29,7 @@ import java.util.List;
 import java.util.Set;
 import org.sosy_lab.java_smt.basicimpl.AbstractModel;
 
-public class CVC4Model extends AbstractModel<Expr, Type, ExprManager> {
+class CVC4Model extends AbstractModel<Expr, Type, ExprManager> {
 
   private final ImmutableList<ValueAssignment> model;
   private final SmtEngine smtEngine;

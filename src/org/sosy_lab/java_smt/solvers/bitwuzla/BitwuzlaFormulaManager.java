@@ -30,7 +30,7 @@ import org.sosy_lab.java_smt.solvers.bitwuzla.api.TermManager;
 import org.sosy_lab.java_smt.solvers.bitwuzla.api.Vector_Int;
 import org.sosy_lab.java_smt.solvers.bitwuzla.api.Vector_Term;
 
-public final class BitwuzlaFormulaManager
+final class BitwuzlaFormulaManager
     extends AbstractFormulaManager<Term, Sort, TermManager, BitwuzlaDeclaration> {
   private final BitwuzlaFormulaCreator creator;
   private final Options bitwuzlaOption;

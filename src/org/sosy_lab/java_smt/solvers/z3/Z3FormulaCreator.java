@@ -9,7 +9,6 @@
 package org.sosy_lab.java_smt.solvers.z3;
 
 import static com.google.common.base.Preconditions.checkArgument;
-import static com.microsoft.z3.enumerations.Z3_decl_kind.Z3_OP_DISTINCT;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.HashBasedTable;
@@ -670,7 +669,7 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
     Z3_decl_kind decl =
         Z3_decl_kind.fromInt(Native.getDeclKind(environment, Native.getAppDecl(environment, f)));
 
-    assert (arity > 0) || (arity == 0 && decl == Z3_OP_DISTINCT)
+    assert arity >= 0
         : String.format(
             "Unexpected arity '%s' for formula '%s' for handling a function application.",
             arity, Native.astToString(environment, f));
@@ -1049,11 +1048,10 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
   }
 
   private Sign getSign(Long pValue) {
-    Native.IntPtr signPtr = new Native.IntPtr();
+    Native.BoolPtr signPtr = new Native.BoolPtr();
     Preconditions.checkState(
         Native.fpaGetNumeralSign(environment, pValue, signPtr), "Sign is not a Boolean value");
-    var sign = signPtr.value != 0;
-    return Sign.of(sign);
+    return Sign.of(signPtr.value);
   }
 
   @Override

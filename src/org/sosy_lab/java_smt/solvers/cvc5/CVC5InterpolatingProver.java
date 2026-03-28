@@ -32,7 +32,7 @@ import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 
-public class CVC5InterpolatingProver extends CVC5AbstractProver<String>
+class CVC5InterpolatingProver extends CVC5AbstractProver<String>
     implements InterpolatingProverEnvironment<String> {
 
   private final TermManager termManager = creator.getEnv();
@@ -181,7 +181,8 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<String>
     Term interpolant;
     try {
       itpSolver.assertFormula(phiPlus);
-      interpolant = itpSolver.getInterpolant(termManager.mkTerm(Kind.NOT, phiMinus));
+      interpolant =
+          itpSolver.simplify(itpSolver.getInterpolant(termManager.mkTerm(Kind.NOT, phiMinus)));
     } finally {
       itpSolver.deletePointer();
     }

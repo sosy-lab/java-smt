@@ -658,6 +658,8 @@ class PrincessFormulaCreator
         return FunctionDeclarationKind.OTHER;
       } else if (fun == ModuloArithmetic.int_cast()) {
         return FunctionDeclarationKind.OTHER;
+      } else if (fun == PrincessEnvironment.stringTheory.re_none()) {
+        return FunctionDeclarationKind.RE_NONE;
       } else {
         return FunctionDeclarationKind.UF;
       }
@@ -716,7 +718,11 @@ class PrincessFormulaCreator
   @Override
   public PrincessFunctionDeclaration declareUFImpl(
       String pName, Sort pReturnType, List<Sort> args) {
-    return environment.declareFun(pName, pReturnType, args);
+    if (args.isEmpty()) {
+      return new PrincessByExampleDeclaration(environment.makeVariable(pReturnType, pName));
+    } else {
+      return environment.declareFun(pName, pReturnType, args);
+    }
   }
 
   @Override

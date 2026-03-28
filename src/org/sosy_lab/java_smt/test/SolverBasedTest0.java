@@ -18,6 +18,8 @@ import java.util.Collection;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
+import org.junit.rules.TestName;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
@@ -26,12 +28,16 @@ import org.sosy_lab.common.ShutdownManager;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.configuration.Configuration;
 import org.sosy_lab.common.configuration.ConfigurationBuilder;
+import org.sosy_lab.common.configuration.FileOption;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
+import org.sosy_lab.common.configuration.converters.FileTypeConverter;
+import org.sosy_lab.common.io.PathTemplate;
 import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.java_smt.SolverContextFactory;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.ArrayFormulaManager;
 import org.sosy_lab.java_smt.api.BasicProverEnvironment;
+import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BitvectorFormulaManager;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.BooleanFormulaManager;
@@ -87,6 +93,8 @@ import org.sosy_lab.java_smt.solvers.opensmt.Logics;
  */
 public abstract class SolverBasedTest0 {
 
+  @Rule public TestName testName = new TestName();
+
   protected Configuration config;
   protected final LogManager logger = LogManager.createTestLogManager();
 
@@ -123,13 +131,51 @@ public abstract class SolverBasedTest0 {
     return Logics.QF_AUFLIRA;
   }
 
-  protected ConfigurationBuilder createTestConfigBuilder() {
+  protected ConfigurationBuilder createTestConfigBuilder() throws InvalidConfigurationException {
     ConfigurationBuilder newConfig =
         Configuration.builder().setOption("solver.solver", solverToUse().toString());
+
+    if (enableTracing()) {
+      String tracefile =
+          String.format(
+              "traces/%s/trace_%s_%s.java",
+              this.getClass().getSimpleName(), testName.getMethodName(), System.nanoTime());
+      newConfig.setOption("solver.trace", "true").setOption("solver.tracefile", tracefile);
+      FileTypeConverter fileTypeConverter =
+          FileTypeConverter.create(Configuration.defaultConfiguration());
+      Configuration.getDefaultConverters().put(FileOption.class, fileTypeConverter);
+      newConfig.addConverter(PathTemplate.class, fileTypeConverter);
+    }
+
     if (solverToUse() == Solvers.OPENSMT) {
       newConfig.setOption("solver.opensmt.logic", logicToUse().toString());
     }
+
     return newConfig;
+  }
+
+  /**
+   * Determines whether execution tracing is enabled for the test suite.
+   *
+   * <p>Tracing is <b>disabled by default</b> for the following reasons:
+   *
+   * <ul>
+   *   <li><b>Compatibility:</b> Some solvers lack support for tracing-related operations, such as
+   *       formula visitation or BitVector-to-Integer conversion.
+   *   <li><b>Isolation:</b> Tracing can alter memory pressure or formula allocation patterns,
+   *       potentially causing non-deterministic behavior or masking bugs.
+   *   <li><b>Performance:</b> Enabling tracing may increase execution time and complicate the
+   *       debugging process.
+   * </ul>
+   *
+   * <p>To enable tracing, override this method in your test class to return {@code true}. The
+   * produced trace will be stored in the "output/traces" directory with a filename pattern of
+   * "trace_[TestClassName]_[TestMethodName]_[Timestamp].java".
+   *
+   * @return {@code true} if tracing should be enabled; {@code false} otherwise.
+   */
+  protected boolean enableTracing() {
+    return false;
   }
 
   @Before
@@ -402,7 +448,7 @@ public abstract class SolverBasedTest0 {
     assume()
         .withMessage("Solver %s does not support unsat core generation", solverToUse())
         .that(solverToUse())
-        .isNotEqualTo(Solvers.PRINCESS);
+        .isNoneOf(Solvers.OPENSMT, Solvers.PRINCESS, Solvers.BOOLECTOR, Solvers.CVC4, Solvers.CVC5);
   }
 
   protected void requireSubstitution() {
@@ -484,6 +530,56 @@ public abstract class SolverBasedTest0 {
         }
       }
     }
+  }
+
+  private static final int BITSIZE = 32;
+
+  protected Formula makeVariable(String name) {
+    return imgr == null ? bvmgr.makeVariable(BITSIZE, name) : imgr.makeVariable(name);
+  }
+
+  protected Formula makeNumber(int number) {
+    return imgr == null ? bvmgr.makeBitvector(BITSIZE, number) : imgr.makeNumber(number);
+  }
+
+  protected Formula addNumber(Formula x, Formula y) {
+    if (x instanceof IntegerFormula && y instanceof IntegerFormula) {
+      return imgr.add((IntegerFormula) x, (IntegerFormula) y);
+    }
+    if (x instanceof BitvectorFormula && y instanceof BitvectorFormula) {
+      return bvmgr.add((BitvectorFormula) x, (BitvectorFormula) y);
+    }
+    throw new IllegalArgumentException();
+  }
+
+  protected Formula multiplyNumber(Formula x, Formula y) {
+    if (x instanceof IntegerFormula && y instanceof IntegerFormula) {
+      return imgr.multiply((IntegerFormula) x, (IntegerFormula) y);
+    }
+    if (x instanceof BitvectorFormula && y instanceof BitvectorFormula) {
+      return bvmgr.multiply((BitvectorFormula) x, (BitvectorFormula) y);
+    }
+    throw new IllegalArgumentException();
+  }
+
+  protected BooleanFormula lessThanNumber(Formula x, Formula y) {
+    if (x instanceof IntegerFormula && y instanceof IntegerFormula) {
+      return imgr.lessThan((IntegerFormula) x, (IntegerFormula) y);
+    }
+    if (x instanceof BitvectorFormula && y instanceof BitvectorFormula) {
+      return bvmgr.lessThan((BitvectorFormula) x, (BitvectorFormula) y, true);
+    }
+    throw new IllegalArgumentException();
+  }
+
+  protected BooleanFormula greaterThanNumber(Formula x, Formula y) {
+    if (x instanceof IntegerFormula && y instanceof IntegerFormula) {
+      return imgr.greaterThan((IntegerFormula) x, (IntegerFormula) y);
+    }
+    if (x instanceof BitvectorFormula && y instanceof BitvectorFormula) {
+      return bvmgr.greaterThan((BitvectorFormula) x, (BitvectorFormula) y, true);
+    }
+    throw new IllegalArgumentException();
   }
 
   @RunWith(Parameterized.class)

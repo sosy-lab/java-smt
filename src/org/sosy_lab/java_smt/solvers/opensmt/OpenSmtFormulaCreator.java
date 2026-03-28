@@ -21,6 +21,7 @@ import org.sosy_lab.java_smt.api.FunctionDeclarationKind;
 import org.sosy_lab.java_smt.api.visitors.FormulaVisitor;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 import org.sosy_lab.java_smt.basicimpl.FunctionDeclarationImpl;
+import org.sosy_lab.java_smt.basicimpl.Tokenizer;
 import org.sosy_lab.java_smt.solvers.opensmt.OpenSmtFormula.OpenSmtArrayFormula;
 import org.sosy_lab.java_smt.solvers.opensmt.OpenSmtFormula.OpenSmtBooleanFormula;
 import org.sosy_lab.java_smt.solvers.opensmt.OpenSmtFormula.OpenSmtIntegerFormula;
@@ -36,7 +37,7 @@ import org.sosy_lab.java_smt.solvers.opensmt.api.SymRef;
 import org.sosy_lab.java_smt.solvers.opensmt.api.VectorPTRef;
 import org.sosy_lab.java_smt.solvers.opensmt.api.VectorSRef;
 
-public final class OpenSmtFormulaCreator extends FormulaCreator<PTRef, SRef, Logic, SymRef> {
+final class OpenSmtFormulaCreator extends FormulaCreator<PTRef, SRef, Logic, SymRef> {
 
   private final Logics logicToUse;
 
@@ -52,7 +53,7 @@ public final class OpenSmtFormulaCreator extends FormulaCreator<PTRef, SRef, Log
     logicToUse = logicType;
   }
 
-  public static OpenSmtFormulaCreator create(Logics logicType) {
+  static OpenSmtFormulaCreator create(Logics logicType) {
     return new OpenSmtFormulaCreator(logicType, createLogic(logicType));
   }
 
@@ -358,7 +359,7 @@ public final class OpenSmtFormulaCreator extends FormulaCreator<PTRef, SRef, Log
 
     if (logic.isVar(f)) {
       String varName = logic.getSymName(logic.getSymRef(f));
-      return visitor.visitFreeVariable(formula, dequote(varName));
+      return visitor.visitFreeVariable(formula, Tokenizer.dequote(varName));
     }
 
     String varName = logic.getSymName(logic.getSymRef(f));

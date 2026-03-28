@@ -8,48 +8,16 @@
 
 package org.sosy_lab.java_smt.solvers.yices2;
 
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YVAL_ALGEBRAIC;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YVAL_BOOL;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YVAL_BV;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YVAL_FUNCTION;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YVAL_MAPPING;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YVAL_RATIONAL;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_application;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bvtype_size;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_def_terms;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_eq;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_false;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_free_model;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_get_term_name;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_get_value;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_get_value_as_term;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_model_to_string;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_parse_bvbin;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_parse_float;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_parse_rational;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_term_to_string;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_true;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_type_children;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_type_is_arithmetic;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_type_is_bitvector;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_type_is_bool;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_type_is_int;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_type_of_term;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_type_to_string;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_val_bitsize;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_val_expand_function;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_val_expand_mapping;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_val_function_arity;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_val_get_bool;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_val_get_bv;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_val_get_mpq;
-
-import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
-import com.google.common.base.Strings;
+import com.google.common.base.Verify;
+import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
-import com.google.common.primitives.Ints;
+import com.sri.yices.Model;
+import com.sri.yices.Terms;
+import com.sri.yices.Types;
+import com.sri.yices.VectorValue;
+import com.sri.yices.YVal;
+import com.sri.yices.YicesException;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
@@ -57,13 +25,13 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.basicimpl.AbstractModel;
 
-public class Yices2Model extends AbstractModel<Integer, Integer, Long> {
+class Yices2Model extends AbstractModel<Integer, Integer, Long> {
 
-  private final long model;
-  private final Yices2TheoremProver prover;
+  private final Model model;
+  private final Yices2AbstractProver<?> prover;
   private final Yices2FormulaCreator formulaCreator;
 
-  Yices2Model(long model, Yices2TheoremProver prover, Yices2FormulaCreator pCreator) {
+  Yices2Model(Model model, Yices2AbstractProver<?> prover, Yices2FormulaCreator pCreator) {
     super(prover, pCreator);
     this.model = model;
     this.prover = prover;
@@ -73,7 +41,7 @@ public class Yices2Model extends AbstractModel<Integer, Integer, Long> {
   @Override
   public void close() {
     if (!isClosed()) {
-      yices_free_model(model);
+      model.close();
     }
     super.close();
   }
@@ -83,145 +51,180 @@ public class Yices2Model extends AbstractModel<Integer, Integer, Long> {
     Preconditions.checkState(!isClosed());
     Preconditions.checkState(!prover.isClosed(), "cannot use model after prover is closed");
     ImmutableList.Builder<ValueAssignment> assignments = ImmutableList.builder();
-    int[] termsInModel = yices_def_terms(model);
+    int[] termsInModel = model.collectDefinedTerms();
     for (int term : termsInModel) {
-      int[] yvalTag = yices_get_value(model, term);
-      switch (yvalTag[1]) {
-        case YVAL_BOOL:
-        case YVAL_RATIONAL:
-        case YVAL_ALGEBRAIC:
-        case YVAL_BV:
+      YVal yval = model.getValue(term);
+      switch (yval.tag) {
+        case BOOL:
+        case RATIONAL:
+        case ALGEBRAIC:
+        case BV:
           assignments.add(getSimpleAssignment(term));
           continue;
-        case YVAL_FUNCTION: // UFs and Arrays
-          assignments.addAll(getFunctionAssignment(term, yvalTag));
+        case FUNCTION: // UFs and Arrays
+          if (formulaCreator.isArrayVariable(term)) {
+            assignments.addAll(getArrayAssignment(term, yval));
+          } else {
+            assignments.addAll(getFunctionAssignment(term, yval));
+          }
           continue;
         default:
-          throw new UnsupportedOperationException("YVAL with unexpected tag: " + yvalTag[1]);
+          throw new UnsupportedOperationException("YVAL with unexpected tag: " + yval.tag);
       }
     }
 
     return assignments.build();
   }
 
-  private ImmutableList<ValueAssignment> getFunctionAssignment(int t, int[] yval) {
+  private ImmutableList<ValueAssignment> getFunctionAssignment(int f, YVal value) {
+    int[] types = Types.children(Terms.typeOf(f));
+    VectorValue expandFun = model.expandFunction(value);
+
     ImmutableList.Builder<ValueAssignment> assignments = ImmutableList.builder();
-    int arity = yices_val_function_arity(model, yval[0], yval[1]);
-    int[] types = yices_type_children(yices_type_of_term(t));
-    int[] argTerms = new int[arity];
-    String name = yices_get_term_name(t);
-    int[] expandFun = yices_val_expand_function(model, yval[0], yval[1]);
-    for (int i = 2; i < expandFun.length - 1; i += 2) {
-      int[] expandMap;
-      if (expandFun[i + 1] == YVAL_MAPPING) {
-        expandMap = yices_val_expand_mapping(model, expandFun[i], arity, expandFun[i + 1]);
-      } else {
-        throw new IllegalArgumentException("Unexpected YVAL tag " + yval[1]);
+    for (var map : expandFun.vector) {
+      var x = model.expandMapping(map);
+
+      ImmutableList.Builder<Object> builderValues = ImmutableList.builder();
+      ImmutableList.Builder<Integer> builderTerms = ImmutableList.builder();
+
+      for (int p = 0; p < x.vector.length; p++) {
+        var v = x.vector[p];
+        var t = types[p];
+
+        var argValue = toValue(v, t);
+        var argTerm = constantValue(argValue, t);
+
+        builderValues.add(argValue);
+        builderTerms.add(argTerm);
       }
-      List<Object> argumentInterpretation = new ArrayList<>();
-      for (int j = 0; j < expandMap.length - 2; j += 2) {
-        Object argValue = valueFromYval(expandMap[j], expandMap[j + 1], types[j / 2]);
-        argumentInterpretation.add(argValue);
-        argTerms[j / 2] = valueAsTerm(types[j / 2], argValue);
-      }
-      Object funValue =
-          valueFromYval(
-              expandMap[expandMap.length - 2],
-              expandMap[expandMap.length - 1],
-              types[types.length - 1]);
-      int valueTerm = valueAsTerm(types[types.length - 1], funValue);
-      int funApp = yices_application(t, arity, argTerms);
+
+      var funValue = toValue(x.value, types[types.length - 1]);
+      var funTerm = constantValue(funValue, types[types.length - 1]);
+
+      var app = Terms.funApplication(f, builderTerms.build());
+
       assignments.add(
           new ValueAssignment(
-              creator.encapsulateWithTypeOf(funApp),
-              creator.encapsulateWithTypeOf(valueTerm),
-              creator.encapsulateBoolean(yices_eq(funApp, valueTerm)),
-              name,
+              creator.encapsulateWithTypeOf(app),
+              creator.encapsulateWithTypeOf(funTerm),
+              creator.encapsulateBoolean(Terms.eq(app, funTerm)),
+              Terms.getName(f),
               funValue,
-              argumentInterpretation));
+              builderValues.build()));
     }
     return assignments.build();
+  }
+
+  private List<ValueAssignment> getArrayAssignment0(
+      int f, Iterable<Integer> arguments, Iterable<Object> values, int type, YVal value) {
+    if (Types.isFunction(type)) {
+      var signature = Types.children(type);
+      Verify.verify(signature.length == 2);
+      var leftType = signature[0];
+      var rightType = signature[1];
+
+      ImmutableList.Builder<ValueAssignment> assignments = ImmutableList.builder();
+      for (var map : model.expandFunction(value).vector) {
+        var app = model.expandMapping(map);
+        Verify.verify(app.vector.length == 1);
+
+        // Build term for the current index
+        var leftValue = toValue(app.vector[0], leftType);
+        var leftTerm = constantValue(leftValue, leftType);
+
+        // Add it to the argument list
+        var newArguments = FluentIterable.concat(arguments, ImmutableList.of(leftTerm));
+        var newValue = FluentIterable.concat(values, ImmutableList.of(leftValue));
+
+        assignments.addAll(getArrayAssignment0(f, newArguments, newValue, rightType, app.value));
+      }
+      return assignments.build();
+
+    } else {
+      // Build term for the left side of the assignment
+      var app = f;
+      for (var arg : arguments) {
+        app = Terms.funApplication(app, arg);
+      }
+
+      // Build term for the value
+      var rightValue = toValue(value, type);
+      var rightTerm = constantValue(rightValue, type);
+
+      return ImmutableList.of(
+          new ValueAssignment(
+              creator.encapsulateWithTypeOf(app),
+              creator.encapsulateWithTypeOf(rightTerm),
+              creator.encapsulateBoolean(Terms.eq(app, rightTerm)),
+              Terms.getName(f),
+              rightValue,
+              ImmutableList.copyOf(values)));
+    }
+  }
+
+  private List<ValueAssignment> getArrayAssignment(int f, YVal value) {
+    return getArrayAssignment0(f, ImmutableList.of(), ImmutableList.of(), Terms.typeOf(f), value);
   }
 
   private ValueAssignment getSimpleAssignment(int t) {
     List<Object> argumentInterpretation = new ArrayList<>();
-    int valueTerm = yices_get_value_as_term(model, t);
+    int valueTerm = model.valueAsTerm(t);
     return new ValueAssignment(
         creator.encapsulateWithTypeOf(t),
         creator.encapsulateWithTypeOf(valueTerm),
-        creator.encapsulateBoolean(yices_eq(t, valueTerm)),
-        yices_get_term_name(t),
+        creator.encapsulateBoolean(Terms.eq(t, valueTerm)),
+        Terms.getName(t),
         formulaCreator.convertValue(t, valueTerm),
         argumentInterpretation);
   }
 
-  private Object valueFromYval(int id, int tag, int type) {
-    if (tag == YVAL_BOOL) {
-      return yices_val_get_bool(model, id, tag);
-    } else if (tag == YVAL_RATIONAL) {
-      String value = yices_val_get_mpq(model, id, tag);
-      if (yices_type_is_int(type) && !value.contains("/")) {
-        return new BigInteger(value);
-      } else {
-        return Rational.of(value);
-      }
-    } else if (tag == YVAL_BV) {
-      int size = yices_val_bitsize(model, id, tag);
-      int[] littleEndianBV = yices_val_get_bv(model, id, size, tag);
-      Preconditions.checkArgument(littleEndianBV.length != 0, "BV was empty");
-      String bigEndianBV = Joiner.on("").join(Lists.reverse(Ints.asList(littleEndianBV)));
-      return new BigInteger(bigEndianBV, 2);
-    } else {
-      throw new IllegalArgumentException("Unexpected YVAL tag: " + tag);
+  /** Convert a Yices value to a Java value. */
+  private Object toValue(YVal value, int type) {
+    switch (value.tag) {
+      case BOOL:
+        return model.boolValue(value);
+      case RATIONAL:
+        if (Types.isInt(type)) {
+          return model.bigIntegerValue(value);
+        } else {
+          var rational = model.bigRationalValue(value);
+          return Rational.of(rational.getNumerator(), rational.getDenominator());
+        }
+      case BV:
+        return Yices2FormulaCreator.bitsToInteger(model.bvValue(value));
+      default:
+        throw new IllegalArgumentException("Unexpected value type: " + value.tag);
     }
   }
 
-  private int valueAsTerm(int type, Object value) {
-    if (yices_type_is_bool(type)) {
-      if ((boolean) value) {
-        return yices_true();
-      } else {
-        return yices_false();
-      }
-    } else if (yices_type_is_arithmetic(type)) {
-      String val = value.toString();
-      if (val.contains("/")) {
-        return yices_parse_rational(val);
-      } else {
-        return yices_parse_float(val);
-      }
-    } else if (yices_type_is_bitvector(type)) {
-      BigInteger val = (BigInteger) value;
-      int bvSize = yices_bvtype_size(type);
-      String bits = val.toString(2);
-      assert bits.length() <= bvSize
-          : "numeral value " + val + " is out of range for size " + bvSize;
-      if (bits.length() < bvSize) {
-        bits = Strings.padStart(bits, bvSize, '0');
-      }
-      Preconditions.checkArgument(bits.length() == bvSize, "Bitvector has unexpected size.");
-      return yices_parse_bvbin(bits);
+  /** Create a term for a constant value. */
+  private int constantValue(Object value, int type) {
+    if (Types.isBool(type)) {
+      return Terms.mkBoolConst((Boolean) value);
+    } else if (Types.isInt(type)) {
+      return Terms.intConst((BigInteger) value);
+    } else if (Types.isReal(type)) {
+      var rational = (Rational) value;
+      return Terms.rationalConst(rational.getNum(), rational.getDen());
+    } else if (Types.isBitvector(type)) {
+      return Terms.bvConst(
+          Yices2FormulaCreator.integerToBits(Types.bvSize(type), (BigInteger) value));
     } else {
-      throw new IllegalArgumentException("Unexpected type: " + yices_type_to_string(type));
+      throw new IllegalArgumentException("Unexpected type: " + Types.toString(type));
     }
   }
 
   @Override
   protected @Nullable Integer evalImpl(Integer pFormula) {
-    // TODO Can UF appear here?? // Built in Functions like "add" seem to be OK
-    Preconditions.checkState(!isClosed());
-    // TODO REENABLE after testing
-    // Preconditions.checkState(!prover.isClosed(), "cannot use model after prover is closed");
-    int val = yices_get_value_as_term(model, pFormula);
-    if (val == -1) {
-      throw new IllegalArgumentException(
-          "Could not evaluate Term: " + yices_term_to_string(pFormula));
+    try {
+      return model.valueAsTerm(pFormula);
+    } catch (YicesException e) {
+      throw new IllegalArgumentException("Could not evaluate term: " + Terms.toString(pFormula));
     }
-    return val;
   }
 
   @Override
   public String toString() {
-    return yices_model_to_string(model);
+    return model.toString();
   }
 }

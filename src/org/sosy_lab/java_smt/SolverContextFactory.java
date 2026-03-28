@@ -30,6 +30,7 @@ import org.sosy_lab.java_smt.delegate.debugging.DebuggingSolverContext;
 import org.sosy_lab.java_smt.delegate.logging.LoggingSolverContext;
 import org.sosy_lab.java_smt.delegate.statistics.StatisticsSolverContext;
 import org.sosy_lab.java_smt.delegate.synchronize.SynchronizedSolverContext;
+import org.sosy_lab.java_smt.delegate.trace.TraceSolverContext;
 import org.sosy_lab.java_smt.solvers.bitwuzla.BitwuzlaSolverContext;
 import org.sosy_lab.java_smt.solvers.boolector.BoolectorSolverContext;
 import org.sosy_lab.java_smt.solvers.cvc4.CVC4SolverContext;
@@ -96,6 +97,11 @@ public class SolverContextFactory {
 
   @Option(secure = true, description = "Apply additional checks to catch common user errors.")
   private boolean useDebugMode = false;
+
+  @Option(
+      secure = true,
+      description = "Enable API tracing to record all calls to the JavaSMT library")
+  private boolean trace = false;
 
   @Option(
       secure = true,
@@ -232,6 +238,9 @@ public class SolverContextFactory {
     if (useDebugMode) {
       context = new DebuggingSolverContext(solverToCreate, config, context);
     }
+    if (trace) {
+      context = new TraceSolverContext(solverToCreate, config, context, logger);
+    }
     if (collectStatistics) {
       // statistics need to be the most outer wrapping layer.
       context = new StatisticsSolverContext(context);
@@ -308,7 +317,7 @@ public class SolverContextFactory {
             config, shutdownNotifier, logfile, (int) randomSeed, nonLinearArithmetic);
 
       case YICES2:
-        return Yices2SolverContext.create(nonLinearArithmetic, shutdownNotifier, loader);
+        return Yices2SolverContext.create(config, nonLinearArithmetic, shutdownNotifier, loader);
 
       case BOOLECTOR:
         return BoolectorSolverContext.create(config, shutdownNotifier, logfile, randomSeed, loader);

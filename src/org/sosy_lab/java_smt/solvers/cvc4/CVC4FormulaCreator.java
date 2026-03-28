@@ -56,6 +56,7 @@ import org.sosy_lab.java_smt.api.StringFormula;
 import org.sosy_lab.java_smt.api.visitors.FormulaVisitor;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 import org.sosy_lab.java_smt.basicimpl.FunctionDeclarationImpl;
+import org.sosy_lab.java_smt.basicimpl.Tokenizer;
 import org.sosy_lab.java_smt.solvers.cvc4.CVC4Formula.CVC4ArrayFormula;
 import org.sosy_lab.java_smt.solvers.cvc4.CVC4Formula.CVC4BitvectorFormula;
 import org.sosy_lab.java_smt.solvers.cvc4.CVC4Formula.CVC4BooleanFormula;
@@ -66,7 +67,7 @@ import org.sosy_lab.java_smt.solvers.cvc4.CVC4Formula.CVC4RationalFormula;
 import org.sosy_lab.java_smt.solvers.cvc4.CVC4Formula.CVC4RegexFormula;
 import org.sosy_lab.java_smt.solvers.cvc4.CVC4Formula.CVC4StringFormula;
 
-public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, Expr> {
+class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, Expr> {
 
   private static final Pattern FLOATING_POINT_PATTERN =
       Pattern.compile("^\\(fp #b(?<sign>\\d) #b(?<exp>\\d+) #b(?<mant>\\d+)$");
@@ -75,7 +76,7 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
   private final Map<String, Expr> functionsCache = new HashMap<>();
   private final ExprManager exprManager;
 
-  protected CVC4FormulaCreator(ExprManager pExprManager) {
+  CVC4FormulaCreator(ExprManager pExprManager) {
     super(
         pExprManager,
         pExprManager.booleanType(),
@@ -304,7 +305,7 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
     if (!e.isConst() && !e.isVariable()) {
       e = e.getOperator();
     }
-    return dequote(e.toString());
+    return Tokenizer.dequote(e.toString());
   }
 
   @SuppressWarnings("deprecation")
@@ -336,7 +337,7 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
       } else if (type.isRoundingMode()) {
         return visitor.visitConstant(formula, getRoundingMode(f));
       } else if (type.isString()) {
-        return visitor.visitConstant(formula, f.getConstString());
+        return visitor.visitConstant(formula, f.getConstString().toString());
       } else if (type.isArray()) {
         ArrayStoreAll storeAll = f.getConstArrayStoreAll();
         Expr constant = storeAll.getExpr();
@@ -481,6 +482,7 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
           .put(Kind.BITVECTOR_NEG, FunctionDeclarationKind.BV_NEG)
           .put(Kind.BITVECTOR_EXTRACT, FunctionDeclarationKind.BV_EXTRACT)
           .put(Kind.BITVECTOR_CONCAT, FunctionDeclarationKind.BV_CONCAT)
+          .put(Kind.BITVECTOR_TO_NAT, FunctionDeclarationKind.UBV_TO_INT)
           .put(Kind.BITVECTOR_SIGN_EXTEND, FunctionDeclarationKind.BV_SIGN_EXTENSION)
           .put(Kind.BITVECTOR_ZERO_EXTEND, FunctionDeclarationKind.BV_ZERO_EXTENSION)
           // Floating-point theory
@@ -544,6 +546,12 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
           .put(Kind.SELECT, FunctionDeclarationKind.SELECT)
           .put(Kind.STORE, FunctionDeclarationKind.STORE)
           .put(Kind.STORE_ALL, FunctionDeclarationKind.CONST)
+          // Separation logic
+          .put(Kind.SEP_EMP, FunctionDeclarationKind.SEP_EMP)
+          .put(Kind.SEP_NIL, FunctionDeclarationKind.SEP_NIL)
+          .put(Kind.SEP_PTO, FunctionDeclarationKind.SEP_PTO)
+          .put(Kind.SEP_STAR, FunctionDeclarationKind.SEP_STAR)
+          .put(Kind.SEP_WAND, FunctionDeclarationKind.SEP_WAND)
           .buildOrThrow();
 
   private FunctionDeclarationKind getDeclarationKind(Expr f) {
@@ -571,7 +579,13 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
   @Override
   public Expr callFunctionImpl(Expr pDeclaration, List<Expr> pArgs) {
     if (pArgs.isEmpty()) {
-      return exprManager.mkExpr(pDeclaration);
+      if (exprManager.getType(pDeclaration).isFunction()) {
+        // Builtin operator
+        return exprManager.mkExpr(pDeclaration);
+      } else {
+        // Uf
+        return pDeclaration;
+      }
     } else {
       vectorExpr args = new vectorExpr();
       for (Expr expr : pArgs) {
@@ -583,6 +597,9 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
 
   @Override
   public Expr declareUFImpl(String pName, Type pReturnType, List<Type> pArgTypes) {
+    if (pArgTypes.isEmpty()) {
+      return makeVariable(pReturnType, pName);
+    }
     Expr exp = functionsCache.get(pName);
     if (exp == null) {
       vectorType args = new vectorType();

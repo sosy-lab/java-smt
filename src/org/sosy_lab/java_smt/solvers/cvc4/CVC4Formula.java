@@ -23,7 +23,7 @@ import org.sosy_lab.java_smt.api.RegexFormula;
 import org.sosy_lab.java_smt.api.StringFormula;
 
 @Immutable
-public class CVC4Formula implements Formula {
+class CVC4Formula implements Formula {
 
   @SuppressWarnings("Immutable")
   private final Expr cvc4term;
