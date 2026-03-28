@@ -225,14 +225,14 @@ public class NumeralFormulaManagerTest extends SolverBasedTest0.ParameterizedSol
         });
   }
 
-  private Formula getOperand(BooleanFormula f, int k) {
+  private Formula getOperand(BooleanFormula pFormula, int pIndex) {
     return mgr.visit(
-        f,
+        pFormula,
         new DefaultFormulaVisitor<>() {
           @Override
           public Formula visitFunction(
               Formula f, List<Formula> args, FunctionDeclaration<?> functionDeclaration) {
-            return args.get(k);
+            return args.get(pIndex);
           }
 
           @Override
@@ -242,9 +242,9 @@ public class NumeralFormulaManagerTest extends SolverBasedTest0.ParameterizedSol
         });
   }
 
-  private FunctionDeclarationKind getKind(Formula f) {
+  private FunctionDeclarationKind getKind(Formula pFormula) {
     return mgr.visit(
-        f,
+        pFormula,
         new DefaultFormulaVisitor<>() {
           @Override
           public FunctionDeclarationKind visitFunction(
