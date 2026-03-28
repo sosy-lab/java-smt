@@ -640,27 +640,41 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
     }
   }
 
-  private static class CheckIndexed extends DefaultFormulaVisitor<Void> {
-    private final FunctionDeclarationKind kind;
-    private final List<Integer> index;
+  private void checkIndexedSymbol(
+      FunctionDeclarationKind pExpectedKind, List<Integer> pExpectedIndex, Formula pTerm) {
+    mgr.visit(
+        pTerm,
+        new DefaultFormulaVisitor<Void>() {
+          @Override
+          public Void visitFunction(
+              Formula f, List<Formula> args, FunctionDeclaration<?> functionDeclaration) {
+            assertThat(functionDeclaration.getKind()).isEqualTo(pExpectedKind);
+            assertThat(functionDeclaration.getIndices()).isEqualTo(pExpectedIndex);
+            return null;
+          }
 
-    private CheckIndexed(FunctionDeclarationKind pKind, List<Integer> pIndex) {
-      kind = pKind;
-      index = pIndex;
-    }
+          @Override
+          protected Void visitDefault(Formula f) {
+            throw new AssertionError();
+          }
+        });
+  }
 
-    @Override
-    protected Void visitDefault(Formula f) {
-      return null;
-    }
+  private List<Formula> getArgs(Formula pFormula) {
+    return mgr.visit(
+        pFormula,
+        new DefaultFormulaVisitor<>() {
+          @Override
+          public List<Formula> visitFunction(
+              Formula f, List<Formula> args, FunctionDeclaration<?> functionDeclaration) {
+            return args;
+          }
 
-    @Override
-    public Void visitFunction(
-        Formula f, List<Formula> args, FunctionDeclaration<?> functionDeclaration) {
-      assertThat(functionDeclaration.getKind()).isEqualTo(kind);
-      assertThat(functionDeclaration.getIndices()).isEqualTo(index);
-      return visitDefault(f);
-    }
+          @Override
+          protected List<Formula> visitDefault(Formula f) {
+            throw new AssertionError();
+          }
+        });
   }
 
   @Test
@@ -669,12 +683,22 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
     assume()
         .withMessage("Visiting indexed functions not fully supported on %")
         .that(solver)
-        .isNoneOf(Solvers.CVC4, Solvers.YICES2);
+        .isNotEqualTo(Solvers.CVC4);
 
     var x = bvmgr.makeVariable(8, "x");
     var f = bvmgr.extract(x, 3, 0);
 
-    mgr.visit(f, new CheckIndexed(FunctionDeclarationKind.BV_EXTRACT, ImmutableList.of(3, 0)));
+    if (solver == Solvers.YICES2) {
+      // Yices2 will rewrite to (bv-array (bit x 3) (bit x 2) (bit x 1) (bit x 0))
+      var args = getArgs(f);
+      assertThat(args.size()).isEqualTo(4);
+      for (var p = 0; p < args.size(); p++) {
+        checkIndexedSymbol(
+            FunctionDeclarationKind.BV_EXTRACT, ImmutableList.of(3 - p, 3 - p), args.get(p));
+      }
+    } else {
+      checkIndexedSymbol(FunctionDeclarationKind.BV_EXTRACT, ImmutableList.of(3, 0), f);
+    }
   }
 
   @Test
@@ -683,12 +707,25 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
     assume()
         .withMessage("Visiting indexed functions not fully supported on %")
         .that(solver)
-        .isNoneOf(Solvers.CVC4, Solvers.YICES2, Solvers.PRINCESS);
+        .isNoneOf(Solvers.CVC4, Solvers.PRINCESS);
 
     var x = bvmgr.makeVariable(8, "x");
     var f = bvmgr.extend(x, 8, false);
 
-    mgr.visit(f, new CheckIndexed(FunctionDeclarationKind.BV_ZERO_EXTENSION, ImmutableList.of(8)));
+    if (solver == Solvers.YICES2) {
+      // Yices2 will rewrite to (bv-array #b0 ... #b0 (bit x 7) ... (bit x 0)
+      var terms = getArgs(f);
+      assertThat(terms.size()).isEqualTo(16);
+      for (var p = 0; p < terms.size(); p++) {
+        if (p < 8) {
+          assertThat(terms.get(p)).isEqualTo(bvmgr.makeBitvector(1, 0));
+        } else {
+          assertThat(terms.get(p)).isEqualTo(bvmgr.extract(f, 15 - p, 15 - p));
+        }
+      }
+    } else {
+      checkIndexedSymbol(FunctionDeclarationKind.BV_ZERO_EXTENSION, ImmutableList.of(8), f);
+    }
   }
 
   @Test

@@ -555,7 +555,12 @@ class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long, Intege
         pFormula,
         args,
         FunctionDeclarationImpl.of(
-            functionName, functionKind, argTypes, getFormulaType(pF), functionDeclaration));
+            functionName,
+            functionKind,
+            functionIndex,
+            argTypes,
+            getFormulaType(pF),
+            functionDeclaration));
   }
 
   private int buildDeclaration(
