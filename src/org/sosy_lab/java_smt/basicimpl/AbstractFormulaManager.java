@@ -70,7 +70,7 @@ import org.sosy_lab.java_smt.utils.SolverUtils;
 public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl>
     implements FormulaManager {
 
-  @Options(prefix = "parser")
+  @Options(prefix = "solver.parser")
   private static class ParserOptions {
     @Option(
         secure = true,
