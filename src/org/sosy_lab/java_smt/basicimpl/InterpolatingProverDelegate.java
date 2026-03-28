@@ -28,91 +28,98 @@ import org.sosy_lab.java_smt.api.SolverException;
  */
 class InterpolatingProverDelegate<T> implements InterpolatingProverEnvironment<T> {
 
-  InterpolatingProverEnvironment<T> baseInterpolatingProver;
+  InterpolatingProverEnvironment<T> itpProver;
+  AbstractProver<T> abstractProver;
 
+  @SuppressWarnings("unchecked")
   InterpolatingProverDelegate(InterpolatingProverEnvironment<T> pBaseProver) {
-    baseInterpolatingProver = checkNotNull(pBaseProver);
+    itpProver = checkNotNull(pBaseProver);
+    abstractProver = (AbstractProver<T>) itpProver;
   }
 
   @Override
   public BooleanFormula getInterpolant(Collection<T> formulasOfA)
       throws SolverException, InterruptedException {
-    // TODO: add common checks/preconditions
-    return baseInterpolatingProver.getInterpolant(formulasOfA);
+    abstractProver.checkGenerateInterpolants(formulasOfA);
+    // TODO: do we want a common method to calculate partition B out of the asserted formulas
+    //  efficiently? We currently have several distinct solutions.
+    return itpProver.getInterpolant(formulasOfA);
   }
 
   @Override
   public List<BooleanFormula> getSeqInterpolants(List<? extends Collection<T>> partitionedFormulas)
       throws SolverException, InterruptedException {
-    // TODO: add common checks/preconditions
-    return baseInterpolatingProver.getSeqInterpolants(partitionedFormulas);
+    abstractProver.checkGenerateSeqInterpolants(partitionedFormulas);
+    // TODO: problem/inefficiency; unsupported solvers still check validity of input before failing?
+    return itpProver.getSeqInterpolants(partitionedFormulas);
   }
 
   @Override
   public List<BooleanFormula> getTreeInterpolants(
       List<? extends Collection<T>> partitionedFormulas, int[] startOfSubTree)
       throws SolverException, InterruptedException {
-    // TODO: add common checks/preconditions
-    return baseInterpolatingProver.getTreeInterpolants(partitionedFormulas, startOfSubTree);
+    abstractProver.checkGenerateTreeInterpolants(partitionedFormulas, startOfSubTree);
+    // TODO: problem/inefficiency; unsupported solvers still check validity of input before failing?
+    return itpProver.getTreeInterpolants(partitionedFormulas, startOfSubTree);
   }
 
   /* ########################## Delegate methods of ProverEnvironment ########################## */
 
   @Override
   public void pop() {
-    baseInterpolatingProver.pop();
+    itpProver.pop();
   }
 
   @Override
   public @Nullable T addConstraint(BooleanFormula constraint) throws InterruptedException {
-    return baseInterpolatingProver.addConstraint(constraint);
+    return itpProver.addConstraint(constraint);
   }
 
   @Override
   public void push() throws InterruptedException {
-    baseInterpolatingProver.push();
+    itpProver.push();
   }
 
   @Override
   public int size() {
-    return baseInterpolatingProver.size();
+    return itpProver.size();
   }
 
   @Override
   public boolean isUnsat() throws SolverException, InterruptedException {
-    return baseInterpolatingProver.isUnsat();
+    return itpProver.isUnsat();
   }
 
   @Override
   public boolean isUnsatWithAssumptions(Collection<BooleanFormula> assumptions)
       throws SolverException, InterruptedException {
-    return baseInterpolatingProver.isUnsatWithAssumptions(assumptions);
+    return itpProver.isUnsatWithAssumptions(assumptions);
   }
 
   @Override
   public Model getModel() throws SolverException {
-    return baseInterpolatingProver.getModel();
+    return itpProver.getModel();
   }
 
   @Override
   public List<BooleanFormula> getUnsatCore() {
-    return baseInterpolatingProver.getUnsatCore();
+    return itpProver.getUnsatCore();
   }
 
   @Override
   public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(
       Collection<BooleanFormula> assumptions) throws SolverException, InterruptedException {
-    return baseInterpolatingProver.unsatCoreOverAssumptions(assumptions);
+    return itpProver.unsatCoreOverAssumptions(assumptions);
   }
 
   @Override
   public void close() {
-    baseInterpolatingProver.close();
+    itpProver.close();
   }
 
   @Override
   public <R> R allSat(AllSatCallback<R> callback, List<BooleanFormula> important)
       throws InterruptedException, SolverException {
-    return baseInterpolatingProver.allSat(callback, important);
+    return itpProver.allSat(callback, important);
   }
 }
