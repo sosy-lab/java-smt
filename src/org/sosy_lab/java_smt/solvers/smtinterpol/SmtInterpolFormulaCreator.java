@@ -162,15 +162,14 @@ class SmtInterpolFormulaCreator extends FormulaCreator<Term, Sort, Script, Funct
     FormulaType<?> type = getFormulaType(value);
     if (type.isBooleanType()) {
       return value.getTheory().mTrue == value;
-    } else if (value instanceof ConstantTerm
-        && ((ConstantTerm) value).getValue() instanceof Rational) {
+    } else if (value instanceof ConstantTerm constantTerm
+        && constantTerm.getValue() instanceof Rational rationalValue) {
 
       /*
        * From SmtInterpol documentation (see {@link ConstantTerm#getValue}),
        * the output is SmtInterpol's Rational unless it is a bitvector,
        * and currently we do not support bitvectors for SmtInterpol.
        */
-      Rational rationalValue = (Rational) ((ConstantTerm) value).getValue();
       org.sosy_lab.common.rationals.Rational ratValue =
           org.sosy_lab.common.rationals.Rational.of(
               rationalValue.numerator(), rationalValue.denominator());
@@ -187,11 +186,10 @@ class SmtInterpolFormulaCreator extends FormulaCreator<Term, Sort, Script, Funct
         "Given term belongs to a different instance of SMTInterpol: %s",
         input);
 
-    if (input instanceof ConstantTerm) {
+    if (input instanceof ConstantTerm constantTerm) {
       Object outValue;
-      Object interpolValue = ((ConstantTerm) input).getValue();
-      if (interpolValue instanceof Rational) {
-        Rational rat = (Rational) interpolValue;
+      Object interpolValue = constantTerm.getValue();
+      if (interpolValue instanceof Rational rat) {
         if ((input.getSort().getName().equals("Int") && rat.isIntegral())
             || BigInteger.ONE.equals(rat.denominator())) {
           outValue = rat.numerator();
@@ -199,11 +197,10 @@ class SmtInterpolFormulaCreator extends FormulaCreator<Term, Sort, Script, Funct
           outValue = org.sosy_lab.common.rationals.Rational.of(rat.numerator(), rat.denominator());
         }
       } else {
-        outValue = ((ConstantTerm) input).getValue();
+        outValue = constantTerm.getValue();
       }
       return visitor.visitConstant(f, outValue);
-    } else if (input instanceof ApplicationTerm) {
-      final ApplicationTerm app = (ApplicationTerm) input;
+    } else if (input instanceof ApplicationTerm app) {
       final int arity = app.getParameters().length;
       final FunctionSymbol func = app.getFunction();
 
@@ -244,16 +241,14 @@ class SmtInterpolFormulaCreator extends FormulaCreator<Term, Sort, Script, Funct
       // TODO: support for quantifiers and bound variables
 
       throw new UnsupportedOperationException(
-          String.format(
-              "Unexpected SMTInterpol formula of type %s: %s",
-              input.getClass().getSimpleName(), input));
+          "Unexpected SMTInterpol formula of type %s: %s"
+              .formatted(input.getClass().getSimpleName(), input));
     }
   }
 
   String getName(Term t) {
-    if (isUF(t)) {
-      assert t instanceof ApplicationTerm;
-      return ((ApplicationTerm) t).getFunction().getName();
+    if (t instanceof ApplicationTerm app && isUF(app)) {
+      return app.getFunction().getName();
     } else {
       return Tokenizer.dequote(t.toString());
     }
@@ -263,16 +258,15 @@ class SmtInterpolFormulaCreator extends FormulaCreator<Term, Sort, Script, Funct
     // A variable is the same as an UF without parameters
     return t.getTheory().mTrue != t
         && t.getTheory().mFalse != t
-        && (t instanceof ApplicationTerm)
-        && ((ApplicationTerm) t).getParameters().length == 0
-        && ((ApplicationTerm) t).getFunction().getDefinition() == null;
+        && (t instanceof ApplicationTerm app)
+        && app.getParameters().length == 0
+        && app.getFunction().getDefinition() == null;
   }
 
   private static boolean isUF(Term t) {
-    if (!(t instanceof ApplicationTerm)) {
+    if (!(t instanceof ApplicationTerm applicationTerm)) {
       return false;
     }
-    ApplicationTerm applicationTerm = (ApplicationTerm) t;
     FunctionSymbol func = applicationTerm.getFunction();
     return applicationTerm.getParameters().length > 0 && !func.isIntern() && !func.isInterpreted();
   }
@@ -297,49 +291,32 @@ class SmtInterpolFormulaCreator extends FormulaCreator<Term, Sort, Script, Funct
     }
 
     // Polymorphic function symbols are more difficult.
-    switch (symbol.getName()) {
-      case "=":
-        return FunctionDeclarationKind.EQ;
-      case "distinct":
-        return FunctionDeclarationKind.DISTINCT;
-      case "ite":
-        return FunctionDeclarationKind.ITE;
-      case "select":
-        return FunctionDeclarationKind.SELECT;
-      case "store":
-        return FunctionDeclarationKind.STORE;
-      case "const":
-        return FunctionDeclarationKind.CONST;
-      case "*":
-        return FunctionDeclarationKind.MUL;
-      case "+":
-        return FunctionDeclarationKind.ADD;
-      case "-":
+    return switch (symbol.getName()) {
+      case "=" -> FunctionDeclarationKind.EQ;
+      case "distinct" -> FunctionDeclarationKind.DISTINCT;
+      case "ite" -> FunctionDeclarationKind.ITE;
+      case "select" -> FunctionDeclarationKind.SELECT;
+      case "store" -> FunctionDeclarationKind.STORE;
+      case "const" -> FunctionDeclarationKind.CONST;
+      case "*" -> FunctionDeclarationKind.MUL;
+      case "+" -> FunctionDeclarationKind.ADD;
+      case "-" -> {
         var arity = input.getParameters().length;
         checkArgument(arity > 0);
-        return arity == 1 ? FunctionDeclarationKind.UMINUS : FunctionDeclarationKind.SUB;
-      case "/":
-      case "div":
-        return FunctionDeclarationKind.DIV;
-      case "%":
-      case "mod":
-        return FunctionDeclarationKind.MODULO;
-      case "<":
-        return FunctionDeclarationKind.LT;
-      case "<=":
-        return FunctionDeclarationKind.LTE;
-      case ">":
-        return FunctionDeclarationKind.GT;
-      case ">=":
-        return FunctionDeclarationKind.GTE;
-      case "to_int":
-        return FunctionDeclarationKind.FLOOR;
-      case "to_real":
-        return FunctionDeclarationKind.TO_REAL;
-      default:
-        // TODO: other declaration kinds!
-        return FunctionDeclarationKind.OTHER;
-    }
+        yield arity == 1 ? FunctionDeclarationKind.UMINUS : FunctionDeclarationKind.SUB;
+      }
+      case "/", "div" -> FunctionDeclarationKind.DIV;
+      case "%", "mod" -> FunctionDeclarationKind.MODULO;
+      case "<" -> FunctionDeclarationKind.LT;
+      case "<=" -> FunctionDeclarationKind.LTE;
+      case ">" -> FunctionDeclarationKind.GT;
+      case ">=" -> FunctionDeclarationKind.GTE;
+      case "to_int" -> FunctionDeclarationKind.FLOOR;
+      case "to_real" -> FunctionDeclarationKind.TO_REAL;
+      default ->
+          // TODO: other declaration kinds!
+          FunctionDeclarationKind.OTHER;
+    };
   }
 
   @Override
@@ -370,7 +347,9 @@ class SmtInterpolFormulaCreator extends FormulaCreator<Term, Sort, Script, Funct
 
   @Override
   protected FunctionSymbol getBooleanVarDeclarationImpl(Term pTerm) {
-    assert pTerm instanceof ApplicationTerm;
-    return ((ApplicationTerm) pTerm).getFunction();
+    if (pTerm instanceof ApplicationTerm app) {
+      return app.getFunction();
+    }
+    throw new IllegalArgumentException("Expected ApplicationTerm, but got " + pTerm);
   }
 }

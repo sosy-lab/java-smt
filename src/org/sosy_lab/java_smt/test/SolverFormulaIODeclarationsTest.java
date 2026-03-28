@@ -310,30 +310,32 @@ public class SolverFormulaIODeclarationsTest
   public void parseAbbreviation() throws SolverException, InterruptedException {
     requireBitvectors();
     String query =
-        "(declare-fun bb () Bool)\n"
-            + "(declare-fun b () Bool)\n"
-            + "(declare-fun |f::v@2| () (_ BitVec 32))\n"
-            + "(declare-fun A_a@ () (_ BitVec 32))\n"
-            + "(declare-fun A_b@ () (_ BitVec 32))\n"
-            + "(declare-fun i1 () (Array (_ BitVec 32) (_ BitVec 32)))\n"
-            + "(declare-fun i2 () (Array (_ BitVec 32) (_ BitVec 32)))\n"
-            + "(declare-fun i3 () (Array (_ BitVec 32) (_ BitVec 32)))\n"
-            + "(declare-fun i4 () (Array (_ BitVec 32) (_ BitVec 32)))\n"
-            + "(define-fun abbrev_9 () Bool (and\n"
-            + " (not bb)\n"
-            + " (= (_ bv0 32) A_a@)\n"
-            + " (= (_ bv4 32) A_b@)\n"
-            + " (= (bvurem A_b@ (_ bv4 32)) (_ bv0 32))\n"
-            + " (bvslt (_ bv0 32) (bvadd A_b@ (_ bv4 32)))\n"
-            + " (= (select i1 A_a@) (_ bv0 32))\n"
-            + " (= (select i1 A_b@) (_ bv0 32))\n"
-            + " (= i2 (store i1 A_b@ (_ bv1 32)))\n"
-            + " (= i3 (store i2 A_a@ (_ bv5 32)))\n"
-            + " (= i4 (store i3 A_a@ (_ bv4 32)))\n"
-            + " (= |f::v@2| (bvsub (bvadd (_ bv4 32) (select i4 A_b@)) (_ bv4 32)))))\n"
-            + "(assert (and\n"
-            + " (not b) abbrev_9\n"
-            + " (not (= |f::v@2| (_ bv1 32)))))";
+        """
+        (declare-fun bb () Bool)
+        (declare-fun b () Bool)
+        (declare-fun |f::v@2| () (_ BitVec 32))
+        (declare-fun A_a@ () (_ BitVec 32))
+        (declare-fun A_b@ () (_ BitVec 32))
+        (declare-fun i1 () (Array (_ BitVec 32) (_ BitVec 32)))
+        (declare-fun i2 () (Array (_ BitVec 32) (_ BitVec 32)))
+        (declare-fun i3 () (Array (_ BitVec 32) (_ BitVec 32)))
+        (declare-fun i4 () (Array (_ BitVec 32) (_ BitVec 32)))
+        (define-fun abbrev_9 () Bool (and
+         (not bb)
+         (= (_ bv0 32) A_a@)
+         (= (_ bv4 32) A_b@)
+         (= (bvurem A_b@ (_ bv4 32)) (_ bv0 32))
+         (bvslt (_ bv0 32) (bvadd A_b@ (_ bv4 32)))
+         (= (select i1 A_a@) (_ bv0 32))
+         (= (select i1 A_b@) (_ bv0 32))
+         (= i2 (store i1 A_b@ (_ bv1 32)))
+         (= i3 (store i2 A_a@ (_ bv5 32)))
+         (= i4 (store i3 A_a@ (_ bv4 32)))
+         (= |f::v@2| (bvsub (bvadd (_ bv4 32) (select i4 A_b@)) (_ bv4 32)))))
+        (assert (and
+         (not b) abbrev_9
+         (not (= |f::v@2| (_ bv1 32)))))\
+        """;
     BooleanFormula parsedQuery = mgr.parse(query);
     assertThatFormula(parsedQuery).isUnsatisfiable();
     assert_().that(mgr.extractVariables(parsedQuery)).hasSize(9);

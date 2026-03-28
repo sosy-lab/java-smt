@@ -24,7 +24,7 @@ import org.sosy_lab.java_smt.api.RegexFormula;
 import org.sosy_lab.java_smt.api.StringFormula;
 
 @Immutable
-abstract class CVC5Formula implements Formula {
+abstract sealed class CVC5Formula implements Formula {
 
   @SuppressWarnings("Immutable")
   private final Term cvc5term;
@@ -43,10 +43,7 @@ abstract class CVC5Formula implements Formula {
     if (o == this) {
       return true;
     }
-    if (!(o instanceof CVC5Formula)) {
-      return false;
-    }
-    return cvc5term.equals(((CVC5Formula) o).cvc5term);
+    return (o instanceof CVC5Formula other) && cvc5term.equals(other.cvc5term);
   }
 
   @Override

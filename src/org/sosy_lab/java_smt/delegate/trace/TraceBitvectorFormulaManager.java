@@ -32,7 +32,7 @@ class TraceBitvectorFormulaManager implements BitvectorFormulaManager {
   public BitvectorFormula makeBitvector(int length, long pI) {
     return logger.logDef(
         "mgr.getBitvectorFormulaManager()",
-        String.format("makeBitvector(%s, %sL)", length, pI),
+        "makeBitvector(%s, %sL)".formatted(length, pI),
         () -> delegate.makeBitvector(length, pI));
   }
 
@@ -40,7 +40,7 @@ class TraceBitvectorFormulaManager implements BitvectorFormulaManager {
   public BitvectorFormula makeBitvector(int length, BigInteger pI) {
     return logger.logDef(
         "mgr.getBitvectorFormulaManager()",
-        String.format("makeBitvector(%s, new BigInteger(\"%s\"))", length, pI),
+        "makeBitvector(%s, new BigInteger(\"%s\"))".formatted(length, pI),
         () -> delegate.makeBitvector(length, pI));
   }
 
@@ -48,7 +48,7 @@ class TraceBitvectorFormulaManager implements BitvectorFormulaManager {
   public BitvectorFormula makeBitvector(int length, IntegerFormula pI) {
     return logger.logDef(
         "mgr.getBitvectorFormulaManager()",
-        String.format("makeBitvector(%s, %s)", length, logger.toVariable(pI)),
+        "makeBitvector(%s, %s)".formatted(length, logger.toVariable(pI)),
         () -> delegate.makeBitvector(length, pI));
   }
 
@@ -56,7 +56,7 @@ class TraceBitvectorFormulaManager implements BitvectorFormulaManager {
   public IntegerFormula toIntegerFormula(BitvectorFormula pI, boolean signed) {
     return logger.logDef(
         "mgr.getBitvectorFormulaManager()",
-        String.format("toIntegerFormula(%s, %s)", logger.toVariable(pI), signed),
+        "toIntegerFormula(%s, %s)".formatted(logger.toVariable(pI), signed),
         () -> delegate.toIntegerFormula(pI, signed));
   }
 
@@ -69,8 +69,7 @@ class TraceBitvectorFormulaManager implements BitvectorFormulaManager {
   public BitvectorFormula makeVariable(BitvectorType type, String pVar) {
     return logger.logDef(
         "mgr.getBitvectorFormulaManager()",
-        String.format(
-            "makeVariable(%s, %s)", logger.printFormulaType(type), logger.printString(pVar)),
+        "makeVariable(%s, %s)".formatted(logger.printFormulaType(type), logger.printString(pVar)),
         () -> delegate.makeVariable(type, pVar));
   }
 
@@ -78,7 +77,7 @@ class TraceBitvectorFormulaManager implements BitvectorFormulaManager {
   public int getLength(BitvectorFormula number) {
     return logger.logDefDiscard(
         "mgr.getBitvectorFormulaManager()",
-        String.format("getLength(%s)", logger.toVariable(number)),
+        "getLength(%s)".formatted(logger.toVariable(number)),
         () -> delegate.getLength(number));
   }
 
@@ -86,7 +85,7 @@ class TraceBitvectorFormulaManager implements BitvectorFormulaManager {
   public BitvectorFormula negate(BitvectorFormula number) {
     return logger.logDef(
         "mgr.getBitvectorFormulaManager()",
-        String.format("negate(%s)", logger.toVariable(number)),
+        "negate(%s)".formatted(logger.toVariable(number)),
         () -> delegate.negate(number));
   }
 
@@ -94,7 +93,7 @@ class TraceBitvectorFormulaManager implements BitvectorFormulaManager {
   public BitvectorFormula add(BitvectorFormula number1, BitvectorFormula number2) {
     return logger.logDef(
         "mgr.getBitvectorFormulaManager()",
-        String.format("add(%s, %s)", logger.toVariable(number1), logger.toVariable(number2)),
+        "add(%s, %s)".formatted(logger.toVariable(number1), logger.toVariable(number2)),
         () -> delegate.add(number1, number2));
   }
 
@@ -102,7 +101,7 @@ class TraceBitvectorFormulaManager implements BitvectorFormulaManager {
   public BitvectorFormula subtract(BitvectorFormula number1, BitvectorFormula number2) {
     return logger.logDef(
         "mgr.getBitvectorFormulaManager()",
-        String.format("subtract(%s, %s)", logger.toVariable(number1), logger.toVariable(number2)),
+        "subtract(%s, %s)".formatted(logger.toVariable(number1), logger.toVariable(number2)),
         () -> delegate.subtract(number1, number2));
   }
 
@@ -111,8 +110,8 @@ class TraceBitvectorFormulaManager implements BitvectorFormulaManager {
       BitvectorFormula dividend, BitvectorFormula divisor, boolean signed) {
     return logger.logDef(
         "mgr.getBitvectorFormulaManager()",
-        String.format(
-            "divide(%s, %s, %s)", logger.toVariable(dividend), logger.toVariable(divisor), signed),
+        "divide(%s, %s, %s)"
+            .formatted(logger.toVariable(dividend), logger.toVariable(divisor), signed),
         () -> delegate.divide(dividend, divisor, signed));
   }
 
@@ -120,7 +119,7 @@ class TraceBitvectorFormulaManager implements BitvectorFormulaManager {
   public BitvectorFormula smodulo(BitvectorFormula dividend, BitvectorFormula divisor) {
     return logger.logDef(
         "mgr.getBitvectorFormulaManager()",
-        String.format("smodulo(%s, %s)", logger.toVariable(dividend), logger.toVariable(dividend)),
+        "smodulo(%s, %s)".formatted(logger.toVariable(dividend), logger.toVariable(dividend)),
         () -> delegate.smodulo(dividend, divisor));
   }
 
@@ -129,9 +128,8 @@ class TraceBitvectorFormulaManager implements BitvectorFormulaManager {
       BitvectorFormula dividend, BitvectorFormula divisor, boolean signed) {
     return logger.logDef(
         "mgr.getBitvectorFormulaManager()",
-        String.format(
-            "remainder(%s, %s, %s)",
-            logger.toVariable(dividend), logger.toVariable(divisor), signed),
+        "remainder(%s, %s, %s)"
+            .formatted(logger.toVariable(dividend), logger.toVariable(divisor), signed),
         () -> delegate.remainder(dividend, divisor, signed));
   }
 
@@ -139,7 +137,7 @@ class TraceBitvectorFormulaManager implements BitvectorFormulaManager {
   public BitvectorFormula multiply(BitvectorFormula number1, BitvectorFormula number2) {
     return logger.logDef(
         "mgr.getBitvectorFormulaManager()",
-        String.format("multiply(%s, %s)", logger.toVariable(number1), logger.toVariable(number2)),
+        "multiply(%s, %s)".formatted(logger.toVariable(number1), logger.toVariable(number2)),
         () -> delegate.multiply(number1, number2));
   }
 
@@ -147,7 +145,7 @@ class TraceBitvectorFormulaManager implements BitvectorFormulaManager {
   public BooleanFormula equal(BitvectorFormula number1, BitvectorFormula number2) {
     return logger.logDef(
         "mgr.getBitvectorFormulaManager()",
-        String.format("equal(%s, %s)", logger.toVariable(number1), logger.toVariable(number2)),
+        "equal(%s, %s)".formatted(logger.toVariable(number1), logger.toVariable(number2)),
         () -> delegate.equal(number1, number2));
   }
 
@@ -156,9 +154,8 @@ class TraceBitvectorFormulaManager implements BitvectorFormulaManager {
       BitvectorFormula number1, BitvectorFormula number2, boolean signed) {
     return logger.logDef(
         "mgr.getBitvectorFormulaManager()",
-        String.format(
-            "greaterThan(%s, %s, %s)",
-            logger.toVariable(number1), logger.toVariable(number2), signed),
+        "greaterThan(%s, %s, %s)"
+            .formatted(logger.toVariable(number1), logger.toVariable(number2), signed),
         () -> delegate.greaterThan(number1, number2, signed));
   }
 
@@ -167,9 +164,8 @@ class TraceBitvectorFormulaManager implements BitvectorFormulaManager {
       BitvectorFormula number1, BitvectorFormula number2, boolean signed) {
     return logger.logDef(
         "mgr.getBitvectorFormulaManager()",
-        String.format(
-            "greaterOrEquals(%s, %s, %s)",
-            logger.toVariable(number1), logger.toVariable(number2), signed),
+        "greaterOrEquals(%s, %s, %s)"
+            .formatted(logger.toVariable(number1), logger.toVariable(number2), signed),
         () -> delegate.greaterOrEquals(number1, number2, signed));
   }
 
@@ -178,8 +174,8 @@ class TraceBitvectorFormulaManager implements BitvectorFormulaManager {
       BitvectorFormula number1, BitvectorFormula number2, boolean signed) {
     return logger.logDef(
         "mgr.getBitvectorFormulaManager()",
-        String.format(
-            "lessThan(%s, %s, %s)", logger.toVariable(number1), logger.toVariable(number2), signed),
+        "lessThan(%s, %s, %s)"
+            .formatted(logger.toVariable(number1), logger.toVariable(number2), signed),
         () -> delegate.lessThan(number1, number2, signed));
   }
 
@@ -188,9 +184,8 @@ class TraceBitvectorFormulaManager implements BitvectorFormulaManager {
       BitvectorFormula number1, BitvectorFormula number2, boolean signed) {
     return logger.logDef(
         "mgr.getBitvectorFormulaManager()",
-        String.format(
-            "lessOrEquals(%s, %s, %s)",
-            logger.toVariable(number1), logger.toVariable(number2), signed),
+        "lessOrEquals(%s, %s, %s)"
+            .formatted(logger.toVariable(number1), logger.toVariable(number2), signed),
         () -> delegate.lessOrEquals(number1, number2, signed));
   }
 
@@ -198,7 +193,7 @@ class TraceBitvectorFormulaManager implements BitvectorFormulaManager {
   public BitvectorFormula not(BitvectorFormula bits) {
     return logger.logDef(
         "mgr.getBitvectorFormulaManager()",
-        String.format("not(%s)", logger.toVariable(bits)),
+        "not(%s)".formatted(logger.toVariable(bits)),
         () -> delegate.not(bits));
   }
 
@@ -206,7 +201,7 @@ class TraceBitvectorFormulaManager implements BitvectorFormulaManager {
   public BitvectorFormula and(BitvectorFormula bits1, BitvectorFormula bits2) {
     return logger.logDef(
         "mgr.getBitvectorFormulaManager()",
-        String.format("and(%s, %s)", logger.toVariable(bits1), logger.toVariable(bits2)),
+        "and(%s, %s)".formatted(logger.toVariable(bits1), logger.toVariable(bits2)),
         () -> delegate.and(bits1, bits2));
   }
 
@@ -214,7 +209,7 @@ class TraceBitvectorFormulaManager implements BitvectorFormulaManager {
   public BitvectorFormula or(BitvectorFormula bits1, BitvectorFormula bits2) {
     return logger.logDef(
         "mgr.getBitvectorFormulaManager()",
-        String.format("or(%s, %s)", logger.toVariable(bits1), logger.toVariable(bits2)),
+        "or(%s, %s)".formatted(logger.toVariable(bits1), logger.toVariable(bits2)),
         () -> delegate.or(bits1, bits2));
   }
 
@@ -222,7 +217,7 @@ class TraceBitvectorFormulaManager implements BitvectorFormulaManager {
   public BitvectorFormula xor(BitvectorFormula bits1, BitvectorFormula bits2) {
     return logger.logDef(
         "mgr.getBitvectorFormulaManager()",
-        String.format("xor(%s, %s)", logger.toVariable(bits1), logger.toVariable(bits2)),
+        "xor(%s, %s)".formatted(logger.toVariable(bits1), logger.toVariable(bits2)),
         () -> delegate.xor(bits1, bits2));
   }
 
@@ -231,9 +226,8 @@ class TraceBitvectorFormulaManager implements BitvectorFormulaManager {
       BitvectorFormula number, BitvectorFormula toShift, boolean signed) {
     return logger.logDef(
         "mgr.getBitvectorFormulaManager()",
-        String.format(
-            "shiftRight(%s, %s, %s)",
-            logger.toVariable(number), logger.toVariable(toShift), signed),
+        "shiftRight(%s, %s, %s)"
+            .formatted(logger.toVariable(number), logger.toVariable(toShift), signed),
         () -> delegate.shiftRight(number, toShift, signed));
   }
 
@@ -241,7 +235,7 @@ class TraceBitvectorFormulaManager implements BitvectorFormulaManager {
   public BitvectorFormula shiftLeft(BitvectorFormula number, BitvectorFormula toShift) {
     return logger.logDef(
         "mgr.getBitvectorFormulaManager()",
-        String.format("shiftLeft(%s, %s)", logger.toVariable(number), logger.toVariable(toShift)),
+        "shiftLeft(%s, %s)".formatted(logger.toVariable(number), logger.toVariable(toShift)),
         () -> delegate.shiftLeft(number, toShift));
   }
 
@@ -249,7 +243,7 @@ class TraceBitvectorFormulaManager implements BitvectorFormulaManager {
   public BitvectorFormula rotateLeft(BitvectorFormula number, int toRotate) {
     return logger.logDef(
         "mgr.getBitvectorFormulaManager()",
-        String.format("rotateLeft(%s, %s)", logger.toVariable(number), toRotate),
+        "rotateLeft(%s, %s)".formatted(logger.toVariable(number), toRotate),
         () -> delegate.rotateLeft(number, toRotate));
   }
 
@@ -257,7 +251,7 @@ class TraceBitvectorFormulaManager implements BitvectorFormulaManager {
   public BitvectorFormula rotateLeft(BitvectorFormula number, BitvectorFormula toRotate) {
     return logger.logDef(
         "mgr.getBitvectorFormulaManager()",
-        String.format("rotateLeft(%s, %s)", logger.toVariable(number), logger.toVariable(toRotate)),
+        "rotateLeft(%s, %s)".formatted(logger.toVariable(number), logger.toVariable(toRotate)),
         () -> delegate.rotateLeft(number, toRotate));
   }
 
@@ -265,7 +259,7 @@ class TraceBitvectorFormulaManager implements BitvectorFormulaManager {
   public BitvectorFormula rotateRight(BitvectorFormula number, int toRotate) {
     return logger.logDef(
         "mgr.getBitvectorFormulaManager()",
-        String.format("rotateRight(%s, %s)", logger.toVariable(number), toRotate),
+        "rotateRight(%s, %s)".formatted(logger.toVariable(number), toRotate),
         () -> delegate.rotateRight(number, toRotate));
   }
 
@@ -273,8 +267,7 @@ class TraceBitvectorFormulaManager implements BitvectorFormulaManager {
   public BitvectorFormula rotateRight(BitvectorFormula number, BitvectorFormula toRotate) {
     return logger.logDef(
         "mgr.getBitvectorFormulaManager()",
-        String.format(
-            "rotateRight(%s, %s)", logger.toVariable(number), logger.toVariable(toRotate)),
+        "rotateRight(%s, %s)".formatted(logger.toVariable(number), logger.toVariable(toRotate)),
         () -> delegate.rotateRight(number, toRotate));
   }
 
@@ -282,7 +275,7 @@ class TraceBitvectorFormulaManager implements BitvectorFormulaManager {
   public BitvectorFormula concat(BitvectorFormula prefix, BitvectorFormula suffix) {
     return logger.logDef(
         "mgr.getBitvectorFormulaManager()",
-        String.format("concat(%s, %s)", logger.toVariable(prefix), logger.toVariable(prefix)),
+        "concat(%s, %s)".formatted(logger.toVariable(prefix), logger.toVariable(prefix)),
         () -> delegate.concat(prefix, suffix));
   }
 
@@ -290,7 +283,7 @@ class TraceBitvectorFormulaManager implements BitvectorFormulaManager {
   public BitvectorFormula extract(BitvectorFormula number, int msb, int lsb) {
     return logger.logDef(
         "mgr.getBitvectorFormulaManager()",
-        String.format("extract(%s, %s, %s)", logger.toVariable(number), msb, lsb),
+        "extract(%s, %s, %s)".formatted(logger.toVariable(number), msb, lsb),
         () -> delegate.extract(number, msb, lsb));
   }
 
@@ -298,7 +291,7 @@ class TraceBitvectorFormulaManager implements BitvectorFormulaManager {
   public BitvectorFormula extend(BitvectorFormula number, int extensionBits, boolean signed) {
     return logger.logDef(
         "mgr.getBitvectorFormulaManager()",
-        String.format("extend(%s, %s, %s)", logger.toVariable(number), extensionBits, signed),
+        "extend(%s, %s, %s)".formatted(logger.toVariable(number), extensionBits, signed),
         () -> delegate.extend(number, extensionBits, signed));
   }
 
@@ -306,7 +299,7 @@ class TraceBitvectorFormulaManager implements BitvectorFormulaManager {
   public BooleanFormula distinct(List<BitvectorFormula> pBits) {
     return logger.logDef(
         "mgr.getBitvectorFormulaManager()",
-        String.format("distinct(ImmutableList.of(%s))", logger.toVariables(pBits)),
+        "distinct(ImmutableList.of(%s))".formatted(logger.toVariables(pBits)),
         () -> delegate.distinct(pBits));
   }
 }

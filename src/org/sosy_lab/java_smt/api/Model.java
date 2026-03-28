@@ -226,14 +226,11 @@ public interface Model extends Evaluator, Iterable<ValueAssignment>, AutoCloseab
       if (o == this) {
         return true;
       }
-      if (!(o instanceof ValueAssignment)) {
-        return false;
-      }
-      ValueAssignment other = (ValueAssignment) o;
 
       // "Key" is purposefully not included in the comparison,
       // name and arguments should be sufficient.
-      return name.equals(other.name)
+      return o instanceof ValueAssignment other
+          && name.equals(other.name)
           && value.equals(other.value)
           && argumentsInterpretation.equals(other.argumentsInterpretation);
     }

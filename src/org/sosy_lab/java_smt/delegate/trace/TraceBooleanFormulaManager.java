@@ -49,7 +49,7 @@ class TraceBooleanFormulaManager implements BooleanFormulaManager {
   public BooleanFormula makeVariable(String pVar) {
     return logger.logDef(
         "mgr.getBooleanFormulaManager()",
-        String.format("makeVariable(%s)", logger.printString(pVar)),
+        "makeVariable(%s)".formatted(logger.printString(pVar)),
         () -> delegate.makeVariable(pVar));
   }
 
@@ -57,8 +57,7 @@ class TraceBooleanFormulaManager implements BooleanFormulaManager {
   public BooleanFormula equivalence(BooleanFormula formula1, BooleanFormula formula2) {
     return logger.logDef(
         "mgr.getBooleanFormulaManager()",
-        String.format(
-            "equivalence(%s, %s)", logger.toVariable(formula1), logger.toVariable(formula2)),
+        "equivalence(%s, %s)".formatted(logger.toVariable(formula1), logger.toVariable(formula2)),
         () -> delegate.equivalence(formula1, formula2));
   }
 
@@ -66,8 +65,7 @@ class TraceBooleanFormulaManager implements BooleanFormulaManager {
   public BooleanFormula implication(BooleanFormula formula1, BooleanFormula formula2) {
     return logger.logDef(
         "mgr.getBooleanFormulaManager()",
-        String.format(
-            "implication(%s, %s)", logger.toVariable(formula1), logger.toVariable(formula2)),
+        "implication(%s, %s)".formatted(logger.toVariable(formula1), logger.toVariable(formula2)),
         () -> delegate.implication(formula1, formula2));
   }
 
@@ -75,7 +73,7 @@ class TraceBooleanFormulaManager implements BooleanFormulaManager {
   public boolean isTrue(BooleanFormula formula) {
     return logger.logDefDiscard(
         "mgr.getBooleanFormulaManager()",
-        String.format("isTrue(%s)", logger.toVariable(formula)),
+        "isTrue(%s)".formatted(logger.toVariable(formula)),
         () -> delegate.isTrue(formula));
   }
 
@@ -83,7 +81,7 @@ class TraceBooleanFormulaManager implements BooleanFormulaManager {
   public boolean isFalse(BooleanFormula formula) {
     return logger.logDefDiscard(
         "mgr.getBooleanFormulaManager()",
-        String.format("isFalse(%s)", logger.toVariable(formula)),
+        "isFalse(%s)".formatted(logger.toVariable(formula)),
         () -> delegate.isFalse(formula));
   }
 
@@ -91,9 +89,8 @@ class TraceBooleanFormulaManager implements BooleanFormulaManager {
   public <T extends Formula> T ifThenElse(BooleanFormula cond, T f1, T f2) {
     return logger.logDef(
         "mgr.getBooleanFormulaManager()",
-        String.format(
-            "ifThenElse(%s, %s, %s)",
-            logger.toVariable(cond), logger.toVariable(f1), logger.toVariable(f2)),
+        "ifThenElse(%s, %s, %s)"
+            .formatted(logger.toVariable(cond), logger.toVariable(f1), logger.toVariable(f2)),
         () -> delegate.ifThenElse(cond, f1, f2));
   }
 
@@ -101,7 +98,7 @@ class TraceBooleanFormulaManager implements BooleanFormulaManager {
   public BooleanFormula not(BooleanFormula formula) {
     return logger.logDef(
         "mgr.getBooleanFormulaManager()",
-        String.format("not(%s)", logger.toVariable(formula)),
+        "not(%s)".formatted(logger.toVariable(formula)),
         () -> delegate.not(formula));
   }
 
@@ -114,7 +111,7 @@ class TraceBooleanFormulaManager implements BooleanFormulaManager {
   public BooleanFormula and(Collection<BooleanFormula> bits) {
     return logger.logDef(
         "mgr.getBooleanFormulaManager()",
-        String.format("and(%s)", logger.toVariables(bits)),
+        "and(%s)".formatted(logger.toVariables(bits)),
         () -> delegate.and(bits));
   }
 
@@ -132,7 +129,7 @@ class TraceBooleanFormulaManager implements BooleanFormulaManager {
   public BooleanFormula or(Collection<BooleanFormula> bits) {
     return logger.logDef(
         "mgr.getBooleanFormulaManager()",
-        String.format("or(%s)", logger.toVariables(bits)),
+        "or(%s)".formatted(logger.toVariables(bits)),
         () -> delegate.or(bits));
   }
 
@@ -145,7 +142,7 @@ class TraceBooleanFormulaManager implements BooleanFormulaManager {
   public BooleanFormula xor(BooleanFormula bits1, BooleanFormula bits2) {
     return logger.logDef(
         "mgr.getBooleanFormulaManager()",
-        String.format("xor(%s, %s)", logger.toVariable(bits1), logger.toVariable(bits2)),
+        "xor(%s, %s)".formatted(logger.toVariable(bits1), logger.toVariable(bits2)),
         () -> delegate.xor(bits1, bits2));
   }
 
@@ -155,8 +152,8 @@ class TraceBooleanFormulaManager implements BooleanFormulaManager {
         "mgr.getBooleanFormulaManager()",
         String.format(
             "visit(%s, new DefaultBooleanFormulaVisitor<>() {"
-                + "protected Formula visitDefault(Formula f) {"
-                + "return %s;"
+                + "  protected Formula visitDefault(Formula f) {"
+                + "  return %s;"
                 + "}})",
             logger.toVariable(pFormula), logger.toVariable(pFormula)),
         () -> delegate.visit(pFormula, visitor));
@@ -169,8 +166,8 @@ class TraceBooleanFormulaManager implements BooleanFormulaManager {
         "mgr.getBooleanFormulaManager()",
         String.format(
             "visitRecursively(%s, new DefaultBooleanFormulaVisitor<>() {"
-                + "protected TraversalProcess visitDefault(Formula f) {"
-                + "return TraversalProcess.CONTINUE;"
+                + "  protected TraversalProcess visitDefault(Formula f) {"
+                + "  return TraversalProcess.CONTINUE;"
                 + "}})",
             logger.toVariable(f)),
         () -> delegate.visitRecursively(f, rFormulaVisitor));
@@ -181,9 +178,8 @@ class TraceBooleanFormulaManager implements BooleanFormulaManager {
       BooleanFormula f, BooleanFormulaTransformationVisitor pVisitor) {
     return logger.logDefDiscard(
         "mgr.getBooleanFormulaManager()",
-        String.format(
-            "transformRecursively(%s, new BooleanFormulaTransformationVisitor(%s) {})",
-            logger.toVariable(f), "mgr"),
+        "transformRecursively(%s, new BooleanFormulaTransformationVisitor(%s) {})"
+            .formatted(logger.toVariable(f), "mgr"),
         () -> delegate.transformRecursively(f, pVisitor));
   }
 
@@ -192,7 +188,7 @@ class TraceBooleanFormulaManager implements BooleanFormulaManager {
     return mgr.rebuildAll(
         logger.logDefDiscard(
             "mgr.getBooleanFormulaManager()",
-            String.format("toConjunctionArgs(%s, %s)", logger.toVariable(f), flatten),
+            "toConjunctionArgs(%s, %s)".formatted(logger.toVariable(f), flatten),
             () -> delegate.toConjunctionArgs(f, flatten)));
   }
 
@@ -201,7 +197,7 @@ class TraceBooleanFormulaManager implements BooleanFormulaManager {
     return mgr.rebuildAll(
         logger.logDefDiscard(
             "mgr.getBooleanFormulaManager()",
-            String.format("toDisjunctionArgs(%s, %s)", logger.toVariable(f), flatten),
+            "toDisjunctionArgs(%s, %s)".formatted(logger.toVariable(f), flatten),
             () -> delegate.toDisjunctionArgs(f, flatten)));
   }
 }

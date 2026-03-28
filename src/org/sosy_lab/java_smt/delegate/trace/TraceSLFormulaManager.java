@@ -30,7 +30,7 @@ class TraceSLFormulaManager implements SLFormulaManager {
   public BooleanFormula makeStar(BooleanFormula f1, BooleanFormula f2) {
     return logger.logDef(
         "mgr.getSLFormulaManager()",
-        String.format("makeStar(%s, %s)", logger.toVariable(f1), logger.toVariable(f2)),
+        "makeStar(%s, %s)".formatted(logger.toVariable(f1), logger.toVariable(f2)),
         () -> delegate.makeStar(f1, f2));
   }
 
@@ -38,7 +38,7 @@ class TraceSLFormulaManager implements SLFormulaManager {
   public <AF extends Formula, VF extends Formula> BooleanFormula makePointsTo(AF ptr, VF to) {
     return logger.logDef(
         "mgr.getSLFormulaManager()",
-        String.format("makePointsTo(%s, %s)", logger.toVariable(ptr), logger.toVariable(to)),
+        "makePointsTo(%s, %s)".formatted(logger.toVariable(ptr), logger.toVariable(to)),
         () -> delegate.makePointsTo(ptr, to));
   }
 
@@ -46,7 +46,7 @@ class TraceSLFormulaManager implements SLFormulaManager {
   public BooleanFormula makeMagicWand(BooleanFormula f1, BooleanFormula f2) {
     return logger.logDef(
         "mgr.getSLFormulaManager()",
-        String.format("makeMagicWand(%s, %s)", logger.toVariable(f1), logger.toVariable(f2)),
+        "makeMagicWand(%s, %s)".formatted(logger.toVariable(f1), logger.toVariable(f2)),
         () -> delegate.makeMagicWand(f1, f2));
   }
 
@@ -59,9 +59,8 @@ class TraceSLFormulaManager implements SLFormulaManager {
       BooleanFormula makeEmptyHeap(AT pAddressType, VT pValueType) {
     return logger.logDef(
         "mgr.getSLFormulaManager()",
-        String.format(
-            "makeEmptyHeap(%s, %s)",
-            logger.printFormulaType(pAddressType), logger.printFormulaType(pValueType)),
+        "makeEmptyHeap(%s, %s)"
+            .formatted(logger.printFormulaType(pAddressType), logger.printFormulaType(pValueType)),
         () -> delegate.makeEmptyHeap(pAddressType, pValueType));
   }
 
@@ -69,7 +68,7 @@ class TraceSLFormulaManager implements SLFormulaManager {
   public <AF extends Formula, AT extends FormulaType<AF>> AF makeNilElement(AT pAddressType) {
     return logger.logDef(
         "mgr.getSLFormulaManager()",
-        String.format("makeNilElement(%s)", logger.printFormulaType(pAddressType)),
+        "makeNilElement(%s)".formatted(logger.printFormulaType(pAddressType)),
         () -> delegate.makeNilElement(pAddressType));
   }
 }

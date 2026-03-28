@@ -43,7 +43,7 @@ class StatisticsFormulaManager implements FormulaManager {
   private final FormulaManager delegate;
   private final SolverStatistics stats;
 
-  protected StatisticsFormulaManager(FormulaManager pDelegate, SolverStatistics pStats) {
+  StatisticsFormulaManager(FormulaManager pDelegate, SolverStatistics pStats) {
     delegate = checkNotNull(pDelegate);
     stats = checkNotNull(pStats);
   }

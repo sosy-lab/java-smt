@@ -30,7 +30,6 @@ import java.math.BigInteger;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.configuration.Configuration;
@@ -210,8 +209,8 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
 
   @Override
   public Long extractInfo(Formula pT) {
-    if (pT instanceof Z3Formula) {
-      return ((Z3Formula) pT).getFormulaInfo();
+    if (pT instanceof Z3Formula z3Formula) {
+      return z3Formula.getFormulaInfo();
     }
     throw new IllegalArgumentException(
         "Cannot get the formula info of type " + pT.getClass().getSimpleName() + " in the Solver!");
@@ -227,43 +226,40 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
   public FormulaType<?> getFormulaTypeFromSort(Long pSort) {
     long z3context = getEnv();
     Z3_sort_kind sortKind = Z3_sort_kind.fromInt(Native.getSortKind(z3context, pSort));
-    switch (sortKind) {
-      case Z3_BOOL_SORT:
-        return FormulaType.BooleanType;
-      case Z3_INT_SORT:
-        return FormulaType.IntegerType;
-      case Z3_REAL_SORT:
-        return FormulaType.RationalType;
-      case Z3_BV_SORT:
-        return FormulaType.getBitvectorTypeWithSize(Native.getBvSortSize(z3context, pSort));
-      case Z3_ARRAY_SORT:
+    return switch (sortKind) {
+      case Z3_BOOL_SORT -> FormulaType.BooleanType;
+      case Z3_INT_SORT -> FormulaType.IntegerType;
+      case Z3_REAL_SORT -> FormulaType.RationalType;
+      case Z3_BV_SORT ->
+          FormulaType.getBitvectorTypeWithSize(Native.getBvSortSize(z3context, pSort));
+      case Z3_ARRAY_SORT -> {
         long domainSort = Native.getArraySortDomain(z3context, pSort);
         long rangeSort = Native.getArraySortRange(z3context, pSort);
-        return FormulaType.getArrayType(
+        yield FormulaType.getArrayType(
             getFormulaTypeFromSort(domainSort), getFormulaTypeFromSort(rangeSort));
-      case Z3_FLOATING_POINT_SORT:
-        return FormulaType.getFloatingPointTypeFromSizesWithHiddenBit(
-            Native.fpaGetEbits(z3context, pSort), Native.fpaGetSbits(z3context, pSort));
-      case Z3_ROUNDING_MODE_SORT:
-        return FormulaType.FloatingPointRoundingModeType;
-      case Z3_RE_SORT:
-        return FormulaType.RegexType;
-      case Z3_DATATYPE_SORT:
+      }
+      case Z3_FLOATING_POINT_SORT ->
+          FormulaType.getFloatingPointTypeFromSizesWithHiddenBit(
+              Native.fpaGetEbits(z3context, pSort), Native.fpaGetSbits(z3context, pSort));
+      case Z3_ROUNDING_MODE_SORT -> FormulaType.FloatingPointRoundingModeType;
+      case Z3_RE_SORT -> FormulaType.RegexType;
+      case Z3_DATATYPE_SORT -> {
         int n = Native.getDatatypeSortNumConstructors(z3context, pSort);
         ImmutableSet.Builder<String> elements = ImmutableSet.builder();
         for (int i = 0; i < n; i++) {
           long decl = Native.getDatatypeSortConstructor(z3context, pSort, i);
           elements.add(symbolToString(Native.getDeclName(z3context, decl)));
         }
-        return FormulaType.getEnumerationType(
+        yield FormulaType.getEnumerationType(
             Native.sortToString(z3context, pSort), elements.build());
-      case Z3_RELATION_SORT:
-      case Z3_FINITE_DOMAIN_SORT:
-      case Z3_SEQ_SORT:
-      case Z3_UNKNOWN_SORT:
-      case Z3_UNINTERPRETED_SORT:
+      }
+      case Z3_RELATION_SORT,
+          Z3_FINITE_DOMAIN_SORT,
+          Z3_SEQ_SORT,
+          Z3_UNKNOWN_SORT,
+          Z3_UNINTERPRETED_SORT -> {
         if (Native.isStringSort(z3context, pSort)) {
-          return FormulaType.StringType;
+          yield FormulaType.StringType;
         } else {
           // TODO: support for remaining sorts.
           throw new IllegalArgumentException(
@@ -272,9 +268,9 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
                   + " with sort "
                   + sortKind);
         }
-      default:
-        throw new UnsupportedOperationException("Unexpected state.");
-    }
+      }
+      default -> throw new UnsupportedOperationException("Unexpected state.");
+    };
   }
 
   @Override
@@ -313,8 +309,7 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
     assert pType.equals(getFormulaType(pTerm))
             || (pType.equals(FormulaType.RationalType)
                 && getFormulaType(pTerm).equals(FormulaType.IntegerType))
-        : String.format(
-            "Trying to encapsulate formula of type %s as %s", getFormulaType(pTerm), pType);
+        : "Trying to encapsulate formula of type %s as %s".formatted(getFormulaType(pTerm), pType);
     cleanupReferences();
     if (pType.isBooleanType()) {
       return (T) storePhantomReference(new Z3BooleanFormula(getEnv(), pTerm), pTerm);
@@ -377,10 +372,10 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
   @Override
   protected StringFormula encapsulateString(Long pTerm) {
     assert getFormulaType(pTerm).isStringType()
-        : String.format(
-            "Term %s has unexpected type %s.",
-            Native.astToString(getEnv(), pTerm),
-            Native.sortToString(getEnv(), Native.getSort(getEnv(), pTerm)));
+        : "Term %s has unexpected type %s."
+            .formatted(
+                Native.astToString(getEnv(), pTerm),
+                Native.sortToString(getEnv(), Native.getSort(getEnv(), pTerm)));
     cleanupReferences();
     return storePhantomReference(new Z3StringFormula(getEnv(), pTerm), pTerm);
   }
@@ -388,10 +383,10 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
   @Override
   protected RegexFormula encapsulateRegex(Long pTerm) {
     assert getFormulaType(pTerm).isRegexType()
-        : String.format(
-            "Term %s has unexpected type %s.",
-            Native.astToString(getEnv(), pTerm),
-            Native.sortToString(getEnv(), Native.getSort(getEnv(), pTerm)));
+        : "Term %s has unexpected type %s."
+            .formatted(
+                Native.astToString(getEnv(), pTerm),
+                Native.sortToString(getEnv(), Native.getSort(getEnv(), pTerm)));
     cleanupReferences();
     return storePhantomReference(new Z3RegexFormula(getEnv(), pTerm), pTerm);
   }
@@ -399,10 +394,10 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
   @Override
   protected EnumerationFormula encapsulateEnumeration(Long pTerm) {
     assert getFormulaType(pTerm).isEnumerationType()
-        : String.format(
-            "Term %s has unexpected type %s.",
-            Native.astToString(getEnv(), pTerm),
-            Native.sortToString(getEnv(), Native.getSort(getEnv(), pTerm)));
+        : "Term %s has unexpected type %s."
+            .formatted(
+                Native.astToString(getEnv(), pTerm),
+                Native.sortToString(getEnv(), Native.getSort(getEnv(), pTerm)));
     cleanupReferences();
     return storePhantomReference(new Z3EnumerationFormula(getEnv(), pTerm), pTerm);
   }
@@ -427,21 +422,16 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
         Native.astToString(environment, f));
 
     int roundingModeOp = Native.getDeclKind(environment, Native.getAppDecl(environment, f));
-    switch (Z3_decl_kind.fromInt(roundingModeOp)) {
-      case Z3_OP_FPA_RM_NEAREST_TIES_TO_EVEN:
-        return FloatingPointRoundingMode.NEAREST_TIES_TO_EVEN;
-      case Z3_OP_FPA_RM_NEAREST_TIES_TO_AWAY:
-        return FloatingPointRoundingMode.NEAREST_TIES_AWAY;
-      case Z3_OP_FPA_RM_TOWARD_POSITIVE:
-        return FloatingPointRoundingMode.TOWARD_POSITIVE;
-      case Z3_OP_FPA_RM_TOWARD_NEGATIVE:
-        return FloatingPointRoundingMode.TOWARD_NEGATIVE;
-      case Z3_OP_FPA_RM_TOWARD_ZERO:
-        return FloatingPointRoundingMode.TOWARD_ZERO;
-      default:
-        throw new IllegalArgumentException(
-            "Cannot get rounding mode for Z3 operator: " + roundingModeOp);
-    }
+    return switch (Z3_decl_kind.fromInt(roundingModeOp)) {
+      case Z3_OP_FPA_RM_NEAREST_TIES_TO_EVEN -> FloatingPointRoundingMode.NEAREST_TIES_TO_EVEN;
+      case Z3_OP_FPA_RM_NEAREST_TIES_TO_AWAY -> FloatingPointRoundingMode.NEAREST_TIES_AWAY;
+      case Z3_OP_FPA_RM_TOWARD_POSITIVE -> FloatingPointRoundingMode.TOWARD_POSITIVE;
+      case Z3_OP_FPA_RM_TOWARD_NEGATIVE -> FloatingPointRoundingMode.TOWARD_NEGATIVE;
+      case Z3_OP_FPA_RM_TOWARD_ZERO -> FloatingPointRoundingMode.TOWARD_ZERO;
+      default ->
+          throw new IllegalArgumentException(
+              "Cannot get rounding mode for Z3 operator: " + roundingModeOp);
+    };
   }
 
   @Override
@@ -522,10 +512,10 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
   @SuppressWarnings("deprecation")
   @Override
   public <R> R visit(FormulaVisitor<R> visitor, final Formula formula, final Long f) {
-    switch (Z3_ast_kind.fromInt(Native.getAstKind(environment, f))) {
-      case Z3_NUMERAL_AST:
-        return visitor.visitConstant(formula, convertValue(f));
-      case Z3_APP_AST:
+    return switch (Z3_ast_kind.fromInt(Native.getAstKind(environment, f))) {
+      case Z3_NUMERAL_AST -> visitor.visitConstant(formula, convertValue(f));
+
+      case Z3_APP_AST -> {
         int arity = Native.getAppNumArgs(environment, f);
         int declKind = Native.getDeclKind(environment, Native.getAppDecl(environment, f));
 
@@ -534,30 +524,30 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
           Object value = Z3_CONSTANTS.get(declKind);
           int sortKind = Native.getSortKind(environment, Native.getSort(environment, f));
           if (value != null) {
-            return visitor.visitConstant(formula, value);
+            yield visitor.visitConstant(formula, value);
 
           } else if (Z3_FP_CONSTANTS.contains(declKind)) {
-            return visitor.visitConstant(formula, convertValue(f));
+            yield visitor.visitConstant(formula, convertValue(f));
 
             // Rounding mode
           } else if (declKind == Z3_decl_kind.Z3_OP_FPA_NUM.toInt()) {
-            return visitor.visitConstant(formula, convertValue(f));
+            yield visitor.visitConstant(formula, convertValue(f));
           } else if (sortKind == Z3_sort_kind.Z3_ROUNDING_MODE_SORT.toInt()) {
-            return visitor.visitConstant(formula, getRoundingMode(f));
+            yield visitor.visitConstant(formula, getRoundingMode(f));
 
             // string constant
           } else if (declKind == Z3_decl_kind.Z3_OP_INTERNAL.toInt()
               && sortKind == Z3_sort_kind.Z3_SEQ_SORT.toInt()) {
-            return visitor.visitConstant(formula, convertValue(f));
+            yield visitor.visitConstant(formula, convertValue(f));
 
             // Free variable
           } else if (declKind == Z3_decl_kind.Z3_OP_UNINTERPRETED.toInt()
               || declKind == Z3_decl_kind.Z3_OP_INTERNAL.toInt()) {
-            return visitor.visitFreeVariable(formula, getAppName(f));
+            yield visitor.visitFreeVariable(formula, getAppName(f));
 
             // enumeration constant
           } else if (declKind == Z3_decl_kind.Z3_OP_DT_CONSTRUCTOR.toInt()) {
-            return visitor.visitConstant(formula, convertValue(f));
+            yield visitor.visitConstant(formula, convertValue(f));
           } // else: fall-through with a function application
 
         } else if (arity == 3) {
@@ -568,7 +558,7 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
             final var expoBv = Native.getAppArg(environment, f, 1);
             final var mantBv = Native.getAppArg(environment, f, 2);
             if (isConstant(signBv) && isConstant(expoBv) && isConstant(mantBv)) {
-              return visitor.visitConstant(formula, convertValue(f));
+              yield visitor.visitConstant(formula, convertValue(f));
             }
           }
         }
@@ -582,7 +572,7 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
           args.add(encapsulate(argumentType, arg));
           argTypes.add(argumentType);
         }
-        return visitor.visitFunction(
+        yield visitor.visitFunction(
             formula,
             args.build(),
             FunctionDeclarationImpl.of(
@@ -591,31 +581,23 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
                 argTypes.build(),
                 getFormulaType(f),
                 Native.getAppDecl(environment, f)));
-      case Z3_VAR_AST:
-        int deBruijnIdx = Native.getIndexValue(environment, f);
-        return visitor.visitBoundVariable(formula, deBruijnIdx);
-      case Z3_QUANTIFIER_AST:
-        return visitQuantifier(visitor, (BooleanFormula) formula, f);
-      case Z3_SORT_AST:
-      case Z3_FUNC_DECL_AST:
-      case Z3_UNKNOWN_AST:
-      default:
-        throw new UnsupportedOperationException(
-            "Input should be a formula AST, " + "got unexpected type instead");
-    }
+      }
+      case Z3_VAR_AST -> visitor.visitBoundVariable(formula, Native.getIndexValue(environment, f));
+      case Z3_QUANTIFIER_AST -> visitQuantifier(visitor, (BooleanFormula) formula, f);
+      case Z3_SORT_AST, Z3_FUNC_DECL_AST, Z3_UNKNOWN_AST ->
+          throw new UnsupportedOperationException(
+              "Input should be a formula AST, got unexpected type instead");
+    };
   }
 
   protected String symbolToString(long symbol) {
-    switch (Z3_symbol_kind.fromInt(Native.getSymbolKind(environment, symbol))) {
-      case Z3_STRING_SYMBOL:
-        return Native.getSymbolString(environment, symbol);
-      case Z3_INT_SYMBOL:
+    return switch (Z3_symbol_kind.fromInt(Native.getSymbolKind(environment, symbol))) {
+      case Z3_STRING_SYMBOL -> Native.getSymbolString(environment, symbol);
+      case Z3_INT_SYMBOL ->
 
-        // Bound variable.
-        return "#" + Native.getSymbolInt(environment, symbol);
-      default:
-        throw new UnsupportedOperationException("Unexpected state");
-    }
+          // Bound variable.
+          "#" + Native.getSymbolInt(environment, symbol);
+    };
   }
 
   private <R> R visitQuantifier(FormulaVisitor<R> pVisitor, BooleanFormula pFormula, Long pF) {
@@ -643,9 +625,7 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
     return pVisitor.visitQuantifier(
         pFormula,
         q,
-        Longs.asList(freeVars).stream()
-            .map(this::encapsulateWithTypeOf)
-            .collect(Collectors.toList()),
+        Longs.asList(freeVars).stream().map(this::encapsulateWithTypeOf).toList(),
         encapsulateBoolean(substBody));
   }
 
@@ -659,271 +639,155 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
         Z3_decl_kind.fromInt(Native.getDeclKind(environment, Native.getAppDecl(environment, f)));
 
     assert arity >= 0
-        : String.format(
-            "Unexpected arity '%s' for formula '%s' for handling a function application.",
-            arity, Native.astToString(environment, f));
+        : "Unexpected arity '%s' for formula '%s' for handling a function application."
+            .formatted(arity, Native.astToString(environment, f));
 
-    switch (decl) {
-      case Z3_OP_AND:
-        return FunctionDeclarationKind.AND;
-      case Z3_OP_NOT:
-        return FunctionDeclarationKind.NOT;
-      case Z3_OP_OR:
-        return FunctionDeclarationKind.OR;
-      case Z3_OP_IFF:
-        return FunctionDeclarationKind.IFF;
-      case Z3_OP_ITE:
-        return FunctionDeclarationKind.ITE;
-      case Z3_OP_XOR:
-        return FunctionDeclarationKind.XOR;
-      case Z3_OP_DISTINCT:
-        return FunctionDeclarationKind.DISTINCT;
-      case Z3_OP_IMPLIES:
-        return FunctionDeclarationKind.IMPLIES;
+    return switch (decl) {
+      case Z3_OP_AND -> FunctionDeclarationKind.AND;
+      case Z3_OP_NOT -> FunctionDeclarationKind.NOT;
+      case Z3_OP_OR -> FunctionDeclarationKind.OR;
+      case Z3_OP_IFF -> FunctionDeclarationKind.IFF;
+      case Z3_OP_ITE -> FunctionDeclarationKind.ITE;
+      case Z3_OP_XOR -> FunctionDeclarationKind.XOR;
+      case Z3_OP_DISTINCT -> FunctionDeclarationKind.DISTINCT;
+      case Z3_OP_IMPLIES -> FunctionDeclarationKind.IMPLIES;
 
-      case Z3_OP_SUB:
-        return FunctionDeclarationKind.SUB;
-      case Z3_OP_ADD:
-        return FunctionDeclarationKind.ADD;
-      case Z3_OP_DIV:
-        return FunctionDeclarationKind.DIV;
-      case Z3_OP_MUL:
-        return FunctionDeclarationKind.MUL;
-      case Z3_OP_MOD:
-        return FunctionDeclarationKind.MODULO;
-      case Z3_OP_TO_INT:
-        return FunctionDeclarationKind.FLOOR;
-      case Z3_OP_TO_REAL:
-        return FunctionDeclarationKind.TO_REAL;
-      case Z3_OP_INT2BV:
-        return FunctionDeclarationKind.INT_TO_BV;
+      case Z3_OP_SUB -> FunctionDeclarationKind.SUB;
+      case Z3_OP_ADD -> FunctionDeclarationKind.ADD;
+      case Z3_OP_DIV -> FunctionDeclarationKind.DIV;
+      case Z3_OP_MUL -> FunctionDeclarationKind.MUL;
+      case Z3_OP_MOD -> FunctionDeclarationKind.MODULO;
+      case Z3_OP_TO_INT -> FunctionDeclarationKind.FLOOR;
+      case Z3_OP_TO_REAL -> FunctionDeclarationKind.TO_REAL;
+      case Z3_OP_INT2BV -> FunctionDeclarationKind.INT_TO_BV;
 
-      case Z3_OP_UNINTERPRETED:
-        return FunctionDeclarationKind.UF;
+      case Z3_OP_UNINTERPRETED -> FunctionDeclarationKind.UF;
 
-      case Z3_OP_LT:
-        return FunctionDeclarationKind.LT;
-      case Z3_OP_LE:
-        return FunctionDeclarationKind.LTE;
-      case Z3_OP_GT:
-        return FunctionDeclarationKind.GT;
-      case Z3_OP_GE:
-        return FunctionDeclarationKind.GTE;
-      case Z3_OP_EQ:
-        return FunctionDeclarationKind.EQ;
+      case Z3_OP_LT -> FunctionDeclarationKind.LT;
+      case Z3_OP_LE -> FunctionDeclarationKind.LTE;
+      case Z3_OP_GT -> FunctionDeclarationKind.GT;
+      case Z3_OP_GE -> FunctionDeclarationKind.GTE;
+      case Z3_OP_EQ -> FunctionDeclarationKind.EQ;
 
-      case Z3_OP_STORE:
-        return FunctionDeclarationKind.STORE;
-      case Z3_OP_SELECT:
-        return FunctionDeclarationKind.SELECT;
-      case Z3_OP_CONST_ARRAY:
-        return FunctionDeclarationKind.CONST;
+      case Z3_OP_STORE -> FunctionDeclarationKind.STORE;
+      case Z3_OP_SELECT -> FunctionDeclarationKind.SELECT;
+      case Z3_OP_CONST_ARRAY -> FunctionDeclarationKind.CONST;
 
-      case Z3_OP_TRUE:
-      case Z3_OP_FALSE:
-      case Z3_OP_ANUM:
-      case Z3_OP_AGNUM:
-        throw new UnsupportedOperationException("Unexpected state: constants not expected");
-      case Z3_OP_OEQ:
-        throw new UnsupportedOperationException("Unexpected state: not a proof");
-      case Z3_OP_UMINUS:
-        return FunctionDeclarationKind.UMINUS;
-      case Z3_OP_IDIV:
+      case Z3_OP_TRUE, Z3_OP_FALSE, Z3_OP_ANUM, Z3_OP_AGNUM ->
+          throw new UnsupportedOperationException("Unexpected state: constants not expected");
+      case Z3_OP_OEQ -> throw new UnsupportedOperationException("Unexpected state: not a proof");
+      case Z3_OP_UMINUS -> FunctionDeclarationKind.UMINUS;
+      case Z3_OP_IDIV ->
 
-        // TODO: different handling for integer division?
-        return FunctionDeclarationKind.DIV;
+          // TODO: different handling for integer division?
+          FunctionDeclarationKind.DIV;
 
-      case Z3_OP_EXTRACT:
-        return FunctionDeclarationKind.BV_EXTRACT;
-      case Z3_OP_CONCAT:
-        return FunctionDeclarationKind.BV_CONCAT;
-      case Z3_OP_BNOT:
-        return FunctionDeclarationKind.BV_NOT;
-      case Z3_OP_BNEG:
-        return FunctionDeclarationKind.BV_NEG;
-      case Z3_OP_BAND:
-        return FunctionDeclarationKind.BV_AND;
-      case Z3_OP_BOR:
-        return FunctionDeclarationKind.BV_OR;
-      case Z3_OP_BXOR:
-        return FunctionDeclarationKind.BV_XOR;
-      case Z3_OP_ULT:
-        return FunctionDeclarationKind.BV_ULT;
-      case Z3_OP_SLT:
-        return FunctionDeclarationKind.BV_SLT;
-      case Z3_OP_ULEQ:
-        return FunctionDeclarationKind.BV_ULE;
-      case Z3_OP_SLEQ:
-        return FunctionDeclarationKind.BV_SLE;
-      case Z3_OP_UGT:
-        return FunctionDeclarationKind.BV_UGT;
-      case Z3_OP_SGT:
-        return FunctionDeclarationKind.BV_SGT;
-      case Z3_OP_UGEQ:
-        return FunctionDeclarationKind.BV_UGE;
-      case Z3_OP_SGEQ:
-        return FunctionDeclarationKind.BV_SGE;
-      case Z3_OP_BADD:
-        return FunctionDeclarationKind.BV_ADD;
-      case Z3_OP_BSUB:
-        return FunctionDeclarationKind.BV_SUB;
-      case Z3_OP_BMUL:
-        return FunctionDeclarationKind.BV_MUL;
-      case Z3_OP_BUDIV:
-      case Z3_OP_BUDIV_I: // same as above, and divisor is non-zero
-        return FunctionDeclarationKind.BV_UDIV;
-      case Z3_OP_BSDIV:
-      case Z3_OP_BSDIV_I: // same as above, and divisor is non-zero
-        return FunctionDeclarationKind.BV_SDIV;
-      case Z3_OP_BUREM:
-      case Z3_OP_BUREM_I: // same as above, and divisor is non-zero
-        return FunctionDeclarationKind.BV_UREM;
-      case Z3_OP_BSREM:
-      case Z3_OP_BSREM_I: // same as above, and divisor is non-zero
-        return FunctionDeclarationKind.BV_SREM;
-      case Z3_OP_BSMOD:
-      case Z3_OP_BSMOD_I: // same as above, and divisor is non-zero
-        return FunctionDeclarationKind.BV_SMOD;
-      case Z3_OP_BSHL:
-        return FunctionDeclarationKind.BV_SHL;
-      case Z3_OP_BLSHR:
-        return FunctionDeclarationKind.BV_LSHR;
-      case Z3_OP_BASHR:
-        return FunctionDeclarationKind.BV_ASHR;
-      case Z3_OP_SIGN_EXT:
-        return FunctionDeclarationKind.BV_SIGN_EXTENSION;
-      case Z3_OP_ZERO_EXT:
-        return FunctionDeclarationKind.BV_ZERO_EXTENSION;
-      case Z3_OP_ROTATE_LEFT:
-        return FunctionDeclarationKind.BV_ROTATE_LEFT_BY_INT;
-      case Z3_OP_ROTATE_RIGHT:
-        return FunctionDeclarationKind.BV_ROTATE_RIGHT_BY_INT;
-      case Z3_OP_EXT_ROTATE_LEFT:
-        return FunctionDeclarationKind.BV_ROTATE_LEFT;
-      case Z3_OP_EXT_ROTATE_RIGHT:
-        return FunctionDeclarationKind.BV_ROTATE_RIGHT;
-      case Z3_OP_BV2INT:
-        return FunctionDeclarationKind.UBV_TO_INT;
-      case Z3_OP_SBV2INT:
-        return FunctionDeclarationKind.SBV_TO_INT;
+      case Z3_OP_EXTRACT -> FunctionDeclarationKind.BV_EXTRACT;
+      case Z3_OP_CONCAT -> FunctionDeclarationKind.BV_CONCAT;
+      case Z3_OP_BNOT -> FunctionDeclarationKind.BV_NOT;
+      case Z3_OP_BNEG -> FunctionDeclarationKind.BV_NEG;
+      case Z3_OP_BAND -> FunctionDeclarationKind.BV_AND;
+      case Z3_OP_BOR -> FunctionDeclarationKind.BV_OR;
+      case Z3_OP_BXOR -> FunctionDeclarationKind.BV_XOR;
+      case Z3_OP_ULT -> FunctionDeclarationKind.BV_ULT;
+      case Z3_OP_SLT -> FunctionDeclarationKind.BV_SLT;
+      case Z3_OP_ULEQ -> FunctionDeclarationKind.BV_ULE;
+      case Z3_OP_SLEQ -> FunctionDeclarationKind.BV_SLE;
+      case Z3_OP_UGT -> FunctionDeclarationKind.BV_UGT;
+      case Z3_OP_SGT -> FunctionDeclarationKind.BV_SGT;
+      case Z3_OP_UGEQ -> FunctionDeclarationKind.BV_UGE;
+      case Z3_OP_SGEQ -> FunctionDeclarationKind.BV_SGE;
+      case Z3_OP_BADD -> FunctionDeclarationKind.BV_ADD;
+      case Z3_OP_BSUB -> FunctionDeclarationKind.BV_SUB;
+      case Z3_OP_BMUL -> FunctionDeclarationKind.BV_MUL;
+      case Z3_OP_BUDIV, Z3_OP_BUDIV_I -> // same as above, and divisor is non-zero
+          FunctionDeclarationKind.BV_UDIV;
+      case Z3_OP_BSDIV, Z3_OP_BSDIV_I -> // same as above, and divisor is non-zero
+          FunctionDeclarationKind.BV_SDIV;
+      case Z3_OP_BUREM, Z3_OP_BUREM_I -> // same as above, and divisor is non-zero
+          FunctionDeclarationKind.BV_UREM;
+      case Z3_OP_BSREM, Z3_OP_BSREM_I -> // same as above, and divisor is non-zero
+          FunctionDeclarationKind.BV_SREM;
+      case Z3_OP_BSMOD, Z3_OP_BSMOD_I -> // same as above, and divisor is non-zero
+          FunctionDeclarationKind.BV_SMOD;
+      case Z3_OP_BSHL -> FunctionDeclarationKind.BV_SHL;
+      case Z3_OP_BLSHR -> FunctionDeclarationKind.BV_LSHR;
+      case Z3_OP_BASHR -> FunctionDeclarationKind.BV_ASHR;
+      case Z3_OP_SIGN_EXT -> FunctionDeclarationKind.BV_SIGN_EXTENSION;
+      case Z3_OP_ZERO_EXT -> FunctionDeclarationKind.BV_ZERO_EXTENSION;
+      case Z3_OP_ROTATE_LEFT -> FunctionDeclarationKind.BV_ROTATE_LEFT_BY_INT;
+      case Z3_OP_ROTATE_RIGHT -> FunctionDeclarationKind.BV_ROTATE_RIGHT_BY_INT;
+      case Z3_OP_EXT_ROTATE_LEFT -> FunctionDeclarationKind.BV_ROTATE_LEFT;
+      case Z3_OP_EXT_ROTATE_RIGHT -> FunctionDeclarationKind.BV_ROTATE_RIGHT;
+      case Z3_OP_BV2INT -> FunctionDeclarationKind.UBV_TO_INT;
+      case Z3_OP_SBV2INT -> FunctionDeclarationKind.SBV_TO_INT;
 
-      case Z3_OP_FPA_NEG:
-        return FunctionDeclarationKind.FP_NEG;
-      case Z3_OP_FPA_ABS:
-        return FunctionDeclarationKind.FP_ABS;
-      case Z3_OP_FPA_MAX:
-        return FunctionDeclarationKind.FP_MAX;
-      case Z3_OP_FPA_MIN:
-        return FunctionDeclarationKind.FP_MIN;
-      case Z3_OP_FPA_SQRT:
-        return FunctionDeclarationKind.FP_SQRT;
-      case Z3_OP_FPA_SUB:
-        return FunctionDeclarationKind.FP_SUB;
-      case Z3_OP_FPA_ADD:
-        return FunctionDeclarationKind.FP_ADD;
-      case Z3_OP_FPA_DIV:
-        return FunctionDeclarationKind.FP_DIV;
-      case Z3_OP_FPA_MUL:
-        return FunctionDeclarationKind.FP_MUL;
-      case Z3_OP_FPA_REM:
-        return FunctionDeclarationKind.FP_REM;
-      case Z3_OP_FPA_LT:
-        return FunctionDeclarationKind.FP_LT;
-      case Z3_OP_FPA_LE:
-        return FunctionDeclarationKind.FP_LE;
-      case Z3_OP_FPA_GE:
-        return FunctionDeclarationKind.FP_GE;
-      case Z3_OP_FPA_GT:
-        return FunctionDeclarationKind.FP_GT;
-      case Z3_OP_FPA_EQ:
-        return FunctionDeclarationKind.FP_EQ;
-      case Z3_OP_FPA_ROUND_TO_INTEGRAL:
-        return FunctionDeclarationKind.FP_ROUND_TO_INTEGRAL;
-      case Z3_OP_FPA_TO_FP_UNSIGNED:
-        return FunctionDeclarationKind.BV_UCASTTO_FP;
-      case Z3_OP_FPA_TO_SBV:
-        return FunctionDeclarationKind.FP_CASTTO_SBV;
-      case Z3_OP_FPA_TO_UBV:
-        return FunctionDeclarationKind.FP_CASTTO_UBV;
-      case Z3_OP_FPA_TO_IEEE_BV:
-        return FunctionDeclarationKind.FP_AS_IEEEBV;
-      case Z3_OP_FPA_TO_FP:
+      case Z3_OP_FPA_NEG -> FunctionDeclarationKind.FP_NEG;
+      case Z3_OP_FPA_ABS -> FunctionDeclarationKind.FP_ABS;
+      case Z3_OP_FPA_MAX -> FunctionDeclarationKind.FP_MAX;
+      case Z3_OP_FPA_MIN -> FunctionDeclarationKind.FP_MIN;
+      case Z3_OP_FPA_SQRT -> FunctionDeclarationKind.FP_SQRT;
+      case Z3_OP_FPA_SUB -> FunctionDeclarationKind.FP_SUB;
+      case Z3_OP_FPA_ADD -> FunctionDeclarationKind.FP_ADD;
+      case Z3_OP_FPA_DIV -> FunctionDeclarationKind.FP_DIV;
+      case Z3_OP_FPA_MUL -> FunctionDeclarationKind.FP_MUL;
+      case Z3_OP_FPA_REM -> FunctionDeclarationKind.FP_REM;
+      case Z3_OP_FPA_LT -> FunctionDeclarationKind.FP_LT;
+      case Z3_OP_FPA_LE -> FunctionDeclarationKind.FP_LE;
+      case Z3_OP_FPA_GE -> FunctionDeclarationKind.FP_GE;
+      case Z3_OP_FPA_GT -> FunctionDeclarationKind.FP_GT;
+      case Z3_OP_FPA_EQ -> FunctionDeclarationKind.FP_EQ;
+      case Z3_OP_FPA_ROUND_TO_INTEGRAL -> FunctionDeclarationKind.FP_ROUND_TO_INTEGRAL;
+      case Z3_OP_FPA_TO_FP_UNSIGNED -> FunctionDeclarationKind.BV_UCASTTO_FP;
+      case Z3_OP_FPA_TO_SBV -> FunctionDeclarationKind.FP_CASTTO_SBV;
+      case Z3_OP_FPA_TO_UBV -> FunctionDeclarationKind.FP_CASTTO_UBV;
+      case Z3_OP_FPA_TO_IEEE_BV -> FunctionDeclarationKind.FP_AS_IEEEBV;
+      case Z3_OP_FPA_TO_FP -> {
         // use the last argument. other arguments can be part of rounding or casting.
         long arg = Native.getAppArg(environment, f, Native.getAppNumArgs(environment, f) - 1);
         Z3_sort_kind sortKind =
             Z3_sort_kind.fromInt(Native.getSortKind(environment, Native.getSort(environment, arg)));
         if (Z3_sort_kind.Z3_BV_SORT == sortKind) {
-          return FunctionDeclarationKind.BV_SCASTTO_FP;
+          yield FunctionDeclarationKind.BV_SCASTTO_FP;
         } else {
-          return FunctionDeclarationKind.FP_CASTTO_FP;
+          yield FunctionDeclarationKind.FP_CASTTO_FP;
         }
-      case Z3_OP_FPA_IS_NAN:
-        return FunctionDeclarationKind.FP_IS_NAN;
-      case Z3_OP_FPA_IS_INF:
-        return FunctionDeclarationKind.FP_IS_INF;
-      case Z3_OP_FPA_IS_ZERO:
-        return FunctionDeclarationKind.FP_IS_ZERO;
-      case Z3_OP_FPA_IS_NEGATIVE:
-        return FunctionDeclarationKind.FP_IS_NEGATIVE;
-      case Z3_OP_FPA_IS_SUBNORMAL:
-        return FunctionDeclarationKind.FP_IS_SUBNORMAL;
-      case Z3_OP_FPA_IS_NORMAL:
-        return FunctionDeclarationKind.FP_IS_NORMAL;
+      }
+      case Z3_OP_FPA_IS_NAN -> FunctionDeclarationKind.FP_IS_NAN;
+      case Z3_OP_FPA_IS_INF -> FunctionDeclarationKind.FP_IS_INF;
+      case Z3_OP_FPA_IS_ZERO -> FunctionDeclarationKind.FP_IS_ZERO;
+      case Z3_OP_FPA_IS_NEGATIVE -> FunctionDeclarationKind.FP_IS_NEGATIVE;
+      case Z3_OP_FPA_IS_SUBNORMAL -> FunctionDeclarationKind.FP_IS_SUBNORMAL;
+      case Z3_OP_FPA_IS_NORMAL -> FunctionDeclarationKind.FP_IS_NORMAL;
 
-      case Z3_OP_SEQ_CONCAT:
-        return FunctionDeclarationKind.STR_CONCAT;
-      case Z3_OP_SEQ_PREFIX:
-        return FunctionDeclarationKind.STR_PREFIX;
-      case Z3_OP_SEQ_SUFFIX:
-        return FunctionDeclarationKind.STR_SUFFIX;
-      case Z3_OP_SEQ_CONTAINS:
-        return FunctionDeclarationKind.STR_CONTAINS;
-      case Z3_OP_SEQ_EXTRACT:
-        return FunctionDeclarationKind.STR_SUBSTRING;
-      case Z3_OP_SEQ_REPLACE:
-        return FunctionDeclarationKind.STR_REPLACE;
-      case Z3_OP_SEQ_AT:
-        return FunctionDeclarationKind.STR_CHAR_AT;
-      case Z3_OP_SEQ_LENGTH:
-        return FunctionDeclarationKind.STR_LENGTH;
-      case Z3_OP_SEQ_INDEX:
-        return FunctionDeclarationKind.STR_INDEX_OF;
-      case Z3_OP_SEQ_TO_RE:
-        return FunctionDeclarationKind.STR_TO_RE;
-      case Z3_OP_SEQ_IN_RE:
-        return FunctionDeclarationKind.STR_IN_RE;
-      case Z3_OP_STR_TO_INT:
-        return FunctionDeclarationKind.STR_TO_INT;
-      case Z3_OP_STR_TO_CODE:
-        return FunctionDeclarationKind.STR_TO_CODE;
-      case Z3_OP_STR_FROM_CODE:
-        return FunctionDeclarationKind.STR_FROM_CODE;
-      case Z3_OP_INT_TO_STR:
-        return FunctionDeclarationKind.INT_TO_STR;
-      case Z3_OP_STRING_LT:
-        return FunctionDeclarationKind.STR_LT;
-      case Z3_OP_STRING_LE:
-        return FunctionDeclarationKind.STR_LE;
-      case Z3_OP_RE_PLUS:
-        return FunctionDeclarationKind.RE_PLUS;
-      case Z3_OP_RE_STAR:
-        return FunctionDeclarationKind.RE_STAR;
-      case Z3_OP_RE_OPTION:
-        return FunctionDeclarationKind.RE_OPTIONAL;
-      case Z3_OP_RE_CONCAT:
-        return FunctionDeclarationKind.RE_CONCAT;
-      case Z3_OP_RE_UNION:
-        return FunctionDeclarationKind.RE_UNION;
-      case Z3_OP_RE_RANGE:
-        return FunctionDeclarationKind.RE_RANGE;
-      case Z3_OP_RE_INTERSECT:
-        return FunctionDeclarationKind.RE_INTERSECT;
-      case Z3_OP_RE_COMPLEMENT:
-        return FunctionDeclarationKind.RE_COMPLEMENT;
+      case Z3_OP_SEQ_CONCAT -> FunctionDeclarationKind.STR_CONCAT;
+      case Z3_OP_SEQ_PREFIX -> FunctionDeclarationKind.STR_PREFIX;
+      case Z3_OP_SEQ_SUFFIX -> FunctionDeclarationKind.STR_SUFFIX;
+      case Z3_OP_SEQ_CONTAINS -> FunctionDeclarationKind.STR_CONTAINS;
+      case Z3_OP_SEQ_EXTRACT -> FunctionDeclarationKind.STR_SUBSTRING;
+      case Z3_OP_SEQ_REPLACE -> FunctionDeclarationKind.STR_REPLACE;
+      case Z3_OP_SEQ_AT -> FunctionDeclarationKind.STR_CHAR_AT;
+      case Z3_OP_SEQ_LENGTH -> FunctionDeclarationKind.STR_LENGTH;
+      case Z3_OP_SEQ_INDEX -> FunctionDeclarationKind.STR_INDEX_OF;
+      case Z3_OP_SEQ_TO_RE -> FunctionDeclarationKind.STR_TO_RE;
+      case Z3_OP_SEQ_IN_RE -> FunctionDeclarationKind.STR_IN_RE;
+      case Z3_OP_STR_TO_INT -> FunctionDeclarationKind.STR_TO_INT;
+      case Z3_OP_STR_TO_CODE -> FunctionDeclarationKind.STR_TO_CODE;
+      case Z3_OP_STR_FROM_CODE -> FunctionDeclarationKind.STR_FROM_CODE;
+      case Z3_OP_INT_TO_STR -> FunctionDeclarationKind.INT_TO_STR;
+      case Z3_OP_STRING_LT -> FunctionDeclarationKind.STR_LT;
+      case Z3_OP_STRING_LE -> FunctionDeclarationKind.STR_LE;
+      case Z3_OP_RE_PLUS -> FunctionDeclarationKind.RE_PLUS;
+      case Z3_OP_RE_STAR -> FunctionDeclarationKind.RE_STAR;
+      case Z3_OP_RE_OPTION -> FunctionDeclarationKind.RE_OPTIONAL;
+      case Z3_OP_RE_CONCAT -> FunctionDeclarationKind.RE_CONCAT;
+      case Z3_OP_RE_UNION -> FunctionDeclarationKind.RE_UNION;
+      case Z3_OP_RE_RANGE -> FunctionDeclarationKind.RE_RANGE;
+      case Z3_OP_RE_INTERSECT -> FunctionDeclarationKind.RE_INTERSECT;
+      case Z3_OP_RE_COMPLEMENT -> FunctionDeclarationKind.RE_COMPLEMENT;
 
-      default:
-        return FunctionDeclarationKind.OTHER;
-    }
+      default -> FunctionDeclarationKind.OTHER;
+    };
   }
 
   /**

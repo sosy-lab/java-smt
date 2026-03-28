@@ -85,20 +85,19 @@ final class Z3LegacyModel extends AbstractModel<Long, Long, Long> {
    * method is only a heuristic, because the user can also create a symbol containing "!".
    */
   private boolean isInternalSymbol(long funcDecl) {
-    switch (Z3_decl_kind.fromInt(Native.getDeclKind(z3context, funcDecl))) {
-      case Z3_OP_SELECT:
-      case Z3_OP_ARRAY_EXT:
-        return true;
-      default:
+    return switch (Z3_decl_kind.fromInt(Native.getDeclKind(z3context, funcDecl))) {
+      case Z3_OP_SELECT, Z3_OP_ARRAY_EXT -> true;
+      default -> {
         long declName = Native.getDeclName(z3context, funcDecl);
         Z3_symbol_kind kind = Z3_symbol_kind.fromInt(Native.getSymbolKind(z3context, declName));
         if (kind == Z3_symbol_kind.Z3_INT_SYMBOL) { // bound variables
-          return true;
+          yield true;
         }
-        return Z3_IRRELEVANT_MODEL_TERM_PATTERN
+        yield Z3_IRRELEVANT_MODEL_TERM_PATTERN
             .matcher(z3creator.symbolToString(declName))
             .matches();
-    }
+      }
+    };
   }
 
   /**

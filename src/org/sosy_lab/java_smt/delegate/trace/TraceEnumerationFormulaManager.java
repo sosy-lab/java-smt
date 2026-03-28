@@ -32,10 +32,12 @@ class TraceEnumerationFormulaManager implements EnumerationFormulaManager {
   public EnumerationFormulaType declareEnumeration(String name, Set<String> elementNames) {
     return logger.logDefKeep(
         "mgr.getEnumerationFormulaManager()",
-        String.format(
-            "declareEnumeration(%s, Set.of(%s))",
-            logger.printString(name),
-            FluentIterable.from(elementNames).transform(logger::printString).join(Joiner.on(", "))),
+        "declareEnumeration(%s, Set.of(%s))"
+            .formatted(
+                logger.printString(name),
+                FluentIterable.from(elementNames)
+                    .transform(logger::printString)
+                    .join(Joiner.on(", "))),
         () -> delegate.declareEnumeration(name, elementNames));
   }
 
@@ -43,7 +45,7 @@ class TraceEnumerationFormulaManager implements EnumerationFormulaManager {
   public EnumerationFormula makeConstant(String pName, EnumerationFormulaType pType) {
     return logger.logDef(
         "mgr.getEnumerationFormulaManager()",
-        String.format("makeConstant(%s, %s)", logger.printString(pName), logger.toVariable(pType)),
+        "makeConstant(%s, %s)".formatted(logger.printString(pName), logger.toVariable(pType)),
         () -> delegate.makeConstant(pName, pType));
   }
 
@@ -51,7 +53,7 @@ class TraceEnumerationFormulaManager implements EnumerationFormulaManager {
   public EnumerationFormula makeVariable(String pVar, EnumerationFormulaType pType) {
     return logger.logDef(
         "mgr.getEnumerationFormulaManager()",
-        String.format("makeVariable(%s, %s)", logger.printString(pVar), logger.toVariable(pType)),
+        "makeVariable(%s, %s)".formatted(logger.printString(pVar), logger.toVariable(pType)),
         () -> delegate.makeVariable(pVar, pType));
   }
 
@@ -60,9 +62,8 @@ class TraceEnumerationFormulaManager implements EnumerationFormulaManager {
       EnumerationFormula pEnumeration1, EnumerationFormula pEnumeration2) {
     return logger.logDef(
         "mgr.getEnumerationFormulaManager()",
-        String.format(
-            "equivalence(%s, %s)",
-            logger.toVariable(pEnumeration1), logger.toVariable(pEnumeration2)),
+        "equivalence(%s, %s)"
+            .formatted(logger.toVariable(pEnumeration1), logger.toVariable(pEnumeration2)),
         () -> delegate.equivalence(pEnumeration1, pEnumeration2));
   }
 }

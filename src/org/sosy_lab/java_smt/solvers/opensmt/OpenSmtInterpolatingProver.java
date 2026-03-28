@@ -120,8 +120,8 @@ class OpenSmtInterpolatingProver extends OpenSmtAbstractProver<Integer>
   protected String getReasonFromSolverFeatures(
       boolean usesUFs, boolean usesIntegers, boolean usesReals, boolean usesArrays) {
     if (!creator.getLogic().doesLogicSupportInterpolation()) {
-      return String.format(
-          "OpenSMT does not support interpolation for the specified logic %s.", creator.getLogic());
+      return "OpenSMT does not support interpolation for the specified logic %s."
+          .formatted(creator.getLogic());
     }
     return super.getReasonFromSolverFeatures(usesUFs, usesIntegers, usesReals, usesArrays);
   }

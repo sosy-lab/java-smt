@@ -110,34 +110,23 @@ public class SolverContextFactoryTest {
    * but we do not explicitly test them in our CI.
    */
   private boolean isSupportedOperatingSystemAndArchitecture() {
-    switch (solverToUse()) {
-      case SMTINTERPOL:
-      case PRINCESS:
-        // Any operating system and any architecture is allowed, Java is sufficient
-        return true;
-      case BOOLECTOR:
-      case CVC4:
-        return IS_LINUX && !IS_ARCH_ARM64;
-      case YICES2:
-        return (IS_LINUX && !IS_ARCH_ARM64 && isSufficientVersionOfLibcxx("yices2java"))
-            || (IS_WINDOWS && !IS_ARCH_ARM64);
-      case CVC5:
-        return (IS_LINUX && isSufficientVersionOfLibcxx("cvc5jni")) || IS_WINDOWS || IS_MAC;
-      case OPENSMT:
-        return IS_LINUX && isSufficientVersionOfLibcxx("opensmtj");
-      case BITWUZLA:
-        return (IS_LINUX && isSufficientVersionOfLibcxx("bitwuzlaj"))
-            || (IS_WINDOWS && !IS_ARCH_ARM64);
-      case MATHSAT5:
-        return (IS_LINUX && isSufficientVersionOfLibcxx("mathsat5j"))
-            || (IS_WINDOWS && !IS_ARCH_ARM64);
-      case Z3:
-        return (IS_LINUX && isSufficientVersionOfLibcxx("z3")) || IS_WINDOWS || IS_MAC;
-      case Z3_WITH_INTERPOLATION:
-        return IS_LINUX;
-      default:
-        throw new AssertionError("unexpected solver: " + solverToUse());
-    }
+    return switch (solverToUse()) {
+      case SMTINTERPOL, PRINCESS ->
+          // Any operating system and any architecture is allowed, Java is sufficient
+          true;
+      case BOOLECTOR, CVC4 -> IS_LINUX && !IS_ARCH_ARM64;
+      case YICES2 ->
+          (IS_LINUX && !IS_ARCH_ARM64 && isSufficientVersionOfLibcxx("yices2java"))
+              || (IS_WINDOWS && !IS_ARCH_ARM64);
+      case CVC5 -> (IS_LINUX && isSufficientVersionOfLibcxx("cvc5jni")) || IS_WINDOWS || IS_MAC;
+      case OPENSMT -> IS_LINUX && isSufficientVersionOfLibcxx("opensmtj");
+      case BITWUZLA ->
+          (IS_LINUX && isSufficientVersionOfLibcxx("bitwuzlaj")) || (IS_WINDOWS && !IS_ARCH_ARM64);
+      case MATHSAT5 ->
+          (IS_LINUX && isSufficientVersionOfLibcxx("mathsat5j")) || (IS_WINDOWS && !IS_ARCH_ARM64);
+      case Z3 -> (IS_LINUX && isSufficientVersionOfLibcxx("z3")) || IS_WINDOWS || IS_MAC;
+      case Z3_WITH_INTERPOLATION -> IS_LINUX;
+    };
   }
 
   /**
@@ -158,22 +147,14 @@ public class SolverContextFactoryTest {
   }
 
   private String[] getRequiredLibcxx(String library) {
-    switch (library) {
-      case "z3":
-        return new String[] {"GLIBC_2.34", "GLIBCXX_3.4.26", "GLIBCXX_3.4.29"};
-      case "bitwuzlaj":
-        return new String[] {"GLIBC_2.33", "GLIBCXX_3.4.26", "GLIBCXX_3.4.29"};
-      case "opensmtj":
-        return new String[] {"GLIBC_2.33", "GLIBCXX_3.4.26", "GLIBCXX_3.4.29"};
-      case "mathsat5j":
-        return new String[] {"GLIBC_2.33", "GLIBC_2.38"};
-      case "cvc5jni":
-        return new String[] {"GLIBC_2.32"};
-      case "yices2java":
-        return new String[] {"GLIBC_2.34"};
-      default:
-        return new String[] {};
-    }
+    return switch (library) {
+      case "z3" -> new String[] {"GLIBC_2.34", "GLIBCXX_3.4.26", "GLIBCXX_3.4.29"};
+      case "bitwuzlaj" -> new String[] {"GLIBC_2.33", "GLIBCXX_3.4.26", "GLIBCXX_3.4.29"};
+      case "opensmtj" -> new String[] {"GLIBC_2.33", "GLIBCXX_3.4.26", "GLIBCXX_3.4.29"};
+      case "mathsat5j" -> new String[] {"GLIBC_2.33", "GLIBC_2.38"};
+      case "cvc5jni" -> new String[] {"GLIBC_2.32"};
+      default -> new String[] {};
+    };
   }
 
   @Before
@@ -268,8 +249,7 @@ public class SolverContextFactoryTest {
         .that(thrown)
         .hasMessageThat()
         .startsWith(
-            String.format(
-                "The SMT solver %s is not available on this machine because of missing libraries ",
-                solverToUse()));
+            "The SMT solver %s is not available on this machine because of missing libraries "
+                .formatted(solverToUse()));
   }
 }

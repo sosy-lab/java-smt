@@ -222,10 +222,8 @@ public class SolverContextFactory {
       context = generateContext0(solverToCreate);
     } catch (UnsatisfiedLinkError | NoClassDefFoundError e) {
       throw new InvalidConfigurationException(
-          String.format(
-              "The SMT solver %s is not available on this machine because of missing libraries"
-                  + " (%s).",
-              solverToCreate, e.getMessage()),
+          "The SMT solver %s is not available on this machine because of missing libraries (%s)."
+              .formatted(solverToCreate, e.getMessage()),
           e);
     }
 
@@ -251,84 +249,81 @@ public class SolverContextFactory {
 
   private SolverContext generateContext0(Solvers solverToCreate)
       throws InvalidConfigurationException {
-    switch (solverToCreate) {
-      case OPENSMT:
-        return OpenSmtSolverContext.create(
-            config, logger, shutdownNotifier, randomSeed, nonLinearArithmetic, loader);
+    return switch (solverToCreate) {
+      case OPENSMT ->
+          OpenSmtSolverContext.create(
+              config, logger, shutdownNotifier, randomSeed, nonLinearArithmetic, loader);
 
-      case CVC4:
-        return CVC4SolverContext.create(
-            logger,
-            shutdownNotifier,
-            (int) randomSeed,
-            nonLinearArithmetic,
-            floatingPointRoundingMode,
-            loader);
+      case CVC4 ->
+          CVC4SolverContext.create(
+              logger,
+              shutdownNotifier,
+              (int) randomSeed,
+              nonLinearArithmetic,
+              floatingPointRoundingMode,
+              loader);
 
-      case CVC5:
-        return CVC5SolverContext.create(
-            logger,
-            config,
-            shutdownNotifier,
-            (int) randomSeed,
-            nonLinearArithmetic,
-            floatingPointRoundingMode,
-            loader);
+      case CVC5 ->
+          CVC5SolverContext.create(
+              logger,
+              config,
+              shutdownNotifier,
+              (int) randomSeed,
+              nonLinearArithmetic,
+              floatingPointRoundingMode,
+              loader);
 
-      case SMTINTERPOL:
-        return SmtInterpolSolverContext.create(
-            config, logger, shutdownNotifier, logfile, randomSeed, nonLinearArithmetic);
+      case SMTINTERPOL ->
+          SmtInterpolSolverContext.create(
+              config, logger, shutdownNotifier, logfile, randomSeed, nonLinearArithmetic);
 
-      case MATHSAT5:
-        return Mathsat5SolverContext.create(
-            logger,
-            config,
-            shutdownNotifier,
-            logfile,
-            randomSeed,
-            floatingPointRoundingMode,
-            nonLinearArithmetic,
-            loader);
+      case MATHSAT5 ->
+          Mathsat5SolverContext.create(
+              logger,
+              config,
+              shutdownNotifier,
+              logfile,
+              randomSeed,
+              floatingPointRoundingMode,
+              nonLinearArithmetic,
+              loader);
 
-      case Z3:
-        return Z3SolverContext.create(
-            logger,
-            config,
-            shutdownNotifier,
-            logfile,
-            randomSeed,
-            floatingPointRoundingMode,
-            nonLinearArithmetic,
-            loader);
+      case Z3 ->
+          Z3SolverContext.create(
+              logger,
+              config,
+              shutdownNotifier,
+              logfile,
+              randomSeed,
+              floatingPointRoundingMode,
+              nonLinearArithmetic,
+              loader);
 
-      case Z3_WITH_INTERPOLATION:
-        return Z3LegacySolverContext.create(
-            logger,
-            config,
-            shutdownNotifier,
-            logfile,
-            randomSeed,
-            floatingPointRoundingMode,
-            nonLinearArithmetic,
-            loader);
+      case Z3_WITH_INTERPOLATION ->
+          Z3LegacySolverContext.create(
+              logger,
+              config,
+              shutdownNotifier,
+              logfile,
+              randomSeed,
+              floatingPointRoundingMode,
+              nonLinearArithmetic,
+              loader);
 
-      case PRINCESS:
-        return PrincessSolverContext.create(
-            config, shutdownNotifier, logfile, (int) randomSeed, nonLinearArithmetic);
+      case PRINCESS ->
+          PrincessSolverContext.create(
+              config, shutdownNotifier, logfile, (int) randomSeed, nonLinearArithmetic);
 
-      case YICES2:
-        return Yices2SolverContext.create(config, nonLinearArithmetic, shutdownNotifier, loader);
+      case YICES2 ->
+          Yices2SolverContext.create(config, nonLinearArithmetic, shutdownNotifier, loader);
 
-      case BOOLECTOR:
-        return BoolectorSolverContext.create(config, shutdownNotifier, logfile, randomSeed, loader);
+      case BOOLECTOR ->
+          BoolectorSolverContext.create(config, shutdownNotifier, logfile, randomSeed, loader);
 
-      case BITWUZLA:
-        return BitwuzlaSolverContext.create(
-            config, shutdownNotifier, logfile, randomSeed, floatingPointRoundingMode, loader);
-
-      default:
-        throw new AssertionError("no solver selected");
-    }
+      case BITWUZLA ->
+          BitwuzlaSolverContext.create(
+              config, shutdownNotifier, logfile, randomSeed, floatingPointRoundingMode, loader);
+    };
   }
 
   /**

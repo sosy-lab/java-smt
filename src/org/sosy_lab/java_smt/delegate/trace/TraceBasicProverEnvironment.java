@@ -43,7 +43,7 @@ class TraceBasicProverEnvironment<T> implements BasicProverEnvironment<T> {
   public @Nullable T addConstraint(BooleanFormula constraint) throws InterruptedException {
     return logger.logDefKeep(
         logger.toVariable(this),
-        String.format("addConstraint(%s)", logger.toVariable(constraint)),
+        "addConstraint(%s)".formatted(logger.toVariable(constraint)),
         () -> delegate.addConstraint(constraint));
   }
 
@@ -67,8 +67,7 @@ class TraceBasicProverEnvironment<T> implements BasicProverEnvironment<T> {
       throws SolverException, InterruptedException {
     return logger.logDefKeep(
         logger.toVariable(this),
-        String.format(
-            "isUnsatWithAssumptions(ImmutableList.of(%s))", logger.toVariables(assumptions)),
+        "isUnsatWithAssumptions(ImmutableList.of(%s))".formatted(logger.toVariables(assumptions)),
         () -> delegate.isUnsatWithAssumptions(assumptions));
   }
 
@@ -93,9 +92,8 @@ class TraceBasicProverEnvironment<T> implements BasicProverEnvironment<T> {
     return logger
         .logDefDiscard(
             logger.toVariable(this),
-            String.format(
-                "getUnsatCoreOverAssumptions(ImmutableList.of(%s))",
-                logger.toVariables(assumptions)),
+            "getUnsatCoreOverAssumptions(ImmutableList.of(%s))"
+                .formatted(logger.toVariables(assumptions)),
             () -> delegate.unsatCoreOverAssumptions(assumptions))
         .map(mgr::rebuildAll);
   }
@@ -110,15 +108,13 @@ class TraceBasicProverEnvironment<T> implements BasicProverEnvironment<T> {
       throws InterruptedException, SolverException {
     return logger.logDefDiscard(
         logger.toVariable(this),
-        String.format(
-            "delegate.allSat(new AllSatCallback<>() {"
-                + "  public void apply(List<BooleanFormula> model) {}"
-                + "  public R getResult() { throw new UnsupportedOperationException(); }"
-                + "}, ImmutableList.of(%s));",
-            logger.toVariables(important)),
+        "delegate.allSat(new AllSatCallback<>() {"
+            + "  public void apply(List<BooleanFormula> model) {}"
+            + "  public R getResult() { throw new UnsupportedOperationException(); }"
+            + "}, ImmutableList.of(%s));".formatted(logger.toVariables(important)),
         () ->
             delegate.allSat(
-                new AllSatCallback<R>() {
+                new AllSatCallback<>() {
                   @Override
                   public void apply(List<BooleanFormula> model) {
                     var newModel = mgr.rebuildAll(model);
