@@ -8,37 +8,33 @@
 
 package org.sosy_lab.java_smt.solvers.yices2;
 
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_STATUS_UNSAT;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_assert_formula;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_check_sat;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_check_sat_with_assumptions;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_context_status;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_free_config;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_free_context;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_get_model;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_get_unsat_core;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_new_config;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_new_context;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_pop;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_push;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_set_config;
-
 import com.google.common.base.Preconditions;
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
+import com.sri.yices.Config;
+import com.sri.yices.Context;
+import com.sri.yices.Parameters;
+import com.sri.yices.Status;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Deque;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import java.util.function.Supplier;
 import org.sosy_lab.common.ShutdownNotifier;
+import org.sosy_lab.common.UniqueIdGenerator;
+import org.sosy_lab.common.collect.PathCopyingPersistentTreeMap;
+import org.sosy_lab.common.collect.PersistentMap;
+import org.sosy_lab.java_smt.api.BasicProverEnvironment;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.BooleanFormulaManager;
 import org.sosy_lab.java_smt.api.Model;
-import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractProverWithAllSat;
 import org.sosy_lab.java_smt.basicimpl.CachingModel;
+import org.sosy_lab.java_smt.basicimpl.ShutdownHook;
 
 /**
  * Info about the option {@link ProverOptions#GENERATE_UNSAT_CORE}: Yices provides the unsat core
@@ -53,29 +49,32 @@ import org.sosy_lab.java_smt.basicimpl.CachingModel;
  * incremental solving, but is more complex to implement. Let's keep this idea is future work for
  * optimization.
  */
-class Yices2TheoremProver extends AbstractProverWithAllSat<Void> implements ProverEnvironment {
+abstract class Yices2AbstractProver<T> extends AbstractProverWithAllSat<T>
+    implements BasicProverEnvironment<T> {
 
-  private static final int DEFAULT_PARAMS = 0; // use default setting in the solver
+  static final Parameters DEFAULT_PARAMS = new Parameters(); // use default setting in the solver
 
   protected final Yices2FormulaCreator creator;
-  protected final long curEnv;
-  protected final long curCfg;
+  protected final Context curEnv;
 
   // Yices does not allow to PUSH when the stack is UNSAT.
   // Therefore, we need to keep track of all added constraints beyond that stack-level.
   private int stackSizeToUnsat = Integer.MAX_VALUE;
 
-  Yices2TheoremProver(
-      Yices2FormulaCreator creator,
+  private static final UniqueIdGenerator ID_GENERATOR = new UniqueIdGenerator();
+
+  protected final Deque<PersistentMap<Integer, Integer>> stack = new ArrayDeque<>();
+
+  Yices2AbstractProver(
+      Yices2FormulaCreator pCreator,
       Set<ProverOptions> pOptions,
       BooleanFormulaManager pBmgr,
-      ShutdownNotifier pShutdownNotifier) {
+      ShutdownNotifier pShutdownNotifier,
+      String pSolverType) {
     super(pOptions, pBmgr, pShutdownNotifier);
-    this.creator = creator;
-    curCfg = yices_new_config();
-    yices_set_config(curCfg, "solver-type", "dpllt");
-    yices_set_config(curCfg, "mode", "push-pop");
-    curEnv = yices_new_context(curCfg);
+    creator = pCreator;
+    curEnv = newContext(pSolverType);
+    stack.push(PathCopyingPersistentTreeMap.of());
   }
 
   boolean isClosed() {
@@ -84,51 +83,92 @@ class Yices2TheoremProver extends AbstractProverWithAllSat<Void> implements Prov
 
   @Override
   protected boolean hasPersistentModel() {
-    return false;
+    return true;
+  }
+
+  Context newContext(String solverType) {
+    try (var cfg = new Config()) {
+      cfg.set("solver-type", solverType);
+      cfg.set("mode", "interactive");
+      cfg.set("model-interpolation", "true");
+      return new Context(cfg);
+    }
+  }
+
+  @SuppressWarnings("try")
+  static boolean satCheckWithShutdownNotifier(
+      Supplier<Status> satCheck, Context pCtx, ShutdownNotifier shutdownNotifier)
+      throws InterruptedException, SolverException {
+    try (ShutdownHook hook = new ShutdownHook(shutdownNotifier, pCtx::stopSearch)) {
+      shutdownNotifier.shutdownIfNecessary();
+      Status result = satCheck.get(); // the expensive computation
+      shutdownNotifier.shutdownIfNecessary();
+
+      return switch (result) {
+        case SAT -> true;
+        case UNSAT -> false;
+        case INTERRUPTED -> throw new InterruptedException();
+        case UNKNOWN -> throw new SolverException("SAT check returned \"unknown\"");
+        default -> throw new SolverException("Internal solver exception");
+      };
+    }
   }
 
   @Override
   protected void popImpl() {
     if (size() < stackSizeToUnsat) { // constraintStack and Yices stack have same level.
-      yices_pop(curEnv);
+      curEnv.pop();
       // Reset stackSizeToUnsat to bring the stack into a pushable state if it was UNSAT before.
       stackSizeToUnsat = Integer.MAX_VALUE;
     }
+    stack.removeLast();
   }
 
-  @Override
-  protected @Nullable Void addConstraintImpl(BooleanFormula pConstraint)
-      throws InterruptedException {
-    if (!generateUnsatCores) { // unsat core does not work with incremental mode
-      int constraint = creator.extractInfo(pConstraint);
-      yices_assert_formula(curEnv, constraint);
+  @CanIgnoreReturnValue
+  protected int addConstraint0(BooleanFormula constraint) {
+    var formula = creator.extractInfo(constraint);
+    var label = Yices2AbstractProver.ID_GENERATOR.getFreshId();
+    if (!generateUnsatCores) {
+      // Skip adding the assertion if we plan to use getUnsatCore. We'll later use assumptions
+      // solving to calculate an unsat core for the assertions
+      curEnv.assertFormula(formula);
     }
-    return null;
+    stack.addLast(stack.removeLast().putAndCopy(label, formula));
+    return label;
   }
 
   @Override
   protected void pushImpl() throws InterruptedException {
-    if (size() < stackSizeToUnsat && yices_context_status(curEnv) != YICES_STATUS_UNSAT) {
+    if (size() < stackSizeToUnsat && curEnv.getStatus() != Status.UNSAT) {
       // Ensure that constraintStack and Yices stack are on the same level
       // and Context is not UNSAT from assertions since last push.
-      yices_push(curEnv);
+      curEnv.push();
     } else if (stackSizeToUnsat == Integer.MAX_VALUE) {
       // if previous check fails and stackSizeToUnsat is
       // not already set, set it to the current stack-size before pushing.
       stackSizeToUnsat = size();
     }
+    stack.addLast(stack.getLast());
   }
 
   @Override
   protected boolean isUnsatImpl() throws SolverException, InterruptedException {
     boolean unsat;
-    if (generateUnsatCores) { // unsat core does not work with incremental mode
-      int[] allConstraints = getAllConstraints();
+    if (generateUnsatCores) {
+      // Yices only tracks assumptions for unsat core. We keep the stack empty and then treat all
+      // assertions as assumptions while checking. If the result is 'unsat', we can then
+      // calculate an unsat core
       unsat =
-          !yices_check_sat_with_assumptions(
-              curEnv, DEFAULT_PARAMS, allConstraints.length, allConstraints, shutdownNotifier);
+          !satCheckWithShutdownNotifier(
+              () -> curEnv.checkWithAssumptions(DEFAULT_PARAMS, getAllConstraints()),
+              curEnv,
+              shutdownNotifier);
+
     } else {
-      unsat = !yices_check_sat(curEnv, DEFAULT_PARAMS, shutdownNotifier);
+      unsat =
+          !satCheckWithShutdownNotifier(
+              () -> curEnv.check(DEFAULT_PARAMS), curEnv, shutdownNotifier);
+
       if (unsat && stackSizeToUnsat == Integer.MAX_VALUE) {
         stackSizeToUnsat = size();
         // If sat check is UNSAT and stackSizeToUnsat waS not already set,
@@ -154,13 +194,10 @@ class Yices2TheoremProver extends AbstractProverWithAllSat<Void> implements Prov
     changedSinceLastSatQuery = false;
     wasLastSatCheckSatisfiable = false;
 
-    // TODO handle BooleanFormulaCollection / check for literals
     final boolean isUnsat =
-        !yices_check_sat_with_assumptions(
+        !satCheckWithShutdownNotifier(
+            () -> curEnv.checkWithAssumptions(DEFAULT_PARAMS, uncapsulate(pAssumptions)),
             curEnv,
-            DEFAULT_PARAMS,
-            pAssumptions.size(),
-            uncapsulate(pAssumptions),
             shutdownNotifier);
     if (!isUnsat) {
       wasLastSatCheckSatisfiable = true;
@@ -175,9 +212,21 @@ class Yices2TheoremProver extends AbstractProverWithAllSat<Void> implements Prov
     return new CachingModel(getEvaluatorWithoutChecks());
   }
 
+  @SuppressWarnings("resource")
   @Override
   protected Yices2Model getEvaluatorWithoutChecks() {
-    return new Yices2Model(yices_get_model(curEnv, 1), this, creator);
+    if (generateUnsatCores) {
+      // We didn't push the assertions when we were planning to use getUnsatCore. Because of that
+      // the SAT check now needs to be repeated to get a model
+      curEnv.push();
+      curEnv.assertFormulas(getAllConstraints());
+      curEnv.check();
+      var model = curEnv.getModel();
+      curEnv.pop();
+      return new Yices2Model(model, this, creator);
+    } else {
+      return new Yices2Model(curEnv.getModel(), this, creator);
+    }
   }
 
   private List<BooleanFormula> encapsulate(int[] terms) {
@@ -200,11 +249,7 @@ class Yices2TheoremProver extends AbstractProverWithAllSat<Void> implements Prov
   @Override
   public List<BooleanFormula> getUnsatCore() {
     checkGenerateUnsatCores();
-    return getUnsatCore0();
-  }
-
-  private List<BooleanFormula> getUnsatCore0() {
-    return encapsulate(yices_get_unsat_core(curEnv));
+    return encapsulate(curEnv.getUnsatCore());
   }
 
   @Override
@@ -212,14 +257,13 @@ class Yices2TheoremProver extends AbstractProverWithAllSat<Void> implements Prov
       Collection<BooleanFormula> pAssumptions) throws SolverException, InterruptedException {
     checkGenerateUnsatCoresOverAssumptions();
     boolean sat = !isUnsatWithAssumptions(pAssumptions);
-    return sat ? Optional.empty() : Optional.of(getUnsatCore0());
+    return sat ? Optional.empty() : Optional.of(encapsulate(curEnv.getUnsatCore()));
   }
 
   @Override
   public void close() {
     if (!closed) {
-      yices_free_context(curEnv);
-      yices_free_config(curCfg);
+      curEnv.close();
       stackSizeToUnsat = Integer.MAX_VALUE;
     }
     super.close();

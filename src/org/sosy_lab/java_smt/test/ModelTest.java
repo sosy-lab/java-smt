@@ -261,6 +261,10 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   @Test
   public void testGetBvUfs() throws SolverException, InterruptedException {
     requireBitvectors();
+    assume()
+        .withMessage("Yices uses a default value for the function and returns no mappings")
+        .that(solver)
+        .isNotEqualTo(Solvers.YICES2);
     // Some names are specifically chosen to test the Boolector model
     // Use 1 instead of 0 or max bv value, as solvers tend to use 0, min or max as default
     for (String ufName : VARIABLE_NAMES) {
@@ -374,6 +378,10 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
 
   @Test
   public void testGetUFwithMoreParams() throws Exception {
+    assume()
+        .withMessage("Yices uses a default value for the function and returns no mappings")
+        .that(solver)
+        .isNotEqualTo(Solvers.YICES2);
     // Boolector does not support integers
     if (imgr != null) {
       IntegerFormula x =
@@ -1247,8 +1255,6 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
     requireIntegers();
     requireArrays();
     requireArrayModel();
-
-    assume().that(solver).isNotEqualTo(Solvers.YICES2); // FIXME Broken in JavaSMT
 
     // (= (select (select (select arr 5) 3) 1) x)
     // (= x 123)"
@@ -2650,7 +2656,6 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
     requireBitvectors();
 
     assume().that(solver).isNotEqualTo(Solvers.BOOLECTOR); // Doesn't support multiple indices
-    assume().that(solver).isNotEqualTo(Solvers.YICES2); // Yices does not give nested array models
 
     // Test for 2d bitvector arrays with formula like:
     //     array[1][7] = 10  and  array[3][2] = 5  and  array[5][4] = 20
@@ -2696,6 +2701,10 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
 
     assume().that(solver).isNotEqualTo(Solvers.BOOLECTOR); // Doesn't support multiple indices
     assume().that(solver).isNotEqualTo(Solvers.CVC4); // FIXME Broken in JavaSMT
+    assume()
+        .withMessage("Yices does not support constant arrays when mcsat is used")
+        .that(solver)
+        .isNotEqualTo(Solvers.YICES2);
 
     var scalarType = FormulaType.getBitvectorTypeWithSize(8);
 
@@ -2737,8 +2746,10 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
     requireBitvectors();
 
     assume().that(solver).isNotEqualTo(Solvers.BOOLECTOR); // Doesn't support multiple indices
-    assume().that(solver).isNotEqualTo(Solvers.YICES2); // Yices does not give nested array models
-
+    assume()
+        .withMessage("Yices does not support constant arrays when mcsat is used")
+        .that(solver)
+        .isNotEqualTo(Solvers.YICES2);
     // FIXME CVC4 array model is sometimes broken in JavaSMT. Unfixable in CVC4, fixed in CVC5.
     assume().that(solver).isNotEqualTo(Solvers.CVC4);
 
@@ -2819,8 +2830,6 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
     requireArrayModel();
     requireIntegers();
 
-    assume().that(solver).isNotEqualTo(Solvers.YICES2); // FIXME Broken in JavaSMT
-
     var array =
         amgr.makeArray("array", IntegerType, FormulaType.getArrayType(IntegerType, IntegerType));
 
@@ -2843,6 +2852,10 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
     requireConstArrays();
 
     assume().that(solver).isNotEqualTo(Solvers.CVC4); // FIXME Broken in JavaSMT
+    assume()
+        .withMessage("Yices does not support constant arrays when mcsat is used")
+        .that(solver)
+        .isNotEqualTo(Solvers.YICES2);
 
     var scalarType = FormulaType.IntegerType;
 
@@ -2877,8 +2890,6 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
     requireArrays();
     requireArrayModel();
     requireIntegers();
-
-    assume().that(solver).isNotEqualTo(Solvers.YICES2); // FIXME Broken in JavaSMT
 
     var array =
         amgr.makeArray("array", IntegerType, FormulaType.getArrayType(IntegerType, IntegerType));

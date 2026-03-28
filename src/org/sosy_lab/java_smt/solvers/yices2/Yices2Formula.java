@@ -9,9 +9,9 @@
 package org.sosy_lab.java_smt.solvers.yices2;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_term_to_string;
 
 import com.google.errorprone.annotations.Immutable;
+import com.sri.yices.Terms;
 import org.sosy_lab.java_smt.api.ArrayFormula;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -40,7 +40,7 @@ abstract sealed class Yices2Formula implements Formula {
 
   @Override
   public final String toString() {
-    return yices_term_to_string(yicesTerm);
+    return Terms.toString(yicesTerm);
   }
 
   @Override

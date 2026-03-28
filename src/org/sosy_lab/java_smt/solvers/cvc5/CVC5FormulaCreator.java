@@ -65,6 +65,7 @@ import org.sosy_lab.java_smt.api.visitors.FormulaVisitor;
 import org.sosy_lab.java_smt.api.visitors.TraversalProcess;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 import org.sosy_lab.java_smt.basicimpl.FunctionDeclarationImpl;
+import org.sosy_lab.java_smt.basicimpl.Tokenizer;
 import org.sosy_lab.java_smt.solvers.cvc5.CVC5Formula.CVC5ArrayFormula;
 import org.sosy_lab.java_smt.solvers.cvc5.CVC5Formula.CVC5BitvectorFormula;
 import org.sosy_lab.java_smt.solvers.cvc5.CVC5Formula.CVC5BooleanFormula;
@@ -379,10 +380,10 @@ class CVC5FormulaCreator extends FormulaCreator<Term, Sort, TermManager, Term> {
       // Functions are packaged like this: (functionName arg1 arg2 ...)
       // But can use |(name)| to enable () inside of the variable name
       // TODO what happens for function names containing whitespace?
-      String dequoted = dequote(repr);
+      String dequoted = Tokenizer.dequote(repr);
       return Iterables.get(Splitter.on(' ').split(dequoted.substring(1)), 0);
     } else {
-      return dequote(repr);
+      return Tokenizer.dequote(repr);
     }
   }
 
@@ -453,7 +454,7 @@ class CVC5FormulaCreator extends FormulaCreator<Term, Sort, TermManager, Term> {
         return visitor.visitQuantifier((BooleanFormula) formula, quant, freeVars, fBody);
 
       } else if (f.getKind() == Kind.CONSTANT) {
-        return visitor.visitFreeVariable(formula, dequote(f.toString()));
+        return visitor.visitFreeVariable(formula, Tokenizer.dequote(f.toString()));
 
       } else if (f.getKind() == Kind.APPLY_CONSTRUCTOR) {
         checkState(
@@ -550,6 +551,7 @@ class CVC5FormulaCreator extends FormulaCreator<Term, Sort, TermManager, Term> {
           .put(Kind.XOR, FunctionDeclarationKind.XOR)
           .put(Kind.ITE, FunctionDeclarationKind.ITE)
           .put(Kind.APPLY_UF, FunctionDeclarationKind.UF)
+          .put(Kind.NEG, FunctionDeclarationKind.UMINUS)
           .put(Kind.ADD, FunctionDeclarationKind.ADD)
           .put(Kind.MULT, FunctionDeclarationKind.MUL)
           .put(Kind.SUB, FunctionDeclarationKind.SUB)
@@ -644,6 +646,7 @@ class CVC5FormulaCreator extends FormulaCreator<Term, Sort, TermManager, Term> {
           .put(Kind.STRING_FROM_CODE, FunctionDeclarationKind.STR_FROM_CODE)
           .put(Kind.STRING_LT, FunctionDeclarationKind.STR_LT)
           .put(Kind.STRING_LEQ, FunctionDeclarationKind.STR_LE)
+          .put(Kind.REGEXP_NONE, FunctionDeclarationKind.RE_NONE)
           .put(Kind.REGEXP_PLUS, FunctionDeclarationKind.RE_PLUS)
           .put(Kind.REGEXP_STAR, FunctionDeclarationKind.RE_STAR)
           .put(Kind.REGEXP_OPT, FunctionDeclarationKind.RE_OPTIONAL)
@@ -656,6 +659,12 @@ class CVC5FormulaCreator extends FormulaCreator<Term, Sort, TermManager, Term> {
           .put(Kind.SELECT, FunctionDeclarationKind.SELECT)
           .put(Kind.STORE, FunctionDeclarationKind.STORE)
           .put(Kind.CONST_ARRAY, FunctionDeclarationKind.CONST)
+          // Separation logic
+          .put(Kind.SEP_EMP, FunctionDeclarationKind.SEP_EMP)
+          .put(Kind.SEP_NIL, FunctionDeclarationKind.SEP_NIL)
+          .put(Kind.SEP_PTO, FunctionDeclarationKind.SEP_PTO)
+          .put(Kind.SEP_STAR, FunctionDeclarationKind.SEP_STAR)
+          .put(Kind.SEP_WAND, FunctionDeclarationKind.SEP_WAND)
           .build();
 
   private FunctionDeclarationKind getDeclarationKind(Term f) {

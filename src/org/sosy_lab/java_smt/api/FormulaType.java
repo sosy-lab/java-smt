@@ -2,7 +2,7 @@
 // an API wrapper for a collection of SMT solvers:
 // https://github.com/sosy-lab/java-smt
 //
-// SPDX-FileCopyrightText: 2020 Dirk Beyer <https://www.sosy-lab.org>
+// SPDX-FileCopyrightText: 2026 Dirk Beyer <https://www.sosy-lab.org>
 //
 // SPDX-License-Identifier: Apache-2.0
 
@@ -25,72 +25,77 @@ import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
 
 /**
- * Type of a formula.
+ * Subclasses of this interface represent the different types of formulas supported by SMT solvers,
+ * typically including boolean, integer, bitvector, and more. Each type corresponds to a specific
+ * class of formulas that can be created and manipulated using the SMT solver's API.
+ *
+ * <p>Subclasses of this interface must be immutable, as they are used as keys in maps and sets, and
+ * their immutability ensures that they can be safely shared and used without unintended side
+ * effects.
  *
  * @param <T> Formula class corresponding to the given formula type.
  */
 @SuppressWarnings("checkstyle:constantname")
 @Immutable
-public abstract class FormulaType<T extends Formula> {
+public interface FormulaType<T extends Formula> {
 
-  private FormulaType() {}
-
-  public boolean isArrayType() {
+  default boolean isArrayType() {
     return false;
   }
 
-  public boolean isBitvectorType() {
+  default boolean isBitvectorType() {
     return false;
   }
 
-  public boolean isBooleanType() {
+  default boolean isBooleanType() {
     return false;
   }
 
-  public boolean isFloatingPointType() {
+  default boolean isFloatingPointType() {
     return false;
   }
 
-  public boolean isFloatingPointRoundingModeType() {
+  default boolean isFloatingPointRoundingModeType() {
     return false;
   }
 
-  public boolean isNumeralType() {
+  default boolean isNumeralType() {
     return false;
   }
 
-  public boolean isRationalType() {
+  default boolean isRationalType() {
     return false;
   }
 
-  public boolean isIntegerType() {
+  default boolean isIntegerType() {
     return false;
   }
 
-  public boolean isSLType() {
+  default boolean isSLType() {
     return false;
   }
 
-  public boolean isStringType() {
+  default boolean isStringType() {
     return false;
   }
 
-  public boolean isRegexType() {
+  default boolean isRegexType() {
     return false;
   }
 
-  public boolean isEnumerationType() {
+  default boolean isEnumerationType() {
     return false;
   }
 
+  /** returns a human-readable representation of the formula type. */
   @Override
-  public abstract String toString();
+  String toString();
 
-  /** return the correctly formatted SMTLIB2 type declaration. */
-  public abstract String toSMTLIBString();
+  /** returns a correctly formatted string that can be used in SMTLIB2 declarations. */
+  String toSMTLIBString();
 
   @Immutable
-  public abstract static class NumeralType<T extends NumeralFormula> extends FormulaType<T> {
+  abstract class NumeralType<T extends NumeralFormula> implements FormulaType<T> {
 
     @Override
     public final boolean isNumeralType() {
@@ -99,7 +104,7 @@ public abstract class FormulaType<T extends Formula> {
   }
 
   @SuppressWarnings("ClassInitializationDeadlock")
-  public static final FormulaType<RationalFormula> RationalType =
+  FormulaType<RationalFormula> RationalType =
       new NumeralType<>() {
 
         @Override
@@ -119,7 +124,7 @@ public abstract class FormulaType<T extends Formula> {
       };
 
   @SuppressWarnings("ClassInitializationDeadlock")
-  public static final FormulaType<IntegerFormula> IntegerType =
+  FormulaType<IntegerFormula> IntegerType =
       new NumeralType<>() {
 
         @Override
@@ -138,7 +143,7 @@ public abstract class FormulaType<T extends Formula> {
         }
       };
 
-  public static final FormulaType<BooleanFormula> BooleanType =
+  FormulaType<BooleanFormula> BooleanType =
       new FormulaType<>() {
 
         @Override
@@ -157,12 +162,12 @@ public abstract class FormulaType<T extends Formula> {
         }
       };
 
-  public static BitvectorType getBitvectorTypeWithSize(int size) {
+  static BitvectorType getBitvectorTypeWithSize(int size) {
     return new BitvectorType(size);
   }
 
   @Immutable
-  public static final class BitvectorType extends FormulaType<BitvectorFormula> {
+  final class BitvectorType implements FormulaType<BitvectorFormula> {
     private final int size;
 
     private BitvectorType(int size) {
@@ -220,7 +225,7 @@ public abstract class FormulaType<T extends Formula> {
    */
   @Deprecated(since = "6.0", forRemoval = true)
   @SuppressWarnings("InlineMeSuggester")
-  public static FloatingPointType getFloatingPointType(
+  static FloatingPointType getFloatingPointType(
       int exponentSize, int mantissaSizeWithoutHiddenBit) {
     return getFloatingPointTypeFromSizesWithoutHiddenBit(
         exponentSize, mantissaSizeWithoutHiddenBit);
@@ -243,7 +248,7 @@ public abstract class FormulaType<T extends Formula> {
    *     significand), excluding the hidden bit.
    * @return the newly constructed {@link FloatingPointType}.
    */
-  public static FloatingPointType getFloatingPointTypeFromSizesWithoutHiddenBit(
+  static FloatingPointType getFloatingPointTypeFromSizesWithoutHiddenBit(
       int exponentSize, int mantissaSizeWithoutHiddenBit) {
     checkArgument(exponentSize > 1, "Exponent size must be greater than 1");
     checkArgument(
@@ -269,7 +274,7 @@ public abstract class FormulaType<T extends Formula> {
    *     significand), including the hidden bit.
    * @return the newly constructed {@link FloatingPointType}.
    */
-  public static FloatingPointType getFloatingPointTypeFromSizesWithHiddenBit(
+  static FloatingPointType getFloatingPointTypeFromSizesWithHiddenBit(
       int exponentSize, int mantissaSizeWithHiddenBit) {
     checkArgument(
         mantissaSizeWithHiddenBit > 1,
@@ -283,7 +288,7 @@ public abstract class FormulaType<T extends Formula> {
    *     of the sign bit, an exponent sized 8 bits, and a mantissa sized 23 bits (excluding the
    *     hidden bit).
    */
-  public static FloatingPointType getSinglePrecisionFloatingPointType() {
+  static FloatingPointType getSinglePrecisionFloatingPointType() {
     return FloatingPointType.SINGLE_PRECISION_FP_TYPE;
   }
 
@@ -292,12 +297,12 @@ public abstract class FormulaType<T extends Formula> {
    *     of the sign bit, an exponent sized 11 bits, and a mantissa sized 52 bits (excluding the
    *     hidden bit).
    */
-  public static FloatingPointType getDoublePrecisionFloatingPointType() {
+  static FloatingPointType getDoublePrecisionFloatingPointType() {
     return FloatingPointType.DOUBLE_PRECISION_FP_TYPE;
   }
 
   @Immutable
-  public static final class FloatingPointType extends FormulaType<FloatingPointFormula> {
+  final class FloatingPointType implements FormulaType<FloatingPointFormula> {
 
     @SuppressWarnings("removal")
     private static final FloatingPointType SINGLE_PRECISION_FP_TYPE =
@@ -400,38 +405,35 @@ public abstract class FormulaType<T extends Formula> {
     }
   }
 
-  public static final FormulaType<FloatingPointRoundingModeFormula> FloatingPointRoundingModeType =
-      new FloatingPointRoundingModeType();
+  FormulaType<FloatingPointRoundingModeFormula> FloatingPointRoundingModeType =
+      new FormulaType<>() {
 
-  private static final class FloatingPointRoundingModeType
-      extends FormulaType<FloatingPointRoundingModeFormula> {
+        @Override
+        public boolean isFloatingPointRoundingModeType() {
+          return true;
+        }
 
-    @Override
-    public boolean isFloatingPointRoundingModeType() {
-      return true;
-    }
+        @Override
+        public String toString() {
+          return "FloatingPointRoundingMode";
+        }
 
-    @Override
-    public String toString() {
-      return "FloatingPointRoundingMode";
-    }
-
-    @Override
-    public String toSMTLIBString() {
-      throw new UnsupportedOperationException(
-          "rounding mode is not expected in symbol declarations");
-    }
-  }
+        @Override
+        public String toSMTLIBString() {
+          throw new UnsupportedOperationException(
+              "rounding mode is not expected in symbol declarations");
+        }
+      };
 
   @SuppressWarnings("MethodTypeParameterName")
-  public static <TD extends Formula, TR extends Formula> ArrayFormulaType<TD, TR> getArrayType(
+  static <TD extends Formula, TR extends Formula> ArrayFormulaType<TD, TR> getArrayType(
       FormulaType<TD> pDomainSort, FormulaType<TR> pRangeSort) {
     return new ArrayFormulaType<>(pDomainSort, pRangeSort);
   }
 
   @SuppressWarnings("ClassTypeParameterName")
-  public static final class ArrayFormulaType<TI extends Formula, TE extends Formula>
-      extends FormulaType<ArrayFormula<TI, TE>> {
+  final class ArrayFormulaType<TI extends Formula, TE extends Formula>
+      implements FormulaType<ArrayFormula<TI, TE>> {
 
     private final FormulaType<TE> elementType;
     private final FormulaType<TI> indexType;
@@ -480,11 +482,11 @@ public abstract class FormulaType<T extends Formula> {
     }
   }
 
-  public static EnumerationFormulaType getEnumerationType(String pName, Set<String> pElements) {
+  static EnumerationFormulaType getEnumerationType(String pName, Set<String> pElements) {
     return new EnumerationFormulaType(pName, pElements);
   }
 
-  public static final class EnumerationFormulaType extends FormulaType<EnumerationFormula> {
+  final class EnumerationFormulaType implements FormulaType<EnumerationFormula> {
 
     private final String name;
     private final ImmutableSet<String> elements;
@@ -537,7 +539,7 @@ public abstract class FormulaType<T extends Formula> {
     }
   }
 
-  public static final FormulaType<StringFormula> StringType =
+  FormulaType<StringFormula> StringType =
       new FormulaType<>() {
 
         @Override
@@ -556,7 +558,7 @@ public abstract class FormulaType<T extends Formula> {
         }
       };
 
-  public static final FormulaType<RegexFormula> RegexType =
+  FormulaType<RegexFormula> RegexType =
       new FormulaType<>() {
 
         @Override
@@ -579,7 +581,7 @@ public abstract class FormulaType<T extends Formula> {
    * Parse a string and return the corresponding type. This method is the counterpart of {@link
    * #toString()}.
    */
-  public static FormulaType<?> fromString(String t) {
+  static FormulaType<?> fromString(String t) {
     if (BooleanType.toString().equals(t)) {
       return BooleanType;
     } else if (IntegerType.toString().equals(t)) {

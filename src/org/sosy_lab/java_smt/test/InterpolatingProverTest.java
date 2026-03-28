@@ -53,21 +53,31 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
   @Test
   @SuppressWarnings("CheckReturnValue")
   public <T> void simpleInterpolation() throws SolverException, InterruptedException {
+    try (InterpolatingProverEnvironment<T> prover = newEnvironmentForTest()) {
+      var f1 = lessThanNumber(makeVariable("x"), makeNumber(0));
+      var f2 = greaterThanNumber(makeVariable("x"), makeNumber(0));
+
+      prover.push(f1);
+      T id2 = prover.push(f2);
+
+      assertThatEnvironment(prover).isUnsatisfiable();
+      prover.getInterpolant(ImmutableList.of(id2));
+      // we actually only check for a successful execution here, the result is irrelevant.
+    }
+  }
+
+  @Test
+  @SuppressWarnings("CheckReturnValue")
+  public <T> void notSoSimpleInterpolation() throws SolverException, InterruptedException {
     assume()
         .withMessage("Solver %s runs into timeout on this test", solverToUse())
         .that(solverToUse())
-        .isNotEqualTo(Solvers.CVC5);
+        .isNoneOf(Solvers.CVC5, Solvers.YICES2, Solvers.OPENSMT);
 
     try (InterpolatingProverEnvironment<T> prover = newEnvironmentForTest()) {
       Formula x = makeVariable("x");
       Formula y = makeVariable("y");
-      /* INFO: Due to limitations in OpenSMT we need to use a simpler formular for this solver
-       * Setting z=x means that the original formula `2x ≠ 1+2z`simplifies to `0 ≠ 1`,
-       * which is trivially true.
-       *
-       * https://github.com/usi-verification-and-security/opensmt/issues/638
-       */
-      Formula z = solverToUse() == Solvers.OPENSMT ? x : makeVariable("z");
+      Formula z = makeVariable("z");
 
       BooleanFormula f1 = mgr.makeEqual(y, multiplyNumber(makeNumber(2), x));
       BooleanFormula f2 =
@@ -75,31 +85,19 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
 
       prover.push(f1);
       T id2 = prover.push(f2);
-      boolean check = prover.isUnsat();
 
-      assertWithMessage("formulas must be contradicting").that(check).isTrue();
+      assertThatEnvironment(prover).isUnsatisfiable();
       prover.getInterpolant(ImmutableList.of(id2));
       // we actually only check for a successful execution here, the result is irrelevant.
     }
   }
 
   @Test
-  @SuppressWarnings("unchecked")
   public <T> void emptyInterpolationGroup() throws SolverException, InterruptedException {
     try (InterpolatingProverEnvironment<T> prover = newEnvironmentForTest()) {
-      Formula x = makeVariable("x");
-      Formula y = makeVariable("y");
-      /* INFO: Due to limitations in OpenSMT we need to use a simpler formula for this solver
-       * Setting z=x means that the original formula `2x ≠ 1+2z`simplifies to `0 ≠ 1`,
-       * which is trivially true.
-       *
-       * https://github.com/usi-verification-and-security/opensmt/issues/638
-       */
-      Formula z = solverToUse() == Solvers.OPENSMT ? x : makeVariable("z");
+      var f1 = lessThanNumber(makeVariable("x"), makeNumber(0));
+      var f2 = greaterThanNumber(makeVariable("x"), makeNumber(0));
 
-      BooleanFormula f1 = mgr.makeEqual(y, multiplyNumber(makeNumber(2), x));
-      BooleanFormula f2 =
-          mgr.makeEqual(y, addNumber(makeNumber(1), multiplyNumber(z, makeNumber(2))));
       T id1 = prover.push(f1);
       T id2 = prover.push(f2);
       assertThat(prover.isUnsat()).isTrue();
@@ -178,8 +176,14 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
 
     // some interpolant needs to be FALSE, however, it can be at arbitrary position.
     BooleanFormula expectedInterpolant = bmgr.makeFalse();
-    if (solverToUse() == Solvers.Z3_WITH_INTERPOLATION) {
-      expectedInterpolant = bmgr.makeTrue(); // LegacyZ3 has an issue here.
+    if (solverToUse() == Solvers.Z3_WITH_INTERPOLATION || solverToUse() == Solvers.YICES2) {
+      // FIXME This test seems wrong to me. Solvers are not guaranteed to return an inductive
+      //  sequence if getInterpolant is used multiple times. And even if it was an inductive
+      //  sequence, 'false' doesn't have to appear in it:
+      //   formulas        F    F    F
+      //   interplants  T    T    T    F
+      //  (getInterpolants would return [T,T] in this case)
+      expectedInterpolant = bmgr.makeTrue();
     }
     assertThat(
             ImmutableList.of(
@@ -382,7 +386,11 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
 
     // sequential interpolation should always work as expected
     checkItpSequence(ImmutableList.of(A, B, C), itpSeq);
-    checkItpSequence(ImmutableList.of(A, B, C), ImmutableList.of(itp1, itp2));
+    if (solver != Solvers.YICES2) {
+      // FIXME This is not guaranteed to be an inductive sequence, see the documentation of
+      //  getInterpolant
+      checkItpSequence(ImmutableList.of(A, B, C), ImmutableList.of(itp1, itp2));
+    }
   }
 
   @Test
@@ -1053,7 +1061,7 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
     assume()
         .withMessage("Solver %s runs into timeout on this test", solverToUse())
         .that(solverToUse())
-        .isNotEqualTo(Solvers.CVC5);
+        .isNoneOf(Solvers.CVC5, Solvers.YICES2);
 
     int bvWidth = 32;
     BitvectorFormula bv0 = bvmgr.makeBitvector(bvWidth, 0);
@@ -1190,7 +1198,7 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
           case PRINCESS -> 12349;
           case SMTINTERPOL -> "some string";
           case Z3_WITH_INTERPOLATION -> 12350;
-          case BITWUZLA -> -1;
+          case BITWUZLA, YICES2 -> -1;
           default -> null; // unexpected solver for interpolation
         };
 

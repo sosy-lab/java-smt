@@ -114,7 +114,10 @@ public class SolverContextFactoryTest {
       case SMTINTERPOL, PRINCESS ->
           // Any operating system and any architecture is allowed, Java is sufficient
           true;
-      case BOOLECTOR, CVC4, YICES2 -> IS_LINUX && !IS_ARCH_ARM64;
+      case BOOLECTOR, CVC4 -> IS_LINUX && !IS_ARCH_ARM64;
+      case YICES2 ->
+          (IS_LINUX && !IS_ARCH_ARM64 && isSufficientVersionOfLibcxx("yices2java"))
+              || (IS_WINDOWS && !IS_ARCH_ARM64);
       case CVC5 -> (IS_LINUX && isSufficientVersionOfLibcxx("cvc5jni")) || IS_WINDOWS || IS_MAC;
       case OPENSMT -> IS_LINUX && isSufficientVersionOfLibcxx("opensmtj");
       case BITWUZLA ->

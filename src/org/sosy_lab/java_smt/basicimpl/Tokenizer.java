@@ -23,6 +23,15 @@ public final class Tokenizer {
 
   private Tokenizer() {}
 
+  /** Variable names (symbols) can be wrapped with "|". This function removes those chars. */
+  public static String dequote(String s) {
+    int l = s.length();
+    if (s.charAt(0) == '|' && s.charAt(l - 1) == '|') {
+      return s.substring(1, l - 1);
+    }
+    return s;
+  }
+
   /**
    * Split up a sequence of lisp expressions.
    *

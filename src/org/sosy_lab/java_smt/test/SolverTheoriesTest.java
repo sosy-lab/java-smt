@@ -283,10 +283,6 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
 
     // SMTLIB allows any value for division-by-zero.
     switch (solverToUse()) {
-      case YICES2 ->
-          assertThrows(
-              IllegalArgumentException.class,
-              () -> assertThatFormula(buildDivision(num10, num0, num10)).isSatisfiable());
       case OPENSMT -> // INFO: OpenSMT does not allow division by zero
           assertThrows(
               UnsupportedOperationException.class,
@@ -307,10 +303,6 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
     }
 
     switch (solverToUse()) {
-      case YICES2 ->
-          assertThrows(
-              IllegalArgumentException.class,
-              () -> assertThatFormula(buildModulo(num10, num0, num10)).isSatisfiable());
       case OPENSMT -> // INFO: OpenSMT does not allow division by zero
           assertThrows(UnsupportedOperationException.class, () -> buildModulo(num10, num0, num10));
       default -> {
@@ -350,7 +342,7 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
     BooleanFormula aEqNeg10 = imgr.equal(a, numNeg10);
 
     switch (solverToUse()) {
-      case OPENSMT, SMTINTERPOL, YICES2 -> { // INFO: OpenSmt does not allow nonlinear terms
+      case OPENSMT, SMTINTERPOL -> { // INFO: OpenSmt does not allow nonlinear terms
         assertThrows(UnsupportedOperationException.class, () -> buildDivision(a, b, num5));
         assertThrows(UnsupportedOperationException.class, () -> buildModulo(a, b, num0));
       }

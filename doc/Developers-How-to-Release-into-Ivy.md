@@ -201,9 +201,9 @@ Example:
 ```bash
 ant publish-opensmt \
     -Dopensmt.path=/workspace/solvers/opensmt/opensmt \
-    -Dopensmt.customRev=2.9.0 \
-    -Dgmp-linux-x64.path=/dependencies/gmp-6.2.1/install/x64-linux \
-    -Dgmp-linux-arm64.path=/dependencies/gmp-6.2.1/install/arm64-linux \
+    -Dopensmt.customRev=2.9.2 \
+    -Dgmp-linux-x64.path=/dependencies/gmp-6.3.0/install/x64-linux \
+    -Dgmp-linux-arm64.path=/dependencies/gmp-6.3.0/install/arm64-linux \
     -Djdk-linux-arm64.path=/dependencies/jdk17-linux-aarch64
 ```
 The build scripts for OpenSMT ... :
@@ -248,36 +248,67 @@ but in the normal system environment, where some testing can be applied by the d
 We prefer to use our own Bitwuzla binaries and SWIG-based Java bindings.
 We prefer to build directly on Ubuntu 22.04, where CMake, SWIG, and Meson are sufficiently up-to-date.
 For simple usage, we provide a Docker definition/environment under `/docker`,
-in which the following command can be run.
+in which the following command can be run. While it's possible to build without the container, some
+paths in the build script (`build/build-publish-solvers/solver-bitwuzla.xml`) are hardwired
+and would have to be updated first
 
-To publish Bitwuzla, checkout the [Bitwuzla repository](https://github.com/bitwuzla/bitwuzla).
-Then execute the following command in the JavaSMT directory:
+To publish Bitwuzla, checkout the [Bitwuzla repository](https://github.com/bitwuzla/bitwuzla). Then
+execute the following command in the JavaSMT directory:
+```bash
+ant bitwuzla-generate-jni -Dbitwuzla.path=/workspace/bitwuzla
+```
+
+This will rebuild the JNI bindings for Bitwuzla with SWIG. To see the changes go to
+`lib/source/native/libbitwuzla`, and then compare with git:
+
+```bash
+cd lib/source/libbitwuzla
+git status
+git diff
+```
+
+Also check if there are any new Java files in the `src` folder under 
+`lib/source/native/libbitwuzla`. Normally, the changes for an update should be minimal, and
+there should be no new files. If you find any `SWIGTYPE_p` classes, it means SWIG ran into a
+class that it didn't understand, and simply created an opaque wrapper for the C++ object. Most
+of the time, this is not what we want, and some updates to the SWIG script (`bitwuzla.i`) will
+be necessary. 
+
+While editing `bitwuzla.i`, you can rerun the command from above at any time to check your changes.
+The command will also produce an updated patch containing the latest changes.
+If there are more changes than just whitespace and timestamps, please commit the changes to JavaSMT.
+
+Often, the problem is a new method that was added to the API with an argument or return type that 
+is not handled correctly. The simple solution may then be to remove the new method by adding an
+`%ignore` to the SWIG script. If the method is actually interesting to us, and we want to keep it,
+it might be necessary to instantiate a `%template` or otherwise wrap the method to help SWIG handle
+the types.
+
+Often there will be no new files left once `bitwuzla.i` has been fixed. If there are still new
+files left, they have to be added to git. Also remember to add the copyright header to all new
+files, and make sure that new classes implement the `Reference` interface to allow tracking for
+garbage collection. Normal classes can extend `AbstractReference` for convenience, see `Term.
+java` for an example. If the class wraps a `std::vector` or similar, it will already extend a
+different class. In that case the `Reference` interface can be implemented similar to how it's
+done in `Vector_Int.java`.
+
+Once the SWIG script has been fully fixed, we "commit" our changes, and build the actual binaries:
 ```bash
 ant publish-bitwuzla \
-     -Dbitwuzla.path=$BITWUZLA_DIR \
-     -Dbitwuzla.customRev=$VERSION \
-     -Dbitwuzla.rebuildWrapper=false \
-     -Djdk-windows.path=$JDK_DIR_WINDOWS \
-     -Djdk-linux-arm64.path=$JDK_DIR_LINUX_ARM64
+    -Dbitwuzla.path=/workspace/bitwuzla \
+    -Dbitwuzla.customRev=0.9.0
 ```
-Example:
-```bash
-ant publish-bitwuzla \
-    -Dbitwuzla.path=/workspace/solvers/bitwuzla/bitwuzla/ \
-    -Dbitwuzla.customRev=0.7.0-13 \
-    -Dbitwuzla.rebuildWrapper=false \
-    -Djdk-windows-x64.path=/workspace/solvers/jdk/openjdk-17.0.2_windows-x64_bin/jdk-17.0.2/ \
-    -Djdk-linux-arm64.path=/workspace/solvers/jdk/openjdk-17.0.2_linux-aarch64_bin/jdk-17.0.2/
-```
-The build scripts for Bitwuzla ... :
-- run for about 10 minutes (we build everything from scratch, three times).
-- download and build necessary dependencies like GMP automatically. 
-- append the git revision of Bitwuzla.
-- produce two Linux (x64 and arm64) libraries and one Windows (x64) library, and publish them.
+
+This command will first try to build the Java code for the bindings. If there is an error, it
+aborts, and you can go back to the last step to fix the generated code. Otherwise, the script
+continues to build binaries for all platforms, which can take several minutes. Dependencies like
+GMP are handled automatically, and the script will add a git hash to the `customRev` version
+string before finally publishing the binaries.
 
 Finally, follow the instructions shown in the message at the end of the command.
-The instructions for publication via SVN into the Ivy repository are not intended to be executed in the Docker environment,
-but in the normal system environment, where some testing can be applied by the developer before the commit.
+The instructions for publication via SVN into the Ivy repository are not intended to be executed
+in the Docker environment, but in the normal system environment, where some testing can be 
+applied by the developer before the commit.
 
 
 ### Publishing (Opti)-MathSAT5
@@ -339,43 +370,116 @@ ant publish-optimathsat \
 ### Publishing Yices2
 
 Yices2 consists of two components: the solver binary and the Java components in JavaSMT.
-The Java components were splitt from the rest of JavaSMT because of the GPL.
+The Java components were split from the rest of JavaSMT because of the GPL.
 
-#### Publishing the solver binary for Yices2
+#### 1. Publishing the solver binary for Yices2
 
-Prepare gperf and gmp (required for our own static binary):
-```bash
-wget http://ftp.gnu.org/pub/gnu/gperf/gperf-3.1.tar.gz && tar -zxvf gperf-3.1.tar.gz && cd gperf-3.1 && ./configure --enable-cxx --with-pic --disable-shared --enable-fat && make
-wget https://gmplib.org/download/gmp/gmp-6.2.0.tar.xz && tar -xvf gmp-6.2.0.tar.xz && cd gmp-6.2.0 && ./configure --enable-cxx --with-pic --disable-shared --enable-fat && make
+We expect one of the Ubuntu docker images to be used for building Yices2. While it's possible to
+build the backend without the container, our build script relies on a preinstalled
+dependency that is already included when using the docker image. Without it, some paths
+would have to be changed, and the user would have to provide their own version of the dependency
+
+#### 1. Build the Yices binaries
+
+We provide a build script for Yices:
+```shell
+ant publish-yices2 -Dyices2.version=2.8.0-prerelease
 ```
 
-Download and build Yices2 from source:
-```bash
-git clone git@github.com:SRI-CSL/yices2.git && cd yices2 && autoconf && ./configure --with-pic-gmp=../gmp-6.2.0/.libs/libgmp.a && make
+The script will fetch all dependencies, download and compile Yices, and then build the JNI bindings
+that are needed to use the solver from Java
+
+We provide additional `ant` targets for a more fine-grained build:
+
+* `ant build-yices2-java` will build all binaries, but not publish them
+* `ant clean-yices2-java` will undo the last build step and delete the JNI bindings
+* `ant clean-yices2` will undo the last two build step and delete the Yices binaries and the JNI
+  bindings
+
+Changes can then be made to the downloaded source in `downloads` before publishing the binaries
+with `ant publish-yices2`. For instance, we could switch to a different branch for Yices:
+
+``` shell
+ant build-yices2-java
+ant clean-yices2
+cd downloads/yices2
+git checkout my-branch
+cd ../..
+ant publish-yices2 -Dyices2.version=2.8.0-prerelease
 ```
 
-Get the version of Yices2:
-```bash
-git describe --tags
+It's also possible to only download the dependencies:
+
+* `ant download-cudd`
+* `ant download-poly`
+* `ant download-yices2`
+* `ant download-yices2-java`
+
+Changes can then be made to the downloaded source before publishing. Compared to the first
+method, this avoids the needless initial build
+
+#### 2. Build the JavaSMT backend
+
+In `solvers_ivy_conf/ivy_javasmt_yices2.xml` update the version of the `javasmt-solver-yices2`
+dependency:
+
+```xml
+<dependency org="org.sosy_lab" name="javasmt-solver-yices2" rev="2.8.0-prerelease" conf="runtime->solver-yices2"/>
 ```
 
-Publish the solver binary from within JavaSMT (adjust all paths to your system!):
-```bash
-ant publish-yices2 -Dyices2.path=../solvers/yices2 -Dgmp.path=../solvers/gmp-6.2.0 -Dgperf.path=../solvers/gperf-3.1 -Dyices2.version=2.6.2-89-g0f77dc4b
+Then, in `lib/ivy.xml` start looking for the following section:
+
+```xml
+<!-- additional JavaSMT components with Solver Binaries -->
+<dependency org="org.sosy_lab" name="javasmt-yices2" rev="5.0.1-722-g90a66d7fa" conf="runtime-yices2->runtime; contrib->sources"/>        
 ```
 
-Afterward, you need to update the version number in `solvers_ivy_conf/ivy_javasmt_yices2.xml` and publish new Java components for Yices2.
+Remove the dependency and replace it with the line from `ivy_javasmt_yices2.xml`, except that
+`conf` has been changed to `runtime-yices2->solver-yices2`:
 
-#### Publish the Java components for Yices2
+```xml
+<dependency org="org.sosy_lab" name="javasmt-solver-yices2" rev="2.8.0-prerelease" conf="runtime-yices2->solver-yices2"/>
+```
 
-Info: There is a small cyclic dependency: JavaSMT itself depends on the Java components of Yices2.
+Then run `ant` to build the project
 
-As long as no API was changed and compilation succeeds, simply execute `ant publish-artifacts-yices2`.
+Now go to the dependency in `ivy.xml` again and change `conf` back to `runtime->solver-yices2`:
 
-If the API was changed, we need to break the dependency cycle for the publication and revert this later:
-edit `lib/ivy.xml` and replace the dependency towards `javasmt-yices2` with the dependency towards `javasmt-solver-yices2`
-(the line can be copied from `solvers_ivy_conf/ivy_javasmt_yices2.xml`).
-Then run `ant publish-artifacts-yices2`.
-We still need to figure out how to avoid the warning about a dirty repository in that case, e.g. by a temporary commit.
+```xml
+<dependency org="org.sosy_lab" name="javasmt-solver-yices2" rev="2.8.0-prerelease" conf="runtime->solver-yices2"/>
+```
+
+Then publish the GPL components of JavaSMT:
+```shell
+ant publish-artifacts-yices2 -Dversion=yices2.8-prerelease
+```
+
+Finally, return the dependency in `ivy.xml` to its original form, but with the version updated:
+
+```xml
+<dependency org="org.sosy_lab" name="javasmt-yices2" rev="yices2.8-prerelease" conf="runtime-yices2->runtime; contrib->sources"/>
+```
+
+Optionally, you may now publish a new version of JavaSMT:
+```shell
+ant publish -Dversion=yices-prerelease
+```
+
+#### 3. Publish the packages
+
+Test the new version, then publish it to svn:
+```shell
+# Publish Yices solver binaries
+svn add repository/org.sosy_lab/javasmt-solver-yices2/*-2.8.0-prerelease* repository/org.sosy_lab/javasmt-solver-yices2/*/*-2.8.0-prerelease*
+svn ci repository/org.sosy_lab/javasmt-solver-yices2 -m"publish version 2.8.0-prerelease of Yices Solver"
+
+# Publish Yices JavaSMT component
+svn add repository/org.sosy_lab/javasmt-yices2/*-yices2.8-prerelease* repository/org.sosy_lab/javasmt-yices2/*/*-yices2.8-prerelease*
+svn ci repository/org.sosy_lab/javasmt-yices2 -m"publish version yices2.8-prerelease of Yices Solver"
+
+# (Optional) Publish JavaSMT
+svn add *-yices-prerelease*
+svn ci -m"publish version yices-prerelease of JavaSMT Solver Library"
+```
 
 [Ivy Repository]: http://www.sosy-lab.org/ivy/org.sosy_lab/

@@ -87,7 +87,7 @@ public record FloatingPointNumber(
   @InlineMe(
       replacement = "this.getMathSign() == Sign.NEGATIVE",
       imports = "org.sosy_lab.java_smt.api.FloatingPointNumber.Sign")
-  public final boolean getSign() {
+  public boolean getSign() {
     return getMathSign() == Sign.NEGATIVE;
   }
 

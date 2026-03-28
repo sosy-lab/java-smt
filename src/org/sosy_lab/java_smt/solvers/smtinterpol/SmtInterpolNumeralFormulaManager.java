@@ -16,6 +16,7 @@ import de.uni_freiburg.informatik.ultimate.logic.Rational;
 import de.uni_freiburg.informatik.ultimate.logic.Script;
 import de.uni_freiburg.informatik.ultimate.logic.Sort;
 import de.uni_freiburg.informatik.ultimate.logic.Term;
+import java.math.BigInteger;
 import java.util.ArrayDeque;
 import java.util.Arrays;
 import java.util.Deque;
@@ -171,5 +172,14 @@ abstract class SmtInterpolNumeralFormulaManager<
   @Override
   public Term lessOrEquals(Term pNumber1, Term pNumber2) {
     return env.term("<=", pNumber1, pNumber2);
+  }
+
+  @Override
+  protected Term sumImpl(List<Term> operands) {
+    return switch (operands.size()) {
+      case 0 -> env.numeral(BigInteger.ZERO);
+      case 1 -> operands.get(0);
+      default -> env.term("+", operands.toArray(new Term[0]));
+    };
   }
 }

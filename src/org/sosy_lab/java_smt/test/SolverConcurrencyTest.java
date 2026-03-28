@@ -146,14 +146,14 @@ public class SolverConcurrencyTest {
     assume()
         .withMessage("Solver does not support integers")
         .that(solver)
-        .isNoneOf(Solvers.BOOLECTOR, Solvers.YICES2, Solvers.BITWUZLA);
+        .isNoneOf(Solvers.BOOLECTOR, Solvers.BITWUZLA);
   }
 
   private void requireBitvectors() {
     assume()
         .withMessage("Solver does not support bitvectors")
         .that(solver)
-        .isNoneOf(Solvers.SMTINTERPOL, Solvers.YICES2, Solvers.OPENSMT);
+        .isNoneOf(Solvers.SMTINTERPOL, Solvers.OPENSMT);
   }
 
   private void requireOptimization() {
@@ -293,11 +293,11 @@ public class SolverConcurrencyTest {
   public void testFormulaTranslationWithConcurrentContexts()
       throws InvalidConfigurationException, InterruptedException, SolverException {
     requireIntegers();
-    // CVC4 does not support parsing and therefore no translation.
+    // CVC4 and Yices2 do not support parsing and therefore no translation.
     assume()
         .withMessage("Solver does not support translation of formulas")
         .that(solver)
-        .isNotEqualTo(Solvers.CVC4);
+        .isNoneOf(Solvers.CVC4, Solvers.YICES2);
 
     ConcurrentLinkedQueue<ContextAndFormula> contextAndFormulaList = new ConcurrentLinkedQueue<>();
 
@@ -528,11 +528,11 @@ public class SolverConcurrencyTest {
   @Test
   public void continuousRunningThreadFormulaTransferTranslateTest() {
     requireIntegers();
-    // CVC4 does not support parsing and therefore no translation.
+    // CVC4 and Yices2 do not support parsing and therefore no translation.
     assume()
         .withMessage("Solver does not support translation of formulas")
         .that(solver)
-        .isNotEqualTo(Solvers.CVC4);
+        .isNoneOf(Solvers.CVC4, Solvers.YICES2);
     assume()
         .withMessage("Princess will run out of memory")
         .that(solver)

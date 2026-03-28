@@ -210,7 +210,7 @@ abstract class OpenSmtAbstractProver<T> extends AbstractProverWithAllSat<T> {
   protected boolean isUnsatImpl() throws InterruptedException, SolverException {
     closeAllEvaluators();
     sstat result;
-    try (ShutdownHook listener = new ShutdownHook(shutdownNotifier, osmtSolver::stop)) {
+    try (ShutdownHook listener = new ShutdownHook(shutdownNotifier, osmtSolver::notifyStop)) {
       shutdownNotifier.shutdownIfNecessary();
       try {
         result = osmtSolver.check();
