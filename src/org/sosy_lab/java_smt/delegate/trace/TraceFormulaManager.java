@@ -10,6 +10,7 @@
 
 package org.sosy_lab.java_smt.delegate.trace;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static org.sosy_lab.common.collect.Collections3.transformedImmutableListCopy;
 import static org.sosy_lab.common.collect.Collections3.transformedImmutableSetCopy;
 
@@ -567,17 +568,38 @@ class TraceFormulaManager implements FormulaManager {
           } else {
             return (T) getRationalFormulaManager().floor((NumeralFormula) args.get(0));
           }
-        // FIXME Requires indexed functions
-        // case INT_TO_BV:
-        // case BV_EXTRACT:
-        case BV_CONCAT:
-          Preconditions.checkArgument(args.size() == 2);
+        case INT_TO_BV:
+          checkArgument(declaration.getIndices().size() == 1);
           return (T)
               getBitvectorFormulaManager()
-                  .concat((BitvectorFormula) args.get(0), (BitvectorFormula) args.get(1));
-        // FIXME Requires indexed functions
-        // case BV_SIGN_EXTENSION:
-        // case BV_ZERO_EXTENSION:
+                  .makeBitvector(declaration.getIndices().get(0), (IntegerFormula) args.get(0));
+        case BV_EXTRACT:
+          return (T)
+              getBitvectorFormulaManager()
+                  .extract(
+                      (BitvectorFormula) args.get(0),
+                      declaration.getIndices().get(0),
+                      declaration.getIndices().get(1));
+        case BV_CONCAT:
+          checkArgument(!args.isEmpty(), "Expected at least one argument");
+          var concat = (T) args.get(0);
+          for (var p = 1; p < args.size(); p++) {
+            concat =
+                (T)
+                    getBitvectorFormulaManager()
+                        .concat((BitvectorFormula) concat, (BitvectorFormula) args.get(p));
+          }
+          return concat;
+        case BV_SIGN_EXTENSION:
+          checkArgument(declaration.getIndices().size() == 1);
+          return (T)
+              getBitvectorFormulaManager()
+                  .extend((BitvectorFormula) args.get(0), declaration.getIndices().get(0), true);
+        case BV_ZERO_EXTENSION:
+          checkArgument(declaration.getIndices().size() == 1);
+          return (T)
+              getBitvectorFormulaManager()
+                  .extend((BitvectorFormula) args.get(0), declaration.getIndices().get(0), false);
         case BV_NOT:
           return (T) getBitvectorFormulaManager().not((BitvectorFormula) args.get(0));
         case BV_NEG:
@@ -696,9 +718,16 @@ class TraceFormulaManager implements FormulaManager {
           return (T)
               getBitvectorFormulaManager()
                   .rotateRight((BitvectorFormula) args.get(0), (BitvectorFormula) args.get(1));
-        // FIXME Requires indexed functions
-        // case BV_ROTATE_LEFT_BY_INT:
-        // case BV_ROTATE_RIGHT_BY_INT:
+        case BV_ROTATE_LEFT_BY_INT:
+          checkArgument(declaration.getIndices().size() == 1);
+          return (T)
+              getBitvectorFormulaManager()
+                  .rotateLeft((BitvectorFormula) args.get(0), declaration.getIndices().get(0));
+        case BV_ROTATE_RIGHT_BY_INT:
+          checkArgument(declaration.getIndices().size() == 1);
+          return (T)
+              getBitvectorFormulaManager()
+                  .rotateRight((BitvectorFormula) args.get(0), declaration.getIndices().get(0));
         case BV_UCASTTO_FP:
           return (T)
               getFloatingPointFormulaManager()
