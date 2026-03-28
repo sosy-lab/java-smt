@@ -10,8 +10,6 @@
 
 package org.sosy_lab.java_smt.solvers.z3legacy;
 
-import static com.google.common.base.Preconditions.checkArgument;
-
 import com.google.common.base.Preconditions;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableList;
@@ -68,17 +66,12 @@ class Z3LegacyInterpolatingProver extends Z3LegacyAbstractProver<Long>
   @SuppressWarnings({"unchecked", "varargs"})
   public BooleanFormula getInterpolant(final Collection<Long> pFormulasOfA)
       throws InterruptedException, SolverException {
-    checkGenerateInterpolants();
-    final Set<Long> assertedConstraints = getAssertedConstraintIds();
-    checkArgument(
-        assertedConstraints.containsAll(pFormulasOfA),
-        "interpolation can only be done over previously asserted formulas.");
 
     Set<Long> formulasOfA = ImmutableSet.copyOf(pFormulasOfA);
 
     // calc difference: formulasOfB := assertedFormulas - formulasOfA
     Set<Long> formulasOfB =
-        assertedConstraints.stream()
+        getAssertedConstraintIds().stream()
             .filter(f -> !formulasOfA.contains(f))
             .collect(ImmutableSet.toImmutableSet());
 
@@ -90,13 +83,6 @@ class Z3LegacyInterpolatingProver extends Z3LegacyAbstractProver<Long>
   public List<BooleanFormula> getTreeInterpolants(
       List<? extends Collection<Long>> partitionedFormulas, int[] startOfSubTree)
       throws InterruptedException, SolverException {
-    checkGenerateInterpolants();
-    final ImmutableSet<Long> assertedConstraintIds = getAssertedConstraintIds();
-    checkArgument(
-        partitionedFormulas.stream().allMatch(assertedConstraintIds::containsAll),
-        "interpolation can only be done over previously asserted formulas.");
-    assert InterpolatingProverEnvironment.checkTreeStructure(
-        partitionedFormulas.size(), startOfSubTree);
 
     final long[] conjunctionFormulas = buildConjunctions(partitionedFormulas);
     final long[] interpolationFormulas =

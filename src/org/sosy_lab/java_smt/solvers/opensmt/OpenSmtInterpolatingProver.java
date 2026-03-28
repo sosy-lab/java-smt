@@ -8,9 +8,6 @@
 
 package org.sosy_lab.java_smt.solvers.opensmt;
 
-import static com.google.common.base.Preconditions.checkArgument;
-
-import com.google.common.collect.ImmutableSet;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -73,11 +70,6 @@ class OpenSmtInterpolatingProver extends OpenSmtAbstractProver<Integer>
 
   @Override
   public BooleanFormula getInterpolant(Collection<Integer> formulasOfA) {
-    checkGenerateInterpolants();
-    checkArgument(
-        getAssertedConstraintIds().containsAll(formulasOfA),
-        "interpolation can only be done over previously asserted formulas.");
-
     return creator.encapsulateBoolean(
         osmtSolver.getInterpolationContext().getSingleInterpolant(new VectorInt(formulasOfA)));
   }
@@ -85,13 +77,6 @@ class OpenSmtInterpolatingProver extends OpenSmtAbstractProver<Integer>
   @Override
   public List<BooleanFormula> getSeqInterpolants(
       List<? extends Collection<Integer>> partitionedFormulas) {
-    checkGenerateInterpolants();
-    checkArgument(!partitionedFormulas.isEmpty(), "Interpolation sequence must not be empty");
-    final ImmutableSet<Integer> assertedConstraintIds = getAssertedConstraintIds();
-    checkArgument(
-        partitionedFormulas.stream().allMatch(assertedConstraintIds::containsAll),
-        "interpolation can only be done over previously asserted formulas.");
-
     VectorVectorInt partitions = new VectorVectorInt();
     for (int i = 1; i < partitionedFormulas.size(); i++) {
       VectorInt prefix = new VectorInt();
