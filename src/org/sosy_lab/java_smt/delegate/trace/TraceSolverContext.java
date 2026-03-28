@@ -51,7 +51,7 @@ public class TraceSolverContext implements SolverContext {
 
   @Option(
       secure = true,
-      name = "error",
+      name = "solver.traceError",
       description = "Sets how tracing errors should be handled",
       values = {"log", "fail"})
   private String error = "log";
