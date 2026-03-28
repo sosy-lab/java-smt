@@ -21,6 +21,9 @@ import com.sri.yices.Types;
 import java.io.IOException;
 import java.util.Locale;
 import java.util.Map;
+import org.sosy_lab.common.configuration.Configuration;
+import org.sosy_lab.common.configuration.InvalidConfigurationException;
+import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaManager;
@@ -37,6 +40,8 @@ class Yices2FormulaManager extends AbstractFormulaManager<Integer, Integer, Long
 
   @SuppressWarnings("checkstyle:parameternumber")
   Yices2FormulaManager(
+      LogManager pLogger,
+      Configuration pConfiguration,
       Yices2FormulaCreator pFormulaCreator,
       Yices2UFManager pFunctionManager,
       Yices2BooleanFormulaManager pBooleanManager,
@@ -44,8 +49,11 @@ class Yices2FormulaManager extends AbstractFormulaManager<Integer, Integer, Long
       Yices2RationalFormulaManager pRationalManager,
       Yices2BitvectorFormulaManager pBitvectorManager,
       Yices2QuantifiedFormulaManager pQuantifiedFormulaManager,
-      Yices2ArrayFormulaManager pArrayFormulaManager) {
+      Yices2ArrayFormulaManager pArrayFormulaManager)
+      throws InvalidConfigurationException {
     super(
+        pLogger,
+        pConfiguration,
         pFormulaCreator,
         pFunctionManager,
         pBooleanManager,

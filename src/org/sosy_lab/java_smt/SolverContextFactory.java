@@ -250,6 +250,7 @@ public class SolverContextFactory {
       case CVC4:
         return CVC4SolverContext.create(
             logger,
+            config,
             shutdownNotifier,
             (int) randomSeed,
             nonLinearArithmetic,
@@ -305,17 +306,25 @@ public class SolverContextFactory {
 
       case PRINCESS:
         return PrincessSolverContext.create(
-            config, shutdownNotifier, logfile, (int) randomSeed, nonLinearArithmetic);
+            logger, config, shutdownNotifier, logfile, (int) randomSeed, nonLinearArithmetic);
 
       case YICES2:
-        return Yices2SolverContext.create(config, nonLinearArithmetic, shutdownNotifier, loader);
+        return Yices2SolverContext.create(
+            logger, config, nonLinearArithmetic, shutdownNotifier, loader);
 
       case BOOLECTOR:
-        return BoolectorSolverContext.create(config, shutdownNotifier, logfile, randomSeed, loader);
+        return BoolectorSolverContext.create(
+            logger, config, shutdownNotifier, logfile, randomSeed, loader);
 
       case BITWUZLA:
         return BitwuzlaSolverContext.create(
-            config, shutdownNotifier, logfile, randomSeed, floatingPointRoundingMode, loader);
+            logger,
+            config,
+            shutdownNotifier,
+            logfile,
+            randomSeed,
+            floatingPointRoundingMode,
+            loader);
 
       default:
         throw new AssertionError("no solver selected");

@@ -18,6 +18,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.sosy_lab.common.configuration.Configuration;
+import org.sosy_lab.common.configuration.InvalidConfigurationException;
+import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaManager;
@@ -31,6 +34,8 @@ final class Z3FormulaManager extends AbstractFormulaManager<Long, Long, Long, Lo
 
   @SuppressWarnings("checkstyle:parameternumber")
   Z3FormulaManager(
+      LogManager pLogger,
+      Configuration pConfiguration,
       Z3FormulaCreator pFormulaCreator,
       Z3UFManager pFunctionManager,
       Z3BooleanFormulaManager pBooleanManager,
@@ -41,8 +46,11 @@ final class Z3FormulaManager extends AbstractFormulaManager<Long, Long, Long, Lo
       Z3QuantifiedFormulaManager pQuantifiedManager,
       Z3ArrayFormulaManager pArrayManager,
       Z3StringFormulaManager pStringManager,
-      Z3EnumerationFormulaManager pEnumerationManager) {
+      Z3EnumerationFormulaManager pEnumerationManager)
+      throws InvalidConfigurationException {
     super(
+        pLogger,
+        pConfiguration,
         pFormulaCreator,
         pFunctionManager,
         pBooleanManager,

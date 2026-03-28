@@ -110,7 +110,7 @@ public final class CVC5SolverContext extends AbstractSolverContext {
     System.setProperty("cvc5.skipLibraryLoad", "true");
   }
 
-  @SuppressWarnings({"unused", "resource"})
+  @SuppressWarnings("resource")
   public static SolverContext create(
       LogManager pLogger,
       Configuration pConfig,
@@ -126,7 +126,7 @@ public final class CVC5SolverContext extends AbstractSolverContext {
       instances++;
     }
 
-    CVC5Settings settings = new CVC5Settings(pConfig);
+    CVC5SolverContext.CVC5Settings settings = new CVC5Settings(pConfig);
 
     loadLibrary(pLoader);
 
@@ -166,6 +166,8 @@ public final class CVC5SolverContext extends AbstractSolverContext {
     CVC5EnumerationFormulaManager enumTheory = new CVC5EnumerationFormulaManager(pCreator);
     CVC5FormulaManager manager =
         new CVC5FormulaManager(
+            pLogger,
+            pConfig,
             pCreator,
             functionTheory,
             booleanTheory,

@@ -16,6 +16,9 @@ import com.google.common.collect.Table.Cell;
 import java.util.Collection;
 import java.util.List;
 import org.sosy_lab.common.collect.Collections3;
+import org.sosy_lab.common.configuration.Configuration;
+import org.sosy_lab.common.configuration.InvalidConfigurationException;
+import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager;
 import org.sosy_lab.java_smt.basicimpl.Tokenizer;
@@ -37,6 +40,8 @@ final class BitwuzlaFormulaManager
 
   @SuppressWarnings("checkstyle:parameternumber")
   BitwuzlaFormulaManager(
+      LogManager pLogger,
+      Configuration pConfiguration,
       BitwuzlaFormulaCreator pFormulaCreator,
       BitwuzlaUFManager pFunctionManager,
       BitwuzlaBooleanFormulaManager pBooleanManager,
@@ -44,8 +49,11 @@ final class BitwuzlaFormulaManager
       BitwuzlaQuantifiedFormulaManager pQuantifierManager,
       BitwuzlaFloatingPointManager pFloatingPointManager,
       BitwuzlaArrayFormulaManager pArrayManager,
-      Options pBitwuzlaOptions) {
+      Options pBitwuzlaOptions)
+      throws InvalidConfigurationException {
     super(
+        pLogger,
+        pConfiguration,
         pFormulaCreator,
         pFunctionManager,
         pBooleanManager,
