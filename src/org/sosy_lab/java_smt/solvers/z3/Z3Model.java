@@ -56,7 +56,9 @@ final class Z3Model extends AbstractModel<Long, Long, Long> {
       for (int constIdx = 0; constIdx < Native.modelGetNumConsts(z3context, model); constIdx++) {
         long keyDecl = Native.modelGetConstDecl(z3context, model, constIdx);
         Native.incRef(z3context, keyDecl);
-        out.addAll(getConstAssignments(keyDecl));
+        if (!isInternalSymbol(keyDecl)) {
+          out.addAll(getConstAssignments(keyDecl));
+        }
         Native.decRef(z3context, keyDecl);
       }
 
