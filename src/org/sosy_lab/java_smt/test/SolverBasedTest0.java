@@ -135,7 +135,7 @@ public abstract class SolverBasedTest0 {
     ConfigurationBuilder newConfig =
         Configuration.builder().setOption("solver.solver", solverToUse().toString());
 
-    if (solverToUse() != Solvers.BOOLECTOR) { // Boolector has no formula visitation.
+    if (enableTracing()) {
       String tracefile =
           String.format(
               "traces/%s/trace_%s_%s.java",
@@ -150,7 +150,32 @@ public abstract class SolverBasedTest0 {
     if (solverToUse() == Solvers.OPENSMT) {
       newConfig.setOption("solver.opensmt.logic", logicToUse().toString());
     }
+
     return newConfig;
+  }
+
+  /**
+   * Determines whether execution tracing is enabled for the test suite.
+   *
+   * <p>Tracing is <b>disabled by default</b> for the following reasons:
+   *
+   * <ul>
+   *   <li><b>Compatibility:</b> Some solvers lack support for tracing-related operations, such as
+   *       formula visitation or BitVector-to-Integer conversion.
+   *   <li><b>Isolation:</b> Tracing can alter memory pressure or formula allocation patterns,
+   *       potentially causing non-deterministic behavior or masking bugs.
+   *   <li><b>Performance:</b> Enabling tracing may increase execution time and complicate the
+   *       debugging process.
+   * </ul>
+   *
+   * <p>To enable tracing, override this method in your test class to return {@code true}. The
+   * produced trace will be stored in the "output/traces" directory with a filename pattern of
+   * "trace_[TestClassName]_[TestMethodName]_[Timestamp].java".
+   *
+   * @return {@code true} if tracing should be enabled; {@code false} otherwise.
+   */
+  protected boolean enableTracing() {
+    return false;
   }
 
   @Before
