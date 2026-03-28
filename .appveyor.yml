@@ -79,9 +79,13 @@ on_finish:
       7z a JUnit.html.zip JUnit.html
       Push-AppveyorArtifact JUnit.html.zip -DeploymentName "JUnit Report"
   - ps: |
-      echo "Compressing and uploading trace files..."
-      7z a traces.zip .\output\traces
-      Push-AppveyorArtifact traces.zip -DeploymentName "Traces"
+      if (Test-Path ".\output\traces") {
+        echo "Compressing and uploading trace files..."
+        7z a traces.zip ".\output\traces"
+        Push-AppveyorArtifact traces.zip -DeploymentName "Traces"
+      } else {
+        echo "Source directory missing. Skipping..."
+      }
 
 cache:
   - C:\ant
