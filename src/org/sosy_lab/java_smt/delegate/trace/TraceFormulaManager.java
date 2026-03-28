@@ -1133,13 +1133,12 @@ class TraceFormulaManager implements FormulaManager {
   public <R> R visit(Formula f, FormulaVisitor<R> rFormulaVisitor) {
     return logger.logDefDiscard(
         "mgr",
-        """
-        visit(%s, new DefaultFormulaVisitor<>() {
-          protected Formula visitDefault(Formula f) {
-          return f;
-        }})
-        """
-            .formatted(logger.toVariable(f)),
+        String.format(
+            "visit(%s, new DefaultFormulaVisitor<>() {"
+                + "  protected Formula visitDefault(Formula f) {"
+                + "  return f;"
+                + "}})",
+            logger.toVariable(f)),
         () -> delegate.visit(f, rFormulaVisitor));
   }
 
@@ -1147,13 +1146,12 @@ class TraceFormulaManager implements FormulaManager {
   public void visitRecursively(Formula f, FormulaVisitor<TraversalProcess> rFormulaVisitor) {
     logger.logStmtDiscard(
         "mgr",
-        """
-        visitRecursively(%s, new DefaultFormulaVisitor<>() {
-          protected TraversalProcess visitDefault(Formula f) {
-          return TraversalProcess.CONTINUE;
-        }})
-        """
-            .formatted(logger.toVariable(f)),
+        String.format(
+            "visitRecursively(%s, new DefaultFormulaVisitor<>() {"
+                + "  protected TraversalProcess visitDefault(Formula f) {"
+                + "  return TraversalProcess.CONTINUE;"
+                + "}})",
+            logger.toVariable(f)),
         () -> delegate.visitRecursively(f, rFormulaVisitor));
   }
 

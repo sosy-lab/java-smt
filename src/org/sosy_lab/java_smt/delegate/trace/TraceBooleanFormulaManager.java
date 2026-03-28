@@ -150,13 +150,12 @@ class TraceBooleanFormulaManager implements BooleanFormulaManager {
   public <R> R visit(BooleanFormula pFormula, BooleanFormulaVisitor<R> visitor) {
     return logger.logDefDiscard(
         "mgr.getBooleanFormulaManager()",
-        """
-        visit(%s, new DefaultBooleanFormulaVisitor<>() {
-          protected Formula visitDefault(Formula f) {
-          return %s;
-        }})
-        """
-            .formatted(logger.toVariable(pFormula), logger.toVariable(pFormula)),
+        String.format(
+            "visit(%s, new DefaultBooleanFormulaVisitor<>() {"
+                + "  protected Formula visitDefault(Formula f) {"
+                + "  return %s;"
+                + "}})",
+            logger.toVariable(pFormula), logger.toVariable(pFormula)),
         () -> delegate.visit(pFormula, visitor));
   }
 
@@ -165,13 +164,12 @@ class TraceBooleanFormulaManager implements BooleanFormulaManager {
       BooleanFormula f, BooleanFormulaVisitor<TraversalProcess> rFormulaVisitor) {
     logger.logStmtDiscard(
         "mgr.getBooleanFormulaManager()",
-        """
-        visitRecursively(%s, new DefaultBooleanFormulaVisitor<>() {
-          protected TraversalProcess visitDefault(Formula f) {
-          return TraversalProcess.CONTINUE;
-        }}})
-        """
-            .formatted(logger.toVariable(f)),
+        String.format(
+            "visitRecursively(%s, new DefaultBooleanFormulaVisitor<>() {"
+                + "  protected TraversalProcess visitDefault(Formula f) {"
+                + "  return TraversalProcess.CONTINUE;"
+                + "}})",
+            logger.toVariable(f)),
         () -> delegate.visitRecursively(f, rFormulaVisitor));
   }
 
