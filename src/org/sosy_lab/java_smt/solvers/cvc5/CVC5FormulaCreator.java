@@ -470,34 +470,34 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, TermManager, 
       } else {
         // Term expressions like uninterpreted function calls (Kind.APPLY_UF) or operators (e.g.
         // Kind.AND).
-        // These are all treated like operators, so we can get the declaration by f.getOperator()!
-
-        ImmutableList.Builder<Formula> argsBuilder = ImmutableList.builder();
-
-        List<FormulaType<?>> argsTypes = new ArrayList<>();
+        Kind kind = f.getKind();
 
         // Collect indices
-        Op operator = f.getOp();
         ImmutableList.Builder<Integer> indexBuilder = ImmutableList.builder();
-        for (int p = 0; p < operator.getNumIndices(); p++) {
-          Term index = operator.get(p);
-          if (index.isIntegerValue()) {
-            indexBuilder.add(index.getIntegerValue().intValueExact());
+        if (f.hasOp()) {
+          Op operator = f.getOp();
+          for (int p = 0; p < operator.getNumIndices(); p++) {
+            Term index = operator.get(p);
+            if (index.isIntegerValue()) {
+              indexBuilder.add(index.getIntegerValue().intValueExact());
+            }
           }
         }
 
         // Collect arguments
-        Kind kind = f.getKind();
+        ImmutableList.Builder<Formula> argsBuilder = ImmutableList.builder();
+        ImmutableList.Builder<FormulaType<?>> argTypesBuilder = ImmutableList.builder();
+
         if (sort.isFunction() || kind == Kind.APPLY_UF) {
           // The arguments are all children except the first one
           for (int i = 1; i < f.getNumChildren(); i++) {
-            argsTypes.add(getFormulaTypeFromTermType(f.getChild(i).getSort()));
+            argTypesBuilder.add(getFormulaTypeFromTermType(f.getChild(i).getSort()));
             // CVC5s first argument in a function/Uf is the declaration, we don't need that here
             argsBuilder.add(encapsulate(f.getChild(i)));
           }
         } else {
           for (Term arg : f) {
-            argsTypes.add(getFormulaType(arg));
+            argTypesBuilder.add(getFormulaType(arg));
             argsBuilder.add(encapsulate(arg));
           }
         }
@@ -507,7 +507,11 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, TermManager, 
               formula,
               argsBuilder.build(),
               FunctionDeclarationImpl.of(
-                  getName(f), getDeclarationKind(f), argsTypes, getFormulaType(f), normalize(f)));
+                  getName(f),
+                  getDeclarationKind(f),
+                  argTypesBuilder.build(),
+                  getFormulaType(f),
+                  normalize(f)));
         } else if (kind == Kind.APPLY_UF) {
           return visitor.visitFunction(
               formula,
@@ -515,7 +519,7 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, TermManager, 
               FunctionDeclarationImpl.of(
                   getName(f),
                   getDeclarationKind(f),
-                  argsTypes,
+                  argTypesBuilder.build(),
                   getFormulaType(f),
                   normalize(f.getChild(0))));
         } else {
@@ -527,7 +531,7 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, TermManager, 
                   getName(f),
                   getDeclarationKind(f),
                   indexBuilder.build(),
-                  argsTypes,
+                  argTypesBuilder.build(),
                   getFormulaType(f),
                   normalize(f)));
         }
