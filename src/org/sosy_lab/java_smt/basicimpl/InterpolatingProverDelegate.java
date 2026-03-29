@@ -26,11 +26,11 @@ import org.sosy_lab.java_smt.api.SolverException;
  * InterpolatingProverEnvironment} based on the implementations in the abstract/theorem prover that
  * can not be done using abstract implementations.
  */
+@SuppressWarnings("resource")
 class InterpolatingProverDelegate<T> implements InterpolatingProverEnvironment<T> {
 
   private final InterpolatingProverEnvironment<T> itpProver;
 
-  @SuppressWarnings("unchecked")
   InterpolatingProverDelegate(InterpolatingProverEnvironment<T> pBaseProver) {
     itpProver = checkNotNull(pBaseProver);
   }
@@ -123,6 +123,7 @@ class InterpolatingProverDelegate<T> implements InterpolatingProverEnvironment<T
   }
 
   /* ############################### Utility methods ############################### */
+  @SuppressWarnings("unchecked")
   private AbstractProver<T> getDelegateAsAbstractProver() {
     return (AbstractProver<T>) itpProver;
   }
