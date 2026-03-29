@@ -1,0 +1,275 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!--
+This file is part of JavaSMT,
+an API wrapper for a collection of SMT solvers:
+https://github.com/sosy-lab/java-smt
+
+SPDX-FileCopyrightText: 2026 Dirk Beyer <https://www.sosy-lab.org>
+
+SPDX-License-Identifier: Apache-2.0
+-->
+
+<!-- vim: set tabstop=8 shiftwidth=4 expandtab filetype=ant : -->
+<project name="maven-central-publish" basedir="."
+         xmlns:ivy="antlib:org.apache.ivy.ant">
+
+    <!--
+        This file provides targets to publish artifacts from the Ivy repository
+        to Maven Central via the new Sonatype Central Publishing Portal (central.sonatype.com).
+
+        The script loads artifacts directly from Ivy, generates a POM file,
+        then uploads to the Maven staging server.
+        There is a manually triggered release process via https://central.sonatype.com/
+
+        Locally, we use the dist-directory for temporary storage.
+        When debugging, you can check that location for files and file-structure.
+
+        Usage:
+        ant publish-to-maven-central -Dpublish.component=z3 -Dpublish.version=4.16.0
+        ant publish-to-maven-central -Dpublish.component=java-smt -Dpublish.version=5.0.0
+    -->
+
+    <import file="build-ivy.xml"/>
+
+    <property name="bundle.main.dir" value="dist/maven-central-bundle"/>
+
+    <!--
+        Passphrase can be provided via command line option as '-Dgpg.passphrase=$GPG_PASS' or in
+        build.properties. Environment variable can be defined interactively via "read -s GPG_PASS".
+    -->
+    <property name="gpg.passphrase" value=""/>
+
+    <target name="init-maven-central" depends="load-ivy">
+        <fail message="Please provide -Dpublish.component (e.g., z3, java-smt)">
+            <condition><not><isset property="publish.component"/></not></condition>
+        </fail>
+        <fail message="Please provide -Dpublish.version (e.g., 4.12.2)">
+            <condition><not><isset property="publish.version"/></not></condition>
+        </fail>
+
+        <!-- Use a consolidated name for Ivy module and Maven artifact ID -->
+        <condition property="publish.full-name" value="java-smt" else="javasmt-solver-${publish.component}">
+            <equals arg1="${publish.component}" arg2="java-smt"/>
+        </condition>
+
+        <property name="bundle.rel.dir" value="org/sosy-lab/${publish.full-name}/${publish.version}"/>
+        <property name="bundle.dir" value="${bundle.main.dir}/${bundle.rel.dir}"/>
+        <property name="zip.file" value="${bundle.main.dir}/${publish.component}-${publish.version}-bundle.zip"/>
+
+        <!-- Define configurations to resolve based on component -->
+        <condition property="resolve.confs" value="core,sources,javadoc" else="*">
+            <equals arg1="${publish.component}" arg2="java-smt"/>
+        </condition>
+
+        <condition property="pom.template" value="pom_template.xml" else="solvers_maven_conf/maven_${publish.component}_pom_template.xml">
+            <equals arg1="${publish.component}" arg2="java-smt"/>
+        </condition>
+
+        <!--
+            Note:
+            We can use arbitrary versions from online Ivy repository with ${publish.version}.
+            However, their configuration needs to match with the local Ivy definition file.
+        -->
+        <condition property="ivy.file" value="lib/ivy.xml" else="solvers_ivy_conf/ivy_${publish.component}.xml">
+            <equals arg1="${publish.component}" arg2="java-smt"/>
+        </condition>
+
+        <!-- Setup properties for POM generation -->
+        <property name="ivy.pom.version" value="${publish.version}"/>
+        <property name="ivy.pom.groupId" value="org.sosy-lab"/>
+        <property name="ivy.pom.artifactId" value="${publish.full-name}"/>
+        <property name="ivy.pom.packaging" value="jar"/>
+        <property name="ivy.pom.name" value="${publish.full-name}"/>
+        <property name="ivy.pom.description" value="JavaSMT component ${publish.full-name}"/>
+        <property name="ivy.pom.url" value="https://github.com/sosy-lab/java-smt"/>
+    </target>
+
+    <target name="resolve-from-ivy" depends="init-maven-central" description="Resolve and retrieve artifacts from Ivy repository">
+        <delete dir="${bundle.dir}"/>
+        <mkdir dir="${bundle.dir}"/>
+
+        <echo message="Resolving ${publish.full-name} version ${publish.version} from Ivy..."/>
+        <ivy:resolve organisation="org.sosy_lab"
+                     module="${publish.full-name}" 
+                     revision="${publish.version}" 
+                     conf="${resolve.confs}" 
+                     log="download-only" 
+                     inline="true"
+                     keep="true"/>
+
+        <!--
+            Retrieve artifacts into the bundle directory with Maven naming.
+            For documentation see https://maven.apache.org/repository/layout.html
+        -->
+        <ivy:retrieve sync="true"
+                      overwriteMode="different"
+                      pattern="${bundle.dir}/[module]-[revision]-[artifact](-[arch])(-[classifier]).[ext]"
+                      conf="${resolve.confs}"/>
+    </target>
+
+    <target name="bundle" depends="init-maven-central" description="Generate POM, sign artifacts, and create ZIP bundle">
+        <!-- Generate POM -->
+        <echo message="Generating POM for ${publish.full-name}..."/>
+
+        <!-- set version placeholder in the template -->
+        <property name="stage.revision" value="${publish.version}"/>
+        <ivy:makepom ivyfile="${ivy.file}"
+                     pomfile="${bundle.dir}/${publish.full-name}-${publish.version}.pom"
+                     templatefile="${pom.template}"
+                     conf="${resolve.confs}">
+            <mapping conf="${resolve.confs}" scope="compile"/>
+        </ivy:makepom>
+
+        <!-- Maven group is "sosy-lab", not "sosy_lab" in generated POM -->
+        <!-- TODO why do we need this step? Just for backwards-compatibility with 2014-2018? -->
+        <replace file="${bundle.dir}/${publish.full-name}-${publish.version}.pom">
+            <replacetoken>sosy_lab</replacetoken>
+            <replacevalue>sosy-lab</replacevalue>
+        </replace>
+
+        <!-- Sign all files -->
+        <echo message="Signing all artifacts in ${bundle.dir}..."/>
+        <apply executable="gpg" failonerror="true">
+            <arg value="--detach-sign"/>
+            <arg value="--armor"/>
+            <arg value="--batch"/>
+            <arg value="--no-tty"/>
+            <arg value="--pinentry-mode"/>
+            <arg value="loopback"/>
+            <arg value="--passphrase"/>
+            <arg value="${gpg.passphrase}"/>
+            <fileset dir="${bundle.dir}">
+                <include name="*"/>
+            </fileset>
+        </apply>
+
+        <!-- Generate checksums for all artifacts and signature files, excluding hash-files. -->
+        <echo message="Generating checksums for all artifacts..."/>
+        <fileset id="bundle.files" dir="${bundle.dir}" includes="*" excludes="*.md5,*.sha*"/>
+        <checksum algorithm="MD5" fileext=".md5"><fileset refid="bundle.files"/></checksum>
+        <checksum algorithm="SHA-1" fileext=".sha1"><fileset refid="bundle.files"/></checksum>
+        <checksum algorithm="SHA-256" fileext=".sha256"><fileset refid="bundle.files"/></checksum>
+        <checksum algorithm="SHA-512" fileext=".sha512"><fileset refid="bundle.files"/></checksum>
+
+        <!-- Create ZIP bundle starting from the root of the repository structure -->
+        <zip destfile="${zip.file}">
+            <fileset dir="${bundle.main.dir}">
+                <include name="${bundle.rel.dir}/**"/>
+            </fileset>
+        </zip>
+        
+        <echo message="Bundle created at ${zip.file}"/>
+    </target>
+
+    <!--
+        Sonatype Central Token is loaded from ~/.m2/settings.xml from server with id="SonatypeCentral".
+        Alternatively, they can be provided via '-Dsonatype.token.username=...' and '-Dsonatype.token.password=...'.
+    -->
+    <property name="m2.settings.file" value="${home.dir}/.m2/settings.xml"/>
+    <available file="${m2.settings.file}" property="m2.settings.available"/>
+
+    <target name="load-sonatype-token" if="m2.settings.available">
+        <!-- Use XSLT to extract credentials for 'SonatypeCentral' into a temporary XML -->
+        <tempfile property="temp.xslt" prefix="extract-sonatype-credentials" suffix=".xslt" deleteonexit="true"/>
+        <echo file="${temp.xslt}"><![CDATA[<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+<xsl:template match="/">
+  <server>
+    <xsl:for-each select="//*[local-name()='server'][*[local-name()='id']='SonatypeCentral']">
+      <username><xsl:value-of select="*[local-name()='username']"/></username>
+      <password><xsl:value-of select="*[local-name()='password']"/></password>
+    </xsl:for-each>
+  </server>
+</xsl:template>
+</xsl:stylesheet>]]></echo>
+        <tempfile property="temp.xml"
+                  prefix="maven-settings-temp"
+                  suffix=".xml"
+                  deleteonexit="true"/>
+        <xslt in="${m2.settings.file}" out="${temp.xml}" style="${temp.xslt}"/>
+        <xmlproperty file="${temp.xml}" keepRoot="false" prefix="sonatype.token.m2"/>
+
+        <condition property="sonatype.token.username" value="${sonatype.token.m2.username}">
+            <isset property="sonatype.token.m2.username"/>
+        </condition>
+        <condition property="sonatype.token.password" value="${sonatype.token.m2.password}">
+            <isset property="sonatype.token.m2.password"/>
+        </condition>
+    </target>
+
+    <!--
+        Use publishingType AUTOMATIC for auto-release.
+        Use publishingType USER_MANAGED for automated stating and manual release via website.
+    -->
+    <property name="sonatype.publishingType" value="USER_MANAGED"/>
+
+    <target name="upload-to-sonatype" depends="init-maven-central, load-sonatype-token" description="Upload the bundle to Sonatype Central">
+        <echo message="The bundle is ready at: ${zip.file}"/>
+        
+        <!-- Default values if not set by load-sonatype-token or command line -->
+        <property name="sonatype.token.username" value=""/>
+        <property name="sonatype.token.password" value=""/>
+        <condition property="sonatype.auth.available">
+            <and>
+                <not><equals arg1="${sonatype.token.username}" arg2=""/></not>
+                <not><equals arg1="${sonatype.token.password}" arg2=""/></not>
+            </and>
+        </condition>
+
+        <condition property="sonatype.auth.message" value="Sonatype authentication available." else="Sonatype authentication NOT available.">
+            <isset property="sonatype.auth.available"/>
+        </condition>
+        <echo message="${sonatype.auth.message}"/>
+
+        <antcall target="upload-to-sonatype-auto"/>
+        <antcall target="upload-to-sonatype-manual"/>
+    </target>
+
+    <target name="upload-to-sonatype-auto" if="sonatype.auth.available">
+        <echo message="Automated upload to Sonatype Central..."/>
+        <condition property="isWindows">
+            <os family="windows"/>
+        </condition>
+        <antcall target="upload-to-sonatype-windows"/>
+        <antcall target="upload-to-sonatype-unix"/>
+        <echo message="Upload request submitted successfully."/>
+    </target>
+
+    <target name="upload-to-sonatype-windows" if="isWindows">
+        <echo message="Starting upload..."/>
+        <property name="sonatype.url" value="https://central.sonatype.com/api/v1/publisher/upload?name=${publish.full-name}-${publish.version}&amp;publishingType=${sonatype.publishingType}"/>
+        <!-- Use PowerShell for multipart upload on Windows -->
+        <exec executable="powershell" failonerror="true">
+            <arg value="-NoProfile"/>
+            <arg value="-Command"/>
+            <arg value="$auth = [Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes('${sonatype.token.username}:${sonatype.token.password}')); Invoke-RestMethod -Uri '${sonatype.url}' -Method Post -Headers @{ Authorization = 'Basic ' + $auth } -InFile '${zip.file}' -ContentType 'multipart/form-data'"/>
+        </exec>
+    </target>
+
+    <target name="upload-to-sonatype-unix" unless="isWindows">
+        <echo message="Starting upload..."/>
+        <exec executable="curl" failonerror="true" outputproperty="sonatype.deployment.id">
+            <arg value="--no-progress-meter"/>
+            <arg value="-X"/>
+            <arg value="POST"/>
+            <arg value="https://central.sonatype.com/api/v1/publisher/upload?name=${publish.full-name}-${publish.version}&amp;publishingType=${sonatype.publishingType}"/>
+            <arg value="-u"/>
+            <arg value="${sonatype.token.username}:${sonatype.token.password}"/>
+            <arg value="-H"/>
+            <arg value="Content-Type: multipart/form-data"/>
+            <arg value="-F"/>
+            <arg value="bundle=@${zip.file}"/>
+        </exec>
+        <echo message="Successfully captured ID from upload: ${sonatype.deployment.id}"/>
+        <echo message="For review and further publication steps, please visit:"/>
+        <echo message="  https://central.sonatype.com/publishing/deployments/${sonatype.deployment.id}"/>
+    </target>
+
+    <target name="upload-to-sonatype-manual" unless="sonatype.auth.available">
+        <echo message="Login to https://central.sonatype.com/ and upload the ZIP file manually."/>
+        <echo message="To automate this step, provide options -Dsonatype.token.username and -Dsonatype.token.password, or provide Maven settings."/>
+    </target>
+
+    <target name="publish-to-maven-central" depends="resolve-from-ivy, bundle, upload-to-sonatype" 
+            description="Complete process to prepare and upload a Maven Central bundle from Ivy"/>
+</project>

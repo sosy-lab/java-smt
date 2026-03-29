@@ -67,6 +67,7 @@ SPDX-License-Identifier: Apache-2.0
     <import file="build/build-publish.xml"/>
     <import file="build/build-publish-solvers.xml"/>
     <import file="build/build-maven-publish.xml"/>
+    <import file="build/build-maven-central.xml"/>
 
     <path id="classpath">
         <pathelement location="${class.dir}"/>
