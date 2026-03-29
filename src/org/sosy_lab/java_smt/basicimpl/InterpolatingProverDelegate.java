@@ -29,18 +29,16 @@ import org.sosy_lab.java_smt.api.SolverException;
 class InterpolatingProverDelegate<T> implements InterpolatingProverEnvironment<T> {
 
   private final InterpolatingProverEnvironment<T> itpProver;
-  private final AbstractProver<T> abstractProver;
 
   @SuppressWarnings("unchecked")
   InterpolatingProverDelegate(InterpolatingProverEnvironment<T> pBaseProver) {
     itpProver = checkNotNull(pBaseProver);
-    abstractProver = (AbstractProver<T>) itpProver;
   }
 
   @Override
   public BooleanFormula getInterpolant(Collection<T> formulasOfA)
       throws SolverException, InterruptedException {
-    abstractProver.checkGenerateInterpolants(formulasOfA);
+    getDelegateAsAbstractProver().checkGenerateInterpolants(formulasOfA);
     // TODO: do we want a common method to calculate partition B out of the asserted formulas
     //  efficiently? We currently have several distinct solutions.
     return itpProver.getInterpolant(formulasOfA);
@@ -49,7 +47,7 @@ class InterpolatingProverDelegate<T> implements InterpolatingProverEnvironment<T
   @Override
   public List<BooleanFormula> getSeqInterpolants(List<? extends Collection<T>> partitionedFormulas)
       throws SolverException, InterruptedException {
-    abstractProver.checkGenerateSeqInterpolants(partitionedFormulas);
+    getDelegateAsAbstractProver().checkGenerateSeqInterpolants(partitionedFormulas);
     // TODO: problem/inefficiency; unsupported solvers still check validity of input before failing?
     return itpProver.getSeqInterpolants(partitionedFormulas);
   }
@@ -58,7 +56,8 @@ class InterpolatingProverDelegate<T> implements InterpolatingProverEnvironment<T
   public List<BooleanFormula> getTreeInterpolants(
       List<? extends Collection<T>> partitionedFormulas, int[] startOfSubTree)
       throws SolverException, InterruptedException {
-    abstractProver.checkGenerateTreeInterpolants(partitionedFormulas, startOfSubTree);
+    getDelegateAsAbstractProver()
+        .checkGenerateTreeInterpolants(partitionedFormulas, startOfSubTree);
     // TODO: problem/inefficiency; unsupported solvers still check validity of input before failing?
     return itpProver.getTreeInterpolants(partitionedFormulas, startOfSubTree);
   }
@@ -121,5 +120,10 @@ class InterpolatingProverDelegate<T> implements InterpolatingProverEnvironment<T
   public <R> R allSat(AllSatCallback<R> callback, List<BooleanFormula> important)
       throws InterruptedException, SolverException {
     return itpProver.allSat(callback, important);
+  }
+
+  /* ############################### Utility methods ############################### */
+  private AbstractProver<T> getDelegateAsAbstractProver() {
+    return (AbstractProver<T>) itpProver;
   }
 }
