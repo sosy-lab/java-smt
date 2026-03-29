@@ -691,7 +691,7 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
     if (solver == Solvers.YICES2) {
       // Yices2 will rewrite to (bv-array (bit x 3) (bit x 2) (bit x 1) (bit x 0))
       var args = getArgs(f);
-      assertThat(args.size()).isEqualTo(4);
+      assertThat(args).hasSize(4);
       for (var p = 0; p < args.size(); p++) {
         checkIndexedSymbol(
             FunctionDeclarationKind.BV_EXTRACT, ImmutableList.of(3 - p, 3 - p), args.get(p));
@@ -715,7 +715,7 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
     if (solver == Solvers.YICES2) {
       // Yices2 will rewrite to (bv-array #b0 ... #b0 (bit x 7) ... (bit x 0)
       var terms = getArgs(f);
-      assertThat(terms.size()).isEqualTo(16);
+      assertThat(terms).hasSize(16);
       for (var p = 0; p < terms.size(); p++) {
         if (p < 8) {
           assertThat(terms.get(p)).isEqualTo(bvmgr.makeBitvector(1, 0));
