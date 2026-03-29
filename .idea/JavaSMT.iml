@@ -59,7 +59,9 @@ SPDX-License-Identifier: Apache-2.0
           <root url="file://$MODULE_DIR$/lib/java/runtime-bitwuzla" />
         </CLASSES>
         <JAVADOC />
-        <SOURCES />
+        <SOURCES>
+          <root url="jar://$MODULE_DIR$/lib/java-contrib/bitwuzla-sources.jar!/" />
+        </SOURCES>
         <jarDirectory url="file://$MODULE_DIR$/lib/java/runtime-bitwuzla" recursive="false" />
       </library>
     </orderEntry>
@@ -89,7 +91,9 @@ SPDX-License-Identifier: Apache-2.0
           <root url="file://$MODULE_DIR$/lib/java/runtime-opensmt" />
         </CLASSES>
         <JAVADOC />
-        <SOURCES />
+        <SOURCES>
+          <root url="jar://$MODULE_DIR$/lib/java-contrib/opensmt-sources.jar!/" />
+        </SOURCES>
         <jarDirectory url="file://$MODULE_DIR$/lib/java/runtime-opensmt" recursive="false" />
       </library>
     </orderEntry>
@@ -99,7 +103,10 @@ SPDX-License-Identifier: Apache-2.0
           <root url="file://$MODULE_DIR$/lib/java/runtime-princess" />
         </CLASSES>
         <JAVADOC />
-        <SOURCES />
+        <SOURCES>
+          <root url="jar://$MODULE_DIR$/lib/java-contrib/ostrich_2.13-sources.jar!/" />
+          <root url="jar://$MODULE_DIR$/lib/java-contrib/princess_2.13-sources.jar!/" />
+        </SOURCES>
         <jarDirectory url="file://$MODULE_DIR$/lib/java/runtime-princess" recursive="false" />
       </library>
     </orderEntry>
@@ -109,7 +116,9 @@ SPDX-License-Identifier: Apache-2.0
           <root url="file://$MODULE_DIR$/lib/java/runtime-smtinterpol" />
         </CLASSES>
         <JAVADOC />
-        <SOURCES />
+        <SOURCES>
+          <root url="jar://$MODULE_DIR$/lib/java-contrib/smtinterpol-sources.jar!/" />
+        </SOURCES>
         <jarDirectory url="file://$MODULE_DIR$/lib/java/runtime-smtinterpol" recursive="false" />
       </library>
     </orderEntry>
@@ -129,7 +138,9 @@ SPDX-License-Identifier: Apache-2.0
           <root url="file://$MODULE_DIR$/lib/java/runtime-z3" />
         </CLASSES>
         <JAVADOC />
-        <SOURCES />
+        <SOURCES>
+          <root url="jar://$MODULE_DIR$/lib/java-contrib/com.microsoft.z3-sources.jar!/" />
+        </SOURCES>
         <jarDirectory url="file://$MODULE_DIR$/lib/java/runtime-z3" recursive="false" />
       </library>
     </orderEntry>
