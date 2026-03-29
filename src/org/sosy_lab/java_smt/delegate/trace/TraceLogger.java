@@ -109,7 +109,7 @@ class TraceLogger implements AutoCloseable {
   public synchronized void appendDef(String pVar, String pExpr) {
     try {
       lastLines.push(output.length());
-      output.write(String.format("var %s = %s;%n", pVar, pExpr).getBytes(StandardCharsets.UTF_8));
+      output.write("var %s = %s;%n".formatted(pVar, pExpr).getBytes(StandardCharsets.UTF_8));
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
@@ -119,7 +119,7 @@ class TraceLogger implements AutoCloseable {
   public synchronized void appendStmt(String pStmt) {
     try {
       lastLines.push(output.length());
-      output.write(String.format("%s;%n", pStmt).getBytes(StandardCharsets.UTF_8));
+      output.write("%s;%n".formatted(pStmt).getBytes(StandardCharsets.UTF_8));
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
@@ -141,8 +141,7 @@ class TraceLogger implements AutoCloseable {
         // We need to remove a line somewhere in the middle
         // Just overwrite it with whitespace to avoid having to move rest of the file around
         output.seek(start);
-        output.write(
-            String.format("%s%n", " ".repeat(line.length())).getBytes(StandardCharsets.UTF_8));
+        output.write("%s%n".formatted(" ".repeat(line.length())).getBytes(StandardCharsets.UTF_8));
         output.seek(output.length());
       }
     } catch (IOException e) {
@@ -259,26 +258,13 @@ class TraceLogger implements AutoCloseable {
     builder.append("\"");
     for (var c : pString.codePoints().toArray()) {
       switch (c) {
-        case '\'':
-          builder.append("\\'");
-          break;
-        case '"':
-          builder.append("\\\"");
-          break;
-        case '\\':
-          builder.append("\\\\");
-          break;
-        case '\n':
-          builder.append("\\n");
-          break;
-        case '\r':
-          builder.append("\\r");
-          break;
-        case '\t':
-          builder.append("\\t");
-          break;
-        default:
-          builder.appendCodePoint(c);
+        case '\'' -> builder.append("\\'");
+        case '"' -> builder.append("\\\"");
+        case '\\' -> builder.append("\\\\");
+        case '\n' -> builder.append("\\n");
+        case '\r' -> builder.append("\\r");
+        case '\t' -> builder.append("\\t");
+        default -> builder.appendCodePoint(c);
       }
     }
     builder.append("\"");
@@ -302,19 +288,19 @@ class TraceLogger implements AutoCloseable {
     }
     if (pType.isArrayType()) {
       ArrayFormulaType<?, ?> arrayType = (ArrayFormulaType<?, ?>) pType;
-      return String.format(
-          "FormulaType.getArrayType(%s, %s)",
-          printFormulaType(arrayType.getIndexType()), printFormulaType(arrayType.getElementType()));
+      return "FormulaType.getArrayType(%s, %s)"
+          .formatted(
+              printFormulaType(arrayType.getIndexType()),
+              printFormulaType(arrayType.getElementType()));
     }
     if (pType.isBitvectorType()) {
       BitvectorType bvType = (BitvectorType) pType;
-      return String.format("FormulaType.getBitvectorTypeWithSize(%s)", bvType.getSize());
+      return "FormulaType.getBitvectorTypeWithSize(%s)".formatted(bvType.getSize());
     }
     if (pType.isFloatingPointType()) {
       FloatingPointType fpType = (FloatingPointType) pType;
-      return String.format(
-          "FormulaType.getFloatingPointTypeFromSizesWithHiddenBit(%s, %s)",
-          fpType.getExponentSize(), fpType.getMantissaSizeWithHiddenBit());
+      return "FormulaType.getFloatingPointTypeFromSizesWithHiddenBit(%s, %s)"
+          .formatted(fpType.getExponentSize(), fpType.getMantissaSizeWithHiddenBit());
     }
     if (pType.isStringType()) {
       return "FormulaType.StringType";
@@ -324,12 +310,11 @@ class TraceLogger implements AutoCloseable {
     }
     if (pType.isEnumerationType()) {
       EnumerationFormulaType enumType = (EnumerationFormulaType) pType;
-      return String.format(
-          "FormulaType.getEnumerationType(%s, Set.of(%s))",
-          enumType.getName(), Joiner.on(", ").join(enumType.getElements()));
+      return "FormulaType.getEnumerationType(%s, Set.of(%s))"
+          .formatted(enumType.getName(), Joiner.on(", ").join(enumType.getElements()));
     }
     // FIXME Handle other cases like SLFormulaType, Function types, etc.
     throw new IllegalArgumentException(
-        String.format("Unsupported formula type %s of class %s.", pType, pType.getClass()));
+        "Unsupported formula type %s of class %s.".formatted(pType, pType.getClass()));
   }
 }

@@ -40,7 +40,7 @@ SPDX-License-Identifier: Apache-2.0
 	<classpathentry kind="lib" path="lib/java/core/checker-qual.jar" sourcepath="lib/java-contrib/checker-qual-sources.jar"/>
 	<classpathentry kind="lib" path="lib/java/runtime-opensmt/opensmt.jar" sourcepath="lib/java-contrib/opensmt-sources.jar"/>
 	<classpathentry kind="lib" path="lib/java/runtime-bitwuzla/bitwuzla.jar" sourcepath="lib/java-contrib/bitwuzla-sources.jar"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-11">
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-17">
 		<attributes>
 			<attribute name="module" value="true"/>
 			<attribute name="limit-modules" value="java.compiler,java.logging,java.management"/>

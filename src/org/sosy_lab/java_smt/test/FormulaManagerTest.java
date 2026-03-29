@@ -177,18 +177,13 @@ public class FormulaManagerTest extends SolverBasedTest0.ParameterizedSolverBase
     @Override
     public Formula visitFunction(
         Formula f, List<Formula> args, FunctionDeclaration<?> functionDeclaration) {
-      switch (functionDeclaration.getKind()) {
-        case AND:
-          return bmgr.and((List<BooleanFormula>) (List<?>) args);
-        case NOT:
-          return bmgr.not((BooleanFormula) args.get(0));
-        case EQ:
-          return mgr.makeEqual(args);
-        case DISTINCT:
-          return mgr.makeDistinct(args);
-        default:
-          throw new UnsupportedOperationException();
-      }
+      return switch (functionDeclaration.getKind()) {
+        case AND -> bmgr.and((List<BooleanFormula>) (List<?>) args);
+        case NOT -> bmgr.not((BooleanFormula) args.get(0));
+        case EQ -> mgr.makeEqual(args);
+        case DISTINCT -> mgr.makeDistinct(args);
+        default -> throw new UnsupportedOperationException();
+      };
     }
   }
 
@@ -222,10 +217,10 @@ public class FormulaManagerTest extends SolverBasedTest0.ParameterizedSolverBase
     var formulaSort = imgr != null ? "Int" : "(_ BitVec 8)";
 
     var str =
-        String.format("(declare-const %s %s)", var1, formulaSort)
-            + String.format("(declare-const %s %s)", var2, formulaSort)
-            + String.format("(declare-const %s %s)", var3, formulaSort)
-            + String.format("(assert (= %s %s %s))", var1, var2, var3);
+        "(declare-const %s %s)".formatted(var1, formulaSort)
+            + "(declare-const %s %s)".formatted(var2, formulaSort)
+            + "(declare-const %s %s)".formatted(var3, formulaSort)
+            + "(assert (= %s %s %s))".formatted(var1, var2, var3);
 
     var f = mgr.makeEqual(var1, var2, var3);
     var g = mgr.parse(str);
@@ -358,10 +353,10 @@ public class FormulaManagerTest extends SolverBasedTest0.ParameterizedSolverBase
     var formulaSort = imgr != null ? "Int" : "(_ BitVec 8)";
 
     var str =
-        String.format("(declare-const %s %s)", var1, formulaSort)
-            + String.format("(declare-const %s %s)", var2, formulaSort)
-            + String.format("(declare-const %s %s)", var3, formulaSort)
-            + String.format("(assert (distinct %s %s %s))", var1, var2, var3);
+        "(declare-const %s %s)".formatted(var1, formulaSort)
+            + "(declare-const %s %s)".formatted(var2, formulaSort)
+            + "(declare-const %s %s)".formatted(var3, formulaSort)
+            + "(assert (distinct %s %s %s))".formatted(var1, var2, var3);
 
     var f = mgr.makeDistinct(var1, var2, var3);
     var g = mgr.parse(str);

@@ -31,9 +31,8 @@ class TraceIntegerFormulaManager extends TraceNumeralFormulaManager<IntegerFormu
       IntegerFormula number1, IntegerFormula number2, BigInteger n) {
     return logger.logDef(
         "mgr.getIntegerFormulaManager()",
-        String.format(
-            "modularCongruence(%s, %s, new BigInteger(\"%s\"))",
-            logger.toVariable(number1), logger.toVariable(number2), n),
+        "modularCongruence(%s, %s, new BigInteger(\"%s\"))"
+            .formatted(logger.toVariable(number1), logger.toVariable(number2), n),
         () -> delegate.modularCongruence(number1, number2, n));
   }
 
@@ -41,9 +40,8 @@ class TraceIntegerFormulaManager extends TraceNumeralFormulaManager<IntegerFormu
   public BooleanFormula modularCongruence(IntegerFormula number1, IntegerFormula number2, long n) {
     return logger.logDef(
         "mgr.getIntegerFormulaManager()",
-        String.format(
-            "modularCongruence(%s, %s, %s)",
-            logger.toVariable(number1), logger.toVariable(number2), n),
+        "modularCongruence(%s, %s, %s)"
+            .formatted(logger.toVariable(number1), logger.toVariable(number2), n),
         () -> delegate.modularCongruence(number1, number2, n));
   }
 
@@ -51,8 +49,7 @@ class TraceIntegerFormulaManager extends TraceNumeralFormulaManager<IntegerFormu
   public IntegerFormula modulo(IntegerFormula numerator, IntegerFormula denominator) {
     return logger.logDef(
         "mgr.getIntegerFormulaManager()",
-        String.format(
-            "modulo(%s, %s)", logger.toVariable(numerator), logger.toVariable(denominator)),
+        "modulo(%s, %s)".formatted(logger.toVariable(numerator), logger.toVariable(denominator)),
         () -> delegate.modulo(numerator, denominator));
   }
 }

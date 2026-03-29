@@ -9,7 +9,6 @@
 package org.sosy_lab.java_smt.solvers.yices2;
 
 import com.google.common.base.Preconditions;
-import com.google.common.primitives.Ints;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import com.sri.yices.Config;
 import com.sri.yices.Context;
@@ -23,7 +22,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.UniqueIdGenerator;
 import org.sosy_lab.common.collect.PathCopyingPersistentTreeMap;
@@ -106,18 +104,13 @@ abstract class Yices2AbstractProver<T> extends AbstractProverWithAllSat<T>
       Status result = satCheck.get(); // the expensive computation
       shutdownNotifier.shutdownIfNecessary();
 
-      switch (result) {
-        case SAT:
-          return true;
-        case UNSAT:
-          return false;
-        case INTERRUPTED:
-          throw new InterruptedException();
-        case UNKNOWN:
-          throw new SolverException("SAT check returned \"unknown\"");
-        default:
-          throw new SolverException("Internal solver exception");
-      }
+      return switch (result) {
+        case SAT -> true;
+        case UNSAT -> false;
+        case INTERRUPTED -> throw new InterruptedException();
+        case UNKNOWN -> throw new SolverException("SAT check returned \"unknown\"");
+        default -> throw new SolverException("Internal solver exception");
+      };
     }
   }
 
@@ -186,8 +179,11 @@ abstract class Yices2AbstractProver<T> extends AbstractProverWithAllSat<T>
   }
 
   private int[] getAllConstraints() {
-    return Ints.toArray(
-        getAssertedFormulas().stream().map(creator::extractInfo).collect(Collectors.toSet()));
+    return getAssertedFormulas().stream()
+        .map(creator::extractInfo)
+        .distinct()
+        .mapToInt(Integer::intValue)
+        .toArray();
   }
 
   @Override

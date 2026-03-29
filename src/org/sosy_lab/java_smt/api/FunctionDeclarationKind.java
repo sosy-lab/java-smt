@@ -326,120 +326,144 @@ public enum FunctionDeclarationKind {
   OTHER;
 
   public static int getArity(FunctionDeclarationKind pKind) {
-    // TODO Add missing kinds
-    switch (pKind) {
-      case AND:
-      case OR:
-      case IFF:
-      case XOR:
-      case IMPLIES:
-      case DISTINCT:
-      case SUB:
-      case ADD:
-      case DIV:
-      case MUL:
-      case LT:
-      case LTE:
-      case GT:
-      case GTE:
-      case EQ:
-      case BV_CONCAT:
-      case BV_OR:
-      case BV_AND:
-      case BV_XOR:
-      case BV_SUB:
-      case BV_ADD:
-      case BV_MUL:
-        return -1;
-
-      case NOT:
-      case UMINUS:
-      case EQ_ZERO:
-      case GTE_ZERO:
-      case FLOOR:
-      case TO_REAL:
-      case CONST:
-      case BV_EXTRACT:
-      case BV_SIGN_EXTENSION:
-      case BV_ZERO_EXTENSION:
-      case BV_NOT:
-      case BV_NEG:
-      case BV_ROTATE_LEFT_BY_INT:
-      case BV_ROTATE_RIGHT_BY_INT:
-      case FP_NEG:
-      case FP_ABS:
-      case FP_IS_NAN:
-      case FP_IS_INF:
-      case FP_IS_ZERO:
-      case FP_IS_NEGATIVE:
-      case FP_IS_SUBNORMAL:
-      case FP_IS_NORMAL:
-      case FP_AS_IEEEBV:
-      case FP_FROM_IEEEBV:
-        return 1;
-
-      case SELECT:
-      case MODULO:
-      case BV_SDIV:
-      case BV_UDIV:
-      case BV_SREM:
-      case BV_UREM:
-      case BV_SMOD:
-      case BV_ULT:
-      case BV_SLT:
-      case BV_ULE:
-      case BV_SLE:
-      case BV_UGT:
-      case BV_SGT:
-      case BV_UGE:
-      case BV_SGE:
-      case BV_SHL:
-      case BV_LSHR:
-      case BV_ASHR:
-      case BV_ROTATE_LEFT:
-      case BV_ROTATE_RIGHT:
-      case BV_UCASTTO_FP:
-      case BV_SCASTTO_FP:
-      case FP_MAX:
-      case FP_MIN:
-      case FP_SQRT:
-      case FP_REM:
-      case FP_LT:
-      case FP_LE:
-      case FP_GE:
-      case FP_GT:
-      case FP_EQ:
-      case FP_ROUND_TO_INTEGRAL:
-      case FP_CASTTO_FP:
-      case FP_CASTTO_SBV:
-      case FP_CASTTO_UBV:
-        return 2;
-
-      case ITE:
-      case STORE:
-      case FP_SUB:
-      case FP_ADD:
-      case FP_DIV:
-      case FP_MUL:
-        return 3;
-
-      default:
-        throw new IllegalArgumentException(String.format("Unsupported kind: \"%s\"", pKind));
-    }
+    return switch (pKind) {
+      case AND,
+          OR,
+          IFF,
+          XOR,
+          IMPLIES,
+          DISTINCT,
+          SUB,
+          ADD,
+          DIV,
+          MUL,
+          LT,
+          LTE,
+          GT,
+          GTE,
+          EQ,
+          BV_CONCAT,
+          BV_OR,
+          BV_AND,
+          BV_XOR,
+          BV_SUB,
+          BV_ADD,
+          BV_MUL,
+          STR_CONCAT,
+          STR_LT,
+          STR_LE,
+          RE_CONCAT,
+          RE_DIFFERENCE,
+          RE_UNION,
+          RE_INTERSECT ->
+          -1;
+      case RE_NONE, SEP_NIL -> 0;
+      case INT_TO_BV,
+          NOT,
+          UMINUS,
+          EQ_ZERO,
+          GTE_ZERO,
+          FLOOR,
+          TO_REAL,
+          CONST,
+          BV_EXTRACT,
+          BV_SIGN_EXTENSION,
+          BV_ZERO_EXTENSION,
+          BV_NOT,
+          BV_NEG,
+          BV_ROTATE_LEFT_BY_INT,
+          BV_ROTATE_RIGHT_BY_INT,
+          UBV_TO_INT,
+          SBV_TO_INT,
+          FP_NEG,
+          FP_ABS,
+          FP_IS_NAN,
+          FP_IS_INF,
+          FP_IS_ZERO,
+          FP_IS_NEGATIVE,
+          FP_IS_SUBNORMAL,
+          FP_IS_NORMAL,
+          FP_AS_IEEEBV,
+          FP_FROM_IEEEBV,
+          RE_PLUS,
+          RE_STAR,
+          INT_TO_STR,
+          STR_FROM_CODE,
+          STR_TO_CODE,
+          STR_LENGTH,
+          STR_TO_INT,
+          STR_TO_RE,
+          RE_COMPLEMENT,
+          RE_OPTIONAL ->
+          1;
+      case SELECT,
+          MODULO,
+          BV_SDIV,
+          BV_UDIV,
+          BV_SREM,
+          BV_UREM,
+          BV_SMOD,
+          BV_ULT,
+          BV_SLT,
+          BV_ULE,
+          BV_SLE,
+          BV_UGT,
+          BV_SGT,
+          BV_UGE,
+          BV_SGE,
+          BV_SHL,
+          BV_LSHR,
+          BV_ASHR,
+          BV_ROTATE_LEFT,
+          BV_ROTATE_RIGHT,
+          BV_UCASTTO_FP,
+          BV_SCASTTO_FP,
+          FP_MAX,
+          FP_MIN,
+          FP_SQRT,
+          FP_REM,
+          FP_LT,
+          FP_LE,
+          FP_GE,
+          FP_GT,
+          FP_EQ,
+          FP_ROUND_TO_INTEGRAL,
+          FP_CASTTO_FP,
+          FP_CASTTO_SBV,
+          FP_CASTTO_UBV,
+          STR_CHAR_AT,
+          STR_CONTAINS,
+          STR_IN_RE,
+          STR_PREFIX,
+          STR_SUFFIX,
+          RE_RANGE,
+          SEP_PTO,
+          SEP_EMP,
+          SEP_STAR,
+          SEP_WAND ->
+          2;
+      case ITE,
+          STORE,
+          FP_SUB,
+          FP_ADD,
+          FP_DIV,
+          FP_MUL,
+          STR_INDEX_OF,
+          STR_REPLACE,
+          STR_REPLACE_ALL,
+          STR_SUBSTRING ->
+          3;
+      default ->
+          throw new IllegalArgumentException(String.format("Unsupported kind: \"%s\"", pKind));
+    };
   }
 
   public static int getNumIndices(FunctionDeclarationKind pKind) {
     // TODO Add missing kinds
-    switch (pKind) {
-      case BV_ROTATE_LEFT_BY_INT:
-      case BV_ROTATE_RIGHT_BY_INT:
-      case BV_SIGN_EXTENSION:
-      case BV_ZERO_EXTENSION:
-        return 1;
-      case BV_EXTRACT:
-        return 2;
-      default:
-        return 0;
-    }
+    return switch (pKind) {
+      case BV_ROTATE_LEFT_BY_INT, BV_ROTATE_RIGHT_BY_INT, BV_SIGN_EXTENSION, BV_ZERO_EXTENSION -> 1;
+      case BV_EXTRACT -> 2;
+      default -> 0;
+    };
   }
 }

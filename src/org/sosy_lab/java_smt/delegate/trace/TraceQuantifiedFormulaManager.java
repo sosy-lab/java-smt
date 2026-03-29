@@ -38,9 +38,9 @@ class TraceQuantifiedFormulaManager implements QuantifiedFormulaManager {
       Quantifier q, List<? extends Formula> pVariables, BooleanFormula pBody) {
     return logger.logDef(
         "mgr.getQuantifiedFormulaManager()",
-        String.format(
-            "mkQuantifier(%s, List.of(%s), %s)",
-            printQuantifier(q), logger.toVariables(pVariables), logger.toVariable(pBody)),
+        "mkQuantifier(%s, List.of(%s), %s)"
+            .formatted(
+                printQuantifier(q), logger.toVariables(pVariables), logger.toVariable(pBody)),
         () -> delegate.mkQuantifier(q, pVariables, pBody));
   }
 
@@ -50,7 +50,7 @@ class TraceQuantifiedFormulaManager implements QuantifiedFormulaManager {
     return mgr.rebuild(
         logger.logDefDiscard(
             "mgr.getQuantifiedFormulaManager()",
-            String.format("eliminateQuantifiers(%s)", logger.toVariable(pF)),
+            "eliminateQuantifiers(%s)".formatted(logger.toVariable(pF)),
             () -> delegate.eliminateQuantifiers(pF)));
   }
 }

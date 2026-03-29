@@ -31,7 +31,7 @@ class TraceArrayFormulaManager implements ArrayFormulaManager {
       ArrayFormula<TI, TE> pArray, TI pIndex) {
     return logger.logDef(
         "mgr.getArrayFormulaManager()",
-        String.format("select(%s, %s)", logger.toVariable(pArray), logger.toVariable(pIndex)),
+        "select(%s, %s)".formatted(logger.toVariable(pArray), logger.toVariable(pIndex)),
         () -> delegate.select(pArray, pIndex));
   }
 
@@ -40,9 +40,9 @@ class TraceArrayFormulaManager implements ArrayFormulaManager {
       ArrayFormula<TI, TE> pArray, TI pIndex, TE pValue) {
     return logger.logDef(
         "mgr.getArrayFormulaManager()",
-        String.format(
-            "store(%s, %s, %s)",
-            logger.toVariable(pArray), logger.toVariable(pIndex), logger.toVariable(pValue)),
+        "store(%s, %s, %s)"
+            .formatted(
+                logger.toVariable(pArray), logger.toVariable(pIndex), logger.toVariable(pValue)),
         () -> delegate.store(pArray, pIndex, pValue));
   }
 
@@ -55,11 +55,11 @@ class TraceArrayFormulaManager implements ArrayFormulaManager {
       ArrayFormula<TI, TE> makeArray(String pName, FTI pIndexType, FTE pElementType) {
     return logger.logDef(
         "mgr.getArrayFormulaManager()",
-        String.format(
-            "makeArray(%s, %s, %s)",
-            logger.printString(pName),
-            logger.printFormulaType(pIndexType),
-            logger.printFormulaType(pElementType)),
+        "makeArray(%s, %s, %s)"
+            .formatted(
+                logger.printString(pName),
+                logger.printFormulaType(pIndexType),
+                logger.printFormulaType(pElementType)),
         () -> delegate.makeArray(pName, pIndexType, pElementType));
   }
 
@@ -72,11 +72,11 @@ class TraceArrayFormulaManager implements ArrayFormulaManager {
       ArrayFormula<TI, TE> makeArray(FTI pIndexType, FTE pElementType, TE defaultElement) {
     return logger.logDef(
         "mgr.getArrayFormulaManager()",
-        String.format(
-            "makeArray(%s, %s, %s)",
-            logger.printFormulaType(pIndexType),
-            logger.printFormulaType(pElementType),
-            logger.toVariable(defaultElement)),
+        "makeArray(%s, %s, %s)"
+            .formatted(
+                logger.printFormulaType(pIndexType),
+                logger.printFormulaType(pElementType),
+                logger.toVariable(defaultElement)),
         () -> delegate.makeArray(pIndexType, pElementType, defaultElement));
   }
 
@@ -85,8 +85,7 @@ class TraceArrayFormulaManager implements ArrayFormulaManager {
       ArrayFormula<TI, TE> pArray1, ArrayFormula<TI, TE> pArray2) {
     return logger.logDef(
         "mgr.getArrayFormulaManager()",
-        String.format(
-            "equivalence(%s, %s)", logger.toVariable(pArray1), logger.toVariable(pArray2)),
+        "equivalence(%s, %s)".formatted(logger.toVariable(pArray1), logger.toVariable(pArray2)),
         () -> delegate.equivalence(pArray1, pArray2));
   }
 

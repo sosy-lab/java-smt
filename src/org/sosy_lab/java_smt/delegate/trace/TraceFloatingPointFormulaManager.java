@@ -59,7 +59,7 @@ class TraceFloatingPointFormulaManager implements FloatingPointFormulaManager {
       FloatingPointRoundingMode pRoundingMode) {
     return logger.logDef(
         "mgr.getFloatingPointFormulaManager()",
-        String.format("makeRoundingMode(%s)", "FloatingPointRoundingMode." + pRoundingMode.name()),
+        "makeRoundingMode(%s)".formatted("FloatingPointRoundingMode." + pRoundingMode.name()),
         () -> delegate.makeRoundingMode(pRoundingMode));
   }
 
@@ -68,7 +68,7 @@ class TraceFloatingPointFormulaManager implements FloatingPointFormulaManager {
       FloatingPointRoundingModeFormula pRoundingModeFormula) {
     return logger.logDefDiscard(
         "mgr.getFloatingPointFormulaManager()",
-        String.format("fromRoundingModeFormula(%s)", logger.toVariable(pRoundingModeFormula)),
+        "fromRoundingModeFormula(%s)".formatted(logger.toVariable(pRoundingModeFormula)),
         () -> delegate.fromRoundingModeFormula(pRoundingModeFormula));
   }
 
@@ -82,11 +82,11 @@ class TraceFloatingPointFormulaManager implements FloatingPointFormulaManager {
       double n, FloatingPointType type, FloatingPointRoundingMode pFloatingPointRoundingMode) {
     return logger.logDef(
         "mgr.getFloatingPointFormulaManager()",
-        String.format(
-            "makeNumber(%s, %s, %s)",
-            printDouble(n),
-            logger.printFormulaType(type),
-            printRoundingMode(pFloatingPointRoundingMode)),
+        "makeNumber(%s, %s, %s)"
+            .formatted(
+                printDouble(n),
+                logger.printFormulaType(type),
+                printRoundingMode(pFloatingPointRoundingMode)),
         () -> delegate.makeNumber(n, type, pFloatingPointRoundingMode));
   }
 
@@ -100,9 +100,9 @@ class TraceFloatingPointFormulaManager implements FloatingPointFormulaManager {
       BigDecimal n, FloatingPointType type, FloatingPointRoundingMode pFloatingPointRoundingMode) {
     return logger.logDef(
         "mgr.getFloatingPointFormulaManager()",
-        String.format(
-            "makeNumber(new BigDecimal(\"%s\"), %s, %s)",
-            n, logger.printFormulaType(type), printRoundingMode(pFloatingPointRoundingMode)),
+        "makeNumber(new BigDecimal(\"%s\"), %s, %s)"
+            .formatted(
+                n, logger.printFormulaType(type), printRoundingMode(pFloatingPointRoundingMode)),
         () -> delegate.makeNumber(n, type, pFloatingPointRoundingMode));
   }
 
@@ -116,9 +116,9 @@ class TraceFloatingPointFormulaManager implements FloatingPointFormulaManager {
       String n, FloatingPointType type, FloatingPointRoundingMode pFloatingPointRoundingMode) {
     return logger.logDef(
         "mgr.getFloatingPointFormulaManager()",
-        String.format(
-            "makeNumber(\"%s\", %s, %s)",
-            n, logger.printFormulaType(type), printRoundingMode(pFloatingPointRoundingMode)),
+        "makeNumber(\"%s\", %s, %s)"
+            .formatted(
+                n, logger.printFormulaType(type), printRoundingMode(pFloatingPointRoundingMode)),
         () -> delegate.makeNumber(n, type, pFloatingPointRoundingMode));
   }
 
@@ -132,9 +132,9 @@ class TraceFloatingPointFormulaManager implements FloatingPointFormulaManager {
       Rational n, FloatingPointType type, FloatingPointRoundingMode pFloatingPointRoundingMode) {
     return logger.logDef(
         "mgr.getFloatingPointFormulaManager()",
-        String.format(
-            "makeNumber(Rational.of(\"%s\"), %s, %s)",
-            n, logger.printFormulaType(type), printRoundingMode(pFloatingPointRoundingMode)),
+        "makeNumber(Rational.of(\"%s\"), %s, %s)"
+            .formatted(
+                n, logger.printFormulaType(type), printRoundingMode(pFloatingPointRoundingMode)),
         () -> delegate.makeNumber(n, type, pFloatingPointRoundingMode));
   }
 
@@ -143,9 +143,8 @@ class TraceFloatingPointFormulaManager implements FloatingPointFormulaManager {
       BigInteger exponent, BigInteger mantissa, Sign sign, FloatingPointType type) {
     return logger.logDef(
         "mgr.getFloatingPointFormulaManager()",
-        String.format(
-            "makeNumber(new BigInteger(\"%s\"), new BigInteger(\"%s\"), %s, %s)",
-            exponent, mantissa, printSign(sign), logger.printFormulaType(type)),
+        "makeNumber(new BigInteger(\"%s\"), new BigInteger(\"%s\"), %s, %s)"
+            .formatted(exponent, mantissa, printSign(sign), logger.printFormulaType(type)),
         () -> delegate.makeNumber(exponent, mantissa, sign, type));
   }
 
@@ -153,8 +152,7 @@ class TraceFloatingPointFormulaManager implements FloatingPointFormulaManager {
   public FloatingPointFormula makeVariable(String pVar, FloatingPointType type) {
     return logger.logDef(
         "mgr.getFloatingPointFormulaManager()",
-        String.format(
-            "makeVariable(%s, %s)", logger.printString(pVar), logger.printFormulaType(type)),
+        "makeVariable(%s, %s)".formatted(logger.printString(pVar), logger.printFormulaType(type)),
         () -> delegate.makeVariable(pVar, type));
   }
 
@@ -162,7 +160,7 @@ class TraceFloatingPointFormulaManager implements FloatingPointFormulaManager {
   public FloatingPointFormula makePlusInfinity(FloatingPointType type) {
     return logger.logDef(
         "mgr.getFloatingPointFormulaManager()",
-        String.format("makePlusInfinity(%s)", logger.printFormulaType(type)),
+        "makePlusInfinity(%s)".formatted(logger.printFormulaType(type)),
         () -> delegate.makePlusInfinity(type));
   }
 
@@ -170,7 +168,7 @@ class TraceFloatingPointFormulaManager implements FloatingPointFormulaManager {
   public FloatingPointFormula makeMinusInfinity(FloatingPointType type) {
     return logger.logDef(
         "mgr.getFloatingPointFormulaManager()",
-        String.format("makeMinusInfinity(%s)", logger.printFormulaType(type)),
+        "makeMinusInfinity(%s)".formatted(logger.printFormulaType(type)),
         () -> delegate.makeMinusInfinity(type));
   }
 
@@ -178,7 +176,7 @@ class TraceFloatingPointFormulaManager implements FloatingPointFormulaManager {
   public FloatingPointFormula makeNaN(FloatingPointType type) {
     return logger.logDef(
         "mgr.getFloatingPointFormulaManager()",
-        String.format("makeNaN(%s)", logger.printFormulaType(type)),
+        "makeNaN(%s)".formatted(logger.printFormulaType(type)),
         () -> delegate.makeNaN(type));
   }
 
@@ -196,12 +194,12 @@ class TraceFloatingPointFormulaManager implements FloatingPointFormulaManager {
       FloatingPointRoundingMode pFloatingPointRoundingMode) {
     return logger.logDef(
         "mgr.getFloatingPointFormulaManager()",
-        String.format(
-            "castTo(%s, %s, %s, %s)",
-            logger.toVariable(source),
-            signed,
-            logger.printFormulaType(targetType),
-            printRoundingMode(pFloatingPointRoundingMode)),
+        "castTo(%s, %s, %s, %s)"
+            .formatted(
+                logger.toVariable(source),
+                signed,
+                logger.printFormulaType(targetType),
+                printRoundingMode(pFloatingPointRoundingMode)),
         () -> delegate.castTo(source, signed, targetType, pFloatingPointRoundingMode));
   }
 
@@ -219,12 +217,12 @@ class TraceFloatingPointFormulaManager implements FloatingPointFormulaManager {
       FloatingPointRoundingMode pFloatingPointRoundingMode) {
     return logger.logDef(
         "mgr.getFloatingPointFormulaManager()",
-        String.format(
-            "castFrom(%s, %s, %s, %s)",
-            logger.toVariable(source),
-            signed,
-            logger.printFormulaType(targetType),
-            printRoundingMode(pFloatingPointRoundingMode)),
+        "castFrom(%s, %s, %s, %s)"
+            .formatted(
+                logger.toVariable(source),
+                signed,
+                logger.printFormulaType(targetType),
+                printRoundingMode(pFloatingPointRoundingMode)),
         () -> delegate.castFrom(source, signed, targetType, pFloatingPointRoundingMode));
   }
 
@@ -233,9 +231,8 @@ class TraceFloatingPointFormulaManager implements FloatingPointFormulaManager {
       BitvectorFormula number, FloatingPointType pTargetType) {
     return logger.logDef(
         "mgr.getFloatingPointFormulaManager()",
-        String.format(
-            "fromIeeeBitvector(%s, %s)",
-            logger.toVariable(number), logger.printFormulaType(pTargetType)),
+        "fromIeeeBitvector(%s, %s)"
+            .formatted(logger.toVariable(number), logger.printFormulaType(pTargetType)),
         () -> delegate.fromIeeeBitvector(number, pTargetType));
   }
 
@@ -243,7 +240,7 @@ class TraceFloatingPointFormulaManager implements FloatingPointFormulaManager {
   public BitvectorFormula toIeeeBitvector(FloatingPointFormula number) {
     return logger.logDef(
         "mgr.getFloatingPointFormulaManager()",
-        String.format("toIeeeBitvector(%s)", logger.toVariable(number)),
+        "toIeeeBitvector(%s)".formatted(logger.toVariable(number)),
         () -> delegate.toIeeeBitvector(number));
   }
 
@@ -252,7 +249,7 @@ class TraceFloatingPointFormulaManager implements FloatingPointFormulaManager {
       FloatingPointFormula formula, FloatingPointRoundingMode roundingMode) {
     return logger.logDef(
         "mgr.getFloatingPointFormulaManager()",
-        String.format("round(%s, %s)", logger.toVariable(formula), printRoundingMode(roundingMode)),
+        "round(%s, %s)".formatted(logger.toVariable(formula), printRoundingMode(roundingMode)),
         () -> delegate.round(formula, roundingMode));
   }
 
@@ -260,7 +257,7 @@ class TraceFloatingPointFormulaManager implements FloatingPointFormulaManager {
   public FloatingPointFormula negate(FloatingPointFormula number) {
     return logger.logDef(
         "mgr.getFloatingPointFormulaManager()",
-        String.format("negate(%s)", logger.toVariable(number)),
+        "negate(%s)".formatted(logger.toVariable(number)),
         () -> delegate.negate(number));
   }
 
@@ -268,7 +265,7 @@ class TraceFloatingPointFormulaManager implements FloatingPointFormulaManager {
   public FloatingPointFormula abs(FloatingPointFormula number) {
     return logger.logDef(
         "mgr.getFloatingPointFormulaManager()",
-        String.format("abs(%s)", logger.toVariable(number)),
+        "abs(%s)".formatted(logger.toVariable(number)),
         () -> delegate.abs(number));
   }
 
@@ -276,7 +273,7 @@ class TraceFloatingPointFormulaManager implements FloatingPointFormulaManager {
   public FloatingPointFormula max(FloatingPointFormula number1, FloatingPointFormula number2) {
     return logger.logDef(
         "mgr.getFloatingPointFormulaManager()",
-        String.format("max(%s, %s)", logger.toVariable(number1), logger.toVariable(number2)),
+        "max(%s, %s)".formatted(logger.toVariable(number1), logger.toVariable(number2)),
         () -> delegate.max(number1, number2));
   }
 
@@ -284,7 +281,7 @@ class TraceFloatingPointFormulaManager implements FloatingPointFormulaManager {
   public FloatingPointFormula min(FloatingPointFormula number1, FloatingPointFormula number2) {
     return logger.logDef(
         "mgr.getFloatingPointFormulaManager()",
-        String.format("min(%s, %s)", logger.toVariable(number1), logger.toVariable(number2)),
+        "min(%s, %s)".formatted(logger.toVariable(number1), logger.toVariable(number2)),
         () -> delegate.min(number1, number2));
   }
 
@@ -298,7 +295,7 @@ class TraceFloatingPointFormulaManager implements FloatingPointFormulaManager {
       FloatingPointFormula number, FloatingPointRoundingMode roundingMode) {
     return logger.logDef(
         "mgr.getFloatingPointFormulaManager()",
-        String.format("sqrt(%s, %s)", logger.toVariable(number), printRoundingMode(roundingMode)),
+        "sqrt(%s, %s)".formatted(logger.toVariable(number), printRoundingMode(roundingMode)),
         () -> delegate.sqrt(number, roundingMode));
   }
 
@@ -314,11 +311,11 @@ class TraceFloatingPointFormulaManager implements FloatingPointFormulaManager {
       FloatingPointRoundingMode pFloatingPointRoundingMode) {
     return logger.logDef(
         "mgr.getFloatingPointFormulaManager()",
-        String.format(
-            "add(%s, %s, %s)",
-            logger.toVariable(number1),
-            logger.toVariable(number2),
-            printRoundingMode(pFloatingPointRoundingMode)),
+        "add(%s, %s, %s)"
+            .formatted(
+                logger.toVariable(number1),
+                logger.toVariable(number2),
+                printRoundingMode(pFloatingPointRoundingMode)),
         () -> delegate.add(number1, number2, pFloatingPointRoundingMode));
   }
 
@@ -334,11 +331,11 @@ class TraceFloatingPointFormulaManager implements FloatingPointFormulaManager {
       FloatingPointRoundingMode pFloatingPointRoundingMode) {
     return logger.logDef(
         "mgr.getFloatingPointFormulaManager()",
-        String.format(
-            "subtract(%s, %s, %s)",
-            logger.toVariable(number1),
-            logger.toVariable(number2),
-            printRoundingMode(pFloatingPointRoundingMode)),
+        "subtract(%s, %s, %s)"
+            .formatted(
+                logger.toVariable(number1),
+                logger.toVariable(number2),
+                printRoundingMode(pFloatingPointRoundingMode)),
         () -> delegate.subtract(number1, number2, pFloatingPointRoundingMode));
   }
 
@@ -354,11 +351,11 @@ class TraceFloatingPointFormulaManager implements FloatingPointFormulaManager {
       FloatingPointRoundingMode pFloatingPointRoundingMode) {
     return logger.logDef(
         "mgr.getFloatingPointFormulaManager()",
-        String.format(
-            "divide(%s, %s, %s)",
-            logger.toVariable(number1),
-            logger.toVariable(number2),
-            printRoundingMode(pFloatingPointRoundingMode)),
+        "divide(%s, %s, %s)"
+            .formatted(
+                logger.toVariable(number1),
+                logger.toVariable(number2),
+                printRoundingMode(pFloatingPointRoundingMode)),
         () -> delegate.divide(number1, number2, pFloatingPointRoundingMode));
   }
 
@@ -374,11 +371,11 @@ class TraceFloatingPointFormulaManager implements FloatingPointFormulaManager {
       FloatingPointRoundingMode pFloatingPointRoundingMode) {
     return logger.logDef(
         "mgr.getFloatingPointFormulaManager()",
-        String.format(
-            "multiply(%s, %s, %s)",
-            logger.toVariable(number1),
-            logger.toVariable(number2),
-            printRoundingMode(pFloatingPointRoundingMode)),
+        "multiply(%s, %s, %s)"
+            .formatted(
+                logger.toVariable(number1),
+                logger.toVariable(number2),
+                printRoundingMode(pFloatingPointRoundingMode)),
         () -> delegate.multiply(number1, number2, pFloatingPointRoundingMode));
   }
 
@@ -387,7 +384,7 @@ class TraceFloatingPointFormulaManager implements FloatingPointFormulaManager {
       FloatingPointFormula dividend, FloatingPointFormula divisor) {
     return logger.logDef(
         "mgr.getFloatingPointFormulaManager()",
-        String.format("remainder(%s, %s)", logger.toVariable(dividend), logger.toVariable(divisor)),
+        "remainder(%s, %s)".formatted(logger.toVariable(dividend), logger.toVariable(divisor)),
         () -> delegate.remainder(dividend, divisor));
   }
 
@@ -395,7 +392,7 @@ class TraceFloatingPointFormulaManager implements FloatingPointFormulaManager {
   public BooleanFormula assignment(FloatingPointFormula number1, FloatingPointFormula number2) {
     return logger.logDef(
         "mgr.getFloatingPointFormulaManager()",
-        String.format("assignment(%s, %s)", logger.toVariable(number1), logger.toVariable(number2)),
+        "assignment(%s, %s)".formatted(logger.toVariable(number1), logger.toVariable(number2)),
         () -> delegate.assignment(number1, number2));
   }
 
@@ -404,8 +401,8 @@ class TraceFloatingPointFormulaManager implements FloatingPointFormulaManager {
       FloatingPointFormula number1, FloatingPointFormula number2) {
     return logger.logDef(
         "mgr.getFloatingPointFormulaManager()",
-        String.format(
-            "equalWithFPSemantics(%s, %s)", logger.toVariable(number1), logger.toVariable(number2)),
+        "equalWithFPSemantics(%s, %s)"
+            .formatted(logger.toVariable(number1), logger.toVariable(number2)),
         () -> delegate.equalWithFPSemantics(number1, number2));
   }
 
@@ -413,8 +410,7 @@ class TraceFloatingPointFormulaManager implements FloatingPointFormulaManager {
   public BooleanFormula greaterThan(FloatingPointFormula number1, FloatingPointFormula number2) {
     return logger.logDef(
         "mgr.getFloatingPointFormulaManager()",
-        String.format(
-            "greaterThan(%s, %s)", logger.toVariable(number1), logger.toVariable(number2)),
+        "greaterThan(%s, %s)".formatted(logger.toVariable(number1), logger.toVariable(number2)),
         () -> delegate.greaterThan(number1, number2));
   }
 
@@ -423,8 +419,7 @@ class TraceFloatingPointFormulaManager implements FloatingPointFormulaManager {
       FloatingPointFormula number1, FloatingPointFormula number2) {
     return logger.logDef(
         "mgr.getFloatingPointFormulaManager()",
-        String.format(
-            "greaterOrEquals(%s, %s)", logger.toVariable(number1), logger.toVariable(number2)),
+        "greaterOrEquals(%s, %s)".formatted(logger.toVariable(number1), logger.toVariable(number2)),
         () -> delegate.greaterOrEquals(number1, number2));
   }
 
@@ -432,7 +427,7 @@ class TraceFloatingPointFormulaManager implements FloatingPointFormulaManager {
   public BooleanFormula lessThan(FloatingPointFormula number1, FloatingPointFormula number2) {
     return logger.logDef(
         "mgr.getFloatingPointFormulaManager()",
-        String.format("lessThan(%s, %s)", logger.toVariable(number1), logger.toVariable(number2)),
+        "lessThan(%s, %s)".formatted(logger.toVariable(number1), logger.toVariable(number2)),
         () -> delegate.lessThan(number1, number2));
   }
 
@@ -440,8 +435,7 @@ class TraceFloatingPointFormulaManager implements FloatingPointFormulaManager {
   public BooleanFormula lessOrEquals(FloatingPointFormula number1, FloatingPointFormula number2) {
     return logger.logDef(
         "mgr.getFloatingPointFormulaManager()",
-        String.format(
-            "lessOrEquals(%s, %s)", logger.toVariable(number1), logger.toVariable(number2)),
+        "lessOrEquals(%s, %s)".formatted(logger.toVariable(number1), logger.toVariable(number2)),
         () -> delegate.lessOrEquals(number1, number2));
   }
 
@@ -449,7 +443,7 @@ class TraceFloatingPointFormulaManager implements FloatingPointFormulaManager {
   public BooleanFormula isNaN(FloatingPointFormula number) {
     return logger.logDef(
         "mgr.getFloatingPointFormulaManager()",
-        String.format("isNaN(%s)", logger.toVariable(number)),
+        "isNaN(%s)".formatted(logger.toVariable(number)),
         () -> delegate.isNaN(number));
   }
 
@@ -457,7 +451,7 @@ class TraceFloatingPointFormulaManager implements FloatingPointFormulaManager {
   public BooleanFormula isInfinity(FloatingPointFormula number) {
     return logger.logDef(
         "mgr.getFloatingPointFormulaManager()",
-        String.format("isInfinity(%s)", logger.toVariable(number)),
+        "isInfinity(%s)".formatted(logger.toVariable(number)),
         () -> delegate.isInfinity(number));
   }
 
@@ -465,7 +459,7 @@ class TraceFloatingPointFormulaManager implements FloatingPointFormulaManager {
   public BooleanFormula isZero(FloatingPointFormula number) {
     return logger.logDef(
         "mgr.getFloatingPointFormulaManager()",
-        String.format("isZero(%s)", logger.toVariable(number)),
+        "isZero(%s)".formatted(logger.toVariable(number)),
         () -> delegate.isZero(number));
   }
 
@@ -473,7 +467,7 @@ class TraceFloatingPointFormulaManager implements FloatingPointFormulaManager {
   public BooleanFormula isNormal(FloatingPointFormula number) {
     return logger.logDef(
         "mgr.getFloatingPointFormulaManager()",
-        String.format("isNormal(%s)", logger.toVariable(number)),
+        "isNormal(%s)".formatted(logger.toVariable(number)),
         () -> delegate.isNormal(number));
   }
 
@@ -481,7 +475,7 @@ class TraceFloatingPointFormulaManager implements FloatingPointFormulaManager {
   public BooleanFormula isSubnormal(FloatingPointFormula number) {
     return logger.logDef(
         "mgr.getFloatingPointFormulaManager()",
-        String.format("isSubnormal(%s)", logger.toVariable(number)),
+        "isSubnormal(%s)".formatted(logger.toVariable(number)),
         () -> delegate.isSubnormal(number));
   }
 
@@ -489,7 +483,7 @@ class TraceFloatingPointFormulaManager implements FloatingPointFormulaManager {
   public BooleanFormula isNegative(FloatingPointFormula number) {
     return logger.logDef(
         "mgr.getFloatingPointFormulaManager()",
-        String.format("isNegative(%s)", logger.toVariable(number)),
+        "isNegative(%s)".formatted(logger.toVariable(number)),
         () -> delegate.isNegative(number));
   }
 }

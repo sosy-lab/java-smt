@@ -79,7 +79,7 @@ public class SLFormulaManagerTest extends SolverBasedTest0.ParameterizedSolverBa
       if (solverToUse() == Solvers.CVC5) {
         assertThatEnvironment(prover).isSatisfiable();
       } else {
-        assertThrows(Exception.class, () -> prover.isUnsat());
+        assertThrows(Exception.class, prover::isUnsat);
       }
       prover.pop();
     }

@@ -70,8 +70,7 @@ class CVC4Model extends AbstractModel<Expr, Type, ExprManager> {
     // collecting duplicate terms
     // (This problem has been fixed on CVC5/Bitwula)
     var cache = new HashSet<CVC4Formula>();
-    var work = new ArrayDeque<CVC4Formula>();
-    work.addAll(Collections2.transform(asserted, CVC4Formula::new));
+    var work = new ArrayDeque<>(Collections2.transform(asserted, CVC4Formula::new));
     while (!work.isEmpty()) {
       var next = work.pop();
       if (cache.add(next)) {

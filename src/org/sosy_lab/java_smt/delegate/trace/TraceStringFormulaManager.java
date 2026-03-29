@@ -31,7 +31,7 @@ class TraceStringFormulaManager implements StringFormulaManager {
   public StringFormula makeString(String value) {
     return logger.logDef(
         "mgr.getStringFormulaManager()",
-        String.format("makeString(%s)", logger.printString(value)),
+        "makeString(%s)".formatted(logger.printString(value)),
         () -> delegate.makeString(value));
   }
 
@@ -39,7 +39,7 @@ class TraceStringFormulaManager implements StringFormulaManager {
   public StringFormula makeVariable(String pVar) {
     return logger.logDef(
         "mgr.getStringFormulaManager()",
-        String.format("makeVariable(%s)", logger.printString(pVar)),
+        "makeVariable(%s)".formatted(logger.printString(pVar)),
         () -> delegate.makeVariable(pVar));
   }
 
@@ -47,7 +47,7 @@ class TraceStringFormulaManager implements StringFormulaManager {
   public BooleanFormula equal(StringFormula str1, StringFormula str2) {
     return logger.logDef(
         "mgr.getStringFormulaManager()",
-        String.format("equal(%s, %s)", logger.toVariable(str1), logger.toVariable(str2)),
+        "equal(%s, %s)".formatted(logger.toVariable(str1), logger.toVariable(str2)),
         () -> delegate.equal(str1, str2));
   }
 
@@ -55,7 +55,7 @@ class TraceStringFormulaManager implements StringFormulaManager {
   public BooleanFormula greaterThan(StringFormula str1, StringFormula str2) {
     return logger.logDef(
         "mgr.getStringFormulaManager()",
-        String.format("greaterThan(%s, %s)", logger.toVariable(str1), logger.toVariable(str2)),
+        "greaterThan(%s, %s)".formatted(logger.toVariable(str1), logger.toVariable(str2)),
         () -> delegate.greaterThan(str1, str2));
   }
 
@@ -63,7 +63,7 @@ class TraceStringFormulaManager implements StringFormulaManager {
   public BooleanFormula greaterOrEquals(StringFormula str1, StringFormula str2) {
     return logger.logDef(
         "mgr.getStringFormulaManager()",
-        String.format("greaterOrEquals(%s, %s)", logger.toVariable(str1), logger.toVariable(str2)),
+        "greaterOrEquals(%s, %s)".formatted(logger.toVariable(str1), logger.toVariable(str2)),
         () -> delegate.greaterOrEquals(str1, str2));
   }
 
@@ -71,7 +71,7 @@ class TraceStringFormulaManager implements StringFormulaManager {
   public BooleanFormula lessThan(StringFormula str1, StringFormula str2) {
     return logger.logDef(
         "mgr.getStringFormulaManager()",
-        String.format("lessThan(%s, %s)", logger.toVariable(str1), logger.toVariable(str2)),
+        "lessThan(%s, %s)".formatted(logger.toVariable(str1), logger.toVariable(str2)),
         () -> delegate.lessThan(str1, str2));
   }
 
@@ -79,7 +79,7 @@ class TraceStringFormulaManager implements StringFormulaManager {
   public BooleanFormula lessOrEquals(StringFormula str1, StringFormula str2) {
     return logger.logDef(
         "mgr.getStringFormulaManager()",
-        String.format("lessOrEquals(%s, %s)", logger.toVariable(str1), logger.toVariable(str2)),
+        "lessOrEquals(%s, %s)".formatted(logger.toVariable(str1), logger.toVariable(str2)),
         () -> delegate.lessOrEquals(str1, str2));
   }
 
@@ -87,7 +87,7 @@ class TraceStringFormulaManager implements StringFormulaManager {
   public BooleanFormula prefix(StringFormula prefix, StringFormula str) {
     return logger.logDef(
         "mgr.getStringFormulaManager()",
-        String.format("prefix(%s, %s)", logger.toVariable(prefix), logger.toVariable(str)),
+        "prefix(%s, %s)".formatted(logger.toVariable(prefix), logger.toVariable(str)),
         () -> delegate.prefix(prefix, str));
   }
 
@@ -95,7 +95,7 @@ class TraceStringFormulaManager implements StringFormulaManager {
   public BooleanFormula suffix(StringFormula suffix, StringFormula str) {
     return logger.logDef(
         "mgr.getStringFormulaManager()",
-        String.format("suffix(%s, %s)", logger.toVariable(suffix), logger.toVariable(str)),
+        "suffix(%s, %s)".formatted(logger.toVariable(suffix), logger.toVariable(str)),
         () -> delegate.suffix(suffix, str));
   }
 
@@ -103,7 +103,7 @@ class TraceStringFormulaManager implements StringFormulaManager {
   public BooleanFormula contains(StringFormula str, StringFormula part) {
     return logger.logDef(
         "mgr.getStringFormulaManager()",
-        String.format("contains(%s, %s)", logger.toVariable(str), logger.toVariable(part)),
+        "contains(%s, %s)".formatted(logger.toVariable(str), logger.toVariable(part)),
         () -> delegate.contains(str, part));
   }
 
@@ -111,9 +111,9 @@ class TraceStringFormulaManager implements StringFormulaManager {
   public IntegerFormula indexOf(StringFormula str, StringFormula part, IntegerFormula startIndex) {
     return logger.logDef(
         "mgr.getStringFormulaManager()",
-        String.format(
-            "indexOf(%s, %s, %s)",
-            logger.toVariable(str), logger.toVariable(part), logger.toVariable(startIndex)),
+        "indexOf(%s, %s, %s)"
+            .formatted(
+                logger.toVariable(str), logger.toVariable(part), logger.toVariable(startIndex)),
         () -> delegate.indexOf(str, part, startIndex));
   }
 
@@ -121,7 +121,7 @@ class TraceStringFormulaManager implements StringFormulaManager {
   public StringFormula charAt(StringFormula str, IntegerFormula index) {
     return logger.logDef(
         "mgr.getStringFormulaManager()",
-        String.format("charAt(%s, %s)", logger.toVariable(str), logger.toVariable(index)),
+        "charAt(%s, %s)".formatted(logger.toVariable(str), logger.toVariable(index)),
         () -> delegate.charAt(str, index));
   }
 
@@ -129,9 +129,8 @@ class TraceStringFormulaManager implements StringFormulaManager {
   public StringFormula substring(StringFormula str, IntegerFormula index, IntegerFormula length) {
     return logger.logDef(
         "mgr.getStringFormulaManager()",
-        String.format(
-            "substring(%s, %s, %s)",
-            logger.toVariable(str), logger.toVariable(index), logger.toVariable(length)),
+        "substring(%s, %s, %s)"
+            .formatted(logger.toVariable(str), logger.toVariable(index), logger.toVariable(length)),
         () -> delegate.substring(str, index, length));
   }
 
@@ -140,9 +139,11 @@ class TraceStringFormulaManager implements StringFormulaManager {
       StringFormula fullStr, StringFormula target, StringFormula replacement) {
     return logger.logDef(
         "mgr.getStringFormulaManager()",
-        String.format(
-            "replace(%s, %s, %s)",
-            logger.toVariable(fullStr), logger.toVariable(target), logger.toVariable(replacement)),
+        "replace(%s, %s, %s)"
+            .formatted(
+                logger.toVariable(fullStr),
+                logger.toVariable(target),
+                logger.toVariable(replacement)),
         () -> delegate.replace(fullStr, target, replacement));
   }
 
@@ -151,9 +152,11 @@ class TraceStringFormulaManager implements StringFormulaManager {
       StringFormula fullStr, StringFormula target, StringFormula replacement) {
     return logger.logDef(
         "mgr.getStringFormulaManager()",
-        String.format(
-            "replaceAll(%s, %s, %s)",
-            logger.toVariable(fullStr), logger.toVariable(target), logger.toVariable(replacement)),
+        "replaceAll(%s, %s, %s)"
+            .formatted(
+                logger.toVariable(fullStr),
+                logger.toVariable(target),
+                logger.toVariable(replacement)),
         () -> delegate.replaceAll(fullStr, target, replacement));
   }
 
@@ -161,7 +164,7 @@ class TraceStringFormulaManager implements StringFormulaManager {
   public IntegerFormula length(StringFormula str) {
     return logger.logDef(
         "mgr.getStringFormulaManager()",
-        String.format("length(%s)", logger.toVariable(str)),
+        "length(%s)".formatted(logger.toVariable(str)),
         () -> delegate.length(str));
   }
 
@@ -169,9 +172,9 @@ class TraceStringFormulaManager implements StringFormulaManager {
   public StringFormula concat(List<StringFormula> parts) {
     return logger.logDef(
         "mgr.getStringFormulaManager()",
-        String.format(
-            "concat(%s)",
-            parts.stream().map(logger::toVariable).reduce((a, b) -> a + ", " + b).orElse("")),
+        "concat(%s)"
+            .formatted(
+                parts.stream().map(logger::toVariable).reduce((a, b) -> a + ", " + b).orElse("")),
         () -> delegate.concat(parts));
   }
 
@@ -179,7 +182,7 @@ class TraceStringFormulaManager implements StringFormulaManager {
   public BooleanFormula in(StringFormula str, RegexFormula regex) {
     return logger.logDef(
         "mgr.getStringFormulaManager()",
-        String.format("in(%s, %s)", logger.toVariable(str), logger.toVariable(regex)),
+        "in(%s, %s)".formatted(logger.toVariable(str), logger.toVariable(regex)),
         () -> delegate.in(str, regex));
   }
 
@@ -187,7 +190,7 @@ class TraceStringFormulaManager implements StringFormulaManager {
   public RegexFormula makeRegex(String value) {
     return logger.logDef(
         "mgr.getStringFormulaManager()",
-        String.format("makeRegex(%s)", logger.printString(value)),
+        "makeRegex(%s)".formatted(logger.printString(value)),
         () -> delegate.makeRegex(value));
   }
 
@@ -210,7 +213,7 @@ class TraceStringFormulaManager implements StringFormulaManager {
   public RegexFormula range(StringFormula start, StringFormula end) {
     return logger.logDef(
         "mgr.getStringFormulaManager()",
-        String.format("range(%s, %s)", logger.toVariable(start), logger.toVariable(end)),
+        "range(%s, %s)".formatted(logger.toVariable(start), logger.toVariable(end)),
         () -> delegate.range(start, end));
   }
 
@@ -218,7 +221,7 @@ class TraceStringFormulaManager implements StringFormulaManager {
   public RegexFormula concatRegex(List<RegexFormula> parts) {
     return logger.logDef(
         "mgr.getStringFormulaManager()",
-        String.format("concatRegex(%s)", logger.toVariables(parts)),
+        "concatRegex(%s)".formatted(logger.toVariables(parts)),
         () -> delegate.concatRegex(parts));
   }
 
@@ -226,7 +229,7 @@ class TraceStringFormulaManager implements StringFormulaManager {
   public RegexFormula union(RegexFormula regex1, RegexFormula regex2) {
     return logger.logDef(
         "mgr.getStringFormulaManager()",
-        String.format("union(%s, %s)", logger.toVariable(regex1), logger.toVariable(regex2)),
+        "union(%s, %s)".formatted(logger.toVariable(regex1), logger.toVariable(regex2)),
         () -> delegate.union(regex1, regex2));
   }
 
@@ -234,7 +237,7 @@ class TraceStringFormulaManager implements StringFormulaManager {
   public RegexFormula intersection(RegexFormula regex1, RegexFormula regex2) {
     return logger.logDef(
         "mgr.getStringFormulaManager()",
-        String.format("intersection(%s, %s)", logger.toVariable(regex1), logger.toVariable(regex2)),
+        "intersection(%s, %s)".formatted(logger.toVariable(regex1), logger.toVariable(regex2)),
         () -> delegate.intersection(regex1, regex2));
   }
 
@@ -242,7 +245,7 @@ class TraceStringFormulaManager implements StringFormulaManager {
   public RegexFormula complement(RegexFormula regex) {
     return logger.logDef(
         "mgr.getStringFormulaManager()",
-        String.format("complement(%s)", logger.toVariable(regex)),
+        "complement(%s)".formatted(logger.toVariable(regex)),
         () -> delegate.complement(regex));
   }
 
@@ -250,7 +253,7 @@ class TraceStringFormulaManager implements StringFormulaManager {
   public RegexFormula closure(RegexFormula regex) {
     return logger.logDef(
         "mgr.getStringFormulaManager()",
-        String.format("closure(%s)", logger.toVariable(regex)),
+        "closure(%s)".formatted(logger.toVariable(regex)),
         () -> delegate.closure(regex));
   }
 
@@ -258,7 +261,7 @@ class TraceStringFormulaManager implements StringFormulaManager {
   public RegexFormula difference(RegexFormula regex1, RegexFormula regex2) {
     return logger.logDef(
         "mgr.getStringFormulaManager()",
-        String.format("difference(%s, %s)", logger.toVariable(regex1), logger.toVariable(regex2)),
+        "difference(%s, %s)".formatted(logger.toVariable(regex1), logger.toVariable(regex2)),
         () -> delegate.difference(regex1, regex2));
   }
 
@@ -266,7 +269,7 @@ class TraceStringFormulaManager implements StringFormulaManager {
   public RegexFormula cross(RegexFormula regex) {
     return logger.logDef(
         "mgr.getStringFormulaManager()",
-        String.format("cross(%s)", logger.toVariable(regex)),
+        "cross(%s)".formatted(logger.toVariable(regex)),
         () -> delegate.cross(regex));
   }
 
@@ -274,7 +277,7 @@ class TraceStringFormulaManager implements StringFormulaManager {
   public RegexFormula optional(RegexFormula regex) {
     return logger.logDef(
         "mgr.getStringFormulaManager()",
-        String.format("optional(%s)", logger.toVariable(regex)),
+        "optional(%s)".formatted(logger.toVariable(regex)),
         () -> delegate.optional(regex));
   }
 
@@ -282,7 +285,7 @@ class TraceStringFormulaManager implements StringFormulaManager {
   public RegexFormula times(RegexFormula regex, int repetitions) {
     return logger.logDef(
         "mgr.getStringFormulaManager()",
-        String.format("times(%s, %d)", logger.toVariable(regex), repetitions),
+        "times(%s, %d)".formatted(logger.toVariable(regex), repetitions),
         () -> delegate.times(regex, repetitions));
   }
 
@@ -290,7 +293,7 @@ class TraceStringFormulaManager implements StringFormulaManager {
   public IntegerFormula toIntegerFormula(StringFormula str) {
     return logger.logDef(
         "mgr.getStringFormulaManager()",
-        String.format("toIntegerFormula(%s)", logger.toVariable(str)),
+        "toIntegerFormula(%s)".formatted(logger.toVariable(str)),
         () -> delegate.toIntegerFormula(str));
   }
 
@@ -298,7 +301,7 @@ class TraceStringFormulaManager implements StringFormulaManager {
   public StringFormula toStringFormula(IntegerFormula number) {
     return logger.logDef(
         "mgr.getStringFormulaManager()",
-        String.format("toStringFormula(%s)", logger.toVariable(number)),
+        "toStringFormula(%s)".formatted(logger.toVariable(number)),
         () -> delegate.toStringFormula(number));
   }
 
@@ -306,7 +309,7 @@ class TraceStringFormulaManager implements StringFormulaManager {
   public IntegerFormula toCodePoint(StringFormula str) {
     return logger.logDef(
         "mgr.getStringFormulaManager()",
-        String.format("toCodePoint(%s)", logger.toVariable(str)),
+        "toCodePoint(%s)".formatted(logger.toVariable(str)),
         () -> delegate.toCodePoint(str));
   }
 
@@ -314,7 +317,7 @@ class TraceStringFormulaManager implements StringFormulaManager {
   public StringFormula fromCodePoint(IntegerFormula codePoint) {
     return logger.logDef(
         "mgr.getStringFormulaManager()",
-        String.format("fromCodePoint(%s)", logger.toVariable(codePoint)),
+        "fromCodePoint(%s)".formatted(logger.toVariable(codePoint)),
         () -> delegate.fromCodePoint(codePoint));
   }
 }

@@ -193,11 +193,7 @@ public interface FormulaType<T extends Formula> {
       if (pObj == this) {
         return true;
       }
-      if (!(pObj instanceof BitvectorType)) {
-        return false;
-      }
-      BitvectorType other = (BitvectorType) pObj;
-      return size == other.size;
+      return (pObj instanceof BitvectorType other) && size == other.size;
     }
 
     @Override
@@ -391,11 +387,8 @@ public interface FormulaType<T extends Formula> {
       if (this == obj) {
         return true;
       }
-      if (!(obj instanceof FloatingPointType)) {
-        return false;
-      }
-      FloatingPointType other = (FloatingPointType) obj;
-      return this.exponentSize == other.exponentSize
+      return (obj instanceof FloatingPointType other)
+          && this.exponentSize == other.exponentSize
           && this.mantissaSizeWithoutHiddenBit == other.mantissaSizeWithoutHiddenBit;
     }
 
@@ -465,7 +458,7 @@ public interface FormulaType<T extends Formula> {
 
     @Override
     public String toString() {
-      return String.format("Array<%s,%s>", indexType, elementType);
+      return "Array<%s,%s>".formatted(indexType, elementType);
     }
 
     @Override
@@ -478,11 +471,9 @@ public interface FormulaType<T extends Formula> {
       if (this == obj) {
         return true;
       }
-      if (!(obj instanceof ArrayFormulaType)) {
-        return false;
-      }
-      ArrayFormulaType<?, ?> other = (ArrayFormulaType<?, ?>) obj;
-      return elementType.equals(other.elementType) && indexType.equals(other.indexType);
+      return (obj instanceof ArrayFormulaType<?, ?> other)
+          && elementType.equals(other.elementType)
+          && indexType.equals(other.indexType);
     }
 
     @Override
@@ -524,7 +515,7 @@ public interface FormulaType<T extends Formula> {
 
     @Override
     public String toString() {
-      return String.format("%s (%s)", name, Joiner.on(", ").join(elements));
+      return "%s (%s)".formatted(name, Joiner.on(", ").join(elements));
     }
 
     @Override
@@ -537,11 +528,9 @@ public interface FormulaType<T extends Formula> {
       if (this == obj) {
         return true;
       }
-      if (!(obj instanceof EnumerationFormulaType)) {
-        return false;
-      }
-      EnumerationFormulaType other = (EnumerationFormulaType) obj;
-      return name.equals(other.name) && elements.equals(other.elements);
+      return (obj instanceof EnumerationFormulaType other)
+          && name.equals(other.name)
+          && elements.equals(other.elements);
     }
 
     @Override

@@ -154,10 +154,7 @@ public class UFManagerTest extends SolverBasedTest0.ParameterizedSolverBasedTest
 
       Formula f2 = mgr.makeApplication(declaration, imgr.makeNumber(1));
       switch (solverToUse()) {
-        case CVC5:
-        case SMTINTERPOL:
-        case Z3:
-        case Z3_WITH_INTERPOLATION:
+        case CVC5, SMTINTERPOL, Z3, Z3_WITH_INTERPOLATION -> {
           // some solvers have an explicit cast for the parameter
           assertThat(f2).isNotEqualTo(f);
           List<Formula> args = getArguments(f2);
@@ -168,9 +165,8 @@ public class UFManagerTest extends SolverBasedTest0.ParameterizedSolverBasedTest
           List<Formula> castedValues = getArguments(args.get(0));
           assertThat(castedValues).hasSize(1);
           assertThat(castedValues.get(0).toString()).isEqualTo("1");
-          break;
-        default:
-          assertThat(f2).isEqualTo(f);
+        }
+        default -> assertThat(f2).isEqualTo(f);
       }
 
       assertThatFormula(rmgr.equal(value, x))
