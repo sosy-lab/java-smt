@@ -87,7 +87,7 @@ public class TraceSolverContext implements SolverContext {
             + FluentIterable.from(configurationOptions.entrySet())
                 .transform(
                     (Entry<String, String> e) ->
-                        String.format(".setOption(\"%s\", \"%s\")", e.getKey(), e.getValue()))
+                        ".setOption(\"%s\", \"%s\")".formatted(e.getKey(), e.getValue()))
                 .join(Joiner.on(""))
             + ".build()");
     logger.appendDef("logger", "LogManager.createNullLogManager()");
@@ -135,7 +135,7 @@ public class TraceSolverContext implements SolverContext {
   public ProverEnvironment newProverEnvironment(ProverOptions... options) {
     return logger.logDefKeep(
         "context",
-        String.format("newProverEnvironment(%s)", getOptionsForLogging(options)),
+        "newProverEnvironment(%s)".formatted(getOptionsForLogging(options)),
         () -> new TraceProverEnvironment(delegate.newProverEnvironment(options), mgr, logger));
   }
 
@@ -145,7 +145,7 @@ public class TraceSolverContext implements SolverContext {
       ProverOptions... options) {
     return logger.logDefKeep(
         "context",
-        String.format("newProverEnvironmentWithInterpolation(%s)", getOptionsForLogging(options)),
+        "newProverEnvironmentWithInterpolation(%s)".formatted(getOptionsForLogging(options)),
         () ->
             new TraceInterpolatingProverEnvironment<>(
                 delegate.newProverEnvironmentWithInterpolation(options), mgr, logger));
@@ -156,7 +156,7 @@ public class TraceSolverContext implements SolverContext {
   public OptimizationProverEnvironment newOptimizationProverEnvironment(ProverOptions... options) {
     return logger.logDefKeep(
         "context",
-        String.format("newOptimizationProverEnvironment(%s)", getOptionsForLogging(options)),
+        "newOptimizationProverEnvironment(%s)".formatted(getOptionsForLogging(options)),
         () ->
             new TraceOptimizationProverEnvironment(
                 delegate.newOptimizationProverEnvironment(options), mgr, logger));

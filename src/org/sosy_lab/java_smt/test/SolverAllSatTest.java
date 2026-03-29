@@ -68,24 +68,20 @@ public class SolverAllSatTest extends SolverBasedTest0 {
   @Before
   public void setupEnvironment() {
     switch (proverEnv) {
-      case "normal":
-        env = context.newProverEnvironment(ProverOptions.GENERATE_ALL_SAT);
-        break;
-      case "itp":
+      case "normal" -> env = context.newProverEnvironment(ProverOptions.GENERATE_ALL_SAT);
+      case "itp" -> {
         requireInterpolation();
 
         // TODO how can we support allsat in MathSat5-interpolation-prover?
         assume().that(solverToUse()).isNotEqualTo(Solvers.MATHSAT5);
 
         env = context.newProverEnvironmentWithInterpolation(ProverOptions.GENERATE_ALL_SAT);
-        break;
-
-      case "opt":
+      }
+      case "opt" -> {
         requireOptimization();
         env = context.newOptimizationProverEnvironment(ProverOptions.GENERATE_ALL_SAT);
-        break;
-      default:
-        throw new AssertionError("unexpected");
+      }
+      default -> throw new AssertionError("unexpected");
     }
   }
 
@@ -138,7 +134,7 @@ public class SolverAllSatTest extends SolverBasedTest0 {
           @Override
           public void apply(List<BooleanFormula> pModel) {
             assert_()
-                .withMessage("Formula is unsat, but all-sat callback called with model " + pModel)
+                .withMessage("Formula is unsat, but all-sat callback called with model %s", pModel)
                 .fail();
           }
         };

@@ -84,18 +84,15 @@ class CVC4BooleanFormulaManager
         operands.add(operand);
       }
     }
-    switch (operands.size()) {
-      case 0:
-        return cvc4True;
-      case 1:
-        return Iterables.getOnlyElement(operands);
-      default:
+    return switch (operands.size()) {
+      case 0 -> cvc4True;
+      case 1 -> Iterables.getOnlyElement(operands);
+      default -> {
         vectorExpr vExpr = new vectorExpr();
-        for (Expr e : operands) {
-          vExpr.add(e);
-        }
-        return exprManager.mkExpr(Kind.AND, vExpr);
-    }
+        operands.forEach(vExpr::add);
+        yield exprManager.mkExpr(Kind.AND, vExpr);
+      }
+    };
   }
 
   @Override
@@ -127,18 +124,17 @@ class CVC4BooleanFormulaManager
         operands.add(operand);
       }
     }
-    switch (operands.size()) {
-      case 0:
-        return cvc4False;
-      case 1:
-        return Iterables.getOnlyElement(operands);
-      default:
+    return switch (operands.size()) {
+      case 0 -> cvc4False;
+      case 1 -> Iterables.getOnlyElement(operands);
+      default -> {
         vectorExpr vExpr = new vectorExpr();
         for (Expr e : operands) {
           vExpr.add(e);
         }
-        return exprManager.mkExpr(Kind.OR, vExpr);
-    }
+        yield exprManager.mkExpr(Kind.OR, vExpr);
+      }
+    };
   }
 
   @Override

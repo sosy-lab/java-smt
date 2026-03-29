@@ -39,11 +39,13 @@ class TraceUFManager implements UFManager {
     String var = logger.newVariable();
     logger.appendDef(
         var,
-        String.format(
-            "mgr.getUFManager().declareUF(%s, %s, ImmutableList.of(%s))",
-            logger.printString(name),
-            logger.printFormulaType(returnType),
-            FluentIterable.from(args).transform(logger::printFormulaType).join(Joiner.on(", "))));
+        "mgr.getUFManager().declareUF(%s, %s, ImmutableList.of(%s))"
+            .formatted(
+                logger.printString(name),
+                logger.printFormulaType(returnType),
+                FluentIterable.from(args)
+                    .transform(logger::printFormulaType)
+                    .join(Joiner.on(", "))));
     FunctionDeclaration<T> f = delegate.declareUF(name, returnType, args);
     if (logger.isTracked(f)) {
       logger.undoLast();
@@ -60,9 +62,8 @@ class TraceUFManager implements UFManager {
     if (funcType.getKind().equals(FunctionDeclarationKind.UF)) {
       return logger.logDef(
           "mgr.getUFManager()",
-          String.format(
-              "callUF(%s, ImmutableList.of(%s))",
-              logger.toVariable(funcType), logger.toVariables(args)),
+          "callUF(%s, ImmutableList.of(%s))"
+              .formatted(logger.toVariable(funcType), logger.toVariables(args)),
           () -> delegate.callUF(funcType, args));
     } else {
       return mgr.makeApplication(funcType, args);

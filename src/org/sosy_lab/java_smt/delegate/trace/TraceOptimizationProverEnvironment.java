@@ -35,7 +35,7 @@ class TraceOptimizationProverEnvironment extends TraceBasicProverEnvironment<Voi
   public int maximize(Formula objective) {
     return logger.logDefKeep(
         logger.toVariable(this),
-        String.format("maximize(%s)", logger.toVariable(objective)),
+        "maximize(%s)".formatted(logger.toVariable(objective)),
         () -> delegate.maximize(objective));
   }
 
@@ -43,7 +43,7 @@ class TraceOptimizationProverEnvironment extends TraceBasicProverEnvironment<Voi
   public int minimize(Formula objective) {
     return logger.logDefKeep(
         logger.toVariable(this),
-        String.format("minimize(%s)", logger.toVariable(objective)),
+        "minimize(%s)".formatted(logger.toVariable(objective)),
         () -> delegate.minimize(objective));
   }
 
@@ -56,7 +56,7 @@ class TraceOptimizationProverEnvironment extends TraceBasicProverEnvironment<Voi
   public Optional<Rational> upper(int handle, Rational epsilon) {
     return logger.logDefDiscard(
         logger.toVariable(this),
-        String.format("upper(%d, Rational.of(\"%s\"))", handle, epsilon),
+        "upper(%d, Rational.of(\"%s\"))".formatted(handle, epsilon),
         () -> delegate.upper(handle, epsilon));
   }
 
@@ -64,7 +64,7 @@ class TraceOptimizationProverEnvironment extends TraceBasicProverEnvironment<Voi
   public Optional<Rational> lower(int handle, Rational epsilon) {
     return logger.logDefDiscard(
         logger.toVariable(this),
-        String.format("lower(%d, Rational.of(\"%s\"))", handle, epsilon),
+        "lower(%d, Rational.of(\"%s\"))".formatted(handle, epsilon),
         () -> delegate.lower(handle, epsilon));
   }
 }

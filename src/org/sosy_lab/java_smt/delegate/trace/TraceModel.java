@@ -66,7 +66,7 @@ class TraceModel implements Model {
     var value =
         logger.logDefDiscard(
             logger.toVariable(this),
-            String.format("eval(%s)", logger.toVariable(formula)),
+            "eval(%s)".formatted(logger.toVariable(formula)),
             () -> delegate.eval(formula));
     return value == null ? null : mgr.rebuild(value);
   }
@@ -75,7 +75,7 @@ class TraceModel implements Model {
   public @Nullable Object evaluate(Formula formula) {
     return logger.logDefDiscard(
         logger.toVariable(this),
-        String.format("evaluate(%s)", logger.toVariable(formula)),
+        "evaluate(%s)".formatted(logger.toVariable(formula)),
         () -> delegate.evaluate(formula));
   }
 
@@ -83,7 +83,7 @@ class TraceModel implements Model {
   public @Nullable BigInteger evaluate(IntegerFormula formula) {
     return logger.logDefDiscard(
         logger.toVariable(this),
-        String.format("evaluate(%s)", logger.toVariable(formula)),
+        "evaluate(%s)".formatted(logger.toVariable(formula)),
         () -> delegate.evaluate(formula));
   }
 
@@ -91,7 +91,7 @@ class TraceModel implements Model {
   public @Nullable Rational evaluate(RationalFormula formula) {
     return logger.logDefDiscard(
         logger.toVariable(this),
-        String.format("evaluate(%s)", logger.toVariable(formula)),
+        "evaluate(%s)".formatted(logger.toVariable(formula)),
         () -> delegate.evaluate(formula));
   }
 
@@ -99,7 +99,7 @@ class TraceModel implements Model {
   public @Nullable Boolean evaluate(BooleanFormula formula) {
     return logger.logDefDiscard(
         logger.toVariable(this),
-        String.format("evaluate(%s)", logger.toVariable(formula)),
+        "evaluate(%s)".formatted(logger.toVariable(formula)),
         () -> delegate.evaluate(formula));
   }
 
@@ -107,7 +107,7 @@ class TraceModel implements Model {
   public @Nullable BigInteger evaluate(BitvectorFormula formula) {
     return logger.logDefDiscard(
         logger.toVariable(this),
-        String.format("evaluate(%s)", logger.toVariable(formula)),
+        "evaluate(%s)".formatted(logger.toVariable(formula)),
         () -> delegate.evaluate(formula));
   }
 
@@ -115,7 +115,7 @@ class TraceModel implements Model {
   public @Nullable String evaluate(StringFormula formula) {
     return logger.logDefDiscard(
         logger.toVariable(this),
-        String.format("evaluate(%s)", logger.toVariable(formula)),
+        "evaluate(%s)".formatted(logger.toVariable(formula)),
         () -> delegate.evaluate(formula));
   }
 
@@ -123,7 +123,7 @@ class TraceModel implements Model {
   public @Nullable String evaluate(EnumerationFormula formula) {
     return logger.logDefDiscard(
         logger.toVariable(this),
-        String.format("evaluate(%s)", logger.toVariable(formula)),
+        "evaluate(%s)".formatted(logger.toVariable(formula)),
         () -> delegate.evaluate(formula));
   }
 
@@ -131,7 +131,7 @@ class TraceModel implements Model {
   public @Nullable FloatingPointNumber evaluate(FloatingPointFormula formula) {
     return logger.logDefDiscard(
         logger.toVariable(this),
-        String.format("evaluate(%s)", logger.toVariable(formula)),
+        "evaluate(%s)".formatted(logger.toVariable(formula)),
         () -> delegate.evaluate(formula));
   }
 

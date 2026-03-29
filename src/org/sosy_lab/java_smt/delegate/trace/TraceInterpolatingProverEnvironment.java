@@ -42,11 +42,11 @@ class TraceInterpolatingProverEnvironment<T> extends TraceBasicProverEnvironment
     return mgr.rebuildAll(
         logger.logDefDiscard(
             logger.toVariable(this),
-            String.format(
-                "getSeqInterpolant(ImmutableList.of(%s))",
-                FluentIterable.from(partitionedFormulas)
-                    .transform(p -> String.format("ImmutableList.of(%s)", logger.toVariables(p)))
-                    .join(Joiner.on(", "))),
+            "getSeqInterpolant(ImmutableList.of(%s))"
+                .formatted(
+                    FluentIterable.from(partitionedFormulas)
+                        .transform(p -> "ImmutableList.of(%s)".formatted(logger.toVariables(p)))
+                        .join(Joiner.on(", "))),
             () -> delegate.getSeqInterpolants(partitionedFormulas)));
   }
 
@@ -56,7 +56,7 @@ class TraceInterpolatingProverEnvironment<T> extends TraceBasicProverEnvironment
     return mgr.rebuild(
         logger.logDefDiscard(
             logger.toVariable(this),
-            String.format("getInterpolant(ImmutableList.of(%s))", logger.toVariables(formulasOfA)),
+            "getInterpolant(ImmutableList.of(%s))".formatted(logger.toVariables(formulasOfA)),
             () -> delegate.getInterpolant(formulasOfA)));
   }
 
@@ -67,14 +67,14 @@ class TraceInterpolatingProverEnvironment<T> extends TraceBasicProverEnvironment
     return mgr.rebuildAll(
         logger.logDefDiscard(
             logger.toVariable(this),
-            String.format(
-                "getTreeInterpolant(ImmutableList.of(%s), new int[]{%s})",
-                FluentIterable.from(partitionedFormulas)
-                    .transform(p -> String.format("ImmutableList.of(%s)", logger.toVariables(p)))
-                    .join(Joiner.on(", ")),
-                FluentIterable.from(Arrays.stream(startOfSubTree).boxed().toArray())
-                    .transform(Objects::toString)
-                    .join(Joiner.on(", "))),
+            "getTreeInterpolant(ImmutableList.of(%s), new int[]{%s})"
+                .formatted(
+                    FluentIterable.from(partitionedFormulas)
+                        .transform(p -> "ImmutableList.of(%s)".formatted(logger.toVariables(p)))
+                        .join(Joiner.on(", ")),
+                    FluentIterable.from(Arrays.stream(startOfSubTree).boxed().toArray())
+                        .transform(Objects::toString)
+                        .join(Joiner.on(", "))),
             () -> delegate.getTreeInterpolants(partitionedFormulas, startOfSubTree)));
   }
 }

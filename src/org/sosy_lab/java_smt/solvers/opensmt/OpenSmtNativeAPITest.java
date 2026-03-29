@@ -450,6 +450,7 @@ public class OpenSmtNativeAPITest {
     assertThat(core).containsExactly(b1, nb1);
   }
 
+  @SuppressWarnings("MisleadingEscapedSpace")
   @Test
   public void proofTest() {
     Logic logic = LogicFactory.getInstance(Logic_t.QF_UF);
@@ -472,19 +473,21 @@ public class OpenSmtNativeAPITest {
     assertThat(r).isEqualTo(sstat.False());
 
     String expected =
-        "(proof \n"
-            + "(let (cls_13 q1 )\n"
-            + "(let (cls_9 (or q2 (not q1) ))\n"
-            + "; q2 \n"
-            + "(let (cls_16 (res cls_9 cls_13 q1))\n"
-            + "(let (cls_19 (not q2) )\n"
-            + "; -\n"
-            + "(let (cls_4294967295 (res cls_19 cls_16 q2))\n"
-            + "cls_0\n"
-            + ")))))\n"
-            + ":core\n"
-            + "( cls_9 cls_13 cls_19 )\n"
-            + ")\n";
+        """
+        (proof\s
+        (let (cls_13 q1 )
+        (let (cls_9 (or q2 (not q1) ))
+        ; q2\s
+        (let (cls_16 (res cls_9 cls_13 q1))
+        (let (cls_19 (not q2) )
+        ; -
+        (let (cls_4294967295 (res cls_19 cls_16 q2))
+        cls_0
+        )))))
+        :core
+        ( cls_9 cls_13 cls_19 )
+        )
+        """;
 
     assertThat(mainSolver.printResolutionProofSMT2()).isEqualTo(expected);
   }

@@ -42,42 +42,42 @@ abstract class TraceNumeralFormulaManager<
   @Override
   public ResultFormulaType makeNumber(long number) {
     return logger.logDef(
-        getPrefix(), String.format("makeNumber(%s)", number), () -> delegate.makeNumber(number));
+        getPrefix(), "makeNumber(%s)".formatted(number), () -> delegate.makeNumber(number));
   }
 
   @Override
   public ResultFormulaType makeNumber(BigInteger number) {
     return logger.logDef(
         getPrefix(),
-        String.format("makeNumber(new BigInteger(\"%s\"))", number),
+        "makeNumber(new BigInteger(\"%s\"))".formatted(number),
         () -> delegate.makeNumber(number));
   }
 
   @Override
   public ResultFormulaType makeNumber(double number) {
     return logger.logDef(
-        getPrefix(), String.format("makeNumber(%s)", number), () -> delegate.makeNumber(number));
+        getPrefix(), "makeNumber(%s)".formatted(number), () -> delegate.makeNumber(number));
   }
 
   @Override
   public ResultFormulaType makeNumber(BigDecimal number) {
     return logger.logDef(
         getPrefix(),
-        String.format("makeNumber(new BigDecimal(\"%s\"))", number),
+        "makeNumber(new BigDecimal(\"%s\"))".formatted(number),
         () -> delegate.makeNumber(number));
   }
 
   @Override
   public ResultFormulaType makeNumber(String pI) {
     return logger.logDef(
-        getPrefix(), String.format("makeNumber(\"%s\")", pI), () -> delegate.makeNumber(pI));
+        getPrefix(), "makeNumber(\"%s\")".formatted(pI), () -> delegate.makeNumber(pI));
   }
 
   @Override
   public ResultFormulaType makeNumber(Rational pRational) {
     return logger.logDef(
         getPrefix(),
-        String.format("makeNumber(Rational.of(\"%s\"))", pRational),
+        "makeNumber(Rational.of(\"%s\"))".formatted(pRational),
         () -> delegate.makeNumber(pRational));
   }
 
@@ -85,7 +85,7 @@ abstract class TraceNumeralFormulaManager<
   public ResultFormulaType makeVariable(String pVar) {
     return logger.logDef(
         getPrefix(),
-        String.format("makeVariable(%s)", logger.printString(pVar)),
+        "makeVariable(%s)".formatted(logger.printString(pVar)),
         () -> delegate.makeVariable(pVar));
   }
 
@@ -93,7 +93,7 @@ abstract class TraceNumeralFormulaManager<
   public ResultFormulaType negate(ParamFormulaType number) {
     return logger.logDef(
         getPrefix(),
-        String.format("negate(%s)", logger.toVariable(number)),
+        "negate(%s)".formatted(logger.toVariable(number)),
         () -> delegate.negate(number));
   }
 
@@ -101,7 +101,7 @@ abstract class TraceNumeralFormulaManager<
   public ResultFormulaType add(ParamFormulaType number1, ParamFormulaType number2) {
     return logger.logDef(
         getPrefix(),
-        String.format("add(%s, %s)", logger.toVariable(number1), logger.toVariable(number2)),
+        "add(%s, %s)".formatted(logger.toVariable(number1), logger.toVariable(number2)),
         () -> delegate.add(number1, number2));
   }
 
@@ -109,7 +109,7 @@ abstract class TraceNumeralFormulaManager<
   public ResultFormulaType sum(List<ParamFormulaType> operands) {
     return logger.logDef(
         getPrefix(),
-        String.format("sum(%s)", logger.toVariables(operands)),
+        "sum(%s)".formatted(logger.toVariables(operands)),
         () -> delegate.sum(operands));
   }
 
@@ -117,7 +117,7 @@ abstract class TraceNumeralFormulaManager<
   public ResultFormulaType subtract(ParamFormulaType number1, ParamFormulaType number2) {
     return logger.logDef(
         getPrefix(),
-        String.format("subtract(%s, %s)", logger.toVariable(number1), logger.toVariable(number2)),
+        "subtract(%s, %s)".formatted(logger.toVariable(number1), logger.toVariable(number2)),
         () -> delegate.subtract(number1, number2));
   }
 
@@ -125,8 +125,7 @@ abstract class TraceNumeralFormulaManager<
   public ResultFormulaType divide(ParamFormulaType numerator, ParamFormulaType denominator) {
     return logger.logDef(
         getPrefix(),
-        String.format(
-            "divide(%s, %s)", logger.toVariable(numerator), logger.toVariable(denominator)),
+        "divide(%s, %s)".formatted(logger.toVariable(numerator), logger.toVariable(denominator)),
         () -> delegate.divide(numerator, denominator));
   }
 
@@ -134,7 +133,7 @@ abstract class TraceNumeralFormulaManager<
   public ResultFormulaType multiply(ParamFormulaType number1, ParamFormulaType number2) {
     return logger.logDef(
         getPrefix(),
-        String.format("multiply(%s, %s)", logger.toVariable(number1), logger.toVariable(number2)),
+        "multiply(%s, %s)".formatted(logger.toVariable(number1), logger.toVariable(number2)),
         () -> delegate.multiply(number1, number2));
   }
 
@@ -142,7 +141,7 @@ abstract class TraceNumeralFormulaManager<
   public BooleanFormula equal(ParamFormulaType number1, ParamFormulaType number2) {
     return logger.logDef(
         getPrefix(),
-        String.format("equal(%s, %s)", logger.toVariable(number1), logger.toVariable(number2)),
+        "equal(%s, %s)".formatted(logger.toVariable(number1), logger.toVariable(number2)),
         () -> delegate.equal(number1, number2));
   }
 
@@ -150,7 +149,7 @@ abstract class TraceNumeralFormulaManager<
   public BooleanFormula distinct(List<ParamFormulaType> pNumbers) {
     return logger.logDef(
         getPrefix(),
-        String.format("distinct(%s)", logger.toVariables(pNumbers)),
+        "distinct(%s)".formatted(logger.toVariables(pNumbers)),
         () -> delegate.distinct(pNumbers));
   }
 
@@ -158,8 +157,7 @@ abstract class TraceNumeralFormulaManager<
   public BooleanFormula greaterThan(ParamFormulaType number1, ParamFormulaType number2) {
     return logger.logDef(
         getPrefix(),
-        String.format(
-            "greaterThan(%s, %s)", logger.toVariable(number1), logger.toVariable(number2)),
+        "greaterThan(%s, %s)".formatted(logger.toVariable(number1), logger.toVariable(number2)),
         () -> delegate.greaterThan(number1, number2));
   }
 
@@ -167,8 +165,7 @@ abstract class TraceNumeralFormulaManager<
   public BooleanFormula greaterOrEquals(ParamFormulaType number1, ParamFormulaType number2) {
     return logger.logDef(
         getPrefix(),
-        String.format(
-            "greaterOrEquals(%s, %s)", logger.toVariable(number1), logger.toVariable(number2)),
+        "greaterOrEquals(%s, %s)".formatted(logger.toVariable(number1), logger.toVariable(number2)),
         () -> delegate.greaterOrEquals(number1, number2));
   }
 
@@ -176,7 +173,7 @@ abstract class TraceNumeralFormulaManager<
   public BooleanFormula lessThan(ParamFormulaType number1, ParamFormulaType number2) {
     return logger.logDef(
         getPrefix(),
-        String.format("lessThan(%s, %s)", logger.toVariable(number1), logger.toVariable(number2)),
+        "lessThan(%s, %s)".formatted(logger.toVariable(number1), logger.toVariable(number2)),
         () -> delegate.lessThan(number1, number2));
   }
 
@@ -184,8 +181,7 @@ abstract class TraceNumeralFormulaManager<
   public BooleanFormula lessOrEquals(ParamFormulaType number1, ParamFormulaType number2) {
     return logger.logDef(
         getPrefix(),
-        String.format(
-            "lessOrEquals(%s, %s)", logger.toVariable(number1), logger.toVariable(number2)),
+        "lessOrEquals(%s, %s)".formatted(logger.toVariable(number1), logger.toVariable(number2)),
         () -> delegate.lessOrEquals(number1, number2));
   }
 
@@ -193,7 +189,7 @@ abstract class TraceNumeralFormulaManager<
   public IntegerFormula floor(ParamFormulaType formula) {
     return logger.logDef(
         getPrefix(),
-        String.format("floor(%s)", logger.toVariable(formula)),
+        "floor(%s)".formatted(logger.toVariable(formula)),
         () -> delegate.floor(formula));
   }
 }

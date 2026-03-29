@@ -59,8 +59,8 @@ class CVC4FormulaManager extends AbstractFormulaManager<Expr, Type, ExprManager,
   }
 
   static Expr getCVC4Expr(Formula pT) {
-    if (pT instanceof CVC4Formula) {
-      return ((CVC4Formula) pT).getTerm();
+    if (pT instanceof CVC4Formula cVC4Formula) {
+      return cVC4Formula.getTerm();
     }
     throw new IllegalArgumentException(
         "Cannot get the formula info of type " + pT.getClass().getSimpleName() + " in the Solver!");
