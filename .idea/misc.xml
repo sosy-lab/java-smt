@@ -15,8 +15,8 @@ SPDX-License-Identifier: Apache-2.0
     <entry_points version="2.0" />
   </component>
   <component name="NullableNotNullManager">
-    <option name="myDefaultNullable" value="javax.annotation.Nullable" />
-    <option name="myDefaultNotNull" value="javax.annotation.Nonnull" />
+    <option name="myDefaultNullable" value="org.checkerframework.checker.nullness.qual.Nullable" />
+    <option name="myDefaultNotNull" value="org.checkerframework.checker.nullness.qual.NonNull" />
     <option name="myOrdered" value="true" />
     <option name="myNullables">
       <value>
