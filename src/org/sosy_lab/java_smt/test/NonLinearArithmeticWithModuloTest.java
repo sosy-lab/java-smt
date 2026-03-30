@@ -55,8 +55,11 @@ public class NonLinearArithmeticWithModuloTest extends SolverBasedTest0 {
 
   @Override
   protected ConfigurationBuilder createTestConfigBuilder() throws InvalidConfigurationException {
-    return super.createTestConfigBuilder()
-        .setOption("solver.nonLinearArithmetic", nonLinearArithmetic.name());
+    var config = super.createTestConfigBuilder();
+    if (solver == Solvers.YICES2) {
+      config.setOption("solver.yices2.logic", "QF_AUFNIRA");
+    }
+    return config.setOption("solver.nonLinearArithmetic", nonLinearArithmetic.name());
   }
 
   private IntegerFormula handleExpectedException(Supplier<IntegerFormula> supplier) {

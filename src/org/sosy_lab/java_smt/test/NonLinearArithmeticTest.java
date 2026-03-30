@@ -38,7 +38,6 @@ public class NonLinearArithmeticTest<T extends NumeralFormula> extends SolverBas
 
   // Boolector, CVC4, SMTInterpol, MathSAT5 and OpenSMT do not fully support non-linear arithmetic
   // (though SMTInterpol and MathSAT5 support some parts)
-
   // INFO: OpenSmt does not suport nonlinear arithmetic
   static final ImmutableSet<Solvers> SOLVER_WITHOUT_NONLINEAR_ARITHMETIC =
       ImmutableSet.of(
@@ -87,8 +86,11 @@ public class NonLinearArithmeticTest<T extends NumeralFormula> extends SolverBas
 
   @Override
   protected ConfigurationBuilder createTestConfigBuilder() throws InvalidConfigurationException {
-    return super.createTestConfigBuilder()
-        .setOption("solver.nonLinearArithmetic", nonLinearArithmetic.name());
+    var config = super.createTestConfigBuilder();
+    if (solver == Solvers.YICES2) {
+      config.setOption("solver.yices2.logic", "QF_AUFNIRA");
+    }
+    return config.setOption("solver.nonLinearArithmetic", nonLinearArithmetic.name());
   }
 
   private T handleExpectedException(Supplier<T> supplier) {
