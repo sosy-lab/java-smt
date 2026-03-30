@@ -11,6 +11,7 @@ package org.sosy_lab.java_smt.test;
 import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.Truth.assert_;
 import static com.google.common.truth.TruthJUnit.assume;
+import static org.sosy_lab.common.collect.Collections3.transformedImmutableListCopy;
 
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableList;
@@ -142,9 +143,8 @@ public class SolverAllSatTest extends SolverBasedTest0 {
         env.addConstraint(
             bmgr.not(
                 bmgr.and(
-                    FluentIterable.from(modelAssignments)
-                        .transform(ValueAssignment::getAssignmentAsFormula)
-                        .toList())));
+                    transformedImmutableListCopy(
+                        modelAssignments, ValueAssignment::getAssignmentAsFormula))));
       }
     }
   }
