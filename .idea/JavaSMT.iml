@@ -23,6 +23,7 @@ SPDX-License-Identifier: Apache-2.0
       <excludeFolder url="file://$MODULE_DIR$/repository" />
     </content>
     <orderEntry type="jdk" jdkName="17" jdkType="JavaSDK" />
+    <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module-library">
       <library>
         <CLASSES>
@@ -154,7 +155,6 @@ SPDX-License-Identifier: Apache-2.0
         <jarDirectory url="file://$MODULE_DIR$/lib/java/runtime-z3-legacy" recursive="false" />
       </library>
     </orderEntry>
-    <orderEntry type="sourceFolder" forTests="false" />
   </component>
   <component name="org.twodividedbyzero.idea.findbugs">
     <option name="_basePreferences">
