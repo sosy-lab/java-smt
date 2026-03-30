@@ -41,11 +41,11 @@ import org.sosy_lab.java_smt.api.SolverException;
 public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   @Override
   protected ConfigurationBuilder createTestConfigBuilder() throws InvalidConfigurationException {
-    var config = super.createTestConfigBuilder();
+    var newConfig = super.createTestConfigBuilder();
     if (solver == Solvers.YICES2) {
-      config.setOption("solver.yices2.logic", "QF_AUFNIRA");
+      newConfig.setOption("solver.yices2.logic", "QF_AUFNIRA");
     }
-    return config;
+    return newConfig;
   }
 
   @Test

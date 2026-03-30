@@ -86,11 +86,11 @@ public class NonLinearArithmeticTest<T extends NumeralFormula> extends SolverBas
 
   @Override
   protected ConfigurationBuilder createTestConfigBuilder() throws InvalidConfigurationException {
-    var config = super.createTestConfigBuilder();
+    var newConfig = super.createTestConfigBuilder();
     if (solver == Solvers.YICES2) {
-      config.setOption("solver.yices2.logic", "QF_AUFNIRA");
+      newConfig.setOption("solver.yices2.logic", "QF_AUFNIRA");
     }
-    return config.setOption("solver.nonLinearArithmetic", nonLinearArithmetic.name());
+    return newConfig.setOption("solver.nonLinearArithmetic", nonLinearArithmetic.name());
   }
 
   private T handleExpectedException(Supplier<T> supplier) {
