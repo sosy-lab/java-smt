@@ -1,0 +1,15 @@
+<component name="libraryTable">
+  <library name="smtinterpol">
+    <CLASSES>
+      <root url="file://$PROJECT_DIR$/lib/java/runtime-smtinterpol" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="https://ultimate.informatik.uni-freiburg.de/smtinterpol/doc/index.html" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$PROJECT_DIR$/lib/java-contrib/smtinterpol-sources.jar!/smtinterpol/Library-SMTLIB/src" />
+      <root url="jar://$PROJECT_DIR$/lib/java-contrib/smtinterpol-sources.jar!/smtinterpol/SMTInterpol/src" />
+    </SOURCES>
+    <jarDirectory url="file://$PROJECT_DIR$/lib/java/runtime-smtinterpol" recursive="false" />
+  </library>
+</component>

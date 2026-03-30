@@ -1,0 +1,14 @@
+<component name="libraryTable">
+  <library name="z3">
+    <CLASSES>
+      <root url="file://$PROJECT_DIR$/lib/java/runtime-z3" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$PROJECT_DIR$/lib/java-contrib/com.microsoft.z3-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$PROJECT_DIR$/lib/java-contrib/com.microsoft.z3-sources.jar!/" />
+    </SOURCES>
+    <jarDirectory url="file://$PROJECT_DIR$/lib/java/runtime-z3" recursive="false" />
+  </library>
+</component>

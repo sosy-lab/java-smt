@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="cvc4">
+    <CLASSES>
+      <root url="file://$PROJECT_DIR$/lib/java/runtime-cvc4" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="https://cvc4.github.io/documentation.html" />
+    </JAVADOC>
+    <SOURCES />
+    <jarDirectory url="file://$PROJECT_DIR$/lib/java/runtime-cvc4" recursive="false" />
+  </library>
+</component>

@@ -1,0 +1,14 @@
+<component name="libraryTable">
+  <library name="opensmt">
+    <CLASSES>
+      <root url="file://$PROJECT_DIR$/lib/java/runtime-opensmt" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$PROJECT_DIR$/lib/java-contrib/opensmt-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$PROJECT_DIR$/lib/java-contrib/opensmt-sources.jar!/" />
+    </SOURCES>
+    <jarDirectory url="file://$PROJECT_DIR$/lib/java/runtime-opensmt" recursive="false" />
+  </library>
+</component>

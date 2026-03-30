@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="yices">
+    <CLASSES>
+      <root url="file://$PROJECT_DIR$/lib/java/runtime-yices2" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="https://yices.csl.sri.com/yices2-documentation.html" />
+    </JAVADOC>
+    <SOURCES />
+    <jarDirectory url="file://$PROJECT_DIR$/lib/java/runtime-yices2" recursive="false" />
+  </library>
+</component>

@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="cvc5">
+    <CLASSES>
+      <root url="file://$PROJECT_DIR$/lib/java/runtime-cvc5" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="https://cvc5.github.io/docs-ci/docs-main/" />
+    </JAVADOC>
+    <SOURCES />
+    <jarDirectory url="file://$PROJECT_DIR$/lib/java/runtime-cvc5" recursive="false" />
+  </library>
+</component>

@@ -1,0 +1,15 @@
+<component name="libraryTable">
+  <library name="princess">
+    <CLASSES>
+      <root url="file://$PROJECT_DIR$/lib/java/runtime-princess" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="https://philipp.ruemmer.org/princess/doc/#ap.package" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$PROJECT_DIR$/lib/java-contrib/ostrich_2.13-sources.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/java-contrib/princess_2.13-sources.jar!/" />
+    </SOURCES>
+    <jarDirectory url="file://$PROJECT_DIR$/lib/java/runtime-princess" recursive="false" />
+  </library>
+</component>
