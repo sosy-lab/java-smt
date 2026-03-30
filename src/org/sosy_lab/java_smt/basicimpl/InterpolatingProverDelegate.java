@@ -26,7 +26,6 @@ import org.sosy_lab.java_smt.api.SolverException;
  * InterpolatingProverEnvironment} based on the implementations in the abstract/theorem prover that
  * can not be done using abstract implementations.
  */
-@SuppressWarnings("resource")
 class InterpolatingProverDelegate<T> implements InterpolatingProverEnvironment<T> {
 
   private final InterpolatingProverEnvironment<T> itpProver;
@@ -35,6 +34,7 @@ class InterpolatingProverDelegate<T> implements InterpolatingProverEnvironment<T
     itpProver = checkNotNull(pBaseProver);
   }
 
+  @SuppressWarnings("resource")
   @Override
   public BooleanFormula getInterpolant(Collection<T> formulasOfA)
       throws SolverException, InterruptedException {
@@ -44,6 +44,7 @@ class InterpolatingProverDelegate<T> implements InterpolatingProverEnvironment<T
     return itpProver.getInterpolant(formulasOfA);
   }
 
+  @SuppressWarnings("resource")
   @Override
   public List<BooleanFormula> getSeqInterpolants(List<? extends Collection<T>> partitionedFormulas)
       throws SolverException, InterruptedException {
@@ -52,6 +53,7 @@ class InterpolatingProverDelegate<T> implements InterpolatingProverEnvironment<T
     return itpProver.getSeqInterpolants(partitionedFormulas);
   }
 
+  @SuppressWarnings("resource")
   @Override
   public List<BooleanFormula> getTreeInterpolants(
       List<? extends Collection<T>> partitionedFormulas, int[] startOfSubTree)
