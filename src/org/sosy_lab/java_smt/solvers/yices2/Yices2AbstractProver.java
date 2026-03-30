@@ -35,6 +35,7 @@ import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractProverWithAllSat;
 import org.sosy_lab.java_smt.basicimpl.CachingModel;
 import org.sosy_lab.java_smt.basicimpl.ShutdownHook;
+import org.sosy_lab.java_smt.solvers.yices2.Yices2SolverContext.Yices2Parameters;
 
 /**
  * Info about the option {@link ProverOptions#GENERATE_UNSAT_CORE}: Yices provides the unsat core
@@ -70,10 +71,10 @@ abstract class Yices2AbstractProver<T> extends AbstractProverWithAllSat<T>
       Set<ProverOptions> pOptions,
       BooleanFormulaManager pBmgr,
       ShutdownNotifier pShutdownNotifier,
-      String pSolverType) {
+      Yices2Parameters pSolverParameters) {
     super(pOptions, pBmgr, pShutdownNotifier);
     creator = pCreator;
-    curEnv = newContext(pSolverType);
+    curEnv = newContext(pSolverParameters);
     stack.push(PathCopyingPersistentTreeMap.of());
   }
 
@@ -86,11 +87,9 @@ abstract class Yices2AbstractProver<T> extends AbstractProverWithAllSat<T>
     return true;
   }
 
-  Context newContext(String solverType) {
-    try (var cfg = new Config()) {
-      cfg.set("solver-type", solverType);
-      cfg.set("mode", "interactive");
-      cfg.set("model-interpolation", "true");
+  Context newContext(Yices2Parameters options) {
+    try (var cfg = new Config(options.logic)) {
+      cfg.set("mode", options.mode);
       return new Context(cfg);
     }
   }
