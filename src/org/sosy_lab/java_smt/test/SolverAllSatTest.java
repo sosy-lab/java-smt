@@ -12,6 +12,7 @@ import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.Truth.assert_;
 import static com.google.common.truth.TruthJUnit.assume;
 
+import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableList;
 import java.util.ArrayList;
 import java.util.List;
@@ -27,6 +28,7 @@ import org.sosy_lab.java_smt.api.BasicProverEnvironment;
 import org.sosy_lab.java_smt.api.BasicProverEnvironment.AllSatCallback;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
+import org.sosy_lab.java_smt.api.Model.ValueAssignment;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
@@ -110,6 +112,40 @@ public class SolverAllSatTest extends SolverBasedTest0 {
     @Override
     public String getResult() {
       return EXPECTED_RESULT;
+    }
+  }
+
+  @Test
+  public void allSatIntegersTest() throws InterruptedException, SolverException {
+    // Adapted from the AllSat example in src/example
+    requireIntegers();
+
+    try (var env = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
+
+      IntegerFormula a = imgr.makeVariable("a");
+      BooleanFormula p = bmgr.makeVariable("p");
+      BooleanFormula q = bmgr.makeVariable("q");
+
+      env.addConstraint(imgr.lessOrEquals(imgr.makeNumber(1), a));
+      env.addConstraint(imgr.lessOrEquals(a, imgr.makeNumber(3)));
+      env.addConstraint(bmgr.equivalence(p, q));
+
+      // loop over all possible models for "1<=a<=3 AND p=q"
+      while (!env.isUnsat()) {
+        ImmutableList<ValueAssignment> modelAssignments = env.getModelAssignments();
+
+        // check that the model doesn't have any internal variables
+        assertThat(FluentIterable.from(modelAssignments).transform(ValueAssignment::getName))
+            .containsExactly("a", "p", "q");
+
+        // prevent next model from using the same assignment as a previous model
+        env.addConstraint(
+            bmgr.not(
+                bmgr.and(
+                    FluentIterable.from(modelAssignments)
+                        .transform(ValueAssignment::getAssignmentAsFormula)
+                        .toList())));
+      }
     }
   }
 
