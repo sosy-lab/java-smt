@@ -121,26 +121,26 @@ public class SolverAllSatTest extends SolverBasedTest0 {
     // Adapted from the AllSat example in src/example
     requireIntegers();
 
-    try (var env = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
+    try (var prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
 
       IntegerFormula a = imgr.makeVariable("a");
       BooleanFormula p = bmgr.makeVariable("p");
       BooleanFormula q = bmgr.makeVariable("q");
 
-      env.addConstraint(imgr.lessOrEquals(imgr.makeNumber(1), a));
-      env.addConstraint(imgr.lessOrEquals(a, imgr.makeNumber(3)));
-      env.addConstraint(bmgr.equivalence(p, q));
+      prover.addConstraint(imgr.lessOrEquals(imgr.makeNumber(1), a));
+      prover.addConstraint(imgr.lessOrEquals(a, imgr.makeNumber(3)));
+      prover.addConstraint(bmgr.equivalence(p, q));
 
       // loop over all possible models for "1<=a<=3 AND p=q"
-      while (!env.isUnsat()) {
-        ImmutableList<ValueAssignment> modelAssignments = env.getModelAssignments();
+      while (!prover.isUnsat()) {
+        ImmutableList<ValueAssignment> modelAssignments = prover.getModelAssignments();
 
         // check that the model doesn't have any internal variables
         assertThat(FluentIterable.from(modelAssignments).transform(ValueAssignment::getName))
             .containsExactly("a", "p", "q");
 
         // prevent next model from using the same assignment as a previous model
-        env.addConstraint(
+        prover.addConstraint(
             bmgr.not(
                 bmgr.and(
                     transformedImmutableListCopy(
