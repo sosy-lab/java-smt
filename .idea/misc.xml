@@ -20,18 +20,17 @@ SPDX-License-Identifier: Apache-2.0
     <option name="myOrdered" value="true" />
     <option name="myNullables">
       <value>
-        <list size="11">
+        <list size="10">
           <item index="0" class="java.lang.String" itemvalue="org.checkerframework.checker.nullness.qual.Nullable" />
           <item index="1" class="java.lang.String" itemvalue="org.checkerframework.checker.nullness.compatqual.NullableDecl" />
           <item index="2" class="java.lang.String" itemvalue="org.checkerframework.checker.nullness.compatqual.NullableType" />
           <item index="3" class="java.lang.String" itemvalue="javax.annotation.Nullable" />
-          <item index="4" class="java.lang.String" itemvalue="androidx.annotation.RecentlyNullable" />
-          <item index="5" class="java.lang.String" itemvalue="org.jspecify.annotations.Nullable" />
-          <item index="6" class="java.lang.String" itemvalue="org.jetbrains.annotations.Nullable" />
-          <item index="7" class="java.lang.String" itemvalue="org.eclipse.jdt.annotation.Nullable" />
-          <item index="8" class="java.lang.String" itemvalue="edu.umd.cs.findbugs.annotations.Nullable" />
-          <item index="9" class="java.lang.String" itemvalue="jakarta.annotation.Nullable" />
-          <item index="10" class="java.lang.String" itemvalue="javax.annotation.CheckForNull" />
+          <item index="4" class="java.lang.String" itemvalue="org.jspecify.annotations.Nullable" />
+          <item index="5" class="java.lang.String" itemvalue="org.jetbrains.annotations.Nullable" />
+          <item index="6" class="java.lang.String" itemvalue="org.eclipse.jdt.annotation.Nullable" />
+          <item index="7" class="java.lang.String" itemvalue="edu.umd.cs.findbugs.annotations.Nullable" />
+          <item index="8" class="java.lang.String" itemvalue="jakarta.annotation.Nullable" />
+          <item index="9" class="java.lang.String" itemvalue="javax.annotation.CheckForNull" />
         </list>
       </value>
     </option>
