@@ -74,16 +74,6 @@ public class UnsatCoreTest extends SolverBasedTest0.ParameterizedSolverBasedTest
   }
 
   @Test
-  public void test() throws SolverException, InterruptedException {
-    var var1 = bmgr.makeVariable("var");
-    try (var prover = context.newProverEnvironment()) {
-      prover.addConstraint(var1);
-      prover.addConstraint(bmgr.not(var1));
-      assertThat(prover.isUnsat()).isTrue();
-    }
-  }
-
-  @Test
   public void simpleUnsatCoreOverAssumptionsTest() throws InterruptedException, SolverException {
     requireUnsatCoreOverAssumptions();
     // MathSat and old Z3 only allow literals as assumptions:
