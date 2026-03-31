@@ -15,7 +15,6 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -34,7 +33,7 @@ final class LeanSmtTheoremProver extends AbstractProverWithAllSat<Void> implemen
   private final LeanSmtFormulaCreator creator;
   private final String logic;
   private long currentSolver = 0L;
-  private @Nullable String lastModelRaw = null;
+  private @Nullable ImmutableList<BooleanFormula> lastSatAssumptions = null;
   private boolean rebuildRequired = false;
   private final Set<String> declaredVariablesInCurrentSolver = new HashSet<>();
   private final Set<Long> assertedUfConstraintsInCurrentSolver = new HashSet<>();
@@ -65,7 +64,7 @@ final class LeanSmtTheoremProver extends AbstractProverWithAllSat<Void> implemen
 
   @Override
   protected boolean hasPersistentModel() {
-    return false;
+    return true;
   }
 
   @Override
@@ -73,7 +72,7 @@ final class LeanSmtTheoremProver extends AbstractProverWithAllSat<Void> implemen
     // LeanSMT currently has no native push/pop support.
     // Mark solver dirty and lazily rebuild from asserted formulas on demand.
     rebuildRequired = true;
-    lastModelRaw = null;
+    lastSatAssumptions = null;
   }
 
   @Override
@@ -89,7 +88,7 @@ final class LeanSmtTheoremProver extends AbstractProverWithAllSat<Void> implemen
         rebuildRequired = true;
       }
     }
-    lastModelRaw = null;
+    lastSatAssumptions = null;
     return null;
   }
 
@@ -105,13 +104,13 @@ final class LeanSmtTheoremProver extends AbstractProverWithAllSat<Void> implemen
     assertPendingDerivedConstraints();
     int result = LeanSmtNativeApi.checkSat(currentSolver);
     if (result == LeanSMTConstants.LEANSMT_UNSAT) {
-      lastModelRaw = null;
+      lastSatAssumptions = null;
       return true;
     } else if (result == LeanSMTConstants.LEANSMT_SAT) {
-      lastModelRaw = generateModels ? LeanSmtNativeApi.getModel(currentSolver) : null;
+      lastSatAssumptions = ImmutableList.of();
       return false;
     }
-    lastModelRaw = null;
+    lastSatAssumptions = null;
     throwOnUnknownOrUnexpectedResult(
         result == LeanSMTConstants.LEANSMT_UNKNOWN, result, "satisfiability check");
     throw new AssertionError("unreachable");
@@ -124,14 +123,12 @@ final class LeanSmtTheoremProver extends AbstractProverWithAllSat<Void> implemen
     changedSinceLastSatQuery = false;
     ensureUpToDateSolver();
 
-    @Nullable String satModelRaw = null;
+    ImmutableList<BooleanFormula> assumptions =
+        ImmutableList.copyOf(new LinkedHashSet<>(pAssumptions));
     int result;
-    if (pAssumptions.isEmpty()) {
+    if (assumptions.isEmpty()) {
       assertPendingDerivedConstraints();
       result = LeanSmtNativeApi.checkSat(currentSolver);
-      if (result == LeanSMTConstants.LEANSMT_SAT && generateModels) {
-        satModelRaw = LeanSmtNativeApi.getModel(currentSolver);
-      }
     } else {
       // Assumptions are checked on a temporary solver to preserve the base incremental solver
       // state, matching JavaSMT assumption semantics.
@@ -142,27 +139,24 @@ final class LeanSmtTheoremProver extends AbstractProverWithAllSat<Void> implemen
           shutdownNotifier.shutdownIfNecessary();
           LeanSmtNativeApi.assertTerm(tmpSolver, creator.extractInfoFromFormula(constraint));
         }
-        for (BooleanFormula assumption : pAssumptions) {
+        for (BooleanFormula assumption : assumptions) {
           shutdownNotifier.shutdownIfNecessary();
           LeanSmtNativeApi.assertTerm(tmpSolver, creator.extractInfoFromFormula(assumption));
         }
         result = LeanSmtNativeApi.checkSat(tmpSolver);
-        if (result == LeanSMTConstants.LEANSMT_SAT && generateModels) {
-          satModelRaw = LeanSmtNativeApi.getModel(tmpSolver);
-        }
       } finally {
         LeanSmtNativeApi.deleteSolverAsync(tmpSolver);
       }
     }
 
     if (result == LeanSMTConstants.LEANSMT_UNSAT) {
-      lastModelRaw = null;
+      lastSatAssumptions = null;
       return true;
     } else if (result == LeanSMTConstants.LEANSMT_SAT) {
-      lastModelRaw = satModelRaw;
+      lastSatAssumptions = assumptions;
       return false;
     }
-    lastModelRaw = null;
+    lastSatAssumptions = null;
     throwOnUnknownOrUnexpectedResult(
         result == LeanSMTConstants.LEANSMT_UNKNOWN, result, "satisfiability check with assumptions");
     throw new AssertionError("unreachable");
@@ -185,11 +179,17 @@ final class LeanSmtTheoremProver extends AbstractProverWithAllSat<Void> implemen
 
   @Override
   protected LeanSmtModel getEvaluatorWithoutChecks() throws SolverException {
-    if (lastModelRaw == null) {
-      lastModelRaw = LeanSmtNativeApi.getModel(currentSolver);
+    ImmutableList<BooleanFormula> assumptions =
+        Preconditions.checkNotNull(lastSatAssumptions, "No satisfying LeanSMT state available");
+    long modelSolver = createModelSnapshotSolver(assumptions);
+    try {
+      return registerEvaluator(
+          new LeanSmtModel(
+              this, creator, modelSolver, getRelevantModelHandles(assumptions), true));
+    } catch (SolverException | RuntimeException e) {
+      LeanSmtNativeApi.deleteSolverAsync(modelSolver);
+      throw e;
     }
-    Map<String, Long> variables = creator.getKnownVariableHandles();
-    return new LeanSmtModel(this, creator, variables, lastModelRaw, getRelevantModelHandles());
   }
 
   @Override
@@ -247,11 +247,14 @@ final class LeanSmtTheoremProver extends AbstractProverWithAllSat<Void> implemen
     return solver;
   }
 
-  private Set<Long> getRelevantModelHandles() {
+  private Set<Long> getRelevantModelHandles(Collection<BooleanFormula> assumptions) {
     ImmutableSet.Builder<Long> relevant = ImmutableSet.builder();
     Set<Long> visited = new HashSet<>();
     for (BooleanFormula constraint : getAssertedFormulas()) {
       collectRelevantModelHandles(creator.extractInfoFromFormula(constraint), visited, relevant);
+    }
+    for (BooleanFormula assumption : assumptions) {
+      collectRelevantModelHandles(creator.extractInfoFromFormula(assumption), visited, relevant);
     }
     return relevant.build();
   }
@@ -298,7 +301,7 @@ final class LeanSmtTheoremProver extends AbstractProverWithAllSat<Void> implemen
       LeanSmtNativeApi.assertTerm(currentSolver, creator.extractInfoFromFormula(constraint));
     }
     rebuildRequired = false;
-    lastModelRaw = null;
+    lastSatAssumptions = null;
   }
 
   private void assertPendingDerivedConstraints() throws SolverException {
@@ -404,6 +407,42 @@ final class LeanSmtTheoremProver extends AbstractProverWithAllSat<Void> implemen
       return LeanSmtNativeApi.checkSat(tmpSolver);
     } finally {
       LeanSmtNativeApi.deleteSolverAsync(tmpSolver);
+    }
+  }
+
+  private long createModelSnapshotSolver(Collection<BooleanFormula> assumptions)
+      throws SolverException {
+    long tmpSolver = createTemporarySolver();
+    boolean success = false;
+    try {
+      assertAllDerivedConstraints(tmpSolver);
+      for (BooleanFormula constraint : getAssertedFormulas()) {
+        shutdownNotifier.shutdownIfNecessary();
+        LeanSmtNativeApi.assertTerm(tmpSolver, creator.extractInfoFromFormula(constraint));
+      }
+      for (BooleanFormula assumption : assumptions) {
+        shutdownNotifier.shutdownIfNecessary();
+        LeanSmtNativeApi.assertTerm(tmpSolver, creator.extractInfoFromFormula(assumption));
+      }
+
+      int result = LeanSmtNativeApi.checkSat(tmpSolver);
+      if (result != LeanSMTConstants.LEANSMT_SAT) {
+        if (result == LeanSMTConstants.LEANSMT_UNSAT) {
+          throw new SolverException("Expected SAT while constructing LeanSMT model snapshot");
+        }
+        throwOnUnknownOrUnexpectedResult(
+            result == LeanSMTConstants.LEANSMT_UNKNOWN, result, "LeanSMT model snapshot");
+      }
+
+      success = true;
+      return tmpSolver;
+    } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
+      throw new SolverException("Interrupted while constructing LeanSMT model snapshot", e);
+    } finally {
+      if (!success) {
+        LeanSmtNativeApi.deleteSolverAsync(tmpSolver);
+      }
     }
   }
 }
