@@ -10,7 +10,6 @@
 
 package org.sosy_lab.java_smt.solvers.yices2;
 
-import static com.google.common.base.Preconditions.checkArgument;
 import static org.sosy_lab.common.collect.Collections3.transformedImmutableSetCopy;
 
 import com.google.common.collect.FluentIterable;
@@ -52,11 +51,6 @@ class Yices2InterpolatingProver extends Yices2AbstractProver<Integer>
   @Override
   public BooleanFormula getInterpolant(Collection<Integer> formulasOfA)
       throws SolverException, InterruptedException {
-    checkGenerateInterpolants();
-    checkArgument(
-        getAssertedConstraintIds().containsAll(formulasOfA),
-        "Interpolation can only be done over previously asserted formulas.");
-
     var setA = ImmutableSet.copyOf(formulasOfA);
     var setB = Sets.difference(getAssertedConstraintIds(), setA);
 
@@ -91,13 +85,6 @@ class Yices2InterpolatingProver extends Yices2AbstractProver<Integer>
   @Override
   public List<BooleanFormula> getSeqInterpolants(List<? extends Collection<Integer>> partitions)
       throws SolverException, InterruptedException {
-    checkGenerateInterpolants();
-    checkArgument(!partitions.isEmpty(), "at least one partition should be available.");
-    final Set<Integer> assertedConstraintIds = getAssertedConstraintIds();
-    checkArgument(
-        partitions.stream().allMatch(assertedConstraintIds::containsAll),
-        "interpolation can only be done over previously asserted formulas.");
-
     final int n = partitions.size();
     final List<BooleanFormula> itps = new ArrayList<>();
     var previousItp = Terms.mkTrue();
