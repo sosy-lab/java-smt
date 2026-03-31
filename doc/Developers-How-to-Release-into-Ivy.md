@@ -156,42 +156,32 @@ ant publish-cvc5 -Dcvc5.version=2025-03-31-34518c3
 During the build process, our script automatically fetches binaries for Windows, Linux, and
 maxOS on x64 and arm64 and repackages them to be used in JavaSMT.
 
-### Publishing LeanSMT
+### LeanSMT
 
-LeanSMT is published as an explicit opt-in runtime profile for Linux x64.
+LeanSMT is currently released as a Linux x64 runtime only.
 
-Prerequisites:
+Before publishing, build and validate the staged runtime as described in:
 
-- JavaSMT checkout.
-- LeanSMT runtime source that already includes the JavaSMT JNI wrapper
-  `libleansmt_jni.so` and the transitive LeanSMT runtime libraries.
-  A plain upstream `lean-smt` checkout built only with `lake build` is currently not
-  sufficient by itself for JavaSMT packaging.
+- [`src/org/sosy_lab/java_smt/solvers/leansmt/README.md`](../src/org/sosy_lab/java_smt/solvers/leansmt/README.md)
 
-Recommended sequence:
+That setup pins the upstream `lean-smt` revision, rebuilds the runtime in a throwaway worktree,
+and stages the resulting files in `build/leansmt-staging/x64`.
 
-1. Package LeanSMT runtime files into JavaSMT:
-   ```bash
-   cd /absolute/path/to/java-smt
-   ./build/build-publish-solvers/package-leansmt-runtime.sh /absolute/path/to/runtime-source
-   ```
-2. Validate integration:
-   ```bash
-   ant -q build-project
-   ant unit-tests-leansmt
-   ```
-3. Publish LeanSMT runtime binaries to the Ivy repository:
-   ```bash
-   ant publish-leansmt -Dleansmt.version=$LEANSMT_VERSION
-   ```
+After the staged runtime is present and a `repository/` checkout exists, publish LeanSMT with:
 
-Notes:
+```bash
+ant publish-leansmt -Dleansmt.version=$LEANSMT_VERSION
+```
 
-- `publish-leansmt` packages runtime libraries from `lib/native/x86_64-linux`.
-- `package-leansmt-runtime.sh` normalizes the JNI wrapper `RUNPATH` to `$ORIGIN`,
-  so `libleansmt_jni.so` resolves `libSmtJNI.so` and the other LeanSMT `.so` files
-  from JavaSMT's native directory instead of from an older machine-specific path.
-- The published Ivy solver artifact contains LeanSMT shared libraries (`.so`); `cvc5` executable is not published as part of this solver artifact.
+Example:
+
+```bash
+ant publish-leansmt -Dleansmt.version=0.1.0-lean1
+```
+
+The published Ivy module contains the staged Linux x64 shared libraries and the bundled `cvc5`
+executable. Repository artifacts use the original Lean-produced library names. Because Ivy files
+need an extension, the published solver executable is stored as `cvc5-<version>.bin`.
 
 
 ### Publishing OpenSMT

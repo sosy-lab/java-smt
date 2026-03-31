@@ -93,33 +93,32 @@ For publishing binary solvers like Boolector, CVC4, MathSAT5, Yices2, or Z3, the
 - Later `release` your staged bundle.
   After some delay (a few hours) the release is automatically synced to Maven Central.
 
-### Publishing LeanSMT
+### LeanSMT
 
-For publishing LeanSMT, we stage `javasmt-solver-leansmt` (Linux x64 `.so` classifiers).
+LeanSMT can be staged to Maven Central as a Linux x64 runtime package after the corresponding Ivy
+release has been prepared.
 
-Prerequisites:
+First, build and validate the staged runtime as described in:
 
-- LeanSMT runtime already published to Ivy (see `doc/Developers-How-to-Release-into-Ivy.md`).
-- JavaSMT checkout with `runtime-leansmt` dependency configured (or provide `-Dstage.revision=...`).
-- Maven credentials, GPG setup, and Maven Ant task setup (see requirements above).
+- [`src/org/sosy_lab/java_smt/solvers/leansmt/README.md`](../src/org/sosy_lab/java_smt/solvers/leansmt/README.md)
 
-Recommended sequence (run in JavaSMT root):
+Then upload the staged LeanSMT runtime with:
 
 ```bash
-# Stage LeanSMT solver package to Maven Central staging area.
-# Preferred: resolve revision from runtime-leansmt Ivy metadata.
-ant stage-leansmt
-
-# Fallback: pass explicit revision if metadata resolution is unavailable.
-ant -Dstage.revision=$LEANSMT_VERSION stage-leansmt
+ant stage-leansmt -Dstage.revision=$LEANSMT_VERSION
 ```
 
-Notes:
+Example:
 
-- `stage-leansmt` resolves Ivy config `runtime-leansmt` explicitly (LeanSMT is opt-in, not part of default runtime).
-- The staged Maven package contains LeanSMT shared libraries only; `cvc5` executable is not part of this artifact.
-- For local build/setup details (outside release flow), see
-  [`src/org/sosy_lab/java_smt/solvers/leansmt/README.md`](../src/org/sosy_lab/java_smt/solvers/leansmt/README.md).
+```bash
+ant stage-leansmt -Dstage.revision=0.1.0-lean1
+```
+
+If `lib/ivy.xml` already points to the desired LeanSMT Ivy revision, `stage-leansmt` can also
+infer the version from `runtime-leansmt`. The staged Maven artifacts follow the original
+Lean-produced library names and additionally upload the bundled solver executable as the
+classifier `cvc5-x64` with file extension `bin`.
+
 Additional instructions are available at the official [OSSRH][] page and
 the [documentation](http://central.sonatype.org/pages/releasing-the-deployment.html).
 

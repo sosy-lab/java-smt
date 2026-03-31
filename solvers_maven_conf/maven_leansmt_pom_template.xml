@@ -17,7 +17,7 @@ SPDX-License-Identifier: Apache-2.0
   <packaging>pom</packaging>
   <name>javasmt-solver-leansmt</name>
   <version>${stage.revision}</version>
-  <description>LeanSMT native runtime for use in JavaSMT (expects cvc5 executable in PATH)</description>
+  <description>LeanSMT native runtime for use in JavaSMT on Linux x64, including bundled cvc5 runtime artifacts</description>
   <url>https://github.com/sosy-lab/java-smt</url>
 
   <licenses>
@@ -39,4 +39,3 @@ SPDX-License-Identifier: Apache-2.0
   </scm>
 
 </project>
-
