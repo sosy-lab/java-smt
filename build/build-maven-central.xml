@@ -128,12 +128,29 @@ SPDX-License-Identifier: Apache-2.0
 
         <!--
             Retrieve artifacts into the bundle directory with Maven naming.
-            For documentation see https://maven.apache.org/repository/layout.html
+            For documentation see https://maven.apache.org/repository/layout.html .
+
+            To align with standard Maven conventions for JAR and POM files,
+            we do not include the artifact name (Java package name) in the file name.
+
+            - Jars: plain name as [module]-[revision](-[classifier]).jar
+            - Other artifacts: name including the artifact name (library name),
+              i.e., [module]-[revision]-[artifact](-[arch])(-[classifier]).[ext]
+
+            Technical hint:
+            The first retrieve uses "sync=true" to ensure a clean/empty directory.
+            The second retrieve uses "sync=false" to _not_ delete files from the first retrieve.
         -->
         <ivy:retrieve sync="true"
                       overwriteMode="different"
+                      pattern="${bundle.dir}/[module]-[revision](-[classifier]).[ext]"
+                      conf="${resolve.confs}"
+                      type="jar,source,javadoc"/>
+        <ivy:retrieve sync="false"
+                      overwriteMode="different"
                       pattern="${bundle.dir}/[module]-[revision]-[artifact](-[arch])(-[classifier]).[ext]"
-                      conf="${resolve.confs}"/>
+                      conf="${resolve.confs}"
+                      type="shared-object,dll,dylib"/>
     </target>
 
     <target name="bundle" depends="init-maven-central" description="Generate POM, sign artifacts, and create ZIP bundle">
