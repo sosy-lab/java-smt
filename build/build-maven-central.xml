@@ -46,6 +46,17 @@ SPDX-License-Identifier: Apache-2.0
         Usage:
         ant publish-to-maven-central -Dpublish.component=z3 -Dpublish.version=4.16.0
         ant publish-to-maven-central -Dpublish.component=java-smt -Dpublish.version=5.0.0
+
+        Finalizing Publication:
+        1. Review and Publish:
+           - Log in to https://central.sonatype.com/publishing/deployments.
+           - Check that the deployment is validated and contains all expected files.
+           - Click 'Publish' to start the release process.
+        2. Wait for Sync:
+           - It usually takes about 15-30 minutes for the artifacts to appear in
+             Maven Central (https://repo1.maven.org/maven2/org/sosy-lab/).
+             Applications can then download the artifacts using the specified version.
+           - Search results on https://central.sonatype.com/ might take longer to update.
     -->
 
     <import file="build-ivy.xml"/>
