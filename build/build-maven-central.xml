@@ -96,6 +96,10 @@ SPDX-License-Identifier: Apache-2.0
         <property name="ivy.pom.name" value="${publish.full-name}"/>
         <property name="ivy.pom.description" value="JavaSMT component ${publish.full-name}"/>
         <property name="ivy.pom.url" value="https://github.com/sosy-lab/java-smt"/>
+
+        <condition property="isWindows">
+            <os family="windows"/>
+        </condition>
     </target>
 
     <target name="resolve-from-ivy" depends="init-maven-central" description="Resolve and retrieve artifacts from Ivy repository">
@@ -238,21 +242,18 @@ SPDX-License-Identifier: Apache-2.0
         <antcall target="upload-to-sonatype-manual"/>
     </target>
 
-    <target name="upload-to-sonatype-auto" if="sonatype.auth.available">
-        <echo message="Automated upload to Sonatype Central..."/>
-        <condition property="isWindows">
-            <os family="windows"/>
-        </condition>
-        <antcall target="upload-to-sonatype-windows"/>
-        <antcall target="upload-to-sonatype-unix"/>
+    <target name="upload-to-sonatype-auto" depends="upload-to-sonatype-windows, upload-to-sonatype-unix" if="sonatype.auth.available">
         <echo message="Upload request submitted successfully."/>
+        <echo message="Successfully captured ID from upload: ${sonatype.deployment.id}"/>
+        <echo message="For review and final release, please visit:"/>
+        <echo message="  https://central.sonatype.com/publishing/deployments/${sonatype.deployment.id}"/>
     </target>
 
     <target name="upload-to-sonatype-windows" if="isWindows">
-        <echo message="Starting upload..."/>
+        <echo message="Starting upload (Windows)..."/>
         <property name="sonatype.url" value="https://central.sonatype.com/api/v1/publisher/upload?name=${publish.full-name}-${publish.version}&amp;publishingType=${sonatype.publishingType}"/>
         <!-- Use PowerShell for multipart upload on Windows -->
-        <exec executable="powershell" failonerror="true">
+        <exec executable="powershell" failonerror="true" outputproperty="sonatype.deployment.id">
             <arg value="-NoProfile"/>
             <arg value="-Command"/>
             <arg value="$auth = [Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes('${sonatype.token.username}:${sonatype.token.password}')); Invoke-RestMethod -Uri '${sonatype.url}' -Method Post -Headers @{ Authorization = 'Basic ' + $auth } -InFile '${zip.file}' -ContentType 'multipart/form-data'"/>
@@ -260,7 +261,7 @@ SPDX-License-Identifier: Apache-2.0
     </target>
 
     <target name="upload-to-sonatype-unix" unless="isWindows">
-        <echo message="Starting upload..."/>
+        <echo message="Starting upload (Unix)..."/>
         <exec executable="curl" failonerror="true" outputproperty="sonatype.deployment.id">
             <arg value="--no-progress-meter"/>
             <arg value="-X"/>
@@ -273,9 +274,6 @@ SPDX-License-Identifier: Apache-2.0
             <arg value="-F"/>
             <arg value="bundle=@${zip.file}"/>
         </exec>
-        <echo message="Successfully captured ID from upload: ${sonatype.deployment.id}"/>
-        <echo message="For review and further publication steps, please visit:"/>
-        <echo message="  https://central.sonatype.com/publishing/deployments/${sonatype.deployment.id}"/>
     </target>
 
     <target name="upload-to-sonatype-manual" unless="sonatype.auth.available">
