@@ -189,9 +189,9 @@ SPDX-License-Identifier: Apache-2.0
             </fileset>
         </apply>
 
-        <!-- Generate checksums for all artifacts and signature files, excluding hash-files. -->
+        <!-- Generate checksums for all artifacts, excluding signature and hash-files. -->
         <echo message="Generating checksums for all artifacts..."/>
-        <fileset id="bundle.files" dir="${bundle.dir}" includes="*" excludes="*.md5,*.sha*"/>
+        <fileset id="bundle.files" dir="${bundle.dir}" includes="*" excludes="*.asc,*.md5,*.sha*"/>
         <checksum algorithm="MD5" fileext=".md5"><fileset refid="bundle.files"/></checksum>
         <checksum algorithm="SHA-1" fileext=".sha1"><fileset refid="bundle.files"/></checksum>
         <checksum algorithm="SHA-256" fileext=".sha256"><fileset refid="bundle.files"/></checksum>
