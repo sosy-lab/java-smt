@@ -401,7 +401,9 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
     for (String token : tokens) {
       if (Tokenizer.isSetLogicToken(token)) {
         // Skip the (set-logic ...) command at the beginning of the input
-        Preconditions.checkArgument(pos == 0);
+        // The command at the top is not (set-logic) but (set-info) for some non-incremental
+        // benchmarks from the SMT-LIB release 2025
+        // Preconditions.checkArgument(pos == 0);
 
       } else if (Tokenizer.isExitToken(token)) {
         // Skip the (exit) command at the end of the input
