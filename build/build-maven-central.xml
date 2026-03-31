@@ -20,10 +20,28 @@ SPDX-License-Identifier: Apache-2.0
 
         The script loads artifacts directly from Ivy, generates a POM file,
         then uploads to the Maven staging server.
-        There is a manually triggered release process via https://central.sonatype.com/
+        There is a manually triggered release process via https://central.sonatype.com/ .
 
         Locally, we use the dist-directory for temporary storage.
         When debugging, you can check that location for files and file-structure.
+
+        Prerequisites for publishing:
+        1. Account:
+           Register at https://central.sonatype.com/ and ensure you have access to the
+           'org.sosy-lab' namespace.
+        2. PGP Key:
+           - You need a GPG key pair (RSA 2048-bit or higher).
+           - Your public key MUST be published to a supported keyserver:
+             e.g., 'gpg - -keyserver keyserver.ubuntu.com - -send-keys <KEY_ID>'
+           - The passphrase can be provided via '-Dgpg.passphrase=...' or in build.properties.
+        3. Authentication Token:
+           - Log in to https://central.sonatype.com/, go to 'Account', and 'Generate User Token'.
+           - Add the credentials to your '~/.m2/settings.xml' as follows:
+             <server>
+               <id>SonatypeCentral</id>
+               <username>TOKEN_NAME</username>
+               <password>TOKEN_PASSWORD</password>
+             </server>
 
         Usage:
         ant publish-to-maven-central -Dpublish.component=z3 -Dpublish.version=4.16.0
@@ -33,11 +51,6 @@ SPDX-License-Identifier: Apache-2.0
     <import file="build-ivy.xml"/>
 
     <property name="bundle.main.dir" value="dist/maven-central-bundle"/>
-
-    <!--
-        Passphrase can be provided via command line option as '-Dgpg.passphrase=$GPG_PASS' or in
-        build.properties. Environment variable can be defined interactively via "read -s GPG_PASS".
-    -->
     <property name="gpg.passphrase" value=""/>
 
     <target name="init-maven-central" depends="load-ivy">
