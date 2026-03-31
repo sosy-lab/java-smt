@@ -73,9 +73,14 @@ SPDX-License-Identifier: Apache-2.0
         </fail>
 
         <!-- Use a consolidated name for Ivy module and Maven artifact ID -->
-        <condition property="publish.full-name" value="java-smt" else="javasmt-solver-${publish.component}">
+        <condition property="publish.full-name" value="java-smt">
             <equals arg1="${publish.component}" arg2="java-smt"/>
         </condition>
+        <condition property="publish.full-name" value="javasmt-yices2">
+            <equals arg1="${publish.component}" arg2="javasmt_yices2"/>
+        </condition>
+        <!-- Default naming convention for other components: use prefix "javasmt-solver-" -->
+        <property name="publish.full-name" value="javasmt-solver-${publish.component}"/>
 
         <property name="bundle.rel.dir" value="org/sosy-lab/${publish.full-name}/${publish.version}"/>
         <property name="bundle.dir" value="${bundle.main.dir}/${bundle.rel.dir}"/>
@@ -124,7 +129,8 @@ SPDX-License-Identifier: Apache-2.0
                      conf="${resolve.confs}" 
                      log="download-only" 
                      inline="true"
-                     keep="true"/>
+                     keep="true"
+                     transitive="false"/>
 
         <!--
             Retrieve artifacts into the bundle directory with Maven naming.
