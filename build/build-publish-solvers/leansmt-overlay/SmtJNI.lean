@@ -208,6 +208,36 @@ private def withQueryProcess (query : String) : IO UInt8 := do
   else
     throw <| IO.userError s!"Unexpected solver output: {output}"
 
+private def readSolverSexp (solver : SolverState) : IO Sexp := do
+  let mut line ← solver.proc.stdout.getLine
+  let mut out := line
+  let mut parseRes := Sexp.Parser.sexp.run out
+  while !line.isEmpty && parseRes matches .error _ do
+    line ← solver.proc.stdout.getLine
+    out := out ++ line
+    parseRes := Sexp.Parser.sexp.run out
+  match parseRes with
+  | .ok (.expr [ .atom "error", .atom e ]) =>
+      throw <| IO.userError <| unquoteString e
+  | .ok sexp => pure sexp
+  | .error e =>
+      let err ← solver.proc.stderr.readToEnd
+      throw <| IO.userError <| parseErrMsg e out err
+where
+  unquoteString (s : String) : String :=
+    if s.length >= 2 && s.startsWith "\"" && s.endsWith "\"" then
+      String.Pos.Raw.extract s ⟨1⟩ ⟨s.length - 1⟩
+    else
+      s
+
+  parseErrMsg (e : String) (out err : String) : String :=
+    s!"could not parse solver output: {e}\nsolver stdout:\n{out}\nsolver stderr:\n{err}"
+
+private def extractGetValue (response : Sexp) : IO String :=
+  match response with
+  | .expr [ .expr [ _, value ] ] => pure (toString value)
+  | _ => throw <| IO.userError s!"unexpected get-value output: {response}"
+
 @[export leansmt_init]
 def leanSmtInit : IO UInt32 := do
   clearError
@@ -465,6 +495,15 @@ def leanSmtCheckSat (solver : UInt64) : IO UInt8 :=
 @[export leansmt_get_model]
 def leanSmtGetModel (solver : UInt64) : IO String :=
   catchString <| runSolver solver Solver.getModel
+
+@[export leansmt_get_value]
+def leanSmtGetValue (solver term : UInt64) : IO String :=
+  catchString do
+    let solverState ← getSolver solver
+    let valueTerm ← getTerm term
+    solverState.proc.stdin.putStr s!"(get-value ({valueTerm}))\n"
+    solverState.proc.stdin.flush
+    extractGetValue (← readSolverSexp solverState)
 
 @[export leansmt_get_proof]
 def leanSmtGetProof (solver : UInt64) : IO String :=

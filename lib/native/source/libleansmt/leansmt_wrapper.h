@@ -97,6 +97,7 @@ uint64_t leansmt_wrapper_mk_neg(uint64_t t);
 int leansmt_wrapper_assert(uint64_t solver, uint64_t term);
 int leansmt_wrapper_check_sat(uint64_t solver);
 char* leansmt_wrapper_get_model(uint64_t solver);
+char* leansmt_wrapper_get_value(uint64_t solver, uint64_t term);
 char* leansmt_wrapper_get_proof(uint64_t solver);
 void leansmt_wrapper_free_string(char* value);
 

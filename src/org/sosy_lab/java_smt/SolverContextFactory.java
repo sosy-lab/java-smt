@@ -318,7 +318,7 @@ public class SolverContextFactory {
             config, shutdownNotifier, logfile, randomSeed, floatingPointRoundingMode, loader);
 
       case LEANSMT:
-        return LeanSmtSolverContext.create(shutdownNotifier, nonLinearArithmetic);
+        return LeanSmtSolverContext.create(shutdownNotifier, nonLinearArithmetic, loader);
 
       default:
         throw new AssertionError("no solver selected");

@@ -29,7 +29,7 @@
  * Free native buffers after creating Java strings for model/proof retrieval.
  * This keeps ownership handling in the generated binding path reproducible.
  */
-%typemap(out) char * leansmt_wrapper_get_model, char * leansmt_wrapper_get_proof {
+%typemap(out) char * leansmt_wrapper_get_model, char * leansmt_wrapper_get_value, char * leansmt_wrapper_get_proof {
   if ($1) {
     $result = (*jenv)->NewStringUTF(jenv, (const char *)$1);
     leansmt_wrapper_free_string($1);

@@ -147,7 +147,7 @@ final class LeanSmtParser {
       if (items.isEmpty() || !items.get(0).isAtom()) {
         throw new IllegalArgumentException("Malformed SMT-LIB command: " + command);
       }
-      String head = items.get(0).getAtom();
+      String head = decodeIdentifier(items.get(0).getAtom());
       switch (head) {
         case "declare-const":
           parseDeclareConst(items);
@@ -390,12 +390,12 @@ final class LeanSmtParser {
       return parseMacroCall(op, macro, args, expectedType, locals);
     }
 
-    @Nullable Term parsed = parseCoreOperator(opToken, op, args, expectedType, locals);
+    @Nullable Term parsed = parseCoreOperator(op, args, expectedType, locals);
     if (parsed != null) {
       return parsed;
     }
 
-    parsed = parseBitvectorOperator(opToken, op, args, locals);
+    parsed = parseBitvectorOperator(op, args, locals);
     if (parsed != null) {
       return parsed;
     }
@@ -407,12 +407,8 @@ final class LeanSmtParser {
   }
 
   private @Nullable Term parseCoreOperator(
-      String opToken,
-      String op,
-      List<SExpr> args,
-      @Nullable LeanSmtType expectedType,
-      Map<String, Term> locals) {
-    switch (opToken) {
+      String op, List<SExpr> args, @Nullable LeanSmtType expectedType, Map<String, Term> locals) {
+    switch (op) {
       case "_":
         return parseIndexedLiteral(args, expectedType);
       case "let":
@@ -485,8 +481,8 @@ final class LeanSmtParser {
   }
 
   private @Nullable Term parseBitvectorOperator(
-      String opToken, String op, List<SExpr> args, Map<String, Term> locals) {
-    switch (opToken) {
+      String op, List<SExpr> args, Map<String, Term> locals) {
+    switch (op) {
       case "concat":
         checkArity(op, args, 2);
         return bitvectorConcat(op, args.get(0), args.get(1), locals);
@@ -659,7 +655,7 @@ final class LeanSmtParser {
     if (head.size() < 3 || !head.get(1).isAtom()) {
       throw new IllegalArgumentException("Malformed indexed SMT-LIB operator");
     }
-    String indexedOp = head.get(1).getAtom();
+    String indexedOp = decodeIdentifier(head.get(1).getAtom());
     List<SExpr> args = expr.subList(1, expr.size());
 
     switch (indexedOp) {

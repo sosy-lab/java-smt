@@ -17,6 +17,7 @@ import org.junit.AssumptionViolatedException;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.sosy_lab.common.NativeLibraries;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FunctionDeclarationKind;
 import org.sosy_lab.java_smt.api.SolverException;
@@ -29,7 +30,7 @@ public class LeanSmtNativeApiTest {
   @BeforeClass
   public static void loadLeanSmt() {
     try {
-      LeanSmtNativeApi.loadLibrary();
+      LeanSmtNativeApi.loadLibrary(NativeLibraries::loadLibrary);
       LeanSmtNativeApi.initialize();
     } catch (UnsatisfiedLinkError | SolverException e) {
       throw new AssumptionViolatedException("LeanSMT is not available", e);
@@ -87,6 +88,19 @@ public class LeanSmtNativeApiTest {
   }
 
   @Test
+  public void getValueEvaluatesCompoundTerms() throws SolverException {
+    long x = LeanSmtNativeApi.mkIntVar(solver, "x_value");
+    long five = LeanSmtNativeApi.mkIntConst(5L);
+    long one = LeanSmtNativeApi.mkIntConst(1L);
+    long sum = LeanSmtNativeApi.mkAdd(x, one);
+    LeanSmtNativeApi.assertTerm(solver, LeanSmtNativeApi.mkEq(x, five));
+
+    assertThat(LeanSmtNativeApi.checkSat(solver)).isEqualTo(LeanSMTConstants.LEANSMT_SAT);
+    assertThat(LeanSmtNativeApi.getValue(solver, x)).isEqualTo("5");
+    assertThat(LeanSmtNativeApi.getValue(solver, sum)).isEqualTo("6");
+  }
+
+  @Test
   public void errorMessageContainsOperationContextForInvalidDelete() {
     SolverException ex = assertThrows(SolverException.class, () -> LeanSmtNativeApi.deleteSolver(0L));
     assertThat(ex).hasMessageThat().contains("deleteSolver");
@@ -101,4 +115,14 @@ public class LeanSmtNativeApiTest {
     assertThat(ex).hasMessageThat().contains("term=0");
   }
 
+  @Test
+  public void parserAcceptsQuotedCoreOperators() throws SolverException {
+    LeanSmtFormulaCreator creator = new LeanSmtFormulaCreator(solver);
+    long formula =
+        new LeanSmtParser(creator).parse("(assert (|and| true (|xor| false true)))");
+
+    LeanSmtNativeApi.assertTerm(solver, formula);
+
+    assertThat(LeanSmtNativeApi.checkSat(solver)).isEqualTo(LeanSMTConstants.LEANSMT_SAT);
+  }
 }

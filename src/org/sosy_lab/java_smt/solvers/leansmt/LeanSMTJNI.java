@@ -68,6 +68,7 @@ public class LeanSMTJNI {
   public final static native int leansmt_wrapper_assert(java.math.BigInteger jarg1, java.math.BigInteger jarg2);
   public final static native int leansmt_wrapper_check_sat(java.math.BigInteger jarg1);
   public final static native String leansmt_wrapper_get_model(java.math.BigInteger jarg1);
+  public final static native String leansmt_wrapper_get_value(java.math.BigInteger jarg1, java.math.BigInteger jarg2);
   public final static native String leansmt_wrapper_get_proof(java.math.BigInteger jarg1);
   public final static native int leansmt_wrapper_check_sat_string(String jarg1);
 }

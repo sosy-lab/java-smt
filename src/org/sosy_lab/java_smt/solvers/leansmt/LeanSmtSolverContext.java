@@ -9,6 +9,7 @@
 package org.sosy_lab.java_smt.solvers.leansmt;
 
 import java.util.Set;
+import java.util.function.Consumer;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
@@ -52,14 +53,16 @@ public final class LeanSmtSolverContext extends AbstractSolverContext {
   }
 
   public static LeanSmtSolverContext create(
-      ShutdownNotifier pShutdownNotifier, NonLinearArithmetic pNonLinearArithmetic)
+      ShutdownNotifier pShutdownNotifier,
+      NonLinearArithmetic pNonLinearArithmetic,
+      Consumer<String> pLoader)
       throws InvalidConfigurationException {
 
     long constructionSolver = 0L;
     try {
       synchronized (LeanSmtSolverContext.class) {
         if (!initialized) {
-          LeanSmtNativeApi.loadLibrary();
+          LeanSmtNativeApi.loadLibrary(pLoader);
           LeanSmtNativeApi.initialize();
           initialized = true;
         }

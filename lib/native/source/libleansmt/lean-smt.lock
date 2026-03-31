@@ -1,0 +1,11 @@
+# This file is part of JavaSMT,
+# an API wrapper for a collection of SMT solvers:
+# https://github.com/sosy-lab/java-smt
+#
+# SPDX-FileCopyrightText: 2026 Dirk Beyer <https://www.sosy-lab.org>
+#
+# SPDX-License-Identifier: Apache-2.0
+
+# Pinned upstream revision used by the reproducible local LeanSMT runtime build.
+LEANSMT_REMOTE=https://github.com/ufmg-smite/lean-smt.git
+LEANSMT_COMMIT=e556db814854fbd2e69d10adb25abf3518376154

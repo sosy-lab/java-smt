@@ -2,15 +2,32 @@
 
 LeanSMT upstream: <https://github.com/ufmg-smite/lean-smt>
 
-## Linux x64 Setup
+This is the supported local setup for LeanSMT in JavaSMT today:
 
-### 1. Install system dependencies
+- build on Linux x64 only
+- keep the upstream `lean-smt` checkout immutable
+- stage the runtime once in `build/leansmt-staging/x64`
+- expose it through symlinks in `lib/native/x86_64-linux`
+- keep the original Lean-produced library names (`libsmt_SmtJNI.so`, `libauto_Auto.so`, ...)
+
+If you are working on a macOS laptop, run these steps inside an Ubuntu 24.04 x64 OrbStack VM or
+another Linux x64 VM/container. Do not run the runtime build on the macOS host.
+
+## Fresh Ubuntu 24.04 x64 VM
+
+### 1. Install the system packages
 
 ```bash
-sudo apt-get install -y git curl unzip
-sudo apt-get install -y build-essential gcc g++
-sudo apt-get install -y openjdk-17-jdk-headless ant
-sudo apt-get install -y swig patchelf ripgrep
+sudo apt-get update
+sudo apt-get install -y \
+  ant \
+  binutils \
+  build-essential \
+  curl \
+  git \
+  openjdk-21-jdk-headless \
+  ripgrep \
+  unzip
 ```
 
 ### 2. Install the Lean toolchain
@@ -20,73 +37,72 @@ curl https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh -sSf 
 export PATH="$HOME/.elan/bin:$PATH"
 ```
 
-### 3. Clone JavaSMT and LeanSMT
+### 3. Clone JavaSMT and the pinned LeanSMT revision
 
 ```bash
-git clone https://github.com/sosy-lab/java-smt.git java-smt
-git clone https://github.com/ufmg-smite/lean-smt.git
+git clone https://github.com/sosy-lab/java-smt.git
 cd java-smt
+LEANSMT_REMOTE="$(sed -n 's/^LEANSMT_REMOTE=//p' lib/native/source/libleansmt/lean-smt.lock)"
+LEANSMT_COMMIT="$(sed -n 's/^LEANSMT_COMMIT=//p' lib/native/source/libleansmt/lean-smt.lock)"
+git clone "$LEANSMT_REMOTE" ../lean-smt
+git -C ../lean-smt checkout "$LEANSMT_COMMIT"
 ```
 
-### 4. Build and package the LeanSMT runtime
+The pinned LeanSMT revision currently used by JavaSMT is stored in:
+`lib/native/source/libleansmt/lean-smt.lock`
+
+### 4. Build the local LeanSMT runtime
 
 ```bash
 export PATH="$HOME/.elan/bin:$PATH"
-build/build-publish-solvers/build-leansmt-runtime-from-source.sh /absolute/path/to/lean-smt
+./lib/native/source/libleansmt/build-runtime.sh /absolute/path/to/lean-smt
 ```
 
-This populates `lib/native/x86_64-linux/` with the packaged LeanSMT runtime, including:
+This script does not mutate the source checkout. It rebuilds from a throwaway copy in
+`build/lean-smt-work`, stages the runtime in `build/leansmt-staging/x64`, and refreshes the
+LeanSMT symlinks in `lib/native/x86_64-linux`.
 
-- `libleansmt_jni.so`
-- `libleansmt_jni.real.so`
-- `libSmtJNI.so`
-- `libSmt.so`
-- `libAuto.so`
-- `libQq.so`
-- `libcvc5.so`
-- `libleanshared.so`
-- `cvc5`
+### 5. Verify the staged runtime
 
-### 5. Verify the runtime
+Check that the bundled solver executable is present:
 
 ```bash
 ./lib/native/x86_64-linux/cvc5 --version
-ldd ./lib/native/x86_64-linux/libleansmt_jni.real.so
 ```
 
-`ldd` should resolve the LeanSMT dependencies from `lib/native/x86_64-linux/`.
+Check that the JNI library keeps only a local runtime search path:
+
+```bash
+objdump -p ./build/leansmt-staging/x64/libleansmt_jni.so | egrep 'NEEDED|RUNPATH'
+```
+
+The output should mention these LeanSMT dependencies by their original names:
+
+- `libsmt_SmtJNI.so`
+- `libsmt_Smt.so`
+- `libauto_Auto.so`
+- `libQq_Qq.so`
+- `libcvc5_cvc5.so`
+- `libleanshared.so`
+
+The `RUNPATH` should be exactly `$ORIGIN`.
 
 ### 6. Run LeanSMT tests
 
 ```bash
 ant -q build-project
-```
-
-LeanSMT-specific backend tests:
-
-```bash
 ant unit-tests-leansmt
-```
-
-Normal JavaSMT shared tests with LeanSMT only:
-
-```bash
 ant -Dtest.solver=LEANSMT tests
 ```
 
-To run the full JavaSMT suite for all solvers, use:
+## Notes
 
-```bash
-ant tests
-```
-
-## Refreshing the packaged runtime
-
-If the LeanSMT runtime has already been built in another checkout, repackage it with:
-
-```bash
-build/build-publish-solvers/package-leansmt-runtime.sh /absolute/path/to/runtime-source
-```
+- The builder enforces the pinned LeanSMT commit by default. Set `LEANSMT_SKIP_PIN_CHECK=1` only
+  for local experiments.
+- The local runtime layout is intentionally minimal. It does not rely on `leansmt-runtime/`,
+  renamed alias libraries, or host-specific absolute RPATHs.
+- JavaSMT loads LeanSMT through the normal native-library loader and the symlink layer in
+  `lib/native/x86_64-linux`.
 
 ## Use LeanSMT in JavaSMT
 
@@ -101,8 +117,3 @@ Minimal example file:
 - `ubv_to_int` and `sbv_to_int` are not supported.
 - Floating points, arrays, strings/regex, interpolation, and optimization are not supported.
 - Do not use one LeanSMT context or prover concurrently from multiple threads.
-
-## Related release docs
-
-- Ivy release flow: `doc/Developers-How-to-Release-into-Ivy.md`
-- Maven staging flow: `doc/Developers-How-to-Release-into-Maven.md`

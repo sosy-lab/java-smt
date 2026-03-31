@@ -28,6 +28,14 @@ lib/native/source/*/*.o
 lib/native/source/**/*.java
 lib/native/source/**/**/*.java
 lib/native/x86_64-windows/*.dll
+lib/native/x86_64-linux/cvc5
+lib/native/x86_64-linux/libQq_Qq.so
+lib/native/x86_64-linux/libauto_Auto.so
+lib/native/x86_64-linux/libcvc5_cvc5.so
+lib/native/x86_64-linux/libleanshared.so
+lib/native/x86_64-linux/libleansmt_jni.so
+lib/native/x86_64-linux/libsmt_Smt.so
+lib/native/x86_64-linux/libsmt_SmtJNI.so
 lib/native/*/*.asc
 
 doc/Example-Maven-Project/target*
@@ -73,5 +81,7 @@ build.properties
 /repository
 /dist
 /downloads
+/build/lean-smt-work
+/build/leansmt-staging
 
 pom.xml

@@ -71,6 +71,7 @@ extern lean_object* leansmt_mk_neg(uint64_t t);
 extern lean_object* leansmt_assert(uint64_t solver, uint64_t term);
 extern lean_object* leansmt_check_sat(uint64_t solver);
 extern lean_object* leansmt_get_model(uint64_t solver);
+extern lean_object* leansmt_get_value(uint64_t solver, uint64_t term);
 extern lean_object* leansmt_get_proof(uint64_t solver);
 extern lean_object* leansmt_check_sat_string(lean_object* query);
 
@@ -159,8 +160,6 @@ static void configure_embedded_cvc5_path(void) {
 
     const char* candidates[] = {
         "cvc5",
-        "leansmt-runtime/cvc5",
-        "leansmt-runtime/bin/cvc5",
     };
 
     for (size_t i = 0; i < sizeof(candidates) / sizeof(candidates[0]); i++) {
@@ -544,6 +543,11 @@ int leansmt_wrapper_check_sat(uint64_t solver) {
 char* leansmt_wrapper_get_model(uint64_t solver) {
     if (!g_initialized) return NULL;
     return extract_io_string(leansmt_get_model(solver));
+}
+
+char* leansmt_wrapper_get_value(uint64_t solver, uint64_t term) {
+    if (!g_initialized) return NULL;
+    return extract_io_string(leansmt_get_value(solver, term));
 }
 
 char* leansmt_wrapper_get_proof(uint64_t solver) {

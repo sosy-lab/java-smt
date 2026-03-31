@@ -181,6 +181,10 @@ public class LeanSMT implements LeanSMTConstants {
     return LeanSMTJNI.leansmt_wrapper_get_model(solver);
   }
 
+  public static String leansmt_wrapper_get_value(java.math.BigInteger solver, java.math.BigInteger term) {
+    return LeanSMTJNI.leansmt_wrapper_get_value(solver, term);
+  }
+
   public static String leansmt_wrapper_get_proof(java.math.BigInteger solver) {
     return LeanSMTJNI.leansmt_wrapper_get_proof(solver);
   }

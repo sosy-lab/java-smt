@@ -2970,6 +2970,78 @@ SWIGEXPORT jstring JNICALL Java_org_sosy_1lab_java_1smt_solvers_leansmt_LeanSMTJ
   return jresult;
 }
 
+SWIGEXPORT jstring JNICALL Java_org_sosy_1lab_java_1smt_solvers_leansmt_LeanSMTJNI_leansmt_1wrapper_1get_1value(JNIEnv *jenv, jclass jcls, jobject jarg1, jobject jarg2) {
+  jstring jresult = 0 ;
+  uint64_t arg1 ;
+  uint64_t arg2 ;
+  char *result = 0 ;
+
+  (void)jenv;
+  (void)jcls;
+  {
+    jclass clazz;
+    jmethodID mid;
+    jbyteArray ba;
+    jbyte* bae;
+    jsize sz;
+    int i;
+
+    if (!jarg1) {
+      SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "BigInteger null");
+      return 0;
+    }
+    clazz = (*jenv)->GetObjectClass(jenv, jarg1);
+    mid = (*jenv)->GetMethodID(jenv, clazz, "toByteArray", "()[B");
+    ba = (jbyteArray)(*jenv)->CallObjectMethod(jenv, jarg1, mid);
+    bae = (*jenv)->GetByteArrayElements(jenv, ba, 0);
+    sz = (*jenv)->GetArrayLength(jenv, ba);
+    arg1 = 0;
+    if (sz > 0) {
+      arg1 = (uint64_t)(signed char)bae[0];
+      for(i=1; i<sz; i++) {
+        arg1 = (arg1 << 8) | (uint64_t)(unsigned char)bae[i];
+      }
+    }
+    (*jenv)->ReleaseByteArrayElements(jenv, ba, bae, 0);
+  }
+  {
+    jclass clazz;
+    jmethodID mid;
+    jbyteArray ba;
+    jbyte* bae;
+    jsize sz;
+    int i;
+
+    if (!jarg2) {
+      SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "BigInteger null");
+      return 0;
+    }
+    clazz = (*jenv)->GetObjectClass(jenv, jarg2);
+    mid = (*jenv)->GetMethodID(jenv, clazz, "toByteArray", "()[B");
+    ba = (jbyteArray)(*jenv)->CallObjectMethod(jenv, jarg2, mid);
+    bae = (*jenv)->GetByteArrayElements(jenv, ba, 0);
+    sz = (*jenv)->GetArrayLength(jenv, ba);
+    arg2 = 0;
+    if (sz > 0) {
+      arg2 = (uint64_t)(signed char)bae[0];
+      for(i=1; i<sz; i++) {
+        arg2 = (arg2 << 8) | (uint64_t)(unsigned char)bae[i];
+      }
+    }
+    (*jenv)->ReleaseByteArrayElements(jenv, ba, bae, 0);
+  }
+  result = (char *)leansmt_wrapper_get_value(arg1,arg2);
+  {
+    if (result) {
+      jresult = (*jenv)->NewStringUTF(jenv, (const char *)result);
+      leansmt_wrapper_free_string(result);
+    } else {
+      jresult = 0;
+    }
+  }
+  return jresult;
+}
+
 
 SWIGEXPORT jstring JNICALL Java_org_sosy_1lab_java_1smt_solvers_leansmt_LeanSMTJNI_leansmt_1wrapper_1get_1proof(JNIEnv *jenv, jclass jcls, jobject jarg1) {
   jstring jresult = 0 ;
@@ -3039,4 +3111,3 @@ SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_leansmt_LeanSMTJNI_
 #ifdef __cplusplus
 }
 #endif
-

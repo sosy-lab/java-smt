@@ -12,8 +12,7 @@ import com.google.common.base.Preconditions;
 import java.math.BigInteger;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.LinkedHashSet;
-import java.util.Set;
+import java.util.function.Consumer;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.concurrent.Executors;
@@ -36,50 +35,36 @@ final class LeanSmtNativeApi {
 
   private LeanSmtNativeApi() {}
 
-  static void loadLibrary() {
-    Path absoluteLibrary =
-        NativeLibraries.getNativeLibraryPath()
-            .resolve("libleansmt_jni.so")
-            .toAbsolutePath()
-            .normalize();
-    if (!Files.exists(absoluteLibrary)) {
-      throw new UnsatisfiedLinkError(
-          "Failed to load LeanSMT JNI library. Expected packaged runtime at " + absoluteLibrary);
-    }
-
+  static void loadLibrary(Consumer<String> pLoader) {
+    Preconditions.checkNotNull(pLoader);
+    Path nativeDir = NativeLibraries.getNativeLibraryPath().toAbsolutePath().normalize();
     try {
-      System.load(absoluteLibrary.toString());
+      pLoader.accept("leansmt_jni");
       configureBundledSolverPathPrefix();
     } catch (UnsatisfiedLinkError error) {
-      throw new UnsatisfiedLinkError(
-          "Failed to load LeanSMT JNI library. "
-              + "Expected packaged runtime libs in JavaSMT native directory "
-              + absoluteLibrary.getParent()
+      UnsatisfiedLinkError wrapped =
+          new UnsatisfiedLinkError(
+              "Failed to load LeanSMT JNI library. "
+              + "Expected libleansmt_jni.so in JavaSMT native directory "
+              + nativeDir
               + ". "
               + "Original error: "
               + error.getMessage());
+      wrapped.initCause(error);
+      throw wrapped;
     }
   }
 
   private static void configureBundledSolverPathPrefix() {
     Path nativeDir = NativeLibraries.getNativeLibraryPath();
-    Set<Path> candidates = new LinkedHashSet<>();
-    candidates.add(nativeDir);
-    candidates.add(nativeDir.resolve("leansmt-runtime"));
-    candidates.add(nativeDir.resolve("leansmt-runtime/bin"));
-
-    for (Path dir : candidates) {
-      Path cvc5 = dir.resolve("cvc5");
-      if (!Files.isExecutable(cvc5)) {
-        continue;
-      }
-      try {
-        if (LeanSMT.leansmt_wrapper_set_path_prefix(dir.toString()) == 0) {
-          return;
-        }
-      } catch (UnsatisfiedLinkError ignored) {
-        // Ignore missing helper and proceed with default process PATH.
-      }
+    Path cvc5 = nativeDir.resolve("cvc5");
+    if (!Files.isExecutable(cvc5)) {
+      return;
+    }
+    try {
+      LeanSMT.leansmt_wrapper_set_path_prefix(nativeDir.toString());
+    } catch (UnsatisfiedLinkError ignored) {
+      // Ignore missing helper and proceed with default process PATH.
     }
   }
 
@@ -371,10 +356,21 @@ final class LeanSmtNativeApi {
 
   static synchronized String getModel(long solver) throws SolverException {
     String model = LeanSMT.leansmt_wrapper_get_model(toBigInt(solver));
-    if (model == null) {
+    String error = currentError();
+    if (model == null || (model.isEmpty() && error != null && !error.isEmpty())) {
       throw new SolverException(errorOrDefault("Failed to obtain model from LeanSMT"));
     }
     return model;
+  }
+
+  static synchronized String getValue(long solver, long term) throws SolverException {
+    String value = LeanSMT.leansmt_wrapper_get_value(toBigInt(solver), toBigInt(term));
+    String error = currentError();
+    if (value == null || (value.isEmpty() && error != null && !error.isEmpty())) {
+      throw new SolverException(
+          errorOrDefault("Failed to obtain value from LeanSMT for solver=" + solver + ", term=" + term));
+    }
+    return value;
   }
 
   private static long requireTerm(BigInteger term, String errorMessage) throws SolverException {
