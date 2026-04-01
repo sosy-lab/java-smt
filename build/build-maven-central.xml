@@ -44,11 +44,13 @@ SPDX-License-Identifier: Apache-2.0
              </server>
 
         Usage:
-          ant publish-to-maven-central -Dpublish.component=z3 -Dpublish.version=4.16.0
-          ant publish-to-maven-central -Dpublish.component=javasmt_yices2 -Dpublish.version=6.0.0-141-g04134287c
+          ant publish-to-maven-central -Dpublish.component=javasmt-solver-z3 -Dpublish.version=4.16.0
+          ant publish-to-maven-central -Dpublish.component=javasmt-yices2 -Dpublish.version=6.0.0-141-g04134287c
           ant publish-to-maven-central -Dpublish.component=java-smt -Dpublish.version=5.0.0
 
         For testing without upload, add option '-Dpublish.upload=false'.
+        Additionally, we provide a script for testing and debugging the bundle process:
+          scripts/test-maven-central-bundle.sh
 
         Finalizing Publication:
         1. Review and Publish:
@@ -69,40 +71,46 @@ SPDX-License-Identifier: Apache-2.0
     <property name="publish.upload" value="true"/>
 
     <target name="init-maven-central" depends="load-ivy">
-        <fail message="Please provide -Dpublish.component (e.g., z3, java-smt)">
+        <fail message="Please provide -Dpublish.component (e.g., javasmt-solver-z3, javasmt-yices2, java-smt)">
             <condition><not><isset property="publish.component"/></not></condition>
         </fail>
         <fail message="Please provide -Dpublish.version (e.g., 4.12.2)">
             <condition><not><isset property="publish.version"/></not></condition>
         </fail>
 
-        <!-- Use a consolidated name for Ivy module and Maven artifact ID -->
-        <condition property="publish.full-name" value="java-smt">
-            <equals arg1="${publish.component}" arg2="java-smt"/>
-        </condition>
-        <condition property="publish.full-name" value="javasmt-yices2">
-            <equals arg1="${publish.component}" arg2="javasmt_yices2"/>
-        </condition>
-        <!-- Default naming convention for other components: use prefix "javasmt-solver-" -->
-        <property name="publish.full-name" value="javasmt-solver-${publish.component}"/>
-
+        <property name="publish.full-name" value="${publish.component}"/>
         <property name="bundle.rel.dir" value="org/sosy-lab/${publish.full-name}/${publish.version}"/>
         <property name="bundle.dir" value="${bundle.main.dir}/${bundle.rel.dir}"/>
         <property name="zip.file" value="${bundle.main.dir}/${publish.component}-${publish.version}-bundle.zip"/>
         <property name="ivy.resolved.file" value="${bundle.main.dir}/org.sosy_lab-${publish.full-name}-ivy-${publish.version}.xml"/>
 
-        <condition property="is-javasmt">
+        <condition property="is-javasmt" value="true">
             <equals arg1="${publish.component}" arg2="java-smt"/>
         </condition>
-
-        <!-- Define configurations to resolve based on component -->
-        <condition property="resolve.confs" value="core,sources" else="*">
-            <isset property="is-javasmt"/>
+        <condition property="is-solver" value="true">
+            <matches string="${publish.component}" pattern="^javasmt-solver-.*"/>
         </condition>
+        <echo message="Publishing component: ${publish.full-name} ${publish.version} (is solver: ${is-solver})"/>
 
-        <condition property="pom.template" value="pom_template.xml" else="solvers_maven_conf/maven_${publish.component}_pom_template.xml">
-            <isset property="is-javasmt"/>
+        <!--
+            Get POM template for publication.
+            Each component can have a different metadata, license, authors,... -->
+        <condition property="pom.template"
+                   value="solvers_maven_conf/maven_${publish.component}_pom_template.xml"
+                   else="pom_template.xml">
+            <equals arg1="${publish.component}" arg2="javasmt-yices2"/>
         </condition>
+        <loadresource property="publish.short-name">
+            <string value="${publish.component}"/>
+            <filterchain>
+                <replaceregex pattern="^javasmt-solver-(.*)" replace="\1"/>
+            </filterchain>
+        </loadresource>
+        <condition property="pom.template"
+                   value="solvers_maven_conf/maven_${publish.short-name}_pom_template.xml">
+            <istrue value="${is-solver}"/>
+        </condition>
+        <property name="pom.template" value="pom_template.xml"/>
 
         <!-- Setup properties for POM generation -->
         <property name="ivy.pom.version" value="${publish.version}"/>
@@ -125,16 +133,6 @@ SPDX-License-Identifier: Apache-2.0
         <delete dir="${bundle.dir}"/>
         <mkdir dir="${bundle.dir}"/>
 
-        <echo message="Resolving ${publish.full-name} version ${publish.version} from Ivy..."/>
-        <ivy:resolve organisation="org.sosy_lab"
-                     module="${publish.full-name}" 
-                     revision="${publish.version}" 
-                     conf="${resolve.confs}" 
-                     log="download-only" 
-                     inline="true"
-                     keep="true"
-                     transitive="false"/>
-
         <!--
             Download the ivy.xml file from the repository to ensure that the dependencies
             and their versions are correctly reflected in the generated POM.
@@ -142,23 +140,62 @@ SPDX-License-Identifier: Apache-2.0
         -->
         <echo message="Downloading ivy.xml from ${ivy.repo.url}..."/>
         <get src="${ivy.repo.url}/org.sosy_lab/${publish.full-name}/ivy-${publish.version}.xml"
-             dest="${bundle.main.dir}/org.sosy_lab-${publish.full-name}-ivy-${publish.version}.xml"/>
+             dest="${ivy.resolved.file}"/>
+
+        <!-- Load properties from the downloaded ivy.xml -->
+        <xmlproperty file="${ivy.resolved.file}" prefix="ivyxml" collapseAttributes="true" keepRoot="false"/>
 
         <!--
-            Retrieve artifacts into the bundle directory with Maven naming.
-            For documentation see https://maven.apache.org/repository/layout.html .
-
-            To align with standard Maven conventions for JAR and POM files,
-            we do not include the artifact name (Java package name) in the file name.
-
-            - Jars: plain name as [module]-[revision](-[classifier]).jar
-            - Other artifacts: name including the artifact name (library name),
-              i.e., [module]-[revision]-[artifact](-[arch])(-[classifier]).[ext]
-
-            Technical hint:
-            The first retrieve uses "sync=true" to ensure a clean/empty directory.
-            The second retrieve uses "sync=false" to _not_ delete files from the first retrieve.
+            Determine the mapping configuration.
+            (Native) Solvers are artifacts that have no further dependencies.
+            We will not use map configuration 'defaultconf' from ivy.xml for solvers,
+            but instead include all artifact files, as the user needs to specify them separately anyway.
         -->
+        <condition property="pom.mapping.conf" value="*">
+            <istrue value="${is-solver}"/>
+        </condition>
+        <condition property="pom.mapping.conf" value="*">
+            <istrue value="${is-javasmt}"/>
+        </condition>
+        <condition property="pom.mapping.conf" value="${ivyxml.publications.defaultconf}">
+            <isset property="ivyxml.publications.defaultconf"/>
+        </condition>
+        <property name="pom.mapping.conf" value="*"/>
+        <echo message="Available Ivy configurations: ${ivyxml.configurations.conf.name}"/>
+        <echo message="Default Ivy configuration: ${ivyxml.publications.defaultconf}"/>
+        <echo message="Using POM mapping configuration: ${pom.mapping.conf}"/>
+
+        <!-- determine the resolve configurations: use mapping configuration and optionally include 'sources' if available -->
+        <condition property="has-sources">
+            <contains string=",${ivyxml.configurations.conf.name}," substring=",sources,"/>
+        </condition>
+        <condition property="resolve.confs" value="*">
+            <istrue value="${is-solver}"/>
+        </condition>
+        <condition property="resolve.confs" value="core,sources">
+            <istrue value="${is-javasmt}"/>
+        </condition>
+        <condition property="resolve.confs" value="${pom.mapping.conf},sources">
+            <isset property="has-sources"/>
+        </condition>
+        <property name="resolve.confs" value="${pom.mapping.conf}"/>
+        <echo message="Using resolution configurations: ${resolve.confs}"/>
+
+        <antcall target="resolve-and-retrieve-inline"/>
+        <antcall target="resolve-and-retrieve-local"/>
+    </target>
+
+    <target name="resolve-and-retrieve-inline" unless="is-javasmt">
+        <echo message="Resolving ${publish.full-name} version ${publish.version} from Ivy..."/>
+        <ivy:resolve organisation="org.sosy_lab"
+                     module="${publish.full-name}"
+                     revision="${publish.version}"
+                     conf="${resolve.confs}"
+                     log="download-only"
+                     inline="true"
+                     keep="true"
+                     transitive="false"/>
+
         <ivy:retrieve sync="true"
                       overwriteMode="different"
                       pattern="${bundle.dir}/[module]-[revision](-[classifier]).[ext]"
@@ -171,25 +208,48 @@ SPDX-License-Identifier: Apache-2.0
                       type="shared-object,dll,dylib"/>
     </target>
 
+    <target name="resolve-and-retrieve-local" if="is-javasmt">
+        <echo message="Resolving ${publish.full-name} version ${publish.version} from local ivy.xml..."/>
+        <ivy:resolve file="${ivy.resolved.file}"
+                     conf="${resolve.confs}"
+                     log="download-only"
+                     transitive="false"/>
+
+        <!--
+            For java-smt, we download artifacts manually because 'ivy:retrieve'
+            does not easily support retrieving artifacts of the module itself
+            when resolved via 'file' attribute, and 'core' is private in the ivy-xml.
+        -->
+        <get src="${ivy.repo.url}/org.sosy_lab/${publish.full-name}/${publish.full-name}-${publish.version}.jar"
+             dest="${bundle.dir}/${publish.full-name}-${publish.version}.jar"/>
+        <get src="${ivy.repo.url}/org.sosy_lab/${publish.full-name}/${publish.full-name}-${publish.version}-sources.jar"
+             dest="${bundle.dir}/${publish.full-name}-${publish.version}-sources.jar"/>
+    </target>
+
     <target name="bundle" depends="init-maven-central" description="Generate POM, sign artifacts, and create ZIP bundle">
         <!-- Generate POM -->
-        <echo message="Generating POM for ${publish.full-name}..."/>
+        <echo message="Generating POM for ${publish.full-name} using POM template: ${pom.template}"/>
+        <echo message="Apply mapping for configuration: '${resolve.confs}' -> scope 'compile'"/>
 
         <!-- set version placeholder in the template -->
         <property name="stage.revision" value="${publish.version}"/>
+
+        <!--
+            The makepom task generates a POM file based on the resolved Ivy dependencies and
+            the provided template. We use wildcard '*' for conf to include all dependencies, and
+            then specify the mapping for the configurations we want to include.
+
+            It is unclear how Ivy handles multiple configurations with overlapping artifacts,
+            but the result is valid: All solver-independent artifacts are included with scope
+            'compile' and all solver-related artifacts are included as well with scope 'optional'.
+            This approach works well for publishing JavaSMT and also for JavaSMT-Yices2.
+        -->
         <ivy:makepom ivyfile="${ivy.resolved.file}"
                      pomfile="${bundle.dir}/${publish.full-name}-${publish.version}.pom"
                      templatefile="${pom.template}"
-                     conf="${resolve.confs}">
+                     conf="*">
             <mapping conf="${resolve.confs}" scope="compile"/>
         </ivy:makepom>
-
-        <!-- Maven group is "sosy-lab", not "sosy_lab" in generated POM -->
-        <!-- TODO why do we need this step? Just for backwards-compatibility with 2014-2018? -->
-        <replace file="${bundle.dir}/${publish.full-name}-${publish.version}.pom">
-            <replacetoken>sosy_lab</replacetoken>
-            <replacevalue>sosy-lab</replacevalue>
-        </replace>
 
         <!-- Sign all files -->
         <echo message="Signing all artifacts in ${bundle.dir}..."/>
