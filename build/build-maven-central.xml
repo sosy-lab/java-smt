@@ -44,8 +44,11 @@ SPDX-License-Identifier: Apache-2.0
              </server>
 
         Usage:
-        ant publish-to-maven-central -Dpublish.component=z3 -Dpublish.version=4.16.0
-        ant publish-to-maven-central -Dpublish.component=java-smt -Dpublish.version=5.0.0
+          ant publish-to-maven-central -Dpublish.component=z3 -Dpublish.version=4.16.0
+          ant publish-to-maven-central -Dpublish.component=javasmt_yices2 -Dpublish.version=6.0.0-141-g04134287c
+          ant publish-to-maven-central -Dpublish.component=java-smt -Dpublish.version=5.0.0
+
+        For testing without upload, add option '-Dpublish.upload=false'.
 
         Finalizing Publication:
         1. Review and Publish:
@@ -63,6 +66,7 @@ SPDX-License-Identifier: Apache-2.0
 
     <property name="bundle.main.dir" value="dist/maven-central-bundle"/>
     <property name="gpg.passphrase" value=""/>
+    <property name="publish.upload" value="true"/>
 
     <target name="init-maven-central" depends="load-ivy">
         <fail message="Please provide -Dpublish.component (e.g., z3, java-smt)">
@@ -85,14 +89,19 @@ SPDX-License-Identifier: Apache-2.0
         <property name="bundle.rel.dir" value="org/sosy-lab/${publish.full-name}/${publish.version}"/>
         <property name="bundle.dir" value="${bundle.main.dir}/${bundle.rel.dir}"/>
         <property name="zip.file" value="${bundle.main.dir}/${publish.component}-${publish.version}-bundle.zip"/>
+        <property name="ivy.resolved.file" value="${bundle.main.dir}/org.sosy_lab-${publish.full-name}-ivy-${publish.version}.xml"/>
 
-        <!-- Define configurations to resolve based on component -->
-        <condition property="resolve.confs" value="core,sources,javadoc" else="*">
+        <condition property="is-javasmt">
             <equals arg1="${publish.component}" arg2="java-smt"/>
         </condition>
 
+        <!-- Define configurations to resolve based on component -->
+        <condition property="resolve.confs" value="core,sources" else="*">
+            <isset property="is-javasmt"/>
+        </condition>
+
         <condition property="pom.template" value="pom_template.xml" else="solvers_maven_conf/maven_${publish.component}_pom_template.xml">
-            <equals arg1="${publish.component}" arg2="java-smt"/>
+            <isset property="is-javasmt"/>
         </condition>
 
         <!-- Setup properties for POM generation -->
@@ -106,6 +115,9 @@ SPDX-License-Identifier: Apache-2.0
 
         <condition property="isWindows">
             <os family="windows"/>
+        </condition>
+        <condition property="publish.upload.enabled">
+            <istrue value="${publish.upload}"/>
         </condition>
     </target>
 
@@ -165,7 +177,7 @@ SPDX-License-Identifier: Apache-2.0
 
         <!-- set version placeholder in the template -->
         <property name="stage.revision" value="${publish.version}"/>
-        <ivy:makepom ivyfile="${bundle.main.dir}/org.sosy_lab-${publish.full-name}-ivy-${publish.version}.xml"
+        <ivy:makepom ivyfile="${ivy.resolved.file}"
                      pomfile="${bundle.dir}/${publish.full-name}-${publish.version}.pom"
                      templatefile="${pom.template}"
                      conf="${resolve.confs}">
@@ -254,7 +266,7 @@ SPDX-License-Identifier: Apache-2.0
     -->
     <property name="sonatype.publishingType" value="USER_MANAGED"/>
 
-    <target name="upload-to-sonatype" depends="init-maven-central, load-sonatype-token" description="Upload the bundle to Sonatype Central">
+    <target name="upload-to-sonatype" depends="init-maven-central, load-sonatype-token" if="publish.upload.enabled" description="Upload the bundle to Sonatype Central">
         <echo message="The bundle is ready at: ${zip.file}"/>
         
         <!-- Default values if not set by load-sonatype-token or command line -->
@@ -315,6 +327,10 @@ SPDX-License-Identifier: Apache-2.0
         <echo message="To automate this step, provide options -Dsonatype.token.username and -Dsonatype.token.password, or provide Maven settings."/>
     </target>
 
-    <target name="publish-to-maven-central" depends="resolve-from-ivy, bundle, upload-to-sonatype" 
+    <target name="skip-upload-to-sonatype" depends="init-maven-central" unless="publish.upload.enabled">
+        <echo message="Skipping upload to Maven Central as requested."/>
+    </target>
+
+    <target name="publish-to-maven-central" depends="resolve-from-ivy, bundle, upload-to-sonatype, skip-upload-to-sonatype" 
             description="Complete process to prepare and upload a Maven Central bundle from Ivy"/>
 </project>
