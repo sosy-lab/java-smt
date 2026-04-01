@@ -256,6 +256,8 @@ SPDX-License-Identifier: Apache-2.0
             <copy file="${yices2.buildDir}/yices2_java_bindings/dist/lib/libyices2java.so" tofile="${yices2.distDir}/x64/libyices2java-${yices2.version}.so" failonerror="true"/>
             <copy file="${yices2.buildDir}/yices2_java_bindings/dist/lib/yices2java.dll" tofile="${yices2.distDir}/x64/yices2java-${yices2.version}.dll" failonerror="true"/>
             <copy file="${yices2.buildDir}/yices2_java_bindings/dist/lib/yices.jar" tofile="${yices2.distDir}/yices-${yices2.version}.jar" failonerror="true"/>
+            <copy file="${yices2.buildDir}/yices2_java_bindings/dist/lib/yices-sources.jar" tofile="${yices2.distDir}/yices-${yices2.version}-sources.jar" failonerror="true"/>
+            <copy file="${yices2.buildDir}/yices2_java_bindings/dist/lib/yices-javadoc.jar" tofile="${yices2.distDir}/yices-${yices2.version}-javadoc.jar" failonerror="true"/>
 
             <ivy:resolve conf="solver-yices2" file="solvers_ivy_conf/ivy_yices2.xml" />
 

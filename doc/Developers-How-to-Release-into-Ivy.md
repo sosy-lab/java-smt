@@ -424,29 +424,31 @@ In `solvers_ivy_conf/ivy_javasmt_yices2.xml` update the version of the `javasmt-
 dependency:
 
 ```xml
-<dependency org="org.sosy_lab" name="javasmt-solver-yices2" rev="2.8.0-prerelease" conf="runtime->solver-yices2"/>
+
+<dependency org="org.sosy_lab" name="javasmt-solver-yices2" rev="2.8.0-prerelease" .../>
 ```
 
 Then, in `lib/ivy.xml` start looking for the following section:
 
 ```xml
 <!-- additional JavaSMT components with Solver Binaries -->
-<dependency org="org.sosy_lab" name="javasmt-yices2" rev="5.0.1-722-g90a66d7fa" conf="runtime-yices2->runtime; contrib->sources"/>        
+<dependency org="org.sosy_lab" name="javasmt-yices2" rev="6.0.0-141-g04134287c" conf="runtime-yices2->runtime; contrib->sources,javadoc"/>        
 ```
 
-Remove the dependency and replace it with the line from `ivy_javasmt_yices2.xml`, except that
-`conf` has been changed to `runtime-yices2->solver-yices2`:
+Remove the dependency and replace it with a dependency on the solvers:
 
 ```xml
-<dependency org="org.sosy_lab" name="javasmt-solver-yices2" rev="2.8.0-prerelease" conf="runtime-yices2->solver-yices2"/>
+
+<dependency org="org.sosy_lab" name="javasmt-solver-yices2" rev="2.8.0-prerelease" conf="runtime-yices2->solver-yices2; contrib->sources,javadoc"/>
 ```
 
 Then run `ant` to build the project
 
-Now go to the dependency in `ivy.xml` again and change `conf` back to `runtime->solver-yices2`:
+Now go to the dependency in `ivy.xml` again and change `conf` to `runtime->solver-yices2`:
 
 ```xml
-<dependency org="org.sosy_lab" name="javasmt-solver-yices2" rev="2.8.0-prerelease" conf="runtime->solver-yices2"/>
+
+<dependency org="org.sosy_lab" name="javasmt-solver-yices2" rev="2.8.0-prerelease" conf="runtime->solver-yices2; contrib->sources,javadoc"/>
 ```
 
 Then publish the GPL components of JavaSMT:
@@ -457,7 +459,8 @@ ant publish-artifacts-yices2 -Dversion=yices2.8-prerelease
 Finally, return the dependency in `ivy.xml` to its original form, but with the version updated:
 
 ```xml
-<dependency org="org.sosy_lab" name="javasmt-yices2" rev="yices2.8-prerelease" conf="runtime-yices2->runtime; contrib->sources"/>
+
+<dependency org="org.sosy_lab" name="javasmt-yices2" rev="yices2.8-prerelease" conf="runtime-yices2->runtime; contrib->sources,javadoc"/>
 ```
 
 Optionally, you may now publish a new version of JavaSMT:

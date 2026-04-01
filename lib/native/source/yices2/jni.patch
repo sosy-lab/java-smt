@@ -2,7 +2,44 @@ Index: build.xml
 diff --git a/build.xml b/build.xml
 --- a/build.xml	(revision 25b03e1858b3ef006bca2532b87510613d8af55f)
 +++ b/build.xml	(date 1773730694637)
-@@ -224,7 +224,6 @@
+@@ -72,6 +72,7 @@
+
+     <property name="build" location="build"/>
+     <property name="classes" location="${build}/classes"/>
++    <property name="docs" location="${build}/docs"/>
+     <property name="test_classes" location="${build}/test_classes"/>
+     <property name="dist" location="dist"/>
+
+@@ -148,6 +149,7 @@
+     <!-- Create the build directory structure used by compile -->
+     <mkdir dir="${build}"/>
+     <mkdir dir="${classes}"/>
++    <mkdir dir="${docs}"/>
+     <mkdir dir="${test_classes}"/>
+   </target>
+
+@@ -182,6 +184,10 @@
+ 	   includeantruntime="false"
+ 	   nativeheaderdir="${code}">
+     </javac>
++
++    <!-- Generate JavaDoc documentation -->
++    <javadoc sourcepath="${src}" destdir="${docs}"/>
++
+   </target>
+
+   <target name="dist" depends="compile"
+@@ -220,11 +226,16 @@
+       </manifest>
+     </jar>
+
++    <!-- Package JavaDoc and sources -->
++    <jar destfile="${dist}/lib/yices-javadoc.jar" basedir="${docs}"/>
++    <jar destfile="${dist}/lib/yices-sources.jar">
++      <fileset dir="${src}" includes="**/*.java"/>
++    </jar>
++
+     <echo> Executing "make ${library}" in ${code} </echo>
      <exec executable="make"
            dir="${code}"
            failonerror="true">
