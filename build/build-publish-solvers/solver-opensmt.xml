@@ -194,7 +194,7 @@ SPDX-License-Identifier: Apache-2.0
     <target name="build-opensmt-bindings-jni" depends="build-opensmt-wrapper">
         <!-- compile java proxies and create jar file -->
         <mkdir dir="${source.path}/build"/>
-        <javac release="11" srcdir="${source.path}/src/" destdir="${source.path}/build" includeantruntime="false" failonerror="true">
+        <javac release="11" srcdir="${source.path}/src/" destdir="${source.path}/build" debug="true" includeantruntime="false" failonerror="true">
             <include name="org/sosy_lab/java_smt/solvers/opensmt/api/*.java"/>
         </javac>
         <jar destfile="${opensmt.dist.dir}/opensmt-${opensmt.version}.jar" basedir="${source.path}/build"/>
