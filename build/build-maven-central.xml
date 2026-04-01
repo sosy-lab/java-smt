@@ -95,15 +95,6 @@ SPDX-License-Identifier: Apache-2.0
             <equals arg1="${publish.component}" arg2="java-smt"/>
         </condition>
 
-        <!--
-            Note:
-            We can use arbitrary versions from online Ivy repository with ${publish.version}.
-            However, their configuration needs to match with the local Ivy definition file.
-        -->
-        <condition property="ivy.file" value="lib/ivy.xml" else="solvers_ivy_conf/ivy_${publish.component}.xml">
-            <equals arg1="${publish.component}" arg2="java-smt"/>
-        </condition>
-
         <!-- Setup properties for POM generation -->
         <property name="ivy.pom.version" value="${publish.version}"/>
         <property name="ivy.pom.groupId" value="org.sosy-lab"/>
@@ -131,6 +122,15 @@ SPDX-License-Identifier: Apache-2.0
                      inline="true"
                      keep="true"
                      transitive="false"/>
+
+        <!--
+            Download the ivy.xml file from the repository to ensure that the dependencies
+            and their versions are correctly reflected in the generated POM.
+            We store it outside the bundle directory so it is not included in the ZIP.
+        -->
+        <echo message="Downloading ivy.xml from ${ivy.repo.url}..."/>
+        <get src="${ivy.repo.url}/org.sosy_lab/${publish.full-name}/ivy-${publish.version}.xml"
+             dest="${bundle.main.dir}/org.sosy_lab-${publish.full-name}-ivy-${publish.version}.xml"/>
 
         <!--
             Retrieve artifacts into the bundle directory with Maven naming.
@@ -165,7 +165,7 @@ SPDX-License-Identifier: Apache-2.0
 
         <!-- set version placeholder in the template -->
         <property name="stage.revision" value="${publish.version}"/>
-        <ivy:makepom ivyfile="${ivy.file}"
+        <ivy:makepom ivyfile="${bundle.main.dir}/org.sosy_lab-${publish.full-name}-ivy-${publish.version}.xml"
                      pomfile="${bundle.dir}/${publish.full-name}-${publish.version}.pom"
                      templatefile="${pom.template}"
                      conf="${resolve.confs}">
