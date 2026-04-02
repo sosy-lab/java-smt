@@ -424,7 +424,6 @@ In `solvers_ivy_conf/ivy_javasmt_yices2.xml` update the version of the `javasmt-
 dependency:
 
 ```xml
-
 <dependency org="org.sosy_lab" name="javasmt-solver-yices2" rev="2.8.0-prerelease" .../>
 ```
 
@@ -438,7 +437,6 @@ Then, in `lib/ivy.xml` start looking for the following section:
 Remove the dependency and replace it with a dependency on the solvers:
 
 ```xml
-
 <dependency org="org.sosy_lab" name="javasmt-solver-yices2" rev="2.8.0-prerelease" conf="runtime-yices2->solver-yices2; contrib->sources,javadoc"/>
 ```
 
@@ -447,7 +445,6 @@ Then run `ant` to build the project
 Now go to the dependency in `ivy.xml` again and change `conf` to `runtime->solver-yices2`:
 
 ```xml
-
 <dependency org="org.sosy_lab" name="javasmt-solver-yices2" rev="2.8.0-prerelease" conf="runtime->solver-yices2; contrib->sources,javadoc"/>
 ```
 
@@ -459,7 +456,6 @@ ant publish-artifacts-yices2 -Dversion=yices2.8-prerelease
 Finally, return the dependency in `ivy.xml` to its original form, but with the version updated:
 
 ```xml
-
 <dependency org="org.sosy_lab" name="javasmt-yices2" rev="yices2.8-prerelease" conf="runtime-yices2->runtime; contrib->sources,javadoc"/>
 ```
 
