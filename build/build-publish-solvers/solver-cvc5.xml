@@ -63,6 +63,7 @@ SPDX-License-Identifier: Apache-2.0
             <mapper type="merge" to="libcvc5jni-${cvc5.version}.dll"/>
         </unzip>
 
+        <!-- Download binaries for Windows on arm64 -->
         <get src="${cvc5.url}/cvc5-Win64-arm64-static-${cvc5.version}.zip" dest="${cvc5.downloads}" verbose="true"/>
         <unzip src="${cvc5.downloads}/cvc5-Win64-arm64-static-${cvc5.version}.zip" dest="${cvc5.distDir}/arm64">
             <patternset><include name="cvc5-Win64-arm64-static/bin/cvc5jni.dll"/></patternset>
@@ -71,9 +72,71 @@ SPDX-License-Identifier: Apache-2.0
 
         <!-- Download the Java bindings -->
         <get src="${cvc5.url}/cvc5-Linux-arm64-java-api-${cvc5.version}.jar" dest="${cvc5.distDir}/cvc5-${cvc5.version}.jar" verbose="true"/>
+        <!-- Remove bundled binary -->
+        <exec executable="zip" failonerror="true">
+            <arg value="-d"/>
+            <arg value="${cvc5.distDir}/cvc5-${cvc5.version}.jar"/>
+            <arg value="cvc5-libs/*"/>
+        </exec>
+
+        <!-- Download the source code -->
+        <exec executable="git" dir="${cvc5.downloads}" failonerror="true">
+            <arg value="clone"/>
+            <arg value="https://github.com/cvc5/cvc5.git"/>
+            <arg value="cvc5-sources"/>
+        </exec>
+        <!-- Get the git version -->
+        <loadresource property="cvc5.gitVersion">
+            <concat>${cvc5.version}</concat>
+            <filterchain>
+                <replaceregex pattern="\d{4}-\d{2}-\d{2}-(.*)" replace="\1"/>
+            </filterchain>
+        </loadresource>
+        <!-- Checkout the right version -->
+        <exec executable="git" dir="${cvc5.downloads}/cvc5-sources" failonerror="true">
+            <arg value="checkout"/>
+            <arg value="${cvc5.gitVersion}"/>
+        </exec>
     </target>
 
-    <target name="publish-cvc5" depends="download-cvc5, load-ivy" description="Publish CVC5 binaries to Ivy repository.">
+    <target name="package-cvc5-sources" depends="download-cvc5">
+        <jar destfile="${cvc5.distDir}/cvc5-${cvc5.version}-sources.jar" whenmanifestonly="fail">
+            <zipfileset dir="${cvc5.downloads}/cvc5-sources/src/api/java" includes="**/*.java" prefix="io/github/cvc5"/>
+            <zipfileset dir="${cvc5.downloads}/cvc5-sources" includes="COPYING.txt" prefix="META-INF"/>
+            <manifest>
+                <attribute name="Implementation-Title" value="cvc5"/>
+                <attribute name="Implementation-Version" value="${cvc5.version}"/>
+            </manifest>
+        </jar>
+    </target>
+
+    <target name="package-cvc5-javadoc" depends="download-cvc5">
+        <delete dir="${cvc5.downloads}/cvc5-javadoc" quiet="true"/>
+        <javadoc destdir="${cvc5.downloads}/cvc5-javadoc"
+                 classpathref="classpath"
+                 locale="en_US"
+                 encoding="utf-8"
+                 windowtitle="cvc5"
+                 failonerror="true"
+                 failonwarning="false"
+                 overview="doc/javadoc_overview.html"
+        >
+            <fileset dir="${cvc5.downloads}/cvc5-sources/src/api/java">
+                <include name="**/*.java"/>
+            </fileset>
+            <link href="https://docs.oracle.com/en/java/javase/11/docs/api/"/>
+            <doctitle><![CDATA[<h1>cvc5</h1>]]></doctitle>
+            <tag name="api.note" description="Note:"/>
+            <arg line="${javadoc.doclint}"/>
+            <arg line="--allow-script-in-comments"/>
+        </javadoc>
+        <jar jarfile="${cvc5.distDir}/cvc5-${cvc5.version}-javadoc.jar" whenmanifestonly="fail">
+            <zipfileset dir="${cvc5.downloads}/cvc5-sources" includes="COPYING.txt" prefix="META-INF"/>
+            <fileset dir="${cvc5.downloads}/cvc5-javadoc"/>
+        </jar>
+    </target>
+
+    <target name="publish-cvc5" depends="download-cvc5, package-cvc5-sources, package-cvc5-javadoc, load-ivy" description="Publish CVC5 binaries to Ivy repository.">
         <ivy:resolve conf="solver-cvc5" file="solvers_ivy_conf/ivy_cvc5.xml"/>
         <publishToRepository solverName="CVC5" solverVersion="${cvc5.version}" distDir="${cvc5.distDir}"/>
 
