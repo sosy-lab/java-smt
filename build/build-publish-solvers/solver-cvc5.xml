@@ -102,7 +102,7 @@ SPDX-License-Identifier: Apache-2.0
     <target name="package-cvc5-sources" depends="download-cvc5">
         <jar destfile="${cvc5.distDir}/cvc5-${cvc5.version}-sources.jar" whenmanifestonly="fail">
             <zipfileset dir="${cvc5.downloads}/cvc5-sources/src/api/java" includes="**/*.java" prefix="io/github/cvc5"/>
-            <zipfileset dir="${cvc5.downloads}/cvc5-sources" includes="COPYING.txt" prefix="META-INF"/>
+            <zipfileset dir="${cvc5.downloads}/cvc5-sources" includes="COPYING" prefix="META-INF"/>
             <manifest>
                 <attribute name="Implementation-Title" value="cvc5"/>
                 <attribute name="Implementation-Version" value="${cvc5.version}"/>
@@ -119,7 +119,6 @@ SPDX-License-Identifier: Apache-2.0
                  windowtitle="cvc5"
                  failonerror="true"
                  failonwarning="false"
-                 overview="doc/javadoc_overview.html"
         >
             <fileset dir="${cvc5.downloads}/cvc5-sources/src/api/java">
                 <include name="**/*.java"/>
@@ -131,8 +130,8 @@ SPDX-License-Identifier: Apache-2.0
             <arg line="--allow-script-in-comments"/>
         </javadoc>
         <jar jarfile="${cvc5.distDir}/cvc5-${cvc5.version}-javadoc.jar" whenmanifestonly="fail">
-            <zipfileset dir="${cvc5.downloads}/cvc5-sources" includes="COPYING.txt" prefix="META-INF"/>
-            <fileset dir="${cvc5.downloads}/cvc5-javadoc"/>
+            <zipfileset dir="${cvc5.downloads}/cvc5-sources" includes="COPYING" prefix="META-INF"/>
+            <zipfileset dir="${cvc5.downloads}/cvc5-javadoc"/>
         </jar>
     </target>
 
