@@ -96,13 +96,17 @@ SPDX-License-Identifier: Apache-2.0
         <!-- Configuration for publishing sources -->
         <conf name="sources" description="sources of JavaSMT" />
 
-        <conf name="sources-all" extends="sources,contrib" description="sources of JavaSMT and its dependencies" />
+        <!-- Configuration for publishing JavaDocs -->
+        <conf name="javadoc" description="documentation of JavaSMT"/>
+
+        <conf name="sources-all" extends="sources,javadoc,contrib" description="sources of JavaSMT and its dependencies"/>
     </configurations>
 
     <publications defaultconf="core">
         <artifact />
 
         <artifact conf="sources" e:classifier="sources" type="source" ext="jar"/>
+        <artifact conf="javadoc" e:classifier="javadoc" type="javadoc" ext="jar"/>
     </publications>
 
     <dependencies>
