@@ -87,11 +87,7 @@ class CVC4BooleanFormulaManager
     return switch (operands.size()) {
       case 0 -> cvc4True;
       case 1 -> Iterables.getOnlyElement(operands);
-      default -> {
-        vectorExpr vExpr = new vectorExpr();
-        operands.forEach(vExpr::add);
-        yield exprManager.mkExpr(Kind.AND, vExpr);
-      }
+      default -> exprManager.mkExpr(Kind.AND, new vectorExpr(exprManager, operands));
     };
   }
 
@@ -127,13 +123,7 @@ class CVC4BooleanFormulaManager
     return switch (operands.size()) {
       case 0 -> cvc4False;
       case 1 -> Iterables.getOnlyElement(operands);
-      default -> {
-        vectorExpr vExpr = new vectorExpr();
-        for (Expr e : operands) {
-          vExpr.add(e);
-        }
-        yield exprManager.mkExpr(Kind.OR, vExpr);
-      }
+      default -> exprManager.mkExpr(Kind.OR, new vectorExpr(exprManager, operands));
     };
   }
 
