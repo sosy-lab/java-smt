@@ -76,7 +76,7 @@ SPDX-License-Identifier: Apache-2.0
             <arg value="--java"/>
         </exec>
         <exec executable="make" dir="${z3.path}/build" failonerror="true">
-            <arg value="-j"/>
+            <arg value="-j8"/>
         </exec>
         <exec executable="make" dir="${z3.path}/build" failonerror="true">
             <arg value="install"/>
@@ -101,7 +101,7 @@ SPDX-License-Identifier: Apache-2.0
             <arg value="--java"/>
         </exec>
         <exec executable="make" dir="${z3.path}/build" failonerror="true">
-            <arg value="-j"/>
+            <arg value="-j8"/>
         </exec>
         <exec executable="make" dir="${z3.path}/build" failonerror="true">
             <arg value="install"/>
