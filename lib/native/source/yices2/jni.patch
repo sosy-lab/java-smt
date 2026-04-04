@@ -18,13 +18,24 @@ diff --git a/build.xml b/build.xml
      <mkdir dir="${test_classes}"/>
    </target>
 
-@@ -182,6 +184,10 @@
+@@ -182,6 +184,21 @@
  	   includeantruntime="false"
  	   nativeheaderdir="${code}">
      </javac>
 +
 +    <!-- Generate JavaDoc documentation -->
-+    <javadoc sourcepath="${src}" destdir="${docs}"/>
++    <javadoc destdir="${docs}"
++             locale="en_US"
++             encoding="utf-8"
++             windowtitle="Yices2"
++             failonerror="false"
++             failonwarning="false">
++        <fileset dir="${src}">
++            <include name="**/*.java"/>
++        </fileset>
++        <link href="https://docs.oracle.com/en/java/javase/11/docs/api/"/>
++        <doctitle><![CDATA[<h1>Yices2</h1>]]></doctitle>
++    </javadoc>
 +
    </target>
 
