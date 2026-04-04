@@ -39,7 +39,7 @@ SPDX-License-Identifier: Apache-2.0
         <property name="javadoc-jar.file" value="javasmt-yices2-${version}-javadoc.jar"/>
         <jar jarfile="${javadoc-jar.file}">
             <metainf dir="." includes="LICENSE"/>
-            <fileset dir="yices.javadoc"/>
+            <fileset dir="${yices.javadoc}"/>
         </jar>
     </target>
 </project>

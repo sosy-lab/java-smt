@@ -30,6 +30,7 @@ SPDX-License-Identifier: Apache-2.0
         <conf name="runtime-x64" extends="runtime-linux-x64, runtime-windows-x64"/>
         <conf name="sources"/>
         <conf name="javadoc"/>
+        <conf name="contrib"/>
 
         <!-- basic configurations -->
         <conf name="runtime-linux-x64" extends="runtime-common"/>
@@ -46,7 +47,7 @@ SPDX-License-Identifier: Apache-2.0
 
     <dependencies>
         <dependency org="org.sosy_lab" name="javasmt-solver-yices2" rev="2.8.0-prerelease"
-                    conf="runtime-linux-x64->solver-yices2-linux-x64; runtime-windows-x64->solver-yices2-windows-x64; sources->sources; javadoc->javadoc"/>
+                    conf="runtime-linux-x64->solver-yices2-linux-x64; runtime-windows-x64->solver-yices2-windows-x64; contrib->sources,javadoc"/>
 
         <!-- keep the following dependencies synchronized with the default lib/ivy.xml and build-jar-yices2.xml -->
 

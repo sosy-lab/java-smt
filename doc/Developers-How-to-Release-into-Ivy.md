@@ -438,17 +438,10 @@ Remove the dependency and replace it with a dependency on the solvers:
 
 ```xml
 <dependency org="org.sosy_lab" name="javasmt-solver-yices2" rev="2.8.0-prerelease" conf="runtime-yices2->solver-yices2; contrib->sources,javadoc"/>
-```
-
-Then run `ant` to build the project
-
-Now go to the dependency in `ivy.xml` again and change `conf` to `runtime->solver-yices2`:
-
-```xml
 <dependency org="org.sosy_lab" name="javasmt-solver-yices2" rev="2.8.0-prerelease" conf="runtime->solver-yices2; contrib->sources,javadoc"/>
 ```
 
-Then publish the GPL components of JavaSMT:
+Then publish the Yices components of JavaSMT:
 ```shell
 ant publish-artifacts-yices2 -Dversion=yices2.8-prerelease
 ```
