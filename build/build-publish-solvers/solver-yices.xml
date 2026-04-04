@@ -278,7 +278,9 @@ SPDX-License-Identifier: Apache-2.0
     </target>
 
     <import file="build-jar-yices2.xml"/>
-    <target name="dist-yices2" depends="jar-yices2, sources-yices2" description="Make a distributable release with yices2 only"/>
+    <import file="build-documentation-yices2.xml"/>
+
+    <target name="dist-yices2" depends="jar-yices2, sources-yices2, javadoc-jar-yices2" description="Make a distributable release with yices2 only"/>
 
     <target name="publish-artifacts-yices2" depends="load-ivy, determine-version, dist-yices2"
          description="Publish Java bindings for Yices2 to Ivy repo.">

@@ -41,6 +41,7 @@ SPDX-License-Identifier: Apache-2.0
     <publications defaultconf="runtime">
         <artifact/>
         <artifact conf="sources" type="source" e:classifier="sources" ext="jar"/>
+        <artifact conf="javadoc" type="javadoc" e:classifier="javadoc" ext="jar"/>
     </publications>
 
     <dependencies>
