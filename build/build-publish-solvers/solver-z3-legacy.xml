@@ -14,6 +14,8 @@ SPDX-License-Identifier: Apache-2.0
 <project name="publish-solvers-z3-legacy" basedir="." xmlns:ivy="antlib:org.apache.ivy.ant">
 
     <property name="z3legacy.dist.dir" value="${ivy.solver.dist.dir}/z3legacy"/>
+    <property name="z3legacy.project.name" value="Java Bindings for Z3 (4.5.0)"/>
+    <property name="z3legacy.javadoc.dir" value="downloads/javadoc/z3-legacy"/>
 
     <import file="macros.xml"/>
 
@@ -130,7 +132,48 @@ SPDX-License-Identifier: Apache-2.0
         <copy file="${z3.installPathLinuxX64}/lib/com.microsoft.z3legacy.jar" tofile="${z3legacy.dist.dir}/com.microsoft.z3legacy-${z3.legacy.version}.jar" failonerror="true"/>
     </target>
 
-    <target name="publish-z3-legacy" depends="package-z3-legacy, load-ivy"
+    <target name="prepare-z3-legacy-sources" depends="set-properties-for-z3-legacy">
+        <delete dir="${z3.path}/build"/>
+        <exec executable="python3" dir="${z3.path}" failonerror="true">
+            <arg value="scripts/mk_make.py"/>
+            <arg value="--java"/>
+        </exec>
+    </target>
+
+    <target name="package-z3-legacy-sources" depends="prepare-z3-legacy-sources">
+        <jar destfile="${z3legacy.dist.dir}/com.microsoft.z3legacy-${z3.legacy.version}-sources.jar" whenmanifestonly="fail">
+            <zipfileset dir="${z3.path}/src/api/java" includes="**/*.java" prefix="com/microsoft/z3"/>
+            <zipfileset dir="${z3.path}/" includes="LICENSE.txt" prefix="META-INF"/>
+            <manifest>
+                <attribute name="Implementation-Title" value="${z3legacy.project.name}"/>
+                <attribute name="Implementation-Version" value="${z3.legacy.version}"/>
+            </manifest>
+        </jar>
+    </target>
+
+    <target name="package-z3-legacy-javadoc" depends="prepare-z3-legacy-sources">
+        <delete dir="${z3legacy.javadoc.dir}" quiet="true"/>
+        <javadoc destdir="${z3legacy.javadoc.dir}"
+                 classpathref="classpath"
+                 locale="en_US"
+                 encoding="utf-8"
+                 windowtitle="${z3legacy.project.name}"
+                 failonerror="false"
+                 failonwarning="false">
+            <fileset dir="${z3.path}/src/api/java">
+                <include name="**/*.java"/>
+            </fileset>
+            <link href="https://docs.oracle.com/en/java/javase/11/docs/api/"/>
+            <doctitle><![CDATA[<h1>${z3legacy.project.name}</h1>]]></doctitle>
+            <arg line="${javadoc.doclint}"/>
+        </javadoc>
+        <jar jarfile="${z3legacy.dist.dir}/com.microsoft.z3legacy-${z3.legacy.version}-javadoc.jar" whenmanifestonly="fail">
+            <zipfileset dir="${z3.path}/" includes="LICENSE.txt" prefix="META-INF"/>
+            <fileset dir="${z3legacy.javadoc.dir}"/>
+        </jar>
+    </target>
+
+    <target name="publish-z3-legacy" depends="package-z3-legacy, package-z3-legacy-sources, package-z3-legacy-javadoc, load-ivy"
         description="Publish Z3 legacy binaries to Ivy repo.">
         <ivy:resolve conf="solver-z3-legacy,solver-z3-legacy-x64" file="solvers_ivy_conf/ivy_z3-legacy.xml"/>
         <publishToRepository solverName="Z3-legacy" solverVersion="${z3.legacy.version}" distDir="${z3legacy.dist.dir}"/>
