@@ -71,13 +71,13 @@ SPDX-License-Identifier: Apache-2.0
         </unzip>
 
         <!-- Download the Java bindings -->
-        <get src="${cvc5.url}/cvc5-Linux-arm64-java-api-${cvc5.version}.jar" dest="${cvc5.distDir}/cvc5-${cvc5.version}.jar" verbose="true"/>
+        <get src="${cvc5.url}/cvc5-Linux-arm64-java-api-${cvc5.version}.jar" dest="${cvc5.downloads}/cvc5-${cvc5.version}.jar" verbose="true"/>
         <!-- Remove bundled binary -->
-        <exec executable="zip" failonerror="true">
-            <arg value="-d"/>
-            <arg value="${cvc5.distDir}/cvc5-${cvc5.version}.jar"/>
-            <arg value="cvc5-libs/*"/>
-        </exec>
+        <zip destfile="${cvc5.distDir}/cvc5-${cvc5.version}.jar">
+            <zipfileset src="${cvc5.downloads}/cvc5-${cvc5.version}.jar">
+                <exclude name="cvc5-libs/**/*"/>
+            </zipfileset>
+        </zip>
 
         <!-- Download the source code -->
         <exec executable="git" dir="${cvc5.downloads}" failonerror="true">
