@@ -71,9 +71,7 @@ class CVC4StringFormulaManager extends AbstractStringFormulaManager<Expr, Type, 
   @Override
   protected Expr concatImpl(List<Expr> parts) {
     Preconditions.checkArgument(parts.size() > 1);
-    vectorExpr vector = new vectorExpr();
-    parts.forEach(vector::add);
-    return exprManager.mkExpr(Kind.STRING_CONCAT, vector);
+    return exprManager.mkExpr(Kind.STRING_CONCAT, new vectorExpr(exprManager, parts));
   }
 
   @Override
@@ -129,7 +127,7 @@ class CVC4StringFormulaManager extends AbstractStringFormulaManager<Expr, Type, 
 
   @Override
   protected Expr noneImpl() {
-    return exprManager.mkExpr(Kind.REGEXP_EMPTY, new vectorExpr());
+    return exprManager.mkExpr(Kind.REGEXP_EMPTY, new vectorExpr(exprManager));
   }
 
   @Override
@@ -139,7 +137,7 @@ class CVC4StringFormulaManager extends AbstractStringFormulaManager<Expr, Type, 
 
   @Override
   protected Expr allCharImpl() {
-    return exprManager.mkExpr(Kind.REGEXP_SIGMA, new vectorExpr());
+    return exprManager.mkExpr(Kind.REGEXP_SIGMA, new vectorExpr(exprManager));
   }
 
   /**
@@ -174,9 +172,7 @@ class CVC4StringFormulaManager extends AbstractStringFormulaManager<Expr, Type, 
   @Override
   protected Expr concatRegexImpl(List<Expr> parts) {
     Preconditions.checkArgument(parts.size() > 1);
-    vectorExpr vector = new vectorExpr();
-    parts.forEach(vector::add);
-    return exprManager.mkExpr(Kind.REGEXP_CONCAT, vector);
+    return exprManager.mkExpr(Kind.REGEXP_CONCAT, new vectorExpr(exprManager, parts));
   }
 
   @Override
