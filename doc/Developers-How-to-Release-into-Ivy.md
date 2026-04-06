@@ -131,17 +131,18 @@ ant publish-z3-legacy -Dz3.path=../solvers/z3/z3 -Dz3.customRev=4.5.0
 
 ### Publishing CVC4
 
-We use the docker image for publishing CVC4. Two additional dependencies are needed for the build:
+We use the Docker image with Ubuntu 18.04 for publishing CVC4.
+Please manually add two additional dependencies before running the build script:
 
 ```bash
-pip install toml
+pip3 install toml
 apt-get install antlr3 libantlr3c-dev
 ```
 
 Then run the build script to publish the bindings:
 
 ```bash
-ant publish-cvc4 -Dcvc4.path=/workspace/CVC4-archived -Dcvc4.customRev=final
+ant publish-cvc4 -Dcvc4.path=/workspace/CVC4-archived -Dcvc4.customRev=1.8.1
 ```
 
 ### Publishing CVC5

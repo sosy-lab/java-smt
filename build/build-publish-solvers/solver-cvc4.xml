@@ -40,9 +40,9 @@ SPDX-License-Identifier: Apache-2.0
 
     <target name="package-cvc4" depends="initialize-cvc4">
         <!-- build CVC4 -->
-        <exec executable="rm" dir="${cvc4.path}/deps" failonerror="true">
+        <exec executable="rm" dir="${cvc4.path}" failonerror="true">
             <arg value="-rf"/>
-            <arg value="symfpu-CVC4"/>
+            <arg value="deps/symfpu-CVC4"/>
         </exec>
         <exec executable="./contrib/get-symfpu" dir="${cvc4.path}" failonerror="true"/>
         <exec executable="./configure.sh" dir="${cvc4.path}" failonerror="true">
@@ -52,15 +52,13 @@ SPDX-License-Identifier: Apache-2.0
             <arg value="--prefix=${cvc4.path}/install"/>
         </exec>
         <exec executable="make" dir="${cvc4.path}/build/" failonerror="true">
-            <arg value="-j4"/>
+            <arg value="-j8"/>
             <arg value="install"/>
         </exec>
 
         <!-- remove unneeded symbols -->
         <exec executable="strip" dir="${cvc4.path}/install/lib" failonerror="true">
             <arg value="libcvc4jni.so" />
-        </exec>
-        <exec executable="strip" dir="${cvc4.path}/install/lib" failonerror="true">
             <arg value="libcvc4.so" />
         </exec>
 
