@@ -224,6 +224,8 @@ SPDX-License-Identifier: Apache-2.0
              dest="${bundle.dir}/${publish.full-name}-${publish.version}.jar"/>
         <get src="${ivy.repo.url}/org.sosy_lab/${publish.full-name}/${publish.full-name}-${publish.version}-sources.jar"
              dest="${bundle.dir}/${publish.full-name}-${publish.version}-sources.jar"/>
+        <get src="${ivy.repo.url}/org.sosy_lab/${publish.full-name}/${publish.full-name}-${publish.version}-javadoc.jar"
+             dest="${bundle.dir}/${publish.full-name}-${publish.version}-javadoc.jar"/>
     </target>
 
     <target name="bundle" depends="init-maven-central" description="Generate POM, sign artifacts, and create ZIP bundle">

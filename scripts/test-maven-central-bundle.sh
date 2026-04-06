@@ -188,12 +188,13 @@ if ! verify_bundle "javasmt-yices2" "${YICES_VERSION}" "${YICES_FULL_NAME}" "com
 fi
 
 # Test case: JavaSMT (Core)
-JAVASMT_VERSION="5.0.0"
+JAVASMT_VERSION="6.0.0"
 JAVASMT_FULL_NAME="java-smt"
 JAVASMT_BASE_FILES=(
     "${JAVASMT_FULL_NAME}-${JAVASMT_VERSION}.jar"
     "${JAVASMT_FULL_NAME}-${JAVASMT_VERSION}.pom"
     "${JAVASMT_FULL_NAME}-${JAVASMT_VERSION}-sources.jar"
+    "${JAVASMT_FULL_NAME}-${JAVASMT_VERSION}-javadoc.jar"
 )
 
 if ! verify_bundle "java-smt" "${JAVASMT_VERSION}" "${JAVASMT_FULL_NAME}" "compile+optional" "${JAVASMT_BASE_FILES[@]}"; then
