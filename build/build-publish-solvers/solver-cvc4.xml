@@ -75,7 +75,22 @@ SPDX-License-Identifier: Apache-2.0
         <mkdir dir="${cvc4.distDir}/x64"/>
         <copy file="${cvc4.path}/install/lib/libcvc4.so" tofile="${cvc4.distDir}/x64/libcvc4-${cvc4.version}.so"/>
         <copy file="${cvc4.path}/install/lib/libcvc4jni.so" tofile="${cvc4.distDir}/x64/libcvc4jni-${cvc4.version}.so"/>
-        <copy file="${cvc4.path}/install/share/java/cvc4/CVC4.jar" tofile="${cvc4.distDir}/CVC4-${cvc4.version}.jar"/>
+
+        <!-- remove the finalizers to fix memory management issues -->
+        <exec executable="find">
+            <arg line="${cvc4.path}/build/src/bindings/java -type f -exec sed -i 's/ delete();//g' {} +"/>
+        </exec>
+
+        <mkdir dir="${cvc4.path}/build/src/bindings/build"/>
+
+        <!-- recompile and build the *.jar -->
+        <javac srcdir="${cvc4.path}/build/src/bindings/java"
+               destdir="${cvc4.path}/build/src/bindings/build"
+               debug="true"
+               release="8"
+               includeAntRuntime="false"
+               encoding="UTF-8"/>
+        <jar basedir="${cvc4.path}/build/src/bindings/build" destfile="${cvc4.distDir}/CVC4-${cvc4.version}.jar"/>
     </target>
 
     <target name="package-cvc4-sources" depends="package-cvc4">
