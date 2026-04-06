@@ -96,8 +96,7 @@ SPDX-License-Identifier: Apache-2.0
             Get POM template for publication.
             Each component can have a different metadata, license, authors,... -->
         <condition property="pom.template"
-                   value="solvers_maven_conf/maven_${publish.component}_pom_template.xml"
-                   else="pom_template.xml">
+                   value="solvers_maven_conf/maven_${publish.component}_pom_template.xml">
             <equals arg1="${publish.component}" arg2="javasmt-yices2"/>
         </condition>
         <loadresource property="publish.short-name">
