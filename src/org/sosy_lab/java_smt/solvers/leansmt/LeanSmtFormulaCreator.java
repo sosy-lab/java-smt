@@ -13,6 +13,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -20,7 +21,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.ConcurrentHashMap;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.rationals.Rational;
@@ -37,6 +37,9 @@ final class LeanSmtFormulaCreator
     extends FormulaCreator<Long, LeanSmtType, Long, LeanSmtFunctionDecl> {
   // Keep chunks comfortably within 32-bit signed range for robust native interop.
   private static final BigInteger INT_CHUNK_BASE = BigInteger.TEN.pow(9);
+  private static final String MANGLED_IDENTIFIER_PREFIX = "__javasmt_escaped_";
+  private static final String SIMPLE_NATIVE_IDENTIFIER_PATTERN =
+      "[a-zA-Z~!@$%^&*_+=<>.?/-][a-zA-Z0-9~!@$%^&*_+=<>.?/-]*";
   private static final ImmutableSet<String> RESERVED_IDENTIFIERS =
       ImmutableSet.of(
           "true",
@@ -132,34 +135,32 @@ final class LeanSmtFormulaCreator
     }
   }
 
-  private final Map<Long, Expr> expressions = new ConcurrentHashMap<>();
+  private static final class FlattenedApplication {
+    private final String symbol;
+    private final ImmutableList<Long> arguments;
+
+    private FlattenedApplication(String pSymbol, ImmutableList<Long> pArguments) {
+      symbol = pSymbol;
+      arguments = pArguments;
+    }
+  }
+
+  private final Map<Long, FormulaType<?>> formulaTypes = new ConcurrentHashMap<>();
+  private final Map<Long, Object> constantValues = new ConcurrentHashMap<>();
+  private final Map<Long, FunctionDeclarationKind> declarationKinds = new ConcurrentHashMap<>();
   private final Map<String, LeanSmtType> declaredVariables = new LinkedHashMap<>();
   private final Map<String, Long> latestVariableHandles = new LinkedHashMap<>();
   private final Map<String, LeanSmtFunctionDecl> declaredUfDeclarations = new LinkedHashMap<>();
-  private final Map<Long, LeanSmtFunctionDecl> booleanVarDeclarations = new ConcurrentHashMap<>();
   private final Map<BigInteger, Long> intConstantHandles = new HashMap<>();
   private final Map<Rational, Long> realConstantHandles = new HashMap<>();
   private final Map<BitvectorConstantKey, Long> bitvectorConstantHandles = new HashMap<>();
   private final Map<OperationKey, Long> canonicalApplications = new HashMap<>();
   private final Map<ApplicationKey, Long> ufApplications = new HashMap<>();
-  private final Map<LeanSmtFunctionDecl, List<UfApplication>> ufApplicationsByDecl = new HashMap<>();
-  private final AtomicLong ufFreshCounter = new AtomicLong(0);
-  private final AtomicLong floorFreshCounter = new AtomicLong(0);
-  private final AtomicLong intToBvFreshCounter = new AtomicLong(0);
-  private final AtomicLong rationalConstFreshCounter = new AtomicLong(0);
-  private final List<Long> ufCongruenceConstraints = new ArrayList<>();
-  private final Map<Long, Long> floorTermsByArgument = new HashMap<>();
-  private final List<Long> floorConstraints = new ArrayList<>();
-  private final Map<IntToBvKey, Long> intToBvTerms = new HashMap<>();
-  private final List<Long> intToBvConstraints = new ArrayList<>();
-  private final Map<Rational, Long> constrainedRationalConstants = new HashMap<>();
-  private final List<Long> rationalConstantConstraints = new ArrayList<>();
-  private boolean ufCongruenceDirty = false;
   private final long trueHandle;
   private final long falseHandle;
 
-  LeanSmtFormulaCreator(long pConstructionSolver) {
-    super(pConstructionSolver, LeanSmtType.BOOL, LeanSmtType.INT, LeanSmtType.REAL, null, null);
+  LeanSmtFormulaCreator() {
+    super(0L, LeanSmtType.BOOL, LeanSmtType.INT, LeanSmtType.REAL, null, null);
     try {
       trueHandle = LeanSmtNativeApi.mkTrue();
       falseHandle = LeanSmtNativeApi.mkFalse();
@@ -201,19 +202,10 @@ final class LeanSmtFormulaCreator
       }
 
       try {
-        String encodedName = encodeIdentifier(varName);
-        final long handle;
-        if (type.isBool()) {
-          handle = LeanSmtNativeApi.mkBoolVar(getEnv(), encodedName);
-        } else if (type.isInt()) {
-          handle = LeanSmtNativeApi.mkIntVar(getEnv(), encodedName);
-        } else if (type.isReal()) {
-          handle = LeanSmtNativeApi.mkRealVar(getEnv(), encodedName);
-        } else if (type.isBitvector()) {
-          handle = LeanSmtNativeApi.mkBvVar(getEnv(), encodedName, type.getBitvectorSize());
-        } else {
+        if (!type.isBool() && !type.isInt() && !type.isReal() && !type.isBitvector()) {
           throw new AssertionError("Unexpected LeanSMT type " + type);
         }
+        long handle = LeanSmtNativeApi.mkSymbol(encodeNativeIdentifier(varName));
         registerVariable(handle, varName, type);
         return handle;
       } catch (Exception e) {
@@ -222,38 +214,13 @@ final class LeanSmtFormulaCreator
     }
   }
 
-  synchronized void redeclareAllVariables(long solver) {
-    for (Map.Entry<String, LeanSmtType> entry : declaredVariables.entrySet()) {
-      declareVariableOnSolver(solver, entry.getKey(), entry.getValue());
-    }
-  }
-
-  synchronized void redeclareMissingVariables(long solver, Set<String> alreadyDeclared) {
-    for (Map.Entry<String, LeanSmtType> entry : declaredVariables.entrySet()) {
-      if (alreadyDeclared.contains(entry.getKey())) {
-        continue;
+  synchronized void redeclareVariables(long solver, Set<String> namesToDeclare) {
+    for (String name : namesToDeclare) {
+      LeanSmtType type = declaredVariables.get(name);
+      if (type != null) {
+        declareVariableOnSolver(solver, name, type);
       }
-      declareVariableOnSolver(solver, entry.getKey(), entry.getValue());
-      alreadyDeclared.add(entry.getKey());
     }
-  }
-
-  synchronized ImmutableMap<String, Long> getKnownVariableHandles() {
-    return ImmutableMap.copyOf(latestVariableHandles);
-  }
-
-  synchronized ImmutableMap<String, Long> getKnownUserVariableHandles() {
-    ImmutableMap.Builder<String, Long> out = ImmutableMap.builder();
-    for (Map.Entry<String, Long> entry : latestVariableHandles.entrySet()) {
-      String name = entry.getKey();
-      if (name.startsWith("__floor#")
-          || name.startsWith("__int2bv#")
-          || name.startsWith("__ratc#")) {
-        continue;
-      }
-      out.put(name, entry.getValue());
-    }
-    return out.build();
   }
 
   synchronized ImmutableMap<String, LeanSmtType> getDeclaredVariableTypes() {
@@ -261,13 +228,24 @@ final class LeanSmtFormulaCreator
   }
 
   List<LeanSmtFunctionDecl> getKnownUfDeclarations() {
-    synchronized (ufApplications) {
-      return ImmutableList.copyOf(ufApplicationsByDecl.keySet());
+    synchronized (declaredUfDeclarations) {
+      return ImmutableList.copyOf(declaredUfDeclarations.values());
     }
   }
 
-  long getConstructionSolver() {
-    return getEnv();
+  synchronized void redeclareUfDeclarations(long solver, Set<String> namesToDeclare)
+      throws org.sosy_lab.java_smt.api.SolverException {
+    for (String name : namesToDeclare) {
+      LeanSmtFunctionDecl declaration = declaredUfDeclarations.get(name);
+      if (declaration == null || declaration.getArgumentTypes().isEmpty()) {
+        continue;
+      }
+      LeanSmtNativeApi.declareFun(
+          solver,
+          encodeNativeIdentifier(name),
+          joinArgSorts(declaration.getArgumentTypes()),
+          toSmtLibSort(declaration.getReturnType()));
+    }
   }
 
   long getTrueHandle() {
@@ -330,9 +308,7 @@ final class LeanSmtFormulaCreator
                     LeanSmtNativeApi::mkNeg);
           }
         } else {
-          // Avoid the native small-rational constructor for now: LeanSMT's check-sat path still
-          // serializes some short fractions like 3/2 and -7/3 into invalid SMT-LIB atoms.
-          handle = makeConstrainedRationalConstant(value);
+          handle = buildExactRationalTerm(value);
         }
         registerConstant(handle, FormulaType.RationalType, value);
         realConstantHandles.put(value, handle);
@@ -389,7 +365,7 @@ final class LeanSmtFormulaCreator
       }
       try {
         long handle = op.apply(arg);
-        registerApplication(handle, symbol, kind, type, arguments);
+        registerApplication(handle, kind, type);
         canonicalApplications.put(key, handle);
         return handle;
       } catch (Exception e) {
@@ -414,7 +390,7 @@ final class LeanSmtFormulaCreator
       }
       try {
         long handle = op.apply(arg1, arg2);
-        registerApplication(handle, symbol, kind, type, arguments);
+        registerApplication(handle, kind, type);
         canonicalApplications.put(key, handle);
         return handle;
       } catch (Exception e) {
@@ -440,7 +416,7 @@ final class LeanSmtFormulaCreator
       }
       try {
         long handle = op.apply(arg1, arg2, arg3);
-        registerApplication(handle, symbol, kind, type, arguments);
+        registerApplication(handle, kind, type);
         canonicalApplications.put(key, handle);
         return handle;
       } catch (Exception e) {
@@ -450,14 +426,63 @@ final class LeanSmtFormulaCreator
   }
 
   Expr getExpression(long handle) {
-    Expr expr = expressions.get(handle);
-    Preconditions.checkArgument(expr != null, "Unknown LeanSMT term handle: %s", handle);
-    return expr;
+    FormulaType<?> type = formulaTypes.get(handle);
+    Preconditions.checkArgument(type != null, "Unknown LeanSMT term handle: %s", handle);
+
+    Object constantValue = constantValues.get(handle);
+    if (constantValue != null) {
+      return new Expr(
+          ExprKind.CONSTANT,
+          type,
+          constantValue.toString(),
+          constantValue,
+          FunctionDeclarationKind.CONST,
+          ImmutableList.of());
+    }
+
+    int nativeKind;
+    try {
+      nativeKind = LeanSmtNativeApi.getTermKind(handle);
+    } catch (org.sosy_lab.java_smt.api.SolverException e) {
+      throw new IllegalStateException("Failed to inspect LeanSMT term " + handle, e);
+    }
+
+    if (nativeKind == LeanSmtNativeApi.TERM_KIND_SYMBOL) {
+      String rawSymbol = getNativeTermText(handle);
+      String symbol = decodeNativeIdentifier(rawSymbol);
+      Preconditions.checkArgument(
+          declaredVariables.containsKey(symbol), "Unexpected LeanSMT symbol term: %s", rawSymbol);
+      return new Expr(
+          ExprKind.VARIABLE,
+          type,
+          symbol,
+          null,
+          FunctionDeclarationKind.VAR,
+          ImmutableList.of());
+    }
+
+    if (nativeKind == LeanSmtNativeApi.TERM_KIND_APPLICATION) {
+      FlattenedApplication application = flattenApplication(handle);
+      FunctionDeclarationKind kind = declarationKinds.get(handle);
+      Preconditions.checkArgument(
+          kind != null, "Missing declaration kind for LeanSMT application handle: %s", handle);
+      return new Expr(
+          ExprKind.APPLICATION, type, application.symbol, null, kind, application.arguments);
+    }
+
+    if (nativeKind == LeanSmtNativeApi.TERM_KIND_LITERAL) {
+      throw new IllegalStateException(
+          "LeanSMT literal term without registered constant value: " + handle);
+    }
+
+    throw new IllegalStateException("Unexpected LeanSMT term kind " + nativeKind + " for " + handle);
   }
 
   @Override
   public FormulaType<?> getFormulaType(Long formula) {
-    return getExpression(formula).type;
+    FormulaType<?> type = formulaTypes.get(formula);
+    Preconditions.checkArgument(type != null, "Unknown LeanSMT term handle: %s", formula);
+    return type;
   }
 
   @SuppressWarnings("unchecked")
@@ -474,22 +499,19 @@ final class LeanSmtFormulaCreator
 
   @Override
   public @Nullable Object convertValue(Long formula) {
-    Expr expr = expressions.get(formula);
-    if (expr == null) {
+    Object value = constantValues.get(formula);
+    if (value == null) {
       return null;
     }
-    if (expr.kind == ExprKind.CONSTANT) {
-      Object value = expr.constantValue;
-      if (value instanceof Rational) {
-        Rational rational = (Rational) value;
-        if (rational.getDen().equals(BigInteger.ONE)) {
-          return rational.getNum();
-        }
-        return rational;
+    if (value instanceof Rational) {
+      Rational rational = (Rational) value;
+      if (rational.getDen().equals(BigInteger.ONE)) {
+        return rational.getNum();
       }
-      if (value instanceof Boolean || value instanceof BigInteger) {
-        return value;
-      }
+      return rational;
+    }
+    if (value instanceof Boolean || value instanceof BigInteger) {
+      return value;
     }
     return null;
   }
@@ -544,25 +566,17 @@ final class LeanSmtFormulaCreator
     }
 
     synchronized (ufApplications) {
-      ImmutableList<Long> normalizedArgs = normalizeUfArguments(declaration, args);
+      ImmutableList<Long> normalizedArgs = castArgumentsToParameterTypes(declaration, args);
       ApplicationKey key = new ApplicationKey(declaration, normalizedArgs);
       Long existing = ufApplications.get(key);
       if (existing != null) {
         return existing;
       }
 
-      long handle = createUfApplicationHandle(declaration);
+      long handle = makeNativeApplication(declaration.getName(), key.args);
       registerApplication(
-          handle,
-          declaration.getName(),
-          FunctionDeclarationKind.UF,
-          declaration.getReturnType().toFormulaType(),
-          key.args);
+          handle, FunctionDeclarationKind.UF, declaration.getReturnType().toFormulaType());
       ufApplications.put(key, handle);
-      ufApplicationsByDecl
-          .computeIfAbsent(declaration, ignored -> new ArrayList<>())
-          .add(new UfApplication(handle, key.args));
-      ufCongruenceDirty = true;
       return handle;
     }
   }
@@ -598,55 +612,37 @@ final class LeanSmtFormulaCreator
 
   @Override
   protected LeanSmtFunctionDecl getBooleanVarDeclarationImpl(Long formulaInfo) {
-    LeanSmtFunctionDecl declaration = booleanVarDeclarations.get(formulaInfo);
-    if (declaration == null) {
+    Expr expr = getExpression(formulaInfo);
+    if (expr.kind != ExprKind.VARIABLE || !FormulaType.BooleanType.equals(expr.type)) {
       throw new UnsupportedOperationException(
           "LeanSMT term is not a declared Boolean variable: " + formulaInfo);
     }
-    return declaration;
+    return new LeanSmtFunctionDecl(
+        expr.symbol, FunctionDeclarationKind.VAR, LeanSmtType.BOOL, ImmutableList.of());
   }
 
   private synchronized void registerVariable(long handle, String name, LeanSmtType type) {
     declaredVariables.put(name, type);
     latestVariableHandles.put(name, handle);
-    FormulaType<?> formulaType = type.toFormulaType();
-    expressions.put(
-        handle,
-        new Expr(
-            ExprKind.VARIABLE,
-            formulaType,
-            name,
-            null,
-            FunctionDeclarationKind.VAR,
-            ImmutableList.of()));
-    if (type.isBool()) {
-      booleanVarDeclarations.put(
-          handle,
-          new LeanSmtFunctionDecl(
-              name, FunctionDeclarationKind.VAR, LeanSmtType.BOOL, ImmutableList.of()));
-    }
+    formulaTypes.put(handle, type.toFormulaType());
   }
 
   private void declareVariableOnSolver(long solver, String name, LeanSmtType type) {
     try {
-      String encodedName = encodeIdentifier(name);
-      if (type.isBool()) {
-        LeanSmtNativeApi.mkBoolVar(solver, encodedName);
-      } else if (type.isInt()) {
-        LeanSmtNativeApi.mkIntVar(solver, encodedName);
-      } else if (type.isReal()) {
-        LeanSmtNativeApi.mkRealVar(solver, encodedName);
-      } else if (type.isBitvector()) {
-        LeanSmtNativeApi.mkBvVar(solver, encodedName, type.getBitvectorSize());
-      } else {
+      if (!type.isBool() && !type.isInt() && !type.isReal() && !type.isBitvector()) {
         throw new AssertionError("Unexpected LeanSMT type " + type);
       }
+      LeanSmtNativeApi.declareFun(solver, encodeNativeIdentifier(name), "", toSmtLibSort(type));
     } catch (Exception e) {
       throw new IllegalStateException("Failed to declare variable " + name, e);
     }
   }
 
   static String encodeIdentifier(String id) {
+    if (!id.isEmpty()
+        && (id.startsWith("@") || id.startsWith(".") || RESERVED_IDENTIFIERS.contains(id))) {
+      return "|" + MANGLED_IDENTIFIER_PREFIX + toHexUtf8(id) + "|";
+    }
     if (!id.isEmpty()
         && !id.startsWith("@")
         && !id.startsWith(".")
@@ -658,11 +654,89 @@ final class LeanSmtFormulaCreator
     return "|" + id.replace("|", "||") + "|";
   }
 
+  static String encodeNativeIdentifier(String id) {
+    if (isSimpleNativeIdentifier(id)) {
+      return id;
+    }
+    return MANGLED_IDENTIFIER_PREFIX + toHexUtf8(id);
+  }
+
+  private static boolean isSimpleNativeIdentifier(String id) {
+    return !id.isEmpty()
+        && !id.startsWith("@")
+        && !id.startsWith(".")
+        && !id.startsWith(":")
+        && !id.startsWith(MANGLED_IDENTIFIER_PREFIX)
+        && !RESERVED_IDENTIFIERS.contains(id)
+        && id.matches(SIMPLE_NATIVE_IDENTIFIER_PATTERN);
+  }
+
+  static String decodeIdentifier(String token) {
+    String id = token;
+    boolean wasQuoted = false;
+    if (token.length() >= 2 && token.startsWith("|") && token.endsWith("|")) {
+      id = token.substring(1, token.length() - 1).replace("||", "|");
+      wasQuoted = true;
+    }
+    if (wasQuoted && id.startsWith(MANGLED_IDENTIFIER_PREFIX)) {
+      return fromHexUtf8(id.substring(MANGLED_IDENTIFIER_PREFIX.length()));
+    }
+    return id;
+  }
+
+  static String decodeNativeIdentifier(String token) {
+    if (token.startsWith(MANGLED_IDENTIFIER_PREFIX)) {
+      return fromHexUtf8(token.substring(MANGLED_IDENTIFIER_PREFIX.length()));
+    }
+    return token;
+  }
+
+  private static String toHexUtf8(String value) {
+    byte[] bytes = value.getBytes(StandardCharsets.UTF_8);
+    StringBuilder out = new StringBuilder(bytes.length * 2);
+    for (byte b : bytes) {
+      out.append(Character.forDigit((b >>> 4) & 0xF, 16));
+      out.append(Character.forDigit(b & 0xF, 16));
+    }
+    return out.toString();
+  }
+
+  private static String fromHexUtf8(String hex) {
+    Preconditions.checkArgument(
+        hex.length() % 2 == 0, "Malformed LeanSMT escaped identifier payload: %s", hex);
+    byte[] bytes = new byte[hex.length() / 2];
+    for (int i = 0; i < hex.length(); i += 2) {
+      int high = Character.digit(hex.charAt(i), 16);
+      int low = Character.digit(hex.charAt(i + 1), 16);
+      Preconditions.checkArgument(
+          high >= 0 && low >= 0, "Malformed LeanSMT escaped identifier payload: %s", hex);
+      bytes[i / 2] = (byte) ((high << 4) | low);
+    }
+    return new String(bytes, StandardCharsets.UTF_8);
+  }
+
+  private static String toSmtLibSort(LeanSmtType type) {
+    if (type.isBool()) {
+      return "Bool";
+    } else if (type.isInt()) {
+      return "Int";
+    } else if (type.isReal()) {
+      return "Real";
+    } else if (type.isBitvector()) {
+      return "(_ BitVec " + type.getBitvectorSize() + ")";
+    }
+    throw new AssertionError("Unexpected LeanSMT type " + type);
+  }
+
+  private static String joinArgSorts(List<LeanSmtType> argumentTypes) {
+    return argumentTypes.stream()
+        .map(LeanSmtFormulaCreator::toSmtLibSort)
+        .collect(java.util.stream.Collectors.joining(" "));
+  }
+
   private void registerConstant(long handle, FormulaType<?> type, Object value) {
-    expressions.put(
-        handle,
-        new Expr(
-            ExprKind.CONSTANT, type, value.toString(), value, FunctionDeclarationKind.CONST, ImmutableList.of()));
+    formulaTypes.put(handle, type);
+    constantValues.put(handle, value);
   }
 
   private static Object normalizeConstantForVisitor(Object value) {
@@ -675,22 +749,87 @@ final class LeanSmtFormulaCreator
     return value;
   }
 
-  private ImmutableList<Long> normalizeUfArguments(
+  private ImmutableList<Long> castArgumentsToParameterTypes(
       LeanSmtFunctionDecl declaration, List<Long> args) {
     ImmutableList.Builder<Long> normalizedArgs = ImmutableList.builderWithExpectedSize(args.size());
     List<LeanSmtType> parameterTypes = declaration.getArgumentTypes();
     for (int i = 0; i < args.size(); i++) {
       long arg = args.get(i);
       LeanSmtType expectedType = parameterTypes.get(i);
-      if (expectedType.isReal()
-          && FormulaType.IntegerType.equals(getFormulaType(arg))
-          && convertValue(arg) instanceof BigInteger) {
-        normalizedArgs.add(makeRealConstant(Rational.ofBigInteger((BigInteger) convertValue(arg))));
+      if (expectedType.isReal() && FormulaType.IntegerType.equals(getFormulaType(arg))) {
+        normalizedArgs.add(
+            makeUnary(
+                "to_real",
+                FunctionDeclarationKind.TO_REAL,
+                FormulaType.RationalType,
+                arg,
+                t -> LeanSmtNativeApi.mkApp1("to_real", t)));
       } else {
         normalizedArgs.add(arg);
       }
     }
     return normalizedArgs.build();
+  }
+
+  private long makeNativeApplication(String symbol, ImmutableList<Long> arguments) {
+    try {
+      long app = LeanSmtNativeApi.mkSymbol(encodeNativeIdentifier(symbol));
+      for (long argument : arguments) {
+        app = LeanSmtNativeApi.mkApply(app, argument);
+      }
+      return app;
+    } catch (Exception e) {
+      throw new IllegalArgumentException("Failed to create LeanSMT application '" + symbol + "'", e);
+    }
+  }
+
+  private String getNativeTermText(long handle) {
+    try {
+      return LeanSmtNativeApi.getTermText(handle);
+    } catch (org.sosy_lab.java_smt.api.SolverException e) {
+      throw new IllegalStateException("Failed to inspect LeanSMT term text for " + handle, e);
+    }
+  }
+
+  private FlattenedApplication flattenApplication(long handle) {
+    List<Long> reversedArguments = new ArrayList<>();
+    long current = handle;
+    while (true) {
+      final int kind;
+      final int childCount;
+      try {
+        kind = LeanSmtNativeApi.getTermKind(current);
+        childCount = LeanSmtNativeApi.getTermNumChildren(current);
+      } catch (org.sosy_lab.java_smt.api.SolverException e) {
+        throw new IllegalStateException("Failed to inspect LeanSMT application " + handle, e);
+      }
+
+      if (kind != LeanSmtNativeApi.TERM_KIND_APPLICATION) {
+        String symbol;
+        if (kind == LeanSmtNativeApi.TERM_KIND_SYMBOL) {
+          symbol = decodeNativeIdentifier(getNativeTermText(current));
+        } else if (kind == LeanSmtNativeApi.TERM_KIND_LITERAL) {
+          symbol = getNativeTermText(current);
+        } else {
+          throw new IllegalStateException(
+              "Unexpected LeanSMT application head kind " + kind + " for " + handle);
+        }
+        java.util.Collections.reverse(reversedArguments);
+        return new FlattenedApplication(symbol, ImmutableList.copyOf(reversedArguments));
+      }
+
+      Preconditions.checkState(
+          childCount == 2,
+          "LeanSMT applications are expected to be binary nodes, got %s children for %s",
+          childCount,
+          current);
+      try {
+        reversedArguments.add(LeanSmtNativeApi.getTermChild(current, 1));
+        current = LeanSmtNativeApi.getTermChild(current, 0);
+      } catch (org.sosy_lab.java_smt.api.SolverException e) {
+        throw new IllegalStateException("Failed to inspect LeanSMT application children for " + handle, e);
+      }
+    }
   }
 
   private static boolean fitsInLong(BigInteger value) {
@@ -716,7 +855,7 @@ final class LeanSmtFormulaCreator
   private long buildBigIntFromNonNegative(BigInteger value) throws Exception {
     Preconditions.checkArgument(value.signum() >= 0, "Expected non-negative value");
     if (fitsInLong(value)) {
-      return LeanSmtNativeApi.mkIntConst(value.longValue());
+      return makeRegisteredIntLiteral(value.longValue());
     }
 
     // Encode very large integers in base 10^9 chunks to avoid lossy 64-bit conversions in native
@@ -725,11 +864,11 @@ final class LeanSmtFormulaCreator
     BigInteger remaining = value;
     while (remaining.signum() > 0) {
       BigInteger[] qr = remaining.divideAndRemainder(INT_CHUNK_BASE);
-      chunks.add(LeanSmtNativeApi.mkIntConst(qr[1].longValue()));
+      chunks.add(makeRegisteredIntLiteral(qr[1].longValue()));
       remaining = qr[0];
     }
 
-    long baseHandle = LeanSmtNativeApi.mkIntConst(INT_CHUNK_BASE.longValue());
+    long baseHandle = makeRegisteredIntLiteral(INT_CHUNK_BASE.longValue());
     long result = chunks.get(chunks.size() - 1);
     for (int i = chunks.size() - 2; i >= 0; i--) {
       long mul =
@@ -755,7 +894,7 @@ final class LeanSmtFormulaCreator
   private long buildBigRealFromNonNegativeInteger(BigInteger value) throws Exception {
     Preconditions.checkArgument(value.signum() >= 0, "Expected non-negative value");
     if (fitsInLong(value)) {
-      return LeanSmtNativeApi.mkRealConst(value.longValue(), 1L);
+      return makeRegisteredRealLiteral(value.longValue());
     }
 
     // Same chunking strategy as integers, but emitted as exact real literals n/1.
@@ -763,11 +902,11 @@ final class LeanSmtFormulaCreator
     BigInteger remaining = value;
     while (remaining.signum() > 0) {
       BigInteger[] qr = remaining.divideAndRemainder(INT_CHUNK_BASE);
-      chunks.add(LeanSmtNativeApi.mkRealConst(qr[1].longValue(), 1L));
+      chunks.add(makeRegisteredRealLiteral(qr[1].longValue()));
       remaining = qr[0];
     }
 
-    long baseHandle = LeanSmtNativeApi.mkRealConst(INT_CHUNK_BASE.longValue(), 1L);
+    long baseHandle = makeRegisteredRealLiteral(INT_CHUNK_BASE.longValue());
     long result = chunks.get(chunks.size() - 1);
     for (int i = chunks.size() - 2; i >= 0; i--) {
       long mul =
@@ -790,13 +929,21 @@ final class LeanSmtFormulaCreator
     return result;
   }
 
-  private void registerApplication(
-      long handle,
-      String symbol,
-      FunctionDeclarationKind kind,
-      FormulaType<?> type,
-      ImmutableList<Long> arguments) {
-    expressions.put(handle, new Expr(ExprKind.APPLICATION, type, symbol, null, kind, arguments));
+  private void registerApplication(long handle, FunctionDeclarationKind kind, FormulaType<?> type) {
+    formulaTypes.put(handle, type);
+    declarationKinds.put(handle, kind);
+  }
+
+  private long makeRegisteredIntLiteral(long value) throws Exception {
+    long handle = LeanSmtNativeApi.mkIntConst(value);
+    registerConstant(handle, FormulaType.IntegerType, BigInteger.valueOf(value));
+    return handle;
+  }
+
+  private long makeRegisteredRealLiteral(long value) throws Exception {
+    long handle = LeanSmtNativeApi.mkRealConst(value, 1L);
+    registerConstant(handle, FormulaType.RationalType, Rational.ofLongs(value, 1L));
+    return handle;
   }
 
   @SuppressWarnings("unchecked")
@@ -821,259 +968,51 @@ final class LeanSmtFormulaCreator
     return extractInfo(formula);
   }
 
-  List<Long> getUfCongruenceConstraints() {
-    synchronized (ufApplications) {
-      if (!ufCongruenceDirty) {
-        return ImmutableList.copyOf(ufCongruenceConstraints);
-      }
-      // Recompute only when the UF application set changed. This keeps check-sat overhead stable
-      // across repeated calls with unchanged formulas.
-      ufCongruenceConstraints.clear();
-      for (Map.Entry<LeanSmtFunctionDecl, List<UfApplication>> entry : ufApplicationsByDecl.entrySet()) {
-        List<UfApplication> apps = entry.getValue();
-        for (int i = 0; i < apps.size(); i++) {
-          for (int j = i + 1; j < apps.size(); j++) {
-            ufCongruenceConstraints.add(buildCongruenceConstraint(apps.get(i), apps.get(j)));
-          }
-        }
-      }
-      ufCongruenceDirty = false;
-      return ImmutableList.copyOf(ufCongruenceConstraints);
-    }
-  }
-
-  List<Long> getFloorConstraints() {
-    synchronized (floorTermsByArgument) {
-      return ImmutableList.copyOf(floorConstraints);
-    }
-  }
-
-  List<Long> getRationalConstantConstraints() {
-    synchronized (constrainedRationalConstants) {
-      return ImmutableList.copyOf(rationalConstantConstraints);
-    }
-  }
-
-  List<Long> getIntToBvConstraints() {
-    synchronized (intToBvTerms) {
-      return ImmutableList.copyOf(intToBvConstraints);
-    }
-  }
-
   long makeFloorTerm(long argument) {
-    synchronized (floorTermsByArgument) {
-      Long existing = floorTermsByArgument.get(argument);
-      if (existing != null) {
-        return existing;
-      }
-      String freshName = "__floor#" + floorFreshCounter.incrementAndGet();
-      long floorHandle = makeVariable(LeanSmtType.INT, freshName);
-
-      // Preserve semantic structure for visitors, while the native term is represented by an
-      // internal Int variable constrained to be floor(argument).
-      registerApplication(
-          floorHandle,
-          "floor",
-          FunctionDeclarationKind.FLOOR,
-          FormulaType.IntegerType,
-          ImmutableList.of(argument));
-
-      long one = makeIntConstant(1L);
-      long floorLeArg =
-          makeBinary(
-              "<=",
-              FunctionDeclarationKind.LTE,
-              FormulaType.BooleanType,
-              floorHandle,
-              argument,
-              LeanSmtNativeApi::mkLe);
-      long floorPlusOne =
-          makeBinary(
-              "+",
-              FunctionDeclarationKind.ADD,
-              FormulaType.IntegerType,
-              floorHandle,
-              one,
-              LeanSmtNativeApi::mkAdd);
-      long argLtFloorPlusOne =
-          makeBinary(
-              "<",
-              FunctionDeclarationKind.LT,
-              FormulaType.BooleanType,
-              argument,
-              floorPlusOne,
-              LeanSmtNativeApi::mkLt);
-
-      floorConstraints.add(floorLeArg);
-      floorConstraints.add(argLtFloorPlusOne);
-      floorTermsByArgument.put(argument, floorHandle);
-      return floorHandle;
-    }
+    return makeUnary(
+        "to_int",
+        FunctionDeclarationKind.FLOOR,
+        FormulaType.IntegerType,
+        argument,
+        arg -> LeanSmtNativeApi.mkApp1("to_int", arg));
   }
 
   long makeIntToBitvectorTerm(int bitwidth, long integerTerm) {
     Preconditions.checkArgument(bitwidth > 0, "Bitvector size must be positive");
-    Object value = convertValue(integerTerm);
-    if (value instanceof BigInteger) {
-      BigInteger modulus = BigInteger.ONE.shiftLeft(bitwidth);
-      BigInteger normalized = ((BigInteger) value).mod(modulus);
-      return makeBitvectorConstant(bitwidth, normalized);
-    }
-    synchronized (intToBvTerms) {
-      IntToBvKey key = new IntToBvKey(bitwidth, integerTerm);
-      Long existing = intToBvTerms.get(key);
-      if (existing != null) {
-        return existing;
-      }
-
-      String freshName = "__int2bv#" + intToBvFreshCounter.incrementAndGet();
-      long bvHandle = makeVariable(LeanSmtType.bitvector(bitwidth), freshName);
-      registerApplication(
-          bvHandle,
-          intToBvSymbol(bitwidth),
-          FunctionDeclarationKind.INT_TO_BV,
-          FormulaType.getBitvectorTypeWithSize(bitwidth),
-          ImmutableList.of(integerTerm));
-
-      long asInt =
-          makeUnary(
-              "ubv_to_int",
-              FunctionDeclarationKind.UBV_TO_INT,
-              FormulaType.IntegerType,
-              bvHandle,
-              arg -> LeanSmtNativeApi.mkApp1("ubv_to_int", arg));
-
-      long modulus = makeIntConstant(BigInteger.ONE.shiftLeft(bitwidth));
-      long normalized =
-          makeBinary(
-              "mod",
-              FunctionDeclarationKind.MODULO,
-              FormulaType.IntegerType,
-              integerTerm,
-              modulus,
-              LeanSmtNativeApi::mkMod);
-      long constraint =
-          makeBinary(
-              "=",
-              FunctionDeclarationKind.EQ,
-              FormulaType.BooleanType,
-              asInt,
-              normalized,
-              LeanSmtNativeApi::mkEq);
-
-      intToBvConstraints.add(constraint);
-      intToBvTerms.put(key, bvHandle);
-      return bvHandle;
-    }
+    return makeUnary(
+        intToBvSymbol(bitwidth),
+        FunctionDeclarationKind.INT_TO_BV,
+        FormulaType.getBitvectorTypeWithSize(bitwidth),
+        integerTerm,
+        arg -> LeanSmtNativeApi.mkIndexedApp1("int_to_bv", bitwidth, arg));
   }
 
   private static String intToBvSymbol(int bitwidth) {
     return "(_ int_to_bv " + bitwidth + ")";
   }
 
-  private long createUfApplicationHandle(LeanSmtFunctionDecl declaration) {
-    String freshName = declaration.getName() + "@uf#" + ufFreshCounter.incrementAndGet();
-    return makeVariable(declaration.getReturnType(), freshName);
-  }
+  private long buildExactRationalTerm(Rational value) throws Exception {
+    BigInteger num = value.getNum();
+    BigInteger den = value.getDen();
 
-  private long buildCongruenceConstraint(UfApplication a, UfApplication b) {
-    Preconditions.checkArgument(
-        a.arguments.size() == b.arguments.size(), "UF arity mismatch in congruence construction");
-    long lhs;
-    if (a.arguments.isEmpty()) {
-      lhs = getTrueHandle();
-    } else {
-      lhs =
-          makeBinary(
-              "=",
-              FunctionDeclarationKind.EQ,
-              FormulaType.BooleanType,
-              a.arguments.get(0),
-              b.arguments.get(0),
-              LeanSmtNativeApi::mkEq);
-      for (int i = 1; i < a.arguments.size(); i++) {
-        long eqArg =
-            makeBinary(
-                "=",
-                FunctionDeclarationKind.EQ,
-                FormulaType.BooleanType,
-                a.arguments.get(i),
-                b.arguments.get(i),
-                LeanSmtNativeApi::mkEq);
-        lhs =
-            makeBinary(
-                "and",
-                FunctionDeclarationKind.AND,
-                FormulaType.BooleanType,
-                lhs,
-                eqArg,
-                LeanSmtNativeApi::mkAnd);
-      }
-    }
-
-    long rhs =
-        makeBinary(
-            "=",
-            FunctionDeclarationKind.EQ,
-            FormulaType.BooleanType,
-            a.handle,
-            b.handle,
-            LeanSmtNativeApi::mkEq);
-
-    return makeBinary(
-        "=>",
-        FunctionDeclarationKind.IMPLIES,
-        FormulaType.BooleanType,
-        lhs,
-        rhs,
-        LeanSmtNativeApi::mkImplies);
-  }
-
-  private long makeConstrainedRationalConstant(Rational value) throws Exception {
-    synchronized (constrainedRationalConstants) {
-      Long existing = constrainedRationalConstants.get(value);
-      if (existing != null) {
-        return existing;
-      }
-
-      String freshName = "__ratc#" + rationalConstFreshCounter.incrementAndGet();
-      long handle = makeVariable(LeanSmtType.REAL, freshName);
-      BigInteger num = value.getNum();
-      BigInteger den = value.getDen();
-
-      // For large rationals, avoid relying on native division constructor behavior. Instead encode
-      // the exact value via den * c = num and treat c as the constant term.
-      long numTerm = buildBigRealFromNonNegativeInteger(num.abs());
-      if (num.signum() < 0) {
-        numTerm =
-            makeUnary(
-                "-",
-                FunctionDeclarationKind.UMINUS,
-                FormulaType.RationalType,
-                numTerm,
-                LeanSmtNativeApi::mkNeg);
-      }
-      long denTerm = buildBigRealFromNonNegativeInteger(den);
-      long lhs =
-          makeBinary(
-              "*",
-              FunctionDeclarationKind.MUL,
+    long numTerm = buildBigRealFromNonNegativeInteger(num.abs());
+    if (num.signum() < 0) {
+      numTerm =
+          makeUnary(
+              "-",
+              FunctionDeclarationKind.UMINUS,
               FormulaType.RationalType,
-              denTerm,
-              handle,
-              LeanSmtNativeApi::mkMul);
-      long eq =
-          makeBinary(
-              "=",
-              FunctionDeclarationKind.EQ,
-              FormulaType.BooleanType,
-              lhs,
               numTerm,
-              LeanSmtNativeApi::mkEq);
-      rationalConstantConstraints.add(eq);
-      constrainedRationalConstants.put(value, handle);
-      return handle;
+              LeanSmtNativeApi::mkNeg);
     }
+    long denTerm = buildBigRealFromNonNegativeInteger(den);
+    return makeBinary(
+        "/",
+        FunctionDeclarationKind.DIV,
+        FormulaType.RationalType,
+        numTerm,
+        denTerm,
+        (left, right) -> LeanSmtNativeApi.mkApp2("/", left, right));
   }
 
   private long callBuiltInFunction(LeanSmtFunctionDecl declaration, List<Long> args) {
@@ -1168,6 +1107,14 @@ final class LeanSmtFormulaCreator
       case UMINUS:
         checkArity(declaration, args, 1);
         return makeUnary("-", kind, returnType, args.get(0), LeanSmtNativeApi::mkNeg);
+      case TO_REAL:
+        checkArity(declaration, args, 1);
+        return makeUnary(
+            "to_real",
+            kind,
+            FormulaType.RationalType,
+            args.get(0),
+            arg -> LeanSmtNativeApi.mkApp1("to_real", arg));
       case FLOOR:
         checkArity(declaration, args, 1);
         return makeFloorTerm(args.get(0));
@@ -1253,22 +1200,10 @@ final class LeanSmtFormulaCreator
             (left, right) -> LeanSmtNativeApi.mkApp2(symbol, left, right));
       case BV_ROTATE_LEFT:
         checkArity(declaration, args, 2);
-        return makeBinary(
-            symbol,
-            kind,
-            returnType,
-            args.get(0),
-            args.get(1),
-            this::buildRotateLeftTerm);
+        return rebuildSymbolicRotateLeft(args);
       case BV_ROTATE_RIGHT:
         checkArity(declaration, args, 2);
-        return makeBinary(
-            symbol,
-            kind,
-            returnType,
-            args.get(0),
-            args.get(1),
-            this::buildRotateRightTerm);
+        return rebuildSymbolicRotateRight(args);
       case BV_EQ:
         return foldPairwiseBoolean("=", kind, args, LeanSmtNativeApi::mkEq);
       case BV_ULT:
@@ -1300,137 +1235,114 @@ final class LeanSmtFormulaCreator
 
   // Shared lowering for symbolic signed bitvector-to-integer conversion.
   long makeSignedBitvectorToIntegerTerm(long bitvectorTerm) {
-    int size = bitvectorSize(bitvectorTerm);
-    BigInteger modulus = BigInteger.ONE.shiftLeft(size);
-
     return makeUnary(
         "sbv_to_int",
         FunctionDeclarationKind.SBV_TO_INT,
         FormulaType.IntegerType,
         bitvectorTerm,
-        arg -> {
-          long unsignedArg =
-              makeUnary(
-                  "ubv_to_int",
-                  FunctionDeclarationKind.UBV_TO_INT,
-                  FormulaType.IntegerType,
-                  arg,
-                  t -> LeanSmtNativeApi.mkApp1("ubv_to_int", t));
-          long zero = makeBitvectorConstant(size, BigInteger.ZERO);
-          long isNegative =
-              makeBinary(
-                  "bvslt",
-                  FunctionDeclarationKind.BV_SLT,
-                  FormulaType.BooleanType,
-                  arg,
-                  zero,
-                  (a, b) -> LeanSmtNativeApi.mkApp2("bvslt", a, b));
-          long modulusInt = makeIntConstant(modulus);
-          long adjusted =
-              makeBinary(
-                  "-",
-                  FunctionDeclarationKind.SUB,
-                  FormulaType.IntegerType,
-                  unsignedArg,
-                  modulusInt,
-                  LeanSmtNativeApi::mkSub);
-          return makeTernary(
-              "ite",
-              FunctionDeclarationKind.ITE,
-              FormulaType.IntegerType,
-              isNegative,
-              adjusted,
-              unsignedArg,
-              LeanSmtNativeApi::mkIte);
-        });
+        arg -> LeanSmtNativeApi.mkApp1("sbv_to_int", arg));
   }
 
-  long buildRotateLeftTerm(long bitvector, long rotationAmount) throws Exception {
-    int size = bitvectorSize(bitvector);
-    long sizeBv = makeBitvectorConstant(size, BigInteger.valueOf(size));
-    long rotateInRange =
+  private Long rebuildSymbolicRotateLeft(List<Long> args) {
+    int width = bitvectorSize(args.get(0));
+    FormulaType<?> bitvectorType = FormulaType.getBitvectorTypeWithSize(width);
+    Preconditions.checkArgument(
+        bitvectorSize(args.get(1)) == width,
+        "Can't rotate bitvectors with different sizes (%s and %s)",
+        width,
+        bitvectorSize(args.get(1)));
+
+    long widthTerm = makeBitvectorConstant(width, BigInteger.valueOf(width));
+    long rotateAmount =
         makeBinary(
             "bvurem",
             FunctionDeclarationKind.BV_UREM,
-            getFormulaType(bitvector),
-            rotationAmount,
-            sizeBv,
-            (a, b) -> LeanSmtNativeApi.mkApp2("bvurem", a, b));
-    long left =
+            bitvectorType,
+            args.get(1),
+            widthTerm,
+            (left, right) -> LeanSmtNativeApi.mkApp2("bvurem", left, right));
+    long shiftLeft =
         makeBinary(
             "bvshl",
             FunctionDeclarationKind.BV_SHL,
-            getFormulaType(bitvector),
-            bitvector,
-            rotateInRange,
-            (a, b) -> LeanSmtNativeApi.mkApp2("bvshl", a, b));
-    long remaining =
+            bitvectorType,
+            args.get(0),
+            rotateAmount,
+            (left, right) -> LeanSmtNativeApi.mkApp2("bvshl", left, right));
+    long remainingWidth =
         makeBinary(
             "bvsub",
             FunctionDeclarationKind.BV_SUB,
-            getFormulaType(bitvector),
-            sizeBv,
-            rotateInRange,
-            (a, b) -> LeanSmtNativeApi.mkApp2("bvsub", a, b));
-    long right =
+            bitvectorType,
+            widthTerm,
+            rotateAmount,
+            (left, right) -> LeanSmtNativeApi.mkApp2("bvsub", left, right));
+    long shiftRight =
         makeBinary(
             "bvlshr",
             FunctionDeclarationKind.BV_LSHR,
-            getFormulaType(bitvector),
-            bitvector,
-            remaining,
-            (a, b) -> LeanSmtNativeApi.mkApp2("bvlshr", a, b));
+            bitvectorType,
+            args.get(0),
+            remainingWidth,
+            (left, right) -> LeanSmtNativeApi.mkApp2("bvlshr", left, right));
     return makeBinary(
         "bvor",
         FunctionDeclarationKind.BV_OR,
-        getFormulaType(bitvector),
-        left,
-        right,
-        (a, b) -> LeanSmtNativeApi.mkApp2("bvor", a, b));
+        bitvectorType,
+        shiftLeft,
+        shiftRight,
+        (left, right) -> LeanSmtNativeApi.mkApp2("bvor", left, right));
   }
 
-  long buildRotateRightTerm(long bitvector, long rotationAmount) throws Exception {
-    int size = bitvectorSize(bitvector);
-    long sizeBv = makeBitvectorConstant(size, BigInteger.valueOf(size));
-    long rotateInRange =
+  private Long rebuildSymbolicRotateRight(List<Long> args) {
+    int width = bitvectorSize(args.get(0));
+    FormulaType<?> bitvectorType = FormulaType.getBitvectorTypeWithSize(width);
+    Preconditions.checkArgument(
+        bitvectorSize(args.get(1)) == width,
+        "Can't rotate bitvectors with different sizes (%s and %s)",
+        width,
+        bitvectorSize(args.get(1)));
+
+    long widthTerm = makeBitvectorConstant(width, BigInteger.valueOf(width));
+    long rotateAmount =
         makeBinary(
             "bvurem",
             FunctionDeclarationKind.BV_UREM,
-            getFormulaType(bitvector),
-            rotationAmount,
-            sizeBv,
-            (a, b) -> LeanSmtNativeApi.mkApp2("bvurem", a, b));
-    long right =
+            bitvectorType,
+            args.get(1),
+            widthTerm,
+            (left, right) -> LeanSmtNativeApi.mkApp2("bvurem", left, right));
+    long shiftRight =
         makeBinary(
             "bvlshr",
             FunctionDeclarationKind.BV_LSHR,
-            getFormulaType(bitvector),
-            bitvector,
-            rotateInRange,
-            (a, b) -> LeanSmtNativeApi.mkApp2("bvlshr", a, b));
-    long remaining =
+            bitvectorType,
+            args.get(0),
+            rotateAmount,
+            (left, right) -> LeanSmtNativeApi.mkApp2("bvlshr", left, right));
+    long remainingWidth =
         makeBinary(
             "bvsub",
             FunctionDeclarationKind.BV_SUB,
-            getFormulaType(bitvector),
-            sizeBv,
-            rotateInRange,
-            (a, b) -> LeanSmtNativeApi.mkApp2("bvsub", a, b));
-    long left =
+            bitvectorType,
+            widthTerm,
+            rotateAmount,
+            (left, right) -> LeanSmtNativeApi.mkApp2("bvsub", left, right));
+    long shiftLeft =
         makeBinary(
             "bvshl",
             FunctionDeclarationKind.BV_SHL,
-            getFormulaType(bitvector),
-            bitvector,
-            remaining,
-            (a, b) -> LeanSmtNativeApi.mkApp2("bvshl", a, b));
+            bitvectorType,
+            args.get(0),
+            remainingWidth,
+            (left, right) -> LeanSmtNativeApi.mkApp2("bvshl", left, right));
     return makeBinary(
         "bvor",
         FunctionDeclarationKind.BV_OR,
-        getFormulaType(bitvector),
-        left,
-        right,
-        (a, b) -> LeanSmtNativeApi.mkApp2("bvor", a, b));
+        bitvectorType,
+        shiftRight,
+        shiftLeft,
+        (left, right) -> LeanSmtNativeApi.mkApp2("bvor", left, right));
   }
 
   private static int parseIntToBvWidth(LeanSmtFunctionDecl declaration, FormulaType<?> returnType) {
@@ -1639,43 +1551,6 @@ final class LeanSmtFormulaCreator
     @Override
     public int hashCode() {
       return Objects.hash(size, value);
-    }
-  }
-
-  private static final class IntToBvKey {
-    private final int width;
-    private final long intTerm;
-
-    private IntToBvKey(int pWidth, long pIntTerm) {
-      width = pWidth;
-      intTerm = pIntTerm;
-    }
-
-    @Override
-    public int hashCode() {
-      return Objects.hash(width, intTerm);
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-      if (this == obj) {
-        return true;
-      }
-      if (!(obj instanceof IntToBvKey)) {
-        return false;
-      }
-      IntToBvKey other = (IntToBvKey) obj;
-      return width == other.width && intTerm == other.intTerm;
-    }
-  }
-
-  private static final class UfApplication {
-    private final long handle;
-    private final ImmutableList<Long> arguments;
-
-    UfApplication(long pHandle, ImmutableList<Long> pArguments) {
-      handle = pHandle;
-      arguments = pArguments;
     }
   }
 

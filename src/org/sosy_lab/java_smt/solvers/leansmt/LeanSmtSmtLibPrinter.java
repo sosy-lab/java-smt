@@ -48,6 +48,10 @@ final class LeanSmtSmtLibPrinter {
     return out.toString();
   }
 
+  String serializeTerm(long formula) {
+    return serialize(formula, Map.of());
+  }
+
   private String serializeWithLets(long root) {
     Map<Long, Integer> counts = new LinkedHashMap<>();
     countOccurrences(root, counts);
@@ -165,11 +169,10 @@ final class LeanSmtSmtLibPrinter {
       case CONSTANT:
         return constantToSmt(expr);
       case APPLICATION:
-        String op = expr.symbol;
         String printedOp =
-            "=>".equals(op)
-                ? "=>"
-                : (op.startsWith("(_ ") && op.endsWith(")")) ? op : quoteIdentifier(op);
+            expr.declarationKind == org.sosy_lab.java_smt.api.FunctionDeclarationKind.UF
+                ? quoteIdentifier(expr.symbol)
+                : expr.symbol;
         List<String> args = new ArrayList<>(expr.arguments.size());
         for (Long arg : expr.arguments) {
           args.add(serialize(arg, substitutions));
@@ -206,12 +209,6 @@ final class LeanSmtSmtLibPrinter {
           (org.sosy_lab.common.rationals.Rational) value;
       BigInteger numerator = rationalValue.getNum();
       BigInteger denominator = rationalValue.getDen();
-      if (denominator.equals(BigInteger.ONE)) {
-        if (numerator.signum() < 0) {
-          return "(- " + numerator.abs() + ")";
-        }
-        return numerator.toString();
-      }
       String fraction = "(/ " + numerator.abs() + " " + denominator + ")";
       if (numerator.signum() < 0) {
         return "(- " + fraction + ")";

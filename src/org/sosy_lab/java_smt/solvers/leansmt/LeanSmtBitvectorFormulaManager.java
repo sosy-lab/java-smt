@@ -174,22 +174,6 @@ final class LeanSmtBitvectorFormulaManager
   }
 
   @Override
-  protected Long rotateLeft(Long pNumber, Long pToRotate) {
-    Long simplified = trySimplifyRotateLeft(pNumber, pToRotate);
-    if (simplified != null) {
-      return simplified;
-    }
-    return creator()
-        .makeBinary(
-            "rotate_left",
-            FunctionDeclarationKind.BV_ROTATE_LEFT,
-            creator().getFormulaType(pNumber),
-            pNumber,
-            pToRotate,
-            creator()::buildRotateLeftTerm);
-  }
-
-  @Override
   protected Long rotateRightByConstant(Long pNumber, int pToRotate) {
     return creator()
         .makeUnary(
@@ -198,44 +182,6 @@ final class LeanSmtBitvectorFormulaManager
             creator().getFormulaType(pNumber),
             pNumber,
             arg -> LeanSmtNativeApi.mkIndexedApp1("rotate_right", pToRotate, arg));
-  }
-
-  @Override
-  protected Long rotateRight(Long pNumber, Long pToRotate) {
-    Long simplified = trySimplifyRotateRight(pNumber, pToRotate);
-    if (simplified != null) {
-      return simplified;
-    }
-    return creator()
-        .makeBinary(
-            "rotate_right",
-            FunctionDeclarationKind.BV_ROTATE_RIGHT,
-            creator().getFormulaType(pNumber),
-            pNumber,
-            pToRotate,
-            creator()::buildRotateRightTerm);
-  }
-
-  private Long trySimplifyRotateLeft(long number, long toRotate) {
-    LeanSmtFormulaCreator.Expr expr = creator().getExpression(number);
-    if (expr.kind == LeanSmtFormulaCreator.ExprKind.APPLICATION
-        && "rotate_right".equals(expr.symbol)
-        && expr.arguments.size() == 2
-        && expr.arguments.get(1) == toRotate) {
-      return expr.arguments.get(0);
-    }
-    return null;
-  }
-
-  private Long trySimplifyRotateRight(long number, long toRotate) {
-    LeanSmtFormulaCreator.Expr expr = creator().getExpression(number);
-    if (expr.kind == LeanSmtFormulaCreator.ExprKind.APPLICATION
-        && "rotate_left".equals(expr.symbol)
-        && expr.arguments.size() == 2
-        && expr.arguments.get(1) == toRotate) {
-      return expr.arguments.get(0);
-    }
-    return null;
   }
 
   @Override
@@ -298,56 +244,12 @@ final class LeanSmtBitvectorFormulaManager
 
   @Override
   protected Long smodulo(Long pParam1, Long pParam2) {
-    Object leftValue = creator().convertValue(pParam1);
-    Object rightValue = creator().convertValue(pParam2);
-    if (leftValue instanceof BigInteger && rightValue instanceof BigInteger) {
-      int size = bitvectorSize(pParam1);
-      BigInteger leftUnsigned = (BigInteger) leftValue;
-      BigInteger rightUnsigned = (BigInteger) rightValue;
-
-      BigInteger resultUnsigned;
-      BigInteger leftSigned = toSignedBitvectorValue(leftUnsigned, size);
-      BigInteger rightSigned = toSignedBitvectorValue(rightUnsigned, size);
-      if (rightSigned.signum() == 0) {
-        resultUnsigned = leftUnsigned;
-      } else {
-        // Follow SMT-LIB definition of bvsmod via bvsrem:
-        //   smod(s,t) = ite(t=0, s,
-        //                 ite(srem(s,t)=0, 0,
-        //                     ite(sign(s)=sign(t), srem(s,t), srem(s,t)+t))).
-        BigInteger absRemainder = leftSigned.abs().remainder(rightSigned.abs());
-        BigInteger signedRemainder =
-            leftSigned.signum() < 0 ? absRemainder.negate() : absRemainder;
-
-        BigInteger signedResult;
-        if (signedRemainder.signum() == 0) {
-          signedResult = BigInteger.ZERO;
-        } else if (leftSigned.signum() == rightSigned.signum()) {
-          signedResult = signedRemainder;
-        } else {
-          signedResult = signedRemainder.add(rightSigned);
-        }
-        resultUnsigned = normalizeToUnsignedBitvectorValue(signedResult, size);
-      }
-      return creator().makeBitvectorConstant(size, resultUnsigned);
-    }
-
     return mkBvBinary(
         "bvsmod",
         FunctionDeclarationKind.BV_SMOD,
         pParam1,
         pParam2,
         (a, b) -> LeanSmtNativeApi.mkApp2("bvsmod", a, b));
-  }
-
-  private static BigInteger toSignedBitvectorValue(BigInteger unsignedValue, int size) {
-    BigInteger modulus = BigInteger.ONE.shiftLeft(size);
-    return unsignedValue.testBit(size - 1) ? unsignedValue.subtract(modulus) : unsignedValue;
-  }
-
-  private static BigInteger normalizeToUnsignedBitvectorValue(BigInteger signedValue, int size) {
-    BigInteger modulus = BigInteger.ONE.shiftLeft(size);
-    return signedValue.mod(modulus);
   }
 
   @Override

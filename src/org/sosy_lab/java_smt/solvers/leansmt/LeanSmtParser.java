@@ -147,7 +147,7 @@ final class LeanSmtParser {
       if (items.isEmpty() || !items.get(0).isAtom()) {
         throw new IllegalArgumentException("Malformed SMT-LIB command: " + command);
       }
-      String head = decodeIdentifier(items.get(0).getAtom());
+      String head = LeanSmtFormulaCreator.decodeIdentifier(items.get(0).getAtom());
       switch (head) {
         case "declare-const":
           parseDeclareConst(items);
@@ -194,7 +194,7 @@ final class LeanSmtParser {
     if (items.size() != 3 || !items.get(1).isAtom()) {
       throw new IllegalArgumentException("Malformed declare-const command");
     }
-    String name = decodeIdentifier(items.get(1).getAtom());
+    String name = LeanSmtFormulaCreator.decodeIdentifier(items.get(1).getAtom());
     @Nullable LeanSmtType type = parseSortOrNull(items.get(2));
     if (type == null) {
       unsupportedSymbols.add(name);
@@ -207,7 +207,7 @@ final class LeanSmtParser {
     if (items.size() != 4 || !items.get(1).isAtom()) {
       throw new IllegalArgumentException("Malformed declare-fun command");
     }
-    String name = decodeIdentifier(items.get(1).getAtom());
+    String name = LeanSmtFormulaCreator.decodeIdentifier(items.get(1).getAtom());
     List<SExpr> argSortExprs = items.get(2).getList();
     List<LeanSmtType> argTypes = new ArrayList<>(argSortExprs.size());
     boolean unsupported = false;
@@ -231,7 +231,7 @@ final class LeanSmtParser {
     if (items.size() != 4 || !items.get(1).isAtom()) {
       throw new IllegalArgumentException("Malformed define-const command");
     }
-    String name = decodeIdentifier(items.get(1).getAtom());
+    String name = LeanSmtFormulaCreator.decodeIdentifier(items.get(1).getAtom());
     if (symbols.containsKey(name)
         || constantDefinitions.containsKey(name)
         || macroDefinitions.containsKey(name)) {
@@ -250,7 +250,7 @@ final class LeanSmtParser {
     if (items.size() != 5 || !items.get(1).isAtom()) {
       throw new IllegalArgumentException("Malformed define-fun command");
     }
-    String name = decodeIdentifier(items.get(1).getAtom());
+    String name = LeanSmtFormulaCreator.decodeIdentifier(items.get(1).getAtom());
     if (symbols.containsKey(name)
         || constantDefinitions.containsKey(name)
         || macroDefinitions.containsKey(name)) {
@@ -280,7 +280,7 @@ final class LeanSmtParser {
         unsupportedSymbols.add(name);
         return;
       }
-      params.add(new ParamDecl(decodeIdentifier(p.get(0).getAtom()), paramType));
+      params.add(new ParamDecl(LeanSmtFormulaCreator.decodeIdentifier(p.get(0).getAtom()), paramType));
     }
     macroDefinitions.put(name, new MacroDef(params.build(), returnType, items.get(4)));
   }
@@ -306,9 +306,7 @@ final class LeanSmtParser {
       return;
     }
 
-    LeanSmtFunctionDecl decl =
-        new LeanSmtFunctionDecl(
-            name, FunctionDeclarationKind.UF, returnType, ImmutableList.copyOf(argTypes));
+      LeanSmtFunctionDecl decl = creator.declareUFImpl(name, returnType, ImmutableList.copyOf(argTypes));
     if (existing == null) {
       symbols.put(name, SymbolDecl.function(decl));
       return;
@@ -333,7 +331,7 @@ final class LeanSmtParser {
   }
 
   private Term parseAtom(String token, @Nullable LeanSmtType expectedType, Map<String, Term> locals) {
-    String decodedToken = decodeIdentifier(token);
+    String decodedToken = LeanSmtFormulaCreator.decodeIdentifier(token);
     if ("true".equals(token)) {
       return new Term(creator.getTrueHandle(), LeanSmtType.BOOL);
     }
@@ -377,7 +375,7 @@ final class LeanSmtParser {
       return parseIndexedApplication(expr, expectedType, locals);
     }
     String opToken = expr.get(0).getAtom();
-    String op = decodeIdentifier(opToken);
+    String op = LeanSmtFormulaCreator.decodeIdentifier(opToken);
     List<SExpr> args = expr.subList(1, expr.size());
 
     SymbolDecl maybeUf = symbols.get(op);
@@ -460,6 +458,21 @@ final class LeanSmtParser {
                 rhs.handle,
                 LeanSmtNativeApi::mkMod),
             LeanSmtType.INT);
+      case "to_real":
+        checkArity(op, args, 1);
+        Term intArg = parseExpr(args.get(0), LeanSmtType.INT, locals);
+        return new Term(
+            creator.makeUnary(
+                "to_real",
+                FunctionDeclarationKind.TO_REAL,
+                FormulaType.RationalType,
+                intArg.handle,
+                term -> LeanSmtNativeApi.mkApp1("to_real", term)),
+            LeanSmtType.REAL);
+      case "to_int":
+        checkArity(op, args, 1);
+        Term realArg = parseExpr(args.get(0), LeanSmtType.REAL, locals);
+        return new Term(creator.makeFloorTerm(realArg.handle), LeanSmtType.INT);
       case "ite":
         checkArity(op, args, 3);
         Term cond = parseExpr(args.get(0), LeanSmtType.BOOL, locals);
@@ -560,11 +573,11 @@ final class LeanSmtParser {
         return bitvectorCompare(op, FunctionDeclarationKind.BV_SGE, args.get(0), args.get(1), locals);
       case "rotate_left":
         checkArity(op, args, 2);
-        return bitvectorRotateSymbolic(
+        return bitvectorBinary(
             op, FunctionDeclarationKind.BV_ROTATE_LEFT, args.get(0), args.get(1), locals);
       case "rotate_right":
         checkArity(op, args, 2);
-        return bitvectorRotateSymbolic(
+        return bitvectorBinary(
             op, FunctionDeclarationKind.BV_ROTATE_RIGHT, args.get(0), args.get(1), locals);
       case "ubv_to_int":
         checkArity(op, args, 1);
@@ -588,7 +601,7 @@ final class LeanSmtParser {
       if (pair.size() != 2 || !pair.get(0).isAtom()) {
         throw new IllegalArgumentException("Malformed let binding");
       }
-      String name = decodeIdentifier(pair.get(0).getAtom());
+      String name = LeanSmtFormulaCreator.decodeIdentifier(pair.get(0).getAtom());
       rhsValues.put(name, parseExpr(pair.get(1), null, locals));
     }
 
@@ -655,7 +668,7 @@ final class LeanSmtParser {
     if (head.size() < 3 || !head.get(1).isAtom()) {
       throw new IllegalArgumentException("Malformed indexed SMT-LIB operator");
     }
-    String indexedOp = decodeIdentifier(head.get(1).getAtom());
+    String indexedOp = LeanSmtFormulaCreator.decodeIdentifier(head.get(1).getAtom());
     List<SExpr> args = expr.subList(1, expr.size());
 
     switch (indexedOp) {
@@ -908,22 +921,6 @@ final class LeanSmtParser {
             rhs.handle,
             (a, b) -> LeanSmtNativeApi.mkApp2(op, a, b)),
         LeanSmtType.BOOL);
-  }
-
-  private Term bitvectorRotateSymbolic(
-      String op, FunctionDeclarationKind kind, SExpr lhsExpr, SExpr rhsExpr, Map<String, Term> locals) {
-    Term lhs = parseExpr(lhsExpr, null, locals);
-    if (!lhs.type.isBitvector()) {
-      throw new IllegalArgumentException("Operator '" + op + "' expects bitvector arguments");
-    }
-    Term rhs = parseExpr(rhsExpr, lhs.type, locals);
-    LeanSmtFormulaCreator.NativeBinary nativeOp =
-        kind == FunctionDeclarationKind.BV_ROTATE_LEFT
-            ? creator::buildRotateLeftTerm
-            : creator::buildRotateRightTerm;
-    return new Term(
-        creator.makeBinary(op, kind, lhs.type.toFormulaType(), lhs.handle, rhs.handle, nativeOp),
-        lhs.type);
   }
 
   private Term unaryBool(String op, FunctionDeclarationKind kind, SExpr argExpr, Map<String, Term> locals) {
@@ -1343,10 +1340,4 @@ final class LeanSmtParser {
     }
   }
 
-  private static String decodeIdentifier(String token) {
-    if (token.length() >= 2 && token.startsWith("|") && token.endsWith("|")) {
-      return token.substring(1, token.length() - 1).replace("||", "|");
-    }
-    return token;
-  }
 }

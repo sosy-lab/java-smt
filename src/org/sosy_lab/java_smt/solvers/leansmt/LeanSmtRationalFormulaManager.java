@@ -33,6 +33,20 @@ final class LeanSmtRationalFormulaManager
   }
 
   @Override
+  protected Long toType(Long pNumber) {
+    if (FormulaType.IntegerType.equals(getFormulaCreator().getFormulaType(pNumber))) {
+      LeanSmtFormulaCreator creator = (LeanSmtFormulaCreator) getFormulaCreator();
+      return creator.makeUnary(
+          "to_real",
+          org.sosy_lab.java_smt.api.FunctionDeclarationKind.TO_REAL,
+          FormulaType.RationalType,
+          pNumber,
+          term -> LeanSmtNativeApi.mkApp1("to_real", term));
+    }
+    return pNumber;
+  }
+
+  @Override
   protected Long makeNumberImpl(double pNumber) {
     return makeNumberImpl(Double.toString(pNumber));
   }
@@ -42,4 +56,3 @@ final class LeanSmtRationalFormulaManager
     return makeNumberImpl(pNumber.toPlainString());
   }
 }
-
