@@ -705,7 +705,7 @@ public abstract class SolverBasedTest0 {
     @Parameter(1)
     public ProverOptions interpolationStrategy;
 
-    protected ProverOptions itpStrategyToUse() {
+    protected @Nullable ProverOptions itpStrategyToUse() {
       return interpolationStrategy;
     }
 
