@@ -36,10 +36,6 @@ extern lean_object* leansmt_cleanup(void);
 extern lean_object* leansmt_create_solver(uint8_t kind);
 extern lean_object* leansmt_delete_solver(uint64_t handle);
 extern lean_object* leansmt_set_logic(uint64_t handle, lean_object* logic);
-extern lean_object* leansmt_mk_bool_var(uint64_t solver, lean_object* name);
-extern lean_object* leansmt_mk_int_var(uint64_t solver, lean_object* name);
-extern lean_object* leansmt_mk_real_var(uint64_t solver, lean_object* name);
-extern lean_object* leansmt_mk_bv_var(uint64_t solver, lean_object* name, uint32_t width);
 extern lean_object* leansmt_mk_int_const(lean_object* value);
 extern lean_object* leansmt_mk_real_const(lean_object* num, lean_object* den);
 extern lean_object* leansmt_mk_bv_const(uint32_t width, lean_object* value);
@@ -49,6 +45,12 @@ extern lean_object* leansmt_mk_app1(lean_object* op, uint64_t term);
 extern lean_object* leansmt_mk_app2(lean_object* op, uint64_t lhs, uint64_t rhs);
 extern lean_object* leansmt_mk_extract(uint64_t term, uint32_t msb, uint32_t lsb);
 extern lean_object* leansmt_mk_indexed_app1(lean_object* op, uint32_t index, uint64_t term);
+extern lean_object* leansmt_mk_symbol(lean_object* symbol);
+extern lean_object* leansmt_mk_apply(uint64_t fn, uint64_t arg);
+extern lean_object* leansmt_get_term_kind(uint64_t term);
+extern lean_object* leansmt_get_term_text(uint64_t term);
+extern lean_object* leansmt_get_term_num_children(uint64_t term);
+extern lean_object* leansmt_get_term_child(uint64_t term, uint32_t index);
 extern lean_object* leansmt_mk_not(uint64_t t);
 extern lean_object* leansmt_mk_and(uint64_t t1, uint64_t t2);
 extern lean_object* leansmt_mk_or(uint64_t t1, uint64_t t2);
@@ -69,11 +71,11 @@ extern lean_object* leansmt_mk_div(uint64_t t1, uint64_t t2);
 extern lean_object* leansmt_mk_mod(uint64_t t1, uint64_t t2);
 extern lean_object* leansmt_mk_neg(uint64_t t);
 extern lean_object* leansmt_assert(uint64_t solver, uint64_t term);
+extern lean_object* leansmt_declare_fun(
+    uint64_t solver, lean_object* name, lean_object* arg_sorts, lean_object* return_sort);
 extern lean_object* leansmt_check_sat(uint64_t solver);
 extern lean_object* leansmt_get_model(uint64_t solver);
 extern lean_object* leansmt_get_value(uint64_t solver, uint64_t term);
-extern lean_object* leansmt_get_proof(uint64_t solver);
-extern lean_object* leansmt_check_sat_string(lean_object* query);
 
 /* Internal state */
 static int g_initialized = 0;
@@ -334,32 +336,6 @@ int leansmt_wrapper_set_logic(uint64_t handle, const char* logic) {
     return (ret == 0) ? LEANSMT_OK : LEANSMT_ERROR;
 }
 
-/*=== Term Creation - Variables ===*/
-
-uint64_t leansmt_wrapper_mk_bool_var(uint64_t solver, const char* name) {
-    if (!g_initialized || !name) return 0;
-    lean_object* lean_name = lean_mk_string(name);
-    return extract_io_uint64(leansmt_mk_bool_var(solver, lean_name));
-}
-
-uint64_t leansmt_wrapper_mk_int_var(uint64_t solver, const char* name) {
-    if (!g_initialized || !name) return 0;
-    lean_object* lean_name = lean_mk_string(name);
-    return extract_io_uint64(leansmt_mk_int_var(solver, lean_name));
-}
-
-uint64_t leansmt_wrapper_mk_real_var(uint64_t solver, const char* name) {
-    if (!g_initialized || !name) return 0;
-    lean_object* lean_name = lean_mk_string(name);
-    return extract_io_uint64(leansmt_mk_real_var(solver, lean_name));
-}
-
-uint64_t leansmt_wrapper_mk_bv_var(uint64_t solver, const char* name, uint32_t width) {
-    if (!g_initialized || !name || width == 0) return 0;
-    lean_object* lean_name = lean_mk_string(name);
-    return extract_io_uint64(leansmt_mk_bv_var(solver, lean_name, width));
-}
-
 /*=== Term Creation - Constants ===*/
 
 uint64_t leansmt_wrapper_mk_true(void) {
@@ -414,6 +390,45 @@ uint64_t leansmt_wrapper_mk_indexed_app1(const char* op, uint32_t index, uint64_
     if (!g_initialized || op == NULL) return 0;
     lean_object* lean_op = lean_mk_string(op);
     return extract_io_uint64(leansmt_mk_indexed_app1(lean_op, index, term));
+}
+
+uint64_t leansmt_wrapper_mk_symbol(const char* symbol) {
+    if (!g_initialized || symbol == NULL) return 0;
+    lean_object* lean_symbol = lean_mk_string(symbol);
+    return extract_io_uint64(leansmt_mk_symbol(lean_symbol));
+}
+
+uint64_t leansmt_wrapper_mk_apply(uint64_t fn, uint64_t arg) {
+    if (!g_initialized) return 0;
+    return extract_io_uint64(leansmt_mk_apply(fn, arg));
+}
+
+int leansmt_wrapper_get_term_kind(uint64_t term) {
+    if (!g_initialized) return -1;
+    uint32_t result = (uint32_t)extract_io_uint32(leansmt_get_term_kind(term));
+    if (result == UINT32_MAX) {
+        return -1;
+    }
+    return (int)result;
+}
+
+char* leansmt_wrapper_get_term_text(uint64_t term) {
+    if (!g_initialized) return NULL;
+    return extract_io_string(leansmt_get_term_text(term));
+}
+
+uint32_t leansmt_wrapper_get_term_num_children(uint64_t term) {
+    if (!g_initialized) return UINT32_MAX;
+    uint32_t result = (uint32_t)extract_io_uint32(leansmt_get_term_num_children(term));
+    if (result == UINT32_MAX) {
+        return UINT32_MAX;
+    }
+    return result;
+}
+
+uint64_t leansmt_wrapper_get_term_child(uint64_t term, uint32_t index) {
+    if (!g_initialized) return 0;
+    return extract_io_uint64(leansmt_get_term_child(term, index));
 }
 
 /*=== Boolean Operations ===*/
@@ -525,6 +540,19 @@ int leansmt_wrapper_assert(uint64_t solver, uint64_t term) {
     return (ret == 0) ? LEANSMT_OK : LEANSMT_ERROR;
 }
 
+int leansmt_wrapper_declare_fun(
+    uint64_t solver, const char* name, const char* arg_sorts, const char* return_sort) {
+    if (!g_initialized || name == NULL || arg_sorts == NULL || return_sort == NULL) {
+        return LEANSMT_ERROR;
+    }
+    lean_object* lean_name = lean_mk_string(name);
+    lean_object* lean_arg_sorts = lean_mk_string(arg_sorts);
+    lean_object* lean_return_sort = lean_mk_string(return_sort);
+    int32_t ret =
+        extract_io_uint32(leansmt_declare_fun(solver, lean_name, lean_arg_sorts, lean_return_sort));
+    return (ret == 0) ? LEANSMT_OK : LEANSMT_ERROR;
+}
+
 int leansmt_wrapper_check_sat(uint64_t solver) {
     if (!g_initialized) return LEANSMT_CHECK_ERROR;
     uint8_t result = extract_io_uint8(leansmt_check_sat(solver));
@@ -550,31 +578,8 @@ char* leansmt_wrapper_get_value(uint64_t solver, uint64_t term) {
     return extract_io_string(leansmt_get_value(solver, term));
 }
 
-char* leansmt_wrapper_get_proof(uint64_t solver) {
-    if (!g_initialized) return NULL;
-    return extract_io_string(leansmt_get_proof(solver));
-}
-
 void leansmt_wrapper_free_string(char* value) {
     if (value != NULL) {
         free(value);
-    }
-}
-
-/*=== Legacy/Convenience ===*/
-
-int leansmt_wrapper_check_sat_string(const char* query) {
-    if (!g_initialized || query == NULL) return LEANSMT_CHECK_ERROR;
-    lean_object* lean_query = lean_mk_string(query);
-    uint8_t result = extract_io_uint8(leansmt_check_sat_string(lean_query));
-    switch (result) {
-        case 0:
-            return LEANSMT_SAT;
-        case 1:
-            return LEANSMT_UNSAT;
-        case 2:
-            return LEANSMT_UNKNOWN;
-        default:
-            return LEANSMT_CHECK_ERROR;
     }
 }

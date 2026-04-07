@@ -59,106 +59,129 @@ static jobject u64_to_bigint(JNIEnv* jenv, uint64_t value) {
 }
 
 JNIEXPORT jobject JNICALL
-Java_org_sosy_1lab_java_1smt_solvers_leansmt_LeanSMTJNI_leansmt_1wrapper_1mk_1bv_1var(
-    JNIEnv* jenv, jclass jcls, jobject jsolver, jstring jname, jint jwidth) {
+Java_org_sosy_1lab_java_1smt_solvers_leansmt_LeanSMTJNI_leansmt_1wrapper_1mk_1symbol(
+    JNIEnv* jenv, jclass jcls, jstring jsymbol) {
   (void)jcls;
-  if (jsolver == NULL || jname == NULL || jwidth <= 0) {
+  if (jsymbol == NULL) {
     return NULL;
+  }
+
+  const char* symbol = (*jenv)->GetStringUTFChars(jenv, jsymbol, NULL);
+  if (symbol == NULL) {
+    return NULL;
+  }
+  uint64_t result = leansmt_wrapper_mk_symbol(symbol);
+  (*jenv)->ReleaseStringUTFChars(jenv, jsymbol, symbol);
+  return u64_to_bigint(jenv, result);
+}
+
+JNIEXPORT jobject JNICALL
+Java_org_sosy_1lab_java_1smt_solvers_leansmt_LeanSMTJNI_leansmt_1wrapper_1mk_1apply(
+    JNIEnv* jenv, jclass jcls, jobject jfn, jobject jarg) {
+  (void)jcls;
+  if (jfn == NULL || jarg == NULL) {
+    return NULL;
+  }
+
+  uint64_t fn = bigint_to_u64(jenv, jfn);
+  uint64_t arg = bigint_to_u64(jenv, jarg);
+  uint64_t result = leansmt_wrapper_mk_apply(fn, arg);
+  return u64_to_bigint(jenv, result);
+}
+
+JNIEXPORT jint JNICALL
+Java_org_sosy_1lab_java_1smt_solvers_leansmt_LeanSMTJNI_leansmt_1wrapper_1declare_1fun(
+    JNIEnv* jenv,
+    jclass jcls,
+    jobject jsolver,
+    jstring jname,
+    jstring jargSorts,
+    jstring jreturnSort) {
+  (void)jcls;
+  if (jsolver == NULL || jname == NULL || jargSorts == NULL || jreturnSort == NULL) {
+    return LEANSMT_ERROR;
   }
 
   uint64_t solver = bigint_to_u64(jenv, jsolver);
   const char* name = (*jenv)->GetStringUTFChars(jenv, jname, NULL);
-  if (name == NULL) {
-    return NULL;
+  const char* arg_sorts = (*jenv)->GetStringUTFChars(jenv, jargSorts, NULL);
+  const char* return_sort = (*jenv)->GetStringUTFChars(jenv, jreturnSort, NULL);
+  if (name == NULL || arg_sorts == NULL || return_sort == NULL) {
+    if (name != NULL) {
+      (*jenv)->ReleaseStringUTFChars(jenv, jname, name);
+    }
+    if (arg_sorts != NULL) {
+      (*jenv)->ReleaseStringUTFChars(jenv, jargSorts, arg_sorts);
+    }
+    if (return_sort != NULL) {
+      (*jenv)->ReleaseStringUTFChars(jenv, jreturnSort, return_sort);
+    }
+    return LEANSMT_ERROR;
   }
 
-  uint64_t result = leansmt_wrapper_mk_bv_var(solver, name, (uint32_t)jwidth);
+  int result = leansmt_wrapper_declare_fun(solver, name, arg_sorts, return_sort);
   (*jenv)->ReleaseStringUTFChars(jenv, jname, name);
-  return u64_to_bigint(jenv, result);
+  (*jenv)->ReleaseStringUTFChars(jenv, jargSorts, arg_sorts);
+  (*jenv)->ReleaseStringUTFChars(jenv, jreturnSort, return_sort);
+  return result;
 }
 
-JNIEXPORT jobject JNICALL
-Java_org_sosy_1lab_java_1smt_solvers_leansmt_LeanSMTJNI_leansmt_1wrapper_1mk_1bv_1const(
-    JNIEnv* jenv, jclass jcls, jint jwidth, jstring jvalue) {
+JNIEXPORT jint JNICALL
+Java_org_sosy_1lab_java_1smt_solvers_leansmt_LeanSMTJNI_leansmt_1wrapper_1get_1term_1kind(
+    JNIEnv* jenv, jclass jcls, jobject jterm) {
   (void)jcls;
-  if (jvalue == NULL || jwidth <= 0) {
-    return NULL;
+  if (jterm == NULL) {
+    return -1;
   }
 
-  const char* value = (*jenv)->GetStringUTFChars(jenv, jvalue, NULL);
-  if (value == NULL) {
-    return NULL;
-  }
-
-  uint64_t result = leansmt_wrapper_mk_bv_const((uint32_t)jwidth, value);
-  (*jenv)->ReleaseStringUTFChars(jenv, jvalue, value);
-  return u64_to_bigint(jenv, result);
-}
-
-JNIEXPORT jobject JNICALL
-Java_org_sosy_1lab_java_1smt_solvers_leansmt_LeanSMTJNI_leansmt_1wrapper_1mk_1app1(
-    JNIEnv* jenv, jclass jcls, jstring jop, jobject jterm) {
-  (void)jcls;
-  if (jop == NULL || jterm == NULL) {
-    return NULL;
-  }
-
-  const char* op = (*jenv)->GetStringUTFChars(jenv, jop, NULL);
-  if (op == NULL) {
-    return NULL;
-  }
   uint64_t term = bigint_to_u64(jenv, jterm);
-  uint64_t result = leansmt_wrapper_mk_app1(op, term);
-  (*jenv)->ReleaseStringUTFChars(jenv, jop, op);
-  return u64_to_bigint(jenv, result);
+  return (jint)leansmt_wrapper_get_term_kind(term);
 }
 
-JNIEXPORT jobject JNICALL
-Java_org_sosy_1lab_java_1smt_solvers_leansmt_LeanSMTJNI_leansmt_1wrapper_1mk_1app2(
-    JNIEnv* jenv, jclass jcls, jstring jop, jobject jlhs, jobject jrhs) {
+JNIEXPORT jstring JNICALL
+Java_org_sosy_1lab_java_1smt_solvers_leansmt_LeanSMTJNI_leansmt_1wrapper_1get_1term_1text(
+    JNIEnv* jenv, jclass jcls, jobject jterm) {
   (void)jcls;
-  if (jop == NULL || jlhs == NULL || jrhs == NULL) {
-    return NULL;
-  }
-
-  const char* op = (*jenv)->GetStringUTFChars(jenv, jop, NULL);
-  if (op == NULL) {
-    return NULL;
-  }
-  uint64_t lhs = bigint_to_u64(jenv, jlhs);
-  uint64_t rhs = bigint_to_u64(jenv, jrhs);
-  uint64_t result = leansmt_wrapper_mk_app2(op, lhs, rhs);
-  (*jenv)->ReleaseStringUTFChars(jenv, jop, op);
-  return u64_to_bigint(jenv, result);
-}
-
-JNIEXPORT jobject JNICALL
-Java_org_sosy_1lab_java_1smt_solvers_leansmt_LeanSMTJNI_leansmt_1wrapper_1mk_1extract(
-    JNIEnv* jenv, jclass jcls, jobject jterm, jint jmsb, jint jlsb) {
-  (void)jcls;
-  if (jterm == NULL || jmsb < 0 || jlsb < 0) {
+  if (jterm == NULL) {
     return NULL;
   }
 
   uint64_t term = bigint_to_u64(jenv, jterm);
-  uint64_t result = leansmt_wrapper_mk_extract(term, (uint32_t)jmsb, (uint32_t)jlsb);
-  return u64_to_bigint(jenv, result);
+  char* text = leansmt_wrapper_get_term_text(term);
+  if (text == NULL) {
+    return NULL;
+  }
+
+  jstring result = (*jenv)->NewStringUTF(jenv, text);
+  leansmt_wrapper_free_string(text);
+  return result;
+}
+
+JNIEXPORT jint JNICALL
+Java_org_sosy_1lab_java_1smt_solvers_leansmt_LeanSMTJNI_leansmt_1wrapper_1get_1term_1num_1children(
+    JNIEnv* jenv, jclass jcls, jobject jterm) {
+  (void)jcls;
+  if (jterm == NULL) {
+    return -1;
+  }
+
+  uint64_t term = bigint_to_u64(jenv, jterm);
+  uint32_t count = leansmt_wrapper_get_term_num_children(term);
+  return count == UINT32_MAX ? -1 : (jint)count;
 }
 
 JNIEXPORT jobject JNICALL
-Java_org_sosy_1lab_java_1smt_solvers_leansmt_LeanSMTJNI_leansmt_1wrapper_1mk_1indexed_1app1(
-    JNIEnv* jenv, jclass jcls, jstring jop, jint jindex, jobject jterm) {
+Java_org_sosy_1lab_java_1smt_solvers_leansmt_LeanSMTJNI_leansmt_1wrapper_1get_1term_1child(
+    JNIEnv* jenv, jclass jcls, jobject jterm, jint jindex) {
   (void)jcls;
-  if (jop == NULL || jterm == NULL || jindex < 0) {
+  if (jterm == NULL || jindex < 0) {
     return NULL;
   }
 
-  const char* op = (*jenv)->GetStringUTFChars(jenv, jop, NULL);
-  if (op == NULL) {
+  uint64_t term = bigint_to_u64(jenv, jterm);
+  uint64_t child = leansmt_wrapper_get_term_child(term, (uint32_t)jindex);
+  if (child == 0) {
     return NULL;
   }
-  uint64_t term = bigint_to_u64(jenv, jterm);
-  uint64_t result = leansmt_wrapper_mk_indexed_app1(op, (uint32_t)jindex, term);
-  (*jenv)->ReleaseStringUTFChars(jenv, jop, op);
-  return u64_to_bigint(jenv, result);
+  return u64_to_bigint(jenv, child);
 }

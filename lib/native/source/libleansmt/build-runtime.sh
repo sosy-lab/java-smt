@@ -189,6 +189,7 @@ require_file "$OVERLAY_FILE"
 require_file "$SCRIPT_DIR/leansmt_wrapper.c"
 require_file "$SCRIPT_DIR/leansmt_wrap.c"
 require_file "$SCRIPT_DIR/leansmt_wrapper.h"
+require_file "$SCRIPT_DIR/leansmt_extra_jni.c"
 
 # shellcheck disable=SC1090
 source "$LOCK_FILE"
@@ -275,6 +276,7 @@ gcc -shared -fPIC -O2 \
   -I"$LEAN_SYSROOT/include" \
   -o "$STAGE_DIR/libleansmt_jni.so" \
   "$SCRIPT_DIR/leansmt_wrapper.c" \
+  "$SCRIPT_DIR/leansmt_extra_jni.c" \
   "$SCRIPT_DIR/leansmt_wrap.c" \
   -L"$STAGE_DIR" \
   -l:libsmt_SmtJNI.so \

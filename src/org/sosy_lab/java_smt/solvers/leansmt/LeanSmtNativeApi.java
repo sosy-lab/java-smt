@@ -22,6 +22,9 @@ import org.sosy_lab.common.NativeLibraries;
 import org.sosy_lab.java_smt.api.SolverException;
 
 final class LeanSmtNativeApi {
+  static final int TERM_KIND_LITERAL = 0;
+  static final int TERM_KIND_SYMBOL = 1;
+  static final int TERM_KIND_APPLICATION = 2;
 
   private static final ExecutorService CLEANUP_EXECUTOR =
       Executors.newSingleThreadExecutor(
@@ -79,7 +82,7 @@ final class LeanSmtNativeApi {
     return LeanSMT.leansmt_wrapper_is_initialized() != 0;
   }
 
-  static synchronized void cleanup() {
+  static void cleanup() {
     Future<?> queueBarrier;
     synchronized (CLEANUP_QUEUE_LOCK) {
       cleanupInProgress = true;
@@ -87,7 +90,9 @@ final class LeanSmtNativeApi {
     }
     try {
       awaitCleanupQueueBarrier(queueBarrier);
-      LeanSMT.leansmt_wrapper_cleanup();
+      synchronized (LeanSmtNativeApi.class) {
+        LeanSMT.leansmt_wrapper_cleanup();
+      }
     } finally {
       synchronized (CLEANUP_QUEUE_LOCK) {
         cleanupInProgress = false;
@@ -175,27 +180,6 @@ final class LeanSmtNativeApi {
     }
   }
 
-  static synchronized long mkBoolVar(long solver, String name) throws SolverException {
-    return requireTerm(
-        LeanSMT.leansmt_wrapper_mk_bool_var(toBigInt(solver), name), "Failed to create Bool variable");
-  }
-
-  static synchronized long mkIntVar(long solver, String name) throws SolverException {
-    return requireTerm(
-        LeanSMT.leansmt_wrapper_mk_int_var(toBigInt(solver), name), "Failed to create Int variable");
-  }
-
-  static synchronized long mkRealVar(long solver, String name) throws SolverException {
-    return requireTerm(
-        LeanSMT.leansmt_wrapper_mk_real_var(toBigInt(solver), name), "Failed to create Real variable");
-  }
-
-  static synchronized long mkBvVar(long solver, String name, int width) throws SolverException {
-    return requireTerm(
-        LeanSMT.leansmt_wrapper_mk_bv_var(toBigInt(solver), name, width),
-        "Failed to create Bitvector variable");
-  }
-
   static synchronized long mkTrue() throws SolverException {
     return requireTerm(LeanSMT.leansmt_wrapper_mk_true(), "Failed to create constant true");
   }
@@ -240,6 +224,51 @@ final class LeanSmtNativeApi {
     return requireTerm(
         LeanSMT.leansmt_wrapper_mk_indexed_app1(op, index, toBigInt(t)),
         "Failed to create indexed unary application term");
+  }
+
+  static synchronized long mkSymbol(String symbol) throws SolverException {
+    return requireTerm(
+        LeanSMT.leansmt_wrapper_mk_symbol(symbol), "Failed to create LeanSMT symbol term");
+  }
+
+  static synchronized long mkApply(long fn, long arg) throws SolverException {
+    return requireTerm(
+        LeanSMT.leansmt_wrapper_mk_apply(toBigInt(fn), toBigInt(arg)),
+        "Failed to create LeanSMT application term");
+  }
+
+  static synchronized int getTermKind(long term) throws SolverException {
+    int kind = LeanSMT.leansmt_wrapper_get_term_kind(toBigInt(term));
+    if (kind < 0) {
+      throw new SolverException(
+          errorOrDefault("Failed to inspect LeanSMT term kind for term=" + term));
+    }
+    return kind;
+  }
+
+  static synchronized String getTermText(long term) throws SolverException {
+    String text = LeanSMT.leansmt_wrapper_get_term_text(toBigInt(term));
+    String error = currentError();
+    if (text == null || (text.isEmpty() && error != null && !error.isEmpty())) {
+      throw new SolverException(
+          errorOrDefault("Failed to inspect LeanSMT term text for term=" + term));
+    }
+    return text;
+  }
+
+  static synchronized int getTermNumChildren(long term) throws SolverException {
+    int count = LeanSMT.leansmt_wrapper_get_term_num_children(toBigInt(term));
+    if (count < 0) {
+      throw new SolverException(
+          errorOrDefault("Failed to inspect LeanSMT child count for term=" + term));
+    }
+    return count;
+  }
+
+  static synchronized long getTermChild(long term, int index) throws SolverException {
+    return requireTerm(
+        LeanSMT.leansmt_wrapper_get_term_child(toBigInt(term), index),
+        "Failed to inspect LeanSMT child " + index + " for term=" + term);
   }
 
   static synchronized long mkNot(long t) throws SolverException {
@@ -343,6 +372,21 @@ final class LeanSmtNativeApi {
     if (status != LeanSMTConstants.LEANSMT_OK) {
       throw new SolverException(
           errorOrDefault("assertTerm failed for solver=" + solver + ", term=" + term));
+    }
+  }
+
+  static synchronized void declareFun(long solver, String name, String argSorts, String returnSort)
+      throws SolverException {
+    int status = LeanSMT.leansmt_wrapper_declare_fun(toBigInt(solver), name, argSorts, returnSort);
+    if (status != LeanSMTConstants.LEANSMT_OK) {
+      throw new SolverException(
+          errorOrDefault(
+              "Failed to declare LeanSMT function "
+                  + name
+                  + " : ("
+                  + argSorts
+                  + ") -> "
+                  + returnSort));
     }
   }
 

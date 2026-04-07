@@ -49,9 +49,14 @@ public class LeanSmtNativeApiTest {
     solver = 0L;
   }
 
+  private static long declareIntVar(long solver, String name) throws SolverException {
+    LeanSmtNativeApi.declareFun(solver, name, "", "Int");
+    return LeanSmtNativeApi.mkSymbol(name);
+  }
+
   @Test
   public void simpleSat() throws SolverException {
-    long x = LeanSmtNativeApi.mkIntVar(solver, "x");
+    long x = declareIntVar(solver, "x");
     long zero = LeanSmtNativeApi.mkIntConst(0L);
     long gt = LeanSmtNativeApi.mkGt(x, zero);
     LeanSmtNativeApi.assertTerm(solver, gt);
@@ -60,7 +65,7 @@ public class LeanSmtNativeApiTest {
 
   @Test
   public void simpleUnsat() throws SolverException {
-    long x = LeanSmtNativeApi.mkIntVar(solver, "x");
+    long x = declareIntVar(solver, "x");
     long one = LeanSmtNativeApi.mkIntConst(1L);
     long two = LeanSmtNativeApi.mkIntConst(2L);
     LeanSmtNativeApi.assertTerm(solver, LeanSmtNativeApi.mkEq(x, one));
@@ -71,7 +76,9 @@ public class LeanSmtNativeApiTest {
   @Test
   public void bigIntegerEncodingViaFormulaCreator() throws SolverException {
     BigInteger big = new BigInteger("1234567890123456789012345678901234567890");
-    LeanSmtFormulaCreator creator = new LeanSmtFormulaCreator(solver);
+    LeanSmtFormulaCreator creator = new LeanSmtFormulaCreator();
+    LeanSmtNativeApi.declareFun(
+        solver, LeanSmtFormulaCreator.encodeNativeIdentifier("x"), "", "Int");
     long x = creator.makeVariable(LeanSmtType.INT, "x");
     long v = creator.makeIntConstant(big);
     long eq =
@@ -89,7 +96,7 @@ public class LeanSmtNativeApiTest {
 
   @Test
   public void getValueEvaluatesCompoundTerms() throws SolverException {
-    long x = LeanSmtNativeApi.mkIntVar(solver, "x_value");
+    long x = declareIntVar(solver, "x_value");
     long five = LeanSmtNativeApi.mkIntConst(5L);
     long one = LeanSmtNativeApi.mkIntConst(1L);
     long sum = LeanSmtNativeApi.mkAdd(x, one);
@@ -117,7 +124,7 @@ public class LeanSmtNativeApiTest {
 
   @Test
   public void parserAcceptsQuotedCoreOperators() throws SolverException {
-    LeanSmtFormulaCreator creator = new LeanSmtFormulaCreator(solver);
+    LeanSmtFormulaCreator creator = new LeanSmtFormulaCreator();
     long formula =
         new LeanSmtParser(creator).parse("(assert (|and| true (|xor| false true)))");
 

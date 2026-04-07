@@ -15,6 +15,7 @@ structure RuntimeState where
   nextTerm : UInt64 := 1
   solvers : Std.HashMap UInt64 SolverState := {}
   terms : Std.HashMap UInt64 Term := {}
+  termHandles : Std.HashMap String UInt64 := {}
   lastError : String := ""
   initialized : Bool := false
 deriving Inhabited
@@ -52,6 +53,14 @@ private def catchUInt32 (action : IO UInt32) : IO UInt32 := do
     setError err.toString
     pure 1
 
+private def catchUInt32As (fallback : UInt32) (action : IO UInt32) : IO UInt32 := do
+  try
+    clearError
+    action
+  catch err =>
+    setError err.toString
+    pure fallback
+
 private def catchUInt8 (action : IO UInt8) : IO UInt8 := do
   try
     clearError
@@ -78,15 +87,29 @@ private def insertSolver (solver : SolverState) : IO UInt64 := do
   }
   pure handle
 
+private partial def termCacheKey : Term → String
+  | .literalT text => s!"lit:{text}"
+  | .symbolT text => s!"sym:{text}"
+  | .arrowT domain codomain => s!"arr({termCacheKey domain},{termCacheKey codomain})"
+  | .appT fn arg => s!"app({termCacheKey fn},{termCacheKey arg})"
+  | .forallT name sort body => s!"forall({name},{termCacheKey sort},{termCacheKey body})"
+  | .existsT name sort body => s!"exists({name},{termCacheKey sort},{termCacheKey body})"
+  | .letT name value body => s!"let({name},{termCacheKey value},{termCacheKey body})"
+
 private def insertTerm (term : Term) : IO UInt64 := do
   let state ← getRuntime
-  let handle := state.nextTerm
-  setRuntime {
-    state with
-      nextTerm := handle + 1
-      terms := state.terms.insert handle term
-  }
-  pure handle
+  let key := termCacheKey term
+  match state.termHandles[key]? with
+  | some handle => pure handle
+  | none =>
+      let handle := state.nextTerm
+      setRuntime {
+        state with
+          nextTerm := handle + 1
+          terms := state.terms.insert handle term
+          termHandles := state.termHandles.insert key handle
+      }
+      pure handle
 
 private def getSolver (handle : UInt64) : IO SolverState := do
   let state ← getRuntime
@@ -158,7 +181,7 @@ private def realLiteral (num den : Int) : Term :=
     else
       (num, den)
   if den == 1 then
-    intLiteral num
+    .appT (.symbolT "to_real") (intLiteral num)
   else
     let fraction := Term.mkApp2 (.symbolT "/") (natLiteral num.natAbs) (natLiteral den.natAbs)
     if num < 0 then
@@ -184,29 +207,38 @@ private def indexedUnary (op : String) (index : UInt32) (arg : Term) : Term :=
 private def extractTerm (arg : Term) (msb lsb : UInt32) : Term :=
   .appT (.literalT s!"(_ extract {msb} {lsb})") arg
 
-private def declareVariable (solver : UInt64) (name : String) (sort : Term) : IO UInt64 := do
-  runSolver solver <| Solver.declareConst name sort
-  insertTerm (.symbolT name)
+private def parseSortSexp : Sexp → IO Term
+  | .atom "Bool" => pure boolSort
+  | .atom "Int" => pure intSort
+  | .atom "Real" => pure realSort
+  | .expr [ .atom "_", .atom "BitVec", .atom width ] =>
+      match width.toNat? with
+      | some n =>
+          if n > 0 then
+            pure <| bitvecSort (UInt32.ofNat n)
+          else
+            throw <| IO.userError s!"bitvector width must be positive, got {width}"
+      | none => throw <| IO.userError s!"invalid bitvector width: {width}"
+  | sexp => throw <| IO.userError s!"unsupported SMT-LIB sort: {sexp}"
 
-private def withQueryProcess (query : String) : IO UInt8 := do
-  let solver ← Solver.createFromKind .cvc5 none none
-  solver.proc.stdin.putStr query
-  if !query.endsWith "\n" then
-    solver.proc.stdin.putStr "\n"
-  solver.proc.stdin.flush
-  let (_, proc) ← solver.proc.takeStdin
-  let output ← proc.stdout.readToEnd
-  let _ ← proc.stderr.readToEnd
-  let _ ← proc.wait
-  let result := output.trimAscii
-  if result == "sat" then
-    pure 0
-  else if result == "unsat" then
-    pure 1
-  else if result == "unknown" then
-    pure 2
+private def parseSortString (sort : String) : IO Term := do
+  match Sexp.Parser.sexp.run sort with
+  | .ok sexp => parseSortSexp sexp
+  | .error err => throw <| IO.userError s!"failed to parse SMT-LIB sort '{sort}': {err}"
+
+private def parseArgSorts (argSorts : String) : IO (List Term) := do
+  if argSorts.trimAscii.isEmpty then
+    pure []
   else
-    throw <| IO.userError s!"Unexpected solver output: {output}"
+    let wrapped := s!"({argSorts})"
+    match Sexp.Parser.sexp.run wrapped with
+    | .ok (.expr sorts) => sorts.mapM parseSortSexp
+    | .ok sexp => throw <| IO.userError s!"expected argument sort list, got {sexp}"
+    | .error err =>
+        throw <| IO.userError s!"failed to parse SMT-LIB argument sorts '{argSorts}': {err}"
+
+private def mkFunctionSort (argSorts : List Term) (returnSort : Term) : Term :=
+  argSorts.foldr Term.arrowT returnSort
 
 private def readSolverSexp (solver : SolverState) : IO Sexp := do
   let mut line ← solver.proc.stdout.getLine
@@ -283,22 +315,6 @@ def leanSmtSetLogic (handle : UInt64) (logic : @&String) : IO UInt32 :=
     runSolver handle <| Solver.setLogic logic
     pure 0
 
-@[export leansmt_mk_bool_var]
-def leanSmtMkBoolVar (solver : UInt64) (name : @&String) : IO UInt64 :=
-  catchUInt64 <| declareVariable solver name boolSort
-
-@[export leansmt_mk_int_var]
-def leanSmtMkIntVar (solver : UInt64) (name : @&String) : IO UInt64 :=
-  catchUInt64 <| declareVariable solver name intSort
-
-@[export leansmt_mk_real_var]
-def leanSmtMkRealVar (solver : UInt64) (name : @&String) : IO UInt64 :=
-  catchUInt64 <| declareVariable solver name realSort
-
-@[export leansmt_mk_bv_var]
-def leanSmtMkBvVar (solver : UInt64) (name : @&String) (width : UInt32) : IO UInt64 :=
-  catchUInt64 <| declareVariable solver name (bitvecSort width)
-
 @[export leansmt_mk_int_const]
 def leanSmtMkIntConst (value : Int) : IO UInt64 :=
   catchUInt64 <| insertTerm (intLiteral value)
@@ -343,6 +359,17 @@ def leanSmtMkIndexedApp1 (op : @&String) (index : UInt32) (term : UInt64) : IO U
   catchUInt64 do
     let arg ← getTerm term
     insertTerm (indexedUnary op index arg)
+
+@[export leansmt_mk_symbol]
+def leanSmtMkSymbol (symbol : @&String) : IO UInt64 :=
+  catchUInt64 <| insertTerm (.symbolT symbol)
+
+@[export leansmt_mk_apply]
+def leanSmtMkApply (fn arg : UInt64) : IO UInt64 :=
+  catchUInt64 do
+    let functionTerm ← getTerm fn
+    let argumentTerm ← getTerm arg
+    insertTerm (.appT functionTerm argumentTerm)
 
 @[export leansmt_mk_not]
 def leanSmtMkNot (term : UInt64) : IO UInt64 :=
@@ -476,11 +503,61 @@ def leanSmtMkNeg (term : UInt64) : IO UInt64 :=
     let arg ← getTerm term
     insertTerm (unary "-" arg)
 
+@[export leansmt_get_term_kind]
+def leanSmtGetTermKind (term : UInt64) : IO UInt32 :=
+  catchUInt32As 0xFFFFFFFF do
+    let value ← getTerm term
+    match value with
+    | .literalT _ => pure 0
+    | .symbolT _ => pure 1
+    | .appT _ _ => pure 2
+    | _ => throw <| IO.userError s!"term kind is unsupported for introspection: {value}"
+
+@[export leansmt_get_term_text]
+def leanSmtGetTermText (term : UInt64) : IO String :=
+  catchString do
+    let value ← getTerm term
+    match value with
+    | .literalT text => pure text
+    | .symbolT text => pure text
+    | _ => throw <| IO.userError s!"term text is only defined for literal and symbol terms: {value}"
+
+@[export leansmt_get_term_num_children]
+def leanSmtGetTermNumChildren (term : UInt64) : IO UInt32 :=
+  catchUInt32As 0xFFFFFFFF do
+    let value ← getTerm term
+    match value with
+    | .literalT _ => pure 0
+    | .symbolT _ => pure 0
+    | .appT _ _ => pure 2
+    | _ => throw <| IO.userError s!"term children are unsupported for introspection: {value}"
+
+@[export leansmt_get_term_child]
+def leanSmtGetTermChild (term : UInt64) (index : UInt32) : IO UInt64 :=
+  catchUInt64 do
+    let value ← getTerm term
+    match value, index.toNat with
+    | .appT fn _, 0 => insertTerm fn
+    | .appT _ arg, 1 => insertTerm arg
+    | .appT _ _, _ =>
+        throw <| IO.userError s!"application child index out of bounds: {index}"
+    | _, _ =>
+        throw <| IO.userError s!"term has no children: {value}"
+
 @[export leansmt_assert]
 def leanSmtAssert (solver term : UInt64) : IO UInt32 :=
   catchUInt32 do
     let arg ← getTerm term
     runSolver solver <| Solver.assert arg
+    pure 0
+
+@[export leansmt_declare_fun]
+def leanSmtDeclareFun
+    (solver : UInt64) (name : @&String) (argSorts : @&String) (returnSort : @&String) : IO UInt32 :=
+  catchUInt32 do
+    let argumentSorts ← parseArgSorts argSorts
+    let codomainSort ← parseSortString returnSort
+    runSolver solver <| Solver.declareFun name (mkFunctionSort argumentSorts codomainSort)
     pure 0
 
 @[export leansmt_check_sat]
@@ -504,15 +581,5 @@ def leanSmtGetValue (solver term : UInt64) : IO String :=
     solverState.proc.stdin.putStr s!"(get-value ({valueTerm}))\n"
     solverState.proc.stdin.flush
     extractGetValue (← readSolverSexp solverState)
-
-@[export leansmt_get_proof]
-def leanSmtGetProof (solver : UInt64) : IO String :=
-  catchString do
-    let proof ← runSolver solver Solver.getProof
-    pure (toString proof)
-
-@[export leansmt_check_sat_string]
-def leanSmtCheckSatString (query : @&String) : IO UInt8 :=
-  catchUInt8 <| withQueryProcess query
 
 end smt

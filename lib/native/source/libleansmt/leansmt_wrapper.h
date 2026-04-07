@@ -42,13 +42,6 @@ uint64_t leansmt_wrapper_create_solver(int solver_kind);
 int leansmt_wrapper_delete_solver(uint64_t handle);
 int leansmt_wrapper_set_logic(uint64_t handle, const char* logic);
 
-/*=== Term Creation - Variables ===*/
-
-uint64_t leansmt_wrapper_mk_bool_var(uint64_t solver, const char* name);
-uint64_t leansmt_wrapper_mk_int_var(uint64_t solver, const char* name);
-uint64_t leansmt_wrapper_mk_real_var(uint64_t solver, const char* name);
-uint64_t leansmt_wrapper_mk_bv_var(uint64_t solver, const char* name, uint32_t width);
-
 /*=== Term Creation - Constants ===*/
 
 uint64_t leansmt_wrapper_mk_true(void);
@@ -63,6 +56,12 @@ uint64_t leansmt_wrapper_mk_app1(const char* op, uint64_t term);
 uint64_t leansmt_wrapper_mk_app2(const char* op, uint64_t lhs, uint64_t rhs);
 uint64_t leansmt_wrapper_mk_extract(uint64_t term, uint32_t msb, uint32_t lsb);
 uint64_t leansmt_wrapper_mk_indexed_app1(const char* op, uint32_t index, uint64_t term);
+uint64_t leansmt_wrapper_mk_symbol(const char* symbol);
+uint64_t leansmt_wrapper_mk_apply(uint64_t fn, uint64_t arg);
+int leansmt_wrapper_get_term_kind(uint64_t term);
+char* leansmt_wrapper_get_term_text(uint64_t term);
+uint32_t leansmt_wrapper_get_term_num_children(uint64_t term);
+uint64_t leansmt_wrapper_get_term_child(uint64_t term, uint32_t index);
 
 /*=== Boolean Operations ===*/
 
@@ -95,15 +94,12 @@ uint64_t leansmt_wrapper_mk_neg(uint64_t t);
 /*=== Solving ===*/
 
 int leansmt_wrapper_assert(uint64_t solver, uint64_t term);
+int leansmt_wrapper_declare_fun(
+    uint64_t solver, const char* name, const char* arg_sorts, const char* return_sort);
 int leansmt_wrapper_check_sat(uint64_t solver);
 char* leansmt_wrapper_get_model(uint64_t solver);
 char* leansmt_wrapper_get_value(uint64_t solver, uint64_t term);
-char* leansmt_wrapper_get_proof(uint64_t solver);
 void leansmt_wrapper_free_string(char* value);
-
-/*=== Legacy/Convenience ===*/
-
-int leansmt_wrapper_check_sat_string(const char* query);
 
 #ifdef __cplusplus
 }

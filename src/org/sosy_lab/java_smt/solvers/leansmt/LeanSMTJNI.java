@@ -33,10 +33,6 @@ public class LeanSMTJNI {
   public final static native java.math.BigInteger leansmt_wrapper_create_solver(int jarg1);
   public final static native int leansmt_wrapper_delete_solver(java.math.BigInteger jarg1);
   public final static native int leansmt_wrapper_set_logic(java.math.BigInteger jarg1, String jarg2);
-  public final static native java.math.BigInteger leansmt_wrapper_mk_bool_var(java.math.BigInteger jarg1, String jarg2);
-  public final static native java.math.BigInteger leansmt_wrapper_mk_int_var(java.math.BigInteger jarg1, String jarg2);
-  public final static native java.math.BigInteger leansmt_wrapper_mk_real_var(java.math.BigInteger jarg1, String jarg2);
-  public final static native java.math.BigInteger leansmt_wrapper_mk_bv_var(java.math.BigInteger jarg1, String jarg2, long jarg3);
   public final static native java.math.BigInteger leansmt_wrapper_mk_true();
   public final static native java.math.BigInteger leansmt_wrapper_mk_false();
   public final static native java.math.BigInteger leansmt_wrapper_mk_int_const(long jarg1);
@@ -46,6 +42,12 @@ public class LeanSMTJNI {
   public final static native java.math.BigInteger leansmt_wrapper_mk_app2(String jarg1, java.math.BigInteger jarg2, java.math.BigInteger jarg3);
   public final static native java.math.BigInteger leansmt_wrapper_mk_extract(java.math.BigInteger jarg1, long jarg2, long jarg3);
   public final static native java.math.BigInteger leansmt_wrapper_mk_indexed_app1(String jarg1, long jarg2, java.math.BigInteger jarg3);
+  public final static native java.math.BigInteger leansmt_wrapper_mk_symbol(String jarg1);
+  public final static native java.math.BigInteger leansmt_wrapper_mk_apply(java.math.BigInteger jarg1, java.math.BigInteger jarg2);
+  public final static native int leansmt_wrapper_get_term_kind(java.math.BigInteger jarg1);
+  public final static native String leansmt_wrapper_get_term_text(java.math.BigInteger jarg1);
+  public final static native int leansmt_wrapper_get_term_num_children(java.math.BigInteger jarg1);
+  public final static native java.math.BigInteger leansmt_wrapper_get_term_child(java.math.BigInteger jarg1, int jarg2);
   public final static native java.math.BigInteger leansmt_wrapper_mk_not(java.math.BigInteger jarg1);
   public final static native java.math.BigInteger leansmt_wrapper_mk_and(java.math.BigInteger jarg1, java.math.BigInteger jarg2);
   public final static native java.math.BigInteger leansmt_wrapper_mk_or(java.math.BigInteger jarg1, java.math.BigInteger jarg2);
@@ -66,9 +68,9 @@ public class LeanSMTJNI {
   public final static native java.math.BigInteger leansmt_wrapper_mk_mod(java.math.BigInteger jarg1, java.math.BigInteger jarg2);
   public final static native java.math.BigInteger leansmt_wrapper_mk_neg(java.math.BigInteger jarg1);
   public final static native int leansmt_wrapper_assert(java.math.BigInteger jarg1, java.math.BigInteger jarg2);
+  public final static native int leansmt_wrapper_declare_fun(
+      java.math.BigInteger jarg1, String jarg2, String jarg3, String jarg4);
   public final static native int leansmt_wrapper_check_sat(java.math.BigInteger jarg1);
   public final static native String leansmt_wrapper_get_model(java.math.BigInteger jarg1);
   public final static native String leansmt_wrapper_get_value(java.math.BigInteger jarg1, java.math.BigInteger jarg2);
-  public final static native String leansmt_wrapper_get_proof(java.math.BigInteger jarg1);
-  public final static native int leansmt_wrapper_check_sat_string(String jarg1);
 }

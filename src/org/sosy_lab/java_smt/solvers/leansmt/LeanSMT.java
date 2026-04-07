@@ -41,22 +41,6 @@ public class LeanSMT implements LeanSMTConstants {
     return LeanSMTJNI.leansmt_wrapper_set_logic(handle, logic);
   }
 
-  public static java.math.BigInteger leansmt_wrapper_mk_bool_var(java.math.BigInteger solver, String name) {
-    return LeanSMTJNI.leansmt_wrapper_mk_bool_var(solver, name);
-  }
-
-  public static java.math.BigInteger leansmt_wrapper_mk_int_var(java.math.BigInteger solver, String name) {
-    return LeanSMTJNI.leansmt_wrapper_mk_int_var(solver, name);
-  }
-
-  public static java.math.BigInteger leansmt_wrapper_mk_real_var(java.math.BigInteger solver, String name) {
-    return LeanSMTJNI.leansmt_wrapper_mk_real_var(solver, name);
-  }
-
-  public static java.math.BigInteger leansmt_wrapper_mk_bv_var(java.math.BigInteger solver, String name, long width) {
-    return LeanSMTJNI.leansmt_wrapper_mk_bv_var(solver, name, width);
-  }
-
   public static java.math.BigInteger leansmt_wrapper_mk_true() {
     return LeanSMTJNI.leansmt_wrapper_mk_true();
   }
@@ -91,6 +75,32 @@ public class LeanSMT implements LeanSMTConstants {
 
   public static java.math.BigInteger leansmt_wrapper_mk_indexed_app1(String op, long index, java.math.BigInteger term) {
     return LeanSMTJNI.leansmt_wrapper_mk_indexed_app1(op, index, term);
+  }
+
+  public static java.math.BigInteger leansmt_wrapper_mk_symbol(String symbol) {
+    return LeanSMTJNI.leansmt_wrapper_mk_symbol(symbol);
+  }
+
+  public static java.math.BigInteger leansmt_wrapper_mk_apply(
+      java.math.BigInteger fn, java.math.BigInteger arg) {
+    return LeanSMTJNI.leansmt_wrapper_mk_apply(fn, arg);
+  }
+
+  public static int leansmt_wrapper_get_term_kind(java.math.BigInteger term) {
+    return LeanSMTJNI.leansmt_wrapper_get_term_kind(term);
+  }
+
+  public static String leansmt_wrapper_get_term_text(java.math.BigInteger term) {
+    return LeanSMTJNI.leansmt_wrapper_get_term_text(term);
+  }
+
+  public static int leansmt_wrapper_get_term_num_children(java.math.BigInteger term) {
+    return LeanSMTJNI.leansmt_wrapper_get_term_num_children(term);
+  }
+
+  public static java.math.BigInteger leansmt_wrapper_get_term_child(
+      java.math.BigInteger term, int index) {
+    return LeanSMTJNI.leansmt_wrapper_get_term_child(term, index);
   }
 
   public static java.math.BigInteger leansmt_wrapper_mk_not(java.math.BigInteger t) {
@@ -173,6 +183,11 @@ public class LeanSMT implements LeanSMTConstants {
     return LeanSMTJNI.leansmt_wrapper_assert(solver, term);
   }
 
+  public static int leansmt_wrapper_declare_fun(
+      java.math.BigInteger solver, String name, String argSorts, String returnSort) {
+    return LeanSMTJNI.leansmt_wrapper_declare_fun(solver, name, argSorts, returnSort);
+  }
+
   public static int leansmt_wrapper_check_sat(java.math.BigInteger solver) {
     return LeanSMTJNI.leansmt_wrapper_check_sat(solver);
   }
@@ -184,13 +199,4 @@ public class LeanSMT implements LeanSMTConstants {
   public static String leansmt_wrapper_get_value(java.math.BigInteger solver, java.math.BigInteger term) {
     return LeanSMTJNI.leansmt_wrapper_get_value(solver, term);
   }
-
-  public static String leansmt_wrapper_get_proof(java.math.BigInteger solver) {
-    return LeanSMTJNI.leansmt_wrapper_get_proof(solver);
-  }
-
-  public static int leansmt_wrapper_check_sat_string(String query) {
-    return LeanSMTJNI.leansmt_wrapper_check_sat_string(query);
-  }
-
 }
