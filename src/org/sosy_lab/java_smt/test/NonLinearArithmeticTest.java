@@ -24,6 +24,7 @@ import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
 import org.sosy_lab.common.configuration.ConfigurationBuilder;
+import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.FormulaType;
@@ -41,12 +42,7 @@ public class NonLinearArithmeticTest<T extends NumeralFormula> extends SolverBas
   // INFO: OpenSmt does not suport nonlinear arithmetic
   static final ImmutableSet<Solvers> SOLVER_WITHOUT_NONLINEAR_ARITHMETIC =
       ImmutableSet.of(
-          Solvers.SMTINTERPOL,
-          Solvers.MATHSAT5,
-          Solvers.BOOLECTOR,
-          Solvers.CVC4,
-          Solvers.YICES2,
-          Solvers.OPENSMT);
+          Solvers.SMTINTERPOL, Solvers.MATHSAT5, Solvers.BOOLECTOR, Solvers.CVC4, Solvers.OPENSMT);
 
   @Parameters(name = "{0} {1} {2}")
   public static Iterable<Object[]> getAllSolversAndTheories() {
@@ -90,7 +86,7 @@ public class NonLinearArithmeticTest<T extends NumeralFormula> extends SolverBas
   public NonLinearArithmetic nonLinearArithmetic;
 
   @Override
-  protected ConfigurationBuilder createTestConfigBuilder() {
+  protected ConfigurationBuilder createTestConfigBuilder() throws InvalidConfigurationException {
     return super.createTestConfigBuilder()
         .setOption("solver.nonLinearArithmetic", nonLinearArithmetic.name());
   }
@@ -204,7 +200,7 @@ public class NonLinearArithmeticTest<T extends NumeralFormula> extends SolverBas
     assume()
         .withMessage("Solver %s does not support division by zero", solverToUse())
         .that(solverToUse())
-        .isNoneOf(Solvers.YICES2, Solvers.OPENSMT);
+        .isNotEqualTo(Solvers.OPENSMT);
 
     T a = nmgr.makeVariable("a");
     T b = nmgr.makeVariable("b");

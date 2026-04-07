@@ -37,6 +37,10 @@ import org.sosy_lab.java_smt.basicimpl.ShutdownHook;
 class CVC4TheoremProver extends AbstractProverWithAllSat<Void>
     implements ProverEnvironment, BasicProverEnvironment<Void> {
 
+  // Keep a global list of all provers to prevent the garbge collector from doing its job
+  // See https://github.com/sosy-lab/java-smt/issues/169
+  private static List<CVC4TheoremProver> provers = new ArrayList<>();
+
   private final CVC4FormulaCreator creator;
   private final int randomSeed;
   SmtEngine smtEngine; // final except for SL theory
@@ -63,6 +67,10 @@ class CVC4TheoremProver extends AbstractProverWithAllSat<Void>
       Set<ProverOptions> pOptions,
       BooleanFormulaManager pBmgr) {
     super(pOptions, pBmgr, pShutdownNotifier);
+
+    synchronized (CVC4TheoremProver.class) {
+      provers.add(this);
+    }
 
     creator = pFormulaCreator;
     randomSeed = pRandomSeed;
@@ -137,7 +145,7 @@ class CVC4TheoremProver extends AbstractProverWithAllSat<Void>
       smtEngine.assertFormula(importExpr(creator.extractInfo(pF)));
     } catch (Exception cvc4Exception) {
       throw new AssertionError(
-          String.format("CVC4 crashed while adding the constraint '%s'", pF), cvc4Exception);
+          "CVC4 crashed while adding the constraint '%s'".formatted(pF), cvc4Exception);
     }
   }
 
@@ -237,9 +245,7 @@ class CVC4TheoremProver extends AbstractProverWithAllSat<Void>
   @Override
   public void close() {
     if (!closed) {
-      exportMapping.delete();
-      // smtEngine.delete();
-      exprManager.delete();
+      // Never release a prover
     }
     super.close();
   }

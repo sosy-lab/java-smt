@@ -10,12 +10,9 @@
 
 package org.sosy_lab.java_smt.solvers.bitwuzla;
 
-import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkState;
 
-import com.google.common.base.Preconditions;
 import com.google.common.collect.FluentIterable;
-import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import java.util.Collection;
 import java.util.List;
@@ -58,12 +55,6 @@ class BitwuzlaInterpolatingProver extends BitwuzlaAbstractProver<Integer>
   @Override
   public BooleanFormula getInterpolant(Collection<Integer> formulasOfA)
       throws SolverException, InterruptedException {
-    checkGenerateInterpolants();
-    checkArgument(
-        getAssertedConstraintIds().containsAll(formulasOfA),
-        "interpolation can only be done over previously asserted formulas.");
-    checkArgument(stack.peek().keySet().containsAll(formulasOfA));
-
     return creator.encapsulateBoolean(
         formulasOfA.isEmpty()
             ? creator.getEnv().mk_true()
@@ -75,16 +66,6 @@ class BitwuzlaInterpolatingProver extends BitwuzlaAbstractProver<Integer>
   public List<BooleanFormula> getSeqInterpolants(
       List<? extends Collection<Integer>> partitionedFormulas)
       throws SolverException, InterruptedException {
-    checkGenerateInterpolants();
-    Preconditions.checkArgument(
-        !partitionedFormulas.isEmpty(), "at least one partition should be available.");
-    final ImmutableSet<Integer> assertedConstraintIds = getAssertedConstraintIds();
-    checkArgument(
-        partitionedFormulas.stream().allMatch(assertedConstraintIds::containsAll),
-        "interpolation can only be done over previously asserted formulas.");
-    for (var partition : partitionedFormulas) {
-      checkArgument(stack.peek().keySet().containsAll(partition));
-    }
 
     Vector_Vector_Term partitions =
         new Vector_Vector_Term(

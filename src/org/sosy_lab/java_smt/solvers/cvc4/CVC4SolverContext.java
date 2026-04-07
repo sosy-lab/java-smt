@@ -13,6 +13,8 @@ import edu.stanford.CVC4.Configuration;
 import edu.stanford.CVC4.ExprManager;
 import edu.stanford.CVC4.SExpr;
 import edu.stanford.CVC4.SmtEngine;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.logging.Level;
@@ -29,6 +31,10 @@ import org.sosy_lab.java_smt.basicimpl.AbstractSolverContext;
 
 public final class CVC4SolverContext extends AbstractSolverContext {
 
+  // Keep a global list of all contexts to prevent the garbge collector from doing its job
+  // See https://github.com/sosy-lab/java-smt/issues/169
+  private static List<CVC4SolverContext> contexts = new ArrayList<>();
+
   // creator is final, except after closing, then null.
   private CVC4FormulaCreator creator;
   private final ShutdownNotifier shutdownNotifier;
@@ -43,6 +49,10 @@ public final class CVC4SolverContext extends AbstractSolverContext {
     this.creator = creator;
     shutdownNotifier = pShutdownNotifier;
     randomSeed = pRandomSeed;
+
+    synchronized (CVC4SolverContext.class) {
+      contexts.add(this);
+    }
   }
 
   public static SolverContext create(
@@ -117,8 +127,7 @@ public final class CVC4SolverContext extends AbstractSolverContext {
   @Override
   public void close() {
     if (creator != null) {
-      creator.getEnv().delete();
-      creator = null;
+      // Never close the context
     }
   }
 

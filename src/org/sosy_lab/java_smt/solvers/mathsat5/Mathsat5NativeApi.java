@@ -173,12 +173,10 @@ final class Mathsat5NativeApi {
 
   private static boolean processSolveResult(long e, int resultCode)
       throws IllegalStateException, SolverException {
-    switch (resultCode) {
-      case MSAT_SAT:
-        return true;
-      case MSAT_UNSAT:
-        return false;
-      default:
+    return switch (resultCode) {
+      case MSAT_SAT -> true;
+      case MSAT_UNSAT -> false;
+      default -> {
         String msg = Strings.emptyToNull(msat_last_error_message(e));
 
         if (ALLOWED_SOLVE_FAILURE_MESSAGES.contains(msg)) {
@@ -189,7 +187,8 @@ final class Mathsat5NativeApi {
         String code = (resultCode == MSAT_UNKNOWN) ? "\"unknown\"" : String.valueOf(resultCode);
         throw new IllegalStateException(
             "msat_solve returned " + code + (msg != null ? ": " + msg : ""));
-    }
+      }
+    };
   }
 
   static class NamedTermsWrapper {

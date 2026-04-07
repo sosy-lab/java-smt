@@ -129,6 +129,21 @@ Example:
 ant publish-z3-legacy -Dz3.path=../solvers/z3/z3 -Dz3.customRev=4.5.0
 ```
 
+### Publishing CVC4
+
+We use the Docker image with Ubuntu 18.04 for publishing CVC4.
+Please manually add two additional dependencies before running the build script:
+
+```bash
+pip3 install toml
+apt-get install antlr3 libantlr3c-dev
+```
+
+Then run the build script to publish the bindings:
+
+```bash
+ant publish-cvc4 -Dcvc4.path=/workspace/CVC4-archived -Dcvc4.customRev=1.8.1
+```
 
 ### Publishing CVC5
 
@@ -370,43 +385,116 @@ ant publish-optimathsat \
 ### Publishing Yices2
 
 Yices2 consists of two components: the solver binary and the Java components in JavaSMT.
-The Java components were splitt from the rest of JavaSMT because of the GPL.
+The Java components were split from the rest of JavaSMT because of the GPL.
 
-#### Publishing the solver binary for Yices2
+#### 1. Publishing the solver binary for Yices2
 
-Prepare gperf and gmp (required for our own static binary):
-```bash
-wget http://ftp.gnu.org/pub/gnu/gperf/gperf-3.1.tar.gz && tar -zxvf gperf-3.1.tar.gz && cd gperf-3.1 && ./configure --enable-cxx --with-pic --disable-shared --enable-fat && make
-wget https://gmplib.org/download/gmp/gmp-6.2.0.tar.xz && tar -xvf gmp-6.2.0.tar.xz && cd gmp-6.2.0 && ./configure --enable-cxx --with-pic --disable-shared --enable-fat && make
+We expect one of the Ubuntu docker images to be used for building Yices2. While it's possible to
+build the backend without the container, our build script relies on a preinstalled
+dependency that is already included when using the docker image. Without it, some paths
+would have to be changed, and the user would have to provide their own version of the dependency
+
+#### 1. Build the Yices binaries
+
+We provide a build script for Yices:
+```shell
+ant publish-yices2 -Dyices2.version=2.8.0-prerelease
 ```
 
-Download and build Yices2 from source:
-```bash
-git clone git@github.com:SRI-CSL/yices2.git && cd yices2 && autoconf && ./configure --with-pic-gmp=../gmp-6.2.0/.libs/libgmp.a && make
+The script will fetch all dependencies, download and compile Yices, and then build the JNI bindings
+that are needed to use the solver from Java
+
+We provide additional `ant` targets for a more fine-grained build:
+
+* `ant build-yices2-java` will build all binaries, but not publish them
+* `ant clean-yices2-java` will undo the last build step and delete the JNI bindings
+* `ant clean-yices2` will undo the last two build step and delete the Yices binaries and the JNI
+  bindings
+
+Changes can then be made to the downloaded source in `downloads` before publishing the binaries
+with `ant publish-yices2`. For instance, we could switch to a different branch for Yices:
+
+``` shell
+ant build-yices2-java
+ant clean-yices2
+cd downloads/yices2
+git checkout my-branch
+cd ../..
+ant publish-yices2 -Dyices2.version=2.8.0-prerelease
 ```
 
-Get the version of Yices2:
-```bash
-git describe --tags
+It's also possible to only download the dependencies:
+
+* `ant download-cudd`
+* `ant download-poly`
+* `ant download-yices2`
+* `ant download-yices2-java`
+
+Changes can then be made to the downloaded source before publishing. Compared to the first
+method, this avoids the needless initial build
+
+#### 2. Build the JavaSMT backend
+
+In `solvers_ivy_conf/ivy_javasmt_yices2.xml` update the version of the `javasmt-solver-yices2`
+dependency:
+
+```xml
+<dependency org="org.sosy_lab" name="javasmt-solver-yices2" rev="2.8.0-prerelease" conf="runtime->solver-yices2"/>
 ```
 
-Publish the solver binary from within JavaSMT (adjust all paths to your system!):
-```bash
-ant publish-yices2 -Dyices2.path=../solvers/yices2 -Dgmp.path=../solvers/gmp-6.2.0 -Dgperf.path=../solvers/gperf-3.1 -Dyices2.version=2.6.2-89-g0f77dc4b
+Then, in `lib/ivy.xml` start looking for the following section:
+
+```xml
+<!-- additional JavaSMT components with Solver Binaries -->
+<dependency org="org.sosy_lab" name="javasmt-yices2" rev="5.0.1-722-g90a66d7fa" conf="runtime-yices2->runtime; contrib->sources"/>        
 ```
 
-Afterward, you need to update the version number in `solvers_ivy_conf/ivy_javasmt_yices2.xml` and publish new Java components for Yices2.
+Remove the dependency and replace it with the line from `ivy_javasmt_yices2.xml`, except that
+`conf` has been changed to `runtime-yices2->solver-yices2`:
 
-#### Publish the Java components for Yices2
+```xml
+<dependency org="org.sosy_lab" name="javasmt-solver-yices2" rev="2.8.0-prerelease" conf="runtime-yices2->solver-yices2"/>
+```
 
-Info: There is a small cyclic dependency: JavaSMT itself depends on the Java components of Yices2.
+Then run `ant` to build the project
 
-As long as no API was changed and compilation succeeds, simply execute `ant publish-artifacts-yices2`.
+Now go to the dependency in `ivy.xml` again and change `conf` back to `runtime->solver-yices2`:
 
-If the API was changed, we need to break the dependency cycle for the publication and revert this later:
-edit `lib/ivy.xml` and replace the dependency towards `javasmt-yices2` with the dependency towards `javasmt-solver-yices2`
-(the line can be copied from `solvers_ivy_conf/ivy_javasmt_yices2.xml`).
-Then run `ant publish-artifacts-yices2`.
-We still need to figure out how to avoid the warning about a dirty repository in that case, e.g. by a temporary commit.
+```xml
+<dependency org="org.sosy_lab" name="javasmt-solver-yices2" rev="2.8.0-prerelease" conf="runtime->solver-yices2"/>
+```
+
+Then publish the GPL components of JavaSMT:
+```shell
+ant publish-artifacts-yices2 -Dversion=yices2.8-prerelease
+```
+
+Finally, return the dependency in `ivy.xml` to its original form, but with the version updated:
+
+```xml
+<dependency org="org.sosy_lab" name="javasmt-yices2" rev="yices2.8-prerelease" conf="runtime-yices2->runtime; contrib->sources"/>
+```
+
+Optionally, you may now publish a new version of JavaSMT:
+```shell
+ant publish -Dversion=yices-prerelease
+```
+
+#### 3. Publish the packages
+
+Test the new version, then publish it to svn:
+```shell
+# Publish Yices solver binaries
+svn add repository/org.sosy_lab/javasmt-solver-yices2/*-2.8.0-prerelease* repository/org.sosy_lab/javasmt-solver-yices2/*/*-2.8.0-prerelease*
+svn ci repository/org.sosy_lab/javasmt-solver-yices2 -m"publish version 2.8.0-prerelease of Yices Solver"
+
+# Publish Yices JavaSMT component
+svn add repository/org.sosy_lab/javasmt-yices2/*-yices2.8-prerelease* repository/org.sosy_lab/javasmt-yices2/*/*-yices2.8-prerelease*
+svn ci repository/org.sosy_lab/javasmt-yices2 -m"publish version yices2.8-prerelease of Yices Solver"
+
+# (Optional) Publish JavaSMT
+svn add *-yices-prerelease*
+svn ci -m"publish version yices-prerelease of JavaSMT Solver Library"
+```
 
 [Ivy Repository]: http://www.sosy-lab.org/ivy/org.sosy_lab/
