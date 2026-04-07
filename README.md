@@ -111,25 +111,6 @@ The following features are supported (depending on the used SMT solver):
 We aim for supporting more important features, more SMT solvers, and more systems.
 If something specific is missing, please [look for or file an issue](https://github.com/sosy-lab/java-smt/issues).
 
-#### LeanSMT Backend Capability Matrix
-
-LeanSMT support in JavaSMT currently targets Linux x64 and is intentionally focused on the
-core SAT/UNSAT/model workflow.
-
-| Capability | LeanSMT status | Notes |
-| --- |:---:| --- |
-| Boolean, Integer, Rational formulas | :heavy_check_mark: | Core theory support is implemented. |
-| Uninterpreted functions (UF) | :heavy_check_mark: | Includes congruence handling in backend encoding. |
-| `FormulaManager.parse` / `dumpFormula` | :heavy_check_mark: | SMT-LIB subset for declarations, definitions, and assertions. |
-| Incremental solving (`push`/`pop`) | :heavy_check_mark: | Implemented with rebuild-based stack handling. |
-| Assumption solving (`isUnsatWithAssumptions`) | :heavy_check_mark: | Supported with temporary solver state. |
-| Unsat core extraction | :heavy_check_mark: | Supports stack cores and assumption cores (deletion-based extraction). |
-| Model generation / evaluation | :heavy_check_mark: | Includes BigInteger / Rational values. |
-| Concurrent context or prover usage |  | Not guaranteed thread-safe for parallel access. |
-| Bitvectors | :heavy_check_mark: | Core BV operations are implemented in the LeanSMT backend. |
-| Floating points, arrays, strings/regex, separation logic, enums |  | Not supported in LeanSMT backend. |
-| Interpolation, optimization, proofs |  | Not supported in LeanSMT backend. |
-
 #### Multithreading Support
 
 | SMT Solver | Concurrent context usage⁵ | Concurrent prover usage⁶ |
@@ -149,8 +130,6 @@ core SAT/UNSAT/model workflow.
 
 Interruption using a [ShutdownNotifier][] may be used to interrupt a solver from any thread.
 Formulas are translatable in between contexts/provers/threads using _FormulaManager.translateFrom()_.
-For LeanSMT, JavaSMT currently guarantees only non-concurrent usage per context/prover.
-Sequential handoff across threads is supported; simultaneous use is not.
 
 ⁵ Multiple contexts, but all operations on each context only from a single thread.  
 ⁶ Multiple provers on one or more contexts, with each prover using its own thread.

@@ -9,6 +9,7 @@
 package org.sosy_lab.java_smt.test;
 
 import static com.google.common.truth.Truth.assertThat;
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.fail;
 
 import com.google.common.collect.ImmutableList;
@@ -74,8 +75,12 @@ public class LeanSmtLifecycleTest extends SolverBasedTest0 {
       prover.push(imgr.lessThan(x, imgr.makeNumber(3)));
 
       assertThat(prover.isUnsat()).isFalse();
-      assertThat(prover.isUnsatWithAssumptions(ImmutableList.of(xEqZero))).isTrue();
-      assertThat(prover.isUnsatWithAssumptions(ImmutableList.of(xEqOne))).isFalse();
+      assertThrows(
+          UnsupportedOperationException.class,
+          () -> prover.isUnsatWithAssumptions(ImmutableList.of(xEqZero)));
+      assertThrows(
+          UnsupportedOperationException.class,
+          () -> prover.isUnsatWithAssumptions(ImmutableList.of(xEqOne)));
       assertThat(prover.isUnsat()).isFalse();
     }
   }
@@ -128,10 +133,6 @@ public class LeanSmtLifecycleTest extends SolverBasedTest0 {
         prover.push(localImgr.equal(floor, localImgr.makeNumber(2)));
 
         assertThat(prover.isUnsat()).isFalse();
-        assertThat(prover.isUnsatWithAssumptions(ImmutableList.of(localImgr.equal(x, localImgr.makeNumber(0)))))
-            .isTrue();
-        assertThat(prover.isUnsatWithAssumptions(ImmutableList.of(localImgr.equal(x, localImgr.makeNumber(2)))))
-            .isFalse();
 
         try (Model model = prover.getModel()) {
           assertThat(model.evaluate(localBmgr.and(localImgr.greaterThan(y, x), localImgr.equal(floor, localImgr.makeNumber(2)))))
@@ -184,10 +185,6 @@ public class LeanSmtLifecycleTest extends SolverBasedTest0 {
                       prover.push(localImgr.equal(floor, localImgr.makeNumber(2)));
 
                       assertThat(prover.isUnsat()).isFalse();
-                      assertThat(
-                              prover.isUnsatWithAssumptions(
-                                  ImmutableList.of(localImgr.equal(x, localImgr.makeNumber(0)))))
-                          .isTrue();
 
                       try (Model model = prover.getModel()) {
                         assertThat(

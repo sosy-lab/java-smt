@@ -253,7 +253,14 @@ public abstract class SolverBasedTest0 {
             "Solver %s does not yet support the conversion between bitvectors and integers",
             solverToUse())
         .that(solverToUse())
-        .isNotIn(java.util.List.of(Solvers.YICES2, Solvers.LEANSMT));
+        .isNotIn(java.util.List.of(Solvers.YICES2));
+  }
+
+  protected final void requireAssumptionSolving() {
+    assume()
+        .withMessage("Solver %s does not support assumption solving natively", solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.LEANSMT);
   }
 
   @SuppressWarnings("CheckReturnValue")

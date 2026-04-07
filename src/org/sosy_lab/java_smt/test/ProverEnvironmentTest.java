@@ -35,6 +35,7 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
 
   @Test
   public void assumptionsTest() throws SolverException, InterruptedException {
+    requireAssumptionSolving();
     BooleanFormula b = bmgr.makeVariable("b");
     BooleanFormula c = bmgr.makeVariable("c");
 
@@ -50,6 +51,7 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
 
   @Test
   public void assumptionsWithModelTest() throws SolverException, InterruptedException {
+    requireAssumptionSolving();
     assume()
         .withMessage("MathSAT can't construct models for SAT check with assumptions")
         .that(solver)

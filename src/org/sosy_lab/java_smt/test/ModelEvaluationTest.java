@@ -52,7 +52,10 @@ public class ModelEvaluationTest extends SolverBasedTest0.ParameterizedSolverBas
 
   @Override
   protected ConfigurationBuilder createTestConfigBuilder() {
-    problemSize = solverToUse() == Solvers.PRINCESS ? 10 : 50; // Princess is too slow.
+    problemSize =
+        solverToUse() == Solvers.PRINCESS || solverToUse() == Solvers.LEANSMT
+            ? 10
+            : 50; // Princess and lean-smt are too slow for the larger model-growth loop.
     ConfigurationBuilder builder = super.createTestConfigBuilder();
     if (solverToUse() == Solvers.MATHSAT5) {
       builder.setOption("solver.mathsat5.furtherOptions", "model_generation=true");

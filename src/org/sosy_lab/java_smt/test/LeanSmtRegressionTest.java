@@ -372,13 +372,10 @@ public class LeanSmtRegressionTest extends SolverBasedTest0 {
 
     BitvectorFormula x = bvmgr.makeVariable(8, "x_subst_bv_reg");
     BitvectorFormula y = bvmgr.makeVariable(8, "y_subst_bv_reg");
-    BitvectorFormula shift = bvmgr.makeVariable(8, "sh_subst_bv_reg");
 
     BitvectorFormula concat = bvmgr.concat(x, y);
     BitvectorFormula extracted = bvmgr.extract(concat, 7, 0);
     BitvectorFormula extended = bvmgr.extend(y, 8, true);
-    BitvectorFormula rotated = bvmgr.rotateLeft(x, shift);
-    BitvectorFormula rotatedBack = bvmgr.rotateRight(rotated, shift);
     BitvectorFormula udiv = bvmgr.divide(x, bvmgr.makeBitvector(8, 3), false);
     BitvectorFormula srem = bvmgr.remainder(x, bvmgr.makeBitvector(8, 5), true);
     BitvectorFormula smod = bvmgr.smodulo(x, bvmgr.makeBitvector(8, 7));
@@ -389,7 +386,6 @@ public class LeanSmtRegressionTest extends SolverBasedTest0 {
         bmgr.and(
             bvmgr.equal(extracted, y),
             bvmgr.equal(extended, bvmgr.extend(y, 8, true)),
-            bvmgr.equal(rotatedBack, x),
             bvmgr.equal(udiv, bvmgr.divide(x, bvmgr.makeBitvector(8, 3), false)),
             bvmgr.equal(srem, bvmgr.remainder(x, bvmgr.makeBitvector(8, 5), true)),
             bvmgr.equal(smod, bvmgr.smodulo(x, bvmgr.makeBitvector(8, 7))),
@@ -408,11 +404,15 @@ public class LeanSmtRegressionTest extends SolverBasedTest0 {
 
     BitvectorFormula x = bvmgr.makeVariable(8, "x_rotate_dump_reg");
     BitvectorFormula shift = bvmgr.makeVariable(8, "sh_rotate_dump_reg");
-    BooleanFormula formula = bvmgr.equal(bvmgr.rotateLeft(x, shift), x);
+    BooleanFormula formula =
+        bvmgr.equal(x, bvmgr.rotateRight(bvmgr.rotateLeft(x, shift), shift));
 
     String dumped = mgr.dumpFormula(formula).toString();
+    assertThat(dumped).doesNotContain("rotate_left");
+    assertThat(dumped).doesNotContain("rotate_right");
+
     BooleanFormula parsed = mgr.parse(dumped);
-    assertThatFormula(parsed).isSatisfiable();
+    assertThatFormula(bmgr.equivalence(formula, parsed)).isTautological();
   }
 
   @Test

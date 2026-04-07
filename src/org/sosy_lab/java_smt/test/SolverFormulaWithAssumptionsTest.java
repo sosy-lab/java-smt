@@ -9,7 +9,6 @@
 package org.sosy_lab.java_smt.test;
 
 import static com.google.common.truth.Truth.assertThat;
-import static com.google.common.truth.TruthJUnit.assume;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
@@ -44,17 +43,7 @@ public class SolverFormulaWithAssumptionsTest
   @SuppressWarnings({"unchecked", "rawtypes", "CheckReturnValue"})
   protected <T> InterpolatingProverEnvironment<T> newEnvironmentForTest()
       throws InvalidConfigurationException, SolverException, InterruptedException {
-
-    // check if we support assumption-solving
-    try (InterpolatingProverEnvironment<?> env = context.newProverEnvironmentWithInterpolation()) {
-      env.isUnsatWithAssumptions(ImmutableList.of());
-    } catch (UnsupportedOperationException e) {
-      assume()
-          .withMessage("Solver %s does not support assumption-solving", solverToUse())
-          .that(e)
-          .isNull();
-    }
-
+    requireAssumptionSolving();
     return (InterpolatingProverEnvironment<T>) context.newProverEnvironmentWithInterpolation();
   }
 
@@ -165,6 +154,7 @@ public class SolverFormulaWithAssumptionsTest
   @Test
   @SuppressWarnings("CheckReturnValue")
   public void assumptionsTest1() throws SolverException, InterruptedException {
+    requireAssumptionSolving();
     /*
     (declare-fun A () Bool)
     (push 1)

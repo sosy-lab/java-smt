@@ -846,7 +846,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
           assertThat(m.evaluate(imgr.makeNumber(123))).isEqualTo(BigInteger.valueOf(123));
           assertThat(m.evaluate(bmgr.makeBoolean(true))).isTrue();
           assertThat(m.evaluate(bmgr.makeBoolean(false))).isFalse();
-          if (SOLVERS_WITH_PARTIAL_MODEL.contains(solver)) {
+          if (SOLVERS_WITH_PARTIAL_MODEL.contains(solver) || solver == Solvers.LEANSMT) {
             // partial model should not return an evaluation
             assertThat(m.evaluate(imgr.makeVariable("y"))).isNull();
           } else {
@@ -861,7 +861,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
           assertThat(m.evaluate(bvmgr.makeBitvector(8, 123))).isEqualTo(BigInteger.valueOf(123));
           assertThat(m.evaluate(bmgr.makeBoolean(true))).isTrue();
           assertThat(m.evaluate(bmgr.makeBoolean(false))).isFalse();
-          if (SOLVERS_WITH_PARTIAL_MODEL.contains(solver)) {
+          if (SOLVERS_WITH_PARTIAL_MODEL.contains(solver) || solver == Solvers.LEANSMT) {
             // partial model should not return an evaluation
             assertThat(m.evaluate(bvmgr.makeVariable(8, "y"))).isNull();
           } else {
@@ -880,7 +880,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
         assertThat(prover).isSatisfiable();
 
         try (Model m = prover.getModel()) {
-          if (SOLVERS_WITH_PARTIAL_MODEL.contains(solver)) {
+          if (SOLVERS_WITH_PARTIAL_MODEL.contains(solver) || solver == Solvers.LEANSMT) {
             // partial model should not return an evaluation
             assertThat(m.evaluate(imgr.makeVariable("y"))).isNull();
           } else {
@@ -894,7 +894,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
         assertThat(prover).isSatisfiable();
 
         try (Model m = prover.getModel()) {
-          if (SOLVERS_WITH_PARTIAL_MODEL.contains(solver)) {
+          if (SOLVERS_WITH_PARTIAL_MODEL.contains(solver) || solver == Solvers.LEANSMT) {
             // partial model should not return an evaluation
             assertThat(m.evaluate(bvmgr.makeVariable(8, "y"))).isNull();
           } else {

@@ -57,6 +57,7 @@ public class RotationVisitorTest extends SolverBasedTest0.ParameterizedSolverBas
                 FunctionDeclarationKind.BV_SUB);
         break;
       case CVC5:
+      case LEANSMT:
       case PRINCESS:
         assertThat(functions)
             .containsExactly(
@@ -120,6 +121,7 @@ public class RotationVisitorTest extends SolverBasedTest0.ParameterizedSolverBas
                 FunctionDeclarationKind.BV_SUB);
         break;
       case CVC5:
+      case LEANSMT:
       case PRINCESS:
         assertThat(functions)
             .containsExactly(
