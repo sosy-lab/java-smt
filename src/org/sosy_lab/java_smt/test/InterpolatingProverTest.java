@@ -28,15 +28,14 @@ import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
-import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.solvers.opensmt.Logics;
+import org.sosy_lab.java_smt.test.SolverBasedTest0.ParameterizedInterpolatingSolverBasedTest0;
 
 /** This class contains some simple Junit-tests to check the interpolation-API of our solvers. */
 @SuppressWarnings({"resource", "LocalVariableName"})
-public class InterpolatingProverTest
-    extends SolverBasedTest0.ParameterizedInterpolatingSolverBasedTest0 {
+public class InterpolatingProverTest extends ParameterizedInterpolatingSolverBasedTest0 {
 
   // INFO: OpenSmt only support interpolation for QF_LIA, QF_LRA and QF_UF
   @Override
@@ -1220,19 +1219,13 @@ public class InterpolatingProverTest
     final Object p3 =
         switch (solverToUse()) {
           case CVC5 -> bmgr.makeVariable("c");
-          case MATHSAT5 -> 12345;
+          case MATHSAT5, Z3, CVC4 -> 12345;
           case OPENSMT -> 12347;
           case PRINCESS -> 12349;
           case SMTINTERPOL -> "some string";
-          case Z3:
-        p3 = 12345;
-        break;
-      case CVC4:
-        p3 = 12345;
-        break;
-      case Z3_WITH_INTERPOLATION -> 12350;
+          case Z3_WITH_INTERPOLATION -> 12350;
           case BITWUZLA, YICES2 -> -1;
-          default -> null; // unexpected solver for interpolation
+          case BOOLECTOR -> throw new AssertionError("Unexpected solver for interpolation");
         };
 
     // and try to solve with the token

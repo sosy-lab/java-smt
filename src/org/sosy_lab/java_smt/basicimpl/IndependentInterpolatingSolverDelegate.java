@@ -64,21 +64,20 @@ public class IndependentInterpolatingSolverDelegate<T> extends AbstractProver<T>
     mgr = pSourceContext.getFormulaManager();
     bmgr = mgr.getBooleanFormulaManager();
 
+    // TODO: refactor the selection of interpolationTechnique by introducing a method for it
     if (interpolationStrategy == null) {
-      this.interpolationTechnique = null;
+      interpolationTechnique = null;
     } else {
-      switch (interpolationStrategy) {
-        case GENERATE_PROJECTION_BASED_INTERPOLANTS:
-          this.interpolationTechnique = new ModelBasedProjectionInterpolation(solverContext);
-          break;
-        case GENERATE_UNIFORM_FORWARD_INTERPOLANTS:
-        case GENERATE_UNIFORM_BACKWARD_INTERPOLANTS:
-          this.interpolationTechnique =
-              new QuantifierEliminationInterpolation(mgr, interpolationStrategy);
-          break;
-        default:
-          throw new AssertionError("Unknown interpolation strategy: " + interpolationStrategy);
-      }
+      interpolationTechnique =
+          switch (interpolationStrategy) {
+            case GENERATE_PROJECTION_BASED_INTERPOLANTS ->
+                new ModelBasedProjectionInterpolation(solverContext);
+            case GENERATE_UNIFORM_FORWARD_INTERPOLANTS, GENERATE_UNIFORM_BACKWARD_INTERPOLANTS ->
+                new QuantifierEliminationInterpolation(mgr, interpolationStrategy);
+            default ->
+                throw new AssertionError(
+                    "Unknown interpolation strategy: " + interpolationStrategy);
+          };
     }
   }
 
