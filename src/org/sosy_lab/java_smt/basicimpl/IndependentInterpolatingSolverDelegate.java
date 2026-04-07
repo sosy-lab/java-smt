@@ -10,11 +10,9 @@
 
 package org.sosy_lab.java_smt.basicimpl;
 
-import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
-import com.google.common.base.Preconditions;
 import com.google.common.collect.Sets;
 import java.util.Collection;
 import java.util.List;
@@ -89,10 +87,6 @@ public class IndependentInterpolatingSolverDelegate<T> extends AbstractProver<T>
   @Override
   public BooleanFormula getInterpolant(Collection<T> identifiersForA)
       throws SolverException, InterruptedException {
-    Preconditions.checkState(!closed);
-    checkArgument(
-        getAssertedConstraintIds().containsAll(identifiersForA),
-        "Interpolation can only be performed over previously asserted formulas.");
 
     if (identifiersForA.isEmpty()) {
       return bmgr.makeTrue();
