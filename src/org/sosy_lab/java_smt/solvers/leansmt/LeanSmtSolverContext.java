@@ -58,7 +58,7 @@ public final class LeanSmtSolverContext extends AbstractSolverContext {
       Consumer<String> pLoader)
       throws InvalidConfigurationException {
 
-    long constructionSolver = 0L;
+    boolean countedInstance = false;
     try {
       synchronized (LeanSmtSolverContext.class) {
         if (!initialized) {
@@ -66,13 +66,12 @@ public final class LeanSmtSolverContext extends AbstractSolverContext {
           LeanSmtNativeApi.initialize();
           initialized = true;
         }
+        numLoadedInstances++;
+        countedInstance = true;
       }
 
-      constructionSolver = LeanSmtNativeApi.createSolverCvc5();
       String logic = "ALL";
-      LeanSmtNativeApi.setLogic(constructionSolver, logic);
-
-      LeanSmtFormulaCreator creator = new LeanSmtFormulaCreator(constructionSolver);
+      LeanSmtFormulaCreator creator = new LeanSmtFormulaCreator();
       LeanSmtUFManager ufManager = new LeanSmtUFManager(creator);
       LeanSmtBooleanFormulaManager booleanTheory = new LeanSmtBooleanFormulaManager(creator);
       LeanSmtIntegerFormulaManager integerTheory =
@@ -84,24 +83,41 @@ public final class LeanSmtSolverContext extends AbstractSolverContext {
       LeanSmtFormulaManager manager =
           new LeanSmtFormulaManager(
               creator, ufManager, booleanTheory, integerTheory, rationalTheory, bitvectorTheory);
-
-      synchronized (LeanSmtSolverContext.class) {
-        numLoadedInstances++;
-      }
       return new LeanSmtSolverContext(manager, creator, booleanTheory, pShutdownNotifier, logic);
     } catch (SolverException e) {
-      if (constructionSolver != 0L) {
-        LeanSmtNativeApi.deleteSolverAsync(constructionSolver);
-      }
+      boolean shouldCleanup = false;
       synchronized (LeanSmtSolverContext.class) {
-        if (initialized && !LeanSmtNativeApi.isNativeRuntimeInitialized()) {
-          initialized = false;
+        if (countedInstance) {
+          numLoadedInstances--;
+          shouldCleanup = numLoadedInstances == 0 && initialized;
+          if (shouldCleanup) {
+            initialized = false;
+          }
+        }
+      }
+      if (shouldCleanup) {
+        LeanSmtNativeApi.cleanup();
+      } else {
+        synchronized (LeanSmtSolverContext.class) {
+          if (initialized && !LeanSmtNativeApi.isNativeRuntimeInitialized()) {
+            initialized = false;
+          }
         }
       }
       throw new InvalidConfigurationException("Failed to initialize LeanSMT backend", e);
     } catch (RuntimeException e) {
-      if (constructionSolver != 0L) {
-        LeanSmtNativeApi.deleteSolverAsync(constructionSolver);
+      boolean shouldCleanup = false;
+      synchronized (LeanSmtSolverContext.class) {
+        if (countedInstance) {
+          numLoadedInstances--;
+          shouldCleanup = numLoadedInstances == 0 && initialized;
+          if (shouldCleanup) {
+            initialized = false;
+          }
+        }
+      }
+      if (shouldCleanup) {
+        LeanSmtNativeApi.cleanup();
       }
       throw e;
     }
@@ -121,14 +137,16 @@ public final class LeanSmtSolverContext extends AbstractSolverContext {
   public synchronized void close() {
     if (!closed) {
       closed = true;
-      // Best-effort cleanup for construction solver; this context no longer needs it.
-      LeanSmtNativeApi.deleteSolverAsync(creator.getConstructionSolver());
+      boolean shouldCleanup = false;
       synchronized (LeanSmtSolverContext.class) {
         numLoadedInstances--;
-        if (numLoadedInstances == 0) {
-          // Native global cleanup can block in some environments.
-          // Keep runtime initialized for process lifetime.
+        if (numLoadedInstances == 0 && initialized) {
+          initialized = false;
+          shouldCleanup = true;
         }
+      }
+      if (shouldCleanup) {
+        LeanSmtNativeApi.cleanup();
       }
     }
   }
@@ -152,5 +170,10 @@ public final class LeanSmtSolverContext extends AbstractSolverContext {
   @Override
   protected boolean supportsAssumptionSolving() {
     return true;
+  }
+
+  @Override
+  protected boolean useAssumptionWrapperIfUnsupported() {
+    return false;
   }
 }

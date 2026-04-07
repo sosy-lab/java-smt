@@ -20,7 +20,6 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.api.FormulaType;
@@ -32,7 +31,6 @@ final class LeanSmtModel extends AbstractModel<Long, LeanSmtType, Long> {
 
   private final LeanSmtFormulaCreator leanCreator;
   private final long solver;
-  private final boolean ownsSolver;
   private final ImmutableList<ValueAssignment> modelAssignments;
   private final Map<Long, @Nullable Value> valuesByHandle = new LinkedHashMap<>();
 
@@ -50,19 +48,16 @@ final class LeanSmtModel extends AbstractModel<Long, LeanSmtType, Long> {
       LeanSmtTheoremProver pProver,
       LeanSmtFormulaCreator pCreator,
       long pSolver,
-      Set<Long> pRelevantHandles,
-      boolean pOwnsSolver)
-      throws SolverException {
+      java.util.Set<Long> pRelevantHandles) {
     super(pProver, pCreator);
     leanCreator = pCreator;
     solver = pSolver;
-    ownsSolver = pOwnsSolver;
     modelAssignments = generateModelAssignments(ImmutableList.copyOf(pRelevantHandles));
   }
 
   @Override
   public void close() {
-    if (!isClosed() && ownsSolver) {
+    if (!isClosed()) {
       LeanSmtNativeApi.deleteSolverAsync(solver);
     }
     super.close();
@@ -187,17 +182,8 @@ final class LeanSmtModel extends AbstractModel<Long, LeanSmtType, Long> {
   }
 
   private static boolean isAssignmentTarget(LeanSmtFormulaCreator.Expr expr) {
-    if (expr.kind == LeanSmtFormulaCreator.ExprKind.VARIABLE) {
-      return !isHiddenHelperVariable(expr);
-    }
-    return expr.declarationKind == FunctionDeclarationKind.UF;
-  }
-
-  private static boolean isHiddenHelperVariable(LeanSmtFormulaCreator.Expr expr) {
     return expr.kind == LeanSmtFormulaCreator.ExprKind.VARIABLE
-        && (expr.symbol.startsWith("__floor#")
-            || expr.symbol.startsWith("__int2bv#")
-            || expr.symbol.startsWith("__ratc#"));
+        || expr.declarationKind == FunctionDeclarationKind.UF;
   }
 
   private static Object toUserValue(Value value) {

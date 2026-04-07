@@ -39,7 +39,7 @@ public abstract class AbstractSolverContext implements SolverContext {
   @Override
   public final ProverEnvironment newProverEnvironment(ProverOptions... options) {
     ProverEnvironment out = newProverEnvironment0(toSet(options));
-    if (!supportsAssumptionSolving()) {
+    if (!supportsAssumptionSolving() && useAssumptionWrapperIfUnsupported()) {
       // In the case we do not already have a prover environment with assumptions,
       // we add a wrapper to it
       out = new ProverWithAssumptionsWrapper(out);
@@ -55,7 +55,7 @@ public abstract class AbstractSolverContext implements SolverContext {
       ProverOptions... options) {
 
     InterpolatingProverEnvironment<?> out = newProverEnvironmentWithInterpolation0(toSet(options));
-    if (!supportsAssumptionSolving()) {
+    if (!supportsAssumptionSolving() && useAssumptionWrapperIfUnsupported()) {
       // In the case we do not already have a prover environment with assumptions,
       // we add a wrapper to it
       out = new InterpolatingProverWithAssumptionsWrapper<>(out, fmgr);
@@ -92,6 +92,17 @@ public abstract class AbstractSolverContext implements SolverContext {
    * class is undefined.
    */
   protected abstract boolean supportsAssumptionSolving();
+
+  /**
+   * Whether JavaSMT should emulate solving under assumptions for backends that do not support it
+   * natively.
+   *
+   * <p>Most backends use the shared wrapper. Minimal backends may override this to keep assumption
+   * solving unsupported instead of adding Java-side semantics.
+   */
+  protected boolean useAssumptionWrapperIfUnsupported() {
+    return true;
+  }
 
   private static Set<ProverOptions> toSet(ProverOptions... options) {
     Set<ProverOptions> opts = EnumSet.noneOf(ProverOptions.class);
