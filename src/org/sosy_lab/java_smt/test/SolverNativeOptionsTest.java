@@ -31,6 +31,16 @@ import org.sosy_lab.java_smt.api.SolverException;
 public class SolverNativeOptionsTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
 
   // TODO: HORN test(s) will be moved once we have a dedicated HORN prover and tests
+  // Small HORN problem in SMT2 (assertions should be asserted individually and not as a
+  // conjunction! Otherwise the solvers don't recognize this as HORN!)
+  private static final String HORN_SMT2 =
+      """
+      (declare-fun Itp (Int Int) Bool)
+      (assert (forall ((a Int) (x Int) (b Int)) (=> (and (< a x) (< x b)) (Itp a b))))
+      (assert (forall ((a Int) (b Int)) (=> (Itp a b) (not (< b a)))))
+      """;
+
+  // TODO: HORN test(s) will be moved once we have a dedicated HORN prover and tests
   @Test
   public void simpleHornSolvingTimeoutTest() throws InterruptedException {
     assume().that(solver).isEqualTo(Solvers.Z3);
@@ -218,12 +228,6 @@ public class SolverNativeOptionsTest extends SolverBasedTest0.ParameterizedSolve
       assertThat(pe.isUnsat()).isTrue();
     }
   }
-
-  // Small HORN problem in SMT2
-  private static final String HORN_SMT2 =
-      "(declare-fun Itp (Int Int) Bool)\n"
-          + "(assert (forall ((a Int) (x Int) (b Int)) (=> (and (< a x) (< x b)) (Itp a b))))\n"
-          + "(assert (forall ((a Int) (b Int)) (=> (Itp a b) (not (< b a)))))";
 
   // TODO: either move to SolverBasedTest0 or even better include into the assertion framework
   /**
