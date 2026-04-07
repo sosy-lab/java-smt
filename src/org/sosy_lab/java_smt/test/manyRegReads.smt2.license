@@ -2,5 +2,7 @@ SPDX-FileCopyrightText: Generator: Dartagnan
 SPDX-FileCopyrightText: Application: Bounded model checking for weak memory models
 SPDX-FileCopyrightText: Hernán Ponce de León, Florian Furbach, Keijo Heljanko, Roland Meyer: Dartagnan: Bounded Model Checking for Weak Memory Models (Competition Contribution). TACAS (2) 2020: 378-382
 SPDX-FileCopyrightText: Thomas Haas, Roland Meyer, Hernán Ponce de León: CAAT: consistency as a theory. Proc. ACM Program. Lang. 6(OOPSLA2): 114-144 (2022)
+SPDX-FileCopyrightText: License: https://creativecommons.org/licenses/by/4.0/
+SPDX-FileCopyrightText: Modified to no include incremental solving
 
-SPDX-License-Identifier: https://creativecommons.org/licenses/by/4.0/
+SPDX-License-Identifier: CC-BY-4.0
