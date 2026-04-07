@@ -148,7 +148,7 @@ public class FloatingPointFormulaManagerTest
                         List<Formula> boundVariables,
                         BooleanFormula body) {
                       throw new IllegalArgumentException(
-                          String.format("Unexpected quantifier %s", quantifier));
+                          "Unexpected quantifier %s".formatted(quantifier));
                     }
                   });
 
@@ -258,6 +258,55 @@ public class FloatingPointFormulaManagerTest
   @Test
   public void nanAssignedNanIsTrue() throws SolverException, InterruptedException {
     assertEqualsAsFormula(nan, nan);
+  }
+
+  @Test
+  public void nanModelAssignment() throws InterruptedException, SolverException {
+    try (var prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
+      // Equation: var = NaN
+      prover.addConstraint(
+          mgr.makeEqual(
+              fpmgr.makeVariable("var", FormulaType.getSinglePrecisionFloatingPointType()),
+              fpmgr.makeNaN(FormulaType.getSinglePrecisionFloatingPointType())));
+
+      // Model: var = NaN
+      assertThat(prover.isUnsat()).isFalse();
+      try (var model = prover.getModel()) {
+        var assignment = model.asList().get(0).getAssignmentAsFormula();
+        prover.addConstraint(bmgr.not(assignment));
+      }
+
+      // No other solutions
+      assertThat(prover.isUnsat()).isTrue();
+    }
+  }
+
+  @Test
+  public void zeroModelAssignment() throws InterruptedException, SolverException {
+    try (var prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
+      // Equation: var =fp 0.0
+      prover.addConstraint(
+          fpmgr.equalWithFPSemantics(
+              fpmgr.makeVariable("var", FormulaType.getSinglePrecisionFloatingPointType()),
+              fpmgr.makeNumber(0, FormulaType.getSinglePrecisionFloatingPointType())));
+
+      // 1st solution: var = 0.0
+      assertThat(prover.isUnsat()).isFalse();
+      try (var model = prover.getModel()) {
+        var assignment = model.asList().get(0).getAssignmentAsFormula();
+        prover.addConstraint(bmgr.not(assignment));
+      }
+
+      // 2nd solution: var = -0.0
+      assertThat(prover.isUnsat()).isFalse();
+      try (var model = prover.getModel()) {
+        var assignment = model.asList().get(0).getAssignmentAsFormula();
+        prover.addConstraint(bmgr.not(assignment));
+      }
+
+      // No other solutions
+      assertThat(prover.isUnsat()).isTrue();
+    }
   }
 
   @Test
@@ -1560,6 +1609,12 @@ public class FloatingPointFormulaManagerTest
         .withMessage("MathSAT5 does not support floating-point interpolation")
         .that(solver)
         .isNotEqualTo(Solvers.MATHSAT5);
+    assume()
+        .withMessage(
+            "Bitwuzla uses internal symbols in fp interpolants that cause problems for "
+                + "this test")
+        .that(solver)
+        .isNotEqualTo(Solvers.BITWUZLA);
 
     FloatingPointFormula var = fpmgr.makeVariable("x", singlePrecType);
     BooleanFormula f1 = fpmgr.equalWithFPSemantics(var, zero);

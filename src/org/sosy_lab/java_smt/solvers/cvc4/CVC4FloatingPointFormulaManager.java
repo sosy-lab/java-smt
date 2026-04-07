@@ -34,13 +34,13 @@ import org.sosy_lab.java_smt.api.FormulaType.BitvectorType;
 import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
 import org.sosy_lab.java_smt.basicimpl.AbstractFloatingPointFormulaManager;
 
-public class CVC4FloatingPointFormulaManager
+class CVC4FloatingPointFormulaManager
     extends AbstractFloatingPointFormulaManager<Expr, Type, ExprManager, Expr> {
 
   private final ExprManager exprManager;
   private final Expr roundingMode;
 
-  protected CVC4FloatingPointFormulaManager(
+  CVC4FloatingPointFormulaManager(
       CVC4FormulaCreator pCreator, FloatingPointRoundingMode pFloatingPointRoundingMode) {
     super(pCreator);
     exprManager = pCreator.getEnv();
@@ -60,20 +60,13 @@ public class CVC4FloatingPointFormulaManager
 
   @Override
   protected Expr getRoundingModeImpl(FloatingPointRoundingMode pFloatingPointRoundingMode) {
-    switch (pFloatingPointRoundingMode) {
-      case NEAREST_TIES_TO_EVEN:
-        return exprManager.mkConst(RoundingMode.roundNearestTiesToEven);
-      case NEAREST_TIES_AWAY:
-        return exprManager.mkConst(RoundingMode.roundNearestTiesToAway);
-      case TOWARD_POSITIVE:
-        return exprManager.mkConst(RoundingMode.roundTowardPositive);
-      case TOWARD_NEGATIVE:
-        return exprManager.mkConst(RoundingMode.roundTowardNegative);
-      case TOWARD_ZERO:
-        return exprManager.mkConst(RoundingMode.roundTowardZero);
-      default:
-        throw new AssertionError("Unexpected branch");
-    }
+    return switch (pFloatingPointRoundingMode) {
+      case NEAREST_TIES_TO_EVEN -> exprManager.mkConst(RoundingMode.roundNearestTiesToEven);
+      case NEAREST_TIES_AWAY -> exprManager.mkConst(RoundingMode.roundNearestTiesToAway);
+      case TOWARD_POSITIVE -> exprManager.mkConst(RoundingMode.roundTowardPositive);
+      case TOWARD_NEGATIVE -> exprManager.mkConst(RoundingMode.roundTowardNegative);
+      case TOWARD_ZERO -> exprManager.mkConst(RoundingMode.roundTowardZero);
+    };
   }
 
   @Override

@@ -8,6 +8,7 @@
 
 package org.sosy_lab.java_smt.basicimpl;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkState;
 
 import com.google.common.base.Preconditions;
@@ -29,6 +30,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.java_smt.api.BasicProverEnvironment;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Evaluator;
+import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
 import org.sosy_lab.java_smt.api.OptimizationProverEnvironment;
 import org.sosy_lab.java_smt.api.OptimizationProverEnvironment.OptStatus;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
@@ -40,12 +42,12 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
   protected final boolean generateModels;
   protected final boolean generateAllSat;
   protected final boolean generateUnsatCores;
-  private final boolean generateUnsatCoresOverAssumptions;
+  protected final boolean generateUnsatCoresOverAssumptions;
   protected final boolean enableSL;
 
   // flags for status
   protected boolean closed = false;
-  private boolean wasLastSatCheckSatisfiable = true; // assume SAT for an empty prover
+  protected boolean wasLastSatCheckSatisfiable = true; // assume SAT for an empty prover
   protected boolean changedSinceLastSatQuery = true; // assume changed for an empty prover
 
   private final Set<Evaluator> evaluators = new LinkedHashSet<>();
@@ -95,10 +97,9 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
         generateUnsatCoresOverAssumptions,
         TEMPLATE,
         ProverOptions.GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS);
-    Preconditions.checkState(!wasLastSatCheckSatisfiable);
   }
 
-  protected final void checkGenerateInterpolants() {
+  private void checkGenerateInterpolants() {
     Preconditions.checkState(!closed);
     Preconditions.checkState(
         !changedSinceLastSatQuery,
@@ -107,6 +108,31 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
         !wasLastSatCheckSatisfiable,
         "Interpolants can only be calculated if the assertions on the solver stack are "
             + "unsatisfiable.");
+  }
+
+  protected final void checkGenerateInterpolants(Collection<T> formulasOfA) {
+    checkGenerateInterpolants();
+    checkArgument(
+        getAssertedConstraintIds().containsAll(formulasOfA),
+        "interpolation can only be done over previously asserted formulas.");
+  }
+
+  protected final void checkGenerateSeqInterpolants(
+      List<? extends Collection<T>> partitionedFormulas) {
+    checkGenerateInterpolants();
+    Preconditions.checkArgument(
+        !partitionedFormulas.isEmpty(), "at least one partition should be available.");
+    final ImmutableSet<T> assertedConstraintIds = getAssertedConstraintIds();
+    checkArgument(
+        partitionedFormulas.stream().allMatch(assertedConstraintIds::containsAll),
+        "interpolation can only be done over previously asserted formulas.");
+  }
+
+  protected final void checkGenerateTreeInterpolants(
+      List<? extends Collection<T>> partitionedFormulas, int[] startOfSubTree) {
+    checkGenerateSeqInterpolants(partitionedFormulas);
+    assert InterpolatingProverEnvironment.checkTreeStructure(
+        partitionedFormulas.size(), startOfSubTree);
   }
 
   protected final void checkEnableSeparationLogic() {

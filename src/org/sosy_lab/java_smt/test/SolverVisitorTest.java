@@ -339,7 +339,9 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
     // Yices does not support integer to bitvector conversions
     assume().that(solver).isNotEqualTo(Solvers.YICES2);
     // CVC4, CVC5 and Z3 will rewrite SBV_TO_INT to a term that only uses unsigned integers
-    assume().that(solver).isNoneOf(Solvers.Z3, Solvers.CVC4, Solvers.CVC5);
+    assume()
+        .that(solver)
+        .isNoneOf(Solvers.Z3, Solvers.Z3_WITH_INTERPOLATION, Solvers.CVC4, Solvers.CVC5);
     // Princess uses mod_casts internally, which makes it hard to figure out when conversion happen
     assume().that(solver).isNotEqualTo(Solvers.PRINCESS);
 
@@ -698,44 +700,28 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
             public TraversalProcess visitFunction(
                 Formula pF, List<Formula> pArgs, FunctionDeclaration<?> pDeclaration) {
               switch (pDeclaration.getKind()) {
-                case NOT:
-                  assertThat(pArgs).hasSize(1);
-                  break;
-                case ITE:
-                  assertThat(pArgs).hasSize(3);
-                  break;
-                case EQ:
-                case BV_SLT:
-                case BV_SLE:
-                case BV_SGT:
-                case BV_SGE:
-                case BV_ULT:
-                case BV_ULE:
-                case BV_UGT:
-                case BV_UGE:
-                  assertThat(pArgs).hasSize(2);
-                  break;
-                case BV_NOT:
-                case BV_NEG:
-                  assertThat(pArgs).hasSize(1);
-                  break;
-                case BV_ADD:
+                case NOT, BV_NOT, BV_NEG -> assertThat(pArgs).hasSize(1);
+                case ITE -> assertThat(pArgs).hasSize(3);
+                case EQ, BV_SLT, BV_SLE, BV_SGT, BV_SGE, BV_ULT, BV_ULE, BV_UGT, BV_UGE ->
+                    assertThat(pArgs).hasSize(2);
+                case BV_ADD -> {
                   assertThat(pArgs).contains(x);
                   assertThat(pArgs).hasSize(2);
-                  break;
-                case BV_MUL:
+                }
+                case BV_MUL -> {
                   assertThat(pArgs).contains(y);
                   assertThat(pArgs).hasSize(2);
                   // Yices is special in some cases
                   if (Solvers.YICES2 != solverToUse()) {
                     assertThat(pArgs).contains(x);
                   }
-                  break;
-                default:
+                }
+                default -> {
                   if (Solvers.YICES2 != solverToUse()) {
                     assertThat(pArgs).hasSize(2);
                     assertThat(pArgs).containsExactly(x, y);
                   }
+                }
               }
               return visitDefault(pF);
             }
@@ -1495,13 +1481,9 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
     assertThat(mapping).containsEntry("v", v);
     assertThat(mapping).containsEntry("q", q);
 
-    // some solvers distinguish between nullary UFs and variables and do not provide variables
-    if (ImmutableList.of(Solvers.CVC4, Solvers.PRINCESS).contains(solverToUse())) {
-      assertThat(mapping2).isEmpty();
-    } else {
-      assertThat(mapping2).hasSize(1);
-      assertThat(mapping2).containsEntry("v", v);
-    }
+    // for nullary UFs we expect a single symbol
+    assertThat(mapping2).hasSize(1);
+    assertThat(mapping2).containsEntry("v", v);
   }
 
   private final FormulaVisitor<Formula> plainFunctionVisitor =

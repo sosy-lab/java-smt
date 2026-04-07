@@ -12,15 +12,15 @@ SPDX-License-Identifier: Apache-2.0
 
 <!-- vim: set tabstop=8 shiftwidth=4 expandtab sts=4 filetype=ant fdm=marker: -->
 <project name="publish-solvers-cvc4" basedir="." xmlns:ivy="antlib:org.apache.ivy.ant">
-
     <import file="macros.xml"/>
 
-    <target name="package-cvc4" depends="">
-        <!-- Copy CVC4 binaries to the root folder along with the version postfix. -->
+    <property name="cvc4.distDir" value="${ivy.solver.dist.dir}/cvc4"/>
+
+    <target name="initialize-cvc4">
         <fail unless="cvc4.path">
             Please specify the path to CVC4 with the flag -Dcvc4.path=/path/to/cvc4.
             The path has to point to the root CVC4 folder, i.e.,
-            a checkout of the official git repository from 'https://github.com/CVC4/CVC4.git'.
+            a checkout of the official git repository from 'https://github.com/CVC4/CVC4-archived.git'.
             Note that shell substitutions do not work and a full absolute path has to be specified.
         </fail>
         <fail unless="cvc4.customRev">
@@ -36,56 +36,94 @@ SPDX-License-Identifier: Apache-2.0
             <arg value="--format=%h"/>
         </exec>
         <property name="cvc4.version" value="${cvc4.customRev}-g${cvc4.revision}"/>
-        <echo message="Building CVC4 in version '${cvc4.version}'"/>
+    </target>
 
+    <target name="package-cvc4" depends="initialize-cvc4">
         <!-- build CVC4 -->
         <exec executable="rm" dir="${cvc4.path}" failonerror="true">
             <arg value="-rf"/>
-            <arg value="symfpu-CVC4"/>
+            <arg value="deps/symfpu-CVC4"/>
         </exec>
         <exec executable="./contrib/get-symfpu" dir="${cvc4.path}" failonerror="true"/>
         <exec executable="./configure.sh" dir="${cvc4.path}" failonerror="true">
             <arg value="--symfpu"/>
             <arg value="--language-bindings=java"/>
+            <arg value="--gmp-dir=/dependencies/gmp-6.3.0/install/x64-linux/"/>
+            <arg value="--prefix=${cvc4.path}/install"/>
         </exec>
         <exec executable="make" dir="${cvc4.path}/build/" failonerror="true">
-            <arg value="-j4" />
+            <arg value="-j8"/>
+            <arg value="install"/>
         </exec>
 
         <!-- remove unneeded symbols -->
-        <exec executable="strip" dir="${cvc4.path}/build/src/bindings/java/" failonerror="true">
+        <exec executable="strip" dir="${cvc4.path}/install/lib" failonerror="true">
             <arg value="libcvc4jni.so" />
-        </exec>
-        <exec executable="strip" dir="${cvc4.path}/build/src/" failonerror="true">
             <arg value="libcvc4.so" />
-        </exec>
-        <exec executable="strip" dir="${cvc4.path}/build/src/parser/" failonerror="true">
-            <arg value="libcvc4parser.so" />
         </exec>
 
         <!-- fix RPATH and library dependencies -->
-        <exec executable="patchelf" dir="${cvc4.path}/build/src/parser/" failonerror="true">
+        <exec executable="patchelf" dir="${cvc4.path}/install/lib" failonerror="true">
             <arg value="--set-rpath"/><arg value="$ORIGIN"/>
-            <arg value="--replace-needed"/><arg value="libcvc4.so.6"/><arg value="libcvc4.so"/>
-            <arg value="libcvc4parser.so"/>
-        </exec>
-        <exec executable="patchelf" dir="${cvc4.path}/build/src/bindings/java/" failonerror="true">
-            <arg value="--set-rpath"/><arg value="$ORIGIN"/>
-            <arg value="--replace-needed"/><arg value="libcvc4.so.6"/><arg value="libcvc4.so"/>
-            <arg value="--replace-needed"/><arg value="libcvc4parser.so.6"/><arg value="libcvc4parser.so"/>
+            <arg value="--replace-needed"/>
+            <arg value="libcvc4.so.7"/>
+            <arg value="libcvc4.so"/>
             <arg value="libcvc4jni.so"/>
         </exec>
 
         <!-- copy library files into directory to be published for IVY -->
-        <copy file="${cvc4.path}/build/src/libcvc4.so" tofile="libcvc4-${cvc4.version}.so"/>
-        <copy file="${cvc4.path}/build/src/parser/libcvc4parser.so" tofile="libcvc4parser-${cvc4.version}.so"/>
-        <copy file="${cvc4.path}/build/src/bindings/java/libcvc4jni.so" tofile="libcvc4jni-${cvc4.version}.so"/>
-        <copy file="${cvc4.path}/build/src/bindings/java/CVC4.jar" tofile="CVC4-${cvc4.version}.jar"/>
+        <mkdir dir="${cvc4.distDir}/x64"/>
+        <copy file="${cvc4.path}/install/lib/libcvc4.so" tofile="${cvc4.distDir}/x64/libcvc4-${cvc4.version}.so"/>
+        <copy file="${cvc4.path}/install/lib/libcvc4jni.so" tofile="${cvc4.distDir}/x64/libcvc4jni-${cvc4.version}.so"/>
+        <copy file="${cvc4.path}/install/share/java/cvc4/CVC4.jar" tofile="${cvc4.distDir}/CVC4-${cvc4.version}.jar"/>
     </target>
 
-    <target name="publish-cvc4" depends="package-cvc4, load-ivy"
-        description="Publish CVC4 binaries to Ivy repository.">
-        <ivy:resolve conf="solver-cvc4" file="solvers_ivy_conf/ivy_cvc4.xml" />
-        <publishToRepository solverName="CVC4" solverVersion="${cvc4.version}"/>
+    <target name="package-cvc4-sources" depends="package-cvc4">
+        <jar destfile="${cvc4.distDir}/CVC4-${cvc4.version}-sources.jar" whenmanifestonly="fail">
+            <zipfileset dir="${cvc4.path}/build/src/bindings/java" includes="**/*.java" prefix="edu/stanford/CVC4"/>
+            <zipfileset dir="${cvc4.path}" includes="COPYING" prefix="META-INF"/>
+            <manifest>
+                <attribute name="Implementation-Title" value="cvc4"/>
+                <attribute name="Implementation-Version" value="${cvc4.version}"/>
+            </manifest>
+        </jar>
+    </target>
+
+    <target name="package-cvc4-javadoc" depends="package-cvc4">
+        <javadoc destdir="${cvc4.path}/build/javadoc"
+                 classpathref="classpath"
+                 locale="en_US"
+                 encoding="utf-8"
+                 windowtitle="cvc4"
+                 failonerror="true"
+                 failonwarning="false">
+            <fileset dir="${cvc4.path}/build/src/bindings/java">
+                <include name="**/*.java"/>
+            </fileset>
+            <link href="https://docs.oracle.com/en/java/javase/11/docs/api/"/>
+            <doctitle><![CDATA[<h1>cvc4</h1>]]></doctitle>
+            <arg line="${javadoc.doclint}"/>
+        </javadoc>
+        <jar jarfile="${cvc4.distDir}/CVC4-${cvc4.version}-javadoc.jar" whenmanifestonly="fail">
+            <zipfileset dir="${cvc4.path}" includes="COPYING" prefix="META-INF"/>
+            <zipfileset dir="${cvc4.path}/build/javadoc"/>
+        </jar>
+    </target>
+
+    <target name="publish-cvc4" depends="package-cvc4, package-cvc4-sources, package-cvc4-javadoc, load-ivy" description="Publish CVC4 binaries to Ivy repository.">
+        <ivy:resolve conf="solver-cvc4" file="solvers_ivy_conf/ivy_cvc4.xml"/>
+        <publishToRepository solverName="CVC4" solverVersion="${cvc4.version}" distDir="${cvc4.distDir}"/>
+
+        <!--
+          We additionally provide x64-files without arch-attribute for backwards compatibility,
+          such that applications can load dependencies without changing their Ivy configuration.
+          Those files are not part of any direct configuration, but will be resolved if the
+          arch-attribute is not used.
+        -->
+        <copy todir="repository/${ivy.organisation}/${ivy.module}/">
+            <fileset dir="repository/${ivy.organisation}/${ivy.module}/x64/">
+                <include name="*-${cvc4.version}.*"/>
+            </fileset>
+        </copy>
     </target>
 </project>

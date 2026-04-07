@@ -1,0 +1,91 @@
+Index: build.xml
+diff --git a/build.xml b/build.xml
+--- a/build.xml	(revision 25b03e1858b3ef006bca2532b87510613d8af55f)
++++ b/build.xml	(date 1773730694637)
+@@ -224,7 +224,6 @@
+     <exec executable="make"
+           dir="${code}"
+           failonerror="true">
+-      <arg line="${library}"/>
+     </exec>
+ 
+   </target>
+Index: src/main/java/com/sri/yices/Makefile
+diff --git a/src/main/java/com/sri/yices/Makefile b/src/main/java/com/sri/yices/Makefile
+--- a/src/main/java/com/sri/yices/Makefile	(revision 25b03e1858b3ef006bca2532b87510613d8af55f)
++++ b/src/main/java/com/sri/yices/Makefile	(date 1773727210451)
+@@ -31,7 +31,9 @@
+ ifeq ($(OS),darwin)
+  EXTENSION=dylib
+ else
+-ifeq ($(OS),)
++ifeq ($(OS),win32)
++  EXTENSION=dll
++else ifeq ($(OS),)
+  $(error "Please set $$OS")
+ else
+  $(error "Unkown OS: $(OS)")
+@@ -48,7 +50,11 @@
+ endif
+ 
+ # name of the library
+-libyices2java := libyices2java.$(EXTENSION)
++ifeq ($(OS),win32)
++ libyices2java := yices2java.$(EXTENSION)
++else
++ libyices2java := libyices2java.$(EXTENSION)
++endif
+ 
+ # install name for darwin
+ libyices2java_install_name := $(YICES_JNI)/libyices2java.dylib
+@@ -56,9 +62,11 @@
+ # we ignore versions and soname for now
+ 
+ # default include directories for jni.h and jni_md.h
+-CPPFLAGS := -I $(JAVA_HOME)/include -I $(JAVA_HOME)/include/$(OS)
+-CXXFLAGS := -g -fPIC
+-LIBS := -lyices -lgmp
++CPPFLAGS := -I $(JNI_PATH) -I $(JNI_PATH)/$(OS) -I $(GMP_PATH)/include -I $(YICES_PATH)/include
++CXXFLAGS := -O3 -fPIC $(CXXFLAGS)
++
++LDFLAGS := -L $(YICES_PATH)/lib -L $(CUDD_PATH)/lib -L $(POLY_PATH)/lib -L $(GMP_PATH)/lib
++LIBS := -lyices -lcudd -lpoly -lgmpxx -lgmp
+ 
+ CXX ?= g++
+ 
+@@ -86,7 +94,10 @@
+ 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -dynamiclib -o $@ yicesJNI.o $(LIBS)
+ 
+ libyices2java.so: yicesJNI.o
+-	$(CXX) $(CFLAGS) $(LDFLAGS) -shared -o $@ yicesJNI.o $(LIBS)
++	$(CXX) $(CFLAGS) $(LDFLAGS) -o $@ yicesJNI.o -shared -Wl,-soname,$(libyices2java) -Wl,-Bstatic $(LIBS) -static-libstdc++ -lstdc++ -Wl,-Bdynamic -lc -lm -Wl,--version-script=libyices2java.version
++
++yices2java.dll: yicesJNI.o
++	$(CXX) $(CFLAGS) $(LDFLAGS) -o $@ yicesJNI.o -shared -Wl,-soname,$(libyices2java) -Wl,-Bstatic,--whole-archive -lpthread -Wl,-Bstatic,--no-whole-archive $(LIBS) -static-libgcc -static-libstdc++ -lstdc++ -Wl,-Bdynamic -lm -Wl,--version-script=libyices2java.version
+ 
+ LIBDIR := $(YICES_JNI)
+ 
+@@ -99,7 +110,10 @@
+ install-darwin:
+ 	cp $(libyices2java) $(LIBDIR)
+ 
++install-win32:
++	cp $(libyices2java) $(LIBDIR)
++
+ clean:
+-	rm -f *.o *.so *.dylib com_sri_yices_Yices.h *.class
++	rm -f *.o *.so *.dylib *.dll com_sri_yices_Yices.h *.class
+ 
+-.PHONY: all clean install install-linux install-darwin 
++.PHONY: all clean install install-linux install-darwin install-win32
+
+Index: src/main/java/com/sri/yices/libyices2java.version
+diff --git a/src/main/java/com/sri/yices/libyices2java.version b/src/main/java/com/sri/yices/libyices2java.version
+new file mode 100644
+--- /dev/null	(date 1773662010549)
++++ b/src/main/java/com/sri/yices/libyices2java.version	(date 1773662010549)
+@@ -0,0 +1,4 @@
++YICES2JAVA {
++  global: Java_*;
++  local: *;
++};

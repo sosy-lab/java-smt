@@ -13,21 +13,23 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.CharMatcher;
+import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
-import com.google.common.collect.Collections2;
+import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableBiMap;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
+import com.google.errorprone.annotations.ForOverride;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.Appender;
 import org.sosy_lab.common.Appenders;
+import org.sosy_lab.common.collect.Collections3;
 import org.sosy_lab.java_smt.api.ArrayFormulaManager;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.EnumerationFormulaManager;
@@ -268,28 +270,20 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
   }
 
   /** Override if the solver API only supports binary equality. */
+  @SuppressWarnings("unused")
   protected TFormulaInfo equalImpl(TFormulaInfo pArg1, TFormulaInfo pArgs) {
-    return equalImpl(ImmutableList.of(pArg1, pArgs));
+    throw new UnsupportedOperationException(
+        "equalImpl(x, y) must be implemented in a subclass, if required.");
   }
 
   @Override
-  public BooleanFormula equal(Collection<Formula> pArgs) {
-    if (pArgs.size() < 2) {
-      return booleanManager.makeTrue(); // trivially true
-    }
-    final Collection<FormulaType<Formula>> types =
-        Collections2.transform(pArgs, formulaCreator::getFormulaType);
-    Preconditions.checkArgument(
-        ImmutableSet.copyOf(types).size() == 1,
-        "All arguments to `equal` must have the same type, but found %s different types: %s",
-        types.size(),
-        types);
-    return formulaCreator.encapsulateBoolean(
-        equalImpl(Collections2.transform(pArgs, formulaCreator::extractInfo)));
+  public BooleanFormula makeEqual(Iterable<Formula> pArgs) {
+    FluentIterable<TFormulaInfo> args = getTFormulaInfosForComparison(pArgs);
+    return formulaCreator.encapsulateBoolean(equalImpl(args));
   }
 
   /** Override if the solver API supports equality with many arguments. */
-  protected TFormulaInfo equalImpl(Collection<TFormulaInfo> pArgs) {
+  protected TFormulaInfo equalImpl(Iterable<TFormulaInfo> pArgs) {
     List<TFormulaInfo> equalities = new ArrayList<>();
     for (TFormulaInfo[] pair : pairwise(pArgs)) {
       equalities.add(equalImpl(pair[0], pair[1]));
@@ -312,22 +306,36 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
   }
 
   @Override
-  public BooleanFormula distinct(Collection<Formula> pArgs) {
-    if (pArgs.size() < 2) {
-      return booleanManager.makeTrue(); // trivially true
-    }
-    final Collection<FormulaType<Formula>> types =
-        Collections2.transform(pArgs, formulaCreator::getFormulaType);
+  public BooleanFormula makeDistinct(Iterable<Formula> pArgs) {
+    FluentIterable<TFormulaInfo> args = getTFormulaInfosForComparison(pArgs);
+    return formulaCreator.encapsulateBoolean(distinctImpl(args));
+  }
+
+  @SuppressWarnings("unchecked")
+  private FluentIterable<TFormulaInfo> getTFormulaInfosForComparison(Iterable<Formula> pArgs) {
+    final ImmutableSet<FormulaType<Formula>> types =
+        FluentIterable.from(pArgs).transform(formulaCreator::getFormulaType).toSet();
     Preconditions.checkArgument(
-        ImmutableSet.copyOf(types).size() == 1,
-        "All arguments to `equal` must have the same type, but found %s different types: %s",
+        types.size() < 2
+            || ImmutableSet.of(FormulaType.IntegerType, FormulaType.RationalType).equals(types),
+        "All arguments for comparison must have the same type, but found %s different types: %s",
         types.size(),
         types);
-    return formulaCreator.encapsulateBoolean(distinctImpl(formulaCreator.extractInfo(pArgs)));
+    FluentIterable<TFormulaInfo> args =
+        FluentIterable.from(pArgs).transform(formulaCreator::extractInfo);
+    if (types.contains(FormulaType.IntegerType) && types.contains(FormulaType.RationalType)) {
+      // We can compare Integer and Rational terms, so we convert all terms to Rational
+      args =
+          args.transform(
+              ((AbstractNumeralFormulaManager<TFormulaInfo, ?, ?, ?, ?, ?>)
+                      getRationalFormulaManager())
+                  ::toType);
+    }
+    return args;
   }
 
   /** Override if the solver API supports <code>distinct</code>. */
-  protected TFormulaInfo distinctImpl(Collection<TFormulaInfo> pArgs) {
+  protected TFormulaInfo distinctImpl(Iterable<TFormulaInfo> pArgs) {
     List<TFormulaInfo> inequalities = new ArrayList<>();
     for (TFormulaInfo[] pair : allUniquePairs(pArgs)) {
       inequalities.add(booleanManager.not(equalImpl(pair[0], pair[1])));
@@ -349,7 +357,28 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
     return result;
   }
 
-  protected abstract TFormulaInfo parseImpl(String formulaStr) throws IllegalArgumentException;
+  @SuppressWarnings("unused")
+  protected TFormulaInfo parseImpl(String formulaStr) throws IllegalArgumentException {
+    throw new UnsupportedOperationException(
+        "parseImpl(String) must be implemented in a subclass, if required.");
+  }
+
+  @ForOverride
+  protected List<TFormulaInfo> parseAllImpl(String formulaStr) throws IllegalArgumentException {
+    // The fallback implementation splits the input into declarations and assertions,
+    // and parses each assertion separately,
+    // which is not very efficient, but it works for simple cases and is better than nothing
+    List<String> tokens = Tokenizer.tokenize(formulaStr);
+
+    List<String> declarationTokens = tokens.stream().filter(Tokenizer::isDeclarationToken).toList();
+    List<String> definitionTokens = tokens.stream().filter(Tokenizer::isDefinitionToken).toList();
+    List<String> assertTokens = tokens.stream().filter(Tokenizer::isAssertToken).toList();
+    String definitions =
+        Joiner.on("").join(declarationTokens) + Joiner.on("").join(definitionTokens);
+
+    return Collections3.transformedImmutableListCopy(
+        assertTokens, assertion -> parseImpl(definitions + assertion));
+  }
 
   /**
    * Takes an SMT-LIB2 script and cleans it up.
@@ -400,10 +429,10 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
           throw new UnsupportedOperationException();
         }
         throw new IllegalArgumentException(
-            String.format("SMTLIB command '%s' is not supported when parsing formulas.", message));
+            "SMTLIB command '%s' is not supported when parsing formulas.".formatted(message));
 
       } else {
-        // Remove everything else
+        // Remove everything else, such as unknown or solver-specific commands, comments, etc.
       }
       pos++;
     }
@@ -411,8 +440,10 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
   }
 
   @Override
-  public BooleanFormula parse(String formulaStr) throws IllegalArgumentException {
-    return formulaCreator.encapsulateBoolean(parseImpl(sanitize(formulaStr)));
+  public List<BooleanFormula> parseAll(String formulaStr) throws IllegalArgumentException {
+    return parseAllImpl(sanitize(formulaStr)).stream()
+        .map(formulaCreator::encapsulateBoolean)
+        .toList();
   }
 
   protected abstract String dumpFormulaImpl(TFormulaInfo t) throws IOException;
@@ -446,18 +477,12 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
   @Override
   public BooleanFormula applyTactic(BooleanFormula f, Tactic tactic)
       throws InterruptedException, SolverException {
-    switch (tactic) {
-      case ACKERMANNIZATION:
-        return applyUFEImpl(f);
-      case NNF:
-        return applyNNFImpl(f);
-      case TSEITIN_CNF:
-        return applyCNFImpl(f);
-      case QE_LIGHT:
-        return applyQELightImpl(f);
-      default:
-        throw new UnsupportedOperationException("Unexpected enum value");
-    }
+    return switch (tactic) {
+      case ACKERMANNIZATION -> applyUFEImpl(f);
+      case NNF -> applyNNFImpl(f);
+      case TSEITIN_CNF -> applyCNFImpl(f);
+      case QE_LIGHT -> applyQELightImpl(f);
+    };
   }
 
   /** Eliminate UFs from the given input formula. */

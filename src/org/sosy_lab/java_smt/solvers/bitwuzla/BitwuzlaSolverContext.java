@@ -183,9 +183,8 @@ public final class BitwuzlaSolverContext extends AbstractSolverContext {
       Option bitwuzlaOption = allAvailableOptions.get(optionName);
       if (bitwuzlaOption == null) {
         throw new InvalidConfigurationException(
-            String.format(
-                "Unknown option: %s. Bitwuzla provides the following options: %s.",
-                optionName, Joiner.on(", ").join(allAvailableOptions.keySet())));
+            "Unknown option: %s. Bitwuzla provides the following options: %s."
+                .formatted(optionName, Joiner.on(", ").join(allAvailableOptions.keySet())));
       }
       try {
         if (pOptions.is_numeric(bitwuzlaOption) || pOptions.is_bool(bitwuzlaOption)) {
@@ -267,14 +266,14 @@ public final class BitwuzlaSolverContext extends AbstractSolverContext {
   @Override
   protected ProverEnvironment newProverEnvironment0(Set<ProverOptions> options) {
     Preconditions.checkState(!closed, "solver context is already closed");
-
     return new BitwuzlaTheoremProver(manager, creator, shutdownNotifier, options, solverOptions);
   }
 
   @Override
   protected InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation0(
       Set<ProverOptions> pF) {
-    throw new UnsupportedOperationException("Bitwuzla does not support interpolation");
+    Preconditions.checkState(!closed, "solver context is already closed");
+    return new BitwuzlaInterpolatingProver(manager, creator, shutdownNotifier, pF, solverOptions);
   }
 
   @Override
@@ -299,7 +298,7 @@ public final class BitwuzlaSolverContext extends AbstractSolverContext {
    */
   @Override
   protected boolean supportsAssumptionSolving() {
-    return true;
+    return false;
   }
 
   /**

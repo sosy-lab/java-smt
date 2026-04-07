@@ -146,11 +146,15 @@ class Z3OptimizationProver extends Z3AbstractProver implements OptimizationProve
 
   @Override
   public Optional<Rational> upper(int handle, Rational epsilon) {
+    checkState(!closed);
+    checkGenerateModels();
     return round(handle, epsilon, Native::optimizeGetUpperAsVector);
   }
 
   @Override
   public Optional<Rational> lower(int handle, Rational epsilon) {
+    checkState(!closed);
+    checkGenerateModels();
     return round(handle, epsilon, Native::optimizeGetLowerAsVector);
   }
 

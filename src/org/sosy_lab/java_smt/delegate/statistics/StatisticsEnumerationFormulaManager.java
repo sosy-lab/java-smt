@@ -16,7 +16,7 @@ import org.sosy_lab.java_smt.api.EnumerationFormula;
 import org.sosy_lab.java_smt.api.EnumerationFormulaManager;
 import org.sosy_lab.java_smt.api.FormulaType.EnumerationFormulaType;
 
-public class StatisticsEnumerationFormulaManager implements EnumerationFormulaManager {
+class StatisticsEnumerationFormulaManager implements EnumerationFormulaManager {
 
   private final EnumerationFormulaManager delegate;
   private final SolverStatistics stats;

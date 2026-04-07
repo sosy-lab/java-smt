@@ -20,7 +20,7 @@ import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FunctionDeclaration;
 
 @Options(prefix = "solver.debugMode")
-public class DebuggingSolverInformation {
+class DebuggingSolverInformation {
 
   @Option(
       secure = true,

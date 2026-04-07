@@ -1078,6 +1078,68 @@ SWIGINTERN void std_vector_Sl_bitwuzla_Term_Sg__doRemoveRange(std::vector< bitwu
           throw std::out_of_range("vector index out of range");
         }
       }
+SWIGINTERN std::vector< std::vector< bitwuzla::Term > > *new_std_vector_Sl_std_vector_Sl_bitwuzla_Term_Sg__Sg___SWIG_2(jint count,std::vector< bitwuzla::Term > const &value){
+        if (count < 0)
+          throw std::out_of_range("vector count must be positive");
+        return new std::vector< std::vector< bitwuzla::Term > >(static_cast<std::vector< std::vector< bitwuzla::Term > >::size_type>(count), value);
+      }
+SWIGINTERN jint std_vector_Sl_std_vector_Sl_bitwuzla_Term_Sg__Sg__doCapacity(std::vector< std::vector< bitwuzla::Term > > *self){
+        return SWIG_VectorSize(self->capacity());
+      }
+SWIGINTERN void std_vector_Sl_std_vector_Sl_bitwuzla_Term_Sg__Sg__doReserve(std::vector< std::vector< bitwuzla::Term > > *self,jint n){
+        if (n < 0)
+          throw std::out_of_range("vector reserve size must be positive");
+        self->reserve(n);
+      }
+SWIGINTERN jint std_vector_Sl_std_vector_Sl_bitwuzla_Term_Sg__Sg__doSize(std::vector< std::vector< bitwuzla::Term > > const *self){
+        return SWIG_VectorSize(self->size());
+      }
+SWIGINTERN void std_vector_Sl_std_vector_Sl_bitwuzla_Term_Sg__Sg__doAdd__SWIG_0(std::vector< std::vector< bitwuzla::Term > > *self,std::vector< std::vector< bitwuzla::Term > >::value_type const &x){
+        self->push_back(x);
+      }
+SWIGINTERN void std_vector_Sl_std_vector_Sl_bitwuzla_Term_Sg__Sg__doAdd__SWIG_1(std::vector< std::vector< bitwuzla::Term > > *self,jint index,std::vector< std::vector< bitwuzla::Term > >::value_type const &x){
+        jint size = static_cast<jint>(self->size());
+        if (0 <= index && index <= size) {
+          self->insert(self->begin() + index, x);
+        } else {
+          throw std::out_of_range("vector index out of range");
+        }
+      }
+SWIGINTERN std::vector< std::vector< bitwuzla::Term > >::value_type std_vector_Sl_std_vector_Sl_bitwuzla_Term_Sg__Sg__doRemove(std::vector< std::vector< bitwuzla::Term > > *self,jint index){
+        jint size = static_cast<jint>(self->size());
+        if (0 <= index && index < size) {
+          std::vector< bitwuzla::Term > const old_value = (*self)[index];
+          self->erase(self->begin() + index);
+          return old_value;
+        } else {
+          throw std::out_of_range("vector index out of range");
+        }
+      }
+SWIGINTERN std::vector< std::vector< bitwuzla::Term > >::value_type const &std_vector_Sl_std_vector_Sl_bitwuzla_Term_Sg__Sg__doGet(std::vector< std::vector< bitwuzla::Term > > *self,jint index){
+        jint size = static_cast<jint>(self->size());
+        if (index >= 0 && index < size)
+          return (*self)[index];
+        else
+          throw std::out_of_range("vector index out of range");
+      }
+SWIGINTERN std::vector< std::vector< bitwuzla::Term > >::value_type std_vector_Sl_std_vector_Sl_bitwuzla_Term_Sg__Sg__doSet(std::vector< std::vector< bitwuzla::Term > > *self,jint index,std::vector< std::vector< bitwuzla::Term > >::value_type const &val){
+        jint size = static_cast<jint>(self->size());
+        if (index >= 0 && index < size) {
+          std::vector< bitwuzla::Term > const old_value = (*self)[index];
+          (*self)[index] = val;
+          return old_value;
+        }
+        else
+          throw std::out_of_range("vector index out of range");
+      }
+SWIGINTERN void std_vector_Sl_std_vector_Sl_bitwuzla_Term_Sg__Sg__doRemoveRange(std::vector< std::vector< bitwuzla::Term > > *self,jint fromIndex,jint toIndex){
+        jint size = static_cast<jint>(self->size());
+        if (0 <= fromIndex && fromIndex <= toIndex && toIndex <= size) {
+          self->erase(self->begin() + fromIndex, self->begin() + toIndex);
+        } else {
+          throw std::out_of_range("vector index out of range");
+        }
+      }
 SWIGINTERN std::vector< bitwuzla::Sort > *new_std_vector_Sl_bitwuzla_Sort_Sg___SWIG_2(jint count,bitwuzla::Sort const &value){
         if (count < 0)
           throw std::out_of_range("vector count must be positive");
@@ -2266,6 +2328,304 @@ SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_Bitwuz
 }
 
 
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_BitwuzlaNativeJNI_new_1Vector_1Vector_1Term_1_1SWIG_10(JNIEnv *jenv, jclass jcls) {
+  jlong jresult = 0 ;
+  std::vector< std::vector< bitwuzla::Term > > *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (std::vector< std::vector< bitwuzla::Term > > *)new std::vector< std::vector< bitwuzla::Term > >();
+  *(std::vector< std::vector< bitwuzla::Term > > **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_BitwuzlaNativeJNI_new_1Vector_1Vector_1Term_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jlong jresult = 0 ;
+  std::vector< std::vector< bitwuzla::Term > > *arg1 = 0 ;
+  std::vector< std::vector< bitwuzla::Term > > *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(std::vector< std::vector< bitwuzla::Term > > **)&jarg1;
+  if (!arg1) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "std::vector< std::vector< bitwuzla::Term > > const & is null");
+    return 0;
+  } 
+  result = (std::vector< std::vector< bitwuzla::Term > > *)new std::vector< std::vector< bitwuzla::Term > >((std::vector< std::vector< bitwuzla::Term > > const &)*arg1);
+  *(std::vector< std::vector< bitwuzla::Term > > **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_BitwuzlaNativeJNI_Vector_1Vector_1Term_1isEmpty(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jboolean jresult = 0 ;
+  std::vector< std::vector< bitwuzla::Term > > *arg1 = 0 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(std::vector< std::vector< bitwuzla::Term > > **)&jarg1; 
+  result = (bool)((std::vector< std::vector< bitwuzla::Term > > const *)arg1)->empty();
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_BitwuzlaNativeJNI_Vector_1Vector_1Term_1clear(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  std::vector< std::vector< bitwuzla::Term > > *arg1 = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(std::vector< std::vector< bitwuzla::Term > > **)&jarg1; 
+  (arg1)->clear();
+}
+
+
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_BitwuzlaNativeJNI_new_1Vector_1Vector_1Term_1_1SWIG_12(JNIEnv *jenv, jclass jcls, jint jarg1, jlong jarg2, jobject jarg2_) {
+  jlong jresult = 0 ;
+  jint arg1 ;
+  std::vector< bitwuzla::Term > *arg2 = 0 ;
+  std::vector< std::vector< bitwuzla::Term > > *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg2_;
+  arg1 = jarg1; 
+  arg2 = *(std::vector< bitwuzla::Term > **)&jarg2;
+  if (!arg2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "std::vector< bitwuzla::Term > const & is null");
+    return 0;
+  } 
+  try {
+    result = (std::vector< std::vector< bitwuzla::Term > > *)new_std_vector_Sl_std_vector_Sl_bitwuzla_Term_Sg__Sg___SWIG_2(SWIG_STD_MOVE(arg1),(std::vector< bitwuzla::Term > const &)*arg2);
+  } catch(std::out_of_range &_e) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaIndexOutOfBoundsException, (&_e)->what());
+    return 0;
+  }
+  *(std::vector< std::vector< bitwuzla::Term > > **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_BitwuzlaNativeJNI_Vector_1Vector_1Term_1doCapacity(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jint jresult = 0 ;
+  std::vector< std::vector< bitwuzla::Term > > *arg1 = 0 ;
+  jint result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(std::vector< std::vector< bitwuzla::Term > > **)&jarg1; 
+  try {
+    result = std_vector_Sl_std_vector_Sl_bitwuzla_Term_Sg__Sg__doCapacity(arg1);
+  } catch(std::out_of_range &_e) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaIndexOutOfBoundsException, (&_e)->what());
+    return 0;
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_BitwuzlaNativeJNI_Vector_1Vector_1Term_1doReserve(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+  std::vector< std::vector< bitwuzla::Term > > *arg1 = 0 ;
+  jint arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(std::vector< std::vector< bitwuzla::Term > > **)&jarg1; 
+  arg2 = jarg2; 
+  try {
+    std_vector_Sl_std_vector_Sl_bitwuzla_Term_Sg__Sg__doReserve(arg1,SWIG_STD_MOVE(arg2));
+  } catch(std::length_error &_e) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaIndexOutOfBoundsException, (&_e)->what());
+    return ;
+  } catch(std::out_of_range &_e) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaIndexOutOfBoundsException, (&_e)->what());
+    return ;
+  }
+}
+
+
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_BitwuzlaNativeJNI_Vector_1Vector_1Term_1doSize(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jint jresult = 0 ;
+  std::vector< std::vector< bitwuzla::Term > > *arg1 = 0 ;
+  jint result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(std::vector< std::vector< bitwuzla::Term > > **)&jarg1; 
+  try {
+    result = std_vector_Sl_std_vector_Sl_bitwuzla_Term_Sg__Sg__doSize((std::vector< std::vector< bitwuzla::Term > > const *)arg1);
+  } catch(std::out_of_range &_e) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaIndexOutOfBoundsException, (&_e)->what());
+    return 0;
+  }
+  jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_BitwuzlaNativeJNI_Vector_1Vector_1Term_1doAdd_1_1SWIG_10(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+  std::vector< std::vector< bitwuzla::Term > > *arg1 = 0 ;
+  std::vector< std::vector< bitwuzla::Term > >::value_type *arg2 = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  (void)jarg2_;
+  arg1 = *(std::vector< std::vector< bitwuzla::Term > > **)&jarg1; 
+  arg2 = *(std::vector< std::vector< bitwuzla::Term > >::value_type **)&jarg2;
+  if (!arg2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "std::vector< std::vector< bitwuzla::Term > >::value_type const & is null");
+    return ;
+  } 
+  std_vector_Sl_std_vector_Sl_bitwuzla_Term_Sg__Sg__doAdd__SWIG_0(arg1,(std::vector< bitwuzla::Term > const &)*arg2);
+}
+
+
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_BitwuzlaNativeJNI_Vector_1Vector_1Term_1doAdd_1_1SWIG_11(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2, jlong jarg3, jobject jarg3_) {
+  std::vector< std::vector< bitwuzla::Term > > *arg1 = 0 ;
+  jint arg2 ;
+  std::vector< std::vector< bitwuzla::Term > >::value_type *arg3 = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  (void)jarg3_;
+  arg1 = *(std::vector< std::vector< bitwuzla::Term > > **)&jarg1; 
+  arg2 = jarg2; 
+  arg3 = *(std::vector< std::vector< bitwuzla::Term > >::value_type **)&jarg3;
+  if (!arg3) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "std::vector< std::vector< bitwuzla::Term > >::value_type const & is null");
+    return ;
+  } 
+  try {
+    std_vector_Sl_std_vector_Sl_bitwuzla_Term_Sg__Sg__doAdd__SWIG_1(arg1,SWIG_STD_MOVE(arg2),(std::vector< bitwuzla::Term > const &)*arg3);
+  } catch(std::out_of_range &_e) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaIndexOutOfBoundsException, (&_e)->what());
+    return ;
+  }
+}
+
+
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_BitwuzlaNativeJNI_Vector_1Vector_1Term_1doRemove(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+  jlong jresult = 0 ;
+  std::vector< std::vector< bitwuzla::Term > > *arg1 = 0 ;
+  jint arg2 ;
+  std::vector< std::vector< bitwuzla::Term > >::value_type result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(std::vector< std::vector< bitwuzla::Term > > **)&jarg1; 
+  arg2 = jarg2; 
+  try {
+    result = std_vector_Sl_std_vector_Sl_bitwuzla_Term_Sg__Sg__doRemove(arg1,SWIG_STD_MOVE(arg2));
+  } catch(std::out_of_range &_e) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaIndexOutOfBoundsException, (&_e)->what());
+    return 0;
+  }
+  *(std::vector< std::vector< bitwuzla::Term > >::value_type **)&jresult = new std::vector< std::vector< bitwuzla::Term > >::value_type(result); 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_BitwuzlaNativeJNI_Vector_1Vector_1Term_1doGet(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2) {
+  jlong jresult = 0 ;
+  std::vector< std::vector< bitwuzla::Term > > *arg1 = 0 ;
+  jint arg2 ;
+  std::vector< std::vector< bitwuzla::Term > >::value_type *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(std::vector< std::vector< bitwuzla::Term > > **)&jarg1; 
+  arg2 = jarg2; 
+  try {
+    result = (std::vector< std::vector< bitwuzla::Term > >::value_type *) &std_vector_Sl_std_vector_Sl_bitwuzla_Term_Sg__Sg__doGet(arg1,SWIG_STD_MOVE(arg2));
+  } catch(std::out_of_range &_e) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaIndexOutOfBoundsException, (&_e)->what());
+    return 0;
+  }
+  *(std::vector< std::vector< bitwuzla::Term > >::value_type **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_BitwuzlaNativeJNI_Vector_1Vector_1Term_1doSet(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2, jlong jarg3, jobject jarg3_) {
+  jlong jresult = 0 ;
+  std::vector< std::vector< bitwuzla::Term > > *arg1 = 0 ;
+  jint arg2 ;
+  std::vector< std::vector< bitwuzla::Term > >::value_type *arg3 = 0 ;
+  std::vector< std::vector< bitwuzla::Term > >::value_type result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  (void)jarg3_;
+  arg1 = *(std::vector< std::vector< bitwuzla::Term > > **)&jarg1; 
+  arg2 = jarg2; 
+  arg3 = *(std::vector< std::vector< bitwuzla::Term > >::value_type **)&jarg3;
+  if (!arg3) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "std::vector< std::vector< bitwuzla::Term > >::value_type const & is null");
+    return 0;
+  } 
+  try {
+    result = std_vector_Sl_std_vector_Sl_bitwuzla_Term_Sg__Sg__doSet(arg1,SWIG_STD_MOVE(arg2),(std::vector< bitwuzla::Term > const &)*arg3);
+  } catch(std::out_of_range &_e) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaIndexOutOfBoundsException, (&_e)->what());
+    return 0;
+  }
+  *(std::vector< std::vector< bitwuzla::Term > >::value_type **)&jresult = new std::vector< std::vector< bitwuzla::Term > >::value_type(result); 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_BitwuzlaNativeJNI_Vector_1Vector_1Term_1doRemoveRange(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jint jarg2, jint jarg3) {
+  std::vector< std::vector< bitwuzla::Term > > *arg1 = 0 ;
+  jint arg2 ;
+  jint arg3 ;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(std::vector< std::vector< bitwuzla::Term > > **)&jarg1; 
+  arg2 = jarg2; 
+  arg3 = jarg3; 
+  try {
+    std_vector_Sl_std_vector_Sl_bitwuzla_Term_Sg__Sg__doRemoveRange(arg1,SWIG_STD_MOVE(arg2),SWIG_STD_MOVE(arg3));
+  } catch(std::out_of_range &_e) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaIndexOutOfBoundsException, (&_e)->what());
+    return ;
+  }
+}
+
+
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_BitwuzlaNativeJNI_delete_1Vector_1Vector_1Term(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  std::vector< std::vector< bitwuzla::Term > > *arg1 = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(std::vector< std::vector< bitwuzla::Term > > **)&jarg1; 
+  {
+    try {
+      delete arg1;
+    } catch(std::exception& e) {
+      jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
+      jenv->ThrowNew(exceptionType, e.what());
+      return ;
+    }
+  }
+}
+
+
 SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_BitwuzlaNativeJNI_new_1Vector_1Sort_1_1SWIG_10(JNIEnv *jenv, jclass jcls) {
   jlong jresult = 0 ;
   std::vector< bitwuzla::Sort > *result = 0 ;
@@ -2883,66 +3243,6 @@ SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_Bitwuz
 }
 
 
-SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_BitwuzlaNativeJNI_Result_1SAT_1get(JNIEnv *jenv, jclass jcls) {
-  jint jresult = 0 ;
-  bitwuzla::Result result;
-  
-  (void)jenv;
-  (void)jcls;
-  {
-    try {
-      result = (bitwuzla::Result)bitwuzla::Result::SAT;
-    } catch(std::exception& e) {
-      jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
-      jenv->ThrowNew(exceptionType, e.what());
-      return 0;
-    }
-  }
-  jresult = (jint)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_BitwuzlaNativeJNI_Result_1UNSAT_1get(JNIEnv *jenv, jclass jcls) {
-  jint jresult = 0 ;
-  bitwuzla::Result result;
-  
-  (void)jenv;
-  (void)jcls;
-  {
-    try {
-      result = (bitwuzla::Result)bitwuzla::Result::UNSAT;
-    } catch(std::exception& e) {
-      jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
-      jenv->ThrowNew(exceptionType, e.what());
-      return 0;
-    }
-  }
-  jresult = (jint)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_BitwuzlaNativeJNI_Result_1UNKNOWN_1get(JNIEnv *jenv, jclass jcls) {
-  jint jresult = 0 ;
-  bitwuzla::Result result;
-  
-  (void)jenv;
-  (void)jcls;
-  {
-    try {
-      result = (bitwuzla::Result)bitwuzla::Result::UNKNOWN;
-    } catch(std::exception& e) {
-      jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
-      jenv->ThrowNew(exceptionType, e.what());
-      return 0;
-    }
-  }
-  jresult = (jint)result; 
-  return jresult;
-}
-
-
 SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_BitwuzlaNativeJNI_RoundingMode_1RNE_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   bitwuzla::RoundingMode result;
@@ -3060,6 +3360,145 @@ SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_Bitwuz
   }
   jresult = (jint)result; 
   return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_BitwuzlaNativeJNI_Result_1SAT_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  bitwuzla::Result result;
+  
+  (void)jenv;
+  (void)jcls;
+  {
+    try {
+      result = (bitwuzla::Result)bitwuzla::Result::SAT;
+    } catch(std::exception& e) {
+      jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
+      jenv->ThrowNew(exceptionType, e.what());
+      return 0;
+    }
+  }
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_BitwuzlaNativeJNI_Result_1UNSAT_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  bitwuzla::Result result;
+  
+  (void)jenv;
+  (void)jcls;
+  {
+    try {
+      result = (bitwuzla::Result)bitwuzla::Result::UNSAT;
+    } catch(std::exception& e) {
+      jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
+      jenv->ThrowNew(exceptionType, e.what());
+      return 0;
+    }
+  }
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_BitwuzlaNativeJNI_Result_1UNKNOWN_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  bitwuzla::Result result;
+  
+  (void)jenv;
+  (void)jcls;
+  {
+    try {
+      result = (bitwuzla::Result)bitwuzla::Result::UNKNOWN;
+    } catch(std::exception& e) {
+      jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
+      jenv->ThrowNew(exceptionType, e.what());
+      return 0;
+    }
+  }
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_BitwuzlaNativeJNI_delete_1Terminator(JNIEnv *jenv, jclass jcls, jlong jarg1) {
+  bitwuzla::Terminator *arg1 = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(bitwuzla::Terminator **)&jarg1; 
+  {
+    try {
+      delete arg1;
+    } catch(std::exception& e) {
+      jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
+      jenv->ThrowNew(exceptionType, e.what());
+      return ;
+    }
+  }
+}
+
+
+SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_BitwuzlaNativeJNI_Terminator_1terminate(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jboolean jresult = 0 ;
+  bitwuzla::Terminator *arg1 = 0 ;
+  bool result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(bitwuzla::Terminator **)&jarg1; 
+  {
+    try {
+      result = (bool)(arg1)->terminate();
+    } catch(std::exception& e) {
+      jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
+      jenv->ThrowNew(exceptionType, e.what());
+      return 0;
+    }
+  }
+  jresult = (jboolean)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_BitwuzlaNativeJNI_new_1Terminator(JNIEnv *jenv, jclass jcls) {
+  jlong jresult = 0 ;
+  bitwuzla::Terminator *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  {
+    try {
+      result = (bitwuzla::Terminator *)new SwigDirector_Terminator(jenv);
+    } catch(std::exception& e) {
+      jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
+      jenv->ThrowNew(exceptionType, e.what());
+      return 0;
+    }
+  }
+  *(bitwuzla::Terminator **)&jresult = result; 
+  return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_BitwuzlaNativeJNI_Terminator_1director_1connect(JNIEnv *jenv, jclass jcls, jobject jself, jlong objarg, jboolean jswig_mem_own, jboolean jweak_global) {
+  bitwuzla::Terminator *obj = *((bitwuzla::Terminator **)&objarg);
+  (void)jcls;
+  SwigDirector_Terminator *director = static_cast<SwigDirector_Terminator *>(obj);
+  director->swig_connect_director(jenv, jself, jenv->GetObjectClass(jself), (jswig_mem_own == JNI_TRUE), (jweak_global == JNI_TRUE));
+}
+
+
+SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_BitwuzlaNativeJNI_Terminator_1change_1ownership(JNIEnv *jenv, jclass jcls, jobject jself, jlong objarg, jboolean jtake_or_release) {
+  bitwuzla::Terminator *obj = *((bitwuzla::Terminator **)&objarg);
+  SwigDirector_Terminator *director = dynamic_cast<SwigDirector_Terminator *>(obj);
+  (void)jcls;
+  if (director) {
+    director->swig_java_change_ownership(jenv, jself, jtake_or_release ? true : false);
+  }
 }
 
 
@@ -5069,85 +5508,6 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_Bi
 }
 
 
-SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_BitwuzlaNativeJNI_delete_1Terminator(JNIEnv *jenv, jclass jcls, jlong jarg1) {
-  bitwuzla::Terminator *arg1 = 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  arg1 = *(bitwuzla::Terminator **)&jarg1; 
-  {
-    try {
-      delete arg1;
-    } catch(std::exception& e) {
-      jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
-      jenv->ThrowNew(exceptionType, e.what());
-      return ;
-    }
-  }
-}
-
-
-SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_BitwuzlaNativeJNI_Terminator_1terminate(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
-  jboolean jresult = 0 ;
-  bitwuzla::Terminator *arg1 = 0 ;
-  bool result;
-  
-  (void)jenv;
-  (void)jcls;
-  (void)jarg1_;
-  arg1 = *(bitwuzla::Terminator **)&jarg1; 
-  {
-    try {
-      result = (bool)(arg1)->terminate();
-    } catch(std::exception& e) {
-      jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
-      jenv->ThrowNew(exceptionType, e.what());
-      return 0;
-    }
-  }
-  jresult = (jboolean)result; 
-  return jresult;
-}
-
-
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_BitwuzlaNativeJNI_new_1Terminator(JNIEnv *jenv, jclass jcls) {
-  jlong jresult = 0 ;
-  bitwuzla::Terminator *result = 0 ;
-  
-  (void)jenv;
-  (void)jcls;
-  {
-    try {
-      result = (bitwuzla::Terminator *)new SwigDirector_Terminator(jenv);
-    } catch(std::exception& e) {
-      jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
-      jenv->ThrowNew(exceptionType, e.what());
-      return 0;
-    }
-  }
-  *(bitwuzla::Terminator **)&jresult = result; 
-  return jresult;
-}
-
-
-SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_BitwuzlaNativeJNI_Terminator_1director_1connect(JNIEnv *jenv, jclass jcls, jobject jself, jlong objarg, jboolean jswig_mem_own, jboolean jweak_global) {
-  bitwuzla::Terminator *obj = *((bitwuzla::Terminator **)&objarg);
-  (void)jcls;
-  SwigDirector_Terminator *director = static_cast<SwigDirector_Terminator *>(obj);
-  director->swig_connect_director(jenv, jself, jenv->GetObjectClass(jself), (jswig_mem_own == JNI_TRUE), (jweak_global == JNI_TRUE));
-}
-
-
-SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_BitwuzlaNativeJNI_Terminator_1change_1ownership(JNIEnv *jenv, jclass jcls, jobject jself, jlong objarg, jboolean jtake_or_release) {
-  bitwuzla::Terminator *obj = *((bitwuzla::Terminator **)&objarg);
-  SwigDirector_Terminator *director = dynamic_cast<SwigDirector_Terminator *>(obj);
-  (void)jcls;
-  if (director) {
-    director->swig_java_change_ownership(jenv, jself, jtake_or_release ? true : false);
-  }
-}
-
-
 SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_BitwuzlaNativeJNI_new_1TermManager(JNIEnv *jenv, jclass jcls) {
   jlong jresult = 0 ;
   bitwuzla::TermManager *result = 0 ;
@@ -6907,6 +7267,72 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_Bitwu
     }
   }
   *(bitwuzla::Term **)&jresult = new bitwuzla::Term(result); 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_BitwuzlaNativeJNI_Bitwuzla_1get_1interpolant(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+  jlong jresult = 0 ;
+  bitwuzla::Bitwuzla *arg1 = 0 ;
+  std::vector< bitwuzla::Term > *arg2 = 0 ;
+  std::shared_ptr< bitwuzla::Bitwuzla > *smartarg1 = 0 ;
+  bitwuzla::Term result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  (void)jarg2_;
+  
+  smartarg1 = *(std::shared_ptr<  bitwuzla::Bitwuzla > **)&jarg1;
+  arg1 = (bitwuzla::Bitwuzla *)(smartarg1 ? smartarg1->get() : 0); 
+  arg2 = *(std::vector< bitwuzla::Term > **)&jarg2;
+  if (!arg2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "std::vector< bitwuzla::Term > const & is null");
+    return 0;
+  } 
+  {
+    try {
+      result = (arg1)->get_interpolant((std::vector< bitwuzla::Term > const &)*arg2);
+    } catch(std::exception& e) {
+      jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
+      jenv->ThrowNew(exceptionType, e.what());
+      return 0;
+    }
+  }
+  *(bitwuzla::Term **)&jresult = new bitwuzla::Term(result); 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_BitwuzlaNativeJNI_Bitwuzla_1get_1interpolants(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+  jlong jresult = 0 ;
+  bitwuzla::Bitwuzla *arg1 = 0 ;
+  std::vector< std::vector< bitwuzla::Term > > *arg2 = 0 ;
+  std::shared_ptr< bitwuzla::Bitwuzla > *smartarg1 = 0 ;
+  std::vector< bitwuzla::Term > result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  (void)jarg2_;
+  
+  smartarg1 = *(std::shared_ptr<  bitwuzla::Bitwuzla > **)&jarg1;
+  arg1 = (bitwuzla::Bitwuzla *)(smartarg1 ? smartarg1->get() : 0); 
+  arg2 = *(std::vector< std::vector< bitwuzla::Term > > **)&jarg2;
+  if (!arg2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "std::vector< std::vector< bitwuzla::Term > > const & is null");
+    return 0;
+  } 
+  {
+    try {
+      result = (arg1)->get_interpolants((std::vector< std::vector< bitwuzla::Term > > const &)*arg2);
+    } catch(std::exception& e) {
+      jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
+      jenv->ThrowNew(exceptionType, e.what());
+      return 0;
+    }
+  }
+  *(std::vector< bitwuzla::Term > **)&jresult = new std::vector< bitwuzla::Term >(result); 
   return jresult;
 }
 

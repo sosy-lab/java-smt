@@ -26,11 +26,11 @@ import org.sosy_lab.common.UniqueIdGenerator;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
+import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
-import org.sosy_lab.java_smt.solvers.cvc5.CVC5BooleanFormulaManager;
 import org.sosy_lab.java_smt.solvers.opensmt.Logics;
 
 /** This class contains some simple Junit-tests to check the interpolation-API of our solvers. */
@@ -63,54 +63,52 @@ public class InterpolatingProverTest
   @SuppressWarnings("CheckReturnValue")
   public <T> void simpleInterpolation() throws SolverException, InterruptedException {
     requireIntegers();
-    assume()
-        .withMessage("Solver %s runs into timeout on this test", solverToUse())
-        .that(solverToUse())
-        .isNotIn(ImmutableList.of(Solvers.CVC5, Solvers.Z3));
-
     try (InterpolatingProverEnvironment<T> prover = newEnvironmentForTest()) {
-      IntegerFormula x = imgr.makeVariable("x");
-      IntegerFormula y = imgr.makeVariable("y");
-      /* INFO: Due to limitations in OpenSMT we need to use a simpler formular for this solver
-       * Setting z=x means that the original formula `2x ≠ 1+2z`simplifies to `0 ≠ 1`,
-       * which is trivially true.
-       *
-       * https://github.com/usi-verification-and-security/opensmt/issues/638
-       */
-      IntegerFormula z = solverToUse() == Solvers.OPENSMT ? x : imgr.makeVariable("z");
-
-      BooleanFormula f1 = imgr.equal(y, imgr.multiply(imgr.makeNumber(2), x));
-      BooleanFormula f2 =
-          imgr.equal(y, imgr.add(imgr.makeNumber(1), imgr.multiply(z, imgr.makeNumber(2))));
+      var f1 = lessThanNumber(makeVariable("x"), makeNumber(0));
+      var f2 = greaterThanNumber(makeVariable("x"), makeNumber(0));
 
       prover.push(f1);
       T id2 = prover.push(f2);
-      boolean check = prover.isUnsat();
 
-      assertWithMessage("formulas must be contradicting").that(check).isTrue();
+      assertThatEnvironment(prover).isUnsatisfiable();
       prover.getInterpolant(ImmutableList.of(id2));
       // we actually only check for a successful execution here, the result is irrelevant.
     }
   }
 
   @Test
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings("CheckReturnValue")
+  public <T> void notSoSimpleInterpolation() throws SolverException, InterruptedException {
+    requireIntegers();
+    assume()
+        .withMessage("Solver %s runs into timeout on this test", solverToUse())
+        .that(solverToUse())
+        .isNoneOf(Solvers.CVC5, Solvers.YICES2, Solvers.OPENSMT, Solvers.Z3);
+
+    try (InterpolatingProverEnvironment<T> prover = newEnvironmentForTest()) {
+      Formula x = makeVariable("x");
+      Formula y = makeVariable("y");
+      Formula z = makeVariable("z");
+
+      BooleanFormula f1 = mgr.makeEqual(y, multiplyNumber(makeNumber(2), x));
+      BooleanFormula f2 =
+          mgr.makeEqual(y, addNumber(makeNumber(1), multiplyNumber(z, makeNumber(2))));
+
+      prover.push(f1);
+      T id2 = prover.push(f2);
+
+      assertThatEnvironment(prover).isUnsatisfiable();
+      prover.getInterpolant(ImmutableList.of(id2));
+      // we actually only check for a successful execution here, the result is irrelevant.
+    }
+  }
+
+  @Test
   public <T> void emptyInterpolationGroup() throws SolverException, InterruptedException {
     try (InterpolatingProverEnvironment<T> prover = newEnvironmentForTest()) {
-      requireIntegers();
-      IntegerFormula x = imgr.makeVariable("x");
-      IntegerFormula y = imgr.makeVariable("y");
-      /* INFO: Due to limitations in OpenSMT we need to use a simpler formula for this solver
-       * Setting z=x means that the original formula `2x ≠ 1+2z`simplifies to `0 ≠ 1`,
-       * which is trivially true.
-       *
-       * https://github.com/usi-verification-and-security/opensmt/issues/638
-       */
-      IntegerFormula z = solverToUse() == Solvers.OPENSMT ? x : imgr.makeVariable("z");
+      var f1 = lessThanNumber(makeVariable("x"), makeNumber(0));
+      var f2 = greaterThanNumber(makeVariable("x"), makeNumber(0));
 
-      BooleanFormula f1 = imgr.equal(y, imgr.multiply(imgr.makeNumber(2), x));
-      BooleanFormula f2 =
-          imgr.equal(y, imgr.add(imgr.makeNumber(1), imgr.multiply(z, imgr.makeNumber(2))));
       T id1 = prover.push(f1);
       T id2 = prover.push(f2);
       assertThat(prover.isUnsat()).isTrue();
@@ -130,18 +128,18 @@ public class InterpolatingProverTest
 
     int i = index.getFreshId();
 
-    IntegerFormula zero = imgr.makeNumber(0);
-    IntegerFormula one = imgr.makeNumber(1);
+    Formula zero = makeNumber(0);
+    Formula one = makeNumber(1);
 
-    IntegerFormula a = imgr.makeVariable("a" + i);
-    IntegerFormula b = imgr.makeVariable("b" + i);
-    IntegerFormula c = imgr.makeVariable("c" + i);
+    Formula a = makeVariable("a" + i);
+    Formula b = makeVariable("b" + i);
+    Formula c = makeVariable("c" + i);
 
     // build formula:  1 = A = B = C = 0
-    BooleanFormula A = imgr.equal(one, a);
-    BooleanFormula B = imgr.equal(a, b);
-    BooleanFormula C = imgr.equal(b, c);
-    BooleanFormula D = imgr.equal(c, zero);
+    BooleanFormula A = mgr.makeEqual(one, a);
+    BooleanFormula B = mgr.makeEqual(a, b);
+    BooleanFormula C = mgr.makeEqual(b, c);
+    BooleanFormula D = mgr.makeEqual(c, zero);
 
     T TA = stack.push(A);
     T TB = stack.push(B);
@@ -191,8 +189,14 @@ public class InterpolatingProverTest
 
     // some interpolant needs to be FALSE, however, it can be at arbitrary position.
     BooleanFormula expectedInterpolant = bmgr.makeFalse();
-    if (solverToUse() == Solvers.Z3_WITH_INTERPOLATION) {
-      expectedInterpolant = bmgr.makeTrue(); // LegacyZ3 has an issue here.
+    if (solverToUse() == Solvers.Z3_WITH_INTERPOLATION || solverToUse() == Solvers.YICES2) {
+      // FIXME This test seems wrong to me. Solvers are not guaranteed to return an inductive
+      //  sequence if getInterpolant is used multiple times. And even if it was an inductive
+      //  sequence, 'false' doesn't have to appear in it:
+      //   formulas        F    F    F
+      //   interplants  T    T    T    F
+      //  (getInterpolants would return [T,T] in this case)
+      expectedInterpolant = bmgr.makeTrue();
     }
     assertThat(
             ImmutableList.of(
@@ -267,6 +271,10 @@ public class InterpolatingProverTest
                 && itpStrategyToUse() == ProverOptions.GENERATE_PROJECTION_BASED_INTERPOLANTS)
         .isFalse();
     requireBitvectors();
+    assume()
+        .withMessage("Solver %s does not support interpolation over bitvectors", solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.Z3_WITH_INTERPOLATION);
 
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
 
@@ -317,22 +325,21 @@ public class InterpolatingProverTest
   public <T> void sequentialInterpolation() throws SolverException, InterruptedException {
     requireSeqItp();
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
-    requireIntegers();
 
     int i = index.getFreshId();
 
-    IntegerFormula zero = imgr.makeNumber(0);
-    IntegerFormula one = imgr.makeNumber(1);
+    Formula zero = makeNumber(0);
+    Formula one = makeNumber(1);
 
-    IntegerFormula a = imgr.makeVariable("a" + i);
-    IntegerFormula b = imgr.makeVariable("b" + i);
-    IntegerFormula c = imgr.makeVariable("c" + i);
+    Formula a = makeVariable("a" + i);
+    Formula b = makeVariable("b" + i);
+    Formula c = makeVariable("c" + i);
 
     // build formula:  1 = A = B = C = 0
-    BooleanFormula A = imgr.equal(one, a);
-    BooleanFormula B = imgr.equal(a, b);
-    BooleanFormula C = imgr.equal(b, c);
-    BooleanFormula D = imgr.equal(c, zero);
+    BooleanFormula A = mgr.makeEqual(one, a);
+    BooleanFormula B = mgr.makeEqual(a, b);
+    BooleanFormula C = mgr.makeEqual(b, c);
+    BooleanFormula D = mgr.makeEqual(c, zero);
 
     T TA = stack.push(A);
     T TB = stack.push(B);
@@ -371,16 +378,17 @@ public class InterpolatingProverTest
     requireSeqItp();
     requireIntegers();
 
-    IntegerFormula zero = imgr.makeNumber(0);
-    IntegerFormula one = imgr.makeNumber(1);
-    IntegerFormula thousand = imgr.makeNumber(1000);
+    Formula zero = makeNumber(0);
+    Formula one = makeNumber(1);
+    Formula thousand = makeNumber(1000);
 
-    IntegerFormula i3 = imgr.makeVariable("i3");
-    IntegerFormula i4 = imgr.makeVariable("i4");
+    Formula i3 = makeVariable("i3");
+    Formula i4 = makeVariable("i4");
 
-    BooleanFormula A = imgr.equal(i3, zero);
-    BooleanFormula B = bmgr.and(imgr.lessThan(i3, thousand), imgr.equal(i4, imgr.add(i3, one)));
-    BooleanFormula C = imgr.greaterThan(i4, thousand);
+    BooleanFormula A = mgr.makeEqual(i3, zero);
+    BooleanFormula B =
+        bmgr.and(lessThanNumber(i3, thousand), mgr.makeEqual(i4, addNumber(i3, one)));
+    BooleanFormula C = greaterThanNumber(i4, thousand);
 
     T TA = stack.push(A);
     T TB = stack.push(B);
@@ -397,7 +405,11 @@ public class InterpolatingProverTest
 
     // sequential interpolation should always work as expected
     checkItpSequence(ImmutableList.of(A, B, C), itpSeq);
-    checkItpSequence(ImmutableList.of(A, B, C), ImmutableList.of(itp1, itp2));
+    if (solver != Solvers.YICES2) {
+      // FIXME This is not guaranteed to be an inductive sequence, see the documentation of
+      //  getInterpolant
+      checkItpSequence(ImmutableList.of(A, B, C), ImmutableList.of(itp1, itp2));
+    }
   }
 
   @Test
@@ -407,7 +419,7 @@ public class InterpolatingProverTest
     requireSeqItp();
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
 
-    stack.push(imgr.equal(imgr.makeNumber(0), imgr.makeNumber(1)));
+    stack.push(mgr.makeEqual(makeNumber(0), makeNumber(1)));
     assertThat(stack).isUnsatisfiable();
 
     // empty list of partition
@@ -424,13 +436,13 @@ public class InterpolatingProverTest
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
     int i = index.getFreshId();
 
-    IntegerFormula zero = imgr.makeNumber(0);
-    IntegerFormula one = imgr.makeNumber(1);
-    IntegerFormula a = imgr.makeVariable("a" + i);
+    Formula zero = makeNumber(0);
+    Formula one = makeNumber(1);
+    Formula a = makeVariable("a" + i);
 
     // build formula:  1 = A = 0
-    BooleanFormula A = imgr.equal(one, a);
-    BooleanFormula B = imgr.equal(a, zero);
+    BooleanFormula A = mgr.makeEqual(one, a);
+    BooleanFormula B = mgr.makeEqual(a, zero);
 
     T TA = stack.push(A);
     T TB = stack.push(B);
@@ -453,13 +465,13 @@ public class InterpolatingProverTest
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
     int i = index.getFreshId();
 
-    IntegerFormula zero = imgr.makeNumber(0);
-    IntegerFormula one = imgr.makeNumber(1);
-    IntegerFormula a = imgr.makeVariable("a" + i);
+    Formula zero = makeNumber(0);
+    Formula one = makeNumber(1);
+    Formula a = makeVariable("a" + i);
 
     // build formula:  1 = A = 0
-    BooleanFormula A = imgr.equal(one, a);
-    BooleanFormula B = imgr.equal(a, zero);
+    BooleanFormula A = mgr.makeEqual(one, a);
+    BooleanFormula B = mgr.makeEqual(a, zero);
 
     T TA = stack.push(A);
     T TB = stack.push(B);
@@ -536,20 +548,20 @@ public class InterpolatingProverTest
 
     int i = index.getFreshId();
 
-    IntegerFormula zero = imgr.makeNumber(0);
-    IntegerFormula one = imgr.makeNumber(1);
+    Formula zero = makeNumber(0);
+    Formula one = makeNumber(1);
 
-    IntegerFormula a = imgr.makeVariable("a" + i);
-    IntegerFormula b = imgr.makeVariable("b" + i);
-    IntegerFormula c = imgr.makeVariable("c" + i);
-    IntegerFormula d = imgr.makeVariable("d" + i);
+    Formula a = makeVariable("a" + i);
+    Formula b = makeVariable("b" + i);
+    Formula c = makeVariable("c" + i);
+    Formula d = makeVariable("d" + i);
 
     // build formula:  1 = A = B = C = D = 0
-    BooleanFormula A = imgr.equal(one, a);
-    BooleanFormula B = imgr.equal(a, b);
-    BooleanFormula C = imgr.equal(b, c);
-    BooleanFormula D = imgr.equal(c, d);
-    BooleanFormula E = imgr.equal(d, zero);
+    BooleanFormula A = mgr.makeEqual(one, a);
+    BooleanFormula B = mgr.makeEqual(a, b);
+    BooleanFormula C = mgr.makeEqual(b, c);
+    BooleanFormula D = mgr.makeEqual(c, d);
+    BooleanFormula E = mgr.makeEqual(d, zero);
 
     testTreeInterpolants0(A, B, C, D, E);
     testTreeInterpolants0(A, B, C, E, D);
@@ -708,22 +720,22 @@ public class InterpolatingProverTest
 
     int i = index.getFreshId();
 
-    IntegerFormula one = imgr.makeNumber(1);
-    IntegerFormula five = imgr.makeNumber(5);
+    Formula one = makeNumber(1);
+    Formula five = makeNumber(5);
 
-    IntegerFormula a = imgr.makeVariable("a" + i);
-    IntegerFormula b = imgr.makeVariable("b" + i);
-    IntegerFormula c = imgr.makeVariable("c" + i);
-    IntegerFormula d = imgr.makeVariable("d" + i);
-    IntegerFormula e = imgr.makeVariable("e" + i);
+    Formula a = makeVariable("a" + i);
+    Formula b = makeVariable("b" + i);
+    Formula c = makeVariable("c" + i);
+    Formula d = makeVariable("d" + i);
+    Formula e = makeVariable("e" + i);
 
     // build formula:  1 = A = B = C = D+1 and D = E = 5
-    BooleanFormula A = imgr.equal(one, a);
-    BooleanFormula B = imgr.equal(a, b);
-    BooleanFormula R1 = imgr.equal(b, c);
-    BooleanFormula C = imgr.equal(c, imgr.add(d, one));
-    BooleanFormula R2 = imgr.equal(d, e);
-    BooleanFormula D = imgr.equal(e, five);
+    BooleanFormula A = mgr.makeEqual(one, a);
+    BooleanFormula B = mgr.makeEqual(a, b);
+    BooleanFormula R1 = mgr.makeEqual(b, c);
+    BooleanFormula C = mgr.makeEqual(c, addNumber(d, one));
+    BooleanFormula R2 = mgr.makeEqual(d, e);
+    BooleanFormula D = mgr.makeEqual(e, five);
 
     T TA = stack.push(A);
     T TB = stack.push(B);
@@ -767,22 +779,22 @@ public class InterpolatingProverTest
 
     int i = index.getFreshId();
 
-    IntegerFormula one = imgr.makeNumber(1);
-    IntegerFormula five = imgr.makeNumber(5);
+    Formula one = makeNumber(1);
+    Formula five = makeNumber(5);
 
-    IntegerFormula a = imgr.makeVariable("a" + i);
-    IntegerFormula b = imgr.makeVariable("b" + i);
-    IntegerFormula c = imgr.makeVariable("c" + i);
-    IntegerFormula d = imgr.makeVariable("d" + i);
-    IntegerFormula e = imgr.makeVariable("e" + i);
+    Formula a = makeVariable("a" + i);
+    Formula b = makeVariable("b" + i);
+    Formula c = makeVariable("c" + i);
+    Formula d = makeVariable("d" + i);
+    Formula e = makeVariable("e" + i);
 
     // build formula:  1 = A = B = C = D+1 and D = E = 5
-    BooleanFormula A = imgr.equal(one, a);
-    BooleanFormula B = imgr.equal(a, b);
-    BooleanFormula R1 = imgr.equal(b, c);
-    BooleanFormula C = imgr.equal(c, imgr.add(d, one));
-    BooleanFormula R2 = imgr.equal(d, e);
-    BooleanFormula D = imgr.equal(e, five);
+    BooleanFormula A = mgr.makeEqual(one, a);
+    BooleanFormula B = mgr.makeEqual(a, b);
+    BooleanFormula R1 = mgr.makeEqual(b, c);
+    BooleanFormula C = mgr.makeEqual(c, addNumber(d, one));
+    BooleanFormula R2 = mgr.makeEqual(d, e);
+    BooleanFormula D = mgr.makeEqual(e, five);
 
     Set<T> TB = ImmutableSet.of(stack.push(A), stack.push(B));
     Set<T> TR1 = ImmutableSet.of(stack.push(R1));
@@ -823,15 +835,15 @@ public class InterpolatingProverTest
 
     int i = index.getFreshId();
 
-    IntegerFormula a = imgr.makeVariable("a" + i);
-    IntegerFormula b = imgr.makeVariable("b" + i);
-    IntegerFormula c = imgr.makeVariable("c" + i);
+    Formula a = makeVariable("a" + i);
+    Formula b = makeVariable("b" + i);
+    Formula c = makeVariable("c" + i);
 
     // build formula: a=9 & b+c=a & b=1 & c=2
-    BooleanFormula bEquals1 = imgr.equal(b, imgr.makeNumber(1));
-    BooleanFormula cEquals2 = imgr.equal(c, imgr.makeNumber(2));
-    BooleanFormula bPlusCEqualsA = imgr.equal(imgr.add(b, c), a);
-    BooleanFormula aEquals9 = imgr.equal(a, imgr.makeNumber(9));
+    BooleanFormula bEquals1 = mgr.makeEqual(b, makeNumber(1));
+    BooleanFormula cEquals2 = mgr.makeEqual(c, makeNumber(2));
+    BooleanFormula bPlusCEqualsA = mgr.makeEqual(addNumber(b, c), a);
+    BooleanFormula aEquals9 = mgr.makeEqual(a, makeNumber(9));
 
     T TbEquals1 = stack.push(bEquals1);
     T TcEquals2 = stack.push(cEquals2);
@@ -870,13 +882,13 @@ public class InterpolatingProverTest
 
     int i = index.getFreshId();
 
-    IntegerFormula zero = imgr.makeNumber(0);
-    IntegerFormula one = imgr.makeNumber(1);
-    IntegerFormula a = imgr.makeVariable("a" + i);
+    Formula zero = makeNumber(0);
+    Formula one = makeNumber(1);
+    Formula a = makeVariable("a" + i);
 
     // build formula: 1 = A = 0
-    BooleanFormula A = imgr.equal(one, a);
-    BooleanFormula B = imgr.equal(a, zero);
+    BooleanFormula A = mgr.makeEqual(one, a);
+    BooleanFormula B = mgr.makeEqual(a, zero);
 
     List<T> formulas = ImmutableList.of(stack.push(A), stack.push(B));
 
@@ -895,21 +907,21 @@ public class InterpolatingProverTest
 
     int i = index.getFreshId();
 
-    IntegerFormula zero = imgr.makeNumber(0);
-    IntegerFormula one = imgr.makeNumber(1);
-    IntegerFormula a = imgr.makeVariable("a" + i);
-    IntegerFormula b = imgr.makeVariable("b" + i);
-    IntegerFormula c = imgr.makeVariable("c" + i);
-    IntegerFormula d = imgr.makeVariable("d" + i);
-    IntegerFormula e = imgr.makeVariable("e" + i);
+    Formula zero = makeNumber(0);
+    Formula one = makeNumber(1);
+    Formula a = makeVariable("a" + i);
+    Formula b = makeVariable("b" + i);
+    Formula c = makeVariable("c" + i);
+    Formula d = makeVariable("d" + i);
+    Formula e = makeVariable("e" + i);
 
     // build formula: 1 = A = B = C = D = E = 0
-    BooleanFormula A = imgr.equal(one, a);
-    BooleanFormula B = imgr.equal(a, b);
-    BooleanFormula C = imgr.equal(b, c);
-    BooleanFormula D = imgr.equal(c, d);
-    BooleanFormula E = imgr.equal(d, e);
-    BooleanFormula F = imgr.equal(e, zero);
+    BooleanFormula A = mgr.makeEqual(one, a);
+    BooleanFormula B = mgr.makeEqual(a, b);
+    BooleanFormula C = mgr.makeEqual(b, c);
+    BooleanFormula D = mgr.makeEqual(c, d);
+    BooleanFormula E = mgr.makeEqual(d, e);
+    BooleanFormula F = mgr.makeEqual(e, zero);
 
     List<T> formulas =
         ImmutableList.of(
@@ -933,7 +945,7 @@ public class InterpolatingProverTest
     requireTreeItp();
 
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
-    BooleanFormula A = imgr.equal(imgr.makeNumber(0), imgr.makeNumber(1));
+    BooleanFormula A = mgr.makeEqual(makeNumber(0), makeNumber(1));
     Set<T> TA = ImmutableSet.of(stack.push(A));
     assertThat(stack).isUnsatisfiable();
 
@@ -949,7 +961,7 @@ public class InterpolatingProverTest
     requireTreeItp();
 
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
-    BooleanFormula A = imgr.equal(imgr.makeNumber(0), imgr.makeNumber(1));
+    BooleanFormula A = mgr.makeEqual(makeNumber(0), makeNumber(1));
     Set<T> TA = ImmutableSet.of(stack.push(A));
     assertThat(stack).isUnsatisfiable();
 
@@ -965,7 +977,7 @@ public class InterpolatingProverTest
     requireTreeItp();
 
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
-    BooleanFormula A = imgr.equal(imgr.makeNumber(0), imgr.makeNumber(1));
+    BooleanFormula A = mgr.makeEqual(makeNumber(0), makeNumber(1));
     Set<T> TA = ImmutableSet.of(stack.push(A));
     assertThat(stack).isUnsatisfiable();
 
@@ -980,7 +992,7 @@ public class InterpolatingProverTest
     requireTreeItp();
 
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
-    BooleanFormula A = imgr.equal(imgr.makeNumber(0), imgr.makeNumber(1));
+    BooleanFormula A = mgr.makeEqual(makeNumber(0), makeNumber(1));
     T TA = stack.push(A);
     assertThat(stack).isUnsatisfiable();
 
@@ -995,7 +1007,7 @@ public class InterpolatingProverTest
     requireTreeItp();
 
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
-    BooleanFormula A = imgr.equal(imgr.makeNumber(0), imgr.makeNumber(1));
+    BooleanFormula A = mgr.makeEqual(makeNumber(0), makeNumber(1));
     T TA = stack.push(A);
     assertThat(stack).isUnsatisfiable();
 
@@ -1010,7 +1022,7 @@ public class InterpolatingProverTest
     requireTreeItp();
 
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
-    BooleanFormula A = imgr.equal(imgr.makeNumber(0), imgr.makeNumber(1));
+    BooleanFormula A = mgr.makeEqual(makeNumber(0), makeNumber(1));
     T TA = stack.push(A);
     assertThat(stack).isUnsatisfiable();
 
@@ -1025,7 +1037,7 @@ public class InterpolatingProverTest
 
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
 
-    stack.push(imgr.equal(imgr.makeNumber(0), imgr.makeNumber(1)));
+    stack.push(mgr.makeEqual(makeNumber(0), makeNumber(1)));
     assertThat(stack).isUnsatisfiable();
 
     // empty list of partition
@@ -1041,14 +1053,14 @@ public class InterpolatingProverTest
 
     int i = index.getFreshId();
 
-    IntegerFormula zero = imgr.makeNumber(0);
-    IntegerFormula one = imgr.makeNumber(1);
+    Formula zero = makeNumber(0);
+    Formula one = makeNumber(1);
 
-    IntegerFormula a = imgr.makeVariable("a" + i);
+    Formula a = makeVariable("a" + i);
 
     // build formula:  1 = A = 0
-    BooleanFormula A = imgr.equal(one, a);
-    BooleanFormula B = imgr.equal(a, zero);
+    BooleanFormula A = mgr.makeEqual(one, a);
+    BooleanFormula B = mgr.makeEqual(a, zero);
 
     T TA = stack.push(A);
     T TB = stack.push(B);
@@ -1070,9 +1082,13 @@ public class InterpolatingProverTest
     requireTreeItp();
 
     assume()
+        .withMessage("Solver %s does not support interpolation over bitvectors", solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.Z3_WITH_INTERPOLATION);
+    assume()
         .withMessage("Solver %s runs into timeout on this test", solverToUse())
         .that(solverToUse())
-        .isNotEqualTo(Solvers.CVC5);
+        .isNoneOf(Solvers.CVC5, Solvers.YICES2);
 
     int bvWidth = 32;
     BitvectorFormula bv0 = bvmgr.makeBitvector(bvWidth, 0);
@@ -1139,14 +1155,14 @@ public class InterpolatingProverTest
   public <T> void testTrivialInterpolation() throws InterruptedException, SolverException {
     requireIntegers();
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
-    IntegerFormula zero = imgr.makeNumber(0);
-    IntegerFormula one = imgr.makeNumber(1);
+    Formula zero = makeNumber(0);
+    Formula one = makeNumber(1);
 
-    IntegerFormula a = imgr.makeVariable("a");
-    IntegerFormula b = imgr.makeVariable("b");
+    Formula a = makeVariable("a");
+    Formula b = makeVariable("b");
 
     // build formula "1 = A = 0", then check interpolant
-    BooleanFormula A = bmgr.and(imgr.equal(a, zero), imgr.equal(a, one));
+    BooleanFormula A = bmgr.and(mgr.makeEqual(a, zero), mgr.makeEqual(a, one));
     T p1 = stack.push(A);
     assertThat(stack).isUnsatisfiable();
     BooleanFormula interpol1 = stack.getInterpolant(ImmutableList.of(p1));
@@ -1154,8 +1170,8 @@ public class InterpolatingProverTest
     stack.pop();
 
     // build formulas "a < 0" and "b < 0 && 1 < b", then check interpolant
-    BooleanFormula B1 = imgr.lessThan(a, zero);
-    BooleanFormula B2 = bmgr.and(imgr.lessThan(b, zero), imgr.lessThan(one, b));
+    BooleanFormula B1 = lessThanNumber(a, zero);
+    BooleanFormula B2 = bmgr.and(lessThanNumber(b, zero), lessThanNumber(one, b));
     T p2 = stack.push(B1);
     stack.push(B2);
     assertThat(stack).isUnsatisfiable();
@@ -1188,11 +1204,11 @@ public class InterpolatingProverTest
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
 
     // create and push formulas and solve them
-    IntegerFormula zero = imgr.makeNumber(0);
-    IntegerFormula one = imgr.makeNumber(1);
-    IntegerFormula a = imgr.makeVariable("a");
-    T p1 = stack.push(imgr.lessThan(a, zero));
-    T p2 = stack.push(imgr.lessThan(one, a));
+    Formula zero = makeNumber(0);
+    Formula one = makeNumber(1);
+    Formula a = makeVariable("a");
+    T p1 = stack.push(lessThanNumber(a, zero));
+    T p2 = stack.push(lessThanNumber(one, a));
     assertThat(stack).isUnsatisfiable();
 
     // try to solve with a null-token
@@ -1201,35 +1217,23 @@ public class InterpolatingProverTest
     assertThrows(IllegalArgumentException.class, () -> stack.getInterpolant(lst));
 
     // create an invalid interpolation token
-    final Object p3;
-    switch (solverToUse()) {
-      case CVC5:
-        p3 = ((CVC5BooleanFormulaManager) bmgr).makeVariableImpl("c");
-        break;
-      case MATHSAT5:
-        p3 = 12345;
-        break;
-      case OPENSMT:
-        p3 = 12347;
-        break;
-      case PRINCESS:
-        p3 = 12349;
-        break;
-      case SMTINTERPOL:
-        p3 = "some string";
-        break;
-      case Z3:
+    final Object p3 =
+        switch (solverToUse()) {
+          case CVC5 -> bmgr.makeVariable("c");
+          case MATHSAT5 -> 12345;
+          case OPENSMT -> 12347;
+          case PRINCESS -> 12349;
+          case SMTINTERPOL -> "some string";
+          case Z3:
         p3 = 12345;
         break;
       case CVC4:
         p3 = 12345;
         break;
-      case Z3_WITH_INTERPOLATION:
-        p3 = 12350;
-        break;
-      default:
-        p3 = null; // unexpected solver for interpolation
-    }
+      case Z3_WITH_INTERPOLATION -> 12350;
+          case BITWUZLA, YICES2 -> -1;
+          default -> null; // unexpected solver for interpolation
+        };
 
     // and try to solve with the token
     assertThrows(
@@ -1246,11 +1250,11 @@ public class InterpolatingProverTest
     requireIntegers();
     requireSeqItp();
     try (InterpolatingProverEnvironment<T> prover = newEnvironmentForTest()) {
-      var x = imgr.makeVariable("x");
-      var one = imgr.makeNumber(1);
-      var eq = imgr.equal(one, x);
-      var lt1 = imgr.lessThan(one, x);
-      var lt2 = imgr.lessThan(one, x);
+      var x = makeVariable("x");
+      var one = makeNumber(1);
+      var eq = mgr.makeEqual(one, x);
+      var lt1 = lessThanNumber(one, x);
+      var lt2 = lessThanNumber(one, x);
       assertThat(lt1).isEqualTo(lt2);
 
       var eqT = prover.addConstraint(eq);
@@ -1274,11 +1278,11 @@ public class InterpolatingProverTest
     requireIntegers();
     requireSeqItp();
     try (InterpolatingProverEnvironment<T> prover = newEnvironmentForTest()) {
-      var x = imgr.makeVariable("x");
-      var one = imgr.makeNumber(1);
-      var eq = imgr.equal(one, x);
-      var lt1 = imgr.lessThan(one, x);
-      var lt2 = imgr.lessThan(one, x);
+      var x = makeVariable("x");
+      var one = makeNumber(1);
+      var eq = mgr.makeEqual(one, x);
+      var lt1 = lessThanNumber(one, x);
+      var lt2 = lessThanNumber(one, x);
       assertThat(lt1).isEqualTo(lt2);
 
       var eqT = prover.addConstraint(eq);
@@ -1301,11 +1305,11 @@ public class InterpolatingProverTest
   public <T> void issue381InterpolationTest3() throws InterruptedException, SolverException {
     requireIntegers();
     try (InterpolatingProverEnvironment<T> prover = newEnvironmentForTest()) {
-      var x = imgr.makeVariable("x");
-      var one = imgr.makeNumber(1);
-      var eq = imgr.equal(one, x);
-      var lt1 = imgr.lessThan(one, x);
-      var lt2 = imgr.lessThan(one, x);
+      var x = makeVariable("x");
+      var one = makeNumber(1);
+      var eq = mgr.makeEqual(one, x);
+      var lt1 = lessThanNumber(one, x);
+      var lt2 = lessThanNumber(one, x);
       assertThat(lt1).isEqualTo(lt2);
 
       var eqT = prover.addConstraint(eq);

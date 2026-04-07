@@ -8,15 +8,17 @@
 
 package org.sosy_lab.java_smt.api;
 
-import static org.sosy_lab.java_smt.api.FormulaType.getSinglePrecisionFloatingPointType;
-
 import com.google.common.testing.AbstractPackageSanityTests;
 import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
 
 public class PackageSanityTest extends AbstractPackageSanityTests {
 
   {
+    setDistinctValues(int.class, 8, 11);
     setDistinctValues(FormulaType.class, FormulaType.BooleanType, FormulaType.IntegerType);
-    setDefault(FloatingPointType.class, getSinglePrecisionFloatingPointType());
+    setDistinctValues(
+        FloatingPointType.class,
+        FormulaType.getSinglePrecisionFloatingPointType(),
+        FormulaType.getDoublePrecisionFloatingPointType());
   }
 }

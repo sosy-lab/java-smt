@@ -66,6 +66,18 @@ public class BitwuzlaNativeApiTest {
   }
 
   @Test
+  public void equalityOverDifferentSorts() {
+    assertThrows(
+        IllegalArgumentException.class,
+        () ->
+            bitwuzla.assert_formula(
+                termManager.mk_term(
+                    Kind.EQUAL,
+                    termManager.mk_fp_pos_inf(termManager.mk_fp_sort(5, 11)),
+                    termManager.mk_fp_neg_inf(termManager.mk_fp_sort(4, 12)))));
+  }
+
+  @Test
   public void signedFunctions() {
     Sort sortbv4 = termManager.mk_bv_sort(4);
     Sort sortbv8 = termManager.mk_bv_sort(8);
@@ -686,15 +698,17 @@ public class BitwuzlaNativeApiTest {
   }
 
   private static final String SMT2DUMP =
-      "(declare-fun a () Bool)\n"
-          + "(declare-fun b () Bool)\n"
-          + "(declare-fun d () Bool)\n"
-          + "(declare-fun e () Bool)\n"
-          + "(define-fun .def_9 () Bool (= a b))\n"
-          + "(define-fun .def_10 () Bool (not .def_9))\n"
-          + "(define-fun .def_13 () Bool (and .def_10 d))\n"
-          + "(define-fun .def_14 () Bool (or e .def_13))\n"
-          + "(assert .def_14)";
+      """
+      (declare-fun a () Bool)
+      (declare-fun b () Bool)
+      (declare-fun d () Bool)
+      (declare-fun e () Bool)
+      (define-fun .def_9 () Bool (= a b))
+      (define-fun .def_10 () Bool (not .def_9))
+      (define-fun .def_13 () Bool (and .def_10 d))
+      (define-fun .def_14 () Bool (or e .def_13))
+      (assert .def_14)\
+      """;
 
   private Vector_Term parse(String smt2dump) {
     Parser parser = new Parser(termManager, createOptions());

@@ -21,6 +21,7 @@ lib/native/source/libz3j/org_sosy_lab_solver_z3_Z3NativeApi.c
 lib/native/source/libbitwuzla/build
 lib/native/source/libbitwuzla/doc
 lib/native/source/libbitwuzla/install*
+lib/native/source/libbitwuzla.nopatch/
 lib/native/source/opensmt/install*
 lib/native/source/*/*.so
 lib/native/source/*/*.dll
@@ -61,6 +62,7 @@ solvers_maven_conf/*.asc
 /Javadoc
 /Javadoc-z3
 /gh-pages
+/scripts/solver.log
 
 .idea/
 
@@ -73,5 +75,6 @@ build.properties
 /repository
 /dist
 /downloads
+/output
 
 pom.xml

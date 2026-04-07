@@ -65,6 +65,7 @@ import org.sosy_lab.java_smt.api.visitors.FormulaVisitor;
 import org.sosy_lab.java_smt.api.visitors.TraversalProcess;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 import org.sosy_lab.java_smt.basicimpl.FunctionDeclarationImpl;
+import org.sosy_lab.java_smt.basicimpl.Tokenizer;
 import org.sosy_lab.java_smt.solvers.cvc5.CVC5Formula.CVC5ArrayFormula;
 import org.sosy_lab.java_smt.solvers.cvc5.CVC5Formula.CVC5BitvectorFormula;
 import org.sosy_lab.java_smt.solvers.cvc5.CVC5Formula.CVC5BooleanFormula;
@@ -76,7 +77,7 @@ import org.sosy_lab.java_smt.solvers.cvc5.CVC5Formula.CVC5RationalFormula;
 import org.sosy_lab.java_smt.solvers.cvc5.CVC5Formula.CVC5RegexFormula;
 import org.sosy_lab.java_smt.solvers.cvc5.CVC5Formula.CVC5StringFormula;
 
-public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, TermManager, Term> {
+class CVC5FormulaCreator extends FormulaCreator<Term, Sort, TermManager, Term> {
 
   /** CVC5 does not allow using some key-functions from SMTLIB2 as identifiers. */
   private static final ImmutableSet<String> UNSUPPORTED_IDENTIFIERS = ImmutableSet.of("let");
@@ -261,7 +262,7 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, TermManager, 
     } else {
       try {
         throw new AssertionError(
-            String.format("Encountered unhandled Type '%s' %s.", sort, sort.getKind()));
+            "Encountered unhandled Type '%s' %s.".formatted(sort, sort.getKind()));
       } catch (CVC5ApiException exception) {
         throw new AssertionError("Unexpected error when accessing sort.", exception);
       }
@@ -274,8 +275,8 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, TermManager, 
     assert pType.equals(getFormulaType(pTerm))
             || (pType.equals(FormulaType.RationalType)
                 && getFormulaType(pTerm).equals(FormulaType.IntegerType))
-        : String.format(
-            "Cannot encapsulate formula %s of Type %s as %s", pTerm, getFormulaType(pTerm), pType);
+        : "Cannot encapsulate formula %s of Type %s as %s"
+            .formatted(pTerm, getFormulaType(pTerm), pType);
     if (pType.isBooleanType()) {
       return (T) new CVC5BooleanFormula(pTerm);
     } else if (pType.isIntegerType()) {
@@ -308,31 +309,29 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, TermManager, 
   @Override
   public BooleanFormula encapsulateBoolean(Term pTerm) {
     assert getFormulaType(pTerm).isBooleanType()
-        : String.format(
-            "%s is not boolean, but %s (%s)", pTerm, pTerm.getSort(), getFormulaType(pTerm));
+        : "%s is not boolean, but %s (%s)".formatted(pTerm, pTerm.getSort(), getFormulaType(pTerm));
     return new CVC5BooleanFormula(pTerm);
   }
 
   @Override
   public BitvectorFormula encapsulateBitvector(Term pTerm) {
     assert getFormulaType(pTerm).isBitvectorType()
-        : String.format("%s is no BV, but %s (%s)", pTerm, pTerm.getSort(), getFormulaType(pTerm));
+        : "%s is no BV, but %s (%s)".formatted(pTerm, pTerm.getSort(), getFormulaType(pTerm));
     return new CVC5BitvectorFormula(pTerm);
   }
 
   @Override
   protected FloatingPointFormula encapsulateFloatingPoint(Term pTerm) {
     assert getFormulaType(pTerm).isFloatingPointType()
-        : String.format("%s is no FP, but %s (%s)", pTerm, pTerm.getSort(), getFormulaType(pTerm));
+        : "%s is no FP, but %s (%s)".formatted(pTerm, pTerm.getSort(), getFormulaType(pTerm));
     return new CVC5FloatingPointFormula(pTerm);
   }
 
   @Override
   protected FloatingPointRoundingModeFormula encapsulateRoundingMode(Term pTerm) {
     assert getFormulaType(pTerm).isFloatingPointRoundingModeType()
-        : String.format(
-            "%s is no FP rounding mode, but %s (%s)",
-            pTerm, pTerm.getSort(), getFormulaType(pTerm));
+        : "%s is no FP rounding mode, but %s (%s)"
+            .formatted(pTerm, pTerm.getSort(), getFormulaType(pTerm));
     return new CVC5FloatingPointRoundingModeFormula(pTerm);
   }
 
@@ -341,16 +340,14 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, TermManager, 
   protected <TI extends Formula, TE extends Formula> ArrayFormula<TI, TE> encapsulateArray(
       Term pTerm, FormulaType<TI> pIndexType, FormulaType<TE> pElementType) {
     assert getFormulaType(pTerm).equals(FormulaType.getArrayType(pIndexType, pElementType))
-        : String.format(
-            "%s is no array, but %s (%s)", pTerm, pTerm.getSort(), getFormulaType(pTerm));
+        : "%s is no array, but %s (%s)".formatted(pTerm, pTerm.getSort(), getFormulaType(pTerm));
     return new CVC5ArrayFormula<>(pTerm, pIndexType, pElementType);
   }
 
   @Override
   protected StringFormula encapsulateString(Term pTerm) {
     assert getFormulaType(pTerm).isStringType()
-        : String.format(
-            "%s is no String, but %s (%s)", pTerm, pTerm.getSort(), getFormulaType(pTerm));
+        : "%s is no String, but %s (%s)".formatted(pTerm, pTerm.getSort(), getFormulaType(pTerm));
     return new CVC5StringFormula(pTerm);
   }
 
@@ -383,10 +380,10 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, TermManager, 
       // Functions are packaged like this: (functionName arg1 arg2 ...)
       // But can use |(name)| to enable () inside of the variable name
       // TODO what happens for function names containing whitespace?
-      String dequoted = dequote(repr);
+      String dequoted = Tokenizer.dequote(repr);
       return Iterables.get(Splitter.on(' ').split(dequoted.substring(1)), 0);
     } else {
-      return dequote(repr);
+      return Tokenizer.dequote(repr);
     }
   }
 
@@ -457,7 +454,7 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, TermManager, 
         return visitor.visitQuantifier((BooleanFormula) formula, quant, freeVars, fBody);
 
       } else if (f.getKind() == Kind.CONSTANT) {
-        return visitor.visitFreeVariable(formula, dequote(f.toString()));
+        return visitor.visitFreeVariable(formula, Tokenizer.dequote(f.toString()));
 
       } else if (f.getKind() == Kind.APPLY_CONSTRUCTOR) {
         checkState(
@@ -554,6 +551,7 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, TermManager, 
           .put(Kind.XOR, FunctionDeclarationKind.XOR)
           .put(Kind.ITE, FunctionDeclarationKind.ITE)
           .put(Kind.APPLY_UF, FunctionDeclarationKind.UF)
+          .put(Kind.NEG, FunctionDeclarationKind.UMINUS)
           .put(Kind.ADD, FunctionDeclarationKind.ADD)
           .put(Kind.MULT, FunctionDeclarationKind.MUL)
           .put(Kind.SUB, FunctionDeclarationKind.SUB)
@@ -648,6 +646,7 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, TermManager, 
           .put(Kind.STRING_FROM_CODE, FunctionDeclarationKind.STR_FROM_CODE)
           .put(Kind.STRING_LT, FunctionDeclarationKind.STR_LT)
           .put(Kind.STRING_LEQ, FunctionDeclarationKind.STR_LE)
+          .put(Kind.REGEXP_NONE, FunctionDeclarationKind.RE_NONE)
           .put(Kind.REGEXP_PLUS, FunctionDeclarationKind.RE_PLUS)
           .put(Kind.REGEXP_STAR, FunctionDeclarationKind.RE_STAR)
           .put(Kind.REGEXP_OPT, FunctionDeclarationKind.RE_OPTIONAL)
@@ -660,6 +659,12 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, TermManager, 
           .put(Kind.SELECT, FunctionDeclarationKind.SELECT)
           .put(Kind.STORE, FunctionDeclarationKind.STORE)
           .put(Kind.CONST_ARRAY, FunctionDeclarationKind.CONST)
+          // Separation logic
+          .put(Kind.SEP_EMP, FunctionDeclarationKind.SEP_EMP)
+          .put(Kind.SEP_NIL, FunctionDeclarationKind.SEP_NIL)
+          .put(Kind.SEP_PTO, FunctionDeclarationKind.SEP_PTO)
+          .put(Kind.SEP_STAR, FunctionDeclarationKind.SEP_STAR)
+          .put(Kind.SEP_WAND, FunctionDeclarationKind.SEP_WAND)
           .build();
 
   private FunctionDeclarationKind getDeclarationKind(Term f) {
@@ -775,16 +780,16 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, TermManager, 
 
   @Override
   public Term declareUFImpl(String pName, Sort pReturnType, List<Sort> pArgTypes) {
+    if (pArgTypes.isEmpty()) {
+      // Ufs in CVC5 can't have 0 arity. We just use a variable as a workaround.
+      return makeVariable(pReturnType, pName);
+    }
     checkSymbol(pName);
 
     Term exp = functionsCache.get(pName);
 
     if (exp == null) {
-      // Ufs in CVC5 can't have 0 arity. We just use a variable as a workaround.
-      Sort sort =
-          pArgTypes.isEmpty()
-              ? pReturnType
-              : termManager.mkFunctionSort(pArgTypes.toArray(new Sort[0]), pReturnType);
+      Sort sort = termManager.mkFunctionSort(pArgTypes.toArray(new Sort[0]), pReturnType);
       exp = termManager.mkConst(sort, pName);
       functionsCache.put(pName, exp);
 
@@ -852,9 +857,8 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, TermManager, 
       }
     } catch (CVC5ApiException e) {
       throw new IllegalArgumentException(
-          String.format(
-              "Failure trying to convert constant %s with type %s to type %s.",
-              value, valueType, type),
+          "Failure trying to convert constant %s with type %s to type %s."
+              .formatted(value, valueType, type),
           e);
     }
   }
@@ -874,24 +878,16 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, TermManager, 
   public FloatingPointRoundingMode getRoundingMode(Term pTerm) {
     checkArgument(pTerm.isRoundingModeValue(), "Term '%s' is not a rounding mode.", pTerm);
     try {
-      switch (pTerm.getRoundingModeValue()) {
-        case ROUND_NEAREST_TIES_TO_AWAY:
-          return FloatingPointRoundingMode.NEAREST_TIES_AWAY;
-        case ROUND_NEAREST_TIES_TO_EVEN:
-          return FloatingPointRoundingMode.NEAREST_TIES_TO_EVEN;
-        case ROUND_TOWARD_NEGATIVE:
-          return FloatingPointRoundingMode.TOWARD_NEGATIVE;
-        case ROUND_TOWARD_POSITIVE:
-          return FloatingPointRoundingMode.TOWARD_POSITIVE;
-        case ROUND_TOWARD_ZERO:
-          return FloatingPointRoundingMode.TOWARD_ZERO;
-        default:
-          throw new IllegalArgumentException(
-              String.format("Unknown rounding mode in Term '%s'.", pTerm));
-      }
+      return switch (pTerm.getRoundingModeValue()) {
+        case ROUND_NEAREST_TIES_TO_AWAY -> FloatingPointRoundingMode.NEAREST_TIES_AWAY;
+        case ROUND_NEAREST_TIES_TO_EVEN -> FloatingPointRoundingMode.NEAREST_TIES_TO_EVEN;
+        case ROUND_TOWARD_NEGATIVE -> FloatingPointRoundingMode.TOWARD_NEGATIVE;
+        case ROUND_TOWARD_POSITIVE -> FloatingPointRoundingMode.TOWARD_POSITIVE;
+        case ROUND_TOWARD_ZERO -> FloatingPointRoundingMode.TOWARD_ZERO;
+      };
     } catch (CVC5ApiException e) {
       throw new IllegalArgumentException(
-          String.format("Failure trying to get the rounding mode of Term '%s'.", pTerm), e);
+          "Failure trying to get the rounding mode of Term '%s'.".formatted(pTerm), e);
     }
   }
 
@@ -900,8 +896,8 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, TermManager, 
    * cache. Will throw a {@link NullPointerException} if no variable is known for the input!
    */
   private Term getFreeVariableFromCache(String name, Sort sort, FormulaVisitor<?> visitor) {
-    if (visitor instanceof BoundVariablesRegisteringRecursiveVisitor) {
-      ((BoundVariablesRegisteringRecursiveVisitor) visitor).registerBoundVariable(name, sort);
+    if (visitor instanceof BoundVariablesRegisteringRecursiveVisitor registeringVisitor) {
+      registeringVisitor.registerBoundVariable(name, sort);
     }
     Term existingVar = variablesCache.get(name, sort.toString());
     return checkNotNull(

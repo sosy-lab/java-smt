@@ -8,49 +8,16 @@
 
 package org.sosy_lab.java_smt.solvers.yices2;
 
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bvadd;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bvand2;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bvashr;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bvconcat2;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bvdiv;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bveq_atom;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bvextract;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bvge_atom;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bvgt_atom;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bvle_atom;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bvlshr;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bvlt_atom;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bvmul;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bvneg;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bvnot;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bvor2;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bvrem;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bvsdiv;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bvsge_atom;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bvsgt_atom;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bvshl;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bvsle_atom;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bvslt_atom;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bvsmod;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bvsrem;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bvsub;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bvxor2;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_parse_bvbin;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_rotate_left;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_rotate_right;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_sign_extend;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_zero_extend;
-
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
+import com.sri.yices.Terms;
 import java.math.BigInteger;
 import org.sosy_lab.java_smt.basicimpl.AbstractBitvectorFormulaManager;
 
-public class Yices2BitvectorFormulaManager
+class Yices2BitvectorFormulaManager
     extends AbstractBitvectorFormulaManager<Integer, Integer, Long, Integer> {
 
-  protected Yices2BitvectorFormulaManager(
-      Yices2FormulaCreator pCreator, Yices2BooleanFormulaManager pBmgr) {
+  Yices2BitvectorFormulaManager(Yices2FormulaCreator pCreator, Yices2BooleanFormulaManager pBmgr) {
     super(pCreator, pBmgr);
   }
 
@@ -64,7 +31,7 @@ public class Yices2BitvectorFormulaManager
       bits = Strings.padStart(bits, pLength, '0');
     }
     Preconditions.checkArgument(bits.length() == pLength, "Bitvector has unexpected size.");
-    return yices_parse_bvbin(bits);
+    return Terms.parseBvBin(bits);
   }
 
   @Override
@@ -76,106 +43,106 @@ public class Yices2BitvectorFormulaManager
 
   @Override
   protected Integer negate(Integer pParam1) {
-    return yices_bvneg(pParam1);
+    return Terms.bvNeg(pParam1);
   }
 
   @Override
   protected Integer add(Integer pParam1, Integer pParam2) {
-    return yices_bvadd(pParam1, pParam2);
+    return Terms.bvAdd(pParam1, pParam2);
   }
 
   @Override
   protected Integer subtract(Integer pParam1, Integer pParam2) {
-    return yices_bvsub(pParam1, pParam2);
+    return Terms.bvSub(pParam1, pParam2);
   }
 
   @Override
   protected Integer divide(Integer pParam1, Integer pParam2, boolean pSigned) {
     if (pSigned) {
-      return yices_bvsdiv(pParam1, pParam2);
+      return Terms.bvSDiv(pParam1, pParam2);
     } else {
-      return yices_bvdiv(pParam1, pParam2);
+      return Terms.bvDiv(pParam1, pParam2);
     }
   }
 
   @Override
   protected Integer remainder(Integer pParam1, Integer pParam2, boolean pSigned) {
     if (pSigned) {
-      return yices_bvsrem(pParam1, pParam2);
+      return Terms.bvSRem(pParam1, pParam2);
     } else {
-      return yices_bvrem(pParam1, pParam2);
+      return Terms.bvRem(pParam1, pParam2);
     }
   }
 
   @Override
   protected Integer smodulo(Integer pParam1, Integer pParam2) {
-    return yices_bvsmod(pParam1, pParam2);
+    return Terms.bvSMod(pParam1, pParam2);
   }
 
   @Override
   protected Integer multiply(Integer pParam1, Integer pParam2) {
-    return yices_bvmul(pParam1, pParam2);
+    return Terms.bvMul(pParam1, pParam2);
   }
 
   @Override
   protected Integer equal(Integer pParam1, Integer pParam2) {
-    return yices_bveq_atom(pParam1, pParam2);
+    return Terms.bvEq(pParam1, pParam2);
   }
 
   @Override
   protected Integer greaterThan(Integer pParam1, Integer pParam2, boolean pSigned) {
     if (pSigned) {
-      return yices_bvsgt_atom(pParam1, pParam2);
+      return Terms.bvSGt(pParam1, pParam2);
     } else {
-      return yices_bvgt_atom(pParam1, pParam2);
+      return Terms.bvGt(pParam1, pParam2);
     }
   }
 
   @Override
   protected Integer greaterOrEquals(Integer pParam1, Integer pParam2, boolean pSigned) {
     if (pSigned) {
-      return yices_bvsge_atom(pParam1, pParam2);
+      return Terms.bvSGe(pParam1, pParam2);
     } else {
-      return yices_bvge_atom(pParam1, pParam2);
+      return Terms.bvGe(pParam1, pParam2);
     }
   }
 
   @Override
   protected Integer lessThan(Integer pParam1, Integer pParam2, boolean pSigned) {
     if (pSigned) {
-      return yices_bvslt_atom(pParam1, pParam2);
+      return Terms.bvSLt(pParam1, pParam2);
     } else {
-      return yices_bvlt_atom(pParam1, pParam2);
+      return Terms.bvLt(pParam1, pParam2);
     }
   }
 
   @Override
   protected Integer lessOrEquals(Integer pParam1, Integer pParam2, boolean pSigned) {
     if (pSigned) {
-      return yices_bvsle_atom(pParam1, pParam2);
+      return Terms.bvSLe(pParam1, pParam2);
     } else {
-      return yices_bvle_atom(pParam1, pParam2);
+      return Terms.bvLe(pParam1, pParam2);
     }
   }
 
   @Override
   protected Integer not(Integer pParam1) {
-    return yices_bvnot(pParam1);
+    return Terms.bvNot(pParam1);
   }
 
   @Override
   protected Integer and(Integer pParam1, Integer pParam2) {
-    return yices_bvand2(pParam1, pParam2);
+    return Terms.bvAnd(pParam1, pParam2);
   }
 
   @Override
   protected Integer or(Integer pParam1, Integer pParam2) {
-    return yices_bvor2(pParam1, pParam2);
+    return Terms.bvOr(pParam1, pParam2);
   }
 
   @Override
   protected Integer xor(Integer pParam1, Integer pParam2) {
-    return yices_bvxor2(pParam1, pParam2);
+    return Terms.bvXor(pParam1, pParam2);
   }
 
   @Override
@@ -187,43 +154,43 @@ public class Yices2BitvectorFormulaManager
   @Override
   protected Integer shiftRight(Integer pNumber, Integer pToShift, boolean pSigned) {
     if (pSigned) {
-      return yices_bvashr(pNumber, pToShift);
+      return Terms.bvAshr(pNumber, pToShift);
     } else {
-      return yices_bvlshr(pNumber, pToShift);
+      return Terms.bvLshr(pNumber, pToShift);
     }
   }
 
   @Override
   protected Integer shiftLeft(Integer pNumber, Integer pToShift) {
-    return yices_bvshl(pNumber, pToShift);
+    return Terms.bvShl(pNumber, pToShift);
   }
 
   @Override
   protected Integer rotateLeftByConstant(Integer pNumber, int toRotate) {
-    return yices_rotate_left(pNumber, toRotate);
+    return Terms.bvRotateLeft(pNumber, toRotate);
   }
 
   @Override
   protected Integer rotateRightByConstant(Integer pNumber, int toRotate) {
-    return yices_rotate_right(pNumber, toRotate);
+    return Terms.bvRotateRight(pNumber, toRotate);
   }
 
   @Override
   protected Integer concat(Integer pNumber, Integer pAppend) {
-    return yices_bvconcat2(pNumber, pAppend);
+    return Terms.bvConcat(pNumber, pAppend);
   }
 
   @Override
   protected Integer extract(Integer pNumber, int pMsb, int pLsb) {
-    return yices_bvextract(pNumber, pLsb, pMsb);
+    return Terms.bvExtract(pNumber, pLsb, pMsb);
   }
 
   @Override
   protected Integer extend(Integer pNumber, int pExtensionBits, boolean pSigned) {
     if (pSigned) {
-      return yices_sign_extend(pNumber, pExtensionBits);
+      return Terms.bvSignExtend(pNumber, pExtensionBits);
     } else {
-      return yices_zero_extend(pNumber, pExtensionBits);
+      return Terms.bvZeroExtend(pNumber, pExtensionBits);
     }
   }
 
