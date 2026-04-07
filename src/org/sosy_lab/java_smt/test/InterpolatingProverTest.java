@@ -84,7 +84,8 @@ public class InterpolatingProverTest extends ParameterizedInterpolatingSolverBas
         .that(solverToUse())
         .isNoneOf(Solvers.CVC5, Solvers.YICES2, Solvers.OPENSMT, Solvers.Z3);
 
-    if (itpStrategyToUse() == ProverOptions.GENERATE_UNIFORM_BACKWARD_INTERPOLANTS || itpStrategyToUse() == ProverOptions.GENERATE_UNIFORM_FORWARD_INTERPOLANTS) {
+    if (itpStrategyToUse() == ProverOptions.GENERATE_UNIFORM_BACKWARD_INTERPOLANTS
+        || itpStrategyToUse() == ProverOptions.GENERATE_UNIFORM_FORWARD_INTERPOLANTS) {
       assume()
           .withMessage("Solver %s fails quantifier elimination in this test", solverToUse())
           .that(solverToUse())
