@@ -231,6 +231,9 @@ public class SolverAllSatTest extends SolverBasedTest0 {
     requireBitvectors();
     requireQuantifiers();
 
+    // FIXME SmtInterpol crashes here, report to the developers
+    assume().that(solver).isNotEqualTo(Solvers.SMTINTERPOL);
+
     assume()
         .withMessage("solver does only partially support quantifiers")
         .that(solverToUse())

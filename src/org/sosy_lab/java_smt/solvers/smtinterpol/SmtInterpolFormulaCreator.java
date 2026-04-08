@@ -11,25 +11,36 @@ package org.sosy_lab.java_smt.solvers.smtinterpol;
 import static com.google.common.base.Preconditions.checkArgument;
 import static org.sosy_lab.common.collect.Collections3.transformedImmutableListCopy;
 
+import com.google.common.collect.FluentIterable;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
+import de.uni_freiburg.informatik.ultimate.logic.AnnotatedTerm;
 import de.uni_freiburg.informatik.ultimate.logic.ApplicationTerm;
 import de.uni_freiburg.informatik.ultimate.logic.ConstantTerm;
 import de.uni_freiburg.informatik.ultimate.logic.FunctionSymbol;
+import de.uni_freiburg.informatik.ultimate.logic.LambdaTerm;
+import de.uni_freiburg.informatik.ultimate.logic.LetTerm;
+import de.uni_freiburg.informatik.ultimate.logic.MatchTerm;
 import de.uni_freiburg.informatik.ultimate.logic.NoopScript;
+import de.uni_freiburg.informatik.ultimate.logic.QuantifiedFormula;
 import de.uni_freiburg.informatik.ultimate.logic.Rational;
 import de.uni_freiburg.informatik.ultimate.logic.SMTLIBException;
 import de.uni_freiburg.informatik.ultimate.logic.Script;
 import de.uni_freiburg.informatik.ultimate.logic.Sort;
 import de.uni_freiburg.informatik.ultimate.logic.Term;
+import de.uni_freiburg.informatik.ultimate.logic.TermVariable;
 import de.uni_freiburg.informatik.ultimate.logic.Theory;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import org.sosy_lab.java_smt.api.ArrayFormula;
+import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FunctionDeclarationKind;
+import org.sosy_lab.java_smt.api.QuantifiedFormulaManager.Quantifier;
 import org.sosy_lab.java_smt.api.visitors.FormulaVisitor;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 import org.sosy_lab.java_smt.basicimpl.FunctionDeclarationImpl;
@@ -234,12 +245,73 @@ class SmtInterpolFormulaCreator extends FormulaCreator<Term, Sort, Script, Funct
                 name, getDeclarationKind(app), argTypes, getFormulaType(f), app.getFunction()));
       }
 
-    } else {
-      // TODO: support for quantifiers and bound variables
+    } else if (input instanceof QuantifiedFormula quantified) {
+      var quantifier =
+          switch (quantified.getQuantifier()) {
+            case QuantifiedFormula.EXISTS -> Quantifier.EXISTS;
+            case QuantifiedFormula.FORALL -> Quantifier.FORALL;
+            default -> throw new AssertionError();
+          };
 
+      ImmutableMap.Builder<TermVariable, Term> builder = ImmutableMap.builder();
+      for (TermVariable var : quantified.getVariables()) {
+        builder.put(var, makeVariable(var.getSort(), var.getName()));
+      }
+
+      var newVars = builder.build();
+      var newBody = substBoundVariables(newVars, quantified.getSubformula());
+
+      return visitor.visitQuantifier(
+          (BooleanFormula) f,
+          quantifier,
+          FluentIterable.from(newVars.values()).transform(this::encapsulateWithTypeOf).toList(),
+          encapsulateBoolean(newBody));
+
+    } else {
       throw new UnsupportedOperationException(
           "Unexpected SMTInterpol formula of type %s: %s"
               .formatted(input.getClass().getSimpleName(), input));
+    }
+  }
+
+  /** Substitute bound variables with free variables. */
+  private Term substBoundVariables(Map<TermVariable, Term> pSubst, Term pTerm) {
+    if (pTerm instanceof ApplicationTerm application) {
+      var args = application.getParameters();
+      if (args.length == 0) {
+        return pTerm;
+      } else {
+        return callFunctionImpl(
+            application.getFunction(),
+            FluentIterable.from(args).transform(p -> substBoundVariables(pSubst, p)).toList());
+      }
+    } else if (pTerm instanceof ConstantTerm constant) {
+      return constant;
+    } else if (pTerm instanceof TermVariable variable) {
+      return pSubst.getOrDefault(variable, variable);
+    } else if (pTerm instanceof AnnotatedTerm annotated) {
+      throw new IllegalArgumentException("Unexpected 'annotated' term: %s".formatted(annotated));
+    } else if (pTerm instanceof LambdaTerm lambda) {
+      throw new IllegalArgumentException("Unexpected 'lambda' term: %s".formatted(lambda));
+    } else if (pTerm instanceof LetTerm let) {
+      throw new IllegalArgumentException("Unexpected 'let' term: %s".formatted(let));
+    } else if (pTerm instanceof MatchTerm match) {
+      throw new IllegalArgumentException("Unexpected 'match' term: %s".formatted(match));
+    } else if (pTerm instanceof QuantifiedFormula quantified) {
+      var bound = FluentIterable.from(quantified.getVariables()).toList();
+      ImmutableMap.Builder<TermVariable, Term> newSubst = ImmutableMap.builder();
+      for (var entry : pSubst.entrySet()) {
+        if (!bound.contains(entry.getKey())) {
+          newSubst.put(entry.getKey(), entry.getValue());
+        }
+      }
+      return getEnv()
+          .quantifier(
+              quantified.getQuantifier(),
+              quantified.getVariables(),
+              substBoundVariables(newSubst.build(), quantified.getSubformula()));
+    } else {
+      throw new AssertionError();
     }
   }
 
