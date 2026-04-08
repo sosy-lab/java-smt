@@ -23,6 +23,7 @@ import de.uni_freiburg.informatik.ultimate.logic.Script;
 import de.uni_freiburg.informatik.ultimate.logic.Sort;
 import de.uni_freiburg.informatik.ultimate.logic.Term;
 import de.uni_freiburg.informatik.ultimate.logic.Theory;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 import org.sosy_lab.java_smt.api.ArrayFormula;
@@ -62,6 +63,8 @@ class SmtInterpolFormulaCreator extends FormulaCreator<Term, Sort, Script, Funct
       return FormulaType.RationalType;
     } else if (pSort == getBoolType()) {
       return FormulaType.BooleanType;
+    } else if (pSort.isBitVecSort()) {
+      return FormulaType.getBitvectorTypeWithSize(Integer.parseInt(pSort.getIndices()[0]));
     } else if (pSort.isArraySort()) {
       return FormulaType.getArrayType(
           getFormulaTypeOfSort(pSort.getArguments()[0]),
@@ -80,8 +83,7 @@ class SmtInterpolFormulaCreator extends FormulaCreator<Term, Sort, Script, Funct
           getArrayFormulaElementType((ArrayFormula<?, ?>) pFormula);
       return (FormulaType<T>) FormulaType.getArrayType(arrayIndexType, arrayElementType);
     }
-
-    return super.getFormulaType(pFormula);
+    return (FormulaType<T>) getFormulaTypeOfSort(extractInfo(pFormula).getSort());
   }
 
   @Override
@@ -139,8 +141,7 @@ class SmtInterpolFormulaCreator extends FormulaCreator<Term, Sort, Script, Funct
 
   @Override
   public Sort getBitvectorType(final int pBitwidth) {
-    throw new UnsupportedOperationException(
-        "Bitvector theory is not supported " + "by SmtInterpol");
+    return environment.getTheory().getSort("BitVec", new String[] {String.valueOf(pBitwidth)});
   }
 
   @Override
@@ -162,16 +163,30 @@ class SmtInterpolFormulaCreator extends FormulaCreator<Term, Sort, Script, Funct
       return value.getTheory().mTrue == value;
     } else if (value instanceof ConstantTerm constantTerm
         && constantTerm.getValue() instanceof Rational rationalValue) {
-
       /*
        * From SmtInterpol documentation (see {@link ConstantTerm#getValue}),
-       * the output is SmtInterpol's Rational unless it is a bitvector,
-       * and currently we do not support bitvectors for SmtInterpol.
+       * the output is SmtInterpol's Rational unless it is a bitvector, even if the formula has
+       * Integer type
        */
       org.sosy_lab.common.rationals.Rational ratValue =
           org.sosy_lab.common.rationals.Rational.of(
               rationalValue.numerator(), rationalValue.denominator());
       return ratValue.isIntegral() ? ratValue.getNum() : ratValue;
+    } else if (value instanceof ConstantTerm constantTerm
+        && constantTerm.getValue() instanceof BigInteger bitvectorValue) {
+      // Bitvector term (_ bv0 32)
+      return bitvectorValue;
+    } else if (value instanceof ConstantTerm constantTerm
+        && constantTerm.getValue() instanceof String bitvectorValue) {
+      // Bitvector term #b1001 or #xffe
+      var prefix = bitvectorValue.substring(0, 2);
+      var base =
+          switch (prefix) {
+            case "#b" -> 2;
+            case "#x" -> 16;
+            default -> throw new IllegalStateException("Unexpected value: " + bitvectorValue);
+          };
+      return new BigInteger(bitvectorValue.substring(2), base);
     } else {
       throw new IllegalArgumentException("Unexpected value: " + value);
     }
@@ -295,6 +310,54 @@ class SmtInterpolFormulaCreator extends FormulaCreator<Term, Sort, Script, Funct
       case ">=" -> FunctionDeclarationKind.GTE;
       case "to_int" -> FunctionDeclarationKind.FLOOR;
       case "to_real" -> FunctionDeclarationKind.TO_REAL;
+
+      case "concat" -> FunctionDeclarationKind.BV_CONCAT;
+      case "extract" -> FunctionDeclarationKind.BV_EXTRACT;
+      case "bvnot" -> FunctionDeclarationKind.BV_NOT;
+      case "bvand" -> FunctionDeclarationKind.BV_AND;
+      case "bvor" -> FunctionDeclarationKind.BV_OR;
+      case "bvneg" -> FunctionDeclarationKind.BV_NEG;
+      case "bvadd" -> FunctionDeclarationKind.BV_ADD;
+      case "bvmul" -> FunctionDeclarationKind.BV_MUL;
+      case "bvudiv" -> FunctionDeclarationKind.BV_UDIV;
+      case "bvurem" -> FunctionDeclarationKind.BV_UREM;
+      case "bvshl" -> FunctionDeclarationKind.BV_SHL;
+      case "bvlshr" -> FunctionDeclarationKind.BV_LSHR;
+      case "bvnand" -> FunctionDeclarationKind.OTHER;
+      case "bvnor" -> FunctionDeclarationKind.OTHER;
+      case "bvxor" -> FunctionDeclarationKind.BV_XOR;
+      case "bvxnor" -> FunctionDeclarationKind.OTHER;
+      case "bvcomp" -> FunctionDeclarationKind.OTHER;
+      case "bvsub" -> FunctionDeclarationKind.BV_SUB;
+      case "bvsdiv" -> FunctionDeclarationKind.BV_SDIV;
+      case "bvsrem" -> FunctionDeclarationKind.BV_SREM;
+      case "bvsmod" -> FunctionDeclarationKind.BV_SMOD;
+      case "bvashr" -> FunctionDeclarationKind.BV_ASHR;
+      case "repeat" -> FunctionDeclarationKind.OTHER;
+      case "zero_extend" -> FunctionDeclarationKind.BV_ZERO_EXTENSION;
+      case "sign_extend" -> FunctionDeclarationKind.BV_SIGN_EXTENSION;
+      case "rotate_left" -> FunctionDeclarationKind.BV_ROTATE_LEFT_BY_INT;
+      case "rotate_right" -> FunctionDeclarationKind.BV_ROTATE_RIGHT_BY_INT;
+      case "bvult" -> FunctionDeclarationKind.BV_ULT;
+      case "bvule" -> FunctionDeclarationKind.BV_ULE;
+      case "bvugt" -> FunctionDeclarationKind.BV_UGT;
+      case "bvuge" -> FunctionDeclarationKind.BV_UGE;
+      case "bvslt" -> FunctionDeclarationKind.BV_SLT;
+      case "bvsle" -> FunctionDeclarationKind.BV_SLE;
+      case "bvsgt" -> FunctionDeclarationKind.BV_SGT;
+      case "bvsge" -> FunctionDeclarationKind.BV_SGE;
+      case "ubv_to_int" -> FunctionDeclarationKind.UBV_TO_INT;
+      case "sbv_to_int" -> FunctionDeclarationKind.SBV_TO_INT;
+      case "int_to_bv" -> FunctionDeclarationKind.INT_TO_BV;
+      case "bvnego" -> FunctionDeclarationKind.OTHER;
+      case "bvuaddo" -> FunctionDeclarationKind.OTHER;
+      case "bvsaddo" -> FunctionDeclarationKind.OTHER;
+      case "bvumulo" -> FunctionDeclarationKind.OTHER;
+      case "bvsmulo" -> FunctionDeclarationKind.OTHER;
+      case "bvusubo" -> FunctionDeclarationKind.OTHER;
+      case "bvssubo" -> FunctionDeclarationKind.OTHER;
+      case "bvsdivo" -> FunctionDeclarationKind.OTHER;
+
       default ->
           // TODO: other declaration kinds!
           FunctionDeclarationKind.OTHER;
@@ -323,8 +386,8 @@ class SmtInterpolFormulaCreator extends FormulaCreator<Term, Sort, Script, Funct
       }
       castedArgs.add(arg);
     }
-
-    return environment.term(declaration.getName(), castedArgs.toArray(new Term[0]));
+    return environment.term(
+        declaration.getName(), declaration.getIndices(), null, castedArgs.toArray(new Term[0]));
   }
 
   @Override

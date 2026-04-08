@@ -468,6 +468,7 @@ public class BitvectorFormulaManagerTest extends SolverBasedTest0.ParameterizedS
         switch (solverToUse()) {
           case YICES2 -> new int[] {2, 3, 4, 8};
           case PRINCESS -> new int[] {2, 3}; // Princess is too slow for larger bitvectors
+          case SMTINTERPOL -> new int[] {1}; // SmtInterpol is very slow in this test
           default -> new int[] {2, 3, 4, 8, 13, 25, 31};
         };
 

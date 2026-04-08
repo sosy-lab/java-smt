@@ -124,6 +124,8 @@ public final class SmtInterpolSolverContext extends AbstractSolverContext {
         new SmtInterpolIntegerFormulaManager(creator, pNonLinearArithmetic);
     SmtInterpolRationalFormulaManager rationalTheory =
         new SmtInterpolRationalFormulaManager(creator, pNonLinearArithmetic);
+    SmtInterpolBitvectorFormulaManager bitvectorTheory =
+        new SmtInterpolBitvectorFormulaManager(creator, booleanTheory);
     SmtInterpolArrayFormulaManager arrayTheory = new SmtInterpolArrayFormulaManager(creator);
     SmtInterpolFormulaManager manager =
         new SmtInterpolFormulaManager(
@@ -132,6 +134,7 @@ public final class SmtInterpolSolverContext extends AbstractSolverContext {
             booleanTheory,
             integerTheory,
             rationalTheory,
+            bitvectorTheory,
             arrayTheory,
             logger);
     return new SmtInterpolSolverContext(manager, pShutdownNotifier, settings);
