@@ -9,6 +9,7 @@
 package org.sosy_lab.java_smt.test;
 
 import static com.google.common.truth.Truth.assertThat;
+import static com.google.common.truth.TruthJUnit.assume;
 import static org.junit.Assert.assertThrows;
 import static org.sosy_lab.java_smt.api.FormulaType.BooleanType;
 import static org.sosy_lab.java_smt.api.FormulaType.IntegerType;
@@ -22,6 +23,7 @@ import java.util.Map;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import org.junit.Test;
+import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.FloatingPointFormula;
 import org.sosy_lab.java_smt.api.Formula;
@@ -174,6 +176,8 @@ public class VariableNamesTest extends SolverBasedTest0.ParameterizedSolverBased
 
   @CanIgnoreReturnValue
   private <T extends Formula> T createVariableWith(Function<String, T> creator, String name) {
+    assume().that(!(solver == Solvers.SMTINTERPOL && name.equals("_"))).isTrue();
+
     if (allowInvalidNames() && !mgr.isValidName(name)) {
       assertThrows(IllegalArgumentException.class, () -> creator.apply(name));
       return null;

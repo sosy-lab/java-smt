@@ -70,8 +70,12 @@ class FormulaCollectionScript implements Script {
 
   @Override
   public void declareFun(String fun, Sort[] paramSorts, Sort resultSort) throws SMTLIBException {
-    FunctionSymbol fsym = theory.getFunction(fun, paramSorts);
-
+    FunctionSymbol fsym = null;
+    try {
+      fsym = theory.getFunction(fun, paramSorts);
+    } catch (SMTLIBException e) {
+      // fsym = null
+    }
     if (fsym == null) {
       script.declareFun(fun, paramSorts, resultSort);
     } else {
@@ -89,8 +93,12 @@ class FormulaCollectionScript implements Script {
     for (int i = 0; i < paramSorts.length; i++) {
       paramSorts[i] = params[i].getSort();
     }
-    FunctionSymbol fsym = theory.getFunction(fun, paramSorts);
-
+    FunctionSymbol fsym = null;
+    try {
+      fsym = theory.getFunction(fun, paramSorts);
+    } catch (SMTLIBException e) {
+      // fsym = null
+    }
     if (fsym == null) {
       script.defineFun(fun, params, resultSort, definition);
     } else {
@@ -166,6 +174,11 @@ class FormulaCollectionScript implements Script {
   public Term quantifier(int quantor, TermVariable[] vars, Term body, Term[]... patterns)
       throws SMTLIBException {
     return script.quantifier(quantor, vars, body, patterns);
+  }
+
+  @Override
+  public Term lambda(TermVariable[] pTermVariables, Term pTerm) throws SMTLIBException {
+    return script.lambda(pTermVariables, pTerm);
   }
 
   @Override

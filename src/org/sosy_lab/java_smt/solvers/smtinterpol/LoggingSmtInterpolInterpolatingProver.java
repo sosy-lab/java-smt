@@ -55,7 +55,7 @@ class LoggingSmtInterpolInterpolatingProver extends SmtInterpolInterpolatingProv
     for (Map.Entry<String, Object> entry : globalOptions.entrySet()) {
       writer.println("(set-option %s %s)".formatted(entry.getKey(), entry.getValue()));
     }
-    writer.println("(set-logic " + env.getTheory().getLogic().name() + ")");
+    writer.println("(set-logic " + env.getTheory().getLogic().getName() + ")");
     return writer;
   }
 

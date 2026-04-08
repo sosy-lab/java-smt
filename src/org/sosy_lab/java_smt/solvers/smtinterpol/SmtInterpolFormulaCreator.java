@@ -23,7 +23,6 @@ import de.uni_freiburg.informatik.ultimate.logic.Script;
 import de.uni_freiburg.informatik.ultimate.logic.Sort;
 import de.uni_freiburg.informatik.ultimate.logic.Term;
 import de.uni_freiburg.informatik.ultimate.logic.Theory;
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 import org.sosy_lab.java_smt.api.ArrayFormula;
@@ -39,7 +38,7 @@ class SmtInterpolFormulaCreator extends FormulaCreator<Term, Sort, Script, Funct
 
   /** SMTInterpol does not allow using key-functions as identifiers. */
   private static final ImmutableSet<String> UNSUPPORTED_IDENTIFIERS =
-      ImmutableSet.of("true", "false", "select", "store", "or", "and", "xor", "distinct");
+      ImmutableSet.of("true", "false", "select", "store", "or", "and", "xor", "distinct", "_");
 
   SmtInterpolFormulaCreator(final Script env) {
     super(
@@ -99,8 +98,12 @@ class SmtInterpolFormulaCreator extends FormulaCreator<Term, Sort, Script, Funct
   @CanIgnoreReturnValue
   private FunctionSymbol declareFun(String fun, Sort[] paramSorts, Sort resultSort) {
     checkSymbol(fun);
-    FunctionSymbol fsym = environment.getTheory().getFunction(fun, paramSorts);
-
+    FunctionSymbol fsym = null;
+    try {
+      fsym = environment.getTheory().getFunction(fun, paramSorts);
+    } catch (SMTLIBException e) {
+      // fsym = null
+    }
     if (fsym == null) {
       try {
         environment.declareFun(fun, paramSorts, resultSort);
@@ -113,9 +116,6 @@ class SmtInterpolFormulaCreator extends FormulaCreator<Term, Sort, Script, Funct
       if (!fsym.getReturnSort().equals(resultSort)) {
         throw new IllegalArgumentException(
             "Function " + fun + " is already declared with different definition");
-      }
-      if (fun.equals("true") || fun.equals("false")) {
-        throw new IllegalArgumentException("Cannot declare a variable named " + fun);
       }
       return fsym;
     }
@@ -131,8 +131,6 @@ class SmtInterpolFormulaCreator extends FormulaCreator<Term, Sort, Script, Funct
    * @throws IllegalArgumentException if symbol contains | or \.
    */
   private void checkSymbol(String symbol) throws SMTLIBException {
-    checkArgument(
-        symbol.indexOf('|') == -1 && symbol.indexOf('\\') == -1, "Symbol must not contain | or \\");
     checkArgument(
         !UNSUPPORTED_IDENTIFIERS.contains(symbol),
         "SMTInterpol does not support %s as identifier.",
@@ -181,25 +179,9 @@ class SmtInterpolFormulaCreator extends FormulaCreator<Term, Sort, Script, Funct
 
   @Override
   public <R> R visit(FormulaVisitor<R> visitor, Formula f, final Term input) {
-    checkArgument(
-        input.getTheory().equals(environment.getTheory()),
-        "Given term belongs to a different instance of SMTInterpol: %s",
-        input);
-
     if (input instanceof ConstantTerm constantTerm) {
-      Object outValue;
-      Object interpolValue = constantTerm.getValue();
-      if (interpolValue instanceof Rational rat) {
-        if ((input.getSort().getName().equals("Int") && rat.isIntegral())
-            || BigInteger.ONE.equals(rat.denominator())) {
-          outValue = rat.numerator();
-        } else {
-          outValue = org.sosy_lab.common.rationals.Rational.of(rat.numerator(), rat.denominator());
-        }
-      } else {
-        outValue = constantTerm.getValue();
-      }
-      return visitor.visitConstant(f, outValue);
+      return visitor.visitConstant(f, convertValue(constantTerm));
+
     } else if (input instanceof ApplicationTerm app) {
       final int arity = app.getParameters().length;
       final FunctionSymbol func = app.getFunction();
