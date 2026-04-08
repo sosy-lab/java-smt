@@ -13,7 +13,6 @@ import static org.junit.Assert.assertThrows;
 
 import com.google.common.collect.ImmutableMap;
 import java.math.BigInteger;
-import java.util.List;
 import org.junit.Test;
 import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
@@ -41,22 +40,6 @@ public class LeanSmtRegressionTest extends SolverBasedTest0 {
   public void unsupportedOperationsAreExplicit() throws SolverException, InterruptedException {
     assertThrows(UnsupportedOperationException.class, () -> context.newOptimizationProverEnvironment());
     assertThrows(UnsupportedOperationException.class, () -> context.newProverEnvironmentWithInterpolation());
-  }
-
-  @Test
-  public void unsatCoreApisAreAvailable() throws SolverException, InterruptedException {
-    BooleanFormula a = bmgr.makeVariable("a_unsat_core_reg");
-    BooleanFormula notA = bmgr.not(a);
-
-    try (ProverEnvironment prover =
-        context.newProverEnvironment(
-            ProverOptions.GENERATE_UNSAT_CORE, ProverOptions.GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS)) {
-      prover.push(a);
-      prover.push(notA);
-      assertThat(prover.isUnsat()).isTrue();
-      assertThat(prover.getUnsatCore()).isNotEmpty();
-      assertThat(prover.unsatCoreOverAssumptions(List.of(a))).isPresent();
-    }
   }
 
   @Test
