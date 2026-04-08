@@ -169,7 +169,7 @@ public final class LeanSmtSolverContext extends AbstractSolverContext {
 
   @Override
   protected boolean supportsAssumptionSolving() {
-    return true;
+    return false;
   }
 
   @Override

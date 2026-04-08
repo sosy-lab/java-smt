@@ -143,6 +143,16 @@ private def parseSolverKind (kind : UInt8) : Kind :=
   | 1 => .z3
   | _ => .cvc5
 
+private def createJavaSmtSolver (kind : Kind) : IO SolverState := do
+  match kind with
+  | .cvc5 =>
+      -- JavaSMT only queries satisfiability and models through the JNI bridge.
+      -- Enabling cvc5 proof production here makes UNSAT bitvector queries dramatically slower,
+      -- while the Java backend never requests or reconstructs proofs from this runtime.
+      Solver.create kind.toDefaultPath #["--quiet", "--incremental", "--lang", "smt", "--dag-thresh=0", "--enum-inst"]
+  | _ =>
+      Solver.createFromKind kind none none
+
 private def configureSolver (kind : Kind) (solver : SolverState) : IO SolverState := do
   let action : SolverM Unit := do
     match kind with
@@ -297,7 +307,7 @@ def leanSmtCleanup : IO Unit := do
 def leanSmtCreateSolver (kind : UInt8) : IO UInt64 :=
   catchUInt64 do
     let solverKind := parseSolverKind kind
-    let solver ← Solver.createFromKind solverKind none none
+    let solver ← createJavaSmtSolver solverKind
     let solver ← configureSolver solverKind solver
     insertSolver solver
 
