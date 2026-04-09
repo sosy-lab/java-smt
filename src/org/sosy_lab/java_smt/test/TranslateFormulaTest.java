@@ -170,7 +170,7 @@ public class TranslateFormulaTest {
     assume()
         .withMessage("Solver does not support shared terms or dump/parse")
         .that(translateTo)
-        .isNoneOf(Solvers.CVC4, Solvers.CVC5, Solvers.YICES2);
+        .isNoneOf(Solvers.CVC4, Solvers.CVC5, Solvers.YICES2, Solvers.LEANSMT);
 
     BooleanFormula inputFrom = createTestFormula(managerFrom);
     BooleanFormula inputTo = createTestFormula(managerTo);
