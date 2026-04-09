@@ -114,13 +114,13 @@ Minimal example file:
 ## Current limitations
 
 - Platform/runtime: Linux x64 only.
-- The java-smt backend uses lean-smt in one-shot mode. Each satisfiability check rebuilds a fresh
-  solver snapshot from the active assertion stack.
-- Models come from one-shot SAT snapshots. `evaluate(...)` only queries the original snapshot and
-  does not mutate or extend it.
+- The JavaSMT backend is intentionally minimal and uses one-shot solver snapshots.
+  JavaSMT manages the assertion stack; the native LeanSMT layer does not expose parser support or
+  a native `push`/`pop` API.
+- Parsing formula strings through `FormulaManager.parse` is not supported.
+- Models are only valid for the dedicated SAT snapshot used to create them.
 - Assumption solving is not supported.
 - Unsat cores are not supported.
 - `ubv_to_int`, `sbv_to_int`, and `(_ int_to_bv n)` are supported.
-- Symbolic bitvector rotations use java-smt's shared bitvector lowering.
 - Floating points, arrays, strings/regex, interpolation, and optimization are not supported.
 - Do not use one LeanSMT context or prover concurrently from multiple threads.

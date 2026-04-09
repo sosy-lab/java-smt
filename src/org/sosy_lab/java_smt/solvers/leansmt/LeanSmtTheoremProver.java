@@ -9,7 +9,6 @@
 package org.sosy_lab.java_smt.solvers.leansmt;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import java.util.Collection;
 import java.util.HashSet;
@@ -21,7 +20,6 @@ import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.BooleanFormulaManager;
 import org.sosy_lab.java_smt.api.Model;
-import org.sosy_lab.java_smt.api.Model.ValueAssignment;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
@@ -32,8 +30,6 @@ final class LeanSmtTheoremProver extends AbstractProverWithAllSat<Void> implemen
 
   private final LeanSmtFormulaCreator creator;
   private final String logic;
-  private @Nullable Long cachedSatSnapshotSolver = null;
-  private @Nullable ImmutableList<ValueAssignment> cachedModelAssignments = null;
 
   private static final class SnapshotSymbols {
     private final Set<String> variables;
@@ -63,32 +59,23 @@ final class LeanSmtTheoremProver extends AbstractProverWithAllSat<Void> implemen
 
   @Override
   protected void popImpl() {
-    clearCachedSatResult();
-    // JavaSMT keeps the assertion stack. LeanSMT sees only fresh snapshots.
+    // JavaSMT owns the assertion stack; LeanSMT only sees snapshot solves.
   }
 
   @Override
   protected @Nullable Void addConstraintImpl(BooleanFormula pConstraint) {
-    clearCachedSatResult();
-    // JavaSMT keeps the active constraints. LeanSMT sees only fresh snapshots.
+    // JavaSMT owns the active constraints; LeanSMT only sees snapshot solves.
     return null;
   }
 
   @Override
   protected void pushImpl() {
-    clearCachedSatResult();
-    // JavaSMT keeps the assertion stack. LeanSMT sees only fresh snapshots.
+    // JavaSMT owns the assertion stack; LeanSMT only sees snapshot solves.
   }
 
   @Override
   protected boolean isUnsatImpl() throws SolverException, InterruptedException {
-    if (hasCachedSatResult()) {
-      return false;
-    }
-
-    ImmutableSet<BooleanFormula> assertedFormulas = getAssertedFormulas();
-    SnapshotSymbols snapshotSymbols = collectSnapshotSymbols(assertedFormulas);
-    int result = checkSatOnSnapshot(assertedFormulas, snapshotSymbols);
+    int result = checkSatOnSnapshot();
     if (result == LeanSMTConstants.LEANSMT_UNSAT) {
       return true;
     } else if (result == LeanSMTConstants.LEANSMT_SAT) {
@@ -121,32 +108,12 @@ final class LeanSmtTheoremProver extends AbstractProverWithAllSat<Void> implemen
   }
 
   @Override
-  public ImmutableList<ValueAssignment> getModelAssignments() throws SolverException {
-    checkGenerateModels();
-    if (cachedModelAssignments != null) {
-      return cachedModelAssignments;
-    }
-    try (Model model = getModel()) {
-      cachedModelAssignments = model.asList();
-      return cachedModelAssignments;
-    }
-  }
-
-  @Override
   protected LeanSmtModel getEvaluatorWithoutChecks() throws SolverException {
-    ImmutableSet<BooleanFormula> assertedFormulas = getAssertedFormulas();
-    Set<Long> relevantModelHandles = getRelevantModelHandles(assertedFormulas);
-    long modelSolver;
-    if (cachedSatSnapshotSolver != null) {
-      modelSolver = takeCachedSatSnapshotSolver();
-    } else {
-      SnapshotSymbols snapshotSymbols = collectSnapshotSymbols(assertedFormulas);
-      modelSolver = createSatModelSnapshotSolver(assertedFormulas, snapshotSymbols);
-    }
+    SnapshotSymbols snapshotSymbols = collectSnapshotSymbols();
+    long modelSolver = createSatModelSnapshotSolver(snapshotSymbols);
     try {
-      LeanSmtModel model = new LeanSmtModel(this, creator, modelSolver, relevantModelHandles);
-      cachedModelAssignments = model.asList();
-      return registerEvaluator(model);
+      return registerEvaluator(
+          new LeanSmtModel(this, creator, modelSolver, getRelevantModelHandles()));
     } catch (RuntimeException e) {
       LeanSmtNativeApi.deleteSolverAsync(modelSolver);
       throw e;
@@ -165,10 +132,10 @@ final class LeanSmtTheoremProver extends AbstractProverWithAllSat<Void> implemen
     throw new UnsupportedOperationException(UNSAT_CORE_NOT_SUPPORTED);
   }
 
-  private Set<Long> getRelevantModelHandles(ImmutableSet<BooleanFormula> assertedFormulas) {
+  private Set<Long> getRelevantModelHandles() {
     ImmutableSet.Builder<Long> relevant = ImmutableSet.builder();
     Set<Long> visited = new HashSet<>();
-    for (BooleanFormula constraint : assertedFormulas) {
+    for (BooleanFormula constraint : getAssertedFormulas()) {
       collectRelevantModelHandles(creator.extractInfoFromFormula(constraint), visited, relevant);
     }
     return relevant.build();
@@ -192,41 +159,30 @@ final class LeanSmtTheoremProver extends AbstractProverWithAllSat<Void> implemen
     return solver;
   }
 
-  private void assertAllConstraints(long solver, ImmutableSet<BooleanFormula> assertedFormulas)
-      throws SolverException, InterruptedException {
-    for (BooleanFormula constraint : assertedFormulas) {
+  private void assertAllConstraints(long solver) throws SolverException, InterruptedException {
+    for (BooleanFormula constraint : getAssertedFormulas()) {
       shutdownNotifier.shutdownIfNecessary();
       LeanSmtNativeApi.assertTerm(solver, creator.extractInfoFromFormula(constraint));
     }
   }
 
-  private int checkSatOnSnapshot(
-      ImmutableSet<BooleanFormula> assertedFormulas, SnapshotSymbols snapshotSymbols)
-      throws SolverException, InterruptedException {
-    long solver = createSolverSnapshot(assertedFormulas, snapshotSymbols);
-    boolean keepSatSnapshot = false;
+  private int checkSatOnSnapshot() throws SolverException, InterruptedException {
+    long solver = createSolverSnapshot(collectSnapshotSymbols());
     try {
-      int result = LeanSmtNativeApi.checkSat(solver);
-      if (generateModels && result == LeanSMTConstants.LEANSMT_SAT) {
-        cachedSatSnapshotSolver = solver;
-        keepSatSnapshot = true;
-      }
-      return result;
+      return LeanSmtNativeApi.checkSat(solver);
     } finally {
-      if (!keepSatSnapshot) {
-        LeanSmtNativeApi.deleteSolverAsync(solver);
-      }
+      LeanSmtNativeApi.deleteSolverAsync(solver);
     }
   }
 
-  private long createSolverSnapshot(
-      ImmutableSet<BooleanFormula> assertedFormulas, SnapshotSymbols snapshotSymbols)
+  private long createSolverSnapshot(SnapshotSymbols snapshotSymbols)
       throws SolverException, InterruptedException {
     long solver = createEmptySolver();
     boolean success = false;
     try {
-      declareSnapshotSymbols(solver, snapshotSymbols);
-      assertAllConstraints(solver, assertedFormulas);
+      creator.redeclareVariables(solver, snapshotSymbols.variables);
+      creator.redeclareUfDeclarations(solver, snapshotSymbols.ufs);
+      assertAllConstraints(solver);
       success = true;
       return solver;
     } finally {
@@ -236,21 +192,15 @@ final class LeanSmtTheoremProver extends AbstractProverWithAllSat<Void> implemen
     }
   }
 
-  private SnapshotSymbols collectSnapshotSymbols(ImmutableSet<BooleanFormula> assertedFormulas) {
+  private SnapshotSymbols collectSnapshotSymbols() {
     Set<String> referencedVariables = new HashSet<>();
     Set<String> referencedUfs = new HashSet<>();
     Set<Long> visited = new HashSet<>();
-    for (BooleanFormula constraint : assertedFormulas) {
+    for (BooleanFormula constraint : getAssertedFormulas()) {
       collectReferencedSymbols(
           creator.extractInfoFromFormula(constraint), visited, referencedVariables, referencedUfs);
     }
     return new SnapshotSymbols(referencedVariables, referencedUfs);
-  }
-
-  private void declareSnapshotSymbols(long solver, SnapshotSymbols snapshotSymbols)
-      throws SolverException {
-    creator.redeclareVariables(solver, snapshotSymbols.variables);
-    creator.redeclareUfDeclarations(solver, snapshotSymbols.ufs);
   }
 
   private void collectReferencedSymbols(
@@ -272,13 +222,11 @@ final class LeanSmtTheoremProver extends AbstractProverWithAllSat<Void> implemen
     }
   }
 
-  private long createSatModelSnapshotSolver(
-      ImmutableSet<BooleanFormula> assertedFormulas, SnapshotSymbols snapshotSymbols)
-      throws SolverException {
+  private long createSatModelSnapshotSolver(SnapshotSymbols snapshotSymbols) throws SolverException {
     long solver = 0L;
     boolean success = false;
     try {
-      solver = createSolverSnapshot(assertedFormulas, snapshotSymbols);
+      solver = createSolverSnapshot(snapshotSymbols);
       int result = LeanSmtNativeApi.checkSat(solver);
       if (result == LeanSMTConstants.LEANSMT_SAT) {
         success = true;
@@ -297,30 +245,6 @@ final class LeanSmtTheoremProver extends AbstractProverWithAllSat<Void> implemen
       if (!success && solver != 0L) {
         LeanSmtNativeApi.deleteSolverAsync(solver);
       }
-    }
-  }
-
-  @Override
-  public void close() {
-    clearCachedSatResult();
-    super.close();
-  }
-
-  private boolean hasCachedSatResult() {
-    return cachedSatSnapshotSolver != null || cachedModelAssignments != null;
-  }
-
-  private long takeCachedSatSnapshotSolver() {
-    long solver = Preconditions.checkNotNull(cachedSatSnapshotSolver);
-    cachedSatSnapshotSolver = null;
-    return solver;
-  }
-
-  private void clearCachedSatResult() {
-    cachedModelAssignments = null;
-    if (cachedSatSnapshotSolver != null) {
-      LeanSmtNativeApi.deleteSolverAsync(cachedSatSnapshotSolver);
-      cachedSatSnapshotSolver = null;
     }
   }
 }

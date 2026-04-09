@@ -43,22 +43,6 @@ public class LeanSmtRegressionTest extends SolverBasedTest0 {
   }
 
   @Test
-  public void parserSupportsBasicAndBitvectorInput() {
-    assertThat(
-            mgr.parse(
-                "(declare-fun x () Int)\n"
-                    + "(assert (> x 0))\n"))
-        .isNotNull();
-
-    requireBitvectors();
-    assertThat(
-            mgr.parse(
-                "(declare-fun b () (_ BitVec 8))\n"
-                    + "(assert (bvult b #x0f))\n"))
-        .isNotNull();
-  }
-
-  @Test
   public void bigIntegerModelEvaluation() throws SolverException, InterruptedException {
     requireIntegers();
     requireModel();
@@ -380,58 +364,4 @@ public class LeanSmtRegressionTest extends SolverBasedTest0 {
     assertThatFormula(bmgr.equivalence(formula, rebuilt)).isTautological();
   }
 
-  @Test
-  public void symbolicRotateFormulaRoundtripViaDumpAndParse()
-      throws SolverException, InterruptedException {
-    requireBitvectors();
-
-    BitvectorFormula x = bvmgr.makeVariable(8, "x_rotate_dump_reg");
-    BitvectorFormula shift = bvmgr.makeVariable(8, "sh_rotate_dump_reg");
-    BooleanFormula formula =
-        bvmgr.equal(x, bvmgr.rotateRight(bvmgr.rotateLeft(x, shift), shift));
-
-    String dumped = mgr.dumpFormula(formula).toString();
-    assertThat(dumped).doesNotContain("rotate_left");
-    assertThat(dumped).doesNotContain("rotate_right");
-
-    BooleanFormula parsed = mgr.parse(dumped);
-    assertThatFormula(bmgr.equivalence(formula, parsed)).isTautological();
-  }
-
-  @Test
-  public void intToBitvectorFormulaRoundtripViaDumpAndParsePreservesSemantics()
-      throws SolverException, InterruptedException {
-    requireBitvectors();
-    requireBitvectorToInt();
-    requireIntegers();
-
-    IntegerFormula x = imgr.makeVariable("x_int_to_bv_dump_reg");
-    BitvectorFormula intToBv = bvmgr.makeBitvector(8, x);
-    BooleanFormula formula =
-        imgr.equal(
-            bvmgr.toIntegerFormula(intToBv, false),
-            imgr.modulo(x, imgr.makeNumber(256)));
-
-    String dumped = mgr.dumpFormula(formula).toString();
-    assertThat(dumped).contains("(_ int_to_bv 8)");
-    assertThat(dumped).doesNotContain("__int2bv#");
-
-    BooleanFormula parsed = mgr.parse(dumped);
-    assertThatFormula(bmgr.equivalence(formula, parsed)).isTautological();
-  }
-
-  @Test
-  public void quotedIdentifiersRoundtripWithEscapedPipes()
-      throws SolverException, InterruptedException {
-    String quotedName = "|quoted||pipe||name|";
-    String dumped =
-        "(declare-fun " + quotedName + " () Bool)\n"
-            + "(assert (or " + quotedName + " (not " + quotedName + ")))\n";
-
-    BooleanFormula parsed = mgr.parse(dumped);
-    assertThatFormula(parsed).isTautological();
-
-    String redumped = mgr.dumpFormula(parsed).toString();
-    assertThat(redumped).contains(quotedName);
-  }
 }

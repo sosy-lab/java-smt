@@ -21,7 +21,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.sosy_lab.java_smt.SolverContextFactory;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
@@ -142,9 +141,6 @@ public class LeanSmtLifecycleTest extends SolverBasedTest0 {
     }
   }
 
-  @Ignore(
-      "LeanSMT native layer is not yet safe for bounded parallel-context stress in CI; "
-          + "kept as manual investigation test.")
   @Test(timeout = 70000)
   public void concurrentIndependentContextsRemainStable() throws Exception {
     final int workers = 3;
