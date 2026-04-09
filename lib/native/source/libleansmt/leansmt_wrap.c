@@ -2631,7 +2631,6 @@ SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_leansmt_LeanSMTJNI_
   return jresult;
 }
 
-
 SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_leansmt_LeanSMTJNI_leansmt_1wrapper_1check_1sat(JNIEnv *jenv, jclass jcls, jobject jarg1) {
   jint jresult = 0 ;
   uint64_t arg1 ;

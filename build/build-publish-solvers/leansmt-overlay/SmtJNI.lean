@@ -53,14 +53,6 @@ private def catchUInt32 (action : IO UInt32) : IO UInt32 := do
     setError err.toString
     pure 1
 
-private def catchUInt32As (fallback : UInt32) (action : IO UInt32) : IO UInt32 := do
-  try
-    clearError
-    action
-  catch err =>
-    setError err.toString
-    pure fallback
-
 private def catchUInt8 (action : IO UInt8) : IO UInt8 := do
   try
     clearError
@@ -329,9 +321,27 @@ def leanSmtSetLogic (handle : UInt64) (logic : @&String) : IO UInt32 :=
 def leanSmtMkIntConst (value : Int) : IO UInt64 :=
   catchUInt64 <| insertTerm (intLiteral value)
 
+@[export leansmt_mk_int_const_str]
+def leanSmtMkIntConstStr (value : @&String) : IO UInt64 :=
+  catchUInt64 do
+    match value.toInt? with
+    | some parsed => insertTerm (intLiteral parsed)
+    | none => throw <| IO.userError s!"invalid integer literal: {value}"
+
 @[export leansmt_mk_real_const]
 def leanSmtMkRealConst (num den : Int) : IO UInt64 :=
   catchUInt64 <| insertTerm (realLiteral num den)
+
+@[export leansmt_mk_real_const_str]
+def leanSmtMkRealConstStr (num den : @&String) : IO UInt64 :=
+  catchUInt64 do
+    let some numerator := num.toInt?
+      | throw <| IO.userError s!"invalid rational numerator: {num}"
+    let some denominator := den.toInt?
+      | throw <| IO.userError s!"invalid rational denominator: {den}"
+    if denominator == 0 then
+      throw <| IO.userError "rational denominator must be non-zero"
+    insertTerm (realLiteral numerator denominator)
 
 @[export leansmt_mk_bv_const]
 def leanSmtMkBvConst (width : UInt32) (value : @&String) : IO UInt64 :=
@@ -512,47 +522,6 @@ def leanSmtMkNeg (term : UInt64) : IO UInt64 :=
   catchUInt64 do
     let arg ← getTerm term
     insertTerm (unary "-" arg)
-
-@[export leansmt_get_term_kind]
-def leanSmtGetTermKind (term : UInt64) : IO UInt32 :=
-  catchUInt32As 0xFFFFFFFF do
-    let value ← getTerm term
-    match value with
-    | .literalT _ => pure 0
-    | .symbolT _ => pure 1
-    | .appT _ _ => pure 2
-    | _ => throw <| IO.userError s!"term kind is unsupported for introspection: {value}"
-
-@[export leansmt_get_term_text]
-def leanSmtGetTermText (term : UInt64) : IO String :=
-  catchString do
-    let value ← getTerm term
-    match value with
-    | .literalT text => pure text
-    | .symbolT text => pure text
-    | _ => throw <| IO.userError s!"term text is only defined for literal and symbol terms: {value}"
-
-@[export leansmt_get_term_num_children]
-def leanSmtGetTermNumChildren (term : UInt64) : IO UInt32 :=
-  catchUInt32As 0xFFFFFFFF do
-    let value ← getTerm term
-    match value with
-    | .literalT _ => pure 0
-    | .symbolT _ => pure 0
-    | .appT _ _ => pure 2
-    | _ => throw <| IO.userError s!"term children are unsupported for introspection: {value}"
-
-@[export leansmt_get_term_child]
-def leanSmtGetTermChild (term : UInt64) (index : UInt32) : IO UInt64 :=
-  catchUInt64 do
-    let value ← getTerm term
-    match value, index.toNat with
-    | .appT fn _, 0 => insertTerm fn
-    | .appT _ arg, 1 => insertTerm arg
-    | .appT _ _, _ =>
-        throw <| IO.userError s!"application child index out of bounds: {index}"
-    | _, _ =>
-        throw <| IO.userError s!"term has no children: {value}"
 
 @[export leansmt_assert]
 def leanSmtAssert (solver term : UInt64) : IO UInt32 :=

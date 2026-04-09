@@ -36,7 +36,9 @@ public class LeanSMTJNI {
   public final static native java.math.BigInteger leansmt_wrapper_mk_true();
   public final static native java.math.BigInteger leansmt_wrapper_mk_false();
   public final static native java.math.BigInteger leansmt_wrapper_mk_int_const(long jarg1);
+  public final static native java.math.BigInteger leansmt_wrapper_mk_int_const_str(String jarg1);
   public final static native java.math.BigInteger leansmt_wrapper_mk_real_const(long jarg1, long jarg2);
+  public final static native java.math.BigInteger leansmt_wrapper_mk_real_const_str(String jarg1, String jarg2);
   public final static native java.math.BigInteger leansmt_wrapper_mk_bv_const(long jarg1, String jarg2);
   public final static native java.math.BigInteger leansmt_wrapper_mk_app1(String jarg1, java.math.BigInteger jarg2);
   public final static native java.math.BigInteger leansmt_wrapper_mk_app2(String jarg1, java.math.BigInteger jarg2, java.math.BigInteger jarg3);
@@ -44,10 +46,6 @@ public class LeanSMTJNI {
   public final static native java.math.BigInteger leansmt_wrapper_mk_indexed_app1(String jarg1, long jarg2, java.math.BigInteger jarg3);
   public final static native java.math.BigInteger leansmt_wrapper_mk_symbol(String jarg1);
   public final static native java.math.BigInteger leansmt_wrapper_mk_apply(java.math.BigInteger jarg1, java.math.BigInteger jarg2);
-  public final static native int leansmt_wrapper_get_term_kind(java.math.BigInteger jarg1);
-  public final static native String leansmt_wrapper_get_term_text(java.math.BigInteger jarg1);
-  public final static native int leansmt_wrapper_get_term_num_children(java.math.BigInteger jarg1);
-  public final static native java.math.BigInteger leansmt_wrapper_get_term_child(java.math.BigInteger jarg1, int jarg2);
   public final static native java.math.BigInteger leansmt_wrapper_mk_not(java.math.BigInteger jarg1);
   public final static native java.math.BigInteger leansmt_wrapper_mk_and(java.math.BigInteger jarg1, java.math.BigInteger jarg2);
   public final static native java.math.BigInteger leansmt_wrapper_mk_or(java.math.BigInteger jarg1, java.math.BigInteger jarg2);

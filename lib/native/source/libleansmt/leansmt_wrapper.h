@@ -47,7 +47,9 @@ int leansmt_wrapper_set_logic(uint64_t handle, const char* logic);
 uint64_t leansmt_wrapper_mk_true(void);
 uint64_t leansmt_wrapper_mk_false(void);
 uint64_t leansmt_wrapper_mk_int_const(int64_t value);
+uint64_t leansmt_wrapper_mk_int_const_str(const char* value);
 uint64_t leansmt_wrapper_mk_real_const(int64_t num, int64_t den);
+uint64_t leansmt_wrapper_mk_real_const_str(const char* num, const char* den);
 uint64_t leansmt_wrapper_mk_bv_const(uint32_t width, const char* value);
 
 /*=== Generic/Indexed Operations ===*/
@@ -58,10 +60,6 @@ uint64_t leansmt_wrapper_mk_extract(uint64_t term, uint32_t msb, uint32_t lsb);
 uint64_t leansmt_wrapper_mk_indexed_app1(const char* op, uint32_t index, uint64_t term);
 uint64_t leansmt_wrapper_mk_symbol(const char* symbol);
 uint64_t leansmt_wrapper_mk_apply(uint64_t fn, uint64_t arg);
-int leansmt_wrapper_get_term_kind(uint64_t term);
-char* leansmt_wrapper_get_term_text(uint64_t term);
-uint32_t leansmt_wrapper_get_term_num_children(uint64_t term);
-uint64_t leansmt_wrapper_get_term_child(uint64_t term, uint32_t index);
 
 /*=== Boolean Operations ===*/
 

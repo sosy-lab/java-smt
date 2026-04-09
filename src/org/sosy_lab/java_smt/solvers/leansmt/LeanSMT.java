@@ -53,8 +53,16 @@ public class LeanSMT implements LeanSMTConstants {
     return LeanSMTJNI.leansmt_wrapper_mk_int_const(value);
   }
 
+  public static java.math.BigInteger leansmt_wrapper_mk_int_const_str(String value) {
+    return LeanSMTJNI.leansmt_wrapper_mk_int_const_str(value);
+  }
+
   public static java.math.BigInteger leansmt_wrapper_mk_real_const(long num, long den) {
     return LeanSMTJNI.leansmt_wrapper_mk_real_const(num, den);
+  }
+
+  public static java.math.BigInteger leansmt_wrapper_mk_real_const_str(String num, String den) {
+    return LeanSMTJNI.leansmt_wrapper_mk_real_const_str(num, den);
   }
 
   public static java.math.BigInteger leansmt_wrapper_mk_bv_const(long width, String value) {
@@ -84,23 +92,6 @@ public class LeanSMT implements LeanSMTConstants {
   public static java.math.BigInteger leansmt_wrapper_mk_apply(
       java.math.BigInteger fn, java.math.BigInteger arg) {
     return LeanSMTJNI.leansmt_wrapper_mk_apply(fn, arg);
-  }
-
-  public static int leansmt_wrapper_get_term_kind(java.math.BigInteger term) {
-    return LeanSMTJNI.leansmt_wrapper_get_term_kind(term);
-  }
-
-  public static String leansmt_wrapper_get_term_text(java.math.BigInteger term) {
-    return LeanSMTJNI.leansmt_wrapper_get_term_text(term);
-  }
-
-  public static int leansmt_wrapper_get_term_num_children(java.math.BigInteger term) {
-    return LeanSMTJNI.leansmt_wrapper_get_term_num_children(term);
-  }
-
-  public static java.math.BigInteger leansmt_wrapper_get_term_child(
-      java.math.BigInteger term, int index) {
-    return LeanSMTJNI.leansmt_wrapper_get_term_child(term, index);
   }
 
   public static java.math.BigInteger leansmt_wrapper_mk_not(java.math.BigInteger t) {
