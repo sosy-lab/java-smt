@@ -31,6 +31,7 @@ import de.uni_freiburg.informatik.ultimate.logic.Sort;
 import de.uni_freiburg.informatik.ultimate.logic.Term;
 import de.uni_freiburg.informatik.ultimate.logic.TermVariable;
 import de.uni_freiburg.informatik.ultimate.logic.Theory;
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
@@ -183,6 +184,11 @@ class SmtInterpolFormulaCreator extends FormulaCreator<Term, Sort, Script, Funct
           org.sosy_lab.common.rationals.Rational.of(
               rationalValue.numerator(), rationalValue.denominator());
       return ratValue.isIntegral() ? ratValue.getNum() : ratValue;
+    } else if (value instanceof ConstantTerm constantTerm
+        && constantTerm.getValue() instanceof BigDecimal decimalValue) {
+      // Reals can be either rational or decimal values
+      return org.sosy_lab.common.rationals.Rational.ofBigDecimal(decimalValue);
+
     } else if (value instanceof ConstantTerm constantTerm
         && constantTerm.getValue() instanceof BigInteger bitvectorValue) {
       // Bitvector term (_ bv0 32)
