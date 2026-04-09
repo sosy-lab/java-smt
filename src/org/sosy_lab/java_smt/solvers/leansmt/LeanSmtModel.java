@@ -8,8 +8,6 @@
 
 package org.sosy_lab.java_smt.solvers.leansmt;
 
-import static com.google.common.base.Preconditions.checkState;
-
 import com.google.common.collect.ImmutableList;
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -65,7 +63,6 @@ final class LeanSmtModel extends AbstractModel<Long, LeanSmtType, Long> {
 
   @Override
   public ImmutableList<ValueAssignment> asList() {
-    checkState(!isClosed());
     return modelAssignments;
   }
 

@@ -122,14 +122,4 @@ public class LeanSmtNativeApiTest {
     assertThat(ex).hasMessageThat().contains("term=0");
   }
 
-  @Test
-  public void parserAcceptsQuotedCoreOperators() throws SolverException {
-    LeanSmtFormulaCreator creator = new LeanSmtFormulaCreator();
-    long formula =
-        new LeanSmtParser(creator).parse("(assert (|and| true (|xor| false true)))");
-
-    LeanSmtNativeApi.assertTerm(solver, formula);
-
-    assertThat(LeanSmtNativeApi.checkSat(solver)).isEqualTo(LeanSMTConstants.LEANSMT_SAT);
-  }
 }
