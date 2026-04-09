@@ -37,7 +37,9 @@ extern lean_object* leansmt_create_solver(uint8_t kind);
 extern lean_object* leansmt_delete_solver(uint64_t handle);
 extern lean_object* leansmt_set_logic(uint64_t handle, lean_object* logic);
 extern lean_object* leansmt_mk_int_const(lean_object* value);
+extern lean_object* leansmt_mk_int_const_str(lean_object* value);
 extern lean_object* leansmt_mk_real_const(lean_object* num, lean_object* den);
+extern lean_object* leansmt_mk_real_const_str(lean_object* num, lean_object* den);
 extern lean_object* leansmt_mk_bv_const(uint32_t width, lean_object* value);
 extern lean_object* leansmt_mk_true(void);
 extern lean_object* leansmt_mk_false(void);
@@ -47,10 +49,6 @@ extern lean_object* leansmt_mk_extract(uint64_t term, uint32_t msb, uint32_t lsb
 extern lean_object* leansmt_mk_indexed_app1(lean_object* op, uint32_t index, uint64_t term);
 extern lean_object* leansmt_mk_symbol(lean_object* symbol);
 extern lean_object* leansmt_mk_apply(uint64_t fn, uint64_t arg);
-extern lean_object* leansmt_get_term_kind(uint64_t term);
-extern lean_object* leansmt_get_term_text(uint64_t term);
-extern lean_object* leansmt_get_term_num_children(uint64_t term);
-extern lean_object* leansmt_get_term_child(uint64_t term, uint32_t index);
 extern lean_object* leansmt_mk_not(uint64_t t);
 extern lean_object* leansmt_mk_and(uint64_t t1, uint64_t t2);
 extern lean_object* leansmt_mk_or(uint64_t t1, uint64_t t2);
@@ -354,11 +352,24 @@ uint64_t leansmt_wrapper_mk_int_const(int64_t value) {
     return extract_io_uint64(leansmt_mk_int_const(lean_val));
 }
 
+uint64_t leansmt_wrapper_mk_int_const_str(const char* value) {
+    if (!g_initialized || value == NULL) return 0;
+    lean_object* lean_value = lean_mk_string(value);
+    return extract_io_uint64(leansmt_mk_int_const_str(lean_value));
+}
+
 uint64_t leansmt_wrapper_mk_real_const(int64_t num, int64_t den) {
     if (!g_initialized) return 0;
     lean_object* lean_num = lean_int_to_int(num);
     lean_object* lean_den = lean_int_to_int(den);
     return extract_io_uint64(leansmt_mk_real_const(lean_num, lean_den));
+}
+
+uint64_t leansmt_wrapper_mk_real_const_str(const char* num, const char* den) {
+    if (!g_initialized || num == NULL || den == NULL) return 0;
+    lean_object* lean_num = lean_mk_string(num);
+    lean_object* lean_den = lean_mk_string(den);
+    return extract_io_uint64(leansmt_mk_real_const_str(lean_num, lean_den));
 }
 
 uint64_t leansmt_wrapper_mk_bv_const(uint32_t width, const char* value) {
@@ -401,34 +412,6 @@ uint64_t leansmt_wrapper_mk_symbol(const char* symbol) {
 uint64_t leansmt_wrapper_mk_apply(uint64_t fn, uint64_t arg) {
     if (!g_initialized) return 0;
     return extract_io_uint64(leansmt_mk_apply(fn, arg));
-}
-
-int leansmt_wrapper_get_term_kind(uint64_t term) {
-    if (!g_initialized) return -1;
-    uint32_t result = (uint32_t)extract_io_uint32(leansmt_get_term_kind(term));
-    if (result == UINT32_MAX) {
-        return -1;
-    }
-    return (int)result;
-}
-
-char* leansmt_wrapper_get_term_text(uint64_t term) {
-    if (!g_initialized) return NULL;
-    return extract_io_string(leansmt_get_term_text(term));
-}
-
-uint32_t leansmt_wrapper_get_term_num_children(uint64_t term) {
-    if (!g_initialized) return UINT32_MAX;
-    uint32_t result = (uint32_t)extract_io_uint32(leansmt_get_term_num_children(term));
-    if (result == UINT32_MAX) {
-        return UINT32_MAX;
-    }
-    return result;
-}
-
-uint64_t leansmt_wrapper_get_term_child(uint64_t term, uint32_t index) {
-    if (!g_initialized) return 0;
-    return extract_io_uint64(leansmt_get_term_child(term, index));
 }
 
 /*=== Boolean Operations ===*/

@@ -58,6 +58,15 @@ static jobject u64_to_bigint(JNIEnv* jenv, uint64_t value) {
   return (*jenv)->NewObject(jenv, bigint_cls, ctor, decimal);
 }
 
+static jstring new_string_and_free(JNIEnv* jenv, char* text) {
+  if (text == NULL) {
+    return NULL;
+  }
+  jstring result = (*jenv)->NewStringUTF(jenv, text);
+  leansmt_wrapper_free_string(text);
+  return result;
+}
+
 JNIEXPORT jobject JNICALL
 Java_org_sosy_1lab_java_1smt_solvers_leansmt_LeanSMTJNI_leansmt_1wrapper_1mk_1symbol(
     JNIEnv* jenv, jclass jcls, jstring jsymbol) {
@@ -72,6 +81,48 @@ Java_org_sosy_1lab_java_1smt_solvers_leansmt_LeanSMTJNI_leansmt_1wrapper_1mk_1sy
   }
   uint64_t result = leansmt_wrapper_mk_symbol(symbol);
   (*jenv)->ReleaseStringUTFChars(jenv, jsymbol, symbol);
+  return u64_to_bigint(jenv, result);
+}
+
+JNIEXPORT jobject JNICALL
+Java_org_sosy_1lab_java_1smt_solvers_leansmt_LeanSMTJNI_leansmt_1wrapper_1mk_1int_1const_1str(
+    JNIEnv* jenv, jclass jcls, jstring jvalue) {
+  (void)jcls;
+  if (jvalue == NULL) {
+    return NULL;
+  }
+
+  const char* value = (*jenv)->GetStringUTFChars(jenv, jvalue, NULL);
+  if (value == NULL) {
+    return NULL;
+  }
+  uint64_t result = leansmt_wrapper_mk_int_const_str(value);
+  (*jenv)->ReleaseStringUTFChars(jenv, jvalue, value);
+  return u64_to_bigint(jenv, result);
+}
+
+JNIEXPORT jobject JNICALL
+Java_org_sosy_1lab_java_1smt_solvers_leansmt_LeanSMTJNI_leansmt_1wrapper_1mk_1real_1const_1str(
+    JNIEnv* jenv, jclass jcls, jstring jnum, jstring jden) {
+  (void)jcls;
+  if (jnum == NULL || jden == NULL) {
+    return NULL;
+  }
+
+  const char* num = (*jenv)->GetStringUTFChars(jenv, jnum, NULL);
+  const char* den = (*jenv)->GetStringUTFChars(jenv, jden, NULL);
+  if (num == NULL || den == NULL) {
+    if (num != NULL) {
+      (*jenv)->ReleaseStringUTFChars(jenv, jnum, num);
+    }
+    if (den != NULL) {
+      (*jenv)->ReleaseStringUTFChars(jenv, jden, den);
+    }
+    return NULL;
+  }
+  uint64_t result = leansmt_wrapper_mk_real_const_str(num, den);
+  (*jenv)->ReleaseStringUTFChars(jenv, jnum, num);
+  (*jenv)->ReleaseStringUTFChars(jenv, jden, den);
   return u64_to_bigint(jenv, result);
 }
 
@@ -124,64 +175,4 @@ Java_org_sosy_1lab_java_1smt_solvers_leansmt_LeanSMTJNI_leansmt_1wrapper_1declar
   (*jenv)->ReleaseStringUTFChars(jenv, jargSorts, arg_sorts);
   (*jenv)->ReleaseStringUTFChars(jenv, jreturnSort, return_sort);
   return result;
-}
-
-JNIEXPORT jint JNICALL
-Java_org_sosy_1lab_java_1smt_solvers_leansmt_LeanSMTJNI_leansmt_1wrapper_1get_1term_1kind(
-    JNIEnv* jenv, jclass jcls, jobject jterm) {
-  (void)jcls;
-  if (jterm == NULL) {
-    return -1;
-  }
-
-  uint64_t term = bigint_to_u64(jenv, jterm);
-  return (jint)leansmt_wrapper_get_term_kind(term);
-}
-
-JNIEXPORT jstring JNICALL
-Java_org_sosy_1lab_java_1smt_solvers_leansmt_LeanSMTJNI_leansmt_1wrapper_1get_1term_1text(
-    JNIEnv* jenv, jclass jcls, jobject jterm) {
-  (void)jcls;
-  if (jterm == NULL) {
-    return NULL;
-  }
-
-  uint64_t term = bigint_to_u64(jenv, jterm);
-  char* text = leansmt_wrapper_get_term_text(term);
-  if (text == NULL) {
-    return NULL;
-  }
-
-  jstring result = (*jenv)->NewStringUTF(jenv, text);
-  leansmt_wrapper_free_string(text);
-  return result;
-}
-
-JNIEXPORT jint JNICALL
-Java_org_sosy_1lab_java_1smt_solvers_leansmt_LeanSMTJNI_leansmt_1wrapper_1get_1term_1num_1children(
-    JNIEnv* jenv, jclass jcls, jobject jterm) {
-  (void)jcls;
-  if (jterm == NULL) {
-    return -1;
-  }
-
-  uint64_t term = bigint_to_u64(jenv, jterm);
-  uint32_t count = leansmt_wrapper_get_term_num_children(term);
-  return count == UINT32_MAX ? -1 : (jint)count;
-}
-
-JNIEXPORT jobject JNICALL
-Java_org_sosy_1lab_java_1smt_solvers_leansmt_LeanSMTJNI_leansmt_1wrapper_1get_1term_1child(
-    JNIEnv* jenv, jclass jcls, jobject jterm, jint jindex) {
-  (void)jcls;
-  if (jterm == NULL || jindex < 0) {
-    return NULL;
-  }
-
-  uint64_t term = bigint_to_u64(jenv, jterm);
-  uint64_t child = leansmt_wrapper_get_term_child(term, (uint32_t)jindex);
-  if (child == 0) {
-    return NULL;
-  }
-  return u64_to_bigint(jenv, child);
 }

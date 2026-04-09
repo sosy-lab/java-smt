@@ -12,19 +12,16 @@ import com.google.common.base.Preconditions;
 import java.math.BigInteger;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.function.Consumer;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Future;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.NativeLibraries;
 import org.sosy_lab.java_smt.api.SolverException;
 
 final class LeanSmtNativeApi {
-  static final int TERM_KIND_LITERAL = 0;
-  static final int TERM_KIND_SYMBOL = 1;
-  static final int TERM_KIND_APPLICATION = 2;
 
   private static final ExecutorService CLEANUP_EXECUTOR =
       Executors.newSingleThreadExecutor(
@@ -48,11 +45,11 @@ final class LeanSmtNativeApi {
       UnsatisfiedLinkError wrapped =
           new UnsatisfiedLinkError(
               "Failed to load LeanSMT JNI library. "
-              + "Expected libleansmt_jni.so in JavaSMT native directory "
-              + nativeDir
-              + ". "
-              + "Original error: "
-              + error.getMessage());
+                  + "Expected libleansmt_jni.so in JavaSMT native directory "
+                  + nativeDir
+                  + ". "
+                  + "Original error: "
+                  + error.getMessage());
       wrapped.initCause(error);
       throw wrapped;
     }
@@ -119,9 +116,6 @@ final class LeanSmtNativeApi {
   }
 
   static long createSolverCvc5() throws SolverException {
-    // Solver handles may be reused by the native runtime. Make sure older asynchronous deletes
-    // have finished before creating a fresh solver, otherwise a queued delete can invalidate the
-    // newly returned handle before its first use.
     drainPendingCleanupQueue();
     synchronized (LeanSmtNativeApi.class) {
       BigInteger handle =
@@ -145,14 +139,6 @@ final class LeanSmtNativeApi {
     return LeanSMT.leansmt_wrapper_delete_solver(toBigInt(solver));
   }
 
-  /**
-   * Best-effort cleanup path for asynchronous teardown.
-   *
-   * <p>The delete still runs on a background thread, but the actual JNI call is serialized with
-   * all other LeanSMT JNI operations. The Lean-side runtime keeps global mutable solver/term
-   * tables, so overlapping native deletes with term creation can otherwise invalidate freshly
-   * created handles or lose term-table updates.
-   */
   private static synchronized void deleteSolverBestEffort(long solver) {
     try {
       deleteSolverNative(solver);
@@ -192,9 +178,19 @@ final class LeanSmtNativeApi {
     return requireTerm(LeanSMT.leansmt_wrapper_mk_int_const(value), "Failed to create Int constant");
   }
 
+  static synchronized long mkIntConst(String value) throws SolverException {
+    return requireTerm(
+        LeanSMT.leansmt_wrapper_mk_int_const_str(value), "Failed to create Int constant");
+  }
+
   static synchronized long mkRealConst(long num, long den) throws SolverException {
     return requireTerm(
         LeanSMT.leansmt_wrapper_mk_real_const(num, den), "Failed to create Real constant");
+  }
+
+  static synchronized long mkRealConst(String num, String den) throws SolverException {
+    return requireTerm(
+        LeanSMT.leansmt_wrapper_mk_real_const_str(num, den), "Failed to create Real constant");
   }
 
   static synchronized long mkBvConst(int width, String value) throws SolverException {
@@ -235,40 +231,6 @@ final class LeanSmtNativeApi {
     return requireTerm(
         LeanSMT.leansmt_wrapper_mk_apply(toBigInt(fn), toBigInt(arg)),
         "Failed to create LeanSMT application term");
-  }
-
-  static synchronized int getTermKind(long term) throws SolverException {
-    int kind = LeanSMT.leansmt_wrapper_get_term_kind(toBigInt(term));
-    if (kind < 0) {
-      throw new SolverException(
-          errorOrDefault("Failed to inspect LeanSMT term kind for term=" + term));
-    }
-    return kind;
-  }
-
-  static synchronized String getTermText(long term) throws SolverException {
-    String text = LeanSMT.leansmt_wrapper_get_term_text(toBigInt(term));
-    String error = currentError();
-    if (text == null || (text.isEmpty() && error != null && !error.isEmpty())) {
-      throw new SolverException(
-          errorOrDefault("Failed to inspect LeanSMT term text for term=" + term));
-    }
-    return text;
-  }
-
-  static synchronized int getTermNumChildren(long term) throws SolverException {
-    int count = LeanSMT.leansmt_wrapper_get_term_num_children(toBigInt(term));
-    if (count < 0) {
-      throw new SolverException(
-          errorOrDefault("Failed to inspect LeanSMT child count for term=" + term));
-    }
-    return count;
-  }
-
-  static synchronized long getTermChild(long term, int index) throws SolverException {
-    return requireTerm(
-        LeanSMT.leansmt_wrapper_get_term_child(toBigInt(term), index),
-        "Failed to inspect LeanSMT child " + index + " for term=" + term);
   }
 
   static synchronized long mkNot(long t) throws SolverException {
