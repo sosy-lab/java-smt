@@ -94,7 +94,7 @@ final class LeanSmtFormulaManager
 
   @Override
   public Long parseImpl(String pS) throws IllegalArgumentException {
-    return new LeanSmtParser(creator()).parse(pS);
+    throw new UnsupportedOperationException("LeanSMT backend does not support parsing formulae");
   }
 
   @Override

@@ -8,7 +8,7 @@
 
 package org.sosy_lab.java_smt.solvers.leansmt;
 
-import java.math.BigInteger;
+import java.io.IOException;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
@@ -17,9 +17,8 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.sosy_lab.java_smt.api.FormulaType;
 
-/** SMT-LIB serializer for the LeanSMT backend's custom expression graph. */
+/** SMT-LIB serializer for the LeanSMT backend's local expression graph. */
 final class LeanSmtSmtLibPrinter {
 
   private final LeanSmtFormulaCreator creator;
@@ -28,7 +27,7 @@ final class LeanSmtSmtLibPrinter {
     creator = pCreator;
   }
 
-  String dumpFormula(long formula) {
+  String dumpFormula(long formula) throws IOException {
     Map<String, LeanSmtType> variableDecls = new LinkedHashMap<>();
     Set<String> functionDecls = new LinkedHashSet<>();
     collectDeclarations(formula, variableDecls, functionDecls);
@@ -44,12 +43,12 @@ final class LeanSmtSmtLibPrinter {
     for (String decl : functionDecls) {
       out.append(decl).append('\n');
     }
-    out.append("(assert ").append(serializeWithLets(formula)).append(')');
+    out.append("(assert ").append(serializeTerm(formula)).append(')');
     return out.toString();
   }
 
-  String serializeTerm(long formula) {
-    return serialize(formula, Map.of());
+  private String serializeTerm(long formula) throws IOException {
+    return serializeWithLets(formula);
   }
 
   private String serializeWithLets(long root) {
@@ -186,8 +185,8 @@ final class LeanSmtSmtLibPrinter {
   private static String constantToSmt(LeanSmtFormulaCreator.Expr expr) {
     Object value = expr.constantValue;
     if (expr.type.isBitvectorType()) {
-      int width = ((FormulaType.BitvectorType) expr.type).getSize();
-      BigInteger unsigned = (BigInteger) value;
+      int width = ((org.sosy_lab.java_smt.api.FormulaType.BitvectorType) expr.type).getSize();
+      java.math.BigInteger unsigned = (java.math.BigInteger) value;
       String bits = unsigned.toString(2);
       if (bits.length() < width) {
         bits = "0".repeat(width - bits.length()) + bits;
@@ -197,8 +196,8 @@ final class LeanSmtSmtLibPrinter {
     if (value instanceof Boolean) {
       return ((Boolean) value) ? "true" : "false";
     }
-    if (value instanceof BigInteger) {
-      BigInteger integerValue = (BigInteger) value;
+    if (value instanceof java.math.BigInteger) {
+      java.math.BigInteger integerValue = (java.math.BigInteger) value;
       if (integerValue.signum() < 0) {
         return "(- " + integerValue.abs() + ")";
       }
@@ -207,8 +206,8 @@ final class LeanSmtSmtLibPrinter {
     if (value instanceof org.sosy_lab.common.rationals.Rational) {
       org.sosy_lab.common.rationals.Rational rationalValue =
           (org.sosy_lab.common.rationals.Rational) value;
-      BigInteger numerator = rationalValue.getNum();
-      BigInteger denominator = rationalValue.getDen();
+      java.math.BigInteger numerator = rationalValue.getNum();
+      java.math.BigInteger denominator = rationalValue.getDen();
       String fraction = "(/ " + numerator.abs() + " " + denominator + ")";
       if (numerator.signum() < 0) {
         return "(- " + fraction + ")";
