@@ -17,6 +17,7 @@ import com.google.common.collect.Iterables;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Function;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -52,13 +53,27 @@ class BitwuzlaInterpolatingProver extends BitwuzlaAbstractProver<Integer>
     return addConstraint0(constraint);
   }
 
+  /** Catches interpolation errors and throws a {@link SolverException} */
+  private <A, B> B callWithError(Function<A, B> f, A args) throws SolverException {
+    try {
+      return f.apply(args);
+    } catch (IllegalArgumentException e) {
+      if (e.getMessage().endsWith("not supported")) {
+        throw new SolverException(e.getMessage());
+      } else {
+        throw e;
+      }
+    }
+  }
+
   @Override
   public BooleanFormula getInterpolant(Collection<Integer> formulasOfA)
       throws SolverException, InterruptedException {
     return creator.encapsulateBoolean(
         formulasOfA.isEmpty()
             ? creator.getEnv().mk_true()
-            : env.get_interpolant(
+            : callWithError(
+                env::get_interpolant,
                 new Vector_Term(FluentIterable.from(formulasOfA).transform(stack.peek()::get))));
   }
 
@@ -72,7 +87,7 @@ class BitwuzlaInterpolatingProver extends BitwuzlaAbstractProver<Integer>
             FluentIterable.from(partitionedFormulas)
                 .transform(
                     p -> new Vector_Term(FluentIterable.from(p).transform(stack.peek()::get))));
-    Vector_Term itps = env.get_interpolants(partitions);
+    Vector_Term itps = callWithError(env::get_interpolants, partitions);
     checkState(
         creator.getEnv().mk_false().equals(Iterables.getLast(itps)),
         "the last interpolant should be false");
