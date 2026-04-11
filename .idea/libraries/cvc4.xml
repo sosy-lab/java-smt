@@ -4,9 +4,11 @@
       <root url="file://$PROJECT_DIR$/lib/java/runtime-cvc4" />
     </CLASSES>
     <JAVADOC>
-      <root url="https://cvc4.github.io/documentation.html" />
+      <root url="jar://$PROJECT_DIR$/lib/java-contrib/CVC4-javadoc.jar!/" />
     </JAVADOC>
-    <SOURCES />
+    <SOURCES>
+      <root url="jar://$PROJECT_DIR$/lib/java-contrib/CVC4-sources.jar!/" />
+    </SOURCES>
     <jarDirectory url="file://$PROJECT_DIR$/lib/java/runtime-cvc4" recursive="false" />
   </library>
 </component>
