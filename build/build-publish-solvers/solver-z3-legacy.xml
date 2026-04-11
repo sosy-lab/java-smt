@@ -142,7 +142,7 @@ SPDX-License-Identifier: Apache-2.0
 
     <target name="package-z3-legacy-sources" depends="prepare-z3-legacy-sources">
         <jar destfile="${z3legacy.dist.dir}/com.microsoft.z3legacy-${z3.legacy.version}-sources.jar" whenmanifestonly="fail">
-            <zipfileset dir="${z3.path}/src/api/java" includes="**/*.java" prefix="com/microsoft/z3"/>
+            <zipfileset dir="${z3.path}/src/api/java" includes="**/*.java"/>
             <zipfileset dir="${z3.path}/" includes="LICENSE.txt" prefix="META-INF"/>
             <manifest>
                 <attribute name="Implementation-Title" value="${z3legacy.project.name}"/>
@@ -166,6 +166,12 @@ SPDX-License-Identifier: Apache-2.0
             <link href="https://docs.oracle.com/en/java/javase/11/docs/api/"/>
             <doctitle><![CDATA[<h1>${z3legacy.project.name}</h1>]]></doctitle>
             <arg line="${javadoc.doclint}"/>
+            <!-- JVM inherits system language. We need to force it to use en_US instead of local language. -->
+            <arg value="-J-Duser.language=en" />
+            <arg value="-J-Duser.country=US" />
+            <arg value="-locale" /><arg value="en_US" />
+            <arg value="-docencoding" /><arg value="UTF-8" />
+            <arg value="-charset" /><arg value="UTF-8" />
         </javadoc>
         <jar jarfile="${z3legacy.dist.dir}/com.microsoft.z3legacy-${z3.legacy.version}-javadoc.jar" whenmanifestonly="fail">
             <zipfileset dir="${z3.path}/" includes="LICENSE.txt" prefix="META-INF"/>
