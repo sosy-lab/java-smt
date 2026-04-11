@@ -19,8 +19,6 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
 import com.google.common.primitives.Ints;
 import edu.stanford.CVC4.ArrayStoreAll;
-import edu.stanford.CVC4.ArrayType;
-import edu.stanford.CVC4.BitVectorType;
 import edu.stanford.CVC4.Expr;
 import edu.stanford.CVC4.ExprManager;
 import edu.stanford.CVC4.FunctionType;
@@ -149,25 +147,13 @@ class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, Expr> {
   @SuppressWarnings("unchecked")
   @Override
   public <T extends Formula> FormulaType<T> getFormulaType(T pFormula) {
-    Type t = extractInfo(pFormula).getType();
-    if (pFormula instanceof BitvectorFormula) {
-      checkArgument(t.isBitVector(), "BitvectorFormula with actual type %s: %s", t, pFormula);
+    if (pFormula instanceof BitvectorFormula
+        || pFormula instanceof FloatingPointFormula
+        || pFormula instanceof ArrayFormula) {
       return (FormulaType<T>) getFormulaType(extractInfo(pFormula));
-
-    } else if (pFormula instanceof FloatingPointFormula) {
-      checkArgument(
-          t.isFloatingPoint(), "FloatingPointFormula with actual type %s: %s", t, pFormula);
-      edu.stanford.CVC4.FloatingPointType fpType = new edu.stanford.CVC4.FloatingPointType(t);
-      return (FormulaType<T>)
-          FormulaType.getFloatingPointTypeFromSizesWithHiddenBit(
-              (int) fpType.getExponentSize(), (int) fpType.getSignificandSize()); // with hidden bit
-
-    } else if (pFormula instanceof ArrayFormula<?, ?>) {
-      FormulaType<T> arrayIndexType = getArrayFormulaIndexType((ArrayFormula<T, T>) pFormula);
-      FormulaType<T> arrayElementType = getArrayFormulaElementType((ArrayFormula<T, T>) pFormula);
-      return (FormulaType<T>) FormulaType.getArrayType(arrayIndexType, arrayElementType);
+    } else {
+      return super.getFormulaType(pFormula);
     }
-    return super.getFormulaType(pFormula);
   }
 
   @Override
@@ -180,32 +166,16 @@ class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, Expr> {
       return FormulaType.BooleanType;
     } else if (t.isInteger()) {
       return FormulaType.IntegerType;
-    } else if (t.isBitVector()) {
-      // apparently, we can get a t instanceof Type here for that t instanceof BitVectorType does
-      // not hold, hence we use the new BitVectorType(t) here as a workaround:
-      return FormulaType.getBitvectorTypeWithSize((int) new BitVectorType(t).getSize());
-    } else if (t.isFloatingPoint()) {
-      edu.stanford.CVC4.FloatingPointType fpType = new edu.stanford.CVC4.FloatingPointType(t);
-      return FormulaType.getFloatingPointTypeFromSizesWithHiddenBit(
-          (int) fpType.getExponentSize(), (int) fpType.getSignificandSize()); // with hidden bit
-    } else if (t.isRoundingMode()) {
-      return FormulaType.FloatingPointRoundingModeType;
     } else if (t.isReal()) {
       // The theory REAL in CVC4 is the theory of (infinite precision!) real numbers.
       // As such, the theory RATIONAL is contained in REAL. TODO: find a better solution.
       return FormulaType.RationalType;
-    } else if (t.isArray()) {
-      ArrayType arrayType = new ArrayType(t); // instead of casting, create a new type.
-      FormulaType<?> indexType = getFormulaTypeFromTermType(arrayType.getIndexType());
-      FormulaType<?> elementType = getFormulaTypeFromTermType(arrayType.getConstituentType());
-      return FormulaType.getArrayType(indexType, elementType);
     } else if (t.isString()) {
       return FormulaType.StringType;
     } else if (t.isRegExp()) {
       return FormulaType.RegexType;
     } else {
-      throw new AssertionError(
-          "Unhandled type '%s' with base type '%s'.".formatted(t, t.getBaseType()));
+      return FormulaType.fromSMTLIBString(t.toString());
     }
   }
 
@@ -384,8 +354,9 @@ class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, Expr> {
       List<Formula> args = ImmutableList.copyOf(Iterables.transform(f, this::encapsulate));
       List<FormulaType<?>> argsTypes = new ArrayList<>();
       Expr operator = normalize(f.getOperator());
-      if (operator.getType().isFunction()) {
-        vectorType argTypes = new FunctionType(operator.getType()).getArgTypes();
+      if (operator.getType().isFunction()
+          && operator.getType() instanceof FunctionType functionType) {
+        vectorType argTypes = functionType.getArgTypes();
         for (int i = 0; i < argTypes.size(); i++) {
           argsTypes.add(getFormulaTypeFromTermType(argTypes.get(i)));
         }
@@ -582,11 +553,7 @@ class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, Expr> {
         return pDeclaration;
       }
     } else {
-      vectorExpr args = new vectorExpr();
-      for (Expr expr : pArgs) {
-        args.add(expr);
-      }
-      return exprManager.mkExpr(pDeclaration, args);
+      return exprManager.mkExpr(pDeclaration, new vectorExpr(exprManager, pArgs));
     }
   }
 
@@ -597,21 +564,17 @@ class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, Expr> {
     }
     Expr exp = functionsCache.get(pName);
     if (exp == null) {
-      vectorType args = new vectorType();
-      for (Type t : pArgTypes) {
-        args.add(t);
-      }
-      exp = exprManager.mkVar(pName, exprManager.mkFunctionType(args, pReturnType));
+      exp =
+          exprManager.mkVar(
+              pName,
+              exprManager.mkFunctionType(new vectorType(exprManager, pArgTypes), pReturnType));
       functionsCache.put(pName, exp);
     } else {
       // We can't cast the cached type to FormulaType, even though it is a function type, due to a
       // bug in the CVC4 Java bindings. As a workaround we create another function type for the
       // current arguments and then compare it to the type from the cache
-      vectorType args = new vectorType();
-      for (Type t : pArgTypes) {
-        args.add(t);
-      }
-      var argumentType = exprManager.mkFunctionType(args, pReturnType);
+      var argumentType =
+          exprManager.mkFunctionType(new vectorType(exprManager, pArgTypes), pReturnType);
       var cachedType = exp.getType();
       Preconditions.checkArgument(
           cachedType.equals(argumentType),
