@@ -53,7 +53,7 @@ class BitwuzlaInterpolatingProver extends BitwuzlaAbstractProver<Integer>
     return addConstraint0(constraint);
   }
 
-  /** Catches interpolation errors and throws a {@link SolverException} */
+  /** Catches interpolation errors and throws a {@link SolverException}. */
   private <A, B> B callWithError(Function<A, B> f, A args) throws SolverException {
     try {
       return f.apply(args);
