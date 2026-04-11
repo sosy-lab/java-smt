@@ -230,6 +230,7 @@ abstract class BitwuzlaAbstractProver<T> extends AbstractProverWithAllSat<T> {
     super.close();
   }
 
+  @SuppressWarnings("resource")
   @Override
   protected BitwuzlaEvaluator getEvaluatorWithoutChecks() {
     return registerEvaluator(new BitwuzlaEvaluator(this, creator));
