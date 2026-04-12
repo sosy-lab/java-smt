@@ -31,13 +31,21 @@ final class LeanSmtTheoremProver extends AbstractProverWithAllSat<Void> implemen
   private final LeanSmtFormulaCreator creator;
   private final String logic;
 
-  private static final class SnapshotSymbols {
+  private static final class SnapshotPlan {
+    private final ImmutableSet<BooleanFormula> constraints;
     private final Set<String> variables;
     private final Set<String> ufs;
+    private final Set<Long> relevantModelHandles;
 
-    private SnapshotSymbols(Set<String> pVariables, Set<String> pUfs) {
+    private SnapshotPlan(
+        ImmutableSet<BooleanFormula> pConstraints,
+        Set<String> pVariables,
+        Set<String> pUfs,
+        Set<Long> pRelevantModelHandles) {
+      constraints = pConstraints;
       variables = ImmutableSet.copyOf(pVariables);
       ufs = ImmutableSet.copyOf(pUfs);
+      relevantModelHandles = ImmutableSet.copyOf(pRelevantModelHandles);
     }
   }
 
@@ -109,11 +117,11 @@ final class LeanSmtTheoremProver extends AbstractProverWithAllSat<Void> implemen
 
   @Override
   protected LeanSmtModel getEvaluatorWithoutChecks() throws SolverException {
-    SnapshotSymbols snapshotSymbols = collectSnapshotSymbols();
-    long modelSolver = createSatModelSnapshotSolver(snapshotSymbols);
+    SnapshotPlan snapshotPlan = collectSnapshotPlan(true);
+    long modelSolver = createSatModelSnapshotSolver(snapshotPlan);
     try {
       return registerEvaluator(
-          new LeanSmtModel(this, creator, modelSolver, getRelevantModelHandles()));
+          new LeanSmtModel(this, creator, modelSolver, snapshotPlan.relevantModelHandles));
     } catch (RuntimeException e) {
       LeanSmtNativeApi.deleteSolverBestEffort(modelSolver);
       throw e;
@@ -132,42 +140,22 @@ final class LeanSmtTheoremProver extends AbstractProverWithAllSat<Void> implemen
     throw new UnsupportedOperationException(UNSAT_CORE_NOT_SUPPORTED);
   }
 
-  private Set<Long> getRelevantModelHandles() {
-    ImmutableSet.Builder<Long> relevant = ImmutableSet.builder();
-    Set<Long> visited = new HashSet<>();
-    for (BooleanFormula constraint : getAssertedFormulas()) {
-      collectRelevantModelHandles(creator.extractInfoFromFormula(constraint), visited, relevant);
-    }
-    return relevant.build();
-  }
-
-  private void collectRelevantModelHandles(
-      long handle, Set<Long> visited, ImmutableSet.Builder<Long> relevant) {
-    if (!visited.add(handle)) {
-      return;
-    }
-    relevant.add(handle);
-    LeanSmtFormulaCreator.Expr expr = creator.getExpression(handle);
-    for (long arg : expr.arguments) {
-      collectRelevantModelHandles(arg, visited, relevant);
-    }
-  }
-
   private long createEmptySolver() throws SolverException {
     long solver = LeanSmtNativeApi.createSolverCvc5();
     LeanSmtNativeApi.setLogic(solver, logic);
     return solver;
   }
 
-  private void assertAllConstraints(long solver) throws SolverException, InterruptedException {
-    for (BooleanFormula constraint : getAssertedFormulas()) {
+  private void assertAllConstraints(long solver, SnapshotPlan snapshotPlan)
+      throws SolverException, InterruptedException {
+    for (BooleanFormula constraint : snapshotPlan.constraints) {
       shutdownNotifier.shutdownIfNecessary();
       LeanSmtNativeApi.assertTerm(solver, creator.extractInfoFromFormula(constraint));
     }
   }
 
   private int checkSatOnSnapshot() throws SolverException, InterruptedException {
-    long solver = createSolverSnapshot(collectSnapshotSymbols());
+    long solver = createSolverSnapshot(collectSnapshotPlan(false));
     try {
       return LeanSmtNativeApi.checkSat(solver);
     } finally {
@@ -175,14 +163,14 @@ final class LeanSmtTheoremProver extends AbstractProverWithAllSat<Void> implemen
     }
   }
 
-  private long createSolverSnapshot(SnapshotSymbols snapshotSymbols)
+  private long createSolverSnapshot(SnapshotPlan snapshotPlan)
       throws SolverException, InterruptedException {
     long solver = createEmptySolver();
     boolean success = false;
     try {
-      creator.redeclareVariables(solver, snapshotSymbols.variables);
-      creator.redeclareUfDeclarations(solver, snapshotSymbols.ufs);
-      assertAllConstraints(solver);
+      creator.redeclareVariables(solver, snapshotPlan.variables);
+      creator.redeclareUfDeclarations(solver, snapshotPlan.ufs);
+      assertAllConstraints(solver, snapshotPlan);
       success = true;
       return solver;
     } finally {
@@ -192,24 +180,39 @@ final class LeanSmtTheoremProver extends AbstractProverWithAllSat<Void> implemen
     }
   }
 
-  private SnapshotSymbols collectSnapshotSymbols() {
+  private SnapshotPlan collectSnapshotPlan(boolean collectRelevantModelHandles) {
+    ImmutableSet<BooleanFormula> constraints = getAssertedFormulas();
     Set<String> referencedVariables = new HashSet<>();
     Set<String> referencedUfs = new HashSet<>();
+    ImmutableSet.Builder<Long> relevantHandles =
+        collectRelevantModelHandles ? ImmutableSet.builder() : null;
     Set<Long> visited = new HashSet<>();
-    for (BooleanFormula constraint : getAssertedFormulas()) {
-      collectReferencedSymbols(
-          creator.extractInfoFromFormula(constraint), visited, referencedVariables, referencedUfs);
+    for (BooleanFormula constraint : constraints) {
+      collectSnapshotMetadata(
+          creator.extractInfoFromFormula(constraint),
+          visited,
+          referencedVariables,
+          referencedUfs,
+          relevantHandles);
     }
-    return new SnapshotSymbols(referencedVariables, referencedUfs);
+    return new SnapshotPlan(
+        constraints,
+        referencedVariables,
+        referencedUfs,
+        relevantHandles == null ? ImmutableSet.of() : relevantHandles.build());
   }
 
-  private void collectReferencedSymbols(
+  private void collectSnapshotMetadata(
       long handle,
       Set<Long> visited,
       Set<String> referencedVariables,
-      Set<String> referencedUfs) {
+      Set<String> referencedUfs,
+      ImmutableSet.Builder<Long> relevantHandles) {
     if (!visited.add(handle)) {
       return;
+    }
+    if (relevantHandles != null) {
+      relevantHandles.add(handle);
     }
     LeanSmtFormulaCreator.Expr expr = creator.getExpression(handle);
     if (expr.kind == LeanSmtFormulaCreator.ExprKind.VARIABLE) {
@@ -218,15 +221,15 @@ final class LeanSmtTheoremProver extends AbstractProverWithAllSat<Void> implemen
       referencedUfs.add(expr.symbol);
     }
     for (long arg : expr.arguments) {
-      collectReferencedSymbols(arg, visited, referencedVariables, referencedUfs);
+      collectSnapshotMetadata(arg, visited, referencedVariables, referencedUfs, relevantHandles);
     }
   }
 
-  private long createSatModelSnapshotSolver(SnapshotSymbols snapshotSymbols) throws SolverException {
+  private long createSatModelSnapshotSolver(SnapshotPlan snapshotPlan) throws SolverException {
     long solver = 0L;
     boolean success = false;
     try {
-      solver = createSolverSnapshot(snapshotSymbols);
+      solver = createSolverSnapshot(snapshotPlan);
       int result = LeanSmtNativeApi.checkSat(solver);
       if (result == LeanSMTConstants.LEANSMT_SAT) {
         success = true;
