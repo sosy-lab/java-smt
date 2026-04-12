@@ -14,7 +14,7 @@ SPDX-License-Identifier: Apache-2.0
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.sosy-lab</groupId>
   <artifactId>javasmt-yices2</artifactId>
-  <packaging>pom</packaging>
+  <packaging>jar</packaging>
   <name>javasmt-yices2</name>
   <version>${stage.revision}</version>
   <description>JavaSMT bindings for the SMT solver Yices</description>

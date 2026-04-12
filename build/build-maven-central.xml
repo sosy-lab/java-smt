@@ -87,7 +87,7 @@ SPDX-License-Identifier: Apache-2.0
         <condition property="is-javasmt" value="true">
             <equals arg1="${publish.component}" arg2="java-smt"/>
         </condition>
-        <condition property="is-solver" value="true">
+        <condition property="is-solver" value="true" else="false">
             <matches string="${publish.component}" pattern="^javasmt-solver-.*"/>
         </condition>
         <echo message="Publishing component: ${publish.full-name} ${publish.version} (is solver: ${is-solver})"/>
@@ -168,14 +168,24 @@ SPDX-License-Identifier: Apache-2.0
         <condition property="has-sources">
             <contains string=",${ivyxml.configurations.conf.name}," substring=",sources,"/>
         </condition>
+        <condition property="has-javadoc">
+            <contains string=",${ivyxml.configurations.conf.name}," substring=",javadoc,"/>
+        </condition>
+
+        <echo message="has 'sources' configuration: ${has-sources}"/>
+        <echo message="has 'javadoc' configuration: ${has-javadoc}"/>
         <condition property="resolve.confs" value="*">
             <istrue value="${is-solver}"/>
         </condition>
-        <condition property="resolve.confs" value="core,sources">
-            <istrue value="${is-javasmt}"/>
+        <!-- stepwise logic is required because of immutable Ant properties -->
+        <condition property="resolve.confs" value="${pom.mapping.conf},sources,javadoc">
+            <and><isset property="has-sources"/><isset property="has-javadoc"/></and>
         </condition>
         <condition property="resolve.confs" value="${pom.mapping.conf},sources">
             <isset property="has-sources"/>
+        </condition>
+        <condition property="resolve.confs" value="${pom.mapping.conf},javadoc">
+            <isset property="has-javadoc"/>
         </condition>
         <property name="resolve.confs" value="${pom.mapping.conf}"/>
         <echo message="Using resolution configurations: ${resolve.confs}"/>
