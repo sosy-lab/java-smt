@@ -35,8 +35,6 @@ public final class LeanSmtSolverContext extends AbstractSolverContext {
   private final ShutdownNotifier shutdownNotifier;
   private final String logic;
 
-  private static int numLoadedInstances = 0;
-  private static boolean initialized = false;
   private boolean closed = false;
 
   private LeanSmtSolverContext(
@@ -58,17 +56,9 @@ public final class LeanSmtSolverContext extends AbstractSolverContext {
       Consumer<String> pLoader)
       throws InvalidConfigurationException {
 
-    boolean countedInstance = false;
     try {
-      synchronized (LeanSmtSolverContext.class) {
-        if (!initialized) {
-          LeanSmtNativeApi.loadLibrary(pLoader);
-          LeanSmtNativeApi.initialize();
-          initialized = true;
-        }
-        numLoadedInstances++;
-        countedInstance = true;
-      }
+      LeanSmtNativeApi.loadLibrary(pLoader);
+      LeanSmtNativeApi.initialize();
 
       String logic = "ALL";
       LeanSmtFormulaCreator creator = new LeanSmtFormulaCreator();
@@ -85,41 +75,7 @@ public final class LeanSmtSolverContext extends AbstractSolverContext {
               creator, ufManager, booleanTheory, integerTheory, rationalTheory, bitvectorTheory);
       return new LeanSmtSolverContext(manager, creator, booleanTheory, pShutdownNotifier, logic);
     } catch (SolverException e) {
-      boolean shouldCleanup = false;
-      synchronized (LeanSmtSolverContext.class) {
-        if (countedInstance) {
-          numLoadedInstances--;
-          shouldCleanup = numLoadedInstances == 0 && initialized;
-          if (shouldCleanup) {
-            initialized = false;
-          }
-        }
-      }
-      if (shouldCleanup) {
-        LeanSmtNativeApi.cleanup();
-      } else {
-        synchronized (LeanSmtSolverContext.class) {
-          if (initialized && !LeanSmtNativeApi.isNativeRuntimeInitialized()) {
-            initialized = false;
-          }
-        }
-      }
       throw new InvalidConfigurationException("Failed to initialize LeanSMT backend", e);
-    } catch (RuntimeException e) {
-      boolean shouldCleanup = false;
-      synchronized (LeanSmtSolverContext.class) {
-        if (countedInstance) {
-          numLoadedInstances--;
-          shouldCleanup = numLoadedInstances == 0 && initialized;
-          if (shouldCleanup) {
-            initialized = false;
-          }
-        }
-      }
-      if (shouldCleanup) {
-        LeanSmtNativeApi.cleanup();
-      }
-      throw e;
     }
   }
 
@@ -136,18 +92,8 @@ public final class LeanSmtSolverContext extends AbstractSolverContext {
   @Override
   public synchronized void close() {
     if (!closed) {
+      // Native runtime lifetime is process-global and not owned by individual contexts.
       closed = true;
-      boolean shouldCleanup = false;
-      synchronized (LeanSmtSolverContext.class) {
-        numLoadedInstances--;
-        if (numLoadedInstances == 0 && initialized) {
-          initialized = false;
-          shouldCleanup = true;
-        }
-      }
-      if (shouldCleanup) {
-        LeanSmtNativeApi.cleanup();
-      }
     }
   }
 

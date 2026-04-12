@@ -56,7 +56,7 @@ final class LeanSmtModel extends AbstractModel<Long, LeanSmtType, Long> {
   @Override
   public void close() {
     if (!isClosed()) {
-      LeanSmtNativeApi.deleteSolverAsync(solver);
+      LeanSmtNativeApi.deleteSolverBestEffort(solver);
     }
     super.close();
   }

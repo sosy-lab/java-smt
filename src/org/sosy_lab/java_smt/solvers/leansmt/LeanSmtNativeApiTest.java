@@ -122,4 +122,22 @@ public class LeanSmtNativeApiTest {
     assertThat(ex).hasMessageThat().contains("term=0");
   }
 
+  @Test
+  public void bestEffortDeleteDoesNotBlockImmediateRecreate() throws SolverException {
+    long extraSolver = LeanSmtNativeApi.createSolverCvc5();
+    LeanSmtNativeApi.deleteSolverBestEffort(extraSolver);
+
+    long recreatedSolver = LeanSmtNativeApi.createSolverCvc5();
+    try {
+      LeanSmtNativeApi.setLogic(recreatedSolver, "QF_LIA");
+      long x = declareIntVar(recreatedSolver, "x_recreated");
+      long zero = LeanSmtNativeApi.mkIntConst(0L);
+      LeanSmtNativeApi.assertTerm(recreatedSolver, LeanSmtNativeApi.mkGe(x, zero));
+      assertThat(LeanSmtNativeApi.checkSat(recreatedSolver))
+          .isEqualTo(LeanSMTConstants.LEANSMT_SAT);
+    } finally {
+      LeanSmtNativeApi.deleteSolver(recreatedSolver);
+    }
+  }
+
 }

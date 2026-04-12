@@ -115,7 +115,7 @@ final class LeanSmtTheoremProver extends AbstractProverWithAllSat<Void> implemen
       return registerEvaluator(
           new LeanSmtModel(this, creator, modelSolver, getRelevantModelHandles()));
     } catch (RuntimeException e) {
-      LeanSmtNativeApi.deleteSolverAsync(modelSolver);
+      LeanSmtNativeApi.deleteSolverBestEffort(modelSolver);
       throw e;
     }
   }
@@ -171,7 +171,7 @@ final class LeanSmtTheoremProver extends AbstractProverWithAllSat<Void> implemen
     try {
       return LeanSmtNativeApi.checkSat(solver);
     } finally {
-      LeanSmtNativeApi.deleteSolverAsync(solver);
+      LeanSmtNativeApi.deleteSolverBestEffort(solver);
     }
   }
 
@@ -187,7 +187,7 @@ final class LeanSmtTheoremProver extends AbstractProverWithAllSat<Void> implemen
       return solver;
     } finally {
       if (!success) {
-        LeanSmtNativeApi.deleteSolverAsync(solver);
+        LeanSmtNativeApi.deleteSolverBestEffort(solver);
       }
     }
   }
@@ -243,7 +243,7 @@ final class LeanSmtTheoremProver extends AbstractProverWithAllSat<Void> implemen
       throw new SolverException("Interrupted while constructing LeanSMT model snapshot", e);
     } finally {
       if (!success && solver != 0L) {
-        LeanSmtNativeApi.deleteSolverAsync(solver);
+        LeanSmtNativeApi.deleteSolverBestEffort(solver);
       }
     }
   }

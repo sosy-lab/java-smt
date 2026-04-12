@@ -12,10 +12,6 @@ import com.google.common.base.Preconditions;
 import java.math.BigInteger;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.NativeLibraries;
@@ -23,24 +19,22 @@ import org.sosy_lab.java_smt.api.SolverException;
 
 final class LeanSmtNativeApi {
 
-  private static final ExecutorService CLEANUP_EXECUTOR =
-      Executors.newSingleThreadExecutor(
-          r -> {
-            Thread t = new Thread(r, "leansmt-cleanup");
-            t.setDaemon(true);
-            return t;
-          });
-  private static final Object CLEANUP_QUEUE_LOCK = new Object();
-  private static boolean cleanupInProgress = false;
+  private static boolean libraryLoaded = false;
+  private static boolean initialized = false;
+  private static boolean shutdownHookRegistered = false;
 
   private LeanSmtNativeApi() {}
 
-  static void loadLibrary(Consumer<String> pLoader) {
+  static synchronized void loadLibrary(Consumer<String> pLoader) {
+    if (libraryLoaded) {
+      return;
+    }
     Preconditions.checkNotNull(pLoader);
     Path nativeDir = NativeLibraries.getNativeLibraryPath().toAbsolutePath().normalize();
     try {
       pLoader.accept("leansmt_jni");
       configureBundledSolverPathPrefix();
+      libraryLoaded = true;
     } catch (UnsatisfiedLinkError error) {
       UnsatisfiedLinkError wrapped =
           new UnsatisfiedLinkError(
@@ -69,63 +63,51 @@ final class LeanSmtNativeApi {
   }
 
   static synchronized void initialize() throws SolverException {
+    if (initialized) {
+      return;
+    }
     int status = LeanSMT.leansmt_wrapper_init();
     if (status != LeanSMTConstants.LEANSMT_OK) {
       throw new SolverException(errorOrDefault("Failed to initialize LeanSMT native library"));
     }
+    initialized = true;
+    registerShutdownHook();
   }
 
-  static synchronized boolean isNativeRuntimeInitialized() {
-    return LeanSMT.leansmt_wrapper_is_initialized() != 0;
+  static synchronized void cleanup() {
+    if (!initialized) {
+      return;
+    }
+    // The Lean runtime is process-global, so we only tear it down during JVM shutdown.
+    LeanSMT.leansmt_wrapper_cleanup();
+    initialized = false;
   }
 
-  static void cleanup() {
-    Future<?> queueBarrier;
-    synchronized (CLEANUP_QUEUE_LOCK) {
-      cleanupInProgress = true;
-      queueBarrier = CLEANUP_EXECUTOR.submit(() -> {});
+  private static synchronized void registerShutdownHook() {
+    if (shutdownHookRegistered) {
+      return;
     }
-    try {
-      awaitCleanupQueueBarrier(queueBarrier);
-      synchronized (LeanSmtNativeApi.class) {
-        LeanSMT.leansmt_wrapper_cleanup();
-      }
-    } finally {
-      synchronized (CLEANUP_QUEUE_LOCK) {
-        cleanupInProgress = false;
-      }
-    }
+    Runtime.getRuntime()
+        .addShutdownHook(
+            new Thread(
+                () -> {
+                  try {
+                    cleanup();
+                  } catch (RuntimeException | UnsatisfiedLinkError ignored) {
+                    // Best-effort JVM shutdown cleanup.
+                  }
+                },
+                "leansmt-shutdown"));
+    shutdownHookRegistered = true;
   }
 
-  private static void awaitCleanupQueueBarrier(Future<?> queueBarrier) {
-    try {
-      queueBarrier.get(30, TimeUnit.SECONDS);
-    } catch (InterruptedException e) {
-      Thread.currentThread().interrupt();
-    } catch (java.util.concurrent.ExecutionException | java.util.concurrent.TimeoutException e) {
-      // Best-effort drain: cleanup still proceeds to avoid wedging shutdown paths.
+  static synchronized long createSolverCvc5() throws SolverException {
+    BigInteger handle = LeanSMT.leansmt_wrapper_create_solver(LeanSMTConstants.LEANSMT_SOLVER_CVC5);
+    long solver = toLong(handle);
+    if (solver == 0L) {
+      throw new SolverException(errorOrDefault("Failed to create LeanSMT solver"));
     }
-  }
-
-  private static void drainPendingCleanupQueue() {
-    Future<?> queueBarrier;
-    synchronized (CLEANUP_QUEUE_LOCK) {
-      queueBarrier = CLEANUP_EXECUTOR.submit(() -> {});
-    }
-    awaitCleanupQueueBarrier(queueBarrier);
-  }
-
-  static long createSolverCvc5() throws SolverException {
-    drainPendingCleanupQueue();
-    synchronized (LeanSmtNativeApi.class) {
-      BigInteger handle =
-          LeanSMT.leansmt_wrapper_create_solver(LeanSMTConstants.LEANSMT_SOLVER_CVC5);
-      long solver = toLong(handle);
-      if (solver == 0L) {
-        throw new SolverException(errorOrDefault("Failed to create LeanSMT solver"));
-      }
-      return solver;
-    }
+    return solver;
   }
 
   static synchronized void deleteSolver(long solver) throws SolverException {
@@ -139,7 +121,7 @@ final class LeanSmtNativeApi {
     return LeanSMT.leansmt_wrapper_delete_solver(toBigInt(solver));
   }
 
-  private static synchronized void deleteSolverBestEffort(long solver) {
+  private static synchronized void deleteSolverSilently(long solver) {
     try {
       deleteSolverNative(solver);
     } catch (RuntimeException | UnsatisfiedLinkError ignored) {
@@ -147,16 +129,11 @@ final class LeanSmtNativeApi {
     }
   }
 
-  static void deleteSolverAsync(long solver) {
+  static void deleteSolverBestEffort(long solver) {
     if (solver == 0L) {
       return;
     }
-    synchronized (CLEANUP_QUEUE_LOCK) {
-      if (cleanupInProgress) {
-        return;
-      }
-      CLEANUP_EXECUTOR.execute(() -> deleteSolverBestEffort(solver));
-    }
+    deleteSolverSilently(solver);
   }
 
   static synchronized void setLogic(long solver, String logic) throws SolverException {
