@@ -118,13 +118,13 @@ public class SolverNativeOptionsTest extends SolverBasedTest0.ParameterizedSolve
     setAdditionalConfigOptionForSolver("solver.z3.furtherOptions", "restart_factor=2");
     // Now 2
     setAdditionalConfigOptionForSolver(
-        "solver.z3.furtherOptions", "arith.epsilon=2," + "restart_factor=2");
+        "solver.z3.furtherOptions", "arith.epsilon=2,restart_factor=2");
     // With spaces
     setAdditionalConfigOptionForSolver(
-        "solver.z3.furtherOptions", "arith.epsilon = 2," + " restart_factor = 2");
+        "solver.z3.furtherOptions", "arith.epsilon = 2, restart_factor = 2");
     // Capitalized
     setAdditionalConfigOptionForSolver(
-        "solver.z3.furtherOptions", "arith.Epsilon=2," + "Restart_facTor=2");
+        "solver.z3.furtherOptions", "arith.Epsilon=2,Restart_facTor=2");
   }
 
   // Test that options are not allowed to be existing twice
