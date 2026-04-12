@@ -211,10 +211,10 @@ final class LeanSmtTheoremProver extends AbstractProverWithAllSat<Void> implemen
     if (!visited.add(handle)) {
       return;
     }
-    if (relevantHandles != null) {
+    LeanSmtFormulaCreator.Expr expr = creator.getExpression(handle);
+    if (relevantHandles != null && isModelAssignmentTarget(expr)) {
       relevantHandles.add(handle);
     }
-    LeanSmtFormulaCreator.Expr expr = creator.getExpression(handle);
     if (expr.kind == LeanSmtFormulaCreator.ExprKind.VARIABLE) {
       referencedVariables.add(expr.symbol);
     } else if (expr.declarationKind == org.sosy_lab.java_smt.api.FunctionDeclarationKind.UF) {
@@ -223,6 +223,11 @@ final class LeanSmtTheoremProver extends AbstractProverWithAllSat<Void> implemen
     for (long arg : expr.arguments) {
       collectSnapshotMetadata(arg, visited, referencedVariables, referencedUfs, relevantHandles);
     }
+  }
+
+  private static boolean isModelAssignmentTarget(LeanSmtFormulaCreator.Expr expr) {
+    return expr.kind == LeanSmtFormulaCreator.ExprKind.VARIABLE
+        || expr.declarationKind == org.sosy_lab.java_smt.api.FunctionDeclarationKind.UF;
   }
 
   private long createSatModelSnapshotSolver(SnapshotPlan snapshotPlan) throws SolverException {

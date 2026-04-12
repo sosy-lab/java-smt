@@ -218,9 +218,6 @@ final class LeanSmtFormulaCreator
       if (declaration == null) {
         throw new IllegalArgumentException("Unknown LeanSMT UF '" + name + "'");
       }
-      if (declaration.getArgumentTypes().isEmpty()) {
-        continue;
-      }
       LeanSmtNativeApi.declareFun(
           solver,
           encodeNativeIdentifier(name),
@@ -477,9 +474,6 @@ final class LeanSmtFormulaCreator
   public Long callFunctionImpl(LeanSmtFunctionDecl declaration, List<Long> args) {
     if (declaration.getKind() != FunctionDeclarationKind.UF) {
       return callBuiltInFunction(declaration, args);
-    }
-    if (args.isEmpty()) {
-      return makeVariable(declaration.getReturnType(), declaration.getName());
     }
 
     synchronized (ufApplications) {
