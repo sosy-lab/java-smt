@@ -264,13 +264,13 @@ class SmtInterpolFormulaCreator extends FormulaCreator<Term, Sort, Script, Funct
         builder.put(var, makeVariable(var.getSort(), var.getName()));
       }
 
-      var newVars = builder.build();
+      var newVars = builder.buildOrThrow();
       var newBody = substBoundVariables(newVars, quantified.getSubformula());
 
       return visitor.visitQuantifier(
           (BooleanFormula) f,
           quantifier,
-          FluentIterable.from(newVars.values()).transform(this::encapsulateWithTypeOf).toList(),
+          transformedImmutableListCopy(newVars.values(), this::encapsulateWithTypeOf),
           encapsulateBoolean(newBody));
 
     } else {
@@ -315,7 +315,7 @@ class SmtInterpolFormulaCreator extends FormulaCreator<Term, Sort, Script, Funct
           .quantifier(
               quantified.getQuantifier(),
               quantified.getVariables(),
-              substBoundVariables(newSubst.build(), quantified.getSubformula()));
+              substBoundVariables(newSubst.buildOrThrow(), quantified.getSubformula()));
     } else {
       throw new AssertionError();
     }

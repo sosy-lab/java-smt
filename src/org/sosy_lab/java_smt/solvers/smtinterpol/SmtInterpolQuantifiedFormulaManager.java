@@ -96,7 +96,7 @@ public class SmtInterpolQuantifiedFormulaManager
               .variable(((ApplicationTerm) var).getFunction().getName(), var.getSort()));
     }
 
-    var newVars = builder.build();
+    var newVars = builder.buildOrThrow();
     var newBody = substFreeVariables(newVars, body);
 
     return formulaCreator
