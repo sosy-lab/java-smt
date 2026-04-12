@@ -15,7 +15,6 @@ structure RuntimeState where
   nextTerm : UInt64 := 1
   solvers : Std.HashMap UInt64 SolverState := {}
   terms : Std.HashMap UInt64 Term := {}
-  termHandles : Std.HashMap String UInt64 := {}
   lastError : String := ""
   initialized : Bool := false
 deriving Inhabited
@@ -79,29 +78,15 @@ private def insertSolver (solver : SolverState) : IO UInt64 := do
   }
   pure handle
 
-private partial def termCacheKey : Term → String
-  | .literalT text => s!"lit:{text}"
-  | .symbolT text => s!"sym:{text}"
-  | .arrowT domain codomain => s!"arr({termCacheKey domain},{termCacheKey codomain})"
-  | .appT fn arg => s!"app({termCacheKey fn},{termCacheKey arg})"
-  | .forallT name sort body => s!"forall({name},{termCacheKey sort},{termCacheKey body})"
-  | .existsT name sort body => s!"exists({name},{termCacheKey sort},{termCacheKey body})"
-  | .letT name value body => s!"let({name},{termCacheKey value},{termCacheKey body})"
-
 private def insertTerm (term : Term) : IO UInt64 := do
   let state ← getRuntime
-  let key := termCacheKey term
-  match state.termHandles[key]? with
-  | some handle => pure handle
-  | none =>
-      let handle := state.nextTerm
-      setRuntime {
-        state with
-          nextTerm := handle + 1
-          terms := state.terms.insert handle term
-          termHandles := state.termHandles.insert key handle
-      }
-      pure handle
+  let handle := state.nextTerm
+  setRuntime {
+    state with
+      nextTerm := handle + 1
+      terms := state.terms.insert handle term
+  }
+  pure handle
 
 private def getSolver (handle : UInt64) : IO SolverState := do
   let state ← getRuntime
@@ -304,12 +289,21 @@ def leanSmtCreateSolver (kind : UInt8) : IO UInt64 :=
     insertSolver solver
 
 @[export leansmt_delete_solver]
-def leanSmtDeleteSolver (handle : UInt64) : IO UInt32 :=
-  catchUInt32 do
-    let solver ← getSolver handle
+def leanSmtDeleteSolver (handle : UInt64) : IO UInt32 := do
+  clearError
+  let solver ←
+    try
+      getSolver handle
+    catch err =>
+      setError err.toString
+      return (1 : UInt32)
+  removeSolver handle
+  try
     let _ ← Solver.exit.run solver
-    removeSolver handle
-    pure 0
+    pure (0 : UInt32)
+  catch err =>
+    setError err.toString
+    pure (1 : UInt32)
 
 @[export leansmt_set_logic]
 def leanSmtSetLogic (handle : UInt64) (logic : @&String) : IO UInt32 :=
