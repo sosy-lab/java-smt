@@ -443,7 +443,7 @@ Remove the dependency and replace it with a dependency on the solvers:
 
 Then publish the Yices components of JavaSMT:
 ```shell
-ant publish-artifacts-yices2 -Dversion=yices2.8-prerelease
+ant publish-artifacts-yices2
 ```
 
 Finally, return the dependency in `ivy.xml` to its original form, but with the version updated:
