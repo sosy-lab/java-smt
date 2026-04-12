@@ -165,6 +165,9 @@ SPDX-License-Identifier: Apache-2.0
         <echo message="Using POM mapping configuration: ${pom.mapping.conf}"/>
 
         <!-- determine the resolve configurations: use mapping configuration and optionally include 'sources' if available -->
+        <condition property="resolve.confs" value="core,sources">
+            <istrue value="${is-javasmt}"/>
+        </condition>
         <condition property="has-sources" value="true" else="false">
             <contains string=",${ivyxml.configurations.conf.name}," substring=",sources,"/>
         </condition>
