@@ -2631,6 +2631,52 @@ SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_leansmt_LeanSMTJNI_
   return jresult;
 }
 
+SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_leansmt_LeanSMTJNI_leansmt_1wrapper_1assert_1smtlib(JNIEnv *jenv, jclass jcls, jobject jarg1, jstring jarg2) {
+  jint jresult = 0 ;
+  uint64_t arg1 ;
+  char *arg2 = (char *) 0 ;
+  int result;
+  
+  (void)jenv;
+  (void)jcls;
+  {
+    jclass clazz;
+    jmethodID mid;
+    jbyteArray ba;
+    jbyte* bae;
+    jsize sz;
+    int i;
+    
+    if (!jarg1) {
+      SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "BigInteger null");
+      return 0;
+    }
+    clazz = (*jenv)->GetObjectClass(jenv, jarg1);
+    mid = (*jenv)->GetMethodID(jenv, clazz, "toByteArray", "()[B");
+    ba = (jbyteArray)(*jenv)->CallObjectMethod(jenv, jarg1, mid);
+    bae = (*jenv)->GetByteArrayElements(jenv, ba, 0);
+    sz = (*jenv)->GetArrayLength(jenv, ba);
+    arg1 = 0;
+    if (sz > 0) {
+      arg1 = (uint64_t)(signed char)bae[0];
+      for(i=1; i<sz; i++) {
+        arg1 = (arg1 << 8) | (uint64_t)(unsigned char)bae[i];
+      }
+    }
+    (*jenv)->ReleaseByteArrayElements(jenv, ba, bae, 0);
+  }
+  if (!jarg2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "String null");
+    return 0;
+  }
+  arg2 = (char *)(*jenv)->GetStringUTFChars(jenv, jarg2, 0);
+  if (!arg2) return 0;
+  result = (int)leansmt_wrapper_assert_smtlib(arg1, (const char *)arg2);
+  (*jenv)->ReleaseStringUTFChars(jenv, jarg2, (const char *)arg2);
+  jresult = (jint)result;
+  return jresult;
+}
+
 SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_leansmt_LeanSMTJNI_leansmt_1wrapper_1check_1sat(JNIEnv *jenv, jclass jcls, jobject jarg1) {
   jint jresult = 0 ;
   uint64_t arg1 ;
@@ -2776,6 +2822,59 @@ SWIGEXPORT jstring JNICALL Java_org_sosy_1lab_java_1smt_solvers_leansmt_LeanSMTJ
     (*jenv)->ReleaseByteArrayElements(jenv, ba, bae, 0);
   }
   result = (char *)leansmt_wrapper_get_value(arg1,arg2);
+  {
+    if (result) {
+      jresult = (*jenv)->NewStringUTF(jenv, (const char *)result);
+      leansmt_wrapper_free_string(result);
+    } else {
+      jresult = 0;
+    }
+  }
+  return jresult;
+}
+
+SWIGEXPORT jstring JNICALL Java_org_sosy_1lab_java_1smt_solvers_leansmt_LeanSMTJNI_leansmt_1wrapper_1get_1value_1smtlib(JNIEnv *jenv, jclass jcls, jobject jarg1, jstring jarg2) {
+  jstring jresult = 0 ;
+  uint64_t arg1 ;
+  char *arg2 = (char *) 0 ;
+  char *result = 0 ;
+
+  (void)jenv;
+  (void)jcls;
+  {
+    jclass clazz;
+    jmethodID mid;
+    jbyteArray ba;
+    jbyte* bae;
+    jsize sz;
+    int i;
+
+    if (!jarg1) {
+      SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "BigInteger null");
+      return 0;
+    }
+    clazz = (*jenv)->GetObjectClass(jenv, jarg1);
+    mid = (*jenv)->GetMethodID(jenv, clazz, "toByteArray", "()[B");
+    ba = (jbyteArray)(*jenv)->CallObjectMethod(jenv, jarg1, mid);
+    bae = (*jenv)->GetByteArrayElements(jenv, ba, 0);
+    sz = (*jenv)->GetArrayLength(jenv, ba);
+    arg1 = 0;
+    if (sz > 0) {
+      arg1 = (uint64_t)(signed char)bae[0];
+      for(i=1; i<sz; i++) {
+        arg1 = (arg1 << 8) | (uint64_t)(unsigned char)bae[i];
+      }
+    }
+    (*jenv)->ReleaseByteArrayElements(jenv, ba, bae, 0);
+  }
+  if (!jarg2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "String null");
+    return 0;
+  }
+  arg2 = (char *)(*jenv)->GetStringUTFChars(jenv, jarg2, 0);
+  if (!arg2) return 0;
+  result = (char *)leansmt_wrapper_get_value_smtlib(arg1, (const char *)arg2);
+  (*jenv)->ReleaseStringUTFChars(jenv, jarg2, (const char *)arg2);
   {
     if (result) {
       jresult = (*jenv)->NewStringUTF(jenv, (const char *)result);

@@ -314,6 +314,14 @@ final class LeanSmtNativeApi {
     }
   }
 
+  static synchronized void assertTermSmtLib(long solver, String term) throws SolverException {
+    int status = LeanSMT.leansmt_wrapper_assert_smtlib(toBigInt(solver), term);
+    if (status != LeanSMTConstants.LEANSMT_OK) {
+      throw new SolverException(
+          errorOrDefault("assertTermSmtLib failed for solver=" + solver + ", term=" + term));
+    }
+  }
+
   static synchronized void declareFun(long solver, String name, String argSorts, String returnSort)
       throws SolverException {
     int status = LeanSMT.leansmt_wrapper_declare_fun(toBigInt(solver), name, argSorts, returnSort);
@@ -352,6 +360,17 @@ final class LeanSmtNativeApi {
     if (value == null || (value.isEmpty() && error != null && !error.isEmpty())) {
       throw new SolverException(
           errorOrDefault("Failed to obtain value from LeanSMT for solver=" + solver + ", term=" + term));
+    }
+    return value;
+  }
+
+  static synchronized String getValueSmtLib(long solver, String term) throws SolverException {
+    String value = LeanSMT.leansmt_wrapper_get_value_smtlib(toBigInt(solver), term);
+    String error = currentError();
+    if (value == null || (value.isEmpty() && error != null && !error.isEmpty())) {
+      throw new SolverException(
+          errorOrDefault(
+              "Failed to obtain value from LeanSMT for solver=" + solver + ", term=" + term));
     }
     return value;
   }

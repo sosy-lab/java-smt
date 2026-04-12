@@ -69,11 +69,13 @@ extern lean_object* leansmt_mk_div(uint64_t t1, uint64_t t2);
 extern lean_object* leansmt_mk_mod(uint64_t t1, uint64_t t2);
 extern lean_object* leansmt_mk_neg(uint64_t t);
 extern lean_object* leansmt_assert(uint64_t solver, uint64_t term);
+extern lean_object* leansmt_assert_smtlib(uint64_t solver, lean_object* term);
 extern lean_object* leansmt_declare_fun(
     uint64_t solver, lean_object* name, lean_object* arg_sorts, lean_object* return_sort);
 extern lean_object* leansmt_check_sat(uint64_t solver);
 extern lean_object* leansmt_get_model(uint64_t solver);
 extern lean_object* leansmt_get_value(uint64_t solver, uint64_t term);
+extern lean_object* leansmt_get_value_smtlib(uint64_t solver, lean_object* term);
 
 /* Internal state */
 static int g_initialized = 0;
@@ -523,6 +525,13 @@ int leansmt_wrapper_assert(uint64_t solver, uint64_t term) {
     return (ret == 0) ? LEANSMT_OK : LEANSMT_ERROR;
 }
 
+int leansmt_wrapper_assert_smtlib(uint64_t solver, const char* term) {
+    if (!g_initialized || term == NULL) return LEANSMT_ERROR;
+    lean_object* lean_term = lean_mk_string(term);
+    int32_t ret = extract_io_uint32(leansmt_assert_smtlib(solver, lean_term));
+    return (ret == 0) ? LEANSMT_OK : LEANSMT_ERROR;
+}
+
 int leansmt_wrapper_declare_fun(
     uint64_t solver, const char* name, const char* arg_sorts, const char* return_sort) {
     if (!g_initialized || name == NULL || arg_sorts == NULL || return_sort == NULL) {
@@ -559,6 +568,12 @@ char* leansmt_wrapper_get_model(uint64_t solver) {
 char* leansmt_wrapper_get_value(uint64_t solver, uint64_t term) {
     if (!g_initialized) return NULL;
     return extract_io_string(leansmt_get_value(solver, term));
+}
+
+char* leansmt_wrapper_get_value_smtlib(uint64_t solver, const char* term) {
+    if (!g_initialized || term == NULL) return NULL;
+    lean_object* lean_term = lean_mk_string(term);
+    return extract_io_string(leansmt_get_value_smtlib(solver, lean_term));
 }
 
 void leansmt_wrapper_free_string(char* value) {

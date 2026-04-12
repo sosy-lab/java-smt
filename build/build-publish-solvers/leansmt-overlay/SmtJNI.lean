@@ -108,6 +108,13 @@ private def removeSolver (handle : UInt64) : IO Unit := do
   let state ← getRuntime
   setRuntime { state with solvers := state.solvers.erase handle }
 
+private def clearTermsIfNoSolversRemain : IO Unit := do
+  let state ← getRuntime
+  if state.solvers.isEmpty then
+    setRuntime { state with nextTerm := 1, terms := {} }
+  else
+    pure ()
+
 private def runSolver (handle : UInt64) (action : SolverM α) : IO α := do
   let solver ← getSolver handle
   let (result, solver') ← action.run solver
@@ -300,8 +307,10 @@ def leanSmtDeleteSolver (handle : UInt64) : IO UInt32 := do
   removeSolver handle
   try
     let _ ← Solver.exit.run solver
+    clearTermsIfNoSolversRemain
     pure (0 : UInt32)
   catch err =>
+    clearTermsIfNoSolversRemain
     setError err.toString
     pure (1 : UInt32)
 
@@ -524,6 +533,14 @@ def leanSmtAssert (solver term : UInt64) : IO UInt32 :=
     runSolver solver <| Solver.assert arg
     pure 0
 
+@[export leansmt_assert_smtlib]
+def leanSmtAssertSmtLib (solver : UInt64) (term : @&String) : IO UInt32 :=
+  catchUInt32 do
+    let solverState ← getSolver solver
+    solverState.proc.stdin.putStr s!"(assert {term})\n"
+    solverState.proc.stdin.flush
+    pure 0
+
 @[export leansmt_declare_fun]
 def leanSmtDeclareFun
     (solver : UInt64) (name : @&String) (argSorts : @&String) (returnSort : @&String) : IO UInt32 :=
@@ -552,6 +569,14 @@ def leanSmtGetValue (solver term : UInt64) : IO String :=
     let solverState ← getSolver solver
     let valueTerm ← getTerm term
     solverState.proc.stdin.putStr s!"(get-value ({valueTerm}))\n"
+    solverState.proc.stdin.flush
+    extractGetValue (← readSolverSexp solverState)
+
+@[export leansmt_get_value_smtlib]
+def leanSmtGetValueSmtLib (solver : UInt64) (term : @&String) : IO String :=
+  catchString do
+    let solverState ← getSolver solver
+    solverState.proc.stdin.putStr s!"(get-value ({term}))\n"
     solverState.proc.stdin.flush
     extractGetValue (← readSolverSexp solverState)
 

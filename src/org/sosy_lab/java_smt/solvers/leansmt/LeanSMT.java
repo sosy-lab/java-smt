@@ -174,6 +174,10 @@ public class LeanSMT implements LeanSMTConstants {
     return LeanSMTJNI.leansmt_wrapper_assert(solver, term);
   }
 
+  public static int leansmt_wrapper_assert_smtlib(java.math.BigInteger solver, String term) {
+    return LeanSMTJNI.leansmt_wrapper_assert_smtlib(solver, term);
+  }
+
   public static int leansmt_wrapper_declare_fun(
       java.math.BigInteger solver, String name, String argSorts, String returnSort) {
     return LeanSMTJNI.leansmt_wrapper_declare_fun(solver, name, argSorts, returnSort);
@@ -189,5 +193,9 @@ public class LeanSMT implements LeanSMTConstants {
 
   public static String leansmt_wrapper_get_value(java.math.BigInteger solver, java.math.BigInteger term) {
     return LeanSMTJNI.leansmt_wrapper_get_value(solver, term);
+  }
+
+  public static String leansmt_wrapper_get_value_smtlib(java.math.BigInteger solver, String term) {
+    return LeanSMTJNI.leansmt_wrapper_get_value_smtlib(solver, term);
   }
 }

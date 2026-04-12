@@ -92,11 +92,13 @@ uint64_t leansmt_wrapper_mk_neg(uint64_t t);
 /*=== Solving ===*/
 
 int leansmt_wrapper_assert(uint64_t solver, uint64_t term);
+int leansmt_wrapper_assert_smtlib(uint64_t solver, const char* term);
 int leansmt_wrapper_declare_fun(
     uint64_t solver, const char* name, const char* arg_sorts, const char* return_sort);
 int leansmt_wrapper_check_sat(uint64_t solver);
 char* leansmt_wrapper_get_model(uint64_t solver);
 char* leansmt_wrapper_get_value(uint64_t solver, uint64_t term);
+char* leansmt_wrapper_get_value_smtlib(uint64_t solver, const char* term);
 void leansmt_wrapper_free_string(char* value);
 
 #ifdef __cplusplus

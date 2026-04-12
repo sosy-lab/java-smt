@@ -30,6 +30,7 @@ final class LeanSmtTheoremProver extends AbstractProverWithAllSat<Void> implemen
 
   private final LeanSmtFormulaCreator creator;
   private final String logic;
+  private final LeanSmtSmtLibPrinter printer;
 
   private static final class SnapshotPlan {
     private final ImmutableSet<BooleanFormula> constraints;
@@ -58,6 +59,7 @@ final class LeanSmtTheoremProver extends AbstractProverWithAllSat<Void> implemen
     super(pOptions, pBmgr, pShutdownNotifier);
     creator = pCreator;
     logic = pLogic;
+    printer = new LeanSmtSmtLibPrinter(pCreator);
   }
 
   @Override
@@ -150,7 +152,8 @@ final class LeanSmtTheoremProver extends AbstractProverWithAllSat<Void> implemen
       throws SolverException, InterruptedException {
     for (BooleanFormula constraint : snapshotPlan.constraints) {
       shutdownNotifier.shutdownIfNecessary();
-      LeanSmtNativeApi.assertTerm(solver, creator.extractInfoFromFormula(constraint));
+      LeanSmtNativeApi.assertTermSmtLib(
+          solver, printer.dumpTerm(creator.extractInfoFromFormula(constraint)));
     }
   }
 

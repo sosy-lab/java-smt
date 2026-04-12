@@ -141,19 +141,20 @@ final class LeanSmtFormulaCreator
   private final Map<BitvectorConstantKey, Long> bitvectorConstantHandles = new HashMap<>();
   private final Map<OperationKey, Long> canonicalApplications = new HashMap<>();
   private final Map<ApplicationKey, Long> ufApplications = new HashMap<>();
+  private long nextExpressionHandle = 1L;
   private final long trueHandle;
   private final long falseHandle;
 
   LeanSmtFormulaCreator() {
     super(0L, LeanSmtType.BOOL, LeanSmtType.INT, LeanSmtType.REAL, null, null);
-    try {
-      trueHandle = LeanSmtNativeApi.mkTrue();
-      falseHandle = LeanSmtNativeApi.mkFalse();
-      registerConstant(trueHandle, FormulaType.BooleanType, true);
-      registerConstant(falseHandle, FormulaType.BooleanType, false);
-    } catch (Exception e) {
-      throw new IllegalStateException("Failed to initialize LeanSMT constants", e);
-    }
+    trueHandle = allocateExpressionHandle();
+    falseHandle = allocateExpressionHandle();
+    registerConstant(trueHandle, FormulaType.BooleanType, true);
+    registerConstant(falseHandle, FormulaType.BooleanType, false);
+  }
+
+  private synchronized long allocateExpressionHandle() {
+    return nextExpressionHandle++;
   }
 
   @Override
@@ -191,13 +192,9 @@ final class LeanSmtFormulaCreator
         }
       }
 
-      try {
-        long handle = LeanSmtNativeApi.mkSymbol(encodeNativeIdentifier(varName));
-        registerVariable(handle, varName, type);
-        return handle;
-      } catch (Exception e) {
-        throw new IllegalArgumentException("Failed to create variable in LeanSMT: " + varName, e);
-      }
+      long handle = allocateExpressionHandle();
+      registerVariable(handle, varName, type);
+      return handle;
     }
   }
 
@@ -244,17 +241,10 @@ final class LeanSmtFormulaCreator
       if (existing != null) {
         return existing;
       }
-      try {
-        long handle =
-            fitsInLong(value)
-                ? LeanSmtNativeApi.mkIntConst(value.longValueExact())
-                : LeanSmtNativeApi.mkIntConst(value.toString());
-        registerConstant(handle, FormulaType.IntegerType, value);
-        intConstantHandles.put(value, handle);
-        return handle;
-      } catch (Exception e) {
-        throw new IllegalArgumentException("Failed to create integer constant", e);
-      }
+      long handle = allocateExpressionHandle();
+      registerConstant(handle, FormulaType.IntegerType, value);
+      intConstantHandles.put(value, handle);
+      return handle;
     }
   }
 
@@ -268,19 +258,10 @@ final class LeanSmtFormulaCreator
       if (existing != null) {
         return existing;
       }
-      try {
-        BigInteger num = value.getNum();
-        BigInteger den = value.getDen();
-        long handle =
-            fitsInLong(num) && fitsInLong(den)
-                ? LeanSmtNativeApi.mkRealConst(num.longValueExact(), den.longValueExact())
-                : LeanSmtNativeApi.mkRealConst(num.toString(), den.toString());
-        registerConstant(handle, FormulaType.RationalType, value);
-        realConstantHandles.put(value, handle);
-        return handle;
-      } catch (Exception e) {
-        throw new IllegalArgumentException("Failed to create rational constant", e);
-      }
+      long handle = allocateExpressionHandle();
+      registerConstant(handle, FormulaType.RationalType, value);
+      realConstantHandles.put(value, handle);
+      return handle;
     }
   }
 
@@ -301,25 +282,16 @@ final class LeanSmtFormulaCreator
       if (existing != null) {
         return existing;
       }
-      try {
-        long handle = LeanSmtNativeApi.mkBvConst(bitwidth, unsignedValue.toString());
-        registerConstant(handle, FormulaType.getBitvectorTypeWithSize(bitwidth), unsignedValue);
-        bitvectorConstantHandles.put(key, handle);
-        return handle;
-      } catch (Exception e) {
-        throw new IllegalArgumentException(
-            "Failed to create bitvector constant (width="
-                + bitwidth
-                + ", value="
-                + unsignedValue
-                + ")",
-            e);
-      }
+      long handle = allocateExpressionHandle();
+      registerConstant(handle, FormulaType.getBitvectorTypeWithSize(bitwidth), unsignedValue);
+      bitvectorConstantHandles.put(key, handle);
+      return handle;
     }
   }
 
   long makeUnary(
       String symbol, FunctionDeclarationKind kind, FormulaType<?> type, long arg, NativeUnary op) {
+    Preconditions.checkNotNull(op);
     ImmutableList<Long> arguments = ImmutableList.of(arg);
     OperationKey key = new OperationKey(symbol, kind, type, arguments);
     synchronized (canonicalApplications) {
@@ -327,14 +299,10 @@ final class LeanSmtFormulaCreator
       if (existing != null) {
         return existing;
       }
-      try {
-        long handle = op.apply(arg);
-        registerApplication(handle, symbol, kind, type, arguments);
-        canonicalApplications.put(key, handle);
-        return handle;
-      } catch (Exception e) {
-        throw new IllegalArgumentException("Failed to create term '" + symbol + "'", e);
-      }
+      long handle = allocateExpressionHandle();
+      registerApplication(handle, symbol, kind, type, arguments);
+      canonicalApplications.put(key, handle);
+      return handle;
     }
   }
 
@@ -345,6 +313,7 @@ final class LeanSmtFormulaCreator
       long arg1,
       long arg2,
       NativeBinary op) {
+    Preconditions.checkNotNull(op);
     ImmutableList<Long> arguments = ImmutableList.of(arg1, arg2);
     OperationKey key = new OperationKey(symbol, kind, type, arguments);
     synchronized (canonicalApplications) {
@@ -352,14 +321,10 @@ final class LeanSmtFormulaCreator
       if (existing != null) {
         return existing;
       }
-      try {
-        long handle = op.apply(arg1, arg2);
-        registerApplication(handle, symbol, kind, type, arguments);
-        canonicalApplications.put(key, handle);
-        return handle;
-      } catch (Exception e) {
-        throw new IllegalArgumentException("Failed to create term '" + symbol + "'", e);
-      }
+      long handle = allocateExpressionHandle();
+      registerApplication(handle, symbol, kind, type, arguments);
+      canonicalApplications.put(key, handle);
+      return handle;
     }
   }
 
@@ -371,6 +336,7 @@ final class LeanSmtFormulaCreator
       long arg2,
       long arg3,
       NativeTernary op) {
+    Preconditions.checkNotNull(op);
     ImmutableList<Long> arguments = ImmutableList.of(arg1, arg2, arg3);
     OperationKey key = new OperationKey(symbol, kind, type, arguments);
     synchronized (canonicalApplications) {
@@ -378,14 +344,10 @@ final class LeanSmtFormulaCreator
       if (existing != null) {
         return existing;
       }
-      try {
-        long handle = op.apply(arg1, arg2, arg3);
-        registerApplication(handle, symbol, kind, type, arguments);
-        canonicalApplications.put(key, handle);
-        return handle;
-      } catch (Exception e) {
-        throw new IllegalArgumentException("Failed to create term '" + symbol + "'", e);
-      }
+      long handle = allocateExpressionHandle();
+      registerApplication(handle, symbol, kind, type, arguments);
+      canonicalApplications.put(key, handle);
+      return handle;
     }
   }
 
@@ -484,7 +446,7 @@ final class LeanSmtFormulaCreator
         return existing;
       }
 
-      long handle = makeNativeApplication(declaration.getName(), normalizedArgs);
+      long handle = allocateExpressionHandle();
       registerApplication(
           handle,
           declaration.getName(),
@@ -663,23 +625,6 @@ final class LeanSmtFormulaCreator
       }
     }
     return normalizedArgs.build();
-  }
-
-  private long makeNativeApplication(String symbol, ImmutableList<Long> arguments) {
-    try {
-      long app = LeanSmtNativeApi.mkSymbol(encodeNativeIdentifier(symbol));
-      for (long argument : arguments) {
-        app = LeanSmtNativeApi.mkApply(app, argument);
-      }
-      return app;
-    } catch (Exception e) {
-      throw new IllegalArgumentException("Failed to create LeanSMT application '" + symbol + "'", e);
-    }
-  }
-
-  private static boolean fitsInLong(BigInteger value) {
-    return value.compareTo(BigInteger.valueOf(Long.MIN_VALUE)) >= 0
-        && value.compareTo(BigInteger.valueOf(Long.MAX_VALUE)) <= 0;
   }
 
   @SuppressWarnings("unchecked")

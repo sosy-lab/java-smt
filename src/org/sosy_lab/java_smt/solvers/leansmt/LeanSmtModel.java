@@ -28,6 +28,7 @@ import org.sosy_lab.java_smt.basicimpl.AbstractModel;
 final class LeanSmtModel extends AbstractModel<Long, LeanSmtType, Long> {
 
   private final LeanSmtFormulaCreator leanCreator;
+  private final LeanSmtSmtLibPrinter printer;
   private final long solver;
   private final ImmutableList<ValueAssignment> modelAssignments;
   private final Map<Long, @Nullable Value> valuesByHandle = new LinkedHashMap<>();
@@ -49,6 +50,7 @@ final class LeanSmtModel extends AbstractModel<Long, LeanSmtType, Long> {
       java.util.Set<Long> pRelevantHandles) {
     super(pProver, pCreator);
     leanCreator = pCreator;
+    printer = new LeanSmtSmtLibPrinter(pCreator);
     solver = pSolver;
     modelAssignments = generateModelAssignments(ImmutableList.copyOf(pRelevantHandles));
   }
@@ -115,7 +117,10 @@ final class LeanSmtModel extends AbstractModel<Long, LeanSmtType, Long> {
 
     @Nullable Value value = null;
     try {
-      value = parseValue(handle, LeanSmtNativeApi.getValue(solver, handle));
+      value =
+          parseValue(
+              handle,
+              LeanSmtNativeApi.getValueSmtLib(solver, printer.dumpTerm(handle)));
     } catch (IllegalArgumentException | SolverException e) {
       value = null;
     }

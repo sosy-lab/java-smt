@@ -89,7 +89,7 @@ public class LeanSmtNativeApiTest {
             x,
             v,
             LeanSmtNativeApi::mkEq);
-    LeanSmtNativeApi.assertTerm(solver, eq);
+    LeanSmtNativeApi.assertTermSmtLib(solver, new LeanSmtSmtLibPrinter(creator).dumpTerm(eq));
     assertThat(LeanSmtNativeApi.checkSat(solver)).isEqualTo(LeanSMTConstants.LEANSMT_SAT);
     assertThat(LeanSmtNativeApi.getModel(solver)).contains(big.toString());
   }

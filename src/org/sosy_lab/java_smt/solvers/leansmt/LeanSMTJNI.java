@@ -66,9 +66,11 @@ public class LeanSMTJNI {
   public final static native java.math.BigInteger leansmt_wrapper_mk_mod(java.math.BigInteger jarg1, java.math.BigInteger jarg2);
   public final static native java.math.BigInteger leansmt_wrapper_mk_neg(java.math.BigInteger jarg1);
   public final static native int leansmt_wrapper_assert(java.math.BigInteger jarg1, java.math.BigInteger jarg2);
+  public final static native int leansmt_wrapper_assert_smtlib(java.math.BigInteger jarg1, String jarg2);
   public final static native int leansmt_wrapper_declare_fun(
       java.math.BigInteger jarg1, String jarg2, String jarg3, String jarg4);
   public final static native int leansmt_wrapper_check_sat(java.math.BigInteger jarg1);
   public final static native String leansmt_wrapper_get_model(java.math.BigInteger jarg1);
   public final static native String leansmt_wrapper_get_value(java.math.BigInteger jarg1, java.math.BigInteger jarg2);
+  public final static native String leansmt_wrapper_get_value_smtlib(java.math.BigInteger jarg1, String jarg2);
 }

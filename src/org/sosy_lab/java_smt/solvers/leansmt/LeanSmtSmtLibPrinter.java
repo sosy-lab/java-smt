@@ -8,7 +8,6 @@
 
 package org.sosy_lab.java_smt.solvers.leansmt;
 
-import java.io.IOException;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
@@ -27,7 +26,7 @@ final class LeanSmtSmtLibPrinter {
     creator = pCreator;
   }
 
-  String dumpFormula(long formula) throws IOException {
+  String dumpFormula(long formula) {
     Map<String, LeanSmtType> variableDecls = new LinkedHashMap<>();
     Set<String> functionDecls = new LinkedHashSet<>();
     collectDeclarations(formula, variableDecls, functionDecls);
@@ -47,7 +46,11 @@ final class LeanSmtSmtLibPrinter {
     return out.toString();
   }
 
-  private String serializeTerm(long formula) throws IOException {
+  String dumpTerm(long formula) {
+    return serializeTerm(formula);
+  }
+
+  private String serializeTerm(long formula) {
     return serializeWithLets(formula);
   }
 
