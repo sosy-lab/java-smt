@@ -256,6 +256,8 @@ SPDX-License-Identifier: Apache-2.0
             <copy file="${yices2.buildDir}/yices2_java_bindings/dist/lib/libyices2java.so" tofile="${yices2.distDir}/x64/libyices2java-${yices2.version}.so" failonerror="true"/>
             <copy file="${yices2.buildDir}/yices2_java_bindings/dist/lib/yices2java.dll" tofile="${yices2.distDir}/x64/yices2java-${yices2.version}.dll" failonerror="true"/>
             <copy file="${yices2.buildDir}/yices2_java_bindings/dist/lib/yices.jar" tofile="${yices2.distDir}/yices-${yices2.version}.jar" failonerror="true"/>
+            <copy file="${yices2.buildDir}/yices2_java_bindings/dist/lib/yices-sources.jar" tofile="${yices2.distDir}/yices-${yices2.version}-sources.jar" failonerror="true"/>
+            <copy file="${yices2.buildDir}/yices2_java_bindings/dist/lib/yices-javadoc.jar" tofile="${yices2.distDir}/yices-${yices2.version}-javadoc.jar" failonerror="true"/>
 
             <ivy:resolve conf="solver-yices2" file="solvers_ivy_conf/ivy_yices2.xml" />
 
@@ -276,7 +278,9 @@ SPDX-License-Identifier: Apache-2.0
     </target>
 
     <import file="build-jar-yices2.xml"/>
-    <target name="dist-yices2" depends="jar-yices2, sources-yices2" description="Make a distributable release with yices2 only"/>
+    <import file="build-documentation-yices2.xml"/>
+
+    <target name="dist-yices2" depends="jar-yices2, sources-yices2, javadoc-jar-yices2" description="Make a distributable release with yices2 only"/>
 
     <target name="publish-artifacts-yices2" depends="load-ivy, determine-version, dist-yices2"
          description="Publish Java bindings for Yices2 to Ivy repo.">
