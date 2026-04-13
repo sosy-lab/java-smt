@@ -10,10 +10,10 @@ package org.sosy_lab.java_smt.solvers.leansmt;
 
 import org.sosy_lab.java_smt.basicimpl.AbstractUFManager;
 
-final class LeanSmtUFManager extends AbstractUFManager<Long, LeanSmtFunctionDecl, LeanSmtType, Long> {
+final class LeanSmtUFManager
+    extends AbstractUFManager<Long, LeanSmtFunctionDecl, LeanSmtType, Long> {
 
   LeanSmtUFManager(LeanSmtFormulaCreator pCreator) {
     super(pCreator);
   }
 }
-

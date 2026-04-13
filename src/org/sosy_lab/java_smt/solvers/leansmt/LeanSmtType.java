@@ -39,7 +39,8 @@ final class LeanSmtType {
 
   static LeanSmtType bitvector(int bitvectorSize) {
     Preconditions.checkArgument(bitvectorSize > 0, "Bitvector size must be positive");
-    return BITVECTOR_CACHE.computeIfAbsent(bitvectorSize, size -> new LeanSmtType(Kind.BITVECTOR, size));
+    return BITVECTOR_CACHE.computeIfAbsent(
+        bitvectorSize, size -> new LeanSmtType(Kind.BITVECTOR, size));
   }
 
   boolean isBool() {

@@ -198,7 +198,8 @@ final class LeanSmtFormulaCreator
     }
   }
 
-  synchronized void redeclareVariables(long solver, Set<String> variableNames) throws org.sosy_lab.java_smt.api.SolverException {
+  synchronized void redeclareVariables(long solver, Set<String> variableNames)
+      throws org.sosy_lab.java_smt.api.SolverException {
     for (String name : variableNames) {
       LeanSmtType type = declaredVariables.get(name);
       if (type == null) {
@@ -447,7 +448,11 @@ final class LeanSmtFormulaCreator
             formula,
             args,
             FunctionDeclarationImpl.of(
-                expr.symbol, expr.declarationKind, argTypes.build(), castFormulaType(expr.type), decl));
+                expr.symbol,
+                expr.declarationKind,
+                argTypes.build(),
+                castFormulaType(expr.type),
+                decl));
 
       default:
         throw new AssertionError("Unexpected expression kind " + expr.kind);
@@ -653,8 +658,7 @@ final class LeanSmtFormulaCreator
       BigInteger integerValue = (BigInteger) expr.constantValue;
       return makeRealConstant(Rational.of(integerValue, BigInteger.ONE));
     }
-    return makeUnary(
-        "to_real", FunctionDeclarationKind.TO_REAL, FormulaType.RationalType, arg);
+    return makeUnary("to_real", FunctionDeclarationKind.TO_REAL, FormulaType.RationalType, arg);
   }
 
   @SuppressWarnings("unchecked")
@@ -709,7 +713,8 @@ final class LeanSmtFormulaCreator
       }
     }
 
-    @Nullable Long handled = tryHandleCoreBuiltInFunction(declaration, args, kind, returnType, symbol);
+    @Nullable Long handled =
+        tryHandleCoreBuiltInFunction(declaration, args, kind, returnType, symbol);
     if (handled != null) {
       return handled;
     }
@@ -743,8 +748,7 @@ final class LeanSmtFormulaCreator
         return foldLeft("=>", kind, FormulaType.BooleanType, args);
       case ITE:
         checkArity(declaration, args, 3);
-        return makeTernary(
-            "ite", kind, returnType, args.get(0), args.get(1), args.get(2));
+        return makeTernary("ite", kind, returnType, args.get(0), args.get(1), args.get(2));
       case EQ:
         return foldPairwiseBoolean("=", kind, args);
       case DISTINCT:
@@ -897,8 +901,7 @@ final class LeanSmtFormulaCreator
     int msb = parseNonNegativeIndex(parts[2], symbol);
     int lsb = parseNonNegativeIndex(parts[3], symbol);
     if (msb < lsb) {
-      throw new IllegalArgumentException(
-          "Expected extract with msb >= lsb, got '" + symbol + "'");
+      throw new IllegalArgumentException("Expected extract with msb >= lsb, got '" + symbol + "'");
     }
     return new int[] {msb, lsb};
   }
@@ -946,7 +949,8 @@ final class LeanSmtFormulaCreator
     long result = args.get(0);
     for (int i = 1; i < args.size(); i++) {
       result =
-          makeBinary("or", FunctionDeclarationKind.OR, FormulaType.BooleanType, result, args.get(i));
+          makeBinary(
+              "or", FunctionDeclarationKind.OR, FormulaType.BooleanType, result, args.get(i));
     }
     return result;
   }
@@ -969,8 +973,7 @@ final class LeanSmtFormulaCreator
     }
     long result = makeBinary(symbol, kind, FormulaType.BooleanType, args.get(0), args.get(1));
     for (int i = 2; i < args.size(); i++) {
-      long next =
-          makeBinary(symbol, kind, FormulaType.BooleanType, args.get(i - 1), args.get(i));
+      long next = makeBinary(symbol, kind, FormulaType.BooleanType, args.get(i - 1), args.get(i));
       result =
           makeBinary("and", FunctionDeclarationKind.AND, FormulaType.BooleanType, result, next);
     }

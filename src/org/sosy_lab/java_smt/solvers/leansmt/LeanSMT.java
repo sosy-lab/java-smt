@@ -73,15 +73,18 @@ public class LeanSMT implements LeanSMTConstants {
     return LeanSMTJNI.leansmt_wrapper_mk_app1(op, term);
   }
 
-  public static java.math.BigInteger leansmt_wrapper_mk_app2(String op, java.math.BigInteger lhs, java.math.BigInteger rhs) {
+  public static java.math.BigInteger leansmt_wrapper_mk_app2(
+      String op, java.math.BigInteger lhs, java.math.BigInteger rhs) {
     return LeanSMTJNI.leansmt_wrapper_mk_app2(op, lhs, rhs);
   }
 
-  public static java.math.BigInteger leansmt_wrapper_mk_extract(java.math.BigInteger term, long msb, long lsb) {
+  public static java.math.BigInteger leansmt_wrapper_mk_extract(
+      java.math.BigInteger term, long msb, long lsb) {
     return LeanSMTJNI.leansmt_wrapper_mk_extract(term, msb, lsb);
   }
 
-  public static java.math.BigInteger leansmt_wrapper_mk_indexed_app1(String op, long index, java.math.BigInteger term) {
+  public static java.math.BigInteger leansmt_wrapper_mk_indexed_app1(
+      String op, long index, java.math.BigInteger term) {
     return LeanSMTJNI.leansmt_wrapper_mk_indexed_app1(op, index, term);
   }
 
@@ -98,71 +101,90 @@ public class LeanSMT implements LeanSMTConstants {
     return LeanSMTJNI.leansmt_wrapper_mk_not(t);
   }
 
-  public static java.math.BigInteger leansmt_wrapper_mk_and(java.math.BigInteger t1, java.math.BigInteger t2) {
+  public static java.math.BigInteger leansmt_wrapper_mk_and(
+      java.math.BigInteger t1, java.math.BigInteger t2) {
     return LeanSMTJNI.leansmt_wrapper_mk_and(t1, t2);
   }
 
-  public static java.math.BigInteger leansmt_wrapper_mk_or(java.math.BigInteger t1, java.math.BigInteger t2) {
+  public static java.math.BigInteger leansmt_wrapper_mk_or(
+      java.math.BigInteger t1, java.math.BigInteger t2) {
     return LeanSMTJNI.leansmt_wrapper_mk_or(t1, t2);
   }
 
-  public static java.math.BigInteger leansmt_wrapper_mk_xor(java.math.BigInteger t1, java.math.BigInteger t2) {
+  public static java.math.BigInteger leansmt_wrapper_mk_xor(
+      java.math.BigInteger t1, java.math.BigInteger t2) {
     return LeanSMTJNI.leansmt_wrapper_mk_xor(t1, t2);
   }
 
-  public static java.math.BigInteger leansmt_wrapper_mk_implies(java.math.BigInteger t1, java.math.BigInteger t2) {
+  public static java.math.BigInteger leansmt_wrapper_mk_implies(
+      java.math.BigInteger t1, java.math.BigInteger t2) {
     return LeanSMTJNI.leansmt_wrapper_mk_implies(t1, t2);
   }
 
-  public static java.math.BigInteger leansmt_wrapper_mk_iff(java.math.BigInteger t1, java.math.BigInteger t2) {
+  public static java.math.BigInteger leansmt_wrapper_mk_iff(
+      java.math.BigInteger t1, java.math.BigInteger t2) {
     return LeanSMTJNI.leansmt_wrapper_mk_iff(t1, t2);
   }
 
-  public static java.math.BigInteger leansmt_wrapper_mk_ite(java.math.BigInteger cond, java.math.BigInteger then_branch, java.math.BigInteger else_branch) {
+  public static java.math.BigInteger leansmt_wrapper_mk_ite(
+      java.math.BigInteger cond,
+      java.math.BigInteger then_branch,
+      java.math.BigInteger else_branch) {
     return LeanSMTJNI.leansmt_wrapper_mk_ite(cond, then_branch, else_branch);
   }
 
-  public static java.math.BigInteger leansmt_wrapper_mk_eq(java.math.BigInteger t1, java.math.BigInteger t2) {
+  public static java.math.BigInteger leansmt_wrapper_mk_eq(
+      java.math.BigInteger t1, java.math.BigInteger t2) {
     return LeanSMTJNI.leansmt_wrapper_mk_eq(t1, t2);
   }
 
-  public static java.math.BigInteger leansmt_wrapper_mk_distinct(java.math.BigInteger t1, java.math.BigInteger t2) {
+  public static java.math.BigInteger leansmt_wrapper_mk_distinct(
+      java.math.BigInteger t1, java.math.BigInteger t2) {
     return LeanSMTJNI.leansmt_wrapper_mk_distinct(t1, t2);
   }
 
-  public static java.math.BigInteger leansmt_wrapper_mk_lt(java.math.BigInteger t1, java.math.BigInteger t2) {
+  public static java.math.BigInteger leansmt_wrapper_mk_lt(
+      java.math.BigInteger t1, java.math.BigInteger t2) {
     return LeanSMTJNI.leansmt_wrapper_mk_lt(t1, t2);
   }
 
-  public static java.math.BigInteger leansmt_wrapper_mk_le(java.math.BigInteger t1, java.math.BigInteger t2) {
+  public static java.math.BigInteger leansmt_wrapper_mk_le(
+      java.math.BigInteger t1, java.math.BigInteger t2) {
     return LeanSMTJNI.leansmt_wrapper_mk_le(t1, t2);
   }
 
-  public static java.math.BigInteger leansmt_wrapper_mk_gt(java.math.BigInteger t1, java.math.BigInteger t2) {
+  public static java.math.BigInteger leansmt_wrapper_mk_gt(
+      java.math.BigInteger t1, java.math.BigInteger t2) {
     return LeanSMTJNI.leansmt_wrapper_mk_gt(t1, t2);
   }
 
-  public static java.math.BigInteger leansmt_wrapper_mk_ge(java.math.BigInteger t1, java.math.BigInteger t2) {
+  public static java.math.BigInteger leansmt_wrapper_mk_ge(
+      java.math.BigInteger t1, java.math.BigInteger t2) {
     return LeanSMTJNI.leansmt_wrapper_mk_ge(t1, t2);
   }
 
-  public static java.math.BigInteger leansmt_wrapper_mk_add(java.math.BigInteger t1, java.math.BigInteger t2) {
+  public static java.math.BigInteger leansmt_wrapper_mk_add(
+      java.math.BigInteger t1, java.math.BigInteger t2) {
     return LeanSMTJNI.leansmt_wrapper_mk_add(t1, t2);
   }
 
-  public static java.math.BigInteger leansmt_wrapper_mk_sub(java.math.BigInteger t1, java.math.BigInteger t2) {
+  public static java.math.BigInteger leansmt_wrapper_mk_sub(
+      java.math.BigInteger t1, java.math.BigInteger t2) {
     return LeanSMTJNI.leansmt_wrapper_mk_sub(t1, t2);
   }
 
-  public static java.math.BigInteger leansmt_wrapper_mk_mul(java.math.BigInteger t1, java.math.BigInteger t2) {
+  public static java.math.BigInteger leansmt_wrapper_mk_mul(
+      java.math.BigInteger t1, java.math.BigInteger t2) {
     return LeanSMTJNI.leansmt_wrapper_mk_mul(t1, t2);
   }
 
-  public static java.math.BigInteger leansmt_wrapper_mk_div(java.math.BigInteger t1, java.math.BigInteger t2) {
+  public static java.math.BigInteger leansmt_wrapper_mk_div(
+      java.math.BigInteger t1, java.math.BigInteger t2) {
     return LeanSMTJNI.leansmt_wrapper_mk_div(t1, t2);
   }
 
-  public static java.math.BigInteger leansmt_wrapper_mk_mod(java.math.BigInteger t1, java.math.BigInteger t2) {
+  public static java.math.BigInteger leansmt_wrapper_mk_mod(
+      java.math.BigInteger t1, java.math.BigInteger t2) {
     return LeanSMTJNI.leansmt_wrapper_mk_mod(t1, t2);
   }
 
@@ -191,7 +213,8 @@ public class LeanSMT implements LeanSMTConstants {
     return LeanSMTJNI.leansmt_wrapper_get_model(solver);
   }
 
-  public static String leansmt_wrapper_get_value(java.math.BigInteger solver, java.math.BigInteger term) {
+  public static String leansmt_wrapper_get_value(
+      java.math.BigInteger solver, java.math.BigInteger term) {
     return LeanSMTJNI.leansmt_wrapper_get_value(solver, term);
   }
 

@@ -46,21 +46,26 @@ final class LeanSmtIntegerFormulaManager
 
   @Override
   protected Long modularCongruence(Long pNumber1, Long pNumber2, BigInteger pModulo) {
-    return modularCongruence0(pNumber1, pNumber2, ((LeanSmtFormulaCreator) getFormulaCreator()).makeIntConstant(pModulo));
+    return modularCongruence0(
+        pNumber1, pNumber2, ((LeanSmtFormulaCreator) getFormulaCreator()).makeIntConstant(pModulo));
   }
 
   @Override
   protected Long modularCongruence(Long pNumber1, Long pNumber2, long pModulo) {
-    return modularCongruence0(pNumber1, pNumber2, ((LeanSmtFormulaCreator) getFormulaCreator()).makeIntConstant(pModulo));
+    return modularCongruence0(
+        pNumber1, pNumber2, ((LeanSmtFormulaCreator) getFormulaCreator()).makeIntConstant(pModulo));
   }
 
   private Long modularCongruence0(Long pNumber1, Long pNumber2, Long pModulo) {
     LeanSmtFormulaCreator creator = (LeanSmtFormulaCreator) getFormulaCreator();
     Long diff =
-        creator.makeBinary("-", FunctionDeclarationKind.SUB, FormulaType.IntegerType, pNumber1, pNumber2);
+        creator.makeBinary(
+            "-", FunctionDeclarationKind.SUB, FormulaType.IntegerType, pNumber1, pNumber2);
     Long remainder =
-        creator.makeBinary("mod", FunctionDeclarationKind.MODULO, FormulaType.IntegerType, diff, pModulo);
+        creator.makeBinary(
+            "mod", FunctionDeclarationKind.MODULO, FormulaType.IntegerType, diff, pModulo);
     Long zero = creator.makeIntConstant(0L);
-    return creator.makeBinary("=", FunctionDeclarationKind.EQ, FormulaType.BooleanType, remainder, zero);
+    return creator.makeBinary(
+        "=", FunctionDeclarationKind.EQ, FormulaType.BooleanType, remainder, zero);
   }
 }

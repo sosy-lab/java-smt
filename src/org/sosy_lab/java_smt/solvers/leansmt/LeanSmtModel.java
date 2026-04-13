@@ -91,9 +91,7 @@ final class LeanSmtModel extends AbstractModel<Long, LeanSmtType, Long> {
       long assignmentHandle;
       if (value.type.isBool() && value.value instanceof Boolean) {
         assignmentHandle =
-            ((Boolean) value.value)
-                ? handle
-                : LeanSmtNativeApiResult.not(leanCreator, handle);
+            ((Boolean) value.value) ? handle : LeanSmtNativeApiResult.not(leanCreator, handle);
       } else {
         assignmentHandle = LeanSmtNativeApiResult.eq(leanCreator, handle, valueHandle);
       }
@@ -117,10 +115,7 @@ final class LeanSmtModel extends AbstractModel<Long, LeanSmtType, Long> {
 
     @Nullable Value value = null;
     try {
-      value =
-          parseValue(
-              handle,
-              LeanSmtNativeApi.getValueSmtLib(solver, printer.dumpTerm(handle)));
+      value = parseValue(handle, LeanSmtNativeApi.getValueSmtLib(solver, printer.dumpTerm(handle)));
     } catch (IllegalArgumentException | SolverException e) {
       value = null;
     }

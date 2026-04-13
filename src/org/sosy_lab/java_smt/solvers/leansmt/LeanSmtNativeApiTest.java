@@ -81,10 +81,8 @@ public class LeanSmtNativeApiTest {
         solver, LeanSmtFormulaCreator.encodeNativeIdentifier("x"), "", "Int");
     long x = creator.makeVariable(LeanSmtType.INT, "x");
     long v = creator.makeIntConstant(big);
-    long eq =
-        creator.makeBinary("=", FunctionDeclarationKind.EQ, FormulaType.BooleanType, x, v);
-    LeanSmtNativeApi.assertTermSmtLib(
-        solver, new LeanSmtSmtLibPrinter(creator, true).dumpTerm(eq));
+    long eq = creator.makeBinary("=", FunctionDeclarationKind.EQ, FormulaType.BooleanType, x, v);
+    LeanSmtNativeApi.assertTermSmtLib(solver, new LeanSmtSmtLibPrinter(creator, true).dumpTerm(eq));
     assertThat(LeanSmtNativeApi.checkSat(solver)).isEqualTo(LeanSMTConstants.LEANSMT_SAT);
     assertThat(LeanSmtNativeApi.getModel(solver)).contains(big.toString());
   }
@@ -98,10 +96,8 @@ public class LeanSmtNativeApiTest {
 
     long x = creator.makeVariable(LeanSmtType.INT, awkwardName);
     long zero = creator.makeIntConstant(0L);
-    long gt =
-        creator.makeBinary(">", FunctionDeclarationKind.GT, FormulaType.BooleanType, x, zero);
-    LeanSmtNativeApi.assertTermSmtLib(
-        solver, new LeanSmtSmtLibPrinter(creator, true).dumpTerm(gt));
+    long gt = creator.makeBinary(">", FunctionDeclarationKind.GT, FormulaType.BooleanType, x, zero);
+    LeanSmtNativeApi.assertTermSmtLib(solver, new LeanSmtSmtLibPrinter(creator, true).dumpTerm(gt));
     assertThat(LeanSmtNativeApi.checkSat(solver)).isEqualTo(LeanSMTConstants.LEANSMT_SAT);
   }
 
@@ -120,7 +116,8 @@ public class LeanSmtNativeApiTest {
 
   @Test
   public void errorMessageContainsOperationContextForInvalidDelete() {
-    SolverException ex = assertThrows(SolverException.class, () -> LeanSmtNativeApi.deleteSolver(0L));
+    SolverException ex =
+        assertThrows(SolverException.class, () -> LeanSmtNativeApi.deleteSolver(0L));
     assertThat(ex).hasMessageThat().contains("deleteSolver");
   }
 
@@ -150,5 +147,4 @@ public class LeanSmtNativeApiTest {
       LeanSmtNativeApi.deleteSolver(recreatedSolver);
     }
   }
-
 }

@@ -27,7 +27,8 @@ import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractProverWithAllSat;
 import org.sosy_lab.java_smt.basicimpl.CachingModel;
 
-final class LeanSmtTheoremProver extends AbstractProverWithAllSat<Void> implements ProverEnvironment {
+final class LeanSmtTheoremProver extends AbstractProverWithAllSat<Void>
+    implements ProverEnvironment {
 
   private final LeanSmtFormulaCreator creator;
   private final String logic;
@@ -109,8 +110,7 @@ final class LeanSmtTheoremProver extends AbstractProverWithAllSat<Void> implemen
   }
 
   static void throwOnUnknownOrUnexpectedResult(
-      boolean isUnknownResult, int result, String operationDescription)
-      throws SolverException {
+      boolean isUnknownResult, int result, String operationDescription) throws SolverException {
     if (isUnknownResult) {
       throw new SolverException("LeanSMT returned UNKNOWN for " + operationDescription);
     }

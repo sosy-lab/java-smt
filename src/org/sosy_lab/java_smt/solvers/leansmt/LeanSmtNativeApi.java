@@ -152,7 +152,8 @@ final class LeanSmtNativeApi {
   }
 
   static synchronized long mkIntConst(long value) throws SolverException {
-    return requireTerm(LeanSMT.leansmt_wrapper_mk_int_const(value), "Failed to create Int constant");
+    return requireTerm(
+        LeanSMT.leansmt_wrapper_mk_int_const(value), "Failed to create Int constant");
   }
 
   static synchronized long mkIntConst(String value) throws SolverException {
@@ -359,7 +360,8 @@ final class LeanSmtNativeApi {
     String error = currentError();
     if (value == null || (value.isEmpty() && error != null && !error.isEmpty())) {
       throw new SolverException(
-          errorOrDefault("Failed to obtain value from LeanSMT for solver=" + solver + ", term=" + term));
+          errorOrDefault(
+              "Failed to obtain value from LeanSMT for solver=" + solver + ", term=" + term));
     }
     return value;
   }

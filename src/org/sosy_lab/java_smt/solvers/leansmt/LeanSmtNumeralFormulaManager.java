@@ -115,12 +115,14 @@ abstract class LeanSmtNumeralFormulaManager<
 
   @Override
   public Long negate(Long pParam1) {
-    return creator().makeUnary("-", FunctionDeclarationKind.UMINUS, getNumericFormulaType(), pParam1);
+    return creator()
+        .makeUnary("-", FunctionDeclarationKind.UMINUS, getNumericFormulaType(), pParam1);
   }
 
   @Override
   public Long add(Long pParam1, Long pParam2) {
-    return creator().makeBinary("+", FunctionDeclarationKind.ADD, getNumericFormulaType(), pParam1, pParam2);
+    return creator()
+        .makeBinary("+", FunctionDeclarationKind.ADD, getNumericFormulaType(), pParam1, pParam2);
   }
 
   @Override
@@ -134,12 +136,14 @@ abstract class LeanSmtNumeralFormulaManager<
 
   @Override
   public Long subtract(Long pParam1, Long pParam2) {
-    return creator().makeBinary("-", FunctionDeclarationKind.SUB, getNumericFormulaType(), pParam1, pParam2);
+    return creator()
+        .makeBinary("-", FunctionDeclarationKind.SUB, getNumericFormulaType(), pParam1, pParam2);
   }
 
   @Override
   public Long multiply(Long pParam1, Long pParam2) {
-    return creator().makeBinary("*", FunctionDeclarationKind.MUL, getNumericFormulaType(), pParam1, pParam2);
+    return creator()
+        .makeBinary("*", FunctionDeclarationKind.MUL, getNumericFormulaType(), pParam1, pParam2);
   }
 
   @Override
@@ -154,22 +158,27 @@ abstract class LeanSmtNumeralFormulaManager<
 
   @Override
   public Long modulo(Long pParam1, Long pParam2) {
-    return creator().makeBinary("mod", FunctionDeclarationKind.MODULO, getNumericFormulaType(), pParam1, pParam2);
+    return creator()
+        .makeBinary(
+            "mod", FunctionDeclarationKind.MODULO, getNumericFormulaType(), pParam1, pParam2);
   }
 
   @Override
   protected Long modularCongruence(Long pNumber1, Long pNumber2, BigInteger pModulo) {
-    throw new UnsupportedOperationException("LeanSMT backend does not support modular congruence yet");
+    throw new UnsupportedOperationException(
+        "LeanSMT backend does not support modular congruence yet");
   }
 
   @Override
   protected Long modularCongruence(Long pNumber1, Long pNumber2, long pModulo) {
-    throw new UnsupportedOperationException("LeanSMT backend does not support modular congruence yet");
+    throw new UnsupportedOperationException(
+        "LeanSMT backend does not support modular congruence yet");
   }
 
   @Override
   public Long equal(Long pParam1, Long pParam2) {
-    return creator().makeBinary("=", FunctionDeclarationKind.EQ, FormulaType.BooleanType, pParam1, pParam2);
+    return creator()
+        .makeBinary("=", FunctionDeclarationKind.EQ, FormulaType.BooleanType, pParam1, pParam2);
   }
 
   @Override
@@ -194,11 +203,7 @@ abstract class LeanSmtNumeralFormulaManager<
           result =
               creator()
                   .makeBinary(
-                      "and",
-                      FunctionDeclarationKind.AND,
-                      FormulaType.BooleanType,
-                      result,
-                      next);
+                      "and", FunctionDeclarationKind.AND, FormulaType.BooleanType, result, next);
         }
       }
     }
@@ -207,22 +212,26 @@ abstract class LeanSmtNumeralFormulaManager<
 
   @Override
   public Long greaterThan(Long pParam1, Long pParam2) {
-    return creator().makeBinary(">", FunctionDeclarationKind.GT, FormulaType.BooleanType, pParam1, pParam2);
+    return creator()
+        .makeBinary(">", FunctionDeclarationKind.GT, FormulaType.BooleanType, pParam1, pParam2);
   }
 
   @Override
   public Long greaterOrEquals(Long pParam1, Long pParam2) {
-    return creator().makeBinary(">=", FunctionDeclarationKind.GTE, FormulaType.BooleanType, pParam1, pParam2);
+    return creator()
+        .makeBinary(">=", FunctionDeclarationKind.GTE, FormulaType.BooleanType, pParam1, pParam2);
   }
 
   @Override
   public Long lessThan(Long pParam1, Long pParam2) {
-    return creator().makeBinary("<", FunctionDeclarationKind.LT, FormulaType.BooleanType, pParam1, pParam2);
+    return creator()
+        .makeBinary("<", FunctionDeclarationKind.LT, FormulaType.BooleanType, pParam1, pParam2);
   }
 
   @Override
   public Long lessOrEquals(Long pParam1, Long pParam2) {
-    return creator().makeBinary("<=", FunctionDeclarationKind.LTE, FormulaType.BooleanType, pParam1, pParam2);
+    return creator()
+        .makeBinary("<=", FunctionDeclarationKind.LTE, FormulaType.BooleanType, pParam1, pParam2);
   }
 
   @Override

@@ -70,4 +70,3 @@ final class LeanSmtFunctionDecl {
     return Objects.hash(name, kind, returnType, argumentTypes);
   }
 }
-

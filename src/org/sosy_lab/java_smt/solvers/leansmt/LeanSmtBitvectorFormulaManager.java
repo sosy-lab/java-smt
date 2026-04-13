@@ -42,13 +42,11 @@ final class LeanSmtBitvectorFormulaManager
     return creator().makeUnary(symbol, kind, creator().getFormulaType(arg), arg);
   }
 
-  private long mkBvBinary(
-      String symbol, FunctionDeclarationKind kind, long arg1, long arg2) {
+  private long mkBvBinary(String symbol, FunctionDeclarationKind kind, long arg1, long arg2) {
     return creator().makeBinary(symbol, kind, creator().getFormulaType(arg1), arg1, arg2);
   }
 
-  private long mkBvCompare(
-      String symbol, FunctionDeclarationKind kind, long arg1, long arg2) {
+  private long mkBvCompare(String symbol, FunctionDeclarationKind kind, long arg1, long arg2) {
     return creator().makeBinary(symbol, kind, FormulaType.BooleanType, arg1, arg2);
   }
 
@@ -115,7 +113,9 @@ final class LeanSmtBitvectorFormulaManager
     int resultSize = bitvectorSize(pParam1) + pExtensionBits;
     String op = signed ? "sign_extend" : "zero_extend";
     FunctionDeclarationKind kind =
-        signed ? FunctionDeclarationKind.BV_SIGN_EXTENSION : FunctionDeclarationKind.BV_ZERO_EXTENSION;
+        signed
+            ? FunctionDeclarationKind.BV_SIGN_EXTENSION
+            : FunctionDeclarationKind.BV_ZERO_EXTENSION;
     return creator()
         .makeUnary(
             indexedSymbol(op, pExtensionBits),

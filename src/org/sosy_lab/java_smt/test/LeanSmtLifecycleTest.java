@@ -41,7 +41,8 @@ public class LeanSmtLifecycleTest extends SolverBasedTest0 {
   }
 
   @Test
-  public void repeatedSatChecksStayConsistentAcrossPop() throws SolverException, InterruptedException {
+  public void repeatedSatChecksStayConsistentAcrossPop()
+      throws SolverException, InterruptedException {
     requireIntegers();
 
     IntegerFormula x = imgr.makeVariable("x");
@@ -62,7 +63,8 @@ public class LeanSmtLifecycleTest extends SolverBasedTest0 {
   }
 
   @Test
-  public void assumptionsDoNotCorruptBaseSolverState() throws SolverException, InterruptedException {
+  public void assumptionsDoNotCorruptBaseSolverState()
+      throws SolverException, InterruptedException {
     requireIntegers();
 
     IntegerFormula x = imgr.makeVariable("x");
@@ -92,12 +94,14 @@ public class LeanSmtLifecycleTest extends SolverBasedTest0 {
                   config, logger, shutdownManager.getNotifier(), Solvers.LEANSMT);
           ProverEnvironment prover = localContext.newProverEnvironment()) {
 
-        IntegerFormula x = localContext.getFormulaManager().getIntegerFormulaManager().makeVariable("x" + i);
+        IntegerFormula x =
+            localContext.getFormulaManager().getIntegerFormulaManager().makeVariable("x" + i);
         BooleanFormula c =
             localContext
                 .getFormulaManager()
                 .getIntegerFormulaManager()
-                .greaterThan(x, localContext.getFormulaManager().getIntegerFormulaManager().makeNumber(0));
+                .greaterThan(
+                    x, localContext.getFormulaManager().getIntegerFormulaManager().makeNumber(0));
         prover.push(c);
         assertThat(prover.isUnsat()).isFalse();
       }
@@ -134,7 +138,11 @@ public class LeanSmtLifecycleTest extends SolverBasedTest0 {
         assertThat(prover.isUnsat()).isFalse();
 
         try (Model model = prover.getModel()) {
-          assertThat(model.evaluate(localBmgr.and(localImgr.greaterThan(y, x), localImgr.equal(floor, localImgr.makeNumber(2)))))
+          assertThat(
+                  model.evaluate(
+                      localBmgr.and(
+                          localImgr.greaterThan(y, x),
+                          localImgr.equal(floor, localImgr.makeNumber(2)))))
               .isTrue();
         }
       }
@@ -152,48 +160,46 @@ public class LeanSmtLifecycleTest extends SolverBasedTest0 {
         final int workerId = worker;
         tasks.add(
             () -> {
-                  for (int round = 0; round < roundsPerWorker; round++) {
-                    if (Thread.currentThread().isInterrupted()) {
-                      throw new InterruptedException("Worker interrupted");
-                    }
-                    try (SolverContext localContext =
-                            SolverContextFactory.createSolverContext(
-                                config, logger, shutdownManager.getNotifier(), Solvers.LEANSMT);
-                        ProverEnvironment prover =
-                            localContext.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
-                      var localMgr = localContext.getFormulaManager();
-                      var localImgr = localMgr.getIntegerFormulaManager();
-                      var localRmgr = localMgr.getRationalFormulaManager();
-                      var localBmgr = localMgr.getBooleanFormulaManager();
+              for (int round = 0; round < roundsPerWorker; round++) {
+                if (Thread.currentThread().isInterrupted()) {
+                  throw new InterruptedException("Worker interrupted");
+                }
+                try (SolverContext localContext =
+                        SolverContextFactory.createSolverContext(
+                            config, logger, shutdownManager.getNotifier(), Solvers.LEANSMT);
+                    ProverEnvironment prover =
+                        localContext.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
+                  var localMgr = localContext.getFormulaManager();
+                  var localImgr = localMgr.getIntegerFormulaManager();
+                  var localRmgr = localMgr.getRationalFormulaManager();
+                  var localBmgr = localMgr.getBooleanFormulaManager();
 
-                      IntegerFormula x =
-                          localImgr.makeVariable("x_thr_" + workerId + "_" + round);
-                      IntegerFormula y =
-                          localImgr.makeVariable("y_thr_" + workerId + "_" + round);
-                      var r = localRmgr.makeVariable("r_thr_" + workerId + "_" + round);
-                      var floor = localRmgr.floor(r);
+                  IntegerFormula x = localImgr.makeVariable("x_thr_" + workerId + "_" + round);
+                  IntegerFormula y = localImgr.makeVariable("y_thr_" + workerId + "_" + round);
+                  var r = localRmgr.makeVariable("r_thr_" + workerId + "_" + round);
+                  var floor = localRmgr.floor(r);
 
-                      prover.push(localImgr.greaterThan(x, localImgr.makeNumber(0)));
-                      prover.push(localImgr.lessOrEquals(x, localImgr.makeNumber(50)));
-                      prover.push(localImgr.equal(y, localImgr.add(x, localImgr.makeNumber(1))));
-                      prover.push(localImgr.modularCongruence(y, localImgr.makeNumber(1), 1));
-                      prover.push(localRmgr.equal(r, localRmgr.makeNumber("9/4")));
-                      prover.push(localImgr.equal(floor, localImgr.makeNumber(2)));
+                  prover.push(localImgr.greaterThan(x, localImgr.makeNumber(0)));
+                  prover.push(localImgr.lessOrEquals(x, localImgr.makeNumber(50)));
+                  prover.push(localImgr.equal(y, localImgr.add(x, localImgr.makeNumber(1))));
+                  prover.push(localImgr.modularCongruence(y, localImgr.makeNumber(1), 1));
+                  prover.push(localRmgr.equal(r, localRmgr.makeNumber("9/4")));
+                  prover.push(localImgr.equal(floor, localImgr.makeNumber(2)));
 
-                      assertThat(prover.isUnsat()).isFalse();
+                  assertThat(prover.isUnsat()).isFalse();
 
-                      try (Model model = prover.getModel()) {
-                        assertThat(
-                                model.evaluate(
-                                    localBmgr.and(
-                                        localImgr.greaterThan(y, x),
-                                        localImgr.equal(floor, localImgr.makeNumber(2)))))
-                            .isTrue();
-                      }
-                    }
+                  try (Model model = prover.getModel()) {
+                    assertThat(
+                            model.evaluate(
+                                localBmgr.and(
+                                    localImgr.greaterThan(y, x),
+                                    localImgr.equal(floor, localImgr.makeNumber(2)))))
+                        .isTrue();
                   }
-                  return null;
-                });
+                }
+              }
+              return null;
+            });
       }
       List<Future<Void>> futures = executor.invokeAll(tasks, 40, TimeUnit.SECONDS);
 

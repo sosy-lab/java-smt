@@ -109,7 +109,8 @@ public final class LeanSmtSolverContext extends AbstractSolverContext {
   }
 
   @Override
-  protected OptimizationProverEnvironment newOptimizationProverEnvironment0(Set<ProverOptions> pSet) {
+  protected OptimizationProverEnvironment newOptimizationProverEnvironment0(
+      Set<ProverOptions> pSet) {
     throw new UnsupportedOperationException("LeanSMT backend does not support optimization");
   }
 

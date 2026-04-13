@@ -8,4 +8,3 @@
 
 /** LeanSMT backend for JavaSMT. */
 package org.sosy_lab.java_smt.solvers.leansmt;
-

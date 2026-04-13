@@ -9,68 +9,162 @@
 package org.sosy_lab.java_smt.solvers.leansmt;
 
 public class LeanSMTJNI {
-  public final static native int OK_get();
-  public final static native int ERROR_get();
-  public final static native int SAT_get();
-  public final static native int UNSAT_get();
-  public final static native int UNKNOWN_get();
-  public final static native int CHECK_ERROR_get();
-  public final static native int SOLVER_CVC5_get();
-  public final static native int SOLVER_Z3_get();
-  public final static native int LEANSMT_OK_get();
-  public final static native int LEANSMT_ERROR_get();
-  public final static native int LEANSMT_SAT_get();
-  public final static native int LEANSMT_UNSAT_get();
-  public final static native int LEANSMT_UNKNOWN_get();
-  public final static native int LEANSMT_CHECK_ERROR_get();
-  public final static native int LEANSMT_SOLVER_CVC5_get();
-  public final static native int LEANSMT_SOLVER_Z3_get();
-  public final static native int leansmt_wrapper_init();
-  public final static native int leansmt_wrapper_is_initialized();
-  public final static native void leansmt_wrapper_cleanup();
-  public final static native String leansmt_wrapper_get_error();
-  public final static native int leansmt_wrapper_set_path_prefix(String jarg1);
-  public final static native java.math.BigInteger leansmt_wrapper_create_solver(int jarg1);
-  public final static native int leansmt_wrapper_delete_solver(java.math.BigInteger jarg1);
-  public final static native int leansmt_wrapper_set_logic(java.math.BigInteger jarg1, String jarg2);
-  public final static native java.math.BigInteger leansmt_wrapper_mk_true();
-  public final static native java.math.BigInteger leansmt_wrapper_mk_false();
-  public final static native java.math.BigInteger leansmt_wrapper_mk_int_const(long jarg1);
-  public final static native java.math.BigInteger leansmt_wrapper_mk_int_const_str(String jarg1);
-  public final static native java.math.BigInteger leansmt_wrapper_mk_real_const(long jarg1, long jarg2);
-  public final static native java.math.BigInteger leansmt_wrapper_mk_real_const_str(String jarg1, String jarg2);
-  public final static native java.math.BigInteger leansmt_wrapper_mk_bv_const(long jarg1, String jarg2);
-  public final static native java.math.BigInteger leansmt_wrapper_mk_app1(String jarg1, java.math.BigInteger jarg2);
-  public final static native java.math.BigInteger leansmt_wrapper_mk_app2(String jarg1, java.math.BigInteger jarg2, java.math.BigInteger jarg3);
-  public final static native java.math.BigInteger leansmt_wrapper_mk_extract(java.math.BigInteger jarg1, long jarg2, long jarg3);
-  public final static native java.math.BigInteger leansmt_wrapper_mk_indexed_app1(String jarg1, long jarg2, java.math.BigInteger jarg3);
-  public final static native java.math.BigInteger leansmt_wrapper_mk_symbol(String jarg1);
-  public final static native java.math.BigInteger leansmt_wrapper_mk_apply(java.math.BigInteger jarg1, java.math.BigInteger jarg2);
-  public final static native java.math.BigInteger leansmt_wrapper_mk_not(java.math.BigInteger jarg1);
-  public final static native java.math.BigInteger leansmt_wrapper_mk_and(java.math.BigInteger jarg1, java.math.BigInteger jarg2);
-  public final static native java.math.BigInteger leansmt_wrapper_mk_or(java.math.BigInteger jarg1, java.math.BigInteger jarg2);
-  public final static native java.math.BigInteger leansmt_wrapper_mk_xor(java.math.BigInteger jarg1, java.math.BigInteger jarg2);
-  public final static native java.math.BigInteger leansmt_wrapper_mk_implies(java.math.BigInteger jarg1, java.math.BigInteger jarg2);
-  public final static native java.math.BigInteger leansmt_wrapper_mk_iff(java.math.BigInteger jarg1, java.math.BigInteger jarg2);
-  public final static native java.math.BigInteger leansmt_wrapper_mk_ite(java.math.BigInteger jarg1, java.math.BigInteger jarg2, java.math.BigInteger jarg3);
-  public final static native java.math.BigInteger leansmt_wrapper_mk_eq(java.math.BigInteger jarg1, java.math.BigInteger jarg2);
-  public final static native java.math.BigInteger leansmt_wrapper_mk_distinct(java.math.BigInteger jarg1, java.math.BigInteger jarg2);
-  public final static native java.math.BigInteger leansmt_wrapper_mk_lt(java.math.BigInteger jarg1, java.math.BigInteger jarg2);
-  public final static native java.math.BigInteger leansmt_wrapper_mk_le(java.math.BigInteger jarg1, java.math.BigInteger jarg2);
-  public final static native java.math.BigInteger leansmt_wrapper_mk_gt(java.math.BigInteger jarg1, java.math.BigInteger jarg2);
-  public final static native java.math.BigInteger leansmt_wrapper_mk_ge(java.math.BigInteger jarg1, java.math.BigInteger jarg2);
-  public final static native java.math.BigInteger leansmt_wrapper_mk_add(java.math.BigInteger jarg1, java.math.BigInteger jarg2);
-  public final static native java.math.BigInteger leansmt_wrapper_mk_sub(java.math.BigInteger jarg1, java.math.BigInteger jarg2);
-  public final static native java.math.BigInteger leansmt_wrapper_mk_mul(java.math.BigInteger jarg1, java.math.BigInteger jarg2);
-  public final static native java.math.BigInteger leansmt_wrapper_mk_div(java.math.BigInteger jarg1, java.math.BigInteger jarg2);
-  public final static native java.math.BigInteger leansmt_wrapper_mk_mod(java.math.BigInteger jarg1, java.math.BigInteger jarg2);
-  public final static native java.math.BigInteger leansmt_wrapper_mk_neg(java.math.BigInteger jarg1);
-  public final static native int leansmt_wrapper_assert(java.math.BigInteger jarg1, java.math.BigInteger jarg2);
-  public final static native int leansmt_wrapper_assert_smtlib(java.math.BigInteger jarg1, String jarg2);
-  public final static native int leansmt_wrapper_declare_fun(
+  public static final native int OK_get();
+
+  public static final native int ERROR_get();
+
+  public static final native int SAT_get();
+
+  public static final native int UNSAT_get();
+
+  public static final native int UNKNOWN_get();
+
+  public static final native int CHECK_ERROR_get();
+
+  public static final native int SOLVER_CVC5_get();
+
+  public static final native int SOLVER_Z3_get();
+
+  public static final native int LEANSMT_OK_get();
+
+  public static final native int LEANSMT_ERROR_get();
+
+  public static final native int LEANSMT_SAT_get();
+
+  public static final native int LEANSMT_UNSAT_get();
+
+  public static final native int LEANSMT_UNKNOWN_get();
+
+  public static final native int LEANSMT_CHECK_ERROR_get();
+
+  public static final native int LEANSMT_SOLVER_CVC5_get();
+
+  public static final native int LEANSMT_SOLVER_Z3_get();
+
+  public static final native int leansmt_wrapper_init();
+
+  public static final native int leansmt_wrapper_is_initialized();
+
+  public static final native void leansmt_wrapper_cleanup();
+
+  public static final native String leansmt_wrapper_get_error();
+
+  public static final native int leansmt_wrapper_set_path_prefix(String jarg1);
+
+  public static final native java.math.BigInteger leansmt_wrapper_create_solver(int jarg1);
+
+  public static final native int leansmt_wrapper_delete_solver(java.math.BigInteger jarg1);
+
+  public static final native int leansmt_wrapper_set_logic(
+      java.math.BigInteger jarg1, String jarg2);
+
+  public static final native java.math.BigInteger leansmt_wrapper_mk_true();
+
+  public static final native java.math.BigInteger leansmt_wrapper_mk_false();
+
+  public static final native java.math.BigInteger leansmt_wrapper_mk_int_const(long jarg1);
+
+  public static final native java.math.BigInteger leansmt_wrapper_mk_int_const_str(String jarg1);
+
+  public static final native java.math.BigInteger leansmt_wrapper_mk_real_const(
+      long jarg1, long jarg2);
+
+  public static final native java.math.BigInteger leansmt_wrapper_mk_real_const_str(
+      String jarg1, String jarg2);
+
+  public static final native java.math.BigInteger leansmt_wrapper_mk_bv_const(
+      long jarg1, String jarg2);
+
+  public static final native java.math.BigInteger leansmt_wrapper_mk_app1(
+      String jarg1, java.math.BigInteger jarg2);
+
+  public static final native java.math.BigInteger leansmt_wrapper_mk_app2(
+      String jarg1, java.math.BigInteger jarg2, java.math.BigInteger jarg3);
+
+  public static final native java.math.BigInteger leansmt_wrapper_mk_extract(
+      java.math.BigInteger jarg1, long jarg2, long jarg3);
+
+  public static final native java.math.BigInteger leansmt_wrapper_mk_indexed_app1(
+      String jarg1, long jarg2, java.math.BigInteger jarg3);
+
+  public static final native java.math.BigInteger leansmt_wrapper_mk_symbol(String jarg1);
+
+  public static final native java.math.BigInteger leansmt_wrapper_mk_apply(
+      java.math.BigInteger jarg1, java.math.BigInteger jarg2);
+
+  public static final native java.math.BigInteger leansmt_wrapper_mk_not(
+      java.math.BigInteger jarg1);
+
+  public static final native java.math.BigInteger leansmt_wrapper_mk_and(
+      java.math.BigInteger jarg1, java.math.BigInteger jarg2);
+
+  public static final native java.math.BigInteger leansmt_wrapper_mk_or(
+      java.math.BigInteger jarg1, java.math.BigInteger jarg2);
+
+  public static final native java.math.BigInteger leansmt_wrapper_mk_xor(
+      java.math.BigInteger jarg1, java.math.BigInteger jarg2);
+
+  public static final native java.math.BigInteger leansmt_wrapper_mk_implies(
+      java.math.BigInteger jarg1, java.math.BigInteger jarg2);
+
+  public static final native java.math.BigInteger leansmt_wrapper_mk_iff(
+      java.math.BigInteger jarg1, java.math.BigInteger jarg2);
+
+  public static final native java.math.BigInteger leansmt_wrapper_mk_ite(
+      java.math.BigInteger jarg1, java.math.BigInteger jarg2, java.math.BigInteger jarg3);
+
+  public static final native java.math.BigInteger leansmt_wrapper_mk_eq(
+      java.math.BigInteger jarg1, java.math.BigInteger jarg2);
+
+  public static final native java.math.BigInteger leansmt_wrapper_mk_distinct(
+      java.math.BigInteger jarg1, java.math.BigInteger jarg2);
+
+  public static final native java.math.BigInteger leansmt_wrapper_mk_lt(
+      java.math.BigInteger jarg1, java.math.BigInteger jarg2);
+
+  public static final native java.math.BigInteger leansmt_wrapper_mk_le(
+      java.math.BigInteger jarg1, java.math.BigInteger jarg2);
+
+  public static final native java.math.BigInteger leansmt_wrapper_mk_gt(
+      java.math.BigInteger jarg1, java.math.BigInteger jarg2);
+
+  public static final native java.math.BigInteger leansmt_wrapper_mk_ge(
+      java.math.BigInteger jarg1, java.math.BigInteger jarg2);
+
+  public static final native java.math.BigInteger leansmt_wrapper_mk_add(
+      java.math.BigInteger jarg1, java.math.BigInteger jarg2);
+
+  public static final native java.math.BigInteger leansmt_wrapper_mk_sub(
+      java.math.BigInteger jarg1, java.math.BigInteger jarg2);
+
+  public static final native java.math.BigInteger leansmt_wrapper_mk_mul(
+      java.math.BigInteger jarg1, java.math.BigInteger jarg2);
+
+  public static final native java.math.BigInteger leansmt_wrapper_mk_div(
+      java.math.BigInteger jarg1, java.math.BigInteger jarg2);
+
+  public static final native java.math.BigInteger leansmt_wrapper_mk_mod(
+      java.math.BigInteger jarg1, java.math.BigInteger jarg2);
+
+  public static final native java.math.BigInteger leansmt_wrapper_mk_neg(
+      java.math.BigInteger jarg1);
+
+  public static final native int leansmt_wrapper_assert(
+      java.math.BigInteger jarg1, java.math.BigInteger jarg2);
+
+  public static final native int leansmt_wrapper_assert_smtlib(
+      java.math.BigInteger jarg1, String jarg2);
+
+  public static final native int leansmt_wrapper_declare_fun(
       java.math.BigInteger jarg1, String jarg2, String jarg3, String jarg4);
-  public final static native int leansmt_wrapper_check_sat(java.math.BigInteger jarg1);
-  public final static native String leansmt_wrapper_get_model(java.math.BigInteger jarg1);
-  public final static native String leansmt_wrapper_get_value(java.math.BigInteger jarg1, java.math.BigInteger jarg2);
-  public final static native String leansmt_wrapper_get_value_smtlib(java.math.BigInteger jarg1, String jarg2);
+
+  public static final native int leansmt_wrapper_check_sat(java.math.BigInteger jarg1);
+
+  public static final native String leansmt_wrapper_get_model(java.math.BigInteger jarg1);
+
+  public static final native String leansmt_wrapper_get_value(
+      java.math.BigInteger jarg1, java.math.BigInteger jarg2);
+
+  public static final native String leansmt_wrapper_get_value_smtlib(
+      java.math.BigInteger jarg1, String jarg2);
 }

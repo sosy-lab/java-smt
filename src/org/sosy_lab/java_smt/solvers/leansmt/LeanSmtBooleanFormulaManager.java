@@ -206,11 +206,6 @@ final class LeanSmtBooleanFormulaManager
     }
     return creator()
         .makeTernary(
-            "ite",
-            FunctionDeclarationKind.ITE,
-            creator().getFormulaType(pF1),
-            pCond,
-            pF1,
-            pF2);
+            "ite", FunctionDeclarationKind.ITE, creator().getFormulaType(pF1), pCond, pF1, pF2);
   }
 }

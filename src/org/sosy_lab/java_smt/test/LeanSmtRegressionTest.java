@@ -38,8 +38,10 @@ public class LeanSmtRegressionTest extends SolverBasedTest0 {
 
   @Test
   public void unsupportedOperationsAreExplicit() throws SolverException, InterruptedException {
-    assertThrows(UnsupportedOperationException.class, () -> context.newOptimizationProverEnvironment());
-    assertThrows(UnsupportedOperationException.class, () -> context.newProverEnvironmentWithInterpolation());
+    assertThrows(
+        UnsupportedOperationException.class, () -> context.newOptimizationProverEnvironment());
+    assertThrows(
+        UnsupportedOperationException.class, () -> context.newProverEnvironmentWithInterpolation());
   }
 
   @Test
@@ -112,7 +114,8 @@ public class LeanSmtRegressionTest extends SolverBasedTest0 {
   }
 
   @Test
-  public void largeDenominatorRationalModelEvaluation() throws SolverException, InterruptedException {
+  public void largeDenominatorRationalModelEvaluation()
+      throws SolverException, InterruptedException {
     requireRationals();
     requireModel();
 
@@ -177,13 +180,17 @@ public class LeanSmtRegressionTest extends SolverBasedTest0 {
     IntegerFormula floor = rmgr.floor(r);
 
     try (ProverEnvironment prover = context.newProverEnvironment()) {
-      prover.push(rmgr.equal(r, rmgr.makeNumber(Rational.of(BigInteger.valueOf(7), BigInteger.valueOf(3)))));
+      prover.push(
+          rmgr.equal(
+              r, rmgr.makeNumber(Rational.of(BigInteger.valueOf(7), BigInteger.valueOf(3)))));
       prover.push(imgr.equal(floor, imgr.makeNumber(2)));
       assertThat(prover.isUnsat()).isFalse();
     }
 
     try (ProverEnvironment prover = context.newProverEnvironment()) {
-      prover.push(rmgr.equal(r, rmgr.makeNumber(Rational.of(BigInteger.valueOf(-7), BigInteger.valueOf(3)))));
+      prover.push(
+          rmgr.equal(
+              r, rmgr.makeNumber(Rational.of(BigInteger.valueOf(-7), BigInteger.valueOf(3)))));
       prover.push(imgr.equal(floor, imgr.makeNumber(-2)));
       assertThat(prover.isUnsat()).isTrue();
     }
@@ -201,7 +208,8 @@ public class LeanSmtRegressionTest extends SolverBasedTest0 {
 
     try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
       prover.push(
-          rmgr.equal(r, rmgr.makeNumber(Rational.of(BigInteger.valueOf(7), BigInteger.valueOf(3)))));
+          rmgr.equal(
+              r, rmgr.makeNumber(Rational.of(BigInteger.valueOf(7), BigInteger.valueOf(3)))));
       prover.push(imgr.equal(floor, imgr.makeNumber(2)));
       assertThat(prover.isUnsat()).isFalse();
 
@@ -332,7 +340,8 @@ public class LeanSmtRegressionTest extends SolverBasedTest0 {
   }
 
   @Test
-  public void substitutionRebuildSupportsBitvectorBuiltIns() throws SolverException, InterruptedException {
+  public void substitutionRebuildSupportsBitvectorBuiltIns()
+      throws SolverException, InterruptedException {
     requireBitvectors();
     requireBitvectorToInt();
     requireIntegers();
@@ -356,12 +365,9 @@ public class LeanSmtRegressionTest extends SolverBasedTest0 {
             bvmgr.equal(udiv, bvmgr.divide(x, bvmgr.makeBitvector(8, 3), false)),
             bvmgr.equal(srem, bvmgr.remainder(x, bvmgr.makeBitvector(8, 5), true)),
             bvmgr.equal(smod, bvmgr.smodulo(x, bvmgr.makeBitvector(8, 7))),
-            imgr.equal(
-                bvmgr.toIntegerFormula(intToBv, false),
-                bvmgr.toIntegerFormula(x, false)));
+            imgr.equal(bvmgr.toIntegerFormula(intToBv, false), bvmgr.toIntegerFormula(x, false)));
 
     BooleanFormula rebuilt = mgr.substitute(formula, ImmutableMap.of());
     assertThatFormula(bmgr.equivalence(formula, rebuilt)).isTautological();
   }
-
 }
