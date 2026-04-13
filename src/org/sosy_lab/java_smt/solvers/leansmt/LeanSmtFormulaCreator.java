@@ -289,9 +289,7 @@ final class LeanSmtFormulaCreator
     }
   }
 
-  long makeUnary(
-      String symbol, FunctionDeclarationKind kind, FormulaType<?> type, long arg, NativeUnary op) {
-    Preconditions.checkNotNull(op);
+  long makeUnary(String symbol, FunctionDeclarationKind kind, FormulaType<?> type, long arg) {
     ImmutableList<Long> arguments = ImmutableList.of(arg);
     OperationKey key = new OperationKey(symbol, kind, type, arguments);
     synchronized (canonicalApplications) {
@@ -307,13 +305,11 @@ final class LeanSmtFormulaCreator
   }
 
   long makeBinary(
-      String symbol,
-      FunctionDeclarationKind kind,
-      FormulaType<?> type,
-      long arg1,
-      long arg2,
-      NativeBinary op) {
-    Preconditions.checkNotNull(op);
+      String symbol, FunctionDeclarationKind kind, FormulaType<?> type, long arg1, long arg2) {
+    Long trivialResult = simplifyBinaryWithIdenticalArguments(kind, arg1, arg2);
+    if (trivialResult != null) {
+      return trivialResult;
+    }
     ImmutableList<Long> arguments = ImmutableList.of(arg1, arg2);
     OperationKey key = new OperationKey(symbol, kind, type, arguments);
     synchronized (canonicalApplications) {
@@ -328,15 +324,41 @@ final class LeanSmtFormulaCreator
     }
   }
 
+  private @Nullable Long simplifyBinaryWithIdenticalArguments(
+      FunctionDeclarationKind kind, long arg1, long arg2) {
+    if (arg1 != arg2) {
+      return null;
+    }
+
+    switch (kind) {
+      case EQ:
+      case IFF:
+      case IMPLIES:
+      case LTE:
+      case GTE:
+      case BV_EQ:
+        return getTrueHandle();
+      case DISTINCT:
+      case XOR:
+      case LT:
+      case GT:
+      case BV_ULT:
+      case BV_SLT:
+      case BV_UGT:
+      case BV_SGT:
+        return getFalseHandle();
+      default:
+        return null;
+    }
+  }
+
   long makeTernary(
       String symbol,
       FunctionDeclarationKind kind,
       FormulaType<?> type,
       long arg1,
       long arg2,
-      long arg3,
-      NativeTernary op) {
-    Preconditions.checkNotNull(op);
+      long arg3) {
     ImmutableList<Long> arguments = ImmutableList.of(arg1, arg2, arg3);
     OperationKey key = new OperationKey(symbol, kind, type, arguments);
     synchronized (canonicalApplications) {
@@ -436,6 +458,10 @@ final class LeanSmtFormulaCreator
   public Long callFunctionImpl(LeanSmtFunctionDecl declaration, List<Long> args) {
     if (declaration.getKind() != FunctionDeclarationKind.UF) {
       return callBuiltInFunction(declaration, args);
+    }
+
+    if (args.isEmpty()) {
+      return makeVariable(declaration.getReturnType(), declaration.getName());
     }
 
     synchronized (ufApplications) {
@@ -613,18 +639,22 @@ final class LeanSmtFormulaCreator
       long arg = args.get(i);
       LeanSmtType expectedType = parameterTypes.get(i);
       if (expectedType.isReal() && FormulaType.IntegerType.equals(getFormulaType(arg))) {
-        normalizedArgs.add(
-            makeUnary(
-                "to_real",
-                FunctionDeclarationKind.TO_REAL,
-                FormulaType.RationalType,
-                arg,
-                t -> LeanSmtNativeApi.mkApp1("to_real", t)));
+        normalizedArgs.add(normalizeIntegerToRealArgument(arg));
       } else {
         normalizedArgs.add(arg);
       }
     }
     return normalizedArgs.build();
+  }
+
+  private long normalizeIntegerToRealArgument(long arg) {
+    Expr expr = getExpression(arg);
+    if (expr.kind == ExprKind.CONSTANT && expr.constantValue instanceof BigInteger) {
+      BigInteger integerValue = (BigInteger) expr.constantValue;
+      return makeRealConstant(Rational.of(integerValue, BigInteger.ONE));
+    }
+    return makeUnary(
+        "to_real", FunctionDeclarationKind.TO_REAL, FormulaType.RationalType, arg);
   }
 
   @SuppressWarnings("unchecked")
@@ -650,12 +680,7 @@ final class LeanSmtFormulaCreator
   }
 
   long makeFloorTerm(long argument) {
-    return makeUnary(
-        "to_int",
-        FunctionDeclarationKind.FLOOR,
-        FormulaType.IntegerType,
-        argument,
-        arg -> LeanSmtNativeApi.mkApp1("to_int", arg));
+    return makeUnary("to_int", FunctionDeclarationKind.FLOOR, FormulaType.IntegerType, argument);
   }
 
   long makeIntToBitvectorTerm(int bitwidth, long integerTerm) {
@@ -664,8 +689,7 @@ final class LeanSmtFormulaCreator
         intToBvSymbol(bitwidth),
         FunctionDeclarationKind.INT_TO_BV,
         FormulaType.getBitvectorTypeWithSize(bitwidth),
-        integerTerm,
-        arg -> LeanSmtNativeApi.mkIndexedApp1("int_to_bv", bitwidth, arg));
+        integerTerm);
   }
 
   private static String intToBvSymbol(int bitwidth) {
@@ -708,70 +732,53 @@ final class LeanSmtFormulaCreator
     switch (kind) {
       case NOT:
         checkArity(declaration, args, 1);
-        return makeUnary("not", kind, FormulaType.BooleanType, args.get(0), LeanSmtNativeApi::mkNot);
+        return makeUnary("not", kind, FormulaType.BooleanType, args.get(0));
       case AND:
         return foldAnd(args);
       case OR:
         return foldOr(args);
       case XOR:
-        return foldLeft("xor", kind, FormulaType.BooleanType, args, LeanSmtNativeApi::mkXor);
+        return foldLeft("xor", kind, FormulaType.BooleanType, args);
       case IMPLIES:
-        return foldLeft("=>", kind, FormulaType.BooleanType, args, LeanSmtNativeApi::mkImplies);
+        return foldLeft("=>", kind, FormulaType.BooleanType, args);
       case ITE:
         checkArity(declaration, args, 3);
         return makeTernary(
-            "ite",
-            kind,
-            returnType,
-            args.get(0),
-            args.get(1),
-            args.get(2),
-            LeanSmtNativeApi::mkIte);
+            "ite", kind, returnType, args.get(0), args.get(1), args.get(2));
       case EQ:
-        return foldPairwiseBoolean("=", kind, args, LeanSmtNativeApi::mkEq);
+        return foldPairwiseBoolean("=", kind, args);
       case DISTINCT:
         return foldAllDistinct(args);
       case LT:
-        return foldPairwiseBoolean("<", kind, args, LeanSmtNativeApi::mkLt);
+        return foldPairwiseBoolean("<", kind, args);
       case LTE:
-        return foldPairwiseBoolean("<=", kind, args, LeanSmtNativeApi::mkLe);
+        return foldPairwiseBoolean("<=", kind, args);
       case GT:
-        return foldPairwiseBoolean(">", kind, args, LeanSmtNativeApi::mkGt);
+        return foldPairwiseBoolean(">", kind, args);
       case GTE:
-        return foldPairwiseBoolean(">=", kind, args, LeanSmtNativeApi::mkGe);
+        return foldPairwiseBoolean(">=", kind, args);
       case ADD:
-        return foldLeft("+", kind, returnType, args, LeanSmtNativeApi::mkAdd);
+        return foldLeft("+", kind, returnType, args);
       case SUB:
         if (args.size() == 1) {
-          return makeUnary(
-              "-", FunctionDeclarationKind.UMINUS, returnType, args.get(0), LeanSmtNativeApi::mkNeg);
+          return makeUnary("-", FunctionDeclarationKind.UMINUS, returnType, args.get(0));
         }
-        return foldLeft("-", kind, returnType, args, LeanSmtNativeApi::mkSub);
+        return foldLeft("-", kind, returnType, args);
       case MUL:
-        return foldLeft("*", kind, returnType, args, LeanSmtNativeApi::mkMul);
+        return foldLeft("*", kind, returnType, args);
       case DIV:
         if (returnType.isRationalType()) {
-          return foldLeft(
-              "/",
-              kind,
-              returnType,
-              args,
-              (left, right) -> LeanSmtNativeApi.mkApp2("/", left, right));
+          return foldLeft("/", kind, returnType, args);
         }
-        return foldLeft("div", kind, returnType, args, LeanSmtNativeApi::mkDiv);
+        return foldLeft("div", kind, returnType, args);
       case MODULO:
-        return foldLeft("mod", kind, returnType, args, LeanSmtNativeApi::mkMod);
+        return foldLeft("mod", kind, returnType, args);
       case UMINUS:
         checkArity(declaration, args, 1);
-        return makeUnary("-", kind, returnType, args.get(0), LeanSmtNativeApi::mkNeg);
+        return makeUnary("-", kind, returnType, args.get(0));
       case TO_REAL:
         checkArity(declaration, args, 1);
-        return makeUnary(
-            "to_real",
-            kind,
-            FormulaType.RationalType,
-            args.get(0),
-            arg -> LeanSmtNativeApi.mkApp1("to_real", arg));
+        return makeUnary("to_real", kind, FormulaType.RationalType, args.get(0));
       case FLOOR:
         checkArity(declaration, args, 1);
         return makeFloorTerm(args.get(0));
@@ -780,43 +787,27 @@ final class LeanSmtFormulaCreator
         return makeIntToBitvectorTerm(parseIntToBvWidth(declaration, returnType), args.get(0));
       case BV_EXTRACT:
         checkArity(declaration, args, 1);
-        int[] extract = parseExtractIndices(symbol);
-        return makeUnary(
-            symbol,
-            kind,
-            returnType,
-            args.get(0),
-            arg -> LeanSmtNativeApi.mkExtract(arg, extract[0], extract[1]));
+        parseExtractIndices(symbol);
+        return makeUnary(symbol, kind, returnType, args.get(0));
       case BV_SIGN_EXTENSION:
       case BV_ZERO_EXTENSION:
         checkArity(declaration, args, 1);
         String extendOp =
             kind == FunctionDeclarationKind.BV_SIGN_EXTENSION ? "sign_extend" : "zero_extend";
-        int extensionBits = parseIndexedUnaryParameter(symbol, extendOp);
-        return makeUnary(
-            symbol,
-            kind,
-            returnType,
-            args.get(0),
-            arg -> LeanSmtNativeApi.mkIndexedApp1(extendOp, extensionBits, arg));
+        parseIndexedUnaryParameter(symbol, extendOp);
+        return makeUnary(symbol, kind, returnType, args.get(0));
       case BV_ROTATE_LEFT_BY_INT:
       case BV_ROTATE_RIGHT_BY_INT:
         checkArity(declaration, args, 1);
         String rotateByIntOp =
             kind == FunctionDeclarationKind.BV_ROTATE_LEFT_BY_INT ? "rotate_left" : "rotate_right";
-        int rotateAmount = parseIndexedUnaryParameter(symbol, rotateByIntOp);
-        return makeUnary(
-            symbol,
-            kind,
-            returnType,
-            args.get(0),
-            arg -> LeanSmtNativeApi.mkIndexedApp1(rotateByIntOp, rotateAmount, arg));
+        parseIndexedUnaryParameter(symbol, rotateByIntOp);
+        return makeUnary(symbol, kind, returnType, args.get(0));
       case BV_NOT:
       case BV_NEG:
       case UBV_TO_INT:
         checkArity(declaration, args, 1);
-        return makeUnary(
-            symbol, kind, returnType, args.get(0), arg -> LeanSmtNativeApi.mkApp1(symbol, arg));
+        return makeUnary(symbol, kind, returnType, args.get(0));
       case SBV_TO_INT:
         checkArity(declaration, args, 1);
         return makeSignedBitvectorToIntegerTerm(args.get(0));
@@ -850,15 +841,9 @@ final class LeanSmtFormulaCreator
       case BV_ROTATE_LEFT:
       case BV_ROTATE_RIGHT:
         checkArity(declaration, args, 2);
-        return makeBinary(
-            symbol,
-            kind,
-            returnType,
-            args.get(0),
-            args.get(1),
-            (left, right) -> LeanSmtNativeApi.mkApp2(symbol, left, right));
+        return makeBinary(symbol, kind, returnType, args.get(0), args.get(1));
       case BV_EQ:
-        return foldPairwiseBoolean("=", kind, args, LeanSmtNativeApi::mkEq);
+        return foldPairwiseBoolean("=", kind, args);
       case BV_ULT:
       case BV_ULE:
       case BV_UGT:
@@ -868,13 +853,7 @@ final class LeanSmtFormulaCreator
       case BV_SGT:
       case BV_SGE:
         checkArity(declaration, args, 2);
-        return makeBinary(
-            symbol,
-            kind,
-            FormulaType.BooleanType,
-            args.get(0),
-            args.get(1),
-            (left, right) -> LeanSmtNativeApi.mkApp2(symbol, left, right));
+        return makeBinary(symbol, kind, FormulaType.BooleanType, args.get(0), args.get(1));
       default:
         return null;
     }
@@ -882,11 +861,7 @@ final class LeanSmtFormulaCreator
 
   long makeSignedBitvectorToIntegerTerm(long bitvectorTerm) {
     return makeUnary(
-        "sbv_to_int",
-        FunctionDeclarationKind.SBV_TO_INT,
-        FormulaType.IntegerType,
-        bitvectorTerm,
-        arg -> LeanSmtNativeApi.mkApp1("sbv_to_int", arg));
+        "sbv_to_int", FunctionDeclarationKind.SBV_TO_INT, FormulaType.IntegerType, bitvectorTerm);
   }
 
   private static int parseIntToBvWidth(LeanSmtFunctionDecl declaration, FormulaType<?> returnType) {
@@ -959,12 +934,7 @@ final class LeanSmtFormulaCreator
     for (int i = 1; i < args.size(); i++) {
       result =
           makeBinary(
-              "and",
-              FunctionDeclarationKind.AND,
-              FormulaType.BooleanType,
-              result,
-              args.get(i),
-              LeanSmtNativeApi::mkAnd);
+              "and", FunctionDeclarationKind.AND, FormulaType.BooleanType, result, args.get(i));
     }
     return result;
   }
@@ -976,51 +946,33 @@ final class LeanSmtFormulaCreator
     long result = args.get(0);
     for (int i = 1; i < args.size(); i++) {
       result =
-          makeBinary(
-              "or",
-              FunctionDeclarationKind.OR,
-              FormulaType.BooleanType,
-              result,
-              args.get(i),
-              LeanSmtNativeApi::mkOr);
+          makeBinary("or", FunctionDeclarationKind.OR, FormulaType.BooleanType, result, args.get(i));
     }
     return result;
   }
 
   private long foldLeft(
-      String symbol,
-      FunctionDeclarationKind kind,
-      FormulaType<?> type,
-      List<Long> args,
-      NativeBinary nativeOp) {
+      String symbol, FunctionDeclarationKind kind, FormulaType<?> type, List<Long> args) {
     if (args.isEmpty()) {
       throw new IllegalArgumentException("Cannot apply " + kind + " to empty argument list");
     }
     long result = args.get(0);
     for (int i = 1; i < args.size(); i++) {
-      result = makeBinary(symbol, kind, type, result, args.get(i), nativeOp);
+      result = makeBinary(symbol, kind, type, result, args.get(i));
     }
     return result;
   }
 
-  private long foldPairwiseBoolean(
-      String symbol, FunctionDeclarationKind kind, List<Long> args, NativeBinary nativeOp) {
+  private long foldPairwiseBoolean(String symbol, FunctionDeclarationKind kind, List<Long> args) {
     if (args.size() < 2) {
       return getTrueHandle();
     }
-    long result =
-        makeBinary(symbol, kind, FormulaType.BooleanType, args.get(0), args.get(1), nativeOp);
+    long result = makeBinary(symbol, kind, FormulaType.BooleanType, args.get(0), args.get(1));
     for (int i = 2; i < args.size(); i++) {
       long next =
-          makeBinary(symbol, kind, FormulaType.BooleanType, args.get(i - 1), args.get(i), nativeOp);
+          makeBinary(symbol, kind, FormulaType.BooleanType, args.get(i - 1), args.get(i));
       result =
-          makeBinary(
-              "and",
-              FunctionDeclarationKind.AND,
-              FormulaType.BooleanType,
-              result,
-              next,
-              LeanSmtNativeApi::mkAnd);
+          makeBinary("and", FunctionDeclarationKind.AND, FormulaType.BooleanType, result, next);
     }
     return result;
   }
@@ -1038,19 +990,12 @@ final class LeanSmtFormulaCreator
                 FunctionDeclarationKind.DISTINCT,
                 FormulaType.BooleanType,
                 args.get(i),
-                args.get(j),
-                LeanSmtNativeApi::mkDistinct);
+                args.get(j));
         if (result == null) {
           result = neq;
         } else {
           result =
-              makeBinary(
-                  "and",
-                  FunctionDeclarationKind.AND,
-                  FormulaType.BooleanType,
-                  result,
-                  neq,
-                  LeanSmtNativeApi::mkAnd);
+              makeBinary("and", FunctionDeclarationKind.AND, FormulaType.BooleanType, result, neq);
         }
       }
     }
@@ -1161,20 +1106,5 @@ final class LeanSmtFormulaCreator
     public int hashCode() {
       return Objects.hash(symbol, kind, type, args);
     }
-  }
-
-  @FunctionalInterface
-  interface NativeUnary {
-    long apply(long a) throws Exception;
-  }
-
-  @FunctionalInterface
-  interface NativeBinary {
-    long apply(long a, long b) throws Exception;
-  }
-
-  @FunctionalInterface
-  interface NativeTernary {
-    long apply(long a, long b, long c) throws Exception;
   }
 }

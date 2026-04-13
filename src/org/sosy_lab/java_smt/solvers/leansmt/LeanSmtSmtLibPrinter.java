@@ -21,9 +21,15 @@ import java.util.Set;
 final class LeanSmtSmtLibPrinter {
 
   private final LeanSmtFormulaCreator creator;
+  private final boolean useNativeIdentifiers;
 
   LeanSmtSmtLibPrinter(LeanSmtFormulaCreator pCreator) {
+    this(pCreator, false);
+  }
+
+  LeanSmtSmtLibPrinter(LeanSmtFormulaCreator pCreator, boolean pUseNativeIdentifiers) {
     creator = pCreator;
+    useNativeIdentifiers = pUseNativeIdentifiers;
   }
 
   String dumpFormula(long formula) {
@@ -47,11 +53,41 @@ final class LeanSmtSmtLibPrinter {
   }
 
   String dumpTerm(long formula) {
-    return serializeTerm(formula);
+    return serializeTermIterative(formula);
   }
 
   private String serializeTerm(long formula) {
     return serializeWithLets(formula);
+  }
+
+  private String serializeTermIterative(long root) {
+    Map<Long, String> rendered = new LinkedHashMap<>();
+    Deque<Frame> work = new ArrayDeque<>();
+    work.push(new Frame(root, false));
+
+    while (!work.isEmpty()) {
+      Frame frame = work.pop();
+      long handle = frame.handle;
+      if (rendered.containsKey(handle)) {
+        continue;
+      }
+
+      LeanSmtFormulaCreator.Expr expr = creator.getExpression(handle);
+      if (!frame.expanded && expr.kind == LeanSmtFormulaCreator.ExprKind.APPLICATION) {
+        work.push(new Frame(handle, true));
+        for (int i = expr.arguments.size() - 1; i >= 0; i--) {
+          long arg = expr.arguments.get(i);
+          if (!rendered.containsKey(arg)) {
+            work.push(new Frame(arg, false));
+          }
+        }
+        continue;
+      }
+
+      rendered.put(handle, renderExpression(expr, rendered));
+    }
+
+    return rendered.get(root);
   }
 
   private String serializeWithLets(long root) {
@@ -185,6 +221,27 @@ final class LeanSmtSmtLibPrinter {
     }
   }
 
+  private String renderExpression(LeanSmtFormulaCreator.Expr expr, Map<Long, String> renderedArgs) {
+    switch (expr.kind) {
+      case VARIABLE:
+        return quoteIdentifier(expr.symbol);
+      case CONSTANT:
+        return constantToSmt(expr);
+      case APPLICATION:
+        String printedOp =
+            expr.declarationKind == org.sosy_lab.java_smt.api.FunctionDeclarationKind.UF
+                ? quoteIdentifier(expr.symbol)
+                : expr.symbol;
+        List<String> args = new ArrayList<>(expr.arguments.size());
+        for (Long arg : expr.arguments) {
+          args.add(renderedArgs.get(arg));
+        }
+        return "(" + printedOp + (args.isEmpty() ? "" : " " + String.join(" ", args)) + ")";
+      default:
+        throw new AssertionError("Unexpected expression kind " + expr.kind);
+    }
+  }
+
   private static String constantToSmt(LeanSmtFormulaCreator.Expr expr) {
     Object value = expr.constantValue;
     if (expr.type.isBitvectorType()) {
@@ -236,7 +293,19 @@ final class LeanSmtSmtLibPrinter {
     throw new AssertionError("Unexpected sort " + type);
   }
 
-  private static String quoteIdentifier(String id) {
-    return LeanSmtFormulaCreator.encodeIdentifier(id);
+  private String quoteIdentifier(String id) {
+    return useNativeIdentifiers
+        ? LeanSmtFormulaCreator.encodeNativeIdentifier(id)
+        : LeanSmtFormulaCreator.encodeIdentifier(id);
+  }
+
+  private static final class Frame {
+    private final long handle;
+    private final boolean expanded;
+
+    private Frame(long pHandle, boolean pExpanded) {
+      handle = pHandle;
+      expanded = pExpanded;
+    }
   }
 }

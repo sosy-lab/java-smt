@@ -40,8 +40,7 @@ final class LeanSmtRationalFormulaManager
           "to_real",
           org.sosy_lab.java_smt.api.FunctionDeclarationKind.TO_REAL,
           FormulaType.RationalType,
-          pNumber,
-          term -> LeanSmtNativeApi.mkApp1("to_real", term));
+          pNumber);
     }
     return pNumber;
   }

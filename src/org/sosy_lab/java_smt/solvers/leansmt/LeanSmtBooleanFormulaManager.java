@@ -47,7 +47,11 @@ final class LeanSmtBooleanFormulaManager
       return expr.arguments.get(0);
     }
     return creator()
-        .makeUnary("not", FunctionDeclarationKind.NOT, org.sosy_lab.java_smt.api.FormulaType.BooleanType, pParam1, LeanSmtNativeApi::mkNot);
+        .makeUnary(
+            "not",
+            FunctionDeclarationKind.NOT,
+            org.sosy_lab.java_smt.api.FormulaType.BooleanType,
+            pParam1);
   }
 
   @Override
@@ -70,8 +74,7 @@ final class LeanSmtBooleanFormulaManager
             FunctionDeclarationKind.AND,
             org.sosy_lab.java_smt.api.FormulaType.BooleanType,
             pParam1,
-            pParam2,
-            LeanSmtNativeApi::mkAnd);
+            pParam2);
   }
 
   @Override
@@ -94,8 +97,7 @@ final class LeanSmtBooleanFormulaManager
             FunctionDeclarationKind.OR,
             org.sosy_lab.java_smt.api.FormulaType.BooleanType,
             pParam1,
-            pParam2,
-            LeanSmtNativeApi::mkOr);
+            pParam2);
   }
 
   @Override
@@ -121,8 +123,7 @@ final class LeanSmtBooleanFormulaManager
             FunctionDeclarationKind.XOR,
             org.sosy_lab.java_smt.api.FormulaType.BooleanType,
             pParam1,
-            pParam2,
-            LeanSmtNativeApi::mkXor);
+            pParam2);
   }
 
   @Override
@@ -148,8 +149,7 @@ final class LeanSmtBooleanFormulaManager
             FunctionDeclarationKind.EQ,
             org.sosy_lab.java_smt.api.FormulaType.BooleanType,
             pBits1,
-            pBits2,
-            LeanSmtNativeApi::mkIff);
+            pBits2);
   }
 
   @Override
@@ -172,8 +172,7 @@ final class LeanSmtBooleanFormulaManager
             FunctionDeclarationKind.IMPLIES,
             org.sosy_lab.java_smt.api.FormulaType.BooleanType,
             bits1,
-            bits2,
-            LeanSmtNativeApi::mkImplies);
+            bits2);
   }
 
   @Override
@@ -212,8 +211,6 @@ final class LeanSmtBooleanFormulaManager
             creator().getFormulaType(pF1),
             pCond,
             pF1,
-            pF2,
-            LeanSmtNativeApi::mkIte);
+            pF2);
   }
 }
-

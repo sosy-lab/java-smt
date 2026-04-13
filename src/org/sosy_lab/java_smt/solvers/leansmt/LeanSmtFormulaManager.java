@@ -52,8 +52,7 @@ final class LeanSmtFormulaManager
             org.sosy_lab.java_smt.api.FunctionDeclarationKind.EQ,
             FormulaType.BooleanType,
             pArg1,
-            pArg2,
-            LeanSmtNativeApi::mkEq);
+            pArg2);
   }
 
   @Override
@@ -72,8 +71,7 @@ final class LeanSmtFormulaManager
                     org.sosy_lab.java_smt.api.FunctionDeclarationKind.DISTINCT,
                     FormulaType.BooleanType,
                     args.get(i),
-                    args.get(j),
-                    LeanSmtNativeApi::mkDistinct);
+                    args.get(j));
         if (result == null) {
           result = neq;
         } else {
@@ -84,8 +82,7 @@ final class LeanSmtFormulaManager
                       org.sosy_lab.java_smt.api.FunctionDeclarationKind.AND,
                       FormulaType.BooleanType,
                       result,
-                      neq,
-                      LeanSmtNativeApi::mkAnd);
+                      neq);
         }
       }
     }

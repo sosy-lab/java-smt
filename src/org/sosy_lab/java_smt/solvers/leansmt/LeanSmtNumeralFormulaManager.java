@@ -115,12 +115,12 @@ abstract class LeanSmtNumeralFormulaManager<
 
   @Override
   public Long negate(Long pParam1) {
-    return creator().makeUnary("-", FunctionDeclarationKind.UMINUS, getNumericFormulaType(), pParam1, LeanSmtNativeApi::mkNeg);
+    return creator().makeUnary("-", FunctionDeclarationKind.UMINUS, getNumericFormulaType(), pParam1);
   }
 
   @Override
   public Long add(Long pParam1, Long pParam2) {
-    return creator().makeBinary("+", FunctionDeclarationKind.ADD, getNumericFormulaType(), pParam1, pParam2, LeanSmtNativeApi::mkAdd);
+    return creator().makeBinary("+", FunctionDeclarationKind.ADD, getNumericFormulaType(), pParam1, pParam2);
   }
 
   @Override
@@ -134,39 +134,27 @@ abstract class LeanSmtNumeralFormulaManager<
 
   @Override
   public Long subtract(Long pParam1, Long pParam2) {
-    return creator().makeBinary("-", FunctionDeclarationKind.SUB, getNumericFormulaType(), pParam1, pParam2, LeanSmtNativeApi::mkSub);
+    return creator().makeBinary("-", FunctionDeclarationKind.SUB, getNumericFormulaType(), pParam1, pParam2);
   }
 
   @Override
   public Long multiply(Long pParam1, Long pParam2) {
-    return creator().makeBinary("*", FunctionDeclarationKind.MUL, getNumericFormulaType(), pParam1, pParam2, LeanSmtNativeApi::mkMul);
+    return creator().makeBinary("*", FunctionDeclarationKind.MUL, getNumericFormulaType(), pParam1, pParam2);
   }
 
   @Override
   public Long divide(Long pParam1, Long pParam2) {
     if (getNumeralType().isReal()) {
       return creator()
-          .makeBinary(
-              "/",
-              FunctionDeclarationKind.DIV,
-              getNumericFormulaType(),
-              pParam1,
-              pParam2,
-              (a, b) -> LeanSmtNativeApi.mkApp2("/", a, b));
+          .makeBinary("/", FunctionDeclarationKind.DIV, getNumericFormulaType(), pParam1, pParam2);
     }
     return creator()
-        .makeBinary(
-            "div",
-            FunctionDeclarationKind.DIV,
-            getNumericFormulaType(),
-            pParam1,
-            pParam2,
-            LeanSmtNativeApi::mkDiv);
+        .makeBinary("div", FunctionDeclarationKind.DIV, getNumericFormulaType(), pParam1, pParam2);
   }
 
   @Override
   public Long modulo(Long pParam1, Long pParam2) {
-    return creator().makeBinary("mod", FunctionDeclarationKind.MODULO, getNumericFormulaType(), pParam1, pParam2, LeanSmtNativeApi::mkMod);
+    return creator().makeBinary("mod", FunctionDeclarationKind.MODULO, getNumericFormulaType(), pParam1, pParam2);
   }
 
   @Override
@@ -181,7 +169,7 @@ abstract class LeanSmtNumeralFormulaManager<
 
   @Override
   public Long equal(Long pParam1, Long pParam2) {
-    return creator().makeBinary("=", FunctionDeclarationKind.EQ, FormulaType.BooleanType, pParam1, pParam2, LeanSmtNativeApi::mkEq);
+    return creator().makeBinary("=", FunctionDeclarationKind.EQ, FormulaType.BooleanType, pParam1, pParam2);
   }
 
   @Override
@@ -199,8 +187,7 @@ abstract class LeanSmtNumeralFormulaManager<
                     FunctionDeclarationKind.DISTINCT,
                     FormulaType.BooleanType,
                     pNumbers.get(i),
-                    pNumbers.get(j),
-                    LeanSmtNativeApi::mkDistinct);
+                    pNumbers.get(j));
         if (result == null) {
           result = next;
         } else {
@@ -211,8 +198,7 @@ abstract class LeanSmtNumeralFormulaManager<
                       FunctionDeclarationKind.AND,
                       FormulaType.BooleanType,
                       result,
-                      next,
-                      LeanSmtNativeApi::mkAnd);
+                      next);
         }
       }
     }
@@ -221,22 +207,22 @@ abstract class LeanSmtNumeralFormulaManager<
 
   @Override
   public Long greaterThan(Long pParam1, Long pParam2) {
-    return creator().makeBinary(">", FunctionDeclarationKind.GT, FormulaType.BooleanType, pParam1, pParam2, LeanSmtNativeApi::mkGt);
+    return creator().makeBinary(">", FunctionDeclarationKind.GT, FormulaType.BooleanType, pParam1, pParam2);
   }
 
   @Override
   public Long greaterOrEquals(Long pParam1, Long pParam2) {
-    return creator().makeBinary(">=", FunctionDeclarationKind.GTE, FormulaType.BooleanType, pParam1, pParam2, LeanSmtNativeApi::mkGe);
+    return creator().makeBinary(">=", FunctionDeclarationKind.GTE, FormulaType.BooleanType, pParam1, pParam2);
   }
 
   @Override
   public Long lessThan(Long pParam1, Long pParam2) {
-    return creator().makeBinary("<", FunctionDeclarationKind.LT, FormulaType.BooleanType, pParam1, pParam2, LeanSmtNativeApi::mkLt);
+    return creator().makeBinary("<", FunctionDeclarationKind.LT, FormulaType.BooleanType, pParam1, pParam2);
   }
 
   @Override
   public Long lessOrEquals(Long pParam1, Long pParam2) {
-    return creator().makeBinary("<=", FunctionDeclarationKind.LTE, FormulaType.BooleanType, pParam1, pParam2, LeanSmtNativeApi::mkLe);
+    return creator().makeBinary("<=", FunctionDeclarationKind.LTE, FormulaType.BooleanType, pParam1, pParam2);
   }
 
   @Override

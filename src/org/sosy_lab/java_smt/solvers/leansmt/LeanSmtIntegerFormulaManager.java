@@ -57,29 +57,10 @@ final class LeanSmtIntegerFormulaManager
   private Long modularCongruence0(Long pNumber1, Long pNumber2, Long pModulo) {
     LeanSmtFormulaCreator creator = (LeanSmtFormulaCreator) getFormulaCreator();
     Long diff =
-        creator.makeBinary(
-            "-",
-            FunctionDeclarationKind.SUB,
-            FormulaType.IntegerType,
-            pNumber1,
-            pNumber2,
-            LeanSmtNativeApi::mkSub);
+        creator.makeBinary("-", FunctionDeclarationKind.SUB, FormulaType.IntegerType, pNumber1, pNumber2);
     Long remainder =
-        creator.makeBinary(
-            "mod",
-            FunctionDeclarationKind.MODULO,
-            FormulaType.IntegerType,
-            diff,
-            pModulo,
-            LeanSmtNativeApi::mkMod);
+        creator.makeBinary("mod", FunctionDeclarationKind.MODULO, FormulaType.IntegerType, diff, pModulo);
     Long zero = creator.makeIntConstant(0L);
-    return creator.makeBinary(
-        "=",
-        FunctionDeclarationKind.EQ,
-        FormulaType.BooleanType,
-        remainder,
-        zero,
-        LeanSmtNativeApi::mkEq);
+    return creator.makeBinary("=", FunctionDeclarationKind.EQ, FormulaType.BooleanType, remainder, zero);
   }
 }
-

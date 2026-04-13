@@ -82,16 +82,27 @@ public class LeanSmtNativeApiTest {
     long x = creator.makeVariable(LeanSmtType.INT, "x");
     long v = creator.makeIntConstant(big);
     long eq =
-        creator.makeBinary(
-            "=",
-            FunctionDeclarationKind.EQ,
-            FormulaType.BooleanType,
-            x,
-            v,
-            LeanSmtNativeApi::mkEq);
-    LeanSmtNativeApi.assertTermSmtLib(solver, new LeanSmtSmtLibPrinter(creator).dumpTerm(eq));
+        creator.makeBinary("=", FunctionDeclarationKind.EQ, FormulaType.BooleanType, x, v);
+    LeanSmtNativeApi.assertTermSmtLib(
+        solver, new LeanSmtSmtLibPrinter(creator, true).dumpTerm(eq));
     assertThat(LeanSmtNativeApi.checkSat(solver)).isEqualTo(LeanSMTConstants.LEANSMT_SAT);
     assertThat(LeanSmtNativeApi.getModel(solver)).contains(big.toString());
+  }
+
+  @Test
+  public void smtLibSnapshotUsesNativeEscapedIdentifiers() throws SolverException {
+    LeanSmtFormulaCreator creator = new LeanSmtFormulaCreator();
+    String awkwardName = "x with space";
+    LeanSmtNativeApi.declareFun(
+        solver, LeanSmtFormulaCreator.encodeNativeIdentifier(awkwardName), "", "Int");
+
+    long x = creator.makeVariable(LeanSmtType.INT, awkwardName);
+    long zero = creator.makeIntConstant(0L);
+    long gt =
+        creator.makeBinary(">", FunctionDeclarationKind.GT, FormulaType.BooleanType, x, zero);
+    LeanSmtNativeApi.assertTermSmtLib(
+        solver, new LeanSmtSmtLibPrinter(creator, true).dumpTerm(gt));
+    assertThat(LeanSmtNativeApi.checkSat(solver)).isEqualTo(LeanSMTConstants.LEANSMT_SAT);
   }
 
   @Test

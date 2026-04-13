@@ -38,31 +38,18 @@ final class LeanSmtBitvectorFormulaManager
     return ((FormulaType.BitvectorType) type).getSize();
   }
 
-  private long mkBvUnary(
-      String symbol,
-      FunctionDeclarationKind kind,
-      long arg,
-      LeanSmtFormulaCreator.NativeUnary nativeOp) {
-    return creator().makeUnary(symbol, kind, creator().getFormulaType(arg), arg, nativeOp);
+  private long mkBvUnary(String symbol, FunctionDeclarationKind kind, long arg) {
+    return creator().makeUnary(symbol, kind, creator().getFormulaType(arg), arg);
   }
 
   private long mkBvBinary(
-      String symbol,
-      FunctionDeclarationKind kind,
-      long arg1,
-      long arg2,
-      LeanSmtFormulaCreator.NativeBinary nativeOp) {
-    return creator()
-        .makeBinary(symbol, kind, creator().getFormulaType(arg1), arg1, arg2, nativeOp);
+      String symbol, FunctionDeclarationKind kind, long arg1, long arg2) {
+    return creator().makeBinary(symbol, kind, creator().getFormulaType(arg1), arg1, arg2);
   }
 
   private long mkBvCompare(
-      String symbol,
-      FunctionDeclarationKind kind,
-      long arg1,
-      long arg2,
-      LeanSmtFormulaCreator.NativeBinary nativeOp) {
-    return creator().makeBinary(symbol, kind, FormulaType.BooleanType, arg1, arg2, nativeOp);
+      String symbol, FunctionDeclarationKind kind, long arg1, long arg2) {
+    return creator().makeBinary(symbol, kind, FormulaType.BooleanType, arg1, arg2);
   }
 
   @Override
@@ -93,11 +80,7 @@ final class LeanSmtBitvectorFormulaManager
     }
     long unsigned =
         creator.makeUnary(
-            "ubv_to_int",
-            FunctionDeclarationKind.UBV_TO_INT,
-            FormulaType.IntegerType,
-            pBv,
-            arg -> LeanSmtNativeApi.mkApp1("ubv_to_int", arg));
+            "ubv_to_int", FunctionDeclarationKind.UBV_TO_INT, FormulaType.IntegerType, pBv);
     if (!signed) {
       return unsigned;
     }
@@ -113,8 +96,7 @@ final class LeanSmtBitvectorFormulaManager
             FunctionDeclarationKind.BV_CONCAT,
             FormulaType.getBitvectorTypeWithSize(resultSize),
             pParam1,
-            pParam2,
-            (a, b) -> LeanSmtNativeApi.mkApp2("concat", a, b));
+            pParam2);
   }
 
   @Override
@@ -125,8 +107,7 @@ final class LeanSmtBitvectorFormulaManager
             extractSymbol(pMsb, pLsb),
             FunctionDeclarationKind.BV_EXTRACT,
             FormulaType.getBitvectorTypeWithSize(resultSize),
-            pParam1,
-            arg -> LeanSmtNativeApi.mkExtract(arg, pMsb, pLsb));
+            pParam1);
   }
 
   @Override
@@ -140,8 +121,7 @@ final class LeanSmtBitvectorFormulaManager
             indexedSymbol(op, pExtensionBits),
             kind,
             FormulaType.getBitvectorTypeWithSize(resultSize),
-            pParam1,
-            arg -> LeanSmtNativeApi.mkIndexedApp1(op, pExtensionBits, arg));
+            pParam1);
   }
 
   @Override
@@ -149,17 +129,12 @@ final class LeanSmtBitvectorFormulaManager
     String op = signed ? "bvashr" : "bvlshr";
     FunctionDeclarationKind kind =
         signed ? FunctionDeclarationKind.BV_ASHR : FunctionDeclarationKind.BV_LSHR;
-    return mkBvBinary(op, kind, pParam1, pParam2, (a, b) -> LeanSmtNativeApi.mkApp2(op, a, b));
+    return mkBvBinary(op, kind, pParam1, pParam2);
   }
 
   @Override
   protected Long shiftLeft(Long pParam1, Long pParam2) {
-    return mkBvBinary(
-        "bvshl",
-        FunctionDeclarationKind.BV_SHL,
-        pParam1,
-        pParam2,
-        (a, b) -> LeanSmtNativeApi.mkApp2("bvshl", a, b));
+    return mkBvBinary("bvshl", FunctionDeclarationKind.BV_SHL, pParam1, pParam2);
   }
 
   @Override
@@ -169,8 +144,7 @@ final class LeanSmtBitvectorFormulaManager
             indexedSymbol("rotate_left", pToRotate),
             FunctionDeclarationKind.BV_ROTATE_LEFT_BY_INT,
             creator().getFormulaType(pNumber),
-            pNumber,
-            arg -> LeanSmtNativeApi.mkIndexedApp1("rotate_left", pToRotate, arg));
+            pNumber);
   }
 
   @Override
@@ -180,50 +154,42 @@ final class LeanSmtBitvectorFormulaManager
             indexedSymbol("rotate_right", pToRotate),
             FunctionDeclarationKind.BV_ROTATE_RIGHT_BY_INT,
             creator().getFormulaType(pNumber),
-            pNumber,
-            arg -> LeanSmtNativeApi.mkIndexedApp1("rotate_right", pToRotate, arg));
+            pNumber);
   }
 
   @Override
   protected Long not(Long pParam1) {
-    return mkBvUnary(
-        "bvnot", FunctionDeclarationKind.BV_NOT, pParam1, arg -> LeanSmtNativeApi.mkApp1("bvnot", arg));
+    return mkBvUnary("bvnot", FunctionDeclarationKind.BV_NOT, pParam1);
   }
 
   @Override
   protected Long and(Long pParam1, Long pParam2) {
-    return mkBvBinary(
-        "bvand", FunctionDeclarationKind.BV_AND, pParam1, pParam2, (a, b) -> LeanSmtNativeApi.mkApp2("bvand", a, b));
+    return mkBvBinary("bvand", FunctionDeclarationKind.BV_AND, pParam1, pParam2);
   }
 
   @Override
   protected Long or(Long pParam1, Long pParam2) {
-    return mkBvBinary(
-        "bvor", FunctionDeclarationKind.BV_OR, pParam1, pParam2, (a, b) -> LeanSmtNativeApi.mkApp2("bvor", a, b));
+    return mkBvBinary("bvor", FunctionDeclarationKind.BV_OR, pParam1, pParam2);
   }
 
   @Override
   protected Long xor(Long pParam1, Long pParam2) {
-    return mkBvBinary(
-        "bvxor", FunctionDeclarationKind.BV_XOR, pParam1, pParam2, (a, b) -> LeanSmtNativeApi.mkApp2("bvxor", a, b));
+    return mkBvBinary("bvxor", FunctionDeclarationKind.BV_XOR, pParam1, pParam2);
   }
 
   @Override
   protected Long negate(Long pParam1) {
-    return mkBvUnary(
-        "bvneg", FunctionDeclarationKind.BV_NEG, pParam1, arg -> LeanSmtNativeApi.mkApp1("bvneg", arg));
+    return mkBvUnary("bvneg", FunctionDeclarationKind.BV_NEG, pParam1);
   }
 
   @Override
   protected Long add(Long pParam1, Long pParam2) {
-    return mkBvBinary(
-        "bvadd", FunctionDeclarationKind.BV_ADD, pParam1, pParam2, (a, b) -> LeanSmtNativeApi.mkApp2("bvadd", a, b));
+    return mkBvBinary("bvadd", FunctionDeclarationKind.BV_ADD, pParam1, pParam2);
   }
 
   @Override
   protected Long subtract(Long pParam1, Long pParam2) {
-    return mkBvBinary(
-        "bvsub", FunctionDeclarationKind.BV_SUB, pParam1, pParam2, (a, b) -> LeanSmtNativeApi.mkApp2("bvsub", a, b));
+    return mkBvBinary("bvsub", FunctionDeclarationKind.BV_SUB, pParam1, pParam2);
   }
 
   @Override
@@ -231,7 +197,7 @@ final class LeanSmtBitvectorFormulaManager
     String op = signed ? "bvsdiv" : "bvudiv";
     FunctionDeclarationKind kind =
         signed ? FunctionDeclarationKind.BV_SDIV : FunctionDeclarationKind.BV_UDIV;
-    return mkBvBinary(op, kind, pParam1, pParam2, (a, b) -> LeanSmtNativeApi.mkApp2(op, a, b));
+    return mkBvBinary(op, kind, pParam1, pParam2);
   }
 
   @Override
@@ -239,29 +205,22 @@ final class LeanSmtBitvectorFormulaManager
     String op = signed ? "bvsrem" : "bvurem";
     FunctionDeclarationKind kind =
         signed ? FunctionDeclarationKind.BV_SREM : FunctionDeclarationKind.BV_UREM;
-    return mkBvBinary(op, kind, pParam1, pParam2, (a, b) -> LeanSmtNativeApi.mkApp2(op, a, b));
+    return mkBvBinary(op, kind, pParam1, pParam2);
   }
 
   @Override
   protected Long smodulo(Long pParam1, Long pParam2) {
-    return mkBvBinary(
-        "bvsmod",
-        FunctionDeclarationKind.BV_SMOD,
-        pParam1,
-        pParam2,
-        (a, b) -> LeanSmtNativeApi.mkApp2("bvsmod", a, b));
+    return mkBvBinary("bvsmod", FunctionDeclarationKind.BV_SMOD, pParam1, pParam2);
   }
 
   @Override
   protected Long multiply(Long pParam1, Long pParam2) {
-    return mkBvBinary(
-        "bvmul", FunctionDeclarationKind.BV_MUL, pParam1, pParam2, (a, b) -> LeanSmtNativeApi.mkApp2("bvmul", a, b));
+    return mkBvBinary("bvmul", FunctionDeclarationKind.BV_MUL, pParam1, pParam2);
   }
 
   @Override
   protected Long equal(Long pParam1, Long pParam2) {
-    return mkBvCompare(
-        "=", FunctionDeclarationKind.BV_EQ, pParam1, pParam2, LeanSmtNativeApi::mkEq);
+    return mkBvCompare("=", FunctionDeclarationKind.BV_EQ, pParam1, pParam2);
   }
 
   @Override
@@ -269,7 +228,7 @@ final class LeanSmtBitvectorFormulaManager
     String op = signed ? "bvslt" : "bvult";
     FunctionDeclarationKind kind =
         signed ? FunctionDeclarationKind.BV_SLT : FunctionDeclarationKind.BV_ULT;
-    return mkBvCompare(op, kind, pParam1, pParam2, (a, b) -> LeanSmtNativeApi.mkApp2(op, a, b));
+    return mkBvCompare(op, kind, pParam1, pParam2);
   }
 
   @Override
@@ -277,7 +236,7 @@ final class LeanSmtBitvectorFormulaManager
     String op = signed ? "bvsle" : "bvule";
     FunctionDeclarationKind kind =
         signed ? FunctionDeclarationKind.BV_SLE : FunctionDeclarationKind.BV_ULE;
-    return mkBvCompare(op, kind, pParam1, pParam2, (a, b) -> LeanSmtNativeApi.mkApp2(op, a, b));
+    return mkBvCompare(op, kind, pParam1, pParam2);
   }
 
   @Override
@@ -285,7 +244,7 @@ final class LeanSmtBitvectorFormulaManager
     String op = signed ? "bvsgt" : "bvugt";
     FunctionDeclarationKind kind =
         signed ? FunctionDeclarationKind.BV_SGT : FunctionDeclarationKind.BV_UGT;
-    return mkBvCompare(op, kind, pParam1, pParam2, (a, b) -> LeanSmtNativeApi.mkApp2(op, a, b));
+    return mkBvCompare(op, kind, pParam1, pParam2);
   }
 
   @Override
@@ -293,7 +252,7 @@ final class LeanSmtBitvectorFormulaManager
     String op = signed ? "bvsge" : "bvuge";
     FunctionDeclarationKind kind =
         signed ? FunctionDeclarationKind.BV_SGE : FunctionDeclarationKind.BV_UGE;
-    return mkBvCompare(op, kind, pParam1, pParam2, (a, b) -> LeanSmtNativeApi.mkApp2(op, a, b));
+    return mkBvCompare(op, kind, pParam1, pParam2);
   }
 
   @Override

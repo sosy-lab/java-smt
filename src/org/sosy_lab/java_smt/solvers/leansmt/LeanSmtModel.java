@@ -50,7 +50,7 @@ final class LeanSmtModel extends AbstractModel<Long, LeanSmtType, Long> {
       java.util.Set<Long> pRelevantHandles) {
     super(pProver, pCreator);
     leanCreator = pCreator;
-    printer = new LeanSmtSmtLibPrinter(pCreator);
+    printer = new LeanSmtSmtLibPrinter(pCreator, true);
     solver = pSolver;
     modelAssignments = generateModelAssignments(ImmutableList.copyOf(pRelevantHandles));
   }
@@ -392,22 +392,11 @@ final class LeanSmtModel extends AbstractModel<Long, LeanSmtType, Long> {
     private LeanSmtNativeApiResult() {}
 
     static long eq(LeanSmtFormulaCreator creator, long a, long b) {
-      return creator.makeBinary(
-          "=",
-          FunctionDeclarationKind.EQ,
-          FormulaType.BooleanType,
-          a,
-          b,
-          LeanSmtNativeApi::mkEq);
+      return creator.makeBinary("=", FunctionDeclarationKind.EQ, FormulaType.BooleanType, a, b);
     }
 
     static long not(LeanSmtFormulaCreator creator, long a) {
-      return creator.makeUnary(
-          "not",
-          FunctionDeclarationKind.NOT,
-          FormulaType.BooleanType,
-          a,
-          LeanSmtNativeApi::mkNot);
+      return creator.makeUnary("not", FunctionDeclarationKind.NOT, FormulaType.BooleanType, a);
     }
   }
 }

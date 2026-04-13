@@ -9,6 +9,7 @@
 package org.sosy_lab.java_smt.solvers.leansmt;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import java.util.Collection;
 import java.util.HashSet;
@@ -31,6 +32,8 @@ final class LeanSmtTheoremProver extends AbstractProverWithAllSat<Void> implemen
   private final LeanSmtFormulaCreator creator;
   private final String logic;
   private final LeanSmtSmtLibPrinter printer;
+  private long cachedSatSnapshotSolver = 0L;
+  private @Nullable ImmutableList<Model.ValueAssignment> cachedModelAssignments = null;
 
   private static final class SnapshotPlan {
     private final ImmutableSet<BooleanFormula> constraints;
@@ -59,7 +62,7 @@ final class LeanSmtTheoremProver extends AbstractProverWithAllSat<Void> implemen
     super(pOptions, pBmgr, pShutdownNotifier);
     creator = pCreator;
     logic = pLogic;
-    printer = new LeanSmtSmtLibPrinter(pCreator);
+    printer = new LeanSmtSmtLibPrinter(pCreator, true);
   }
 
   @Override
@@ -69,17 +72,20 @@ final class LeanSmtTheoremProver extends AbstractProverWithAllSat<Void> implemen
 
   @Override
   protected void popImpl() {
+    clearCachedSnapshot();
     // JavaSMT owns the assertion stack; LeanSMT only sees snapshot solves.
   }
 
   @Override
   protected @Nullable Void addConstraintImpl(BooleanFormula pConstraint) {
+    clearCachedSnapshot();
     // JavaSMT owns the active constraints; LeanSMT only sees snapshot solves.
     return null;
   }
 
   @Override
   protected void pushImpl() {
+    clearCachedSnapshot();
     // JavaSMT owns the assertion stack; LeanSMT only sees snapshot solves.
   }
 
@@ -114,13 +120,19 @@ final class LeanSmtTheoremProver extends AbstractProverWithAllSat<Void> implemen
   @Override
   public Model getModel() throws SolverException {
     checkGenerateModels();
-    return new CachingModel(getEvaluatorWithoutChecks());
+    LeanSmtModel model = getEvaluatorWithoutChecks();
+    cachedModelAssignments = model.asList();
+    return new CachingModel(model);
   }
 
   @Override
   protected LeanSmtModel getEvaluatorWithoutChecks() throws SolverException {
     SnapshotPlan snapshotPlan = collectSnapshotPlan(true);
-    long modelSolver = createSatModelSnapshotSolver(snapshotPlan);
+    long modelSolver = cachedSatSnapshotSolver;
+    cachedSatSnapshotSolver = 0L;
+    if (modelSolver == 0L) {
+      modelSolver = createSatModelSnapshotSolver(snapshotPlan);
+    }
     try {
       return registerEvaluator(
           new LeanSmtModel(this, creator, modelSolver, snapshotPlan.relevantModelHandles));
@@ -142,6 +154,26 @@ final class LeanSmtTheoremProver extends AbstractProverWithAllSat<Void> implemen
     throw new UnsupportedOperationException(UNSAT_CORE_NOT_SUPPORTED);
   }
 
+  @Override
+  public ImmutableList<Model.ValueAssignment> getModelAssignments() throws SolverException {
+    checkGenerateModels();
+    if (cachedModelAssignments != null) {
+      return cachedModelAssignments;
+    }
+
+    try (Model model = getModel()) {
+      ImmutableList<Model.ValueAssignment> assignments = model.asList();
+      cachedModelAssignments = assignments;
+      return assignments;
+    }
+  }
+
+  @Override
+  public void close() {
+    clearCachedSnapshot();
+    super.close();
+  }
+
   private long createEmptySolver() throws SolverException {
     long solver = LeanSmtNativeApi.createSolverCvc5();
     LeanSmtNativeApi.setLogic(solver, logic);
@@ -151,18 +183,37 @@ final class LeanSmtTheoremProver extends AbstractProverWithAllSat<Void> implemen
   private void assertAllConstraints(long solver, SnapshotPlan snapshotPlan)
       throws SolverException, InterruptedException {
     for (BooleanFormula constraint : snapshotPlan.constraints) {
+      long handle = creator.extractInfoFromFormula(constraint);
+      if (isBooleanConstant(handle, true)) {
+        continue;
+      }
       shutdownNotifier.shutdownIfNecessary();
-      LeanSmtNativeApi.assertTermSmtLib(
-          solver, printer.dumpTerm(creator.extractInfoFromFormula(constraint)));
+      LeanSmtNativeApi.assertTermSmtLib(solver, printer.dumpTerm(handle));
     }
   }
 
   private int checkSatOnSnapshot() throws SolverException, InterruptedException {
-    long solver = createSolverSnapshot(collectSnapshotPlan(false));
+    SnapshotPlan snapshotPlan = collectSnapshotPlan(false);
+    Integer trivialResult = getTrivialSatResult(snapshotPlan.constraints);
+    if (trivialResult != null) {
+      clearCachedSnapshot();
+      return trivialResult;
+    }
+
+    clearCachedSnapshot();
+    long solver = createSolverSnapshot(snapshotPlan);
+    boolean keepSnapshot = false;
     try {
-      return LeanSmtNativeApi.checkSat(solver);
+      int result = LeanSmtNativeApi.checkSat(solver);
+      if (result == LeanSMTConstants.LEANSMT_SAT) {
+        cachedSatSnapshotSolver = solver;
+        keepSnapshot = true;
+      }
+      return result;
     } finally {
-      LeanSmtNativeApi.deleteSolverBestEffort(solver);
+      if (!keepSnapshot) {
+        LeanSmtNativeApi.deleteSolverBestEffort(solver);
+      }
     }
   }
 
@@ -257,5 +308,34 @@ final class LeanSmtTheoremProver extends AbstractProverWithAllSat<Void> implemen
         LeanSmtNativeApi.deleteSolverBestEffort(solver);
       }
     }
+  }
+
+  private void clearCachedSnapshot() {
+    cachedModelAssignments = null;
+    if (cachedSatSnapshotSolver != 0L) {
+      LeanSmtNativeApi.deleteSolverBestEffort(cachedSatSnapshotSolver);
+      cachedSatSnapshotSolver = 0L;
+    }
+  }
+
+  private @Nullable Integer getTrivialSatResult(ImmutableSet<BooleanFormula> constraints) {
+    boolean hasNonTrivialConstraint = false;
+    for (BooleanFormula constraint : constraints) {
+      long handle = creator.extractInfoFromFormula(constraint);
+      if (isBooleanConstant(handle, false)) {
+        return LeanSMTConstants.LEANSMT_UNSAT;
+      }
+      if (!isBooleanConstant(handle, true)) {
+        hasNonTrivialConstraint = true;
+      }
+    }
+    return hasNonTrivialConstraint ? null : LeanSMTConstants.LEANSMT_SAT;
+  }
+
+  private boolean isBooleanConstant(long handle, boolean expectedValue) {
+    LeanSmtFormulaCreator.Expr expr = creator.getExpression(handle);
+    return expr.kind == LeanSmtFormulaCreator.ExprKind.CONSTANT
+        && expr.constantValue instanceof Boolean
+        && ((Boolean) expr.constantValue) == expectedValue;
   }
 }
