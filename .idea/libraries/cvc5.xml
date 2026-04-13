@@ -4,9 +4,11 @@
       <root url="file://$PROJECT_DIR$/lib/java/runtime-cvc5" />
     </CLASSES>
     <JAVADOC>
-      <root url="https://cvc5.github.io/docs-ci/docs-main/" />
+      <root url="jar://$PROJECT_DIR$/lib/java-contrib/cvc5-javadoc.jar!/" />
     </JAVADOC>
-    <SOURCES />
+    <SOURCES>
+      <root url="jar://$PROJECT_DIR$/lib/java-contrib/cvc5-sources.jar!/" />
+    </SOURCES>
     <jarDirectory url="file://$PROJECT_DIR$/lib/java/runtime-cvc5" recursive="false" />
   </library>
 </component>

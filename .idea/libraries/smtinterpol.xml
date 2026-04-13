@@ -4,7 +4,7 @@
       <root url="file://$PROJECT_DIR$/lib/java/runtime-smtinterpol" />
     </CLASSES>
     <JAVADOC>
-      <root url="https://ultimate.informatik.uni-freiburg.de/smtinterpol/doc/index.html" />
+      <root url="jar://$PROJECT_DIR$/lib/java-contrib/smtinterpol-javadoc.jar!/" />
     </JAVADOC>
     <SOURCES>
       <root url="jar://$PROJECT_DIR$/lib/java-contrib/smtinterpol-sources.jar!/smtinterpol/Library-SMTLIB/src" />

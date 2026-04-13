@@ -4,7 +4,8 @@
       <root url="file://$PROJECT_DIR$/lib/java/runtime-princess" />
     </CLASSES>
     <JAVADOC>
-      <root url="https://philipp.ruemmer.org/princess/doc/#ap.package" />
+      <root url="jar://$PROJECT_DIR$/lib/java-contrib/ostrich_2.13-javadoc.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/java-contrib/princess_2.13-javadoc.jar!/" />
     </JAVADOC>
     <SOURCES>
       <root url="jar://$PROJECT_DIR$/lib/java-contrib/ostrich_2.13-sources.jar!/" />

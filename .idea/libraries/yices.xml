@@ -4,9 +4,11 @@
       <root url="file://$PROJECT_DIR$/lib/java/runtime-yices2" />
     </CLASSES>
     <JAVADOC>
-      <root url="https://yices.csl.sri.com/yices2-documentation.html" />
+      <root url="jar://$PROJECT_DIR$/lib/java-contrib/yices-javadoc.jar!/" />
     </JAVADOC>
-    <SOURCES />
+    <SOURCES>
+      <root url="jar://$PROJECT_DIR$/lib/java-contrib/yices-sources.jar!/" />
+    </SOURCES>
     <jarDirectory url="file://$PROJECT_DIR$/lib/java/runtime-yices2" recursive="false" />
   </library>
 </component>
