@@ -43,13 +43,13 @@ final class LeanSmtTheoremProver extends AbstractProverWithAllSat<Void> implemen
 
     private SnapshotPlan(
         ImmutableSet<BooleanFormula> pConstraints,
-        Set<String> pVariables,
-        Set<String> pUfs,
-        Set<Long> pRelevantModelHandles) {
+        ImmutableSet<String> pVariables,
+        ImmutableSet<String> pUfs,
+        ImmutableSet<Long> pRelevantModelHandles) {
       constraints = pConstraints;
-      variables = ImmutableSet.copyOf(pVariables);
-      ufs = ImmutableSet.copyOf(pUfs);
-      relevantModelHandles = ImmutableSet.copyOf(pRelevantModelHandles);
+      variables = pVariables;
+      ufs = pUfs;
+      relevantModelHandles = pRelevantModelHandles;
     }
   }
 
@@ -236,8 +236,8 @@ final class LeanSmtTheoremProver extends AbstractProverWithAllSat<Void> implemen
 
   private SnapshotPlan collectSnapshotPlan(boolean collectRelevantModelHandles) {
     ImmutableSet<BooleanFormula> constraints = getAssertedFormulas();
-    Set<String> referencedVariables = new HashSet<>();
-    Set<String> referencedUfs = new HashSet<>();
+    ImmutableSet.Builder<String> referencedVariables = ImmutableSet.builder();
+    ImmutableSet.Builder<String> referencedUfs = ImmutableSet.builder();
     ImmutableSet.Builder<Long> relevantHandles =
         collectRelevantModelHandles ? ImmutableSet.builder() : null;
     Set<Long> visited = new HashSet<>();
@@ -251,16 +251,16 @@ final class LeanSmtTheoremProver extends AbstractProverWithAllSat<Void> implemen
     }
     return new SnapshotPlan(
         constraints,
-        referencedVariables,
-        referencedUfs,
+        referencedVariables.build(),
+        referencedUfs.build(),
         relevantHandles == null ? ImmutableSet.of() : relevantHandles.build());
   }
 
   private void collectSnapshotMetadata(
       long handle,
       Set<Long> visited,
-      Set<String> referencedVariables,
-      Set<String> referencedUfs,
+      ImmutableSet.Builder<String> referencedVariables,
+      ImmutableSet.Builder<String> referencedUfs,
       ImmutableSet.Builder<Long> relevantHandles) {
     if (!visited.add(handle)) {
       return;
