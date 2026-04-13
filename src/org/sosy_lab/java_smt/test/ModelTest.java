@@ -95,7 +95,6 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
       ImmutableList.of(Solvers.Z3, Solvers.Z3_WITH_INTERPOLATION, Solvers.PRINCESS);
   private static final ImmutableList<Solvers> SOLVERS_WITH_PERSISTENT_MODEL =
       ImmutableList.of(
-          Solvers.LEANSMT,
           Solvers.MATHSAT5,
           Solvers.Z3,
           Solvers.Z3_WITH_INTERPOLATION,

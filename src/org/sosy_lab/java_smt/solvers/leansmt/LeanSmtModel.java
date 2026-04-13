@@ -18,6 +18,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.api.FormulaType;
@@ -47,12 +48,12 @@ final class LeanSmtModel extends AbstractModel<Long, LeanSmtType, Long> {
       LeanSmtTheoremProver pProver,
       LeanSmtFormulaCreator pCreator,
       long pSolver,
-      java.util.Set<Long> pRelevantHandles) {
+      Set<Long> pRelevantHandles) {
     super(pProver, pCreator);
     leanCreator = pCreator;
     printer = new LeanSmtSmtLibPrinter(pCreator, true);
     solver = pSolver;
-    modelAssignments = generateModelAssignments(ImmutableList.copyOf(pRelevantHandles));
+    modelAssignments = generateModelAssignments(pRelevantHandles);
   }
 
   @Override

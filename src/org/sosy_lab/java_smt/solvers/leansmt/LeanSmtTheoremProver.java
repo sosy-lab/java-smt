@@ -9,7 +9,6 @@
 package org.sosy_lab.java_smt.solvers.leansmt;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import java.util.Collection;
 import java.util.HashSet;
@@ -25,7 +24,6 @@ import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractProverWithAllSat;
-import org.sosy_lab.java_smt.basicimpl.CachingModel;
 
 final class LeanSmtTheoremProver extends AbstractProverWithAllSat<Void>
     implements ProverEnvironment {
@@ -34,7 +32,6 @@ final class LeanSmtTheoremProver extends AbstractProverWithAllSat<Void>
   private final String logic;
   private final LeanSmtSmtLibPrinter printer;
   private long cachedSatSnapshotSolver = 0L;
-  private @Nullable ImmutableList<Model.ValueAssignment> cachedModelAssignments = null;
 
   private static final class SnapshotPlan {
     private final ImmutableSet<BooleanFormula> constraints;
@@ -68,7 +65,7 @@ final class LeanSmtTheoremProver extends AbstractProverWithAllSat<Void>
 
   @Override
   protected boolean hasPersistentModel() {
-    return true;
+    return false;
   }
 
   @Override
@@ -104,8 +101,7 @@ final class LeanSmtTheoremProver extends AbstractProverWithAllSat<Void>
   }
 
   @Override
-  public boolean isUnsatWithAssumptions(Collection<BooleanFormula> pAssumptions)
-      throws SolverException, InterruptedException {
+  public boolean isUnsatWithAssumptions(Collection<BooleanFormula> pAssumptions) {
     throw new UnsupportedOperationException(ASSUMPTION_SOLVING_NOT_SUPPORTED);
   }
 
@@ -120,13 +116,26 @@ final class LeanSmtTheoremProver extends AbstractProverWithAllSat<Void>
   @Override
   public Model getModel() throws SolverException {
     checkGenerateModels();
-    LeanSmtModel model = getEvaluatorWithoutChecks();
-    cachedModelAssignments = model.asList();
-    return new CachingModel(model);
+    // The model is non-persistent, so we register it as an evaluator.
+    return registerEvaluator(createModelFromNewSnapshot());
   }
+
+  // TODO: switch to evaluator impl
+  /*
+  @Override
+  public Evaluator getEvaluator() {
+    checkGenerateModels();
+    return getEvaluatorWithoutChecks();
+  }
+   */
 
   @Override
   protected LeanSmtModel getEvaluatorWithoutChecks() throws SolverException {
+    // TODO: switch to a proper evaluator
+    return registerEvaluator(createModelFromNewSnapshot());
+  }
+
+  private LeanSmtModel createModelFromNewSnapshot() throws SolverException {
     SnapshotPlan snapshotPlan = collectSnapshotPlan(true);
     long modelSolver = cachedSatSnapshotSolver;
     cachedSatSnapshotSolver = 0L;
@@ -134,8 +143,7 @@ final class LeanSmtTheoremProver extends AbstractProverWithAllSat<Void>
       modelSolver = createSatModelSnapshotSolver(snapshotPlan);
     }
     try {
-      return registerEvaluator(
-          new LeanSmtModel(this, creator, modelSolver, snapshotPlan.relevantModelHandles));
+      return new LeanSmtModel(this, creator, modelSolver, snapshotPlan.relevantModelHandles);
     } catch (RuntimeException e) {
       LeanSmtNativeApi.deleteSolverBestEffort(modelSolver);
       throw e;
@@ -149,23 +157,9 @@ final class LeanSmtTheoremProver extends AbstractProverWithAllSat<Void>
 
   @Override
   public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(
-      Collection<BooleanFormula> pAssumptions) throws SolverException, InterruptedException {
+      Collection<BooleanFormula> pAssumptions) {
     Preconditions.checkNotNull(pAssumptions);
     throw new UnsupportedOperationException(UNSAT_CORE_NOT_SUPPORTED);
-  }
-
-  @Override
-  public ImmutableList<Model.ValueAssignment> getModelAssignments() throws SolverException {
-    checkGenerateModels();
-    if (cachedModelAssignments != null) {
-      return cachedModelAssignments;
-    }
-
-    try (Model model = getModel()) {
-      ImmutableList<Model.ValueAssignment> assignments = model.asList();
-      cachedModelAssignments = assignments;
-      return assignments;
-    }
   }
 
   @Override
@@ -311,7 +305,6 @@ final class LeanSmtTheoremProver extends AbstractProverWithAllSat<Void>
   }
 
   private void clearCachedSnapshot() {
-    cachedModelAssignments = null;
     if (cachedSatSnapshotSolver != 0L) {
       LeanSmtNativeApi.deleteSolverBestEffort(cachedSatSnapshotSolver);
       cachedSatSnapshotSolver = 0L;
