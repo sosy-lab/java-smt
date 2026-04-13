@@ -34,6 +34,7 @@ import de.uni_freiburg.informatik.ultimate.logic.Theory;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import org.sosy_lab.java_smt.api.ArrayFormula;
@@ -112,27 +113,21 @@ class SmtInterpolFormulaCreator extends FormulaCreator<Term, Sort, Script, Funct
   @CanIgnoreReturnValue
   private FunctionSymbol declareFun(String fun, Sort[] paramSorts, Sort resultSort) {
     checkSymbol(fun);
-    FunctionSymbol fsym = null;
-    try {
-      fsym = environment.getTheory().getFunction(fun, paramSorts);
-    } catch (SMTLIBException e) {
-      // fsym = null
-    }
-    if (fsym == null) {
-      try {
-        environment.declareFun(fun, paramSorts, resultSort);
-      } catch (SMTLIBException e) {
-        // can fail, if function is already declared with a different sort
-        throw new IllegalArgumentException("Cannot declare function '" + fun + "'", e);
-      }
-      return environment.getTheory().getFunction(fun, paramSorts);
+    var functions = environment.getTheory().getDeclaredFunctions();
+    if (!functions.containsKey(fun)) {
+      // There is no function with that name yet: create a new symbol
+      environment.declareFun(fun, paramSorts, resultSort);
     } else {
-      if (!fsym.getReturnSort().equals(resultSort)) {
+      // A symbol with the same name already exists: Check if the signature matches and throw an
+      // exception otherwise
+      var decl = functions.get(fun);
+      if (!Arrays.equals(decl.getParameterSorts(), paramSorts)
+          || !decl.getReturnSort().equals(resultSort)) {
         throw new IllegalArgumentException(
-            "Function " + fun + " is already declared with different definition");
+            "Function '%s' already declared with a different sort".formatted(fun));
       }
-      return fsym;
     }
+    return functions.get(fun);
   }
 
   /**
