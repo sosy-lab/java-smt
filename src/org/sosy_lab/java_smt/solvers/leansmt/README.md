@@ -97,10 +97,8 @@ ant -Dtest.solver=LEANSMT tests
 
 ## Notes
 
-- The builder enforces the pinned LeanSMT commit by default. Set `LEANSMT_SKIP_PIN_CHECK=1` only
-  for local experiments.
-- The local runtime layout is intentionally minimal. It does not rely on `leansmt-runtime/`,
-  renamed alias libraries, or host-specific absolute RPATHs.
+- The builder enforces the pinned LeanSMT commit by default. Set `LEANSMT_SKIP_PIN_CHECK=1` to
+  bypass.
 - JavaSMT loads LeanSMT through the normal native-library loader and the symlink layer in
   `lib/native/x86_64-linux`.
 
