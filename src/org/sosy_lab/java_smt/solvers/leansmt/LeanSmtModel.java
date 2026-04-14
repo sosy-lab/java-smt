@@ -58,9 +58,7 @@ final class LeanSmtModel extends AbstractModel<Long, LeanSmtType, Long> {
 
   @Override
   public void close() {
-    if (!isClosed()) {
-      LeanSmtNativeApi.deleteSolverBestEffort(solver);
-    }
+    // The solver is closed by the prover
     super.close();
   }
 
