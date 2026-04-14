@@ -24,6 +24,7 @@ import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractProverWithAllSat;
+import org.sosy_lab.java_smt.basicimpl.CachingModel;
 
 final class LeanSmtTheoremProver extends AbstractProverWithAllSat<Void>
     implements ProverEnvironment {
@@ -31,7 +32,7 @@ final class LeanSmtTheoremProver extends AbstractProverWithAllSat<Void>
   private final LeanSmtFormulaCreator creator;
   private final String logic;
   private final LeanSmtSmtLibPrinter printer;
-  private long cachedSatSnapshotSolver = 0L;
+  private Long solver = null;
 
   private static final class SnapshotPlan {
     private final ImmutableSet<BooleanFormula> constraints;
@@ -89,6 +90,7 @@ final class LeanSmtTheoremProver extends AbstractProverWithAllSat<Void>
 
   @Override
   protected boolean isUnsatImpl() throws SolverException, InterruptedException {
+    closeAllEvaluators();
     int result = checkSatOnSnapshot();
     if (result == LeanSMTConstants.LEANSMT_UNSAT) {
       return true;
@@ -117,7 +119,7 @@ final class LeanSmtTheoremProver extends AbstractProverWithAllSat<Void>
   public Model getModel() throws SolverException {
     checkGenerateModels();
     // The model is non-persistent, so we register it as an evaluator.
-    return registerEvaluator(createModelFromNewSnapshot());
+    return new CachingModel(registerEvaluator(createModelFromNewSnapshot()));
   }
 
   // TODO: switch to evaluator impl
@@ -137,15 +139,14 @@ final class LeanSmtTheoremProver extends AbstractProverWithAllSat<Void>
 
   private LeanSmtModel createModelFromNewSnapshot() throws SolverException {
     SnapshotPlan snapshotPlan = collectSnapshotPlan(true);
-    long modelSolver = cachedSatSnapshotSolver;
-    cachedSatSnapshotSolver = 0L;
-    if (modelSolver == 0L) {
-      modelSolver = createSatModelSnapshotSolver(snapshotPlan);
+    if (solver == null) {
+      solver = createSatModelSnapshotSolver(snapshotPlan);
     }
+
     try {
-      return new LeanSmtModel(this, creator, modelSolver, snapshotPlan.relevantModelHandles);
+      return new LeanSmtModel(this, creator, solver, snapshotPlan.relevantModelHandles);
     } catch (RuntimeException e) {
-      LeanSmtNativeApi.deleteSolverBestEffort(modelSolver);
+      clearCachedSnapshot();
       throw e;
     }
   }
@@ -194,21 +195,10 @@ final class LeanSmtTheoremProver extends AbstractProverWithAllSat<Void>
       return trivialResult;
     }
 
+    // Reset solver if there is one and create a new one
     clearCachedSnapshot();
-    long solver = createSolverSnapshot(snapshotPlan);
-    boolean keepSnapshot = false;
-    try {
-      int result = LeanSmtNativeApi.checkSat(solver);
-      if (result == LeanSMTConstants.LEANSMT_SAT) {
-        cachedSatSnapshotSolver = solver;
-        keepSnapshot = true;
-      }
-      return result;
-    } finally {
-      if (!keepSnapshot) {
-        LeanSmtNativeApi.deleteSolverBestEffort(solver);
-      }
-    }
+    solver = createSolverSnapshot(snapshotPlan);
+    return LeanSmtNativeApi.checkSat(solver);
   }
 
   private long createSolverSnapshot(SnapshotPlan snapshotPlan)
@@ -305,9 +295,9 @@ final class LeanSmtTheoremProver extends AbstractProverWithAllSat<Void>
   }
 
   private void clearCachedSnapshot() {
-    if (cachedSatSnapshotSolver != 0L) {
-      LeanSmtNativeApi.deleteSolverBestEffort(cachedSatSnapshotSolver);
-      cachedSatSnapshotSolver = 0L;
+    if (solver != null) {
+      LeanSmtNativeApi.deleteSolverBestEffort(solver);
+      solver = null;
     }
   }
 
