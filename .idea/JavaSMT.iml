@@ -16,41 +16,51 @@
       <library>
         <CLASSES>
           <root url="file://$MODULE_DIR$/lib/java/core" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
-        <jarDirectory url="file://$MODULE_DIR$/lib/java/core" recursive="false" />
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library">
-      <library>
-        <CLASSES>
           <root url="file://$MODULE_DIR$/lib/java/build" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
-        <jarDirectory url="file://$MODULE_DIR$/lib/java/build" recursive="false" />
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library">
-      <library>
-        <CLASSES>
           <root url="file://$MODULE_DIR$/lib/java/test" />
+          <root url="jar://$MODULE_DIR$/lib/java/runtime-bitwuzla/bitwuzla.jar!/" />
+          <root url="jar://$MODULE_DIR$/lib/java/runtime-opensmt/opensmt.jar!/" />
+          <root url="jar://$MODULE_DIR$/lib/java/runtime-smtinterpol/smtinterpol.jar!/" />
+          <root url="jar://$MODULE_DIR$/lib/java/runtime-princess/scala-library.jar!/" />
+          <root url="jar://$MODULE_DIR$/lib/java/runtime-princess/princess-smt-parser_2.13.jar!/" />
+          <root url="jar://$MODULE_DIR$/lib/java/runtime-princess/princess_2.13.jar!/" />
+          <root url="jar://$MODULE_DIR$/lib/java/runtime-princess/princess-parser_2.13.jar!/" />
+          <root url="jar://$MODULE_DIR$/lib/java/runtime-princess/sourcecode_2.13.jar!/" />
+          <root url="jar://$MODULE_DIR$/lib/java/runtime-princess/org.sat4j.core.jar!/" />
+          <root url="jar://$MODULE_DIR$/lib/java/runtime-cvc5/cvc5.jar!/" />
+          <root url="jar://$MODULE_DIR$/lib/java/runtime-princess/ostrich_2.13.jar!/" />
+          <root url="jar://$MODULE_DIR$/lib/java/runtime-princess/scala-parser-combinators_2.13.jar!/" />
+          <root url="jar://$MODULE_DIR$/lib/java/runtime-princess/ostrich-ecma2020-parser_2.13.jar!/" />
+          <root url="jar://$MODULE_DIR$/lib/java/runtime-princess/geny_2.13.jar!/" />
+          <root url="jar://$MODULE_DIR$/lib/java/runtime-princess/fastparse_2.13.jar!/" />
+          <root url="jar://$MODULE_DIR$/lib/java/runtime-cvc4/CVC4.jar!/" />
+          <root url="jar://$MODULE_DIR$/lib/java/runtime-z3/com.microsoft.z3.jar!/" />
+          <root url="jar://$MODULE_DIR$/lib/java/runtime-z3-legacy/com.microsoft.z3legacy.jar!/" />
         </CLASSES>
-        <JAVADOC />
-        <SOURCES />
+        <JAVADOC>
+          <root url="file://$MODULE_DIR$/lib/java-contrib" />
+        </JAVADOC>
+        <NATIVE>
+          <root url="file://$MODULE_DIR$/lib/java/runtime-z3" />
+          <root url="file://$MODULE_DIR$/lib/java/runtime-bitwuzla" />
+          <root url="file://$MODULE_DIR$/lib/java/runtime-boolector" />
+          <root url="file://$MODULE_DIR$/lib/java/runtime-mathsat" />
+          <root url="file://$MODULE_DIR$/lib/java/runtime-optimathsat" />
+          <root url="file://$MODULE_DIR$/lib/java/runtime-opensmt" />
+          <root url="file://$MODULE_DIR$/lib/java/runtime-cvc4" />
+          <root url="file://$MODULE_DIR$/lib/java/runtime-cvc5" />
+          <root url="file://$MODULE_DIR$/lib/java/runtime-z3-legacy" />
+        </NATIVE>
+        <SOURCES>
+          <root url="file://$MODULE_DIR$/lib/java-contrib" />
+        </SOURCES>
+        <jarDirectory url="file://$MODULE_DIR$/lib/java/build" recursive="false" />
+        <jarDirectory url="file://$MODULE_DIR$/lib/java/core" recursive="false" />
         <jarDirectory url="file://$MODULE_DIR$/lib/java/test" recursive="false" />
+        <jarDirectory url="file://$MODULE_DIR$/lib/java-contrib" recursive="false" type="SOURCES" />
+        <jarDirectory url="file://$MODULE_DIR$/lib/java-contrib" recursive="false" type="JAVADOC" />
       </library>
     </orderEntry>
-    <orderEntry type="library" name="bitwuzla" level="project" />
-    <orderEntry type="library" name="cvc4" level="project" />
-    <orderEntry type="library" name="cvc5" level="project" />
-    <orderEntry type="library" name="opensmt" level="project" />
-    <orderEntry type="library" name="princess" level="project" />
-    <orderEntry type="library" name="smtinterpol" level="project" />
-    <orderEntry type="library" name="yices" level="project" />
-    <orderEntry type="library" name="z3" level="project" />
-    <orderEntry type="library" name="z3legacy" level="project" />
   </component>
   <component name="org.twodividedbyzero.idea.findbugs">
     <option name="_basePreferences">
