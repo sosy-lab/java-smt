@@ -36,6 +36,7 @@
           <root url="jar://$MODULE_DIR$/lib/java/runtime-cvc4/CVC4.jar!/" />
           <root url="jar://$MODULE_DIR$/lib/java/runtime-z3/com.microsoft.z3.jar!/" />
           <root url="jar://$MODULE_DIR$/lib/java/runtime-z3-legacy/com.microsoft.z3legacy.jar!/" />
+          <root url="jar://$MODULE_DIR$/lib/java/runtime-yices2/yices.jar!/" />
         </CLASSES>
         <JAVADOC>
           <root url="file://$MODULE_DIR$/lib/java-contrib" />
@@ -50,6 +51,7 @@
           <root url="file://$MODULE_DIR$/lib/java/runtime-cvc4" />
           <root url="file://$MODULE_DIR$/lib/java/runtime-cvc5" />
           <root url="file://$MODULE_DIR$/lib/java/runtime-z3-legacy" />
+          <root url="file://$MODULE_DIR$/lib/java/runtime-yices2" />
         </NATIVE>
         <SOURCES>
           <root url="file://$MODULE_DIR$/lib/java-contrib" />
@@ -57,8 +59,8 @@
         <jarDirectory url="file://$MODULE_DIR$/lib/java/build" recursive="false" />
         <jarDirectory url="file://$MODULE_DIR$/lib/java/core" recursive="false" />
         <jarDirectory url="file://$MODULE_DIR$/lib/java/test" recursive="false" />
-        <jarDirectory url="file://$MODULE_DIR$/lib/java-contrib" recursive="false" type="SOURCES" />
         <jarDirectory url="file://$MODULE_DIR$/lib/java-contrib" recursive="false" type="JAVADOC" />
+        <jarDirectory url="file://$MODULE_DIR$/lib/java-contrib" recursive="false" type="SOURCES" />
       </library>
     </orderEntry>
   </component>
