@@ -3,6 +3,18 @@
   <component name="NewModuleRootManager">
     <output url="file://$MODULE_DIR$/bin" />
     <exclude-output />
+    <javadoc-paths>
+      <root url="jar://$MODULE_DIR$/lib/java-contrib/bitwuzla-javadoc.jar!/" />
+      <root url="jar://$MODULE_DIR$/lib/java-contrib/com.microsoft.z3-javadoc.jar!/" />
+      <root url="jar://$MODULE_DIR$/lib/java-contrib/CVC4-javadoc.jar!/" />
+      <root url="jar://$MODULE_DIR$/lib/java-contrib/cvc5-javadoc.jar!/" />
+      <root url="jar://$MODULE_DIR$/lib/java-contrib/javasmt-yices2-javadoc.jar!/" />
+      <root url="jar://$MODULE_DIR$/lib/java-contrib/opensmt-javadoc.jar!/" />
+      <root url="jar://$MODULE_DIR$/lib/java-contrib/ostrich_2.13-javadoc.jar!/" />
+      <root url="jar://$MODULE_DIR$/lib/java-contrib/princess_2.13-javadoc.jar!/" />
+      <root url="jar://$MODULE_DIR$/lib/java-contrib/smtinterpol-javadoc.jar!/" />
+      <root url="jar://$MODULE_DIR$/lib/java-contrib/yices-javadoc.jar!/" />
+    </javadoc-paths>
     <content url="file://$MODULE_DIR$">
       <sourceFolder url="file://$MODULE_DIR$/src" isTestSource="false" />
       <excludeFolder url="file://$MODULE_DIR$/JUnit-coverage" />
