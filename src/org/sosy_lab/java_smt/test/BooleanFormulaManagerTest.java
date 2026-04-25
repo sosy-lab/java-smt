@@ -18,6 +18,7 @@ import org.junit.AssumptionViolatedException;
 import org.junit.Test;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BooleanFormula;
+import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.SolverException;
 
 /**
@@ -411,5 +412,33 @@ public class BooleanFormulaManagerTest extends SolverBasedTest0.ParameterizedSol
     assertThat(bmgr.ifThenElse(var1, fFalse, fFalse)).isEqualTo(fFalse);
     assertThat(bmgr.ifThenElse(var1, fTrue, fFalse)).isEqualTo(var1);
     assertThat(bmgr.ifThenElse(var1, fFalse, fTrue)).isEqualTo(bmgr.not(var1));
+  }
+
+  @Test
+  public void hornBuilding() throws SolverException, InterruptedException {
+    BooleanFormula var1 = bmgr.makeVariable("var1");
+    BooleanFormula var2 = bmgr.makeVariable("var2");
+    BooleanFormula var3 = bmgr.makeVariable("var3");
+
+    assertThatFormula(bmgr.makeHornClause(var1, ImmutableList.of(var2, var3))).isEquisatisfiableTo(
+        bmgr.or(bmgr.not(bmgr.and(var2,var3)), var1));
+  }
+
+  @Test
+  public void hornBuildingConstraint() throws SolverException, InterruptedException {
+    assume()
+        .that(imgr)
+        .isNotNull();
+
+    BooleanFormula var1 = bmgr.makeVariable("var1");
+    BooleanFormula var2 = bmgr.makeVariable("var2");
+    BooleanFormula var3 = bmgr.makeVariable("var3");
+
+    IntegerFormula var4 = imgr.makeVariable("var4");
+    IntegerFormula n1 = imgr.makeNumber(1);
+    BooleanFormula c1 = imgr.greaterThan(var4, n1);
+
+    assertThatFormula(bmgr.makeHornClause(var1, ImmutableList.of(var2, var3), c1)).isEquisatisfiableTo(bmgr.or(c1,
+        bmgr.not(bmgr.and(var2, var3)), var1));
   }
 }

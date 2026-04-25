@@ -203,4 +203,47 @@ public interface BooleanFormulaManager {
    * @param flatten If {@code true}, flatten recursively.
    */
   Set<BooleanFormula> toDisjunctionArgs(BooleanFormula f, boolean flatten);
+
+  /**
+   * Creates a constrained horn clause
+   * {@code (constraint \/ body) => head}
+   * @param head Head of horn clause
+   * @param body Body of horn clause
+   * @param constraint Constraint of horn clause
+   * @return boolean formula representation of horn clause
+   */
+  BooleanFormula makeHornClause(BooleanFormula head,
+                            Collection<BooleanFormula> body, BooleanFormula constraint);
+
+  /**
+   * Creates a constrained horn clause
+   * {@code body => head}
+   * @param head Head of horn clause
+   * @param body Body of horn clause
+   * @return boolean formula representation of horn clause
+   */
+  default BooleanFormula makeHornClause(BooleanFormula head,
+                            Collection<BooleanFormula> body) {
+    return makeHornClause(head, body, makeTrue());
+  }
+
+  /**
+   * Creates a horn clause
+   * {@code body => true}
+   * @param body Body of horn clause
+   * @return boolean formula representation of horn clause
+   */
+  default BooleanFormula makeHornClause(Collection<BooleanFormula> body) {
+    return makeHornClause(makeTrue(), body);
+  }
+  /**
+   * Creates a constrained horn clause
+   * {@code (constraint \/ body) => true}
+   * @param body Body of horn clause
+   * @param constraint Constraint of horn clause
+   * @return boolean formula representation of horn clause
+   */
+  default BooleanFormula makeHornClause(Collection<BooleanFormula> body, BooleanFormula constraint) {
+    return makeHornClause(makeTrue(), body, constraint);
+  }
 }
