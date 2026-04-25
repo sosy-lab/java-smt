@@ -416,12 +416,14 @@ public class BooleanFormulaManagerTest extends SolverBasedTest0.ParameterizedSol
 
   @Test
   public void hornBuilding() throws SolverException, InterruptedException {
-    BooleanFormula var1 = bmgr.makeVariable("var1");
-    BooleanFormula var2 = bmgr.makeVariable("var2");
-    BooleanFormula var3 = bmgr.makeVariable("var3");
+    BooleanFormula a = bmgr.makeVariable("a");
+    BooleanFormula b = bmgr.makeVariable("b");
+    BooleanFormula c = bmgr.makeVariable("c");
 
-    assertThatFormula(bmgr.makeHornClause(var1, ImmutableList.of(var2, var3))).isEquisatisfiableTo(
-        bmgr.or(bmgr.not(bmgr.and(var2,var3)), var1));
+    var horn = bmgr.makeHornClause(a, ImmutableList.of(b, c));
+    var expected = bmgr.or(a, bmgr.not(b), bmgr.not(c));
+
+    assertThatFormula(horn).isEquivalentTo(expected);
   }
 
   @Test
@@ -430,15 +432,18 @@ public class BooleanFormulaManagerTest extends SolverBasedTest0.ParameterizedSol
         .that(imgr)
         .isNotNull();
 
-    BooleanFormula var1 = bmgr.makeVariable("var1");
-    BooleanFormula var2 = bmgr.makeVariable("var2");
-    BooleanFormula var3 = bmgr.makeVariable("var3");
+    BooleanFormula a = bmgr.makeVariable("a");
+    BooleanFormula b = bmgr.makeVariable("b");
+    BooleanFormula c = bmgr.makeVariable("c");
 
-    IntegerFormula var4 = imgr.makeVariable("var4");
+    IntegerFormula d = imgr.makeVariable("d");
     IntegerFormula n1 = imgr.makeNumber(1);
-    BooleanFormula c1 = imgr.greaterThan(var4, n1);
+    BooleanFormula c1 = imgr.greaterThan(d, n1);
 
-    assertThatFormula(bmgr.makeHornClause(var1, ImmutableList.of(var2, var3), c1)).isEquisatisfiableTo(bmgr.or(c1,
-        bmgr.not(bmgr.and(var2, var3)), var1));
+
+    var horn = bmgr.makeHornClause(a, ImmutableList.of(b, c), c1);
+    var expected = bmgr.or( a,bmgr.not(c1), bmgr.not(b), bmgr.not(c));
+
+    assertThatFormula(horn).isEquivalentTo(expected);
   }
 }

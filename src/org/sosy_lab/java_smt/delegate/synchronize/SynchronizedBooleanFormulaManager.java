@@ -189,28 +189,28 @@ class SynchronizedBooleanFormulaManager implements BooleanFormulaManager {
       BooleanFormula head,
       Collection<BooleanFormula> body,
       BooleanFormula constraint) {
-    synchronized (sync){
+    synchronized (sync) {
       return delegate.makeHornClause(head, body, constraint);
     }
   }
 
   @Override
   public BooleanFormula makeHornClause(BooleanFormula head, Collection<BooleanFormula> body) {
-    synchronized (sync){
+    synchronized (sync) {
       return delegate.makeHornClause(head, body);
     }
   }
 
   @Override
   public BooleanFormula makeHornClause(Collection<BooleanFormula> body) {
-    synchronized (sync){
+    synchronized (sync) {
       return delegate.makeHornClause(body);
     }
   }
 
   @Override
   public BooleanFormula makeHornClause(Collection<BooleanFormula> body, BooleanFormula constraint) {
-    synchronized (sync){
+    synchronized (sync) {
       return delegate.makeHornClause(body, constraint);
     }
   }
