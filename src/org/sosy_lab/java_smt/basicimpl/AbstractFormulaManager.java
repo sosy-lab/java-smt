@@ -399,8 +399,10 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
 
     StringBuilder builder = new StringBuilder();
 
-    // SMTLIB2ProgramState tracks that the SMTLIB2 query conforms to the rules outlined in the
-    // standard. SMTLIB2ProgramStateMachine models the
+    // SMTLIB2ProgramStateMachine models and tracks that the SMTLIB2 query conforms to the rules
+    // outlined in the standard, i.e. which command can follow on which etc.
+    // We allow a slightly more lenient version than the standard, allowing implicit logic
+    // selection, as most solvers export and support SMTLIB2 like this.
     SMTLIB2ProgramStateMachine smtLibStateMachine = new SMTLIB2ProgramStateMachine(false);
 
     for (String token : tokens) {
