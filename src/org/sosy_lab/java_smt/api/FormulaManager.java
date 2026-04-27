@@ -195,7 +195,7 @@ public interface FormulaManager {
     checkArgument(!formulas.isEmpty(), "No assertion found in the SMTLIB string.");
     checkArgument(
         formulas.size() == 1,
-        "More than one assertion found in the SMT-LIB string, " + "please use parseAll(String).");
+        "More than one assertion found in the SMT-LIB string, please use parseAll(String).");
     return Objects.requireNonNull(Iterables.getOnlyElement(formulas));
   }
 
