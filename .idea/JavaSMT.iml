@@ -49,6 +49,8 @@
           <root url="jar://$MODULE_DIR$/lib/java/runtime-z3/com.microsoft.z3.jar!/" />
           <root url="jar://$MODULE_DIR$/lib/java/runtime-z3-legacy/com.microsoft.z3legacy.jar!/" />
           <root url="jar://$MODULE_DIR$/lib/java/runtime-yices2/yices.jar!/" />
+          <root url="jar://$MODULE_DIR$/lib/java/runtime-princess/automaton.jar!/" />
+          <root url="jar://$MODULE_DIR$/lib/java/runtime-princess/java-cup-runtime.jar!/" />
         </CLASSES>
         <JAVADOC>
           <root url="file://$MODULE_DIR$/lib/java-contrib" />
