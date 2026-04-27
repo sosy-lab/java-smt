@@ -23,6 +23,15 @@ public final class Tokenizer {
 
   private Tokenizer() {}
 
+  /** Variable names (symbols) can be wrapped with "|". This function removes those chars. */
+  public static String dequote(String s) {
+    int l = s.length();
+    if (s.charAt(0) == '|' && s.charAt(l - 1) == '|') {
+      return s.substring(1, l - 1);
+    }
+    return s;
+  }
+
   /**
    * Split up a sequence of lisp expressions.
    *
@@ -112,9 +121,16 @@ public final class Tokenizer {
               // Handle opening brackets
               token.append("(");
               level++;
+            } else if (c == ')') {
+              throw new IllegalArgumentException(
+                  "parentheses do not match, unexpected closing parenthesis");
             } else {
-              // Should be unreachable: all top-level expressions need parentheses around them
-              throw new IllegalArgumentException();
+              token.append(c);
+            }
+          } else {
+            if (!token.isEmpty()) {
+              builder.add(token.toString());
+              token = new StringBuilder();
             }
           }
         } else {
@@ -137,7 +153,10 @@ public final class Tokenizer {
     }
     if (level != 0) {
       // Throw an exception if the brackets don't match
-      throw new IllegalArgumentException("brackets do not match, too many open brackets");
+      throw new IllegalArgumentException("parentheses do not match, too many open parentheses");
+    }
+    if (!token.isEmpty()) {
+      builder.add(token.toString());
     }
     return builder.build();
   }

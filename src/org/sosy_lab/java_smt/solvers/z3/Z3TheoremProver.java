@@ -127,12 +127,13 @@ class Z3TheoremProver extends Z3AbstractProver implements ProverEnvironment {
       creator.shutdownNotifier.shutdownIfNecessary();
       final String reason = Native.solverGetReasonUnknown(z3context, z3solver);
       switch (reason) {
-        case "canceled": // see Z3: src/tactic/tactic.cpp
-        case "interrupted": // see Z3: src/solver/check_sat_result.cpp
-        case "interrupted from keyboard": // see Z3: src/solver/check_sat_result.cpp
-          throw new InterruptedException(reason);
-        default:
-          throw new SolverException("Z3 returned 'unknown' status, reason: " + reason);
+        // see Z3:
+        // - src/tactic/tactic.cpp,
+        // - src/solver/check_sat_result.cpp, and
+        // - src/solver/check_sat_result.cpp
+        case "canceled", "interrupted", "interrupted from keyboard" ->
+            throw new InterruptedException(reason);
+        default -> throw new SolverException("Z3 returned 'unknown' status, reason: " + reason);
       }
     }
   }

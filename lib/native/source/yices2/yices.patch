@@ -1,0 +1,35 @@
+Index: configure.ac
+diff --git a/configure.ac b/configure.ac
+--- a/configure.ac	(revision dc5687ca5964ff44ded1628923b5a878f7a78d59)
++++ b/configure.ac	(date 1773697157769)
+@@ -174,7 +174,7 @@
+ AC_RUN_IFELSE(
+ [AC_LANG_PROGRAM([[__thread int test;]],
+                  [[]])],
+-has_tls=yes,has_tls=no,has_tls=no)
++has_tls=yes,has_tls=no,has_tls=yes)
+ AC_MSG_RESULT([$has_tls])
+ #
+ # restore CPPFLAGS and LIBS
+@@ -660,7 +660,7 @@
+ lp_variable_db_detach(var_db);
+ ]])
+ 
+-],run_ok=yes,run_ok=no,run_ok=no)
++],run_ok=yes,run_ok=no,run_ok=yes)
+ AC_MSG_RESULT([$run_ok])
+ #
+ # restore CPPFLAGS and LIBS
+Index: Makefile
+diff --git a/Makefile b/Makefile
+--- a/Makefile	(revision dc5687ca5964ff44ded1628923b5a878f7a78d59)
++++ b/Makefile	(date 1773662227754)
+@@ -145,7 +145,7 @@
+       newarch=$(subst x86_64,i686,$(ARCH))
+     else
+     ifeq ($(OPTION),mingw32)
+-      newarch=i686-w64-mingw32
++      newarch=x86_64-w64-mingw32
+       POSIXOS=mingw
+     endif
+     endif

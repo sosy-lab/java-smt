@@ -21,7 +21,7 @@ ENV LANGUAGE=en_US.UTF-8
 RUN apt-get update \
  && apt-get install -y \
         wget curl git build-essential cmake pkg-config patchelf unzip \
-        openjdk-11-jdk ant maven \
+        openjdk-17-jdk ant maven \
         gcc-mingw-w64-x86-64-posix g++-mingw-w64-x86-64-posix mingw-w64-tools \
         gcc-aarch64-linux-gnu g++-aarch64-linux-gnu \
         binutils-aarch64-linux-gnu libc6-dev-arm64-cross \
@@ -134,7 +134,7 @@ RUN wget https://download.java.net/java/GA/jdk17.0.2/dfd4a8d0985749f896bed50d713
  && rm openjdk-17.0.2_linux-aarch64_bin.tar.gz
 
 # JNI is not found when compiling Boolector in the image, so we need to set JAVA_HOME
-ENV JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64/
+ENV JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64/
 
 # set labels for the image
 ARG BUILD_DATE

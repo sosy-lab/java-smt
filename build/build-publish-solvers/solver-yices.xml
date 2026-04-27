@@ -12,45 +12,279 @@ SPDX-License-Identifier: Apache-2.0
 
 <!-- vim: set tabstop=8 shiftwidth=4 expandtab sts=4 filetype=ant fdm=marker: -->
 <project name="publish-solvers-yices" basedir="." xmlns:ivy="antlib:org.apache.ivy.ant">
-
     <import file="macros.xml"/>
 
-    <target name="compile-yices2-bindings"
-        description="Compile Yices2 bindings">
-        <sequential>
-            <checkPathOption pathOption="yices2.path" defaultPath="/path/to/yices2" targetName="Yices2 source folder"/>
-            <checkPathOption pathOption="gmp.path" defaultPath="/path/to/gmp" targetName="GMP source folder"/>
-            <checkPathOption pathOption="gperf.path" defaultPath="/path/to/gperf" targetName="GPERF source folder"/>
-           <exec executable="lib/native/source/yices2j/compile.sh" failonerror="true">
-               <arg value="${yices2.path}" />
-               <arg value="${gmp.path}" />
-               <arg value="${gperf.path}" />
-           </exec>
-       </sequential>
+    <property name="yices2.distDir" value="${ivy.solver.dist.dir}/yices"/>
+    <property name="yices2.buildDir" value="${basedir}/downloads"/>
+
+    <target name="build-initialize">
+        <mkdir dir="${yices2.buildDir}"/>
+
+        <condition property="cudd.downloaded">
+            <available file="${yices2.buildDir}/cudd" type="dir"/>
+        </condition>
+        <condition property="cudd.installed">
+            <available file="${yices2.buildDir}/cudd/install" type="dir"/>
+        </condition>
+
+        <condition property="libpoly.downloaded">
+            <available file="${yices2.buildDir}/libpoly" type="dir"/>
+        </condition>
+        <condition property="libpoly.installed">
+            <available file="${yices2.buildDir}/libpoly/install" type="dir"/>
+        </condition>
+
+        <condition property="yices.downloaded">
+            <available file="${yices2.buildDir}/yices2" type="dir"/>
+        </condition>
+        <condition property="yices.installed">
+            <available file="${yices2.buildDir}/yices2/install" type="dir"/>
+        </condition>
+
+        <condition property="jdk.downloaded">
+            <available file="/dependencies/jdk21-windows-x64" type="dir"/>
+        </condition>
+        <condition property="yices-java.downloaded">
+            <available file="${yices2.buildDir}/yices2_java_bindings" type="dir"/>
+        </condition>
+        <condition property="yices-java.installed">
+            <available file="${yices2.buildDir}/yices2_java_bindings/dist/lib" type="dir"/>
+        </condition>
     </target>
 
-    <target name="publish-yices2" depends="compile-yices2-bindings, load-ivy"
+    <target name="download-cudd" depends="build-initialize" unless="cudd.downloaded">
+        <exec executable="git" dir="${yices2.buildDir}" failonerror="true">
+            <arg value="clone"/>
+            <arg value="https://github.com/ivmai/cudd.git"/>
+        </exec>
+    </target>
+    <target name="build-cudd" depends="download-cudd" unless="cudd.installed">
+        <exec executable="aclocal" dir="${yices2.buildDir}/cudd" failonerror="true"/>
+        <exec executable="autoconf" dir="${yices2.buildDir}/cudd" failonerror="true"/>
+        <exec executable="automake" dir="${yices2.buildDir}/cudd" failonerror="true"/>
+        <!-- Linux build -->
+        <exec executable="./configure" dir="${yices2.buildDir}/cudd" failonerror="true">
+            <env key="CFLAGS" value="-fPIC"/>
+            <arg value="--prefix=${yices2.buildDir}/cudd/install/x64-linux"/>
+        </exec>
+        <exec executable="make" dir="${yices2.buildDir}/cudd" failonerror="true">
+            <arg value="-j"/>
+            <arg value="install"/>
+        </exec>
+        <exec executable="make" dir="${yices2.buildDir}/cudd" failonerror="true">
+            <arg value="clean"/>
+        </exec>
+        <!-- Windows build -->
+        <exec executable="./configure" dir="${yices2.buildDir}/cudd" failonerror="true">
+            <env key="CFLAGS" value="-fPIC"/>
+            <arg value="--host"/>
+            <arg value="x86_64-w64-mingw32"/>
+            <arg value="--prefix=${yices2.buildDir}/cudd/install/x64-windows"/>
+        </exec>
+        <exec executable="make" dir="${yices2.buildDir}/cudd" failonerror="true">
+            <arg value="-j"/>
+            <arg value="install"/>
+        </exec>
+        <exec executable="make" dir="${yices2.buildDir}/cudd" failonerror="true">
+            <arg value="clean"/>
+        </exec>
+    </target>
+
+    <target name="download-libpoly" depends="build-initialize" unless="libpoly.downloaded">
+        <exec executable="git" dir="${yices2.buildDir}" failonerror="true">
+            <arg value="clone"/>
+            <arg value="https://github.com/SRI-CSL/libpoly.git"/>
+        </exec>
+    </target>
+    <target name="build-libpoly" depends="download-libpoly" unless="libpoly.installed">
+        <!-- Linux build -->
+        <mkdir dir="${yices2.buildDir}/libpoly/build"/>
+        <exec executable="cmake" dir="${yices2.buildDir}/libpoly/build" failonerror="true">
+            <arg value=".."/>
+            <arg value="-DCMAKE_BUILD_TYPE=Release"/>
+            <arg value="-DCMAKE_INSTALL_PREFIX=${yices2.buildDir}/libpoly/install/x64-linux"/>
+            <arg value="-DGMP_INCLUDE_DIR=/dependencies/gmp-6.3.0/install/x64-linux/include"/>
+            <arg value="-DGMP_LIBRARY=/dependencies/gmp-6.3.0/install/x64-linux/lib/libgmp.a"/>
+            <arg value="-DLIBPOLY_BUILD_PYTHON_API=OFF"/>
+        </exec>
+        <exec executable="make" dir="${yices2.buildDir}/libpoly/build" failonerror="true">
+            <arg value="-j"/>
+            <arg value="install"/>
+        </exec>
+        <delete dir="${yices2.buildDir}/libpoly/build"/>
+        <!-- Windows build -->
+        <mkdir dir="${yices2.buildDir}/libpoly/build"/>
+        <exec executable="cmake" dir="${yices2.buildDir}/libpoly/build" failonerror="true">
+            <arg value=".."/>
+            <arg value="-DCMAKE_BUILD_TYPE=Release"/>
+            <arg value="-DCMAKE_TOOLCHAIN_FILE=../cmake/x86_64-w64-mingw32.cmake"/>
+            <arg value="-DCMAKE_INSTALL_PREFIX=${yices2.buildDir}/libpoly/install/x64-windows"/>
+            <arg value="-DGMP_INCLUDE_DIR=/dependencies/gmp-6.3.0/install/x64-windows/include"/>
+            <arg value="-DGMP_LIBRARY=/dependencies/gmp-6.3.0/install/x64-windows/lib/libgmp.a"/>
+            <arg value="-DLIBPOLY_BUILD_PYTHON_API=OFF"/>
+        </exec>
+        <exec executable="make" dir="${yices2.buildDir}/libpoly/build" failonerror="true">
+            <arg value="-j"/>
+            <arg value="install"/>
+        </exec>
+        <delete dir="${yices2.buildDir}/libpoly/build"/>
+    </target>
+
+    <target name="download-yices2" depends="build-initialize" unless="yices.downloaded">
+        <exec executable="git" dir="${yices2.buildDir}" failonerror="true">
+            <arg value="clone"/>
+            <arg value="https://github.com/SRI-CSL/yices2.git"/>
+        </exec>
+    </target>
+    <target name="build-yices2" depends="build-cudd, build-libpoly, download-yices2" unless="yices.installed">
+        <exec executable="git" dir="${yices2.buildDir}/yices2" failonerror="true">
+            <arg value="apply"/>
+            <arg value="${basedir}/lib/native/source/yices2/yices.patch"/>
+        </exec>
+        <exec executable="autoconf" dir="${yices2.buildDir}/yices2" failonerror="true"/>
+        <mkdir dir="${yices2.buildDir}/yices2/install"/>
+        <!-- Linux build -->
+        <exec executable="./configure" dir="${yices2.buildDir}/yices2" failonerror="true">
+            <env key="LDFLAGS" value="-L/dependencies/gmp-6.3.0/install/x64-linux/lib -L${yices2.buildDir}/libpoly/install/x64-linux/lib -L${yices2.buildDir}/cudd/install/x64-linux/lib"/>
+            <env key="CFLAGS" value="-I/dependencies/gmp-6.3.0/install/x64-linux/include -I${yices2.buildDir}/libpoly/install/x64-linux/include -I${yices2.buildDir}/cudd/install/x64-linux/include"/>
+            <arg value="--enable-mcsat"/>
+            <arg value="--enable-thread-safety"/>
+            <arg value="--prefix=${yices2.buildDir}/yices2/install/x64-linux"/>
+        </exec>
+        <exec executable="make" dir="${yices2.buildDir}/yices2" failonerror="true">
+            <arg value="-j"/>
+        </exec>
+        <exec executable="make" dir="${yices2.buildDir}/yices2" failonerror="true">
+            <arg value="install"/>
+        </exec>
+        <exec executable="make" dir="${yices2.buildDir}/yices2" failonerror="true">
+            <arg value="clean"/>
+        </exec>
+        <!-- Windows build -->
+        <exec executable="./configure" dir="${yices2.buildDir}/yices2" failonerror="true">
+            <env key="LDFLAGS" value="-L/dependencies/gmp-6.3.0/install/x64-windows/lib -L${yices2.buildDir}/libpoly/install/x64-windows/lib -L${yices2.buildDir}/cudd/install/x64-windows/lib"/>
+            <env key="CFLAGS" value="-I/dependencies/gmp-6.3.0/install/x64-windows/include -I${yices2.buildDir}/libpoly/install/x64-windows/include -I${yices2.buildDir}/cudd/install/x64-windows/include"/>
+            <arg value="--host"/>
+            <arg value="x86_64-w64-mingw32"/>
+            <arg value="--enable-mcsat"/>
+            <arg value="--enable-thread-safety"/>
+            <arg value="--prefix=${yices2.buildDir}/yices2/install/x64-windows"/>
+        </exec>
+        <exec executable="make" dir="${yices2.buildDir}/yices2" failonerror="true">
+            <arg value="-j8"/>
+            <arg value="OPTION=mingw32"/>
+        </exec>
+        <exec executable="make" dir="${yices2.buildDir}/yices2" failonerror="true">
+            <arg value="install"/>
+            <arg value="OPTION=mingw32"/>
+        </exec>
+        <exec executable="make" dir="${yices2.buildDir}/yices2" failonerror="true">
+            <arg value="clean"/>
+            <arg value="OPTION=mingw32"/>
+        </exec>
+    </target>
+    <target name="clean-yices2" depends="build-initialize, clean-yices2-java" if="yices.installed">
+        <delete dir="${yices2.buildDir}/yices2/install"/>
+        <exec executable="git" dir="${yices2.buildDir}/yices2" failonerror="true">
+            <arg value="apply"/>
+            <arg value="-R"/>
+            <arg value="${basedir}/lib/native/source/yices2/yices.patch"/>
+        </exec>
+    </target>
+
+    <target name="download-jdk21-windows" depends="build-initialize" unless="jdk.downloaded">
+        <!-- Download a more recent Jdk to avoid compile errors -->
+        <get src="https://download.oracle.com/java/21/latest/jdk-21_windows-x64_bin.zip" dest="/dependencies" verbose="true"/>
+        <unzip src="/dependencies/jdk-21_windows-x64_bin.zip" dest="/dependencies"/>
+        <delete file="/dependencies/jdk-21_windows-x64_bin.zip" failonerror="true"/>
+        <move file="/dependencies/jdk-21.0.10" tofile="/dependencies/jdk21-windows-x64" failonerror="true"/>
+    </target>
+
+    <target name="download-yices2-java" depends="build-initialize" unless="yices-java.downloaded">
+        <exec executable="git" dir="${yices2.buildDir}" failonerror="true">
+            <arg value="clone"/>
+            <arg value="https://github.com/daniel-raffler/yices2_java_bindings.git"/>
+        </exec>
+    </target>
+    <target name="build-yices2-java" depends="build-yices2, download-jdk21-windows, download-yices2-java" unless="yices-java.installed">
+        <exec executable="git" dir="${yices2.buildDir}/yices2_java_bindings" failonerror="true">
+            <arg value="apply"/>
+            <arg value="${basedir}/lib/native/source/yices2/jni.patch"/>
+        </exec>
+        <mkdir dir="${yices2.buildDir}/yices2_java_bindings/dist/lib"/>
+        <!-- Linux build -->
+        <exec executable="ant" dir="${yices2.buildDir}/yices2_java_bindings" failonerror="true">
+            <env key="OS" value="linux"/>
+            <env key="JNI_PATH" value="${java.home}/include"/>
+            <env key="GMP_PATH" value="/dependencies/gmp-6.3.0/install/x64-linux"/>
+            <env key="CUDD_PATH" value="${yices2.buildDir}/cudd/install/x64-linux"/>
+            <env key="POLY_PATH" value="${yices2.buildDir}/libpoly/install/x64-linux"/>
+            <env key="YICES_PATH" value="${yices2.buildDir}/yices2/install/x64-linux"/>
+            <arg value="install"/>
+        </exec>
+        <!-- Windows build -->
+        <exec executable="ant" dir="${yices2.buildDir}/yices2_java_bindings" failonerror="true">
+            <env key="OS" value="win32"/>
+            <env key="JNI_PATH" value="/dependencies/jdk21-windows-x64/include"/>
+            <env key="GMP_PATH" value="/dependencies/gmp-6.3.0/install/x64-windows"/>
+            <env key="CUDD_PATH" value="${yices2.buildDir}/cudd/install/x64-windows"/>
+            <env key="POLY_PATH" value="${yices2.buildDir}/libpoly/install/x64-windows"/>
+            <env key="YICES_PATH" value="${yices2.buildDir}/yices2/install/x64-windows"/>
+            <env key="CXX" value="x86_64-w64-mingw32-g++"/>
+            <env key="CXXFLAGS" value="-DNOYICES_DLL"/>
+            <arg value="install"/>
+        </exec>
+    </target>
+    <target name="clean-yices2-java" depends="build-initialize" if="yices-java.installed">
+        <exec executable="ant" dir="${yices2.buildDir}/yices2_java_bindings" failonerror="true">
+            <arg value="clean"/>
+        </exec>
+        <exec executable="git" dir="${yices2.buildDir}/yices2_java_bindings" failonerror="true">
+            <arg value="apply"/>
+            <arg value="-R"/>
+            <arg value="${basedir}/lib/native/source/yices2/jni.patch"/>
+        </exec>
+    </target>
+
+    <target name="publish-yices2" depends="load-ivy, build-yices2-java"
         description="Publish Yices2 binaries to Ivy repo.">
         <sequential>
             <fail unless="yices2.version">
                 Please specify the Yices2 version with the flag -Dyices2.version=... .
             </fail>
 
-            <copy file="lib/native/source/yices2j/libyices2j.so" tofile="libyices2j-${yices2.version}.so"/>
+            <copy file="${yices2.buildDir}/yices2_java_bindings/dist/lib/libyices2java.so" tofile="${yices2.distDir}/x64/libyices2java-${yices2.version}.so" failonerror="true"/>
+            <copy file="${yices2.buildDir}/yices2_java_bindings/dist/lib/yices2java.dll" tofile="${yices2.distDir}/x64/yices2java-${yices2.version}.dll" failonerror="true"/>
+            <copy file="${yices2.buildDir}/yices2_java_bindings/dist/lib/yices.jar" tofile="${yices2.distDir}/yices-${yices2.version}.jar" failonerror="true"/>
+            <copy file="${yices2.buildDir}/yices2_java_bindings/dist/lib/yices-sources.jar" tofile="${yices2.distDir}/yices-${yices2.version}-sources.jar" failonerror="true"/>
+            <copy file="${yices2.buildDir}/yices2_java_bindings/dist/lib/yices-javadoc.jar" tofile="${yices2.distDir}/yices-${yices2.version}-javadoc.jar" failonerror="true"/>
 
             <ivy:resolve conf="solver-yices2" file="solvers_ivy_conf/ivy_yices2.xml" />
-            <publishToRepository solverName="Yices" solverVersion="${version}"/>
+
+            <publishToRepository solverName="Yices" solverVersion="${yices2.version}" distDir="${yices2.distDir}"/>
+
+            <!--
+              We additionally provide x64-files without arch-attribute for backwards compatibility,
+              such that applications can load dependencies without changing their Ivy configuration.
+              Those files are not part of any direct configuration, but will be resolved if the
+              arch-attribute is not used.
+            -->
+            <copy todir="repository/${ivy.organisation}/${ivy.module}/">
+                <fileset dir="repository/${ivy.organisation}/${ivy.module}/x64/">
+                    <include name="*-${yices2.version}.*"/>
+                </fileset>
+            </copy>
         </sequential>
     </target>
 
     <import file="build-jar-yices2.xml"/>
-    <target name="dist-yices2" depends="jar-yices2, sources-yices2" description="Make a distributable release with yices2 only"/>
+    <import file="build-documentation-yices2.xml"/>
+
+    <target name="dist-yices2" depends="jar-yices2, sources-yices2, javadoc-jar-yices2" description="Make a distributable release with yices2 only"/>
 
     <target name="publish-artifacts-yices2" depends="load-ivy, determine-version, dist-yices2"
          description="Publish Java bindings for Yices2 to Ivy repo.">
         <sequential>
-            <fail unless="version.publishable"
-                  message="Cannot publish version ${version}, only unmodified working copies may be published." />
             <ivy:resolve conf="runtime" file="solvers_ivy_conf/ivy_javasmt_yices2.xml" />
             <publishToRepository solverName="Yices" solverVersion="${version}"/>
         </sequential>

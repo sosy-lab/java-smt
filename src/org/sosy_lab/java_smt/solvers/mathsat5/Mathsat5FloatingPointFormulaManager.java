@@ -75,21 +75,15 @@ class Mathsat5FloatingPointFormulaManager
 
   @Override
   protected Long getRoundingModeImpl(FloatingPointRoundingMode pFloatingPointRoundingMode) {
-    switch (pFloatingPointRoundingMode) {
-      case NEAREST_TIES_TO_EVEN:
-        return msat_make_fp_roundingmode_nearest_even(mathsatEnv);
-      case NEAREST_TIES_AWAY:
-        throw new IllegalArgumentException(
-            "Rounding mode NEAREST_TIES_AWAY is not supported by Mathsat5");
-      case TOWARD_POSITIVE:
-        return msat_make_fp_roundingmode_plus_inf(mathsatEnv);
-      case TOWARD_NEGATIVE:
-        return msat_make_fp_roundingmode_minus_inf(mathsatEnv);
-      case TOWARD_ZERO:
-        return msat_make_fp_roundingmode_zero(mathsatEnv);
-      default:
-        throw new AssertionError("Unexpected branch");
-    }
+    return switch (pFloatingPointRoundingMode) {
+      case NEAREST_TIES_TO_EVEN -> msat_make_fp_roundingmode_nearest_even(mathsatEnv);
+      case NEAREST_TIES_AWAY ->
+          throw new IllegalArgumentException(
+              "Rounding mode NEAREST_TIES_AWAY is not supported by Mathsat5");
+      case TOWARD_POSITIVE -> msat_make_fp_roundingmode_plus_inf(mathsatEnv);
+      case TOWARD_NEGATIVE -> msat_make_fp_roundingmode_minus_inf(mathsatEnv);
+      case TOWARD_ZERO -> msat_make_fp_roundingmode_zero(mathsatEnv);
+    };
   }
 
   @Override

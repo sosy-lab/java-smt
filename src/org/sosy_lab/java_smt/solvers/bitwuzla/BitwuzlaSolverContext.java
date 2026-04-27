@@ -188,9 +188,8 @@ public final class BitwuzlaSolverContext extends AbstractSolverContext {
       Option bitwuzlaOption = allAvailableOptions.get(optionName);
       if (bitwuzlaOption == null) {
         throw new InvalidConfigurationException(
-            String.format(
-                "Unknown option: %s. Bitwuzla provides the following options: %s.",
-                optionName, Joiner.on(", ").join(allAvailableOptions.keySet())));
+            "Unknown option: %s. Bitwuzla provides the following options: %s."
+                .formatted(optionName, Joiner.on(", ").join(allAvailableOptions.keySet())));
       }
       try {
         if (pOptions.is_numeric(bitwuzlaOption) || pOptions.is_bool(bitwuzlaOption)) {

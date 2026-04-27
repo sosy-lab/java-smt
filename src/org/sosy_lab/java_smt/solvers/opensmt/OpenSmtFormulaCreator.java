@@ -21,6 +21,7 @@ import org.sosy_lab.java_smt.api.FunctionDeclarationKind;
 import org.sosy_lab.java_smt.api.visitors.FormulaVisitor;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 import org.sosy_lab.java_smt.basicimpl.FunctionDeclarationImpl;
+import org.sosy_lab.java_smt.basicimpl.Tokenizer;
 import org.sosy_lab.java_smt.solvers.opensmt.OpenSmtFormula.OpenSmtArrayFormula;
 import org.sosy_lab.java_smt.solvers.opensmt.OpenSmtFormula.OpenSmtBooleanFormula;
 import org.sosy_lab.java_smt.solvers.opensmt.OpenSmtFormula.OpenSmtIntegerFormula;
@@ -44,8 +45,8 @@ final class OpenSmtFormulaCreator extends FormulaCreator<PTRef, SRef, Logic, Sym
     super(
         logic,
         logic.getSort_bool(),
-        (logic instanceof ArithLogic) ? ((ArithLogic) logic).getSort_int() : null,
-        (logic instanceof ArithLogic) ? ((ArithLogic) logic).getSort_real() : null,
+        (logic instanceof ArithLogic arithLogic) ? arithLogic.getSort_int() : null,
+        (logic instanceof ArithLogic arithLogic) ? arithLogic.getSort_real() : null,
         null,
         null);
 
@@ -57,38 +58,22 @@ final class OpenSmtFormulaCreator extends FormulaCreator<PTRef, SRef, Logic, Sym
   }
 
   private static Logic createLogic(Logics logicType) {
-    switch (logicType) {
-      case CORE:
-        return LogicFactory.getInstance(Logic_t.QF_BOOL);
-      case QF_AX:
-        return LogicFactory.getInstance(Logic_t.QF_AX);
-      case QF_UF:
-        return LogicFactory.getInstance(Logic_t.QF_UF);
-      case QF_IDL:
-        return LogicFactory.getLAInstance(Logic_t.QF_IDL);
-      case QF_RDL:
-        return LogicFactory.getLAInstance(Logic_t.QF_RDL);
-      case QF_LIA:
-        return LogicFactory.getLAInstance(Logic_t.QF_LIA);
-      case QF_LRA:
-        return LogicFactory.getLAInstance(Logic_t.QF_LRA);
-      case QF_ALIA:
-        return LogicFactory.getLAInstance(Logic_t.QF_ALIA);
-      case QF_ALRA:
-        return LogicFactory.getLAInstance(Logic_t.QF_ALRA);
-      case QF_UFLIA:
-        return LogicFactory.getLAInstance(Logic_t.QF_UFLIA);
-      case QF_UFLRA:
-        return LogicFactory.getLAInstance(Logic_t.QF_UFLRA);
-      case QF_AUFLIA:
-        return LogicFactory.getLAInstance(Logic_t.QF_AUFLIA);
-      case QF_AUFLRA:
-        return LogicFactory.getLAInstance(Logic_t.QF_AUFLRA);
-      case QF_AUFLIRA:
-        return LogicFactory.getLAInstance(Logic_t.QF_AUFLIRA);
-      default:
-        throw new AssertionError("no logic available");
-    }
+    return switch (logicType) {
+      case CORE -> LogicFactory.getInstance(Logic_t.QF_BOOL);
+      case QF_AX -> LogicFactory.getInstance(Logic_t.QF_AX);
+      case QF_UF -> LogicFactory.getInstance(Logic_t.QF_UF);
+      case QF_IDL -> LogicFactory.getLAInstance(Logic_t.QF_IDL);
+      case QF_RDL -> LogicFactory.getLAInstance(Logic_t.QF_RDL);
+      case QF_LIA -> LogicFactory.getLAInstance(Logic_t.QF_LIA);
+      case QF_LRA -> LogicFactory.getLAInstance(Logic_t.QF_LRA);
+      case QF_ALIA -> LogicFactory.getLAInstance(Logic_t.QF_ALIA);
+      case QF_ALRA -> LogicFactory.getLAInstance(Logic_t.QF_ALRA);
+      case QF_UFLIA -> LogicFactory.getLAInstance(Logic_t.QF_UFLIA);
+      case QF_UFLRA -> LogicFactory.getLAInstance(Logic_t.QF_UFLRA);
+      case QF_AUFLIA -> LogicFactory.getLAInstance(Logic_t.QF_AUFLIA);
+      case QF_AUFLRA -> LogicFactory.getLAInstance(Logic_t.QF_AUFLRA);
+      case QF_AUFLIRA -> LogicFactory.getLAInstance(Logic_t.QF_AUFLIRA);
+    };
   }
 
   Logics getLogic() {
@@ -188,7 +173,7 @@ final class OpenSmtFormulaCreator extends FormulaCreator<PTRef, SRef, Logic, Sym
     if (alogic.isSortReal(sort)) {
       return FormulaType.RationalType;
     }
-    throw new AssertionError(String.format("Encountered unhandled Type '%s'.", sort));
+    throw new AssertionError("Encountered unhandled Type '%s'.".formatted(sort));
   }
 
   @SuppressWarnings("unchecked")
@@ -197,8 +182,8 @@ final class OpenSmtFormulaCreator extends FormulaCreator<PTRef, SRef, Logic, Sym
     assert pType.equals(getFormulaType(pTerm))
             || (pType.equals(FormulaType.RationalType)
                 && getFormulaType(pTerm).equals(FormulaType.IntegerType))
-        : String.format(
-            "Cannot encapsulate formula %s of Type %s as %s", pTerm, getFormulaType(pTerm), pType);
+        : "Cannot encapsulate formula %s of Type %s as %s"
+            .formatted(pTerm, getFormulaType(pTerm), pType);
     if (pType.isBooleanType()) {
       return (T) new OpenSmtBooleanFormula(getEnv(), pTerm);
     }
@@ -223,9 +208,8 @@ final class OpenSmtFormulaCreator extends FormulaCreator<PTRef, SRef, Logic, Sym
   @Override
   public BooleanFormula encapsulateBoolean(PTRef pTerm) {
     assert getFormulaType(pTerm).isBooleanType()
-        : String.format(
-            "%s is not boolean, but %s (%s)",
-            pTerm, getEnv().getSortRef(pTerm), getFormulaType(pTerm));
+        : "%s is not boolean, but %s (%s)"
+            .formatted(pTerm, getEnv().getSortRef(pTerm), getFormulaType(pTerm));
     return new OpenSmtBooleanFormula(getEnv(), pTerm);
   }
 
@@ -234,9 +218,8 @@ final class OpenSmtFormulaCreator extends FormulaCreator<PTRef, SRef, Logic, Sym
   protected <TI extends Formula, TE extends Formula> ArrayFormula<TI, TE> encapsulateArray(
       PTRef pTerm, FormulaType<TI> pIndexType, FormulaType<TE> pElementType) {
     assert getFormulaType(pTerm).equals(FormulaType.getArrayType(pIndexType, pElementType))
-        : String.format(
-            "%s is no array, but %s (%s)",
-            pTerm, getEnv().getSortRef(pTerm), getFormulaType(pTerm));
+        : "%s is no array, but %s (%s)"
+            .formatted(pTerm, getEnv().getSortRef(pTerm), getFormulaType(pTerm));
     return new OpenSmtArrayFormula<>(getEnv(), pTerm, pIndexType, pElementType);
   }
 
@@ -358,7 +341,7 @@ final class OpenSmtFormulaCreator extends FormulaCreator<PTRef, SRef, Logic, Sym
 
     if (logic.isVar(f)) {
       String varName = logic.getSymName(logic.getSymRef(f));
-      return visitor.visitFreeVariable(formula, dequote(varName));
+      return visitor.visitFreeVariable(formula, Tokenizer.dequote(varName));
     }
 
     String varName = logic.getSymName(logic.getSymRef(f));

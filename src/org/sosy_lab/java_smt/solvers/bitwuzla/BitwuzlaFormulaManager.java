@@ -111,9 +111,8 @@ final class BitwuzlaFormulaManager
       parser.parse(declsFromCache + declsFromTokens + assertionsFromTokens, true, false);
     } catch (IllegalArgumentException e) {
       throw new IllegalArgumentException(
-          String.format(
-              "Failed to parse input string \"%s\" with declarations \"%s\" and \"%s\"",
-              assertionsFromTokens, declsFromCache, declsFromTokens),
+          "Failed to parse input string \"%s\" with declarations \"%s\" and \"%s\""
+              .formatted(assertionsFromTokens, declsFromCache, declsFromTokens),
           e);
     }
 
@@ -171,7 +170,7 @@ final class BitwuzlaFormulaManager
         sort = sort.fun_codomain();
       }
       String argsStr = Joiner.on(" ").join(args);
-      builder.add(String.format("(declare-fun %s (%s) %s)", symbol, argsStr, sort));
+      builder.add("(declare-fun %s (%s) %s)".formatted(symbol, argsStr, sort));
     }
     return builder.build();
   }
@@ -205,9 +204,8 @@ final class BitwuzlaFormulaManager
             // Sort of the definition that we parsed does not match the sort from the variable
             // cache.
             throw new IllegalArgumentException(
-                String.format(
-                    "Symbol %s is already defined with a different sort %s in the variable cache",
-                    symbol, cache.row(symbol)));
+                "Symbol %s is already defined with a different sort %s in the variable cache"
+                    .formatted(symbol, cache.row(symbol)));
           }
           // Skip if it's just a redefinition
           continue;
@@ -227,7 +225,7 @@ final class BitwuzlaFormulaManager
     // Only bitwuzla_print_formula() gives us the proper SMT2 format, with (check-sat) etc.
     // Note: bitwuzla_print_formula() is wrapped in dump_assertions_smt2()
     if (pTerm.is_value()) {
-      return "(assert " + pTerm + ")";
+      return "(assert %s)".formatted(pTerm);
     }
     Bitwuzla bitwuzla = new Bitwuzla(creator.getEnv());
     for (Term t : creator.getConstraintsForTerm(pTerm)) {

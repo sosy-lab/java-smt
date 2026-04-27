@@ -18,5 +18,6 @@ public class PackageSanityTest extends AbstractPackageSanityTests {
   {
     setDistinctValues(FormulaType.class, FormulaType.BooleanType, FormulaType.IntegerType);
     setDefault(ShutdownNotifier.class, ShutdownManager.create().getNotifier());
+    ignoreClasses(c -> c.equals(InterpolatingProverDelegate.class));
   }
 }

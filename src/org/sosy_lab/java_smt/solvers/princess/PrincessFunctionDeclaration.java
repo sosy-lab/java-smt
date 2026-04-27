@@ -39,12 +39,12 @@ import scala.collection.immutable.Seq;
  * function). The latter case does not have a valid {@code equals}, but it is not necessary, as it's
  * not used in {@link org.sosy_lab.java_smt.basicimpl.FunctionDeclarationImpl}.
  */
-abstract class PrincessFunctionDeclaration {
+abstract sealed class PrincessFunctionDeclaration {
   private PrincessFunctionDeclaration() {}
 
   abstract IExpression makeApp(PrincessEnvironment environment, List<IExpression> args);
 
-  private abstract static class AbstractDeclaration<T> extends PrincessFunctionDeclaration {
+  private abstract static sealed class AbstractDeclaration<T> extends PrincessFunctionDeclaration {
 
     /* some object representing the function declaration. */
     final T declarationItem;
@@ -55,11 +55,8 @@ abstract class PrincessFunctionDeclaration {
 
     @Override
     public boolean equals(Object o) {
-      if (!(o instanceof AbstractDeclaration<?>)) {
-        return false;
-      }
-      AbstractDeclaration<?> other = (AbstractDeclaration<?>) o;
-      return declarationItem.equals(other.declarationItem);
+      return o instanceof AbstractDeclaration<?> other
+          && declarationItem.equals(other.declarationItem);
     }
 
     @Override
@@ -76,7 +73,7 @@ abstract class PrincessFunctionDeclaration {
     }
   }
 
-  static class PrincessIFunctionDeclaration extends AbstractDeclaration<IFunction> {
+  static final class PrincessIFunctionDeclaration extends AbstractDeclaration<IFunction> {
     private final List<FormulaType<?>> argSorts;
     private final FormulaType<?> returnSort;
 
@@ -152,7 +149,7 @@ abstract class PrincessFunctionDeclaration {
     }
   }
 
-  static class PrincessByExampleDeclaration extends AbstractDeclaration<IExpression> {
+  static final class PrincessByExampleDeclaration extends AbstractDeclaration<IExpression> {
 
     PrincessByExampleDeclaration(IExpression pExample) {
       super(pExample);
@@ -164,7 +161,7 @@ abstract class PrincessFunctionDeclaration {
     }
   }
 
-  static class PrincessBitvectorToBooleanDeclaration extends AbstractDeclaration<Predicate> {
+  static final class PrincessBitvectorToBooleanDeclaration extends AbstractDeclaration<Predicate> {
 
     PrincessBitvectorToBooleanDeclaration(Predicate pPredicate) {
       super(pPredicate);
@@ -188,7 +185,8 @@ abstract class PrincessFunctionDeclaration {
     }
   }
 
-  static class PrincessBitvectorToBitvectorDeclaration extends AbstractDeclaration<IFunction> {
+  static final class PrincessBitvectorToBitvectorDeclaration
+      extends AbstractDeclaration<IFunction> {
 
     PrincessBitvectorToBitvectorDeclaration(IFunction pFunction) {
       super(pFunction);
@@ -212,9 +210,9 @@ abstract class PrincessFunctionDeclaration {
     }
   }
 
-  static class PrincessEquationDeclaration extends PrincessFunctionDeclaration {
+  static final class PrincessEquationDeclaration extends PrincessFunctionDeclaration {
 
-    static final PrincessEquationDeclaration INSTANCE = new PrincessEquationDeclaration() {};
+    static final PrincessEquationDeclaration INSTANCE = new PrincessEquationDeclaration();
 
     private PrincessEquationDeclaration() {}
 
@@ -225,9 +223,9 @@ abstract class PrincessFunctionDeclaration {
     }
   }
 
-  static class PrincessMultiplyDeclaration extends PrincessFunctionDeclaration {
+  static final class PrincessMultiplyDeclaration extends PrincessFunctionDeclaration {
 
-    static final PrincessMultiplyDeclaration INSTANCE = new PrincessMultiplyDeclaration() {};
+    static final PrincessMultiplyDeclaration INSTANCE = new PrincessMultiplyDeclaration();
 
     private PrincessMultiplyDeclaration() {}
 

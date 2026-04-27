@@ -10,12 +10,13 @@ package org.sosy_lab.java_smt.solvers.smtinterpol;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.google.errorprone.annotations.FormatMethod;
+import com.google.errorprone.annotations.FormatString;
 import de.uni_freiburg.informatik.ultimate.smtinterpol.LogProxy;
 import java.util.logging.Level;
 import org.sosy_lab.common.log.LogManager;
 
 /** Implementation of {@link LogProxy} that forwards to {@link LogManager}. */
-@SuppressWarnings("FormatStringAnnotation")
 final class LogProxyForwarder implements LogProxy {
 
   private static final Level LEVEL_FATAL = Level.SEVERE;
@@ -117,7 +118,8 @@ final class LogProxyForwarder implements LogProxy {
   }
 
   @Override
-  public void fatal(String pArg0, Object... pArg1) {
+  @FormatMethod
+  public void fatal(@FormatString String pArg0, Object... pArg1) {
     delegate.logf(LEVEL_FATAL, pArg0, pArg1);
   }
 
@@ -127,7 +129,8 @@ final class LogProxyForwarder implements LogProxy {
   }
 
   @Override
-  public void error(String pArg0, Object... pArg1) {
+  @FormatMethod
+  public void error(@FormatString String pArg0, Object... pArg1) {
     delegate.logf(LEVEL_ERROR, pArg0, pArg1);
   }
 
@@ -137,7 +140,8 @@ final class LogProxyForwarder implements LogProxy {
   }
 
   @Override
-  public void warn(String pArg0, Object... pArg1) {
+  @FormatMethod
+  public void warn(@FormatString String pArg0, Object... pArg1) {
     delegate.logf(LEVEL_WARN, pArg0, pArg1);
   }
 
@@ -147,7 +151,8 @@ final class LogProxyForwarder implements LogProxy {
   }
 
   @Override
-  public void info(String pArg0, Object... pArg1) {
+  @FormatMethod
+  public void info(@FormatString String pArg0, Object... pArg1) {
     delegate.logf(LEVEL_INFO, pArg0, pArg1);
   }
 
@@ -157,7 +162,8 @@ final class LogProxyForwarder implements LogProxy {
   }
 
   @Override
-  public void debug(String pArg0, Object... pArg1) {
+  @FormatMethod
+  public void debug(@FormatString String pArg0, Object... pArg1) {
     delegate.logf(LEVEL_DEBUG, pArg0, pArg1);
   }
 
@@ -167,7 +173,8 @@ final class LogProxyForwarder implements LogProxy {
   }
 
   @Override
-  public void trace(String pArg0, Object... pArg1) {
+  @FormatMethod
+  public void trace(@FormatString String pArg0, Object... pArg1) {
     delegate.logf(LEVEL_TRACE, pArg0, pArg1);
   }
 }
