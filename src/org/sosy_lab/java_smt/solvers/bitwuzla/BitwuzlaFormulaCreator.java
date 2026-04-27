@@ -598,6 +598,7 @@ class BitwuzlaFormulaCreator extends FormulaCreator<Term, Sort, TermManager, Bit
     if (sort.is_fp()) {
       int exponentSize = sort.fp_exp_size();
       int mantissaSizeWithHiddenBit = sort.fp_sig_size();
+      // We can also return REAL representations with fp_value_to_real_str()
       return FloatingPointNumber.of(
           term.to_bv(),
           getFloatingPointTypeFromSizesWithHiddenBit(exponentSize, mantissaSizeWithHiddenBit));
