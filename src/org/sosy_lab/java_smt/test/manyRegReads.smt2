@@ -11,7 +11,6 @@ Publications:
 - Hernán Ponce de León, Florian Furbach, Keijo Heljanko, Roland Meyer: Dartagnan: Bounded Model Checking for Weak Memory Models (Competition Contribution). TACAS (2) 2020: 378-382
 - Thomas Haas, Roland Meyer, Hernán Ponce de León: CAAT: consistency as a theory. Proc. ACM Program. Lang. 6(OOPSLA2): 114-144 (2022)
 |)
-(set-info :license "https://creativecommons.org/licenses/by/4.0/")
 ; Program encoding
 (declare-fun |__memToReg#5(720_result)| () (_ BitVec 32))
 (declare-fun |__memToReg#5(1529)| () (_ BitVec 32))
