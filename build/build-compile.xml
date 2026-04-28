@@ -21,7 +21,7 @@ SPDX-License-Identifier: Apache-2.0
     -->
 
     <!-- These properties can be overridden from including file. -->
-    <property name="source.release" value="11"/>
+    <property name="source.release" value="17"/>
     <property name="source.dir" value="src"/>
     <property name="source.generated.dir" value=".apt-generated"/>
     <property name="class.dir" value="bin"/>

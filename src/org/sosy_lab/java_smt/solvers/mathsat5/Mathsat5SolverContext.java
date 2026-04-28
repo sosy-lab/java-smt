@@ -317,8 +317,8 @@ public final class Mathsat5SolverContext extends AbstractSolverContext {
             .put("4b32db6b0e84", "5.6.14")
             .buildOrThrow();
     for (Map.Entry<String, String> entry : versionHashes.entrySet()) {
-      String versionHash = String.format(" version %s ", entry.getKey());
-      String replacement = String.format(" version %s (%s) ", entry.getValue(), entry.getKey());
+      String versionHash = " version %s ".formatted(entry.getKey());
+      String replacement = " version %s (%s) ".formatted(entry.getValue(), entry.getKey());
       version = version.replace(versionHash, replacement);
     }
 

@@ -118,8 +118,7 @@ public final class CVC4SolverContext extends AbstractSolverContext {
   @Override
   public void close() {
     if (creator != null) {
-      creator.getEnv().delete();
-      creator = null;
+      // Never close the context
     }
   }
 

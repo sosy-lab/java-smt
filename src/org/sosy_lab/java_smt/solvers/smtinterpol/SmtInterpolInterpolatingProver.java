@@ -8,8 +8,6 @@
 
 package org.sosy_lab.java_smt.solvers.smtinterpol;
 
-import static com.google.common.base.Preconditions.checkArgument;
-
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
@@ -47,10 +45,6 @@ class SmtInterpolInterpolatingProver extends SmtInterpolAbstractProver<String>
   @Override
   public BooleanFormula getInterpolant(Collection<String> pTermNamesOfA)
       throws SolverException, InterruptedException {
-    checkGenerateInterpolants();
-    checkArgument(
-        getAssertedConstraintIds().containsAll(pTermNamesOfA),
-        "interpolation can only be done over previously asserted formulas.");
 
     // SMTInterpol is not able to handle the trivial cases,
     // so we need to check them explicitly
@@ -74,13 +68,6 @@ class SmtInterpolInterpolatingProver extends SmtInterpolAbstractProver<String>
   public List<BooleanFormula> getTreeInterpolants(
       List<? extends Collection<String>> partitionedTermNames, int[] startOfSubTree)
       throws SolverException, InterruptedException {
-    checkGenerateInterpolants();
-    final ImmutableSet<String> assertedConstraintIds = getAssertedConstraintIds();
-    checkArgument(
-        partitionedTermNames.stream().allMatch(assertedConstraintIds::containsAll),
-        "interpolation can only be done over previously asserted formulas.");
-    assert InterpolatingProverEnvironment.checkTreeStructure(
-        partitionedTermNames.size(), startOfSubTree);
 
     final Term[] formulas = new Term[partitionedTermNames.size()];
     for (int i = 0; i < formulas.length; i++) {

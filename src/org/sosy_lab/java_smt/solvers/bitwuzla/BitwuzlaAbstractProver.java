@@ -165,7 +165,12 @@ abstract class BitwuzlaAbstractProver<T> extends AbstractProverWithAllSat<T> {
     checkGenerateModels();
     // special case for Bitwuzla: Models are not permanent and need to be closed
     // before any change is applied to the prover stack. So, we register the Model as Evaluator.
-    return getEvaluatorWithoutChecks();
+    return registerEvaluator(
+        new BitwuzlaModel(
+            env,
+            this,
+            creator,
+            Collections2.transform(getAssertedFormulas(), creator::extractInfo)));
   }
 
   /**
@@ -222,13 +227,8 @@ abstract class BitwuzlaAbstractProver<T> extends AbstractProverWithAllSat<T> {
 
   @SuppressWarnings("resource")
   @Override
-  protected BitwuzlaModel getEvaluatorWithoutChecks() {
-    return registerEvaluator(
-        new BitwuzlaModel(
-            env,
-            this,
-            creator,
-            Collections2.transform(getAssertedFormulas(), creator::extractInfo)));
+  protected BitwuzlaEvaluator getEvaluatorWithoutChecks() {
+    return registerEvaluator(new BitwuzlaEvaluator(this, creator));
   }
 
   public boolean isClosed() {

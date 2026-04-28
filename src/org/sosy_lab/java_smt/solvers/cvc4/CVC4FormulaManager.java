@@ -59,8 +59,8 @@ class CVC4FormulaManager extends AbstractFormulaManager<Expr, Type, ExprManager,
   }
 
   static Expr getCVC4Expr(Formula pT) {
-    if (pT instanceof CVC4Formula) {
-      return ((CVC4Formula) pT).getTerm();
+    if (pT instanceof CVC4Formula cVC4Formula) {
+      return cVC4Formula.getTerm();
     }
     throw new IllegalArgumentException(
         "Cannot get the formula info of type " + pT.getClass().getSimpleName() + " in the Solver!");
@@ -73,10 +73,7 @@ class CVC4FormulaManager extends AbstractFormulaManager<Expr, Type, ExprManager,
 
   @Override
   public Expr distinctImpl(Iterable<Expr> pArgs) {
-    vectorExpr vec = new vectorExpr();
-    for (Expr e : pArgs) {
-      vec.add(e);
-    }
+    vectorExpr vec = new vectorExpr(getEnvironment(), pArgs);
     if (vec.size() < 2) {
       return getEnvironment().mkConst(true);
     } else {

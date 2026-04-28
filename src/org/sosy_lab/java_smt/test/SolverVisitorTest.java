@@ -697,44 +697,28 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
             public TraversalProcess visitFunction(
                 Formula pF, List<Formula> pArgs, FunctionDeclaration<?> pDeclaration) {
               switch (pDeclaration.getKind()) {
-                case NOT:
-                  assertThat(pArgs).hasSize(1);
-                  break;
-                case ITE:
-                  assertThat(pArgs).hasSize(3);
-                  break;
-                case EQ:
-                case BV_SLT:
-                case BV_SLE:
-                case BV_SGT:
-                case BV_SGE:
-                case BV_ULT:
-                case BV_ULE:
-                case BV_UGT:
-                case BV_UGE:
-                  assertThat(pArgs).hasSize(2);
-                  break;
-                case BV_NOT:
-                case BV_NEG:
-                  assertThat(pArgs).hasSize(1);
-                  break;
-                case BV_ADD:
+                case NOT, BV_NOT, BV_NEG -> assertThat(pArgs).hasSize(1);
+                case ITE -> assertThat(pArgs).hasSize(3);
+                case EQ, BV_SLT, BV_SLE, BV_SGT, BV_SGE, BV_ULT, BV_ULE, BV_UGT, BV_UGE ->
+                    assertThat(pArgs).hasSize(2);
+                case BV_ADD -> {
                   assertThat(pArgs).contains(x);
                   assertThat(pArgs).hasSize(2);
-                  break;
-                case BV_MUL:
+                }
+                case BV_MUL -> {
                   assertThat(pArgs).contains(y);
                   assertThat(pArgs).hasSize(2);
                   // Yices is special in some cases
                   if (Solvers.YICES2 != solverToUse()) {
                     assertThat(pArgs).contains(x);
                   }
-                  break;
-                default:
+                }
+                default -> {
                   if (Solvers.YICES2 != solverToUse()) {
                     assertThat(pArgs).hasSize(2);
                     assertThat(pArgs).containsExactly(x, y);
                   }
+                }
               }
               return visitDefault(pF);
             }

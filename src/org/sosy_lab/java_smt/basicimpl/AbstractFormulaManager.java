@@ -26,7 +26,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.Appender;
 import org.sosy_lab.common.Appenders;
@@ -373,11 +372,9 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
       List<String> tokens = Tokenizer.tokenize(formulaStr);
 
       List<String> declarationTokens =
-          tokens.stream().filter(Tokenizer::isDeclarationToken).collect(Collectors.toList());
-      List<String> definitionTokens =
-          tokens.stream().filter(Tokenizer::isDefinitionToken).collect(Collectors.toList());
-      List<String> assertTokens =
-          tokens.stream().filter(Tokenizer::isAssertToken).collect(Collectors.toList());
+          tokens.stream().filter(Tokenizer::isDeclarationToken).toList();
+      List<String> definitionTokens = tokens.stream().filter(Tokenizer::isDefinitionToken).toList();
+      List<String> assertTokens = tokens.stream().filter(Tokenizer::isAssertToken).toList();
       String definitions =
           Joiner.on("").join(declarationTokens) + Joiner.on("").join(definitionTokens);
 
@@ -438,7 +435,7 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
           throw new UnsupportedOperationException();
         }
         throw new IllegalArgumentException(
-            String.format("SMTLIB command '%s' is not supported when parsing formulas.", message));
+            "SMTLIB command '%s' is not supported when parsing formulas.".formatted(message));
 
       } else {
         // Remove everything else, such as unknown or solver-specific commands, comments, etc.
@@ -452,7 +449,7 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
   public List<BooleanFormula> parseAll(String formulaStr) throws IllegalArgumentException {
     return parseAllImpl(sanitize(formulaStr)).stream()
         .map(formulaCreator::encapsulateBoolean)
-        .collect(Collectors.toList());
+        .toList();
   }
 
   protected abstract String dumpFormulaImpl(TFormulaInfo t) throws IOException;
@@ -486,18 +483,12 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
   @Override
   public BooleanFormula applyTactic(BooleanFormula f, Tactic tactic)
       throws InterruptedException, SolverException {
-    switch (tactic) {
-      case ACKERMANNIZATION:
-        return applyUFEImpl(f);
-      case NNF:
-        return applyNNFImpl(f);
-      case TSEITIN_CNF:
-        return applyCNFImpl(f);
-      case QE_LIGHT:
-        return applyQELightImpl(f);
-      default:
-        throw new UnsupportedOperationException("Unexpected enum value");
-    }
+    return switch (tactic) {
+      case ACKERMANNIZATION -> applyUFEImpl(f);
+      case NNF -> applyNNFImpl(f);
+      case TSEITIN_CNF -> applyCNFImpl(f);
+      case QE_LIGHT -> applyQELightImpl(f);
+    };
   }
 
   /** Eliminate UFs from the given input formula. */

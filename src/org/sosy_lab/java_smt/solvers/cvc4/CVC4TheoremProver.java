@@ -137,7 +137,7 @@ class CVC4TheoremProver extends AbstractProverWithAllSat<Void>
       smtEngine.assertFormula(importExpr(creator.extractInfo(pF)));
     } catch (Exception cvc4Exception) {
       throw new AssertionError(
-          String.format("CVC4 crashed while adding the constraint '%s'", pF), cvc4Exception);
+          "CVC4 crashed while adding the constraint '%s'".formatted(pF), cvc4Exception);
     }
   }
 
@@ -237,9 +237,7 @@ class CVC4TheoremProver extends AbstractProverWithAllSat<Void>
   @Override
   public void close() {
     if (!closed) {
-      exportMapping.delete();
-      // smtEngine.delete();
-      exprManager.delete();
+      // Never close the context
     }
     super.close();
   }

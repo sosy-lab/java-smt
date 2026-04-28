@@ -71,7 +71,7 @@ public class TimeoutTest extends SolverBasedTest0 {
     //   ask the developers for a way to interrupt the solver.
     // TODO Add interruption for Princess
     assume()
-        .withMessage(solverToUse() + " does not support interruption")
+        .withMessage("%s does not support interruption", solverToUse())
         .that(solverToUse())
         .isNoneOf(Solvers.PRINCESS, Solvers.CVC5);
   }

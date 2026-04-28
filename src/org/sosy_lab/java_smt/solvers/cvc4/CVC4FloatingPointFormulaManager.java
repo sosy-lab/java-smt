@@ -62,20 +62,13 @@ class CVC4FloatingPointFormulaManager
 
   @Override
   protected Expr getRoundingModeImpl(FloatingPointRoundingMode pFloatingPointRoundingMode) {
-    switch (pFloatingPointRoundingMode) {
-      case NEAREST_TIES_TO_EVEN:
-        return exprManager.mkConst(RoundingMode.roundNearestTiesToEven);
-      case NEAREST_TIES_AWAY:
-        return exprManager.mkConst(RoundingMode.roundNearestTiesToAway);
-      case TOWARD_POSITIVE:
-        return exprManager.mkConst(RoundingMode.roundTowardPositive);
-      case TOWARD_NEGATIVE:
-        return exprManager.mkConst(RoundingMode.roundTowardNegative);
-      case TOWARD_ZERO:
-        return exprManager.mkConst(RoundingMode.roundTowardZero);
-      default:
-        throw new AssertionError("Unexpected branch");
-    }
+    return switch (pFloatingPointRoundingMode) {
+      case NEAREST_TIES_TO_EVEN -> exprManager.mkConst(RoundingMode.roundNearestTiesToEven);
+      case NEAREST_TIES_AWAY -> exprManager.mkConst(RoundingMode.roundNearestTiesToAway);
+      case TOWARD_POSITIVE -> exprManager.mkConst(RoundingMode.roundTowardPositive);
+      case TOWARD_NEGATIVE -> exprManager.mkConst(RoundingMode.roundTowardNegative);
+      case TOWARD_ZERO -> exprManager.mkConst(RoundingMode.roundTowardZero);
+    };
   }
 
   @Override

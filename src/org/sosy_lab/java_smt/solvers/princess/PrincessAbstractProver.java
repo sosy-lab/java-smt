@@ -235,7 +235,7 @@ abstract class PrincessAbstractProver<E> extends AbstractProverWithAllSat<E> {
 
     @Override
     public String toString() {
-      return String.format("{%s, %s, %s}", booleanSymbols, theorySymbols, functionSymbols);
+      return "{%s, %s, %s}".formatted(booleanSymbols, theorySymbols, functionSymbols);
     }
   }
 }

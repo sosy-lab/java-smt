@@ -14,13 +14,17 @@ import static org.sosy_lab.java_smt.api.FormulaType.getFloatingPointTypeFromSize
 import com.google.common.base.Preconditions;
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Table;
 import java.math.BigInteger;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Optional;
+import java.util.function.BiConsumer;
 import org.sosy_lab.java_smt.api.ArrayFormula;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -105,8 +109,8 @@ class BitwuzlaFormulaCreator extends FormulaCreator<Term, Sort, TermManager, Bit
   @Override
   protected FloatingPointRoundingModeFormula encapsulateRoundingMode(Term pTerm) {
     assert getFormulaType(pTerm).isFloatingPointRoundingModeType()
-        : String.format(
-            "%s is no FP rounding mode, but %s (%s)", pTerm, pTerm.sort(), getFormulaType(pTerm));
+        : "%s is no FP rounding mode, but %s (%s)"
+            .formatted(pTerm, pTerm.sort(), getFormulaType(pTerm));
     return new BitwuzlaFloatingPointRoundingModeFormula(pTerm);
   }
 
@@ -324,8 +328,7 @@ class BitwuzlaFormulaCreator extends FormulaCreator<Term, Sort, TermManager, Bit
   @Override
   public <T extends Formula> T encapsulate(FormulaType<T> pType, Term pTerm) {
     assert pType.equals(getFormulaType(pTerm))
-        : String.format(
-            "Trying to encapsulate formula of type %s as %s", getFormulaType(pTerm), pType);
+        : "Trying to encapsulate formula of type %s as %s".formatted(getFormulaType(pTerm), pType);
     if (pType.isBooleanType()) {
       return (T) new BitwuzlaBooleanFormula(pTerm);
     } else if (pType.isArrayType()) {
@@ -570,11 +573,47 @@ class BitwuzlaFormulaCreator extends FormulaCreator<Term, Sort, TermManager, Bit
     if (sort.is_fp()) {
       int exponentSize = sort.fp_exp_size();
       int mantissaSizeWithHiddenBit = sort.fp_sig_size();
+      // We can also return REAL representations with fp_value_to_real_str()
       return FloatingPointNumber.of(
           term.to_bv(),
           getFloatingPointTypeFromSizesWithHiddenBit(exponentSize, mantissaSizeWithHiddenBit));
     }
     throw new AssertionError("Unknown value type.");
+  }
+
+  @Override
+  public void extractVariablesAndUFs(
+      final Formula pFormula,
+      final boolean extractUF,
+      final BiConsumer<String, Formula> pConsumer) {
+    ImmutableSet.Builder<Term> builder = ImmutableSet.builder();
+    var cache = new HashSet<Term>();
+    var work = new ArrayDeque<>(ImmutableList.of(extractInfo(pFormula)));
+    while (!work.isEmpty()) {
+      var term = work.pop();
+      if (cache.add(term)) {
+        var kind = term.kind();
+        if (kind == Kind.CONSTANT) {
+          builder.add(term);
+        } else if (kind == Kind.APPLY) {
+          if (extractUF) {
+            builder.add(term);
+          }
+          for (int c = 1; c < term.num_children(); c++) {
+            work.push(term.get(c));
+          }
+        } else {
+          for (int c = 0; c < term.num_children(); c++) {
+            work.push(term.get(c));
+          }
+        }
+      }
+    }
+    for (var term : builder.build()) {
+      pConsumer.accept(
+          term.kind() == Kind.APPLY ? term.get(0).symbol() : term.symbol(),
+          encapsulateWithTypeOf(term));
+    }
   }
 
   @Override
@@ -591,8 +630,7 @@ class BitwuzlaFormulaCreator extends FormulaCreator<Term, Sort, TermManager, Bit
     } else if (term.is_rm_value_rtz()) {
       return FloatingPointRoundingMode.TOWARD_ZERO;
     } else {
-      throw new IllegalArgumentException(
-          String.format("Unknown rounding mode in Term '%s'.", term));
+      throw new IllegalArgumentException("Unknown rounding mode in Term '%s'.".formatted(term));
     }
   }
 }

@@ -45,20 +45,13 @@ class BitwuzlaFloatingPointManager
 
   @Override
   protected Term getRoundingModeImpl(FloatingPointRoundingMode pFloatingPointRoundingMode) {
-    switch (pFloatingPointRoundingMode) {
-      case NEAREST_TIES_TO_EVEN:
-        return termManager.mk_rm_value(RoundingMode.RNE);
-      case NEAREST_TIES_AWAY:
-        return termManager.mk_rm_value(RoundingMode.RNA);
-      case TOWARD_POSITIVE:
-        return termManager.mk_rm_value(RoundingMode.RTP);
-      case TOWARD_NEGATIVE:
-        return termManager.mk_rm_value(RoundingMode.RTN);
-      case TOWARD_ZERO:
-        return termManager.mk_rm_value(RoundingMode.RTZ);
-      default:
-        throw new AssertionError("Unexpected value for Floating-Point rounding mode.");
-    }
+    return switch (pFloatingPointRoundingMode) {
+      case NEAREST_TIES_TO_EVEN -> termManager.mk_rm_value(RoundingMode.RNE);
+      case NEAREST_TIES_AWAY -> termManager.mk_rm_value(RoundingMode.RNA);
+      case TOWARD_POSITIVE -> termManager.mk_rm_value(RoundingMode.RTP);
+      case TOWARD_NEGATIVE -> termManager.mk_rm_value(RoundingMode.RTN);
+      case TOWARD_ZERO -> termManager.mk_rm_value(RoundingMode.RTZ);
+    };
   }
 
   @Override

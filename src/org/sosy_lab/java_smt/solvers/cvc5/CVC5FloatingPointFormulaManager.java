@@ -51,21 +51,14 @@ class CVC5FloatingPointFormulaManager
 
   @Override
   protected Term getRoundingModeImpl(FloatingPointRoundingMode pFloatingPointRoundingMode) {
-    switch (pFloatingPointRoundingMode) {
-      case NEAREST_TIES_TO_EVEN:
-        return termManager.mkRoundingMode(RoundingMode.ROUND_NEAREST_TIES_TO_EVEN);
-      case NEAREST_TIES_AWAY:
-        return termManager.mkRoundingMode(RoundingMode.ROUND_NEAREST_TIES_TO_AWAY);
-      case TOWARD_POSITIVE:
-        return termManager.mkRoundingMode(RoundingMode.ROUND_TOWARD_POSITIVE);
-      case TOWARD_NEGATIVE:
-        return termManager.mkRoundingMode(RoundingMode.ROUND_TOWARD_NEGATIVE);
-      case TOWARD_ZERO:
-        return termManager.mkRoundingMode(RoundingMode.ROUND_TOWARD_ZERO);
-      default:
-        throw new AssertionError(
-            "Unexpected rounding mode encountered: " + pFloatingPointRoundingMode);
-    }
+    return switch (pFloatingPointRoundingMode) {
+      case NEAREST_TIES_TO_EVEN ->
+          termManager.mkRoundingMode(RoundingMode.ROUND_NEAREST_TIES_TO_EVEN);
+      case NEAREST_TIES_AWAY -> termManager.mkRoundingMode(RoundingMode.ROUND_NEAREST_TIES_TO_AWAY);
+      case TOWARD_POSITIVE -> termManager.mkRoundingMode(RoundingMode.ROUND_TOWARD_POSITIVE);
+      case TOWARD_NEGATIVE -> termManager.mkRoundingMode(RoundingMode.ROUND_TOWARD_NEGATIVE);
+      case TOWARD_ZERO -> termManager.mkRoundingMode(RoundingMode.ROUND_TOWARD_ZERO);
+    };
   }
 
   @Override
