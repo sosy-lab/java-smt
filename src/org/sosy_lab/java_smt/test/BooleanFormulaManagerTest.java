@@ -442,7 +442,7 @@ public class BooleanFormulaManagerTest extends SolverBasedTest0.ParameterizedSol
 
 
     var horn = bmgr.makeHornClause(a, ImmutableList.of(b, c), c1);
-    var expected = bmgr.or( a,bmgr.not(c1), bmgr.not(b), bmgr.not(c));
+    var expected = bmgr.or(a, bmgr.not(c1), bmgr.not(b), bmgr.not(c));
 
     assertThatFormula(horn).isEquivalentTo(expected);
   }
