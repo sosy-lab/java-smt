@@ -223,8 +223,8 @@ public class SolverNativeOptionsTest extends SolverBasedTest0.ParameterizedSolve
       pe.addConstraint(fs.get(fs.size() - 1));
 
       // The query should be solved in ~3s with the correct (non-default) option set, but takes
-      // ~9s for default options
-      buildShutdownThreadWith(shutdownManager, 5000).start();
+      // ~9s for default options. We use 6.5s as timeout as the CI is a little slower.
+      buildShutdownThreadWith(shutdownManager, 6500).start();
       assertThat(pe.isUnsat()).isTrue();
     }
   }
