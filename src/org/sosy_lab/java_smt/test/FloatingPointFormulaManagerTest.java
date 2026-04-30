@@ -896,21 +896,24 @@ public class FloatingPointFormulaManagerTest
 
           // 0.0 and -0.0 are equal for FP equality, hence a solver might return any
           switch (solver) {
-            case Z3:
-            case Z3_WITH_INTERPOLATION:
+            case Z3, Z3_WITH_INTERPOLATION -> {
               if (specialFpNumAsBv.equals(SINGLE_PRECISION_POSITIVE_ZERO_BITWISE)) {
                 assertThat(fpAsString).isEqualTo(SINGLE_PRECISION_NEGATIVE_ZERO_BITWISE);
-                break;
+              } else if (specialFpNumAsBv.equals(SINGLE_PRECISION_NEGATIVE_ZERO_BITWISE)) {
+                assertThat(fpAsString).isEqualTo(SINGLE_PRECISION_POSITIVE_ZERO_BITWISE);
+              } else {
+                assertThat(fpAsString).isEqualTo(specialFpNumAsBv);
               }
-            // $FALL-THROUGH$
-            case MATHSAT5:
+            }
+            case MATHSAT5 -> {
               if (specialFpNumAsBv.equals(SINGLE_PRECISION_NEGATIVE_ZERO_BITWISE)) {
                 assertThat(fpAsString).isEqualTo(SINGLE_PRECISION_POSITIVE_ZERO_BITWISE);
-                break;
+              } else {
+                assertThat(fpAsString).isEqualTo(specialFpNumAsBv);
               }
-            // $FALL-THROUGH$
-            default:
-              assertThat(fpAsString).isEqualTo(specialFpNumAsBv);
+            }
+            case BITWUZLA, CVC4, CVC5, BOOLECTOR, PRINCESS, OPENSMT, SMTINTERPOL, YICES2 ->
+                assertThat(fpAsString).isEqualTo(specialFpNumAsBv);
           }
         }
       }
