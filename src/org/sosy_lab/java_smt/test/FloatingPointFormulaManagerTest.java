@@ -820,7 +820,7 @@ public class FloatingPointFormulaManagerTest
         .isTautological();
   }
 
-  // Tests +-0 and +-Infinity from BV -> FP
+  // Tests +-0 and +-Infinity from BV -> FP and that the FP model values are == to the original BV
   @Test
   public void floatingPointSpecialNumberFromBitvector32()
       throws SolverException, InterruptedException {
@@ -915,6 +915,18 @@ public class FloatingPointFormulaManagerTest
             case BITWUZLA, CVC4, CVC5, BOOLECTOR, PRINCESS, OPENSMT, SMTINTERPOL, YICES2 ->
                 assertThat(fpAsString).isEqualTo(specialFpNumAsBv);
           }
+        }
+      }
+
+      try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
+        prover.push(bvToIeeeFPConstraint); // has to be true!
+        prover.push(fpmgr.assignment(someFP, fpFromBv));
+        assertThat(prover).isSatisfiable();
+
+        // If we use assignment instead of FP equality, the result needs to be 1:1
+        try (Model model = prover.getModel()) {
+          FloatingPointNumber fpValue = model.evaluate(someFP);
+          assertThat(fpValue.toString()).isEqualTo(specialFpNumAsBv);
         }
       }
     }
