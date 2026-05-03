@@ -2,7 +2,7 @@
 // an API wrapper for a collection of SMT solvers:
 // https://github.com/sosy-lab/java-smt
 //
-// SPDX-FileCopyrightText: 2024 Dirk Beyer <https://www.sosy-lab.org>
+// SPDX-FileCopyrightText: 2026 Dirk Beyer <https://www.sosy-lab.org>
 //
 // SPDX-License-Identifier: Apache-2.0
 
@@ -85,36 +85,15 @@ public class SudokuTest {
   public Solvers solver;
 
   private static final String OS = System.getProperty("os.name").toLowerCase().replace(" ", "");
-  private static final boolean IS_WINDOWS = OS.startsWith("windows");
-  private static final boolean IS_MAC = OS.startsWith("macos");
   private static final boolean IS_LINUX = OS.startsWith("linux");
+  private static final boolean IS_X64 = System.getProperty("os.arch").contains("64");
 
-  /**
-   * Let's allow to disable some checks on certain combinations of operating systems and solvers,
-   * because of missing support.
-   *
-   * <p>We update this list, whenever a new solver or operating system is added.
-   */
+  /** Disable some checks on certain combinations of operating systems and solvers, because of missing dependencies. */
   private static boolean isOperatingSystemSupported(Solvers solver) {
-    switch (solver) {
-      case SMTINTERPOL:
-      case PRINCESS:
-        // any operating system is allowed, Java is already available.
-        return true;
-      case BOOLECTOR:
-      case CVC4:
-      case CVC5:
-      case OPENSMT:
-      case YICES2:
-        return IS_LINUX;
-      case MATHSAT5:
-      case BITWUZLA:
-        return IS_LINUX || IS_WINDOWS;
-      case Z3:
-        return IS_LINUX || IS_WINDOWS || IS_MAC;
-      default:
-        throw new AssertionError("unexpected solver: " + solver);
-    }
+      return switch (solver) {
+          case SMTINTERPOL, PRINCESS -> true; // Java-based solvers should work on all platforms
+          default -> IS_LINUX && IS_X64; // this example only includes Linux x64 binaries for native solvers
+      };
   }
 
   private Configuration config;
