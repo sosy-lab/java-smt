@@ -22,7 +22,7 @@ The configuration in `pom.xml` handles the download and setup of native solver l
 * Native solvers are only provided for **Linux x64** in this example. 
   Some solvers like Z3 and MathSAT5 also support Windows or ARM64 platform, if dependencies are adjusted in `pom.xml`.
   Java-only solvers (SMTInterpol, Princess) work on all platforms.
-* When using Linux, please use Ubuntu 24.04 or newer, as we provide latest solver versions for GLIBC_2.33 or newer.
+* When using Linux, please use Ubuntu 24.04 or newer, as we require GLIBC_2.33 or newer for some of the latest solver versions.
 
 ## Usage
 
