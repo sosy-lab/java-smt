@@ -174,6 +174,10 @@ public final class Tokenizer {
     return matchesOneOf(token, "set-logic");
   }
 
+  public static boolean isSetInfoToken(String token) {
+    return matchesOneOf(token, "set-info");
+  }
+
   /**
    * Check if the token is a function or variable declaration.
    *
