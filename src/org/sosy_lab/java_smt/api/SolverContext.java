@@ -91,6 +91,14 @@ public interface SolverContext extends AutoCloseable {
   OptimizationProverEnvironment newOptimizationProverEnvironment(ProverOptions... options);
 
   /**
+   * Create a fresh new {@link HornProverEnvironment} for solving horn clauses.
+   *
+   * @param options Options specified for the prover environment. All the options specified in
+   *     {@link ProverOptions} are turned off by default.
+   */
+  HornProverEnvironment newHornProverEnvironment(ProverOptions... options);
+
+  /**
    * Get version information out of the solver.
    *
    * <p>In most cases, the version contains the name of the solver followed by some numbers and

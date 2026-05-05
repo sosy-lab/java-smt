@@ -15,6 +15,7 @@ import org.sosy_lab.common.configuration.Configuration;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.FormulaManager;
+import org.sosy_lab.java_smt.api.HornProverEnvironment;
 import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
 import org.sosy_lab.java_smt.api.OptimizationProverEnvironment;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
@@ -62,6 +63,13 @@ public class DebuggingSolverContext implements SolverContext {
     debugging.assertThreadLocal();
     return new DebuggingOptimizationProverEnvironment(
         delegate.newOptimizationProverEnvironment(options), debugging);
+  }
+
+  @Override
+  public HornProverEnvironment newHornProverEnvironment(ProverOptions... options) {
+    debugging.assertThreadLocal();
+    return new DebuggingHornProverEnvironment(delegate.newHornProverEnvironment(options),
+        debugging);
   }
 
   @Override
