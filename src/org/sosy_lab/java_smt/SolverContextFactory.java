@@ -63,7 +63,8 @@ public class SolverContextFactory {
     CVC4,
     CVC5,
     YICES2,
-    BITWUZLA
+    BITWUZLA,
+    ELDARICA,
   }
 
   @Option(secure = true, description = "Export solver queries in SmtLib format into a file.")
@@ -310,7 +311,7 @@ public class SolverContextFactory {
               nonLinearArithmetic,
               loader);
 
-      case PRINCESS ->
+      case PRINCESS, ELDARICA ->
           PrincessSolverContext.create(
               config, shutdownNotifier, logfile, (int) randomSeed, nonLinearArithmetic);
 
