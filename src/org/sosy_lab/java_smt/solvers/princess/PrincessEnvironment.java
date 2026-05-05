@@ -210,6 +210,7 @@ class PrincessEnvironment {
    */
   PrincessAbstractProver<?> getNewProver(
       boolean useForInterpolation,
+      boolean useForHorn,
       PrincessFormulaManager mgr,
       PrincessFormulaCreator creator,
       Set<ProverOptions> pOptions) {
@@ -225,6 +226,8 @@ class PrincessEnvironment {
     PrincessAbstractProver<?> prover;
     if (useForInterpolation) {
       prover = new PrincessInterpolatingProver(mgr, creator, newApi, shutdownNotifier, pOptions);
+    } else if (useForHorn) {
+      prover = new EldaricaHornProver(mgr, creator, newApi, shutdownNotifier, pOptions);
     } else {
       prover = new PrincessTheoremProver(mgr, creator, newApi, shutdownNotifier, pOptions);
     }

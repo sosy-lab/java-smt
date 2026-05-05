@@ -1,12 +1,14 @@
-// This file is part of JavaSMT,
-// an API wrapper for a collection of SMT solvers:
-// https://github.com/sosy-lab/java-smt
-//
-// SPDX-FileCopyrightText: 2020 Dirk Beyer <https://www.sosy-lab.org>
-//
-// SPDX-License-Identifier: Apache-2.0
+/*
+ * This file is part of JavaSMT,
+ * an API wrapper for a collection of SMT solvers:
+ * https://github.com/sosy-lab/java-smt
+ *
+ * SPDX-FileCopyrightText: 2026 Dirk Beyer <https://www.sosy-lab.org>
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
 
-package org.sosy_lab.java_smt.solvers.eldarica;
+package org.sosy_lab.java_smt.solvers.princess;
 
 import ap.api.SimpleAPI;
 import ap.parser.IAtom;
@@ -29,16 +31,14 @@ import lazabs.horn.bottomup.HornClauses.Clause;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.java_smt.api.BooleanFormula;
-import org.sosy_lab.java_smt.api.ProverEnvironment;
+import org.sosy_lab.java_smt.api.HornProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
-import org.sosy_lab.java_smt.solvers.princess.PrincessAbstractProver;
-import org.sosy_lab.java_smt.solvers.princess.PrincessFormulaCreator;
-import org.sosy_lab.java_smt.solvers.princess.PrincessFormulaManager;
 import scala.collection.immutable.List$;
 import scala.jdk.javaapi.CollectionConverters;
 
-public class EldaricaHornProver extends PrincessAbstractProver<Void> implements ProverEnvironment {
+public class EldaricaHornProver extends PrincessAbstractProver<Void> implements
+                                                                     HornProverEnvironment {
   private final HornAPI horn;
   private final ArrayList<Clause> clauses = new ArrayList<>();
 
@@ -104,7 +104,7 @@ public class EldaricaHornProver extends PrincessAbstractProver<Void> implements 
         }
 
         if (constraint != null) {
-          throw new IllegalArgumentException("Duplicated constraints: " + rest);
+          throw new IllegalArgumentException("Multiple constraints: " + rest);
         }
         constraint = and;
       }
@@ -121,10 +121,8 @@ public class EldaricaHornProver extends PrincessAbstractProver<Void> implements 
 
   @Nullable
   private static IAtom toAtom(final IIntFormula formula) {
-    if (formula.t() instanceof IFunApp && formula.rel() == IIntRelation.EqZero()) {
-      var t = (IFunApp) formula.t();
-      if (t.fun() instanceof MonoSortedIFunction) {
-        var fun = (MonoSortedIFunction) t.fun();
+    if (formula.t() instanceof IFunApp t && formula.rel() == IIntRelation.EqZero()) {
+      if (t.fun() instanceof MonoSortedIFunction fun) {
         return new IAtom(new Predicate(fun.name(), fun.arity()), t.args());
       }
     }
@@ -198,8 +196,11 @@ public class EldaricaHornProver extends PrincessAbstractProver<Void> implements 
     var assertion =
         api.abbrevSharedExpressions(formula, creator.getEnv().getMinAtomsForAbbreviation());
 
+    if (assertion.isFalse()) {
+      throw new RuntimeException("TODO: handle false");
+    }
     if (assertion.isTrue()) {
-      return; // TODO: handle false
+      return;
     }
 
     var clause = toClause(assertion);
@@ -218,4 +219,6 @@ public class EldaricaHornProver extends PrincessAbstractProver<Void> implements 
   protected boolean isUnsatImpl() throws SolverException {
     return !this.horn.isSat(CollectionConverters.asScala(this.clauses));
   }
+
+  // TODO: Model, push/pop?.
 }
