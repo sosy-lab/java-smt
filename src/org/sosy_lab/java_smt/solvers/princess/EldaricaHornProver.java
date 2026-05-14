@@ -20,6 +20,9 @@ import ap.parser.IFunApp;
 import ap.parser.IIntFormula;
 import ap.parser.IIntRelation;
 import ap.parser.INot;
+import ap.parser.ISortedQuantified;
+import ap.parser.ITerm;
+import ap.terfor.conjunctions.Quantifier.ALL$;
 import ap.terfor.preds.Predicate;
 import ap.types.MonoSortedIFunction;
 import com.google.common.base.Preconditions;
@@ -27,6 +30,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import lazabs.horn.HornAPI;
+import lazabs.horn.bottomup.HornClauses;
 import lazabs.horn.bottomup.HornClauses.Clause;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.ShutdownNotifier;
@@ -34,7 +38,9 @@ import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.HornProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
+import scala.collection.Seq$;
 import scala.collection.immutable.List$;
+import scala.collection.immutable.Seq;
 import scala.jdk.javaapi.CollectionConverters;
 
 public class EldaricaHornProver extends PrincessAbstractProver<Void> implements
@@ -53,15 +59,28 @@ public class EldaricaHornProver extends PrincessAbstractProver<Void> implements
   }
 
   private static List<IFormula> flatten(final IBinFormula input) {
-    if (input.j() != IBinJunctor.And()) {
-      throw new IllegalArgumentException("Illegal horn clause: " + input);
+    if (input.j() == IBinJunctor.And()) {
+      return flattenAnd(input);
+    }
+    if (input.j() == IBinJunctor.Or()) {
+      return flattenOr(input);
     }
 
+    throw new IllegalArgumentException("Illegal horn clause: " + input);
+  }
+
+  private static List<IFormula> flattenAnd(final IBinFormula input) {
     final ArrayList<IFormula> atoms = new ArrayList<>();
     atoms.addAll(flatten(input.f1()));
     atoms.addAll(flatten(input.f2()));
 
     return atoms;
+  }
+
+  private static List<IFormula> flattenOr(final IBinFormula input) {
+    final ArrayList<IFormula> atoms = new ArrayList<>();
+
+    throw new IllegalArgumentException("Illegal horn clause: " + input);
   }
 
   private static List<IFormula> flatten(final IFormula input) {
@@ -72,52 +91,73 @@ public class EldaricaHornProver extends PrincessAbstractProver<Void> implements
     return List.of(input);
   }
 
-  private static Clause toClause(final IAtom head, final IFormula rest) {
-    if (rest instanceof IAtom) {
-      return new Clause(head, CollectionConverters.asScala(List.of((IAtom) rest)).toList(),
+  private static Clause toClause(final IAtom head, final IAtom rest) {
+    return new Clause(head, CollectionConverters.asScala(List.of(rest)).toList(),
+        new IBoolLit(true));
+  }
+
+  private static Clause toClause(final IAtom head, final IIntFormula rest) {
+    var atom = toAtom(rest);
+    if (atom != null) {
+      return new Clause(head, CollectionConverters.asScala(List.of(atom)).toList(),
           new IBoolLit(true));
     }
-    if (rest instanceof IIntFormula) {
-      var atom = toAtom((IIntFormula) rest);
-      if (atom != null) {
-        return new Clause(head, CollectionConverters.asScala(List.of(atom)).toList(),
-            new IBoolLit(true));
+    return new Clause(head, List$.MODULE$.empty(), rest);
+  }
+
+  private static Clause toClause(final IAtom head, final IBinFormula rest) {
+    List<IAtom> body = new ArrayList<>();
+    IFormula constraint = null;
+
+    for (IFormula and : flatten(rest)) {
+      if (and instanceof IAtom) {
+        body.add((IAtom) and);
+        continue;
       }
-      return new Clause(head, List$.MODULE$.empty(), rest);
+      if (and instanceof IIntFormula) {
+        var atom = toAtom((IIntFormula) and);
+        if (atom != null) {
+          body.add(atom);
+          continue;
+        }
+      }
+
+      if (constraint == null) {
+        constraint = and;
+      } else {
+        constraint = new IBinFormula(IBinJunctor.And(), constraint, and);
+      }
+    }
+
+
+    var _constraint = constraint == null ? new IBoolLit(true) : constraint;
+
+    return new Clause(head, CollectionConverters.asScala(body).toList(), _constraint);
+  }
+
+  private static Clause toClause(final IAtom head, final IFormula rest, final IFormula constraint) {
+    // INPUT: ((B1 = 0) & C2) ; constraint: C1
+    // CLAUSE: Clause(FALSE, List(B1), (C2 & !C1))
+    var clause = toClause(head, rest);
+
+    return new Clause(clause.head(), clause.body(), new IBinFormula(IBinJunctor.And(),
+        clause.constraint(), new INot(constraint)));
+  }
+
+  private static Clause toClause(final IAtom head, final IFormula rest) {
+    if (rest instanceof IAtom) {
+      return toClause(head, (IAtom) rest);
+    }
+    if (rest instanceof IIntFormula) {
+      return toClause(head, (IIntFormula) rest);
     }
 
     if (rest instanceof IBinFormula) {
-      List<IAtom> body = new ArrayList<>();
-      IFormula constraint = null;
-
-      for (IFormula and : flatten(rest)) {
-        if (and instanceof IAtom) {
-          body.add((IAtom) and);
-          continue;
-        }
-        if (and instanceof IIntFormula) {
-          var atom = toAtom((IIntFormula) and);
-          if (atom != null) {
-            body.add(atom);
-            continue;
-          }
-        }
-
-        if (constraint != null) {
-          throw new IllegalArgumentException("Multiple constraints: " + rest);
-        }
-        constraint = and;
-      }
-
-
-      var _constraint = constraint == null ? new IBoolLit(true) : constraint;
-
-      return new Clause(head, CollectionConverters.asScala(body).toList(), _constraint);
+      return toClause(head, (IBinFormula) rest);
     }
 
     throw new RuntimeException("TODO");
   }
-
 
   @Nullable
   private static IAtom toAtom(final IIntFormula formula) {
@@ -132,6 +172,14 @@ public class EldaricaHornProver extends PrincessAbstractProver<Void> implements
 
   private static Clause toClause(final IAtom input) {
     return new Clause(input, List$.MODULE$.empty(), new IBoolLit(true));
+  }
+
+  private static Clause toClause(final ISortedQuantified input) {
+    if (input.quan() != ALL$.MODULE$) {
+      throw new IllegalArgumentException("Illegal horn clause: " + input);
+    }
+
+    return toClause(input.subformula());
   }
 
   private static Clause toClause(final IBinFormula input) {
@@ -163,7 +211,8 @@ public class EldaricaHornProver extends PrincessAbstractProver<Void> implements
         throw new RuntimeException("TODO");
       }
     } else {
-      throw new RuntimeException("TODO");
+      head = new IAtom(HornClauses.FALSE(), (Seq<ITerm>) Seq$.MODULE$.empty());
+      return toClause(head, not.subformula(), other);
     }
 
 
@@ -171,10 +220,15 @@ public class EldaricaHornProver extends PrincessAbstractProver<Void> implements
   }
 
   public static Clause toClause(IFormula input) {
+    if (input instanceof ISortedQuantified) {
+      return toClause((ISortedQuantified) input);
+    }
     if (input instanceof IAtom) {
       return toClause((IAtom) input);
     }
     if (input instanceof IBinFormula) {
+      // (!(((((((((_0 = _8) & (_1 = _9)) & (_2 = _10)) & (_3 = _11)) & (_4 = _12)) & (_5 = _13)) & (_6 = _14)) & (_7 = _15)) & true) | (h1(_15, _14, _13, _12, _11, _10, _9, _8, _7, _6, _5, _4, _3, _2, _1, _0) = 0))
+      // Clause(h1(P15, P14, P13, P12, P11, P10, P9, P8, P7, P6, P5, P4, P3, P2, P1, P0),List(),((((((((P0 = P8) & (P1 = P9)) & (P2 = P10)) & (P3 = P11)) & (P4 = P12)) & (P5 = P13)) & (P6 = P14)) & (P7 = P15)))
       return toClause((IBinFormula) input);
     }
     if (input instanceof IIntFormula) {
