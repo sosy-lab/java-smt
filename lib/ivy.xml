@@ -175,9 +175,6 @@ SPDX-License-Identifier: Apache-2.0
         <!-- Eldarica -->
         <dependency org="uuverifiers" name="eldarica_2.13" rev="2.2.1" conf="runtime-eldarica->master; contrib->sources"/>
 
-        <!-- Eldarica -->
-        <dependency org="uuverifiers" name="eldarica_2.13" rev="2.2.1" conf="runtime-eldarica->master; contrib->sources"/>
-
         <!-- Princess and Ostrich for our Maven release -->
         <dependency org="io.github.uuverifiers" name="princess_2.13" rev="2025-11-17" conf="runtime-princess-with-javacup->default; contrib->sources,javadoc"/>
         <dependency org="io.github.uuverifiers" name="ostrich_2.13" rev="2.0" conf="runtime-princess-with-javacup->default; contrib->sources,javadoc"/>
