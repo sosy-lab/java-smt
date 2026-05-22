@@ -96,18 +96,12 @@ public abstract class AbstractFloatingPointFormulaManager<TFormulaInfo, TType, T
     // mantissa sizes, hence comparing it to the type used to create the FP term checks that it
     // was created correctly. (There are other tests checking FP type correctness)
     if (pTypeForAssertions != null) {
-      checkArgument(
-          type.equals(pTypeForAssertions),
-          "Floating-Point formula %s type %s is not equal to expected type %s",
-          pTerm,
-          type,
-          pTypeForAssertions);
-    } else {
-      checkArgument(
-          type.isFloatingPointType(),
-          "Floating-Point formula %s has unexpected type: %s",
-          pTerm,
-          type);
+      assert type.equals(pTypeForAssertions)
+          : "Floating-Point formula %s with type %s is not equal to expected type %s"
+              .formatted(pTerm, type, pTypeForAssertions);
+    } else if (!type.isFloatingPointType()) {
+      throw new IllegalArgumentException(
+          "Floating-Point formula %s has unexpected type: %s".formatted(pTerm, type));
     }
 
     return getFormulaCreator().encapsulateFloatingPoint(pTerm);
