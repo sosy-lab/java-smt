@@ -9,20 +9,126 @@
 package org.sosy_lab.java_smt.test;
 
 import static com.google.common.truth.Truth.assertThat;
+import static com.google.common.truth.TruthJUnit.assume;
 
 import org.junit.Test;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.java_smt.SolverContextFactory;
+import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BitvectorFormulaManager;
+import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.BooleanFormulaManager;
+import org.sosy_lab.java_smt.api.FormulaType;
+import org.sosy_lab.java_smt.api.FunctionDeclaration;
 import org.sosy_lab.java_smt.api.IntegerFormulaManager;
 import org.sosy_lab.java_smt.api.SolverContext;
+import org.sosy_lab.java_smt.api.UFManager;
 
 public class SolverFormulaTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
 
-  // TODO: UFs exclusively with constants/empty and a separate test that includes variables
   // TODO: a test that the shared constants are also usable and return the correct results for
   //  Yices2 and Princess when used in 2 distinct contexts
+
+  // TODO: add a int or bv example for MathSAT5 as well
+  // TODO: OpenSMT2 seems to allow sharing of FunctionDeclarations in some instances. Investigate.
+  @Test
+  public void ufDeclarationFromDistinctContextsEqualsTest() throws InvalidConfigurationException {
+    assume()
+        .withMessage("MathSAT5 does not support boolean arguments in UFs")
+        .that(solver)
+        .isNotEqualTo(Solvers.MATHSAT5);
+
+    try (SolverContext otherContext = SolverContextFactory.createSolverContext(solverToUse())) {
+      UFManager otherUfMgr = otherContext.getFormulaManager().getUFManager();
+
+      FunctionDeclaration<BooleanFormula> noArgFunDecl =
+          fmgr.declareUF("noArg", FormulaType.BooleanType);
+      FunctionDeclaration<BooleanFormula> boolArgFunDecl =
+          fmgr.declareUF("boolArg", FormulaType.BooleanType, FormulaType.BooleanType);
+
+      FunctionDeclaration<BooleanFormula> otherNoArgFunDecl =
+          otherUfMgr.declareUF("noArg", FormulaType.BooleanType);
+      FunctionDeclaration<BooleanFormula> otherBoolArgFunDecl =
+          otherUfMgr.declareUF("boolArg", FormulaType.BooleanType, FormulaType.BooleanType);
+
+      assertThat(noArgFunDecl).isNotEqualTo(otherNoArgFunDecl);
+      assertThat(otherNoArgFunDecl).isNotEqualTo(noArgFunDecl);
+      assertThat(boolArgFunDecl).isNotEqualTo(otherBoolArgFunDecl);
+      assertThat(otherBoolArgFunDecl).isNotEqualTo(boolArgFunDecl);
+    }
+  }
+
+  // TODO: add a int or bv example for MathSAT5 as well
+  @Test
+  public void ufFromDistinctContextsEqualsTest() throws InvalidConfigurationException {
+    assume()
+        .withMessage("MathSAT5 does not support boolean arguments in UFs")
+        .that(solver)
+        .isNotEqualTo(Solvers.MATHSAT5);
+
+    try (SolverContext otherContext = SolverContextFactory.createSolverContext(solverToUse())) {
+      UFManager otherUfMgr = otherContext.getFormulaManager().getUFManager();
+
+      FunctionDeclaration<BooleanFormula> noArgFunDecl =
+          fmgr.declareUF("noArg", FormulaType.BooleanType);
+      FunctionDeclaration<BooleanFormula> boolArgFunDecl =
+          fmgr.declareUF("boolArg", FormulaType.BooleanType, FormulaType.BooleanType);
+
+      FunctionDeclaration<BooleanFormula> otherNoArgFunDecl =
+          otherUfMgr.declareUF("noArg", FormulaType.BooleanType);
+      FunctionDeclaration<BooleanFormula> otherBoolArgFunDecl =
+          otherUfMgr.declareUF("boolArg", FormulaType.BooleanType, FormulaType.BooleanType);
+
+      BooleanFormula boolVar1 = bmgr.makeVariable("var1");
+      BooleanFormula ufNoArg = fmgr.callUF(noArgFunDecl);
+      BooleanFormula ufBoolArg = fmgr.callUF(boolArgFunDecl, boolVar1);
+
+      BooleanFormula otherBoolVar1 =
+          otherContext.getFormulaManager().getBooleanFormulaManager().makeVariable("var1");
+      BooleanFormula otherUfNoArg = otherUfMgr.callUF(otherNoArgFunDecl);
+      BooleanFormula otherUfBoolArg = otherUfMgr.callUF(otherBoolArgFunDecl, otherBoolVar1);
+
+      assertThat(ufNoArg).isNotEqualTo(otherUfNoArg);
+      assertThat(otherUfNoArg).isNotEqualTo(ufNoArg);
+      assertThat(ufBoolArg).isNotEqualTo(otherUfBoolArg);
+      assertThat(otherUfBoolArg).isNotEqualTo(ufBoolArg);
+    }
+  }
+
+  // TODO: add a int or bv example for MathSAT5
+  @Test
+  public void constUfFromDistinctContextsEqualsTest() throws InvalidConfigurationException {
+    assume()
+        .withMessage("MathSAT5 does not support boolean arguments in UFs")
+        .that(solver)
+        .isNotEqualTo(Solvers.MATHSAT5);
+
+    try (SolverContext otherContext = SolverContextFactory.createSolverContext(solverToUse())) {
+      UFManager otherUfMgr = otherContext.getFormulaManager().getUFManager();
+
+      FunctionDeclaration<BooleanFormula> boolArgFunDecl =
+          fmgr.declareUF("boolArg", FormulaType.BooleanType, FormulaType.BooleanType);
+
+      FunctionDeclaration<BooleanFormula> otherBoolArgFunDecl =
+          otherUfMgr.declareUF("boolArg", FormulaType.BooleanType, FormulaType.BooleanType);
+
+      BooleanFormula ufTrueArg = fmgr.callUF(boolArgFunDecl, bmgr.makeBoolean(true));
+      BooleanFormula ufFalseArg = fmgr.callUF(boolArgFunDecl, bmgr.makeBoolean(false));
+      assertThat(ufTrueArg).isNotEqualTo(ufFalseArg);
+
+      BooleanFormulaManager otherBmgr = otherContext.getFormulaManager().getBooleanFormulaManager();
+      BooleanFormula otherUfTrueArg =
+          otherUfMgr.callUF(otherBoolArgFunDecl, otherBmgr.makeBoolean(true));
+      BooleanFormula otherUfFalseArg =
+          otherUfMgr.callUF(otherBoolArgFunDecl, otherBmgr.makeBoolean(false));
+      assertThat(otherUfTrueArg).isNotEqualTo(otherUfFalseArg);
+
+      assertThat(ufTrueArg).isNotEqualTo(otherUfTrueArg);
+      assertThat(otherUfTrueArg).isNotEqualTo(ufTrueArg);
+      assertThat(ufFalseArg).isNotEqualTo(otherUfFalseArg);
+      assertThat(otherUfFalseArg).isNotEqualTo(ufFalseArg);
+    }
+  }
 
   @Test
   public void bvFormulasFromDistinctContextsEqualsTest() throws InvalidConfigurationException {
