@@ -99,9 +99,9 @@ public abstract class AbstractFloatingPointFormulaManager<TFormulaInfo, TType, T
       assert type.equals(pTypeForAssertions)
           : "Floating-Point formula %s with type %s is not equal to expected type %s"
               .formatted(pTerm, type, pTypeForAssertions);
-    } else if (!type.isFloatingPointType()) {
-      throw new IllegalArgumentException(
-          "Floating-Point formula %s has unexpected type: %s".formatted(pTerm, type));
+    } else {
+      assert type.isFloatingPointType() :
+          "Floating-Point formula %s has unexpected type: %s".formatted(pTerm, type);
     }
 
     return getFormulaCreator().encapsulateFloatingPoint(pTerm);
