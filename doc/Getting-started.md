@@ -149,6 +149,11 @@ The XML snippets for other solvers available via Maven,
 such as `Boolector`, `CVC4`, `CVC5`, `OpenSMT`, `Princess`, and `Yices2`,
 can be found in the [`POM file`](Example-Maven-Project/pom.xml) of our [`Example-Maven-Project`](Example-Maven-Project).
 
+The latest supported solver versions can be found in the Maven example project under
+[`Example-Maven-Project/pom.xml`](Example-Maven-Project/pom.xml). It may sometimes be possible to use a newer version of a solver, or downgrade to
+an older release. However, this should be done with caution as JavaSMT releases are generally tied to specific solver
+version, and any change may lead to compatibility issues.
+
 If you are not using Linux, but Windows or macOS, or if you want to use a different architecture,
 such as `arm64`, you might need to set the dependencies accordingly, e.g.,
 change the type from `so` to `dll` (for Windows) or `dylib` (for macOS),
