@@ -28,6 +28,28 @@ After the repository URL is configured, you only need to add the following depen
 <dependency org="org.sosy-lab" name="java-smt" rev="5.0.0" conf="runtime->runtime"/>
 ```
 
+Solvers that are not needed can be excluded from the download:
+```xml
+<dependency org="org.sosy_lab" name="java-smt" rev="6.0.0" conf="runtime->runtime-without-gpl; contrib->sources">
+    <exclude org="org.sosy_lab" module="javasmt-solver-optimathsat"/>
+    <exclude org="org.sosy_lab" module="javasmt-solver-mathsat"/>
+</dependency>
+```
+
+By removing the dependency and then adding it back in, it is also possible to manually override the solver version:
+```xml
+<dependency org="org.sosy_lab" name="java-smt" rev="6.0.0" conf="runtime->runtime-without-gpl; contrib->sources">
+    <exclude org="org.sosy_lab" module="javasmt-solver-optimathsat"/>
+    <exclude org="org.sosy_lab" module="javasmt-solver-mathsat"/>
+</dependency>
+<!-- MathSAT5 beyond 5.6.11 requires system dependencies equivalent of Ubuntu 24.04/Debian 13 or greater.
+     We use version 5.6.11 as an intermediate step to give users and our systems some time to upgrade
+     before switching to newer MathSAT5 versions.
+-->
+<dependency org="org.sosy_lab" name="javasmt-solver-mathsat" rev="5.6.11" conf="runtime->solver-mathsat" />
+```
+However, note that this should be done with caution as it may often lead to compatibility issues
+
 #### Architecture specification and Operating System
 
 The support for operating systems depends on the solver,
