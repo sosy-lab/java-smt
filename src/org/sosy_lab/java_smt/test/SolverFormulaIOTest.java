@@ -31,7 +31,7 @@ import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FunctionDeclaration;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.SolverException;
-import org.sosy_lab.java_smt.basicimpl.Tokenizer;
+import org.sosy_lab.java_smt.basicimpl.SMTLibTokenizer;
 
 @SuppressWarnings("checkstyle:linelength")
 public class SolverFormulaIOTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
@@ -531,7 +531,7 @@ public class SolverFormulaIOTest extends SolverBasedTest0.ParameterizedSolverBas
     // Boolector will fail this anyway since bools are bitvecs for btor
     TruthJUnit.assume().that(solver).isNotEqualTo(Solvers.BOOLECTOR);
 
-    String lastCommand = getLast(Tokenizer.of(dump).toImmutableList());
+    String lastCommand = getLast(SMTLibTokenizer.of(dump).toImmutableList());
     assertWithMessage("last line(s) of <\n%s>", dump).that(lastCommand).startsWith("(assert ");
     assertWithMessage("last line(s) of <\n%s>", dump).that(lastCommand).endsWith(")");
   }

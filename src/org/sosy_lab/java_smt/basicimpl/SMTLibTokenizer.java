@@ -27,16 +27,16 @@ import java.util.Optional;
  * turn an SMT-LIB2 script into a string of input tokens efficiently. Alternatively, a {@link
  * ImmutableList} of all tokens can be created with {@link #toImmutableList()}.
  */
-public final class Tokenizer implements Iterable<String> {
+public final class SMTLibTokenizer implements Iterable<String> {
 
   private final String input;
 
-  private Tokenizer(final String inputToTokenize) {
+  private SMTLibTokenizer(final String inputToTokenize) {
     input = checkNotNull(inputToTokenize);
   }
 
-  public static Tokenizer of(final String inputToTokenize) {
-    return new Tokenizer(inputToTokenize);
+  public static SMTLibTokenizer of(final String inputToTokenize) {
+    return new SMTLibTokenizer(inputToTokenize);
   }
 
   /** Variable names (symbols) can be wrapped with "|". This function removes those chars. */
@@ -84,7 +84,7 @@ public final class Tokenizer implements Iterable<String> {
   /**
    * Check if the token is <code>(set-logic ..)</code>.
    *
-   * <p>Use {@link Tokenizer} as an {@link Iterable}, or the {@link Iterator} with {@link
+   * <p>Use {@link SMTLibTokenizer} as an {@link Iterable}, or the {@link Iterator} with {@link
    * #iterator()} to turn an SMT-LIB2 script into a string of input tokens efficiently.
    * Alternatively, a {@link ImmutableList} of all tokens can be created with {@link
    * #toImmutableList()}.
@@ -100,7 +100,7 @@ public final class Tokenizer implements Iterable<String> {
   /**
    * Check if the token is a function or variable declaration.
    *
-   * <p>Use {@link Tokenizer} as an {@link Iterable}, or the {@link Iterator} with {@link
+   * <p>Use {@link SMTLibTokenizer} as an {@link Iterable}, or the {@link Iterator} with {@link
    * #iterator()} to turn an SMT-LIB2 script into a string of input tokens efficiently.
    * Alternatively, a {@link ImmutableList} of all tokens can be created with {@link
    * #toImmutableList()}.
@@ -112,7 +112,7 @@ public final class Tokenizer implements Iterable<String> {
   /**
    * Check if the token is a function definition.
    *
-   * <p>Use {@link Tokenizer} as an {@link Iterable}, or the {@link Iterator} with {@link
+   * <p>Use {@link SMTLibTokenizer} as an {@link Iterable}, or the {@link Iterator} with {@link
    * #iterator()} to turn an SMT-LIB2 script into a string of input tokens efficiently.
    * Alternatively, a {@link ImmutableList} of all tokens can be created with {@link
    * #toImmutableList()}.
@@ -124,7 +124,7 @@ public final class Tokenizer implements Iterable<String> {
   /**
    * Check if the token is an <code>(assert ...)</code>.
    *
-   * <p>Use {@link Tokenizer} as an {@link Iterable}, or the {@link Iterator} with {@link
+   * <p>Use {@link SMTLibTokenizer} as an {@link Iterable}, or the {@link Iterator} with {@link
    * #iterator()} to turn an SMT-LIB2 script into a string of input tokens efficiently.
    * Alternatively, a {@link ImmutableList} of all tokens can be created with {@link
    * #toImmutableList()}.
@@ -136,7 +136,7 @@ public final class Tokenizer implements Iterable<String> {
   /**
    * Check if the token is an <code>(push ...)</code>.
    *
-   * <p>Use {@link Tokenizer} as an {@link Iterable}, or the {@link Iterator} with {@link
+   * <p>Use {@link SMTLibTokenizer} as an {@link Iterable}, or the {@link Iterator} with {@link
    * #iterator()} to turn an SMT-LIB2 script into a string of input tokens efficiently.
    * Alternatively, a {@link ImmutableList} of all tokens can be created with {@link
    * #toImmutableList()}.
@@ -148,7 +148,7 @@ public final class Tokenizer implements Iterable<String> {
   /**
    * Check if the token is an <code>(pop ...)</code>.
    *
-   * <p>Use {@link Tokenizer} as an {@link Iterable}, or the {@link Iterator} with {@link
+   * <p>Use {@link SMTLibTokenizer} as an {@link Iterable}, or the {@link Iterator} with {@link
    * #iterator()} to turn an SMT-LIB2 script into a string of input tokens efficiently.
    * Alternatively, a {@link ImmutableList} of all tokens can be created with {@link
    * #toImmutableList()}.
@@ -160,7 +160,7 @@ public final class Tokenizer implements Iterable<String> {
   /**
    * Check if the token is an <code>(reset-assertions ...)</code>.
    *
-   * <p>Use {@link Tokenizer} as an {@link Iterable}, or the {@link Iterator} with {@link
+   * <p>Use {@link SMTLibTokenizer} as an {@link Iterable}, or the {@link Iterator} with {@link
    * #iterator()} to turn an SMT-LIB2 script into a string of input tokens efficiently.
    * Alternatively, a {@link ImmutableList} of all tokens can be created with {@link
    * #toImmutableList()}.
@@ -172,7 +172,7 @@ public final class Tokenizer implements Iterable<String> {
   /**
    * Check if the token is an <code>(reset)</code>.
    *
-   * <p>Use {@link Tokenizer} as an {@link Iterable}, or the {@link Iterator} with {@link
+   * <p>Use {@link SMTLibTokenizer} as an {@link Iterable}, or the {@link Iterator} with {@link
    * #iterator()} to turn an SMT-LIB2 script into a string of input tokens efficiently.
    * Alternatively, a {@link ImmutableList} of all tokens can be created with {@link
    * #toImmutableList()}.
@@ -184,7 +184,7 @@ public final class Tokenizer implements Iterable<String> {
   /**
    * Check if the token is <code>(exit)</code>.
    *
-   * <p>Use {@link Tokenizer} as an {@link Iterable}, or the {@link Iterator} with {@link
+   * <p>Use {@link SMTLibTokenizer} as an {@link Iterable}, or the {@link Iterator} with {@link
    * #iterator()} to turn an SMT-LIB2 script into a string of input tokens efficiently.
    * Alternatively, a {@link ImmutableList} of all tokens can be created with {@link
    * #toImmutableList()}.
@@ -209,7 +209,7 @@ public final class Tokenizer implements Iterable<String> {
    * When a forbidden token is found parsing should be aborted by throwing an {@link
    * IllegalArgumentException} exception.
    *
-   * <p>Use {@link Tokenizer} as an {@link Iterable}, or the {@link Iterator} with {@link
+   * <p>Use {@link SMTLibTokenizer} as an {@link Iterable}, or the {@link Iterator} with {@link
    * #iterator()} to turn an SMT-LIB2 script into a string of input tokens efficiently.
    * Alternatively, a {@link ImmutableList} of all tokens can be created with {@link
    * #toImmutableList()}.

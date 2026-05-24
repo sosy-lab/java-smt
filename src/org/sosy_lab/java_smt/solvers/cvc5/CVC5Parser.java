@@ -34,7 +34,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.sosy_lab.common.collect.Collections3;
-import org.sosy_lab.java_smt.basicimpl.Tokenizer;
+import org.sosy_lab.java_smt.basicimpl.SMTLibTokenizer;
 
 class CVC5Parser {
 
@@ -252,7 +252,7 @@ class CVC5Parser {
    * cached one is recorded in the given substitutions map.
    */
   private void registerNewTermSymbols(Term declaration, Map<Term, Term> substitutions) {
-    final String parsedTermString = Tokenizer.dequote(declaration.toString());
+    final String parsedTermString = SMTLibTokenizer.dequote(declaration.toString());
     final Sort parsedSort = declaration.getSort();
     final String parsedSortString = parsedSort.toString();
 
