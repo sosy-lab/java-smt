@@ -220,13 +220,19 @@ public final class Tokenizer {
 
       // Generate first token if possible. There might be none, in which case isNext() needs to
       // return 'false' immediately.
-      while (nextToken.isEmpty() && pos < inputLength) {
+      while (nextToken.isEmpty() && !endOfInputReached()) {
         String maybeFirstToken = getNextPossiblyEmptyToken();
         // Can be optimized by returning null for empty tokens in getNextPossiblyEmptyToken()
         if (!maybeFirstToken.isEmpty()) {
           nextToken = Optional.of(maybeFirstToken);
         }
       }
+    }
+
+    private boolean endOfInputReached() {
+      // As long as pos is smaller than inputLength, we are not at the end of the input. This
+      // does not tell us that there is still tokens left! There might be input that we skip!
+      return pos >= inputLength;
     }
 
     @Override
@@ -244,7 +250,7 @@ public final class Tokenizer {
       nextToken = Optional.empty();
 
       // Get lookahead if possible
-      while (pos < inputLength) {
+      while (!endOfInputReached()) {
         String maybeNextToken = getNextPossiblyEmptyToken();
         // Can be optimized by returning null for empty tokens in getNextPossiblyEmptyToken()
         if (!maybeNextToken.isEmpty()) {
@@ -260,7 +266,7 @@ public final class Tokenizer {
       StringBuilder tokenBuilder = new StringBuilder();
       String token = null;
 
-      while (token == null && pos < inputLength) {
+      while (token == null && !endOfInputReached()) {
         char c = input.charAt(pos);
         if (inComment) {
           if (c == '\n') {
