@@ -531,7 +531,7 @@ public class SolverFormulaIOTest extends SolverBasedTest0.ParameterizedSolverBas
     // Boolector will fail this anyway since bools are bitvecs for btor
     TruthJUnit.assume().that(solver).isNotEqualTo(Solvers.BOOLECTOR);
 
-    String lastCommand = getLast(Tokenizer.tokenizeToList(dump));
+    String lastCommand = getLast(Tokenizer.of(dump).toImmutableList());
     assertWithMessage("last line(s) of <\n%s>", dump).that(lastCommand).startsWith("(assert ");
     assertWithMessage("last line(s) of <\n%s>", dump).that(lastCommand).endsWith(")");
   }

@@ -22,10 +22,22 @@ import java.util.Optional;
  * Helper class for splitting up an SMT-LIB2 file into a string of commands.
  *
  * <p>This is not a full SMTLIB parser, but only provides basic support for SMTLIB commands.
+ *
+ * <p>Use this class as an {@link Iterable}, or the {@link Iterator} with {@link #iterator()} to
+ * turn an SMT-LIB2 script into a string of input tokens efficiently. Alternatively, a {@link
+ * ImmutableList} of all tokens can be created with {@link #toImmutableList()}.
  */
-public final class Tokenizer {
+public final class Tokenizer implements Iterable<String> {
 
-  private Tokenizer() {}
+  private final String input;
+
+  private Tokenizer(final String inputToTokenize) {
+    input = checkNotNull(inputToTokenize);
+  }
+
+  public static Tokenizer of(final String inputToTokenize) {
+    return new Tokenizer(inputToTokenize);
+  }
 
   /** Variable names (symbols) can be wrapped with "|". This function removes those chars. */
   public static String dequote(String s) {
@@ -47,7 +59,7 @@ public final class Tokenizer {
    * <p>As an example <code>tokenize("(define-const a Int)(assert (= a 0)")</code> will return the
    * sequence <code>["(define-const a Int)", "(assert (= a 0))"]</code>
    */
-  public static ImmutableList<String> tokenizeToList(String input) {
+  public ImmutableList<String> toImmutableList() {
     ImmutableList.Builder<String> builder = ImmutableList.builder();
     TokenizerIterator iter = new TokenizerIterator(input);
 
@@ -60,6 +72,11 @@ public final class Tokenizer {
     return builder.build();
   }
 
+  @Override
+  public Iterator<String> iterator() {
+    return new TokenizerIterator(input);
+  }
+
   private static boolean matchesOneOf(String token, String... regexp) {
     return token.matches("\\(\\s*(" + String.join("|", regexp) + ")[\\S\\s]*");
   }
@@ -67,8 +84,10 @@ public final class Tokenizer {
   /**
    * Check if the token is <code>(set-logic ..)</code>.
    *
-   * <p>Use {@link #tokenizeToList(String)} to turn an SMT-LIB2 script into a string of input
-   * tokens.
+   * <p>Use {@link Tokenizer} as an {@link Iterable}, or the {@link Iterator} with {@link
+   * #iterator()} to turn an SMT-LIB2 script into a string of input tokens efficiently.
+   * Alternatively, a {@link ImmutableList} of all tokens can be created with {@link
+   * #toImmutableList()}.
    */
   public static boolean isSetLogicToken(String token) {
     return matchesOneOf(token, "set-logic");
@@ -81,8 +100,10 @@ public final class Tokenizer {
   /**
    * Check if the token is a function or variable declaration.
    *
-   * <p>Use {@link #tokenizeToList(String)} to turn an SMT-LIB2 script into a string of input
-   * tokens.
+   * <p>Use {@link Tokenizer} as an {@link Iterable}, or the {@link Iterator} with {@link
+   * #iterator()} to turn an SMT-LIB2 script into a string of input tokens efficiently.
+   * Alternatively, a {@link ImmutableList} of all tokens can be created with {@link
+   * #toImmutableList()}.
    */
   public static boolean isDeclarationToken(String token) {
     return matchesOneOf(token, "declare-const", "declare-fun");
@@ -91,8 +112,10 @@ public final class Tokenizer {
   /**
    * Check if the token is a function definition.
    *
-   * <p>Use {@link #tokenizeToList(String)} to turn an SMT-LIB2 script into a string of input
-   * tokens.
+   * <p>Use {@link Tokenizer} as an {@link Iterable}, or the {@link Iterator} with {@link
+   * #iterator()} to turn an SMT-LIB2 script into a string of input tokens efficiently.
+   * Alternatively, a {@link ImmutableList} of all tokens can be created with {@link
+   * #toImmutableList()}.
    */
   public static boolean isDefinitionToken(String token) {
     return matchesOneOf(token, "define-fun", "define-const");
@@ -101,8 +124,10 @@ public final class Tokenizer {
   /**
    * Check if the token is an <code>(assert ...)</code>.
    *
-   * <p>Use {@link #tokenizeToList(String)} to turn an SMT-LIB2 script into a string of input
-   * tokens.
+   * <p>Use {@link Tokenizer} as an {@link Iterable}, or the {@link Iterator} with {@link
+   * #iterator()} to turn an SMT-LIB2 script into a string of input tokens efficiently.
+   * Alternatively, a {@link ImmutableList} of all tokens can be created with {@link
+   * #toImmutableList()}.
    */
   public static boolean isAssertToken(String token) {
     return matchesOneOf(token, "assert");
@@ -111,8 +136,10 @@ public final class Tokenizer {
   /**
    * Check if the token is an <code>(push ...)</code>.
    *
-   * <p>Use {@link #tokenizeToList(String)} to turn an SMT-LIB2 script into a string of input
-   * tokens.
+   * <p>Use {@link Tokenizer} as an {@link Iterable}, or the {@link Iterator} with {@link
+   * #iterator()} to turn an SMT-LIB2 script into a string of input tokens efficiently.
+   * Alternatively, a {@link ImmutableList} of all tokens can be created with {@link
+   * #toImmutableList()}.
    */
   public static boolean isPushToken(String token) {
     return matchesOneOf(token, "push");
@@ -121,8 +148,10 @@ public final class Tokenizer {
   /**
    * Check if the token is an <code>(pop ...)</code>.
    *
-   * <p>Use {@link #tokenizeToList(String)} to turn an SMT-LIB2 script into a string of input
-   * tokens.
+   * <p>Use {@link Tokenizer} as an {@link Iterable}, or the {@link Iterator} with {@link
+   * #iterator()} to turn an SMT-LIB2 script into a string of input tokens efficiently.
+   * Alternatively, a {@link ImmutableList} of all tokens can be created with {@link
+   * #toImmutableList()}.
    */
   public static boolean isPopToken(String token) {
     return matchesOneOf(token, "pop");
@@ -131,8 +160,10 @@ public final class Tokenizer {
   /**
    * Check if the token is an <code>(reset-assertions ...)</code>.
    *
-   * <p>Use {@link #tokenizeToList(String)} to turn an SMT-LIB2 script into a string of input
-   * tokens.
+   * <p>Use {@link Tokenizer} as an {@link Iterable}, or the {@link Iterator} with {@link
+   * #iterator()} to turn an SMT-LIB2 script into a string of input tokens efficiently.
+   * Alternatively, a {@link ImmutableList} of all tokens can be created with {@link
+   * #toImmutableList()}.
    */
   public static boolean isResetAssertionsToken(String token) {
     return matchesOneOf(token, "reset-assertions");
@@ -141,8 +172,10 @@ public final class Tokenizer {
   /**
    * Check if the token is an <code>(reset)</code>.
    *
-   * <p>Use {@link #tokenizeToList(String)} to turn an SMT-LIB2 script into a string of input
-   * tokens.
+   * <p>Use {@link Tokenizer} as an {@link Iterable}, or the {@link Iterator} with {@link
+   * #iterator()} to turn an SMT-LIB2 script into a string of input tokens efficiently.
+   * Alternatively, a {@link ImmutableList} of all tokens can be created with {@link
+   * #toImmutableList()}.
    */
   public static boolean isResetToken(String token) {
     return matchesOneOf(token, "reset");
@@ -151,8 +184,10 @@ public final class Tokenizer {
   /**
    * Check if the token is <code>(exit)</code>.
    *
-   * <p>Use {@link #tokenizeToList(String)} to turn an SMT-LIB2 script into a string of input
-   * tokens.
+   * <p>Use {@link Tokenizer} as an {@link Iterable}, or the {@link Iterator} with {@link
+   * #iterator()} to turn an SMT-LIB2 script into a string of input tokens efficiently.
+   * Alternatively, a {@link ImmutableList} of all tokens can be created with {@link
+   * #toImmutableList()}.
    */
   public static boolean isExitToken(String token) {
     return matchesOneOf(token, "exit");
@@ -174,8 +209,10 @@ public final class Tokenizer {
    * When a forbidden token is found parsing should be aborted by throwing an {@link
    * IllegalArgumentException} exception.
    *
-   * <p>Use {@link #tokenizeToList(String)} to turn an SMT-LIB2 script into a string of input
-   * tokens.
+   * <p>Use {@link Tokenizer} as an {@link Iterable}, or the {@link Iterator} with {@link
+   * #iterator()} to turn an SMT-LIB2 script into a string of input tokens efficiently.
+   * Alternatively, a {@link ImmutableList} of all tokens can be created with {@link
+   * #toImmutableList()}.
    */
   public static boolean isForbiddenToken(String token) {
     return isPushToken(token)

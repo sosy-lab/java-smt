@@ -85,7 +85,8 @@ final class BitwuzlaFormulaManager
   @Override
   protected List<Term> parseAllImpl(String formulaStr) throws IllegalArgumentException {
     // Split the input string into a list of SMT-LIB2 commands
-    List<String> tokens = Tokenizer.tokenizeToList(formulaStr);
+    // TODO: refactor this and use the iterator instead of looping through input multiple times
+    List<String> tokens = Tokenizer.of(formulaStr).toImmutableList();
 
     Table<String, Sort, Term> cache = creator.getCache();
 

@@ -374,16 +374,26 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
     // The fallback implementation splits the input into declarations and assertions,
     // and parses each assertion separately,
     // which is not very efficient, but it works for simple cases and is better than nothing
-    List<String> tokens = Tokenizer.tokenizeToList(formulaStr);
-
-    List<String> declarationTokens = tokens.stream().filter(Tokenizer::isDeclarationToken).toList();
-    List<String> definitionTokens = tokens.stream().filter(Tokenizer::isDefinitionToken).toList();
-    List<String> assertTokens = tokens.stream().filter(Tokenizer::isAssertToken).toList();
+    ImmutableList.Builder<String> declarationTokens = ImmutableList.builder();
+    ImmutableList.Builder<String> definitionTokens = ImmutableList.builder();
+    ImmutableList.Builder<String> assertTokens = ImmutableList.builder();
+    for (String token : Tokenizer.of(formulaStr)) {
+      if (Tokenizer.isDeclarationToken(token)) {
+        declarationTokens.add(token);
+      }
+      if (Tokenizer.isDefinitionToken(token)) {
+        definitionTokens.add(token);
+      }
+      if (Tokenizer.isAssertToken(token)) {
+        assertTokens.add(token);
+      }
+    }
     String definitions =
-        Joiner.on("").join(declarationTokens) + Joiner.on("").join(definitionTokens);
+        Joiner.on("").join(declarationTokens.build())
+            + Joiner.on("").join(definitionTokens.build());
 
     return Collections3.transformedImmutableListCopy(
-        assertTokens, assertion -> parseImpl(definitions + assertion));
+        assertTokens.build(), assertion -> parseImpl(definitions + assertion));
   }
 
   /**
@@ -395,17 +405,14 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
    * only occur as the last command.
    */
   private String sanitize(String formulaStr) {
-    List<String> tokens = Tokenizer.tokenizeToList(formulaStr);
-
-    StringBuilder builder = new StringBuilder();
-
     // SMTLIB2ProgramStateMachine models and tracks that the SMTLIB2 query conforms to the rules
     // outlined in the standard, i.e. which command can follow on which etc.
     // We allow a slightly more lenient version than the standard, allowing implicit logic
     // selection, as most solvers export and support SMTLIB2 like this.
     SMTLIB2ProgramStateMachine smtLibStateMachine = new SMTLIB2ProgramStateMachine(false);
+    StringBuilder builder = new StringBuilder();
 
-    for (String token : tokens) {
+    for (String token : Tokenizer.of(formulaStr)) {
       if (Tokenizer.isSetInfoToken(token)) {
         // set-info call is allowed to be the very first command in the benchmark, but can also
         // appear repeatedly throughout a SMT2 program

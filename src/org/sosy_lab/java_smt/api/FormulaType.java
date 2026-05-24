@@ -638,7 +638,7 @@ public abstract class FormulaType<T extends Formula> {
       checkArgument(m.find());
       return FormulaType.getBitvectorTypeWithSize(Integer.parseInt(m.group(1)));
     } else if (t.startsWith("(Array")) {
-      var tokens = Tokenizer.tokenizeToList(t.substring(1, t.length() - 1));
+      var tokens = Tokenizer.of(t.substring(1, t.length() - 1)).toImmutableList();
       checkArgument(tokens.size() == 3);
       var domain = fromSMTLIBString(tokens.get(1));
       var range = fromSMTLIBString(tokens.get(2));
