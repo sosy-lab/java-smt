@@ -93,6 +93,14 @@ public final class SMTLibTokenizer implements Iterable<String> {
     return matchesOneOf(token, "set-logic");
   }
 
+  /**
+   * Check if the token is <code>(set-info ..)</code>.
+   *
+   * <p>Use {@link SMTLibTokenizer} as an {@link Iterable}, or the {@link Iterator} with {@link
+   * #iterator()} to turn an SMT-LIB2 script into a string of input tokens efficiently.
+   * Alternatively, a {@link ImmutableList} of all tokens can be created with {@link
+   * #toImmutableList()}.
+   */
   public static boolean isSetInfoToken(String token) {
     return matchesOneOf(token, "set-info");
   }
