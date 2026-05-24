@@ -35,6 +35,16 @@ public final class SMTLibTokenizer implements Iterable<String> {
     input = checkNotNull(inputToTokenize);
   }
 
+  /**
+   * Creates a new {@link SMTLibTokenizer} from the input {@link String}. The resulting {@link
+   * SMTLibTokenizer} is an {@link Iterable} for the SMTLIB tokens. A new {@link Iterator} on the
+   * input can be created with {@link #iterator()}. A {@link ImmutableList} of all tokens can be
+   * created via {@link #toImmutableList()}. Tokenized input is returned sanitized from unnecessary
+   * characters, and checked for basic (but not full) syntactic validity (e.g. that every opened
+   * bracket is also closed in a valid way).
+   *
+   * @param inputToTokenize SMTLIB input {@link String} that may be empty, but not null.
+   */
   public static SMTLibTokenizer of(final String inputToTokenize) {
     return new SMTLibTokenizer(inputToTokenize);
   }
@@ -50,7 +60,8 @@ public final class SMTLibTokenizer implements Iterable<String> {
 
   /**
    * Split up a sequence of lisp expressions into a list of nen-empty tokens. This method simply
-   * uses the {@link TokenizerIterator} and creates a list out of all tokens.
+   * uses the {@link TokenizerIterator} and creates a list out of all tokens. Repeated calls to this
+   * method are inefficient, as a new {@link java.util.List} is created every time it is called.
    *
    * <p>This is used by {@link AbstractFormulaManager#parse(String)} as part of the preprocessing
    * before the input is passed on to the solver. SMT-LIB2 scripts are sequences of commands that
