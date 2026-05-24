@@ -341,7 +341,7 @@ final class OpenSmtFormulaCreator extends FormulaCreator<PTRef, SRef, Logic, Sym
 
     if (logic.isVar(f)) {
       String varName = logic.getSymName(logic.getSymRef(f));
-      return visitor.visitFreeVariable(formula, SMTLibTokenizer.dequote(varName));
+      return visitor.visitFreeVariable(formula, SMTLibTokenizer.dequoteSMTLib(varName));
     }
 
     String varName = logic.getSymName(logic.getSymRef(f));

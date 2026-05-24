@@ -210,7 +210,7 @@ class SmtInterpolFormulaCreator extends FormulaCreator<Term, Sort, Script, Funct
         } else if (app.equals(environment.getTheory().mFalse)) {
           return visitor.visitConstant(f, false);
         } else if (func.getDefinition() == null) {
-          return visitor.visitFreeVariable(f, SMTLibTokenizer.dequote(input.toString()));
+          return visitor.visitFreeVariable(f, SMTLibTokenizer.dequoteSMTLib(input.toString()));
         } else {
           throw new UnsupportedOperationException("Unexpected nullary function " + input);
         }
@@ -250,7 +250,7 @@ class SmtInterpolFormulaCreator extends FormulaCreator<Term, Sort, Script, Funct
     if (t instanceof ApplicationTerm app && isUF(app)) {
       return app.getFunction().getName();
     } else {
-      return SMTLibTokenizer.dequote(t.toString());
+      return SMTLibTokenizer.dequoteSMTLib(t.toString());
     }
   }
 

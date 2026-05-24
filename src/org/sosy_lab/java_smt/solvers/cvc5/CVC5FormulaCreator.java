@@ -380,10 +380,10 @@ class CVC5FormulaCreator extends FormulaCreator<Term, Sort, TermManager, Term> {
       // Functions are packaged like this: (functionName arg1 arg2 ...)
       // But can use |(name)| to enable () inside of the variable name
       // TODO what happens for function names containing whitespace?
-      String dequoted = SMTLibTokenizer.dequote(repr);
+      String dequoted = SMTLibTokenizer.dequoteSMTLib(repr);
       return Iterables.get(Splitter.on(' ').split(dequoted.substring(1)), 0);
     } else {
-      return SMTLibTokenizer.dequote(repr);
+      return SMTLibTokenizer.dequoteSMTLib(repr);
     }
   }
 
@@ -454,7 +454,7 @@ class CVC5FormulaCreator extends FormulaCreator<Term, Sort, TermManager, Term> {
         return visitor.visitQuantifier((BooleanFormula) formula, quant, freeVars, fBody);
 
       } else if (f.getKind() == Kind.CONSTANT) {
-        return visitor.visitFreeVariable(formula, SMTLibTokenizer.dequote(f.toString()));
+        return visitor.visitFreeVariable(formula, SMTLibTokenizer.dequoteSMTLib(f.toString()));
 
       } else if (f.getKind() == Kind.APPLY_CONSTRUCTOR) {
         checkState(

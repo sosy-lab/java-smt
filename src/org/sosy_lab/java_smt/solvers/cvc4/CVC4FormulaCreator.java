@@ -270,7 +270,7 @@ class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, Expr> {
     if (!e.isConst() && !e.isVariable()) {
       e = e.getOperator();
     }
-    return SMTLibTokenizer.dequote(e.toString());
+    return SMTLibTokenizer.dequoteSMTLib(e.toString());
   }
 
   @SuppressWarnings("deprecation")

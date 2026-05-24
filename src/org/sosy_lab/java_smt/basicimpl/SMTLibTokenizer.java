@@ -40,7 +40,7 @@ public final class SMTLibTokenizer implements Iterable<String> {
   }
 
   /** Variable names (symbols) can be wrapped with "|". This function removes those chars. */
-  public static String dequote(String s) {
+  public static String dequoteSMTLib(String s) {
     int l = s.length();
     if (s.charAt(0) == '|' && s.charAt(l - 1) == '|') {
       return s.substring(1, l - 1);
