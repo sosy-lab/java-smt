@@ -10,8 +10,12 @@
 
 package org.sosy_lab.java_smt.basicimpl;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
+
 import com.google.common.collect.ImmutableList;
-import java.util.List;
+import java.util.Iterator;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 /**
@@ -33,7 +37,8 @@ public final class Tokenizer {
   }
 
   /**
-   * Split up a sequence of lisp expressions.
+   * Split up a sequence of lisp expressions into a list of nen-empty tokens. This method simply
+   * uses the {@link TokenizerIterator} and creates a list out of all tokens.
    *
    * <p>This is used by {@link AbstractFormulaManager#parse(String)} as part of the preprocessing
    * before the input is passed on to the solver. SMT-LIB2 scripts are sequences of commands that
@@ -42,121 +47,15 @@ public final class Tokenizer {
    * <p>As an example <code>tokenize("(define-const a Int)(assert (= a 0)")</code> will return the
    * sequence <code>["(define-const a Int)", "(assert (= a 0))"]</code>
    */
-  public static List<String> tokenize(String input) {
+  public static ImmutableList<String> tokenizeToList(String input) {
     ImmutableList.Builder<String> builder = ImmutableList.builder();
-    boolean inComment = false;
-    boolean inString = false;
-    boolean inQuoted = false;
+    TokenizerIterator iter = new TokenizerIterator(input);
 
-    int level = 0;
-    int pos = 0;
-
-    StringBuilder token = new StringBuilder();
-    while (pos < input.length()) {
-      char c = input.charAt(pos);
-      if (inComment) {
-        if (c == '\n') {
-          // End of a comment
-          inComment = false;
-          if (level > 0) {
-            // If we're in an expression we need to replace the entire comment (+ the newline) with
-            // some whitespace. Otherwise, symbols might get merged across line-wraps. This is not
-            // a problem at the top-level where all terms are surrounded by brackets.
-            token.append(c);
-          }
-        }
-
-      } else if (inString) {
-        if (c == '"') {
-          // We have a double quote: Check that it's not followed by another and actually closes
-          // the string.
-          Optional<Character> n =
-              (pos == input.length() - 1) ? Optional.empty() : Optional.of(input.charAt(pos + 1));
-          if (n.isEmpty() || n.orElseThrow() != '"') {
-            // Close the string
-            token.append(c);
-            inString = false;
-          } else {
-            // Add both quotes to the token and skip one character ahead
-            token.append(c);
-            token.append(n.orElseThrow());
-            pos++;
-          }
-        } else {
-          token.append(c);
-        }
-
-      } else if (inQuoted) {
-        if (c == '|') {
-          // Close the quotes
-          inQuoted = false;
-        }
-        if (c == '\\') {
-          // The SMT-LIB2 standard does not allow backslash inside quoted symbols:
-          // Throw an exception
-          throw new IllegalArgumentException();
-        }
-        token.append(c);
-
-      } else if (c == ';') {
-        // Start of a comment
-        inComment = true;
-
-      } else if (c == '"') {
-        // Start of a string literal
-        inString = true;
-        token.append(c);
-
-      } else if (c == '|') {
-        // Start of a quoted symbol
-        inQuoted = true;
-        token.append(c);
-
-      } else {
-        // Just a regular character outside of comments, quotes or string literals
-        if (level == 0) {
-          // We're at the top-level
-          if (!Character.isWhitespace(c)) {
-            if (c == '(') {
-              // Handle opening brackets
-              token.append("(");
-              level++;
-            } else if (c == ')') {
-              throw new IllegalArgumentException(
-                  "parentheses do not match, unexpected closing parenthesis");
-            } else {
-              token.append(c);
-            }
-          } else {
-            if (!token.isEmpty()) {
-              builder.add(token.toString());
-              token = new StringBuilder();
-            }
-          }
-        } else {
-          // We're inside an r-expression
-          token.append(c);
-          // Handle opening/closing brackets
-          if (c == '(') {
-            level++;
-          }
-          if (c == ')') {
-            if (level == 1) {
-              builder.add(token.toString());
-              token = new StringBuilder();
-            }
-            level--;
-          }
-        }
-      }
-      pos++;
-    }
-    if (level != 0) {
-      // Throw an exception if the brackets don't match
-      throw new IllegalArgumentException("parentheses do not match, too many open parentheses");
-    }
-    if (!token.isEmpty()) {
-      builder.add(token.toString());
+    // TODO: Switch to some one-liner like: iter.forEachRemaining(builder::add);
+    while (iter.hasNext()) {
+      final String token = iter.next();
+      checkState(!token.isEmpty());
+      builder.add(token);
     }
     return builder.build();
   }
@@ -168,7 +67,8 @@ public final class Tokenizer {
   /**
    * Check if the token is <code>(set-logic ..)</code>.
    *
-   * <p>Use {@link #tokenize(String)} to turn an SMT-LIB2 script into a string of input tokens.
+   * <p>Use {@link #tokenizeToList(String)} to turn an SMT-LIB2 script into a string of input
+   * tokens.
    */
   public static boolean isSetLogicToken(String token) {
     return matchesOneOf(token, "set-logic");
@@ -181,7 +81,8 @@ public final class Tokenizer {
   /**
    * Check if the token is a function or variable declaration.
    *
-   * <p>Use {@link #tokenize(String)} to turn an SMT-LIB2 script into a string of input tokens.
+   * <p>Use {@link #tokenizeToList(String)} to turn an SMT-LIB2 script into a string of input
+   * tokens.
    */
   public static boolean isDeclarationToken(String token) {
     return matchesOneOf(token, "declare-const", "declare-fun");
@@ -190,7 +91,8 @@ public final class Tokenizer {
   /**
    * Check if the token is a function definition.
    *
-   * <p>Use {@link #tokenize(String)} to turn an SMT-LIB2 script into a string of input tokens.
+   * <p>Use {@link #tokenizeToList(String)} to turn an SMT-LIB2 script into a string of input
+   * tokens.
    */
   public static boolean isDefinitionToken(String token) {
     return matchesOneOf(token, "define-fun", "define-const");
@@ -199,7 +101,8 @@ public final class Tokenizer {
   /**
    * Check if the token is an <code>(assert ...)</code>.
    *
-   * <p>Use {@link #tokenize(String)} to turn an SMT-LIB2 script into a string of input tokens.
+   * <p>Use {@link #tokenizeToList(String)} to turn an SMT-LIB2 script into a string of input
+   * tokens.
    */
   public static boolean isAssertToken(String token) {
     return matchesOneOf(token, "assert");
@@ -208,7 +111,8 @@ public final class Tokenizer {
   /**
    * Check if the token is an <code>(push ...)</code>.
    *
-   * <p>Use {@link #tokenize(String)} to turn an SMT-LIB2 script into a string of input tokens.
+   * <p>Use {@link #tokenizeToList(String)} to turn an SMT-LIB2 script into a string of input
+   * tokens.
    */
   public static boolean isPushToken(String token) {
     return matchesOneOf(token, "push");
@@ -217,7 +121,8 @@ public final class Tokenizer {
   /**
    * Check if the token is an <code>(pop ...)</code>.
    *
-   * <p>Use {@link #tokenize(String)} to turn an SMT-LIB2 script into a string of input tokens.
+   * <p>Use {@link #tokenizeToList(String)} to turn an SMT-LIB2 script into a string of input
+   * tokens.
    */
   public static boolean isPopToken(String token) {
     return matchesOneOf(token, "pop");
@@ -226,7 +131,8 @@ public final class Tokenizer {
   /**
    * Check if the token is an <code>(reset-assertions ...)</code>.
    *
-   * <p>Use {@link #tokenize(String)} to turn an SMT-LIB2 script into a string of input tokens.
+   * <p>Use {@link #tokenizeToList(String)} to turn an SMT-LIB2 script into a string of input
+   * tokens.
    */
   public static boolean isResetAssertionsToken(String token) {
     return matchesOneOf(token, "reset-assertions");
@@ -235,7 +141,8 @@ public final class Tokenizer {
   /**
    * Check if the token is an <code>(reset)</code>.
    *
-   * <p>Use {@link #tokenize(String)} to turn an SMT-LIB2 script into a string of input tokens.
+   * <p>Use {@link #tokenizeToList(String)} to turn an SMT-LIB2 script into a string of input
+   * tokens.
    */
   public static boolean isResetToken(String token) {
     return matchesOneOf(token, "reset");
@@ -244,7 +151,8 @@ public final class Tokenizer {
   /**
    * Check if the token is <code>(exit)</code>.
    *
-   * <p>Use {@link #tokenize(String)} to turn an SMT-LIB2 script into a string of input tokens.
+   * <p>Use {@link #tokenizeToList(String)} to turn an SMT-LIB2 script into a string of input
+   * tokens.
    */
   public static boolean isExitToken(String token) {
     return matchesOneOf(token, "exit");
@@ -266,12 +174,202 @@ public final class Tokenizer {
    * When a forbidden token is found parsing should be aborted by throwing an {@link
    * IllegalArgumentException} exception.
    *
-   * <p>Use {@link #tokenize(String)} to turn an SMT-LIB2 script into a string of input tokens.
+   * <p>Use {@link #tokenizeToList(String)} to turn an SMT-LIB2 script into a string of input
+   * tokens.
    */
   public static boolean isForbiddenToken(String token) {
     return isPushToken(token)
         || isPopToken(token)
         || isResetAssertionsToken(token)
         || isResetToken(token);
+  }
+
+  public static final class TokenizerIterator implements Iterator<String> {
+
+    private final String input;
+    private final int inputLength;
+
+    // To avoid empty string returns we have a 1-lookahead. If this is ever empty, we don't have
+    // a next element!
+    private Optional<String> nextToken = Optional.empty();
+
+    private boolean inComment = false;
+    private boolean inString = false;
+    private boolean inQuoted = false;
+
+    private int level = 0;
+    private int pos = 0;
+
+    /**
+     * Returns an {@link Iterator} splitting up the given {@link String}, consisting of a sequence
+     * of lisp expressions (i.e. SMTLIB2), into non-empty SMTLIB2 tokens.
+     *
+     * <p>SMT-LIB2 scripts are sequences of commands that are just r-expression. Split them up for
+     * (pre-/post-)processing makes handling easier. This is used by e.g. {@link
+     * AbstractFormulaManager#parse(String)} as part of the preprocessing before the input is passed
+     * on to the solver.
+     *
+     * <p>As an example <code>tokenize("(define-const a Int)(assert (= a 0)")</code> will return the
+     * following tokens: <code>["(define-const a Int)", "(assert (= a 0))"]</code>
+     *
+     * @param inputToTokenize SMTLIB2 {@link String}.
+     */
+    private TokenizerIterator(final String inputToTokenize) {
+      input = inputToTokenize;
+      inputLength = input.length();
+
+      // Generate first token if possible. There might be none, in which case isNext() needs to
+      // return 'false' immediately.
+      while (nextToken.isEmpty() && pos < inputLength) {
+        String maybeFirstToken = getNextPossiblyEmptyToken();
+        // Can be optimized by returning null for empty tokens in getNextPossiblyEmptyToken()
+        if (!maybeFirstToken.isEmpty()) {
+          nextToken = Optional.of(maybeFirstToken);
+        }
+      }
+    }
+
+    @Override
+    public boolean hasNext() {
+      return nextToken.isPresent();
+    }
+
+    @Override
+    public String next() {
+      if (!hasNext()) {
+        throw new NoSuchElementException();
+      }
+
+      String currentToken = nextToken.orElseThrow();
+      nextToken = Optional.empty();
+
+      // Get lookahead if possible
+      while (pos < inputLength) {
+        String maybeNextToken = getNextPossiblyEmptyToken();
+        // Can be optimized by returning null for empty tokens in getNextPossiblyEmptyToken()
+        if (!maybeNextToken.isEmpty()) {
+          nextToken = Optional.of(maybeNextToken);
+          break;
+        }
+      }
+      // nextToken may be present or empty!
+      return checkNotNull(currentToken);
+    }
+
+    private String getNextPossiblyEmptyToken() {
+      StringBuilder tokenBuilder = new StringBuilder();
+      String token = null;
+
+      while (token == null && pos < inputLength) {
+        char c = input.charAt(pos);
+        if (inComment) {
+          if (c == '\n') {
+            // End of a comment
+            inComment = false;
+            if (level > 0) {
+              // If we're in an expression we need to replace the entire comment (+ the newline)
+              // with
+              // some whitespace. Otherwise, symbols might get merged across line-wraps. This is not
+              // a problem at the top-level where all terms are surrounded by brackets.
+              tokenBuilder.append(c);
+            }
+          }
+
+        } else if (inString) {
+          if (c == '"') {
+            // We have a double quote: Check that it's not followed by another and actually closes
+            // the string.
+            Optional<Character> n =
+                (pos == inputLength - 1) ? Optional.empty() : Optional.of(input.charAt(pos + 1));
+            if (n.isEmpty() || n.orElseThrow() != '"') {
+              // Close the string
+              tokenBuilder.append(c);
+              inString = false;
+            } else {
+              // Add both quotes to the token and skip one character ahead
+              tokenBuilder.append(c);
+              tokenBuilder.append(n.orElseThrow());
+              pos++;
+            }
+          } else {
+            tokenBuilder.append(c);
+          }
+
+        } else if (inQuoted) {
+          if (c == '|') {
+            // Close the quotes
+            inQuoted = false;
+          }
+          if (c == '\\') {
+            // The SMT-LIB2 standard does not allow backslash inside quoted symbols:
+            // Throw an exception
+            throw new IllegalArgumentException();
+          }
+          tokenBuilder.append(c);
+
+        } else if (c == ';') {
+          // Start of a comment
+          inComment = true;
+
+        } else if (c == '"') {
+          // Start of a string literal
+          inString = true;
+          tokenBuilder.append(c);
+
+        } else if (c == '|') {
+          // Start of a quoted symbol
+          inQuoted = true;
+          tokenBuilder.append(c);
+
+        } else {
+          // Just a regular character outside of comments, quotes or string literals
+          if (level == 0) {
+            // We're at the top-level
+            if (!Character.isWhitespace(c)) {
+              if (c == '(') {
+                // Handle opening brackets
+                tokenBuilder.append("(");
+                level++;
+              } else if (c == ')') {
+                throw new IllegalArgumentException(
+                    "parentheses do not match, unexpected closing parenthesis");
+              } else {
+                tokenBuilder.append(c);
+              }
+            } else {
+              if (!tokenBuilder.isEmpty()) {
+                token = tokenBuilder.toString();
+              }
+            }
+          } else {
+            // We're inside an r-expression
+            tokenBuilder.append(c);
+            // Handle opening/closing brackets
+            if (c == '(') {
+              level++;
+            }
+            if (c == ')') {
+              if (level == 1) {
+                token = tokenBuilder.toString();
+              }
+              level--;
+            }
+          }
+        }
+        pos++;
+      }
+
+      if (level != 0) {
+        // Throw an exception if the brackets don't match
+        throw new IllegalArgumentException("parentheses do not match, too many open parentheses");
+      }
+
+      if (token == null) {
+        // This is always the empty token. Can only happen at tWe need to fix this first.he end of
+        // the input.
+        token = tokenBuilder.toString();
+      }
+      return token;
+    }
   }
 }

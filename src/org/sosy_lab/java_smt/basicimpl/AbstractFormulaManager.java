@@ -374,7 +374,7 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
     // The fallback implementation splits the input into declarations and assertions,
     // and parses each assertion separately,
     // which is not very efficient, but it works for simple cases and is better than nothing
-    List<String> tokens = Tokenizer.tokenize(formulaStr);
+    List<String> tokens = Tokenizer.tokenizeToList(formulaStr);
 
     List<String> declarationTokens = tokens.stream().filter(Tokenizer::isDeclarationToken).toList();
     List<String> definitionTokens = tokens.stream().filter(Tokenizer::isDefinitionToken).toList();
@@ -395,7 +395,7 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
    * only occur as the last command.
    */
   private String sanitize(String formulaStr) {
-    List<String> tokens = Tokenizer.tokenize(formulaStr);
+    List<String> tokens = Tokenizer.tokenizeToList(formulaStr);
 
     StringBuilder builder = new StringBuilder();
 
