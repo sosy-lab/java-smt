@@ -35,7 +35,7 @@ val yices2Version = "2.7.0-gdc5687ca"
 val z3Version = "4.16.0"
 val z3LegacyVersion = "4.5.0-gd57a2a6dc"
 
-val junit4Version = "4.13.2"
+val junit6Version = "6.1.0"
 
 repositories {
     // Use MavenCentral as a source, but try using POMs first and if that fails just use the artifact
@@ -68,8 +68,10 @@ dependencies {
     // Align versions of all Kotlin components
     implementation(platform("org.jetbrains.kotlin:kotlin-bom"))
 
-    // JUnit 4
-    testImplementation("junit:junit:$junit4Version")
+    // JUnit
+    testImplementation("org.junit.jupiter:junit-jupiter-api:$junit6Version")
+    testImplementation("org.junit.jupiter:junit-jupiter-params:$junit6Version")
+    testImplementation("org.junit.jupiter:junit-jupiter-engine:$junit6Version")
 
     // JavaSMT dependencies
     implementation("org.sosy-lab:java-smt:$javasmtVersion")
