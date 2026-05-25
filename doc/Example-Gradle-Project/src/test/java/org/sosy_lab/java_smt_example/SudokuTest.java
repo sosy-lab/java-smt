@@ -2,7 +2,7 @@
 // an API wrapper for a collection of SMT solvers:
 // https://github.com/sosy-lab/java-smt
 //
-// SPDX-FileCopyrightText: 2021 Dirk Beyer <https://www.sosy-lab.org>
+// SPDX-FileCopyrightText: 2026 Dirk Beyer <https://www.sosy-lab.org>
 //
 // SPDX-License-Identifier: Apache-2.0
 
@@ -10,14 +10,19 @@ package org.sosy_lab.java_smt_example;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assume.assumeTrue;
 import static org.sosy_lab.java_smt.example.Sudoku.SIZE;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
+import java.util.Arrays;
 import java.util.List;
+import java.util.logging.Level;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.configuration.Configuration;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
@@ -27,8 +32,7 @@ import org.sosy_lab.java_smt.SolverContextFactory;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.SolverContext;
 import org.sosy_lab.java_smt.api.SolverException;
-import org.sosy_lab.java_smt.example.Sudoku.IntegerBasedSudokuSolver;
-import org.sosy_lab.java_smt.example.Sudoku.BooleanBasedSudokuSolver;
+import org.sosy_lab.java_smt.example.Sudoku;
 import org.sosy_lab.java_smt.example.Sudoku.SudokuSolver;
 
 /**
@@ -69,7 +73,28 @@ import org.sosy_lab.java_smt.example.Sudoku.SudokuSolver;
  * 451839627
  * </pre>
  */
+@RunWith(Parameterized.class)
 public class SudokuTest {
+
+  @Parameterized.Parameters(name = "{0}")
+  public static List<Solvers> getSolvers() {
+    return Arrays.asList(Solvers.values());
+  }
+
+  @Parameterized.Parameter(0)
+  public Solvers solver;
+
+  private static final String OS = System.getProperty("os.name").toLowerCase().replace(" ", "");
+  private static final boolean IS_LINUX = OS.startsWith("linux");
+  private static final boolean IS_X64 = System.getProperty("os.arch").contains("64");
+
+  /** Disable some checks on certain combinations of operating systems and solvers, because of missing dependencies. */
+  private static boolean isOperatingSystemSupported(Solvers solver) {
+    return switch (solver) {
+      case SMTINTERPOL, PRINCESS -> true; // Java-based solvers should work on all platforms
+      default -> IS_LINUX && IS_X64; // this example only includes Linux x64 binaries for native solvers
+    };
+  }
 
   private Configuration config;
   private LogManager logger;
@@ -78,26 +103,26 @@ public class SudokuTest {
   private SolverContext context;
 
   private static final String input =
-      "2..9.6..1\n"
-          + "..6.4...9\n"
-          + "...52.4..\n"
-          + "3.2..7.5.\n"
-          + "...2..1..\n"
-          + ".9.3..7..\n"
-          + ".87.5.31.\n"
-          + "6.3.1.8..\n"
-          + "4....9...";
+          "2..9.6..1\n"
+                  + "..6.4...9\n"
+                  + "...52.4..\n"
+                  + "3.2..7.5.\n"
+                  + "...2..1..\n"
+                  + ".9.3..7..\n"
+                  + ".87.5.31.\n"
+                  + "6.3.1.8..\n"
+                  + "4....9...";
 
   private static final String sudokuSolution =
-      "248976531\n"
-          + "536148279\n"
-          + "179523468\n"
-          + "312487956\n"
-          + "764295183\n"
-          + "895361742\n"
-          + "987652314\n"
-          + "623714895\n"
-          + "451839627\n";
+          "248976531\n"
+                  + "536148279\n"
+                  + "179523468\n"
+                  + "312487956\n"
+                  + "764295183\n"
+                  + "895361742\n"
+                  + "987652314\n"
+                  + "623714895\n"
+                  + "451839627\n";
 
   @Before
   public void init() throws InvalidConfigurationException {
@@ -117,69 +142,16 @@ public class SudokuTest {
   }
 
   @Test
-  public void princessSudokuTest()
-      throws InvalidConfigurationException, InterruptedException, SolverException {
-    checkSudoku(Solvers.PRINCESS);
-  }
-  
-  @Test
-  public void smtInterpolSudokuTest()
-      throws InvalidConfigurationException, InterruptedException, SolverException {
-    checkSudoku(Solvers.SMTINTERPOL);
-  }
-  
-  @Test
-  public void cvc4SudokuTest()
-      throws InvalidConfigurationException, InterruptedException, SolverException {
-    checkSudoku(Solvers.CVC4);
-  }
+  public void checkSudoku()
+          throws InvalidConfigurationException, InterruptedException, SolverException {
+    assumeTrue(isOperatingSystemSupported(solver));
 
-  @Test
-  public void z3SudokuTest()
-      throws InvalidConfigurationException, InterruptedException, SolverException {
-    checkSudoku(Solvers.Z3);
-  }
-
-  @Test
-  public void mathsatSudokuTest()
-      throws InvalidConfigurationException, InterruptedException, SolverException {
-    checkSudoku(Solvers.MATHSAT5);
-  }
-  
-  @Test
-  public void boolectorSudokuTest()
-      throws InvalidConfigurationException, InterruptedException, SolverException {
-    // Boolector does not support Integers
-    checkSudokuWithBooleans(Solvers.BOOLECTOR);
-  }
-  
-  @Test
-  public void yicesSudokuTest()
-      throws InvalidConfigurationException, InterruptedException, SolverException {
-    checkSudoku(Solvers.YICES2);
-  }
-
-  private void checkSudoku(Solvers solver)
-      throws InvalidConfigurationException, InterruptedException, SolverException {
+    logger.log(Level.INFO, "Executing " + solver + "...");
 
     context = SolverContextFactory.createSolverContext(config, logger, notifier, solver);
     Integer[][] grid = readGridFromString(input);
 
-    SudokuSolver<?> sudoku = new IntegerBasedSudokuSolver(context);
-    Integer[][] solution = sudoku.solve(grid);
-
-    assertNotNull(solution);
-    assertEquals(sudokuSolution, solutionToString(solution));
-  }
-
-  // Same as checkSudoku but with Booleans instead of Integers
-  private void checkSudokuWithBooleans(Solvers solver)
-      throws InvalidConfigurationException, InterruptedException, SolverException {
-
-    context = SolverContextFactory.createSolverContext(config, logger, notifier, solver);
-    Integer[][] grid = readGridFromString(input);
-
-    SudokuSolver<?> sudoku = new BooleanBasedSudokuSolver(context);
+    SudokuSolver<?> sudoku = new Sudoku.BooleanBasedSudokuSolver(context);
     Integer[][] solution = sudoku.solve(grid);
 
     assertNotNull(solution);
