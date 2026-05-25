@@ -18,6 +18,11 @@ class AppTest {
   }
 
   @Test
+  fun z3LegacySudokuTest() {
+    SudokuTest().z3LegacySudokuTest()
+  }
+
+  @Test
   fun princessSudokuTest() {
     SudokuTest().princessSudokuTest()
   }
@@ -33,6 +38,11 @@ class AppTest {
   }
 
   @Test
+  fun cvc5SudokuTest() {
+    SudokuTest().cvc5SudokuTest()
+  }
+
+  @Test
   fun mathsatSudokuTest() {
     SudokuTest().mathsatSudokuTest()
   }
@@ -43,7 +53,17 @@ class AppTest {
   }
 
   @Test
+  fun bitwuzlaSudokuTest() {
+    SudokuTest().bitwuzlaSudokuTest()
+  }
+
+  @Test
   fun yicesSudokuTest() {
     SudokuTest().yicesSudokuTest()
+  }
+
+  @Test
+  fun opensmtSudokuTest() {
+    SudokuTest().opensmtSudokuTest()
   }
 }

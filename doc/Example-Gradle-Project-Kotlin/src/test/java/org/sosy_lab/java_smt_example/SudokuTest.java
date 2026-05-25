@@ -98,9 +98,9 @@ public class SudokuTest {
           + "987652314\n"
           + "623714895\n"
           + "451839627\n";
-  
+
   public SudokuTest() {
-    
+
   }
 
   private void init() throws InvalidConfigurationException {
@@ -124,18 +124,25 @@ public class SudokuTest {
     checkSudoku(Solvers.PRINCESS);
     closeSolver();
   }
-  
+
   public void smtInterpolSudokuTest()
       throws InvalidConfigurationException, InterruptedException, SolverException {
     init();
     checkSudoku(Solvers.SMTINTERPOL);
     closeSolver();
   }
-  
+
   public void cvc4SudokuTest()
       throws InvalidConfigurationException, InterruptedException, SolverException {
     init();
     checkSudoku(Solvers.CVC4);
+    closeSolver();
+  }
+
+  public void cvc5SudokuTest()
+          throws InvalidConfigurationException, InterruptedException, SolverException {
+    init();
+    checkSudoku(Solvers.CVC5);
     closeSolver();
   }
 
@@ -146,13 +153,20 @@ public class SudokuTest {
     closeSolver();
   }
 
+  public void z3LegacySudokuTest()
+          throws InvalidConfigurationException, InterruptedException, SolverException {
+    init();
+    checkSudoku(Solvers.Z3_WITH_INTERPOLATION);
+    closeSolver();
+  }
+
   public void mathsatSudokuTest()
       throws InvalidConfigurationException, InterruptedException, SolverException {
     init();
     checkSudoku(Solvers.MATHSAT5);
     closeSolver();
   }
-  
+
   public void boolectorSudokuTest()
       throws InvalidConfigurationException, InterruptedException, SolverException {
     init();
@@ -160,11 +174,26 @@ public class SudokuTest {
     checkSudokuWithBooleans(Solvers.BOOLECTOR);
     closeSolver();
   }
-  
+
+  public void bitwuzlaSudokuTest()
+          throws InvalidConfigurationException, InterruptedException, SolverException {
+    init();
+    // Boolector does not support Integers
+    checkSudokuWithBooleans(Solvers.BITWUZLA);
+    closeSolver();
+  }
+
   public void yicesSudokuTest()
       throws InvalidConfigurationException, InterruptedException, SolverException {
     init();
     checkSudoku(Solvers.YICES2);
+    closeSolver();
+  }
+
+  public void opensmtSudokuTest()
+          throws InvalidConfigurationException, InterruptedException, SolverException {
+    init();
+    checkSudoku(Solvers.OPENSMT);
     closeSolver();
   }
 
