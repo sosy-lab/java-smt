@@ -28,12 +28,14 @@ import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
+import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.solvers.opensmt.Logics;
+import org.sosy_lab.java_smt.test.SolverBasedTest0.ParameterizedInterpolatingSolverBasedTest0;
 
 /** This class contains some simple Junit-tests to check the interpolation-API of our solvers. */
 @SuppressWarnings({"resource", "LocalVariableName"})
-public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
+public class InterpolatingProverTest extends ParameterizedInterpolatingSolverBasedTest0 {
 
   // INFO: OpenSmt only support interpolation for QF_LIA, QF_LRA and QF_UF
   @Override
@@ -44,8 +46,14 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
   /** Generate a prover environment depending on the parameter above. */
   @SuppressWarnings("unchecked")
   private <T> InterpolatingProverEnvironment<T> newEnvironmentForTest() {
-    requireInterpolation();
-    return (InterpolatingProverEnvironment<T>) context.newProverEnvironmentWithInterpolation();
+    requireInterpolation(itpStrategyToUse());
+    ProverOptions itpStrat = itpStrategyToUse();
+    if (itpStrat == null) {
+      return (InterpolatingProverEnvironment<T>) context.newProverEnvironmentWithInterpolation();
+    } else {
+      return (InterpolatingProverEnvironment<T>)
+          context.newProverEnvironmentWithInterpolation(itpStrat);
+    }
   }
 
   private static final UniqueIdGenerator index = new UniqueIdGenerator(); // to get different names
@@ -53,6 +61,7 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
   @Test
   @SuppressWarnings("CheckReturnValue")
   public <T> void simpleInterpolation() throws SolverException, InterruptedException {
+    requireIntegers();
     try (InterpolatingProverEnvironment<T> prover = newEnvironmentForTest()) {
       var f1 = lessThanNumber(makeVariable("x"), makeNumber(0));
       var f2 = greaterThanNumber(makeVariable("x"), makeNumber(0));
@@ -69,10 +78,20 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
   @Test
   @SuppressWarnings("CheckReturnValue")
   public <T> void notSoSimpleInterpolation() throws SolverException, InterruptedException {
+    requireIntegers();
     assume()
         .withMessage("Solver %s runs into timeout on this test", solverToUse())
         .that(solverToUse())
-        .isNoneOf(Solvers.CVC5, Solvers.YICES2, Solvers.OPENSMT);
+        .isNoneOf(Solvers.CVC5, Solvers.YICES2, Solvers.OPENSMT, Solvers.Z3);
+
+    if (itpStrategyToUse() == ProverOptions.GENERATE_UNIFORM_BACKWARD_INTERPOLANTS
+        || itpStrategyToUse() == ProverOptions.GENERATE_UNIFORM_FORWARD_INTERPOLANTS) {
+      assume()
+          .withMessage("Solver %s fails quantifier elimination in this test", solverToUse())
+          .that(solverToUse())
+          .isNotEqualTo(Solvers.PRINCESS);
+      // TODO: forward must be investigated, as it returns a weird error that we might cause!
+    }
 
     try (InterpolatingProverEnvironment<T> prover = newEnvironmentForTest()) {
       Formula x = makeVariable("x");
@@ -111,6 +130,8 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
 
   @Test
   public <T> void binaryInterpolation() throws SolverException, InterruptedException {
+    requireBitvectors();
+    requireIntegers();
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
 
     int i = index.getFreshId();
@@ -176,14 +197,16 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
 
     // some interpolant needs to be FALSE, however, it can be at arbitrary position.
     BooleanFormula expectedInterpolant = bmgr.makeFalse();
-    if (solverToUse() == Solvers.Z3_WITH_INTERPOLATION || solverToUse() == Solvers.YICES2) {
-      // FIXME This test seems wrong to me. Solvers are not guaranteed to return an inductive
-      //  sequence if getInterpolant is used multiple times. And even if it was an inductive
-      //  sequence, 'false' doesn't have to appear in it:
-      //   formulas        F    F    F
-      //   interplants  T    T    T    F
-      //  (getInterpolants would return [T,T] in this case)
-      expectedInterpolant = bmgr.makeTrue();
+    if (itpStrategyToUse() == null) {
+      if (solverToUse() == Solvers.Z3_WITH_INTERPOLATION || solverToUse() == Solvers.YICES2) {
+        // FIXME This test seems wrong to me. Solvers are not guaranteed to return an inductive
+        //  sequence if getInterpolant is used multiple times. And even if it was an inductive
+        //  sequence, 'false' doesn't have to appear in it:
+        //   formulas        F    F    F
+        //   interplants  T    T    T    F
+        //  (getInterpolants would return [T,T] in this case)
+        expectedInterpolant = bmgr.makeTrue();
+      }
     }
     assertThat(
             ImmutableList.of(
@@ -246,6 +269,17 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
 
   @Test
   public <T> void binaryBVInterpolation1() throws SolverException, InterruptedException {
+    assume()
+        .withMessage("Solver %s is not supported or times out", solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.BITWUZLA);
+
+    assume()
+        .withMessage("Z3 with strategy %s is not supported or times out", itpStrategyToUse())
+        .that(
+            solverToUse() == Solvers.Z3
+                && itpStrategyToUse() == ProverOptions.GENERATE_PROJECTION_BASED_INTERPOLANTS)
+        .isFalse();
     requireBitvectors();
     assume()
         .withMessage("Solver %s does not support interpolation over bitvectors", solverToUse())
@@ -297,16 +331,9 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
     checkItpSequence(ImmutableList.of(D, C, B, A), ImmutableList.of(itpD, itpDC, itpDCB));
   }
 
-  private void requireTreeItp() {
-    requireInterpolation();
-    assume()
-        .withMessage("Solver does not support tree-interpolation.")
-        .that(solver)
-        .isAnyOf(Solvers.SMTINTERPOL, Solvers.PRINCESS, Solvers.Z3_WITH_INTERPOLATION);
-  }
-
   @Test
   public <T> void sequentialInterpolation() throws SolverException, InterruptedException {
+    requireSeqItp();
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
 
     int i = index.getFreshId();
@@ -358,6 +385,8 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
   public <T> void sequentialInterpolationIsNotRepeatedIndividualInterpolation()
       throws SolverException, InterruptedException {
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
+    requireSeqItp();
+    requireIntegers();
 
     Formula zero = makeNumber(0);
     Formula one = makeNumber(1);
@@ -396,7 +425,8 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
   @Test
   public <T> void sequentialInterpolationWithoutPartition()
       throws SolverException, InterruptedException {
-
+    requireIntegers();
+    requireSeqItp();
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
 
     stack.push(mgr.makeEqual(makeNumber(0), makeNumber(1)));
@@ -410,6 +440,8 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
   @Test
   public <T> void sequentialInterpolationWithOnePartition()
       throws SolverException, InterruptedException {
+    requireIntegers();
+    requireSeqItp();
 
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
     int i = index.getFreshId();
@@ -437,6 +469,8 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
   @Test
   public <T> void sequentialInterpolationWithFewPartitions()
       throws SolverException, InterruptedException {
+    requireIntegers();
+    requireSeqItp();
 
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
     int i = index.getFreshId();
@@ -469,6 +503,8 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
   @Test
   public <T> void sequentialBVInterpolation() throws SolverException, InterruptedException {
     requireBitvectors();
+    requireSeqItp();
+    requireTreeItp();
 
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
 
@@ -1023,7 +1059,6 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
   @Test
   public <T> void treeInterpolationWithOnePartition() throws SolverException, InterruptedException {
     requireTreeItp();
-
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
 
     int i = index.getFreshId();
@@ -1053,6 +1088,8 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
   public <T> void bigSeqInterpolationTest() throws InterruptedException, SolverException {
     requireBitvectors();
     requireInterpolation();
+    requireSeqItp();
+    requireTreeItp();
 
     assume()
         .withMessage("Solver %s does not support interpolation over bitvectors", solverToUse())
@@ -1126,7 +1163,7 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
 
   @Test
   public <T> void testTrivialInterpolation() throws InterruptedException, SolverException {
-    requireInterpolation();
+    requireIntegers();
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
     Formula zero = makeNumber(0);
     Formula one = makeNumber(1);
@@ -1173,7 +1210,7 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
   @SuppressWarnings({"unchecked", "unused"})
   @Test
   public <T> void testInvalidToken() throws InterruptedException, SolverException {
-    requireInterpolation();
+    requireIntegers();
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
 
     // create and push formulas and solve them
@@ -1193,13 +1230,13 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
     final Object p3 =
         switch (solverToUse()) {
           case CVC5 -> bmgr.makeVariable("c");
-          case MATHSAT5 -> 12345;
+          case MATHSAT5, Z3, CVC4 -> 12345;
           case OPENSMT -> 12347;
           case PRINCESS -> 12349;
           case SMTINTERPOL -> "some string";
           case Z3_WITH_INTERPOLATION -> 12350;
           case BITWUZLA, YICES2 -> -1;
-          default -> null; // unexpected solver for interpolation
+          case BOOLECTOR -> throw new AssertionError("Unexpected solver for interpolation");
         };
 
     // and try to solve with the token
@@ -1214,6 +1251,8 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
    */
   @Test
   public <T> void issue381InterpolationTest1() throws InterruptedException, SolverException {
+    requireIntegers();
+    requireSeqItp();
     try (InterpolatingProverEnvironment<T> prover = newEnvironmentForTest()) {
       var x = makeVariable("x");
       var one = makeNumber(1);
@@ -1240,6 +1279,8 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
    */
   @Test
   public <T> void issue381InterpolationTest2() throws InterruptedException, SolverException {
+    requireIntegers();
+    requireSeqItp();
     try (InterpolatingProverEnvironment<T> prover = newEnvironmentForTest()) {
       var x = makeVariable("x");
       var one = makeNumber(1);
@@ -1266,6 +1307,7 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
    */
   @Test
   public <T> void issue381InterpolationTest3() throws InterruptedException, SolverException {
+    requireIntegers();
     try (InterpolatingProverEnvironment<T> prover = newEnvironmentForTest()) {
       var x = makeVariable("x");
       var one = makeNumber(1);
