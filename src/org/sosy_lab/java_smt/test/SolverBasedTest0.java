@@ -8,11 +8,13 @@
 
 package org.sosy_lab.java_smt.test;
 
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.truth.TruthJUnit.assume;
 import static org.sosy_lab.java_smt.api.FormulaType.getSinglePrecisionFloatingPointType;
-import static org.sosy_lab.java_smt.test.BooleanFormulaSubject.assertUsing;
 import static org.sosy_lab.java_smt.test.ProverEnvironmentSubject.assertThat;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.truth.Truth;
 import java.util.Collection;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -466,11 +468,40 @@ public abstract class SolverBasedTest0 {
   }
 
   /**
-   * Use this for checking assertions about BooleanFormulas with Truth: <code>
+   * Use this for checking assertions about {@link BooleanFormula}s with Truth: <code>
    * assertThatFormula(formula).is...()</code>.
    */
   protected final BooleanFormulaSubject assertThatFormula(BooleanFormula formula) {
-    return assertUsing(context).that(formula);
+    return BooleanFormulaSubject.assertUsing(context).that(formula);
+  }
+
+  /**
+   * Use this for checking assertions about the conjunction of {@link BooleanFormula}s with Truth:
+   * <code>assertThatFormulas(BooleanFormula, BooleanFormula).is...()</code>.
+   */
+  protected final BooleanFormulaSubjects assertThatFormulas(
+      BooleanFormula formula1, BooleanFormula formula2) {
+    return assertThatFormulas(ImmutableList.of(formula1, formula2));
+  }
+
+  /**
+   * Use this for checking assertions about the conjunction of {@link BooleanFormula}s with Truth:
+   * <code>assertThatFormulas(BooleanFormula, BooleanFormula).is...()</code>.
+   */
+  protected final BooleanFormulaSubjects assertThatFormulas(
+      BooleanFormula formula1, BooleanFormula formula2, BooleanFormula formula3) {
+    return assertThatFormulas(ImmutableList.of(formula1, formula2, formula3));
+  }
+
+  /**
+   * Use this for checking assertions about the conjunction of {@link BooleanFormula}s with Truth:
+   * <code>assertThatFormulas(Collection).are...()</code>.
+   */
+  protected final BooleanFormulaSubjects assertThatFormulas(Collection<BooleanFormula> formulas) {
+    checkArgument(
+        checkNotNull(formulas).iterator().hasNext(),
+        "Please use a non-empty iterable of BooleanFormulas");
+    return BooleanFormulaSubjects.assertUsing(context).that(formulas);
   }
 
   /**
