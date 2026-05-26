@@ -33,6 +33,7 @@ import ap.types.Sort.Integer$;
 import java.util.Arrays;
 import org.junit.Test;
 import org.sosy_lab.java_smt.solvers.princess.EldaricaHornProver;
+import org.sosy_lab.java_smt.solvers.princess.eldarica.PrincessHornConverter;
 import scala.collection.immutable.Seq;
 import scala.collection.immutable.Seq$;
 import scala.collection.immutable.Set;
@@ -60,7 +61,7 @@ public class EldaricaHornProverTest {
     IFormula input = a;
 
 
-    var clause = EldaricaHornProver.toClause(input);
+    var clause = new PrincessHornConverter().toClause(input);
 
     assertThat(clause.head()).isEqualTo(a);
     assertThat(clause.body().toSet()).isEqualTo(set());
@@ -77,7 +78,7 @@ public class EldaricaHornProverTest {
         new IBinFormula(IBinJunctor.And(), b, c), d)), a);
 
 
-    var clause = EldaricaHornProver.toClause(input);
+    var clause = new PrincessHornConverter().toClause(input);
 
     assertThat(clause.head()).isEqualTo(a);
     assertThat(clause.body().toSet()).isEqualTo(set(b, c, d));
@@ -92,7 +93,7 @@ public class EldaricaHornProverTest {
     IFormula input = new IBinFormula(IBinJunctor.Or(), new INot(b), a);
 
 
-    var clause = EldaricaHornProver.toClause(input);
+    var clause = new PrincessHornConverter().toClause(input);
 
     assertThat(clause.head()).isEqualTo(a);
     assertThat(clause.body().toSet()).isEqualTo(set(b));
@@ -107,7 +108,7 @@ public class EldaricaHornProverTest {
     IFormula f0 = new IIntFormula(IIntRelation.EqZero(), f);
 
 
-    var clause = EldaricaHornProver.toClause(f0);
+    var clause = new PrincessHornConverter().toClause(f0);
 
     assertThat(clause.head().toString()).isEqualTo(new IAtom(new Predicate("f", 1), args).toString());
     assertThat(clause.body().toSet()).isEqualTo(set());
@@ -127,7 +128,7 @@ public class EldaricaHornProverTest {
     IFormula input = new IBinFormula(IBinJunctor.Or(), new INot(h0), f0);
 
 
-    var clause = EldaricaHornProver.toClause(input);
+    var clause = new PrincessHornConverter().toClause(input);
 
     assertThat(clause.head().toString()).isEqualTo(new IAtom(new Predicate("f", 1), args).toString());
     assertThat(clause.body().toSet().toString()).isEqualTo(set(new IAtom(new Predicate("h", 1),
@@ -151,7 +152,7 @@ public class EldaricaHornProverTest {
         constraint, body)), a);
 
 
-    var clause = EldaricaHornProver.toClause(input);
+    var clause = new PrincessHornConverter().toClause(input);
 
     assertThat(clause.head()).isEqualTo(a);
     assertThat(clause.body().toSet()).isEqualTo(set(b, c));
@@ -170,7 +171,7 @@ public class EldaricaHornProverTest {
     IFormula input = new IBinFormula(IBinJunctor.Or(), new INot(constraint), a);
 
 
-    var clause = EldaricaHornProver.toClause(input);
+    var clause = new PrincessHornConverter().toClause(input);
 
     assertThat(clause.head()).isEqualTo(a);
     assertThat(clause.body().toSet()).isEqualTo(set());
