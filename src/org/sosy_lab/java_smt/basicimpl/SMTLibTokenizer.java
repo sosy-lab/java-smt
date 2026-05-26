@@ -308,20 +308,6 @@ public final class SMTLibTokenizer implements Iterable<String> {
      * Optional#empty()} if there is none.
      */
     private Optional<String> getNextToken() {
-      while (!endOfInputReached()) {
-        String maybeNextToken = getNextPossiblyEmptyToken();
-        if (!maybeNextToken.isEmpty()) {
-          return Optional.of(maybeNextToken);
-        }
-      }
-      return Optional.empty();
-    }
-
-    /**
-     * Progresses the iterator and returns the next token. These tokens might be empty due to our
-     * lenient way of interpreting SMTLIB.
-     */
-    private String getNextPossiblyEmptyToken() {
       StringBuilder tokenBuilder = new StringBuilder();
       String token = null;
 
@@ -430,11 +416,18 @@ public final class SMTLibTokenizer implements Iterable<String> {
       }
 
       if (token == null) {
-        // This is always the empty token. Can only happen at tWe need to fix this first.he end of
-        // the input.
+        // Might happen at the end of an SMTLIB program
         token = tokenBuilder.toString();
       }
-      return token;
+
+      if (token.isEmpty()) {
+        if (endOfInputReached()) {
+          return Optional.empty();
+        } else {
+          return getNextToken();
+        }
+      }
+      return Optional.of(token);
     }
   }
 }
