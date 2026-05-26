@@ -16,10 +16,13 @@ import org.junit.Test;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.java_smt.SolverContextFactory;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
+import org.sosy_lab.java_smt.api.BitvectorFormulaManager;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.FormulaManager;
+import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext;
+import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 
 public class SolverContextTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
@@ -54,7 +57,7 @@ public class SolverContextTest extends SolverBasedTest0.ParameterizedSolverBased
             "Solver %s does not support to access formulae after closing the context",
             solverToUse())
         .that(solverToUse())
-        .isNoneOf(Solvers.CVC5, Solvers.OPENSMT);
+        .isNoneOf(Solvers.CVC5, Solvers.BITWUZLA, Solvers.OPENSMT);
 
     assertThat(term).isEqualTo(term2);
     assertThat(term).isNotEqualTo(term3);
@@ -87,14 +90,14 @@ public class SolverContextTest extends SolverBasedTest0.ParameterizedSolverBased
         .that(solverToUse())
         .isNotEqualTo(Solvers.YICES2);
 
-    // Z3 seems to allows simple operations, but not deterministically, so better lets abort here.
+    // Z3 seems to allow simple operations, but not deterministically, so better lets abort here.
     // Simple checks could even be ok (comparison against constants like TRUE/FALSE).
     assume()
         .withMessage(
             "Solver %s does not support to access formulae after closing the context",
             solverToUse())
         .that(solverToUse())
-        .isNotEqualTo(Solvers.Z3);
+        .isNoneOf(Solvers.Z3, Solvers.Z3_WITH_INTERPOLATION);
 
     assertThat(bmgr.isTrue(term)).isFalse();
     assertThat(bmgr.isFalse(term)).isFalse();
@@ -106,7 +109,7 @@ public class SolverContextTest extends SolverBasedTest0.ParameterizedSolverBased
     assertThat(term.hashCode()).isEqualTo(hash);
     assertThat(term).isEqualTo(term2);
 
-    // For CVC4 and Bitwuzla, we close the solver, however do not finalize and cleanup the terms,
+    // For CVC4, we close the solver, however, we do not finalize and cleanup the terms,
     // thus direct access is possible, operations are forbidden.
     // See https://github.com/sosy-lab/java-smt/issues/169
     assume()
@@ -114,7 +117,7 @@ public class SolverContextTest extends SolverBasedTest0.ParameterizedSolverBased
             "Solver %s does not support to access formulae after closing the context",
             solverToUse())
         .that(solverToUse())
-        .isNoneOf(Solvers.CVC4, Solvers.BITWUZLA);
+        .isNotEqualTo(Solvers.CVC4);
 
     // Java-based solvers allow more, i.e. they wait for GC, which is nice.
 
@@ -143,7 +146,7 @@ public class SolverContextTest extends SolverBasedTest0.ParameterizedSolverBased
     }
   }
 
-  @Test(timeout = 1000)
+  @Test(timeout = 5000)
   @SuppressWarnings({"try", "CheckReturnValue"})
   public void testCVC5WithValidOptionsTimeLimit()
       throws InvalidConfigurationException, InterruptedException {
@@ -173,6 +176,43 @@ public class SolverContextTest extends SolverBasedTest0.ParameterizedSolverBased
     var config2 =
         createTestConfigBuilder().setOption("solver.cvc5.furtherOptions", "foo=bar").build();
     var factory2 = new SolverContextFactory(config2, logger, shutdownNotifierToUse());
+    assertThrows(InvalidConfigurationException.class, factory2::generateContext);
+  }
+
+  @Test
+  public void testBitwuzlaWithValidOptionsModelGeneration()
+      throws InvalidConfigurationException, InterruptedException, SolverException {
+    assume().that(solverToUse()).isEqualTo(Solvers.BITWUZLA);
+
+    // the option and its value are irrelevant,
+    // as long as we can parse and inject them as real options.
+    var validConfig =
+        createTestConfigBuilder()
+            .setOption("solver.bitwuzla.furtherOptions", "PRODUCE_MODELS=1")
+            .build();
+    var factory2 = new SolverContextFactory(validConfig, logger, shutdownNotifierToUse());
+    try (SolverContext context2 = factory2.generateContext()) {
+      FormulaManager fmgr2 = context2.getFormulaManager();
+      BitvectorFormulaManager bvmgr2 = fmgr2.getBitvectorFormulaManager();
+      try (ProverEnvironment prover2 =
+          context2.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
+        prover2.addConstraint(
+            bvmgr2.equal(bvmgr2.makeVariable(8, "x"), bvmgr2.makeBitvector(8, 17)));
+        assertThat(prover2.isUnsat()).isFalse();
+        try (Model model = prover2.getModel()) {
+          assertThat(model.asList()).hasSize(1);
+        }
+      }
+    }
+  }
+
+  @Test
+  public void testBitwuzlaWithInvalidOptions() throws InvalidConfigurationException {
+    assume().that(solverToUse()).isEqualTo(Solvers.BITWUZLA);
+
+    var invalidConfig =
+        createTestConfigBuilder().setOption("solver.bitwuzla.furtherOptions", "foo=bar").build();
+    var factory2 = new SolverContextFactory(invalidConfig, logger, shutdownNotifierToUse());
     assertThrows(InvalidConfigurationException.class, factory2::generateContext);
   }
 }

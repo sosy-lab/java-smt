@@ -53,7 +53,7 @@ class LoggingSmtInterpolInterpolatingProver extends SmtInterpolInterpolatingProv
     @SuppressWarnings("IllegalInstantiation")
     PrintWriter writer = new PrintWriter(IO.openOutputFile(logfile, Charset.defaultCharset()));
     for (Map.Entry<String, Object> entry : globalOptions.entrySet()) {
-      writer.println(String.format("(set-option %s %s)", entry.getKey(), entry.getValue()));
+      writer.println("(set-option %s %s)".formatted(entry.getKey(), entry.getValue()));
     }
     writer.println("(set-logic " + env.getTheory().getLogic().name() + ")");
     return writer;
@@ -90,9 +90,9 @@ class LoggingSmtInterpolInterpolatingProver extends SmtInterpolInterpolatingProv
   }
 
   @Override
-  public boolean isUnsat() throws InterruptedException {
+  protected boolean isUnsatImpl() throws InterruptedException {
     out.print("(check-sat)");
-    boolean isUnsat = super.isUnsat();
+    boolean isUnsat = super.isUnsatImpl();
     out.println(" ; " + (isUnsat ? "UNSAT" : "SAT"));
     return isUnsat;
   }

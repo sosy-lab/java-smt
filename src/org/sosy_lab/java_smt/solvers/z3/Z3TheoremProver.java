@@ -83,8 +83,7 @@ class Z3TheoremProver extends Z3AbstractProver implements ProverEnvironment {
   }
 
   @Override
-  public boolean isUnsat() throws SolverException, InterruptedException {
-    Preconditions.checkState(!closed);
+  protected boolean isUnsatImpl() throws SolverException, InterruptedException {
     logSolverStack();
     int result;
     try {
@@ -100,6 +99,8 @@ class Z3TheoremProver extends Z3AbstractProver implements ProverEnvironment {
   public boolean isUnsatWithAssumptions(Collection<BooleanFormula> assumptions)
       throws SolverException, InterruptedException {
     Preconditions.checkState(!closed);
+    changedSinceLastSatQuery = false;
+    wasLastSatCheckSatisfiable = false;
 
     int result;
     try {
@@ -113,7 +114,11 @@ class Z3TheoremProver extends Z3AbstractProver implements ProverEnvironment {
       throw creator.handleZ3Exception(e);
     }
     undefinedStatusToException(result);
-    return result == Z3_lbool.Z3_L_FALSE.toInt();
+    boolean isUnsat = result == Z3_lbool.Z3_L_FALSE.toInt();
+    if (!isUnsat) {
+      wasLastSatCheckSatisfiable = true;
+    }
+    return isUnsat;
   }
 
   private void undefinedStatusToException(int solverStatus)
@@ -122,12 +127,13 @@ class Z3TheoremProver extends Z3AbstractProver implements ProverEnvironment {
       creator.shutdownNotifier.shutdownIfNecessary();
       final String reason = Native.solverGetReasonUnknown(z3context, z3solver);
       switch (reason) {
-        case "canceled": // see Z3: src/tactic/tactic.cpp
-        case "interrupted": // see Z3: src/solver/check_sat_result.cpp
-        case "interrupted from keyboard": // see Z3: src/solver/check_sat_result.cpp
-          throw new InterruptedException(reason);
-        default:
-          throw new SolverException("Z3 returned 'unknown' status, reason: " + reason);
+        // see Z3:
+        // - src/tactic/tactic.cpp,
+        // - src/solver/check_sat_result.cpp, and
+        // - src/solver/check_sat_result.cpp
+        case "canceled", "interrupted", "interrupted from keyboard" ->
+            throw new InterruptedException(reason);
+        default -> throw new SolverException("Z3 returned 'unknown' status, reason: " + reason);
       }
     }
   }

@@ -16,12 +16,12 @@ import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverException;
 
-public class DebuggingInterpolatingProverEnvironment<T> extends DebuggingBasicProverEnvironment<T>
+class DebuggingInterpolatingProverEnvironment<T> extends DebuggingBasicProverEnvironment<T>
     implements InterpolatingProverEnvironment<T> {
   private final InterpolatingProverEnvironment<T> delegate;
   private final DebuggingAssertions debugging;
 
-  public DebuggingInterpolatingProverEnvironment(
+  DebuggingInterpolatingProverEnvironment(
       InterpolatingProverEnvironment<T> pDelegate, DebuggingAssertions pDebugging) {
     super(pDelegate, pDebugging);
     delegate = checkNotNull(pDelegate);

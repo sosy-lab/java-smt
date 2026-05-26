@@ -16,7 +16,6 @@ import com.google.common.truth.Fact;
 import com.google.common.truth.FailureMetadata;
 import com.google.common.truth.StandardSubjectBuilder;
 import com.google.common.truth.Subject;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import org.sosy_lab.java_smt.api.BasicProverEnvironment;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -32,7 +31,6 @@ import org.sosy_lab.java_smt.api.SolverException;
  * {@link StandardSubjectBuilder#about(com.google.common.truth.Subject.Factory)} and {@link
  * #proverEnvironments()}.
  */
-@SuppressFBWarnings("EQ_DOESNT_OVERRIDE_EQUALS")
 public final class ProverEnvironmentSubject extends Subject {
 
   private final BasicProverEnvironment<?> stackUnderTest;

@@ -1,0 +1,35 @@
+# This file is part of JavaSMT,
+# an API wrapper for a collection of SMT solvers:
+# https://github.com/sosy-lab/java-smt
+#
+# SPDX-FileCopyrightText: 2025 Dirk Beyer <https://www.sosy-lab.org>
+#
+# SPDX-License-Identifier: Apache-2.0
+
+# This is a container image for running the tests.
+# It should be pushed to registry.gitlab.com/sosy-lab/software/java-smt/test
+# and will be used by CI as declared in .gitlab-ci.yml.
+#
+# Commands for updating the image:
+# podman build --pull -t registry.gitlab.com/sosy-lab/software/java-smt/test:jdk-24 - < build/gitlab-ci.Dockerfile.jdk-24
+# podman push registry.gitlab.com/sosy-lab/software/java-smt/test:jdk-24
+
+# LTS versions currently do not have Java 24
+FROM ubuntu:25.04
+
+ENV DEBIAN_FRONTEND=noninteractive
+ENV TZ=UTC
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+  ant \
+  curl \
+  git \
+  jq \
+  openjdk-24-jdk-headless \
+  wget \
+  && rm -rf /var/lib/apt/lists/*
+
+ENV LANG C.UTF-8
+
+RUN apt-get update && apt-get install -y \
+  libgomp1

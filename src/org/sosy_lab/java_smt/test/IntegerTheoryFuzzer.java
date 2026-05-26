@@ -8,7 +8,6 @@
 
 package org.sosy_lab.java_smt.test;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Random;
 import java.util.stream.IntStream;
 import org.sosy_lab.java_smt.api.FormulaManager;
@@ -43,7 +42,6 @@ class IntegerTheoryFuzzer {
     return recFuzz(formulaSize);
   }
 
-  @SuppressFBWarnings(value = "DMI_RANDOM_USED_ONLY_ONCE")
   private IntegerFormula recFuzz(int pFormulaSize) {
     if (pFormulaSize == 1) {
 
@@ -63,27 +61,22 @@ class IntegerTheoryFuzzer {
 
       // Pivot \in [1, formulaSize - 1]
       int pivot = 1 + r.nextInt(pFormulaSize - 1);
-      switch (r.nextInt(3)) {
-        case 0:
-          return ifmgr.add(recFuzz(pivot), recFuzz(pFormulaSize - pivot));
-        case 1:
-          return ifmgr.subtract(recFuzz(pivot), recFuzz(pFormulaSize - pivot));
-        case 2:
+      return switch (r.nextInt(3)) {
+        case 0 -> ifmgr.add(recFuzz(pivot), recFuzz(pFormulaSize - pivot));
+        case 1 -> ifmgr.subtract(recFuzz(pivot), recFuzz(pFormulaSize - pivot));
+        case 2 ->
 
-          // Multiplication by a constant.
-          return ifmgr.multiply(getConstant(), recFuzz(pFormulaSize - 1));
-        default:
-          throw new UnsupportedOperationException("Unexpected state");
-      }
+            // Multiplication by a constant.
+            ifmgr.multiply(getConstant(), recFuzz(pFormulaSize - 1));
+        default -> throw new UnsupportedOperationException("Unexpected state");
+      };
     }
   }
 
-  @SuppressFBWarnings(value = "DMI_RANDOM_USED_ONLY_ONCE")
   private IntegerFormula getConstant() {
     return ifmgr.makeNumber((long) r.nextInt(2 * maxConstant) - maxConstant);
   }
 
-  @SuppressFBWarnings(value = "DMI_RANDOM_USED_ONLY_ONCE")
   private IntegerFormula getVar() {
     return vars[r.nextInt(vars.length)];
   }

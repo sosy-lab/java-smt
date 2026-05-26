@@ -10,9 +10,9 @@ package org.sosy_lab.java_smt.test;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
-import java.util.Arrays;
 import java.util.List;
 import java.util.function.Supplier;
 import org.junit.AssumptionViolatedException;
@@ -22,6 +22,7 @@ import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
 import org.sosy_lab.common.configuration.ConfigurationBuilder;
+import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
@@ -34,8 +35,8 @@ public class NonLinearArithmeticWithModuloTest extends SolverBasedTest0 {
   @Parameters(name = "{0} {1}")
   public static Iterable<Object[]> getAllSolversAndTheories() {
     return Lists.cartesianProduct(
-            Arrays.asList(ParameterizedSolverBasedTest0.getAllSolvers()),
-            Arrays.asList(NonLinearArithmetic.values()))
+            ImmutableList.copyOf(ParameterizedSolverBasedTest0.getAllSolvers()),
+            ImmutableList.copyOf(NonLinearArithmetic.values()))
         .stream()
         .map(List::toArray)
         .collect(toImmutableList());
@@ -53,7 +54,7 @@ public class NonLinearArithmeticWithModuloTest extends SolverBasedTest0 {
   public NonLinearArithmetic nonLinearArithmetic;
 
   @Override
-  protected ConfigurationBuilder createTestConfigBuilder() {
+  protected ConfigurationBuilder createTestConfigBuilder() throws InvalidConfigurationException {
     return super.createTestConfigBuilder()
         .setOption("solver.nonLinearArithmetic", nonLinearArithmetic.name());
   }

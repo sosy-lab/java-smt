@@ -8,10 +8,11 @@
 
 package org.sosy_lab.java_smt.api;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static org.sosy_lab.java_smt.api.FloatingPointNumber.DOUBLE_PRECISION_EXPONENT_SIZE;
-import static org.sosy_lab.java_smt.api.FloatingPointNumber.DOUBLE_PRECISION_MANTISSA_SIZE;
+import static org.sosy_lab.java_smt.api.FloatingPointNumber.DOUBLE_PRECISION_MANTISSA_SIZE_WITHOUT_HIDDEN_BIT;
 import static org.sosy_lab.java_smt.api.FloatingPointNumber.SINGLE_PRECISION_EXPONENT_SIZE;
-import static org.sosy_lab.java_smt.api.FloatingPointNumber.SINGLE_PRECISION_MANTISSA_SIZE;
+import static org.sosy_lab.java_smt.api.FloatingPointNumber.SINGLE_PRECISION_MANTISSA_SIZE_WITHOUT_HIDDEN_BIT;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
@@ -20,8 +21,10 @@ import com.google.common.collect.ImmutableSet;
 import com.google.errorprone.annotations.Immutable;
 import java.util.List;
 import java.util.Set;
+import java.util.regex.Pattern;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
+import org.sosy_lab.java_smt.basicimpl.Tokenizer;
 
 /**
  * Type of a formula.
@@ -187,11 +190,7 @@ public abstract class FormulaType<T extends Formula> {
       if (pObj == this) {
         return true;
       }
-      if (!(pObj instanceof BitvectorType)) {
-        return false;
-      }
-      BitvectorType other = (BitvectorType) pObj;
-      return size == other.size;
+      return (pObj instanceof BitvectorType other) && size == other.size;
     }
 
     @Override
@@ -205,14 +204,96 @@ public abstract class FormulaType<T extends Formula> {
     }
   }
 
-  public static FloatingPointType getFloatingPointType(int exponentSize, int mantissaSize) {
-    return new FloatingPointType(exponentSize, mantissaSize);
+  /**
+   * Constructs a new IEEE-754 {@link FloatingPointType} with the given exponent and mantissa sizes.
+   * The mantissa size is expected to not include the hidden bit.
+   *
+   * @deprecated this method can be confusing, as the SMTLIB2 standard expects the mantissa to
+   *     include the hidden bit, but this method expects the mantissa argument without the hidden
+   *     bit. Use {@link #getFloatingPointTypeFromSizesWithoutHiddenBit(int, int)} instead if you
+   *     want to construct a {@link FloatingPointType} with the constructing method treating the
+   *     mantissa argument without the hidden bit, and {@link
+   *     #getFloatingPointTypeFromSizesWithHiddenBit(int, int)} if you want it to include the hidden
+   *     bit in the size of the mantissa argument.
+   * @param exponentSize size of the exponent for the base of the floating-point
+   * @param mantissaSizeWithoutHiddenBit size of the mantissa (also called a coefficient or
+   *     significand), excluding the hidden bit.
+   * @return the newly constructed {@link FloatingPointType}.
+   */
+  @Deprecated(since = "6.0", forRemoval = true)
+  @SuppressWarnings("InlineMeSuggester")
+  public static FloatingPointType getFloatingPointType(
+      int exponentSize, int mantissaSizeWithoutHiddenBit) {
+    return getFloatingPointTypeFromSizesWithoutHiddenBit(
+        exponentSize, mantissaSizeWithoutHiddenBit);
   }
 
+  /**
+   * Constructs a new IEEE-754 {@link FloatingPointType} with the given exponent and mantissa sizes.
+   * The mantissa size is expected to not include the hidden bit. The total size of the constructed
+   * type is equal to the addition of the two arguments plus one, as in: total size == exponentSize
+   * + mantissaSizeWithoutHiddenBit + 1.
+   *
+   * <p>Using the arguments e and m, calling this method with
+   * getFloatingPointTypeFromSizesWithoutHiddenBit (e, m) returns a type equal to a type constructed
+   * by {@link #getFloatingPointTypeFromSizesWithHiddenBit(int, int)} with the same arguments e and
+   * m as before, but m incremented by 1, as in getFloatingPointTypeFromSizesWithHiddenBit(e, m +
+   * 1).
+   *
+   * @param exponentSize size of the exponent for the base of the floating-point
+   * @param mantissaSizeWithoutHiddenBit size of the mantissa (also called a coefficient or
+   *     significand), excluding the hidden bit.
+   * @return the newly constructed {@link FloatingPointType}.
+   */
+  public static FloatingPointType getFloatingPointTypeFromSizesWithoutHiddenBit(
+      int exponentSize, int mantissaSizeWithoutHiddenBit) {
+    checkArgument(exponentSize > 1, "Exponent size must be greater than 1");
+    checkArgument(
+        mantissaSizeWithoutHiddenBit > 0,
+        "Mantissa size (without 'hidden bit') must be greater than 0");
+    return new FloatingPointType(exponentSize, mantissaSizeWithoutHiddenBit);
+  }
+
+  /**
+   * Constructs a new IEEE-754 {@link FloatingPointType} with the given exponent and mantissa sizes.
+   * The mantissa size is expected to include the hidden bit. The total size of the constructed type
+   * is equal to the addition of the two arguments, as in: total size == exponentSize +
+   * mantissaSizeWithHiddenBit.
+   *
+   * <p>Using the arguments e and m, calling this method with
+   * getFloatingPointTypeFromSizesWithHiddenBit(e, m) returns a type equal to a type constructed by
+   * {@link #getFloatingPointTypeFromSizesWithoutHiddenBit(int, int)} with the same arguments e and
+   * m as before, but m decremented by 1, as in getFloatingPointTypeFromSizesWithoutHiddenBit(e, m -
+   * 1).
+   *
+   * @param exponentSize size of the exponent for the base of the floating-point
+   * @param mantissaSizeWithHiddenBit size of the mantissa (also called a coefficient or
+   *     significand), including the hidden bit.
+   * @return the newly constructed {@link FloatingPointType}.
+   */
+  public static FloatingPointType getFloatingPointTypeFromSizesWithHiddenBit(
+      int exponentSize, int mantissaSizeWithHiddenBit) {
+    checkArgument(
+        mantissaSizeWithHiddenBit > 1,
+        "Mantissa size (including the 'hidden bit') must be greater than 1");
+    return getFloatingPointTypeFromSizesWithoutHiddenBit(
+        exponentSize, mantissaSizeWithHiddenBit - 1);
+  }
+
+  /**
+   * @return a single precision {@link FloatingPointType} with a total size of 32 bits, consisting
+   *     of the sign bit, an exponent sized 8 bits, and a mantissa sized 23 bits (excluding the
+   *     hidden bit).
+   */
   public static FloatingPointType getSinglePrecisionFloatingPointType() {
     return FloatingPointType.SINGLE_PRECISION_FP_TYPE;
   }
 
+  /**
+   * @return a double precision {@link FloatingPointType} with a total size of 64 bits, consisting
+   *     of the sign bit, an exponent sized 11 bits, and a mantissa sized 52 bits (excluding the
+   *     hidden bit).
+   */
   public static FloatingPointType getDoublePrecisionFloatingPointType() {
     return FloatingPointType.DOUBLE_PRECISION_FP_TYPE;
   }
@@ -220,17 +301,24 @@ public abstract class FormulaType<T extends Formula> {
   @Immutable
   public static final class FloatingPointType extends FormulaType<FloatingPointFormula> {
 
+    @SuppressWarnings("removal")
     private static final FloatingPointType SINGLE_PRECISION_FP_TYPE =
-        new FloatingPointType(SINGLE_PRECISION_EXPONENT_SIZE, SINGLE_PRECISION_MANTISSA_SIZE);
+        new FloatingPointType(
+            SINGLE_PRECISION_EXPONENT_SIZE, SINGLE_PRECISION_MANTISSA_SIZE_WITHOUT_HIDDEN_BIT);
+
+    @SuppressWarnings("removal")
     private static final FloatingPointType DOUBLE_PRECISION_FP_TYPE =
-        new FloatingPointType(DOUBLE_PRECISION_EXPONENT_SIZE, DOUBLE_PRECISION_MANTISSA_SIZE);
+        new FloatingPointType(
+            DOUBLE_PRECISION_EXPONENT_SIZE, DOUBLE_PRECISION_MANTISSA_SIZE_WITHOUT_HIDDEN_BIT);
 
     private final int exponentSize;
-    private final int mantissaSize;
+    // The SMTLib2 standard defines the mantissa size as including the hidden bit. We do not include
+    // it here though.
+    private final int mantissaSizeWithoutHiddenBit;
 
-    private FloatingPointType(int pExponentSize, int pMantissaSize) {
+    private FloatingPointType(int pExponentSize, int pMantissaSizeWithoutHiddenBit) {
       exponentSize = pExponentSize;
-      mantissaSize = pMantissaSize;
+      mantissaSizeWithoutHiddenBit = pMantissaSizeWithoutHiddenBit;
     }
 
     @Override
@@ -238,22 +326,57 @@ public abstract class FormulaType<T extends Formula> {
       return true;
     }
 
+    /** Returns the size of the exponent. */
     public int getExponentSize() {
       return exponentSize;
     }
 
+    /**
+     * Returns the size of the mantissa (also called a coefficient or significand), excluding the
+     * hidden bit.
+     *
+     * @deprecated this method can be confusing, as the SMTLIB2 standard expects the mantissa to
+     *     include the hidden bit, but this does not. Use {@link #getMantissaSizeWithoutHiddenBit()}
+     *     instead if you want the mantissa without the hidden bit, and {@link
+     *     #getMantissaSizeWithHiddenBit()} if you want it to include the hidden bit.
+     */
+    @Deprecated(since = "6.0", forRemoval = true)
     public int getMantissaSize() {
-      return mantissaSize;
+      return mantissaSizeWithoutHiddenBit;
     }
 
-    /** Return the total size of a value of this type in bits. */
+    /**
+     * Returns the size of the mantissa (also called a coefficient or significand), excluding the
+     * hidden bit.
+     */
+    public int getMantissaSizeWithoutHiddenBit() {
+      return mantissaSizeWithoutHiddenBit;
+    }
+
+    /**
+     * Returns the size of the mantissa (also called a coefficient or significand), including the
+     * hidden bit.
+     */
+    public int getMantissaSizeWithHiddenBit() {
+      return mantissaSizeWithoutHiddenBit + 1;
+    }
+
+    /**
+     * Return the total bit size of a value of this type (i.e. the precision). Defined by the <a
+     * href="https://smt-lib.org/theories-FloatingPoint.shtml">SMT-LIB2 standard</a> as being equal
+     * to the "size of the exponent + size of the mantissa including the hidden bit". This is equal
+     * to the total size as defined by the <a
+     * href="https://ieeexplore.ieee.org/document/4610935">IEEE 754-2008 floating-point
+     * standard</a>, as being equal to "sign bit + size of the exponent + size of the mantissa
+     * excluding the hidden bit".
+     */
     public int getTotalSize() {
-      return exponentSize + mantissaSize + 1;
+      return exponentSize + getMantissaSizeWithHiddenBit();
     }
 
     @Override
     public int hashCode() {
-      return (31 + exponentSize) * 31 + mantissaSize;
+      return (31 + exponentSize) * 31 + mantissaSizeWithoutHiddenBit;
     }
 
     @Override
@@ -261,21 +384,21 @@ public abstract class FormulaType<T extends Formula> {
       if (this == obj) {
         return true;
       }
-      if (!(obj instanceof FloatingPointType)) {
-        return false;
-      }
-      FloatingPointType other = (FloatingPointType) obj;
-      return this.exponentSize == other.exponentSize && this.mantissaSize == other.mantissaSize;
+      return (obj instanceof FloatingPointType other)
+          && this.exponentSize == other.exponentSize
+          && this.mantissaSizeWithoutHiddenBit == other.mantissaSizeWithoutHiddenBit;
     }
 
     @Override
     public String toString() {
-      return "FloatingPoint<exp=" + exponentSize + ",mant=" + mantissaSize + ">";
+      // We align what we do here with the SMTLIB2 standard, which expects the hidden bit to be part
+      // of the mantissa.
+      return "FloatingPoint<exp=" + exponentSize + ",mant=" + getMantissaSizeWithHiddenBit() + ">";
     }
 
     @Override
     public String toSMTLIBString() {
-      return "(_ FloatingPoint " + exponentSize + " " + mantissaSize + ")";
+      return "(_ FloatingPoint " + exponentSize + " " + getMantissaSizeWithHiddenBit() + ")";
     }
   }
 
@@ -297,8 +420,7 @@ public abstract class FormulaType<T extends Formula> {
 
     @Override
     public String toSMTLIBString() {
-      throw new UnsupportedOperationException(
-          "rounding mode is not expected in symbol declarations");
+      return "RoundingMode";
     }
   }
 
@@ -335,7 +457,7 @@ public abstract class FormulaType<T extends Formula> {
 
     @Override
     public String toString() {
-      return String.format("Array<%s,%s>", indexType, elementType);
+      return "Array<%s,%s>".formatted(indexType, elementType);
     }
 
     @Override
@@ -348,11 +470,9 @@ public abstract class FormulaType<T extends Formula> {
       if (this == obj) {
         return true;
       }
-      if (!(obj instanceof ArrayFormulaType)) {
-        return false;
-      }
-      ArrayFormulaType<?, ?> other = (ArrayFormulaType<?, ?>) obj;
-      return elementType.equals(other.elementType) && indexType.equals(other.indexType);
+      return (obj instanceof ArrayFormulaType<?, ?> other)
+          && elementType.equals(other.elementType)
+          && indexType.equals(other.indexType);
     }
 
     @Override
@@ -394,7 +514,7 @@ public abstract class FormulaType<T extends Formula> {
 
     @Override
     public String toString() {
-      return String.format("%s (%s)", name, Joiner.on(", ").join(elements));
+      return "%s (%s)".formatted(name, Joiner.on(", ").join(elements));
     }
 
     @Override
@@ -407,11 +527,9 @@ public abstract class FormulaType<T extends Formula> {
       if (this == obj) {
         return true;
       }
-      if (!(obj instanceof EnumerationFormulaType)) {
-        return false;
-      }
-      EnumerationFormulaType other = (EnumerationFormulaType) obj;
-      return name.equals(other.name) && elements.equals(other.elements);
+      return (obj instanceof EnumerationFormulaType other)
+          && name.equals(other.name)
+          && elements.equals(other.elements);
     }
 
     @Override
@@ -476,20 +594,55 @@ public abstract class FormulaType<T extends Formula> {
     } else if (FloatingPointRoundingModeType.toString().equals(t)) {
       return FloatingPointRoundingModeType;
     } else if (t.startsWith("FloatingPoint<")) {
-      // FloatingPoint<exp=11,mant=52>
+      // Example: FloatingPoint<exp=11,mant=52>
       List<String> exman = Splitter.on(',').limit(2).splitToList(t.substring(14, t.length() - 1));
-      return FormulaType.getFloatingPointType(
+      // We align what we do here with the SMTLIB2 standard, which expects the hidden bit to be part
+      // of the mantissa.
+      return FormulaType.getFloatingPointTypeFromSizesWithHiddenBit(
           Integer.parseInt(exman.get(0).substring(4)), Integer.parseInt(exman.get(1).substring(5)));
     } else if (t.startsWith("Bitvector<")) {
-      // Bitvector<32>
+      // Example: Bitvector<32>
       return FormulaType.getBitvectorTypeWithSize(
           Integer.parseInt(t.substring(10, t.length() - 1)));
     } else if (t.matches(".*\\(.*\\)")) {
-      // Color (Red, Green, Blue)
+      // Example: Color (Red, Green, Blue)
       String name = t.substring(0, t.indexOf("(") - 1);
       String elementsStr = t.substring(t.indexOf("(") + 1, t.length() - 1);
       Set<String> elements = ImmutableSet.copyOf(Splitter.on(", ").split(elementsStr));
       return new EnumerationFormulaType(name, elements);
+    } else {
+      throw new AssertionError("unknown type:" + t);
+    }
+  }
+
+  public static FormulaType<?> fromSMTLIBString(String t) {
+    if (t.equals("Bool")) {
+      return BooleanType;
+    } else if (t.equals("Int")) {
+      return IntegerType;
+    } else if (t.equals("Real")) {
+      return RationalType;
+    } else if (t.equals("String")) {
+      return StringType;
+    } else if (t.equals("RegLan")) {
+      return RegexType;
+    } else if (t.equals("RoundingMode")) {
+      return FloatingPointRoundingModeType;
+    } else if (t.startsWith("(_ FloatingPoint")) {
+      var m = Pattern.compile("\\(\\s*_\\s+FloatingPoint\\s+(\\d+)\\s+(\\d+)\\s*\\)").matcher(t);
+      checkArgument(m.find());
+      return FormulaType.getFloatingPointTypeFromSizesWithHiddenBit(
+          Integer.parseInt(m.group(1)), Integer.parseInt(m.group(2)));
+    } else if (t.startsWith("(_ BitVec")) {
+      var m = Pattern.compile("\\(\\s*_\\s+BitVec\\s+(\\d+)\\s*\\)").matcher(t);
+      checkArgument(m.find());
+      return FormulaType.getBitvectorTypeWithSize(Integer.parseInt(m.group(1)));
+    } else if (t.startsWith("(Array")) {
+      var tokens = Tokenizer.tokenize(t.substring(1, t.length() - 1));
+      checkArgument(tokens.size() == 3);
+      var domain = fromSMTLIBString(tokens.get(1));
+      var range = fromSMTLIBString(tokens.get(2));
+      return FormulaType.getArrayType(domain, range);
     } else {
       throw new AssertionError("unknown type:" + t);
     }

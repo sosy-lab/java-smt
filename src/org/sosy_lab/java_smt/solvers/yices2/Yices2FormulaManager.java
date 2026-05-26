@@ -9,29 +9,25 @@
 package org.sosy_lab.java_smt.solvers.yices2;
 
 import static com.google.common.base.CharMatcher.inRange;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_APP_TERM;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bvtype_size;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_parse_term;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_term_child;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_term_constructor;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_term_to_string;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_type_children;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_type_is_bitvector;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_type_num_children;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_type_of_term;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_type_to_string;
 
 import com.google.common.base.CharMatcher;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
+import com.google.common.collect.ImmutableList;
+import com.google.common.primitives.Ints;
+import com.sri.yices.Constructor;
+import com.sri.yices.Terms;
+import com.sri.yices.Types;
 import java.io.IOException;
 import java.util.Locale;
 import java.util.Map;
+import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
+import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager;
 
-public class Yices2FormulaManager extends AbstractFormulaManager<Integer, Integer, Long, Integer> {
+class Yices2FormulaManager extends AbstractFormulaManager<Integer, Integer, Long, Integer> {
 
   private static final CharMatcher LETTERS = inRange('a', 'z').or(inRange('A', 'Z'));
   private static final CharMatcher DIGITS = inRange('0', '9');
@@ -39,13 +35,16 @@ public class Yices2FormulaManager extends AbstractFormulaManager<Integer, Intege
   private static final CharMatcher VALID_CHARS =
       LETTERS.or(DIGITS).or(ADDITIONAL_CHARS).precomputed();
 
-  protected Yices2FormulaManager(
+  @SuppressWarnings("checkstyle:parameternumber")
+  Yices2FormulaManager(
       Yices2FormulaCreator pFormulaCreator,
       Yices2UFManager pFunctionManager,
       Yices2BooleanFormulaManager pBooleanManager,
       Yices2IntegerFormulaManager pIntegerManager,
       Yices2RationalFormulaManager pRationalManager,
-      Yices2BitvectorFormulaManager pBitvectorManager) {
+      Yices2BitvectorFormulaManager pBitvectorManager,
+      Yices2QuantifiedFormulaManager pQuantifiedFormulaManager,
+      Yices2ArrayFormulaManager pArrayFormulaManager) {
     super(
         pFormulaCreator,
         pFunctionManager,
@@ -54,8 +53,8 @@ public class Yices2FormulaManager extends AbstractFormulaManager<Integer, Intege
         pRationalManager,
         pBitvectorManager,
         null,
-        null,
-        null,
+        pQuantifiedFormulaManager,
+        pArrayFormulaManager,
         null,
         null,
         null);
@@ -66,17 +65,32 @@ public class Yices2FormulaManager extends AbstractFormulaManager<Integer, Intege
   }
 
   @Override
-  public Integer parseImpl(String pS) throws IllegalArgumentException {
-    // TODO Might expect Yices input language instead of smt-lib2 notation
-    return yices_parse_term(pS);
+  protected Integer equalImpl(Integer pArg1, Integer pArgs) {
+    return Terms.eq(pArg1, pArgs);
+  }
+
+  @Override
+  protected Integer distinctImpl(Iterable<Integer> pArgs) {
+    int[] array = Ints.toArray(ImmutableList.copyOf(pArgs));
+    if (array.length < 2) {
+      return Terms.mkTrue();
+    } else {
+      return Terms.distinct(array);
+    }
+  }
+
+  @Override
+  protected Integer parseImpl(String pSmtScript) throws IllegalArgumentException {
+    // Yices uses its own input language and can't parse smt-lib2
+    throw new UnsupportedOperationException();
   }
 
   /** Helper function to (pretty) print yices2 sorts. */
   private String getTypeRepr(int type) {
-    if (yices_type_is_bitvector(type)) {
-      return "(_ BitVec " + yices_bvtype_size(type) + ")";
+    if (Types.isBitvector(type)) {
+      return "(_ BitVec " + Types.bvSize(type) + ")";
     }
-    String typeRepr = yices_type_to_string(type);
+    String typeRepr = Types.toString(type);
     return typeRepr.substring(0, 1).toUpperCase(Locale.getDefault()) + typeRepr.substring(1);
   }
 
@@ -91,17 +105,17 @@ public class Yices2FormulaManager extends AbstractFormulaManager<Integer, Intege
     for (Map.Entry<String, Formula> entry : varsAndUFs.entrySet()) {
       final int term = ((Yices2Formula) entry.getValue()).getTerm();
       final int type;
-      if (yices_term_constructor(term) == YICES_APP_TERM) {
+      if (Terms.constructor(term) == Constructor.APP_TERM) {
         // Is an UF. Correct type is carried by first child.
-        type = yices_type_of_term(yices_term_child(term, 0));
+        type = Terms.typeOf(Terms.child(term, 0));
       } else {
-        type = yices_type_of_term(term);
+        type = Terms.typeOf(term);
       }
       final int[] types;
-      if (yices_type_num_children(type) == 0) {
+      if (Types.numChildren(type) == 0) {
         types = new int[] {type};
       } else {
-        types = yices_type_children(type); // adds children types and then return type
+        types = Types.children(type); // adds children types and then return type
       }
       if (types.length > 0) {
         out.append("(declare-fun ");
@@ -119,9 +133,17 @@ public class Yices2FormulaManager extends AbstractFormulaManager<Integer, Intege
       }
     }
     // TODO fold formula to avoid exp. overhead
-    out.append("(assert ").append(yices_term_to_string(formula)).append(")");
+    out.append("(assert ").append(Terms.toString(formula, 100000, 1)).append(")");
 
     return out.toString();
+  }
+
+  @Override
+  public BooleanFormula translateFrom(BooleanFormula formula, FormulaManager otherManager) {
+    if (otherManager instanceof Yices2FormulaManager) {
+      return formula;
+    }
+    return super.translateFrom(formula, otherManager);
   }
 
   /**

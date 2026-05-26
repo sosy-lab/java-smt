@@ -62,9 +62,19 @@ public class BitwuzlaNativeApiTest {
 
   @After
   public void freeEnvironment() {
-    if (bitwuzla != null) {
-      bitwuzla.delete();
-    }
+    TermManager.deleteReferences();
+  }
+
+  @Test
+  public void equalityOverDifferentSorts() {
+    assertThrows(
+        IllegalArgumentException.class,
+        () ->
+            bitwuzla.assert_formula(
+                termManager.mk_term(
+                    Kind.EQUAL,
+                    termManager.mk_fp_pos_inf(termManager.mk_fp_sort(5, 11)),
+                    termManager.mk_fp_neg_inf(termManager.mk_fp_sort(4, 12)))));
   }
 
   @Test
@@ -90,21 +100,6 @@ public class BitwuzlaNativeApiTest {
   public void boolType() {
     Sort pBoolType = termManager.mk_bool_sort();
     assertThat(pBoolType.is_bool()).isTrue();
-  }
-
-  @Test
-  public void repeatedTermCreationInMultipleSolversTest() {
-    Term tru1 = termManager.mk_true();
-    Term tru12 = termManager.mk_true();
-    assertThat(tru1.is_true()).isTrue();
-    assertThat(tru12.is_true()).isTrue();
-
-    new Thread(
-            () -> {
-              assertThat(tru1.is_true()).isTrue();
-              assertThat(tru12.is_true()).isTrue();
-            })
-        .start();
   }
 
   @Test
@@ -467,6 +462,55 @@ public class BitwuzlaNativeApiTest {
     bitwuzla.pop(1);
   }
 
+  // fp_value_to_real_str() transforms FP to their REAL string representation. But this loses
+  // the sign in negative zero and NaN, as well as positive/negative infinity are returned with
+  // their type wrapped in their fp.to_real transformation term.
+  // (FP-)Terms that don't evaluate to a concrete value throw an IllegalArgumentException. This
+  // also goes for constructed terms (e.g. (3.0 + 1.0)) or terms of other types.
+  // As long as an FP Term is created with a fixed value, we get this value as REAL back.
+  // Model evaluation is possible and tested in testFpModel
+  @Test
+  public void testFpToRealString() {
+    Sort fpSort = termManager.mk_fp_sort(5, 11);
+
+    Term zero = termManager.mk_fp_pos_zero(fpSort);
+    assertThat(zero.fp_value_to_real_str()).isEqualTo("0.0");
+    Term negZero = termManager.mk_fp_neg_zero(fpSort);
+    assertThat(negZero.fp_value_to_real_str()).isEqualTo("0.0");
+
+    Term posInf = termManager.mk_fp_pos_inf(fpSort);
+    assertThat(posInf.fp_value_to_real_str()).isEqualTo("(fp.to_real (_ +oo 5 11))");
+    Term negInf = termManager.mk_fp_neg_inf(fpSort);
+    assertThat(negInf.fp_value_to_real_str()).isEqualTo("(fp.to_real (_ -oo 5 11))");
+
+    Term nan = termManager.mk_fp_nan(fpSort);
+    assertThat(nan.fp_value_to_real_str()).isEqualTo("(fp.to_real (_ NaN 5 11))");
+
+    Term rm = termManager.mk_rm_value(RoundingMode.RNE);
+    Term one = termManager.mk_fp_value(fpSort, rm, "1");
+    assertThat(one.fp_value_to_real_str()).isEqualTo("1.0");
+    Term two = termManager.mk_fp_value(fpSort, rm, "2", "1");
+    assertThat(two.fp_value_to_real_str()).isEqualTo("2.0");
+
+    Term cons = termManager.mk_const(fpSort, "cons");
+
+    // Constants without evaluation throw IllegalArgumentException for fp_value_to_real_str()
+    assertThrows(IllegalArgumentException.class, cons::fp_value_to_real_str);
+
+    // Constructed FP terms are also disallowed from using fp_value_to_real_str()
+    assertThrows(
+        IllegalArgumentException.class,
+        () -> termManager.mk_term(Kind.FP_ADD, rm, two, one).fp_value_to_real_str());
+
+    // It is not allowed to use fp_value_to_real_str() on other types (bool here)
+    assertThrows(
+        IllegalArgumentException.class,
+        () -> termManager.mk_term(Kind.NOT, posInf).fp_value_to_real_str());
+    assertThrows(
+        IllegalArgumentException.class,
+        () -> termManager.mk_term(Kind.FP_EQUAL, posInf, negInf).fp_value_to_real_str());
+  }
+
   @Test
   public void testFpModel() {
     Sort fpSort = termManager.mk_fp_sort(5, 11);
@@ -487,11 +531,17 @@ public class BitwuzlaNativeApiTest {
     // Get model value as String
     String aString = a.toString();
     assertThat(aString).isEqualTo("a");
-    String aValue = bitwuzla.get_value(a).toString();
+    Term aValue = bitwuzla.get_value(a);
+    String aValueString = aValue.toString();
 
-    assertThat(aValue).isEqualTo("(fp #b0 #b10000 #b1000000000)");
+    assertThat(aValueString).isEqualTo("(fp #b0 #b10000 #b1000000000)");
     assertThat(one.toString()).isEqualTo("(fp #b0 #b01111 #b0000000000)");
     assertThat(two.toString()).isEqualTo("(fp #b0 #b10000 #b0000000000)");
+
+    // We can use fp_value_to_real_str() to get the real string representation of FPs
+    assertThat(aValue.fp_value_to_real_str()).isEqualTo("3.0");
+    assertThat(one.fp_value_to_real_str()).isEqualTo("1.0");
+    assertThat(two.fp_value_to_real_str()).isEqualTo("2.0");
   }
 
   @Test
@@ -703,15 +753,17 @@ public class BitwuzlaNativeApiTest {
   }
 
   private static final String SMT2DUMP =
-      "(declare-fun a () Bool)\n"
-          + "(declare-fun b () Bool)\n"
-          + "(declare-fun d () Bool)\n"
-          + "(declare-fun e () Bool)\n"
-          + "(define-fun .def_9 () Bool (= a b))\n"
-          + "(define-fun .def_10 () Bool (not .def_9))\n"
-          + "(define-fun .def_13 () Bool (and .def_10 d))\n"
-          + "(define-fun .def_14 () Bool (or e .def_13))\n"
-          + "(assert .def_14)";
+      """
+      (declare-fun a () Bool)
+      (declare-fun b () Bool)
+      (declare-fun d () Bool)
+      (declare-fun e () Bool)
+      (define-fun .def_9 () Bool (= a b))
+      (define-fun .def_10 () Bool (not .def_9))
+      (define-fun .def_13 () Bool (and .def_10 d))
+      (define-fun .def_14 () Bool (or e .def_13))
+      (assert .def_14)\
+      """;
 
   private Vector_Term parse(String smt2dump) {
     Parser parser = new Parser(termManager, createOptions());

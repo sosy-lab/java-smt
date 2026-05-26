@@ -10,6 +10,7 @@ package org.sosy_lab.java_smt.solvers.cvc4;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkState;
+import static org.sosy_lab.java_smt.api.FormulaType.getFloatingPointTypeFromSizesWithoutHiddenBit;
 import static org.sosy_lab.java_smt.basicimpl.AbstractStringFormulaManager.unescapeUnicodeForSmtlib;
 
 import com.google.common.base.Preconditions;
@@ -18,14 +19,13 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
 import com.google.common.primitives.Ints;
 import edu.stanford.CVC4.ArrayStoreAll;
-import edu.stanford.CVC4.ArrayType;
-import edu.stanford.CVC4.BitVectorType;
 import edu.stanford.CVC4.Expr;
 import edu.stanford.CVC4.ExprManager;
 import edu.stanford.CVC4.FunctionType;
 import edu.stanford.CVC4.Integer;
 import edu.stanford.CVC4.Kind;
 import edu.stanford.CVC4.Rational;
+import edu.stanford.CVC4.RoundingMode;
 import edu.stanford.CVC4.Type;
 import edu.stanford.CVC4.vectorExpr;
 import edu.stanford.CVC4.vectorType;
@@ -41,6 +41,8 @@ import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.FloatingPointFormula;
 import org.sosy_lab.java_smt.api.FloatingPointNumber;
 import org.sosy_lab.java_smt.api.FloatingPointNumber.Sign;
+import org.sosy_lab.java_smt.api.FloatingPointRoundingMode;
+import org.sosy_lab.java_smt.api.FloatingPointRoundingModeFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.ArrayFormulaType;
@@ -52,6 +54,7 @@ import org.sosy_lab.java_smt.api.StringFormula;
 import org.sosy_lab.java_smt.api.visitors.FormulaVisitor;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 import org.sosy_lab.java_smt.basicimpl.FunctionDeclarationImpl;
+import org.sosy_lab.java_smt.basicimpl.Tokenizer;
 import org.sosy_lab.java_smt.solvers.cvc4.CVC4Formula.CVC4ArrayFormula;
 import org.sosy_lab.java_smt.solvers.cvc4.CVC4Formula.CVC4BitvectorFormula;
 import org.sosy_lab.java_smt.solvers.cvc4.CVC4Formula.CVC4BooleanFormula;
@@ -62,7 +65,7 @@ import org.sosy_lab.java_smt.solvers.cvc4.CVC4Formula.CVC4RationalFormula;
 import org.sosy_lab.java_smt.solvers.cvc4.CVC4Formula.CVC4RegexFormula;
 import org.sosy_lab.java_smt.solvers.cvc4.CVC4Formula.CVC4StringFormula;
 
-public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, Expr> {
+class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, Expr> {
 
   private static final Pattern FLOATING_POINT_PATTERN =
       Pattern.compile("^\\(fp #b(?<sign>\\d) #b(?<exp>\\d+) #b(?<mant>\\d+)$");
@@ -71,7 +74,7 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
   private final Map<String, Expr> functionsCache = new HashMap<>();
   private final ExprManager exprManager;
 
-  protected CVC4FormulaCreator(ExprManager pExprManager) {
+  CVC4FormulaCreator(ExprManager pExprManager) {
     super(
         pExprManager,
         pExprManager.booleanType(),
@@ -114,7 +117,7 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
   @Override
   public Type getFloatingPointType(FloatingPointType pType) {
     return exprManager.mkFloatingPointType(
-        pType.getExponentSize(), pType.getMantissaSize() + 1); // plus sign bit
+        pType.getExponentSize(), pType.getMantissaSizeWithHiddenBit());
   }
 
   @Override
@@ -144,26 +147,13 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
   @SuppressWarnings("unchecked")
   @Override
   public <T extends Formula> FormulaType<T> getFormulaType(T pFormula) {
-    Type t = extractInfo(pFormula).getType();
-    if (pFormula instanceof BitvectorFormula) {
-      checkArgument(t.isBitVector(), "BitvectorFormula with actual type %s: %s", t, pFormula);
+    if (pFormula instanceof BitvectorFormula
+        || pFormula instanceof FloatingPointFormula
+        || pFormula instanceof ArrayFormula) {
       return (FormulaType<T>) getFormulaType(extractInfo(pFormula));
-
-    } else if (pFormula instanceof FloatingPointFormula) {
-      checkArgument(
-          t.isFloatingPoint(), "FloatingPointFormula with actual type %s: %s", t, pFormula);
-      edu.stanford.CVC4.FloatingPointType fpType = new edu.stanford.CVC4.FloatingPointType(t);
-      return (FormulaType<T>)
-          FormulaType.getFloatingPointType(
-              (int) fpType.getExponentSize(),
-              (int) fpType.getSignificandSize() - 1); // without sign bit
-
-    } else if (pFormula instanceof ArrayFormula<?, ?>) {
-      FormulaType<T> arrayIndexType = getArrayFormulaIndexType((ArrayFormula<T, T>) pFormula);
-      FormulaType<T> arrayElementType = getArrayFormulaElementType((ArrayFormula<T, T>) pFormula);
-      return (FormulaType<T>) FormulaType.getArrayType(arrayIndexType, arrayElementType);
+    } else {
+      return super.getFormulaType(pFormula);
     }
-    return super.getFormulaType(pFormula);
   }
 
   @Override
@@ -176,33 +166,16 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
       return FormulaType.BooleanType;
     } else if (t.isInteger()) {
       return FormulaType.IntegerType;
-    } else if (t.isBitVector()) {
-      // apparently, we can get a t instanceof Type here for that t instanceof BitVectorType does
-      // not hold, hence we use the new BitVectorType(t) here as a workaround:
-      return FormulaType.getBitvectorTypeWithSize((int) new BitVectorType(t).getSize());
-    } else if (t.isFloatingPoint()) {
-      edu.stanford.CVC4.FloatingPointType fpType = new edu.stanford.CVC4.FloatingPointType(t);
-      return FormulaType.getFloatingPointType(
-          (int) fpType.getExponentSize(),
-          (int) fpType.getSignificandSize() - 1); // without sign bit
-    } else if (t.isRoundingMode()) {
-      return FormulaType.FloatingPointRoundingModeType;
     } else if (t.isReal()) {
       // The theory REAL in CVC4 is the theory of (infinite precision!) real numbers.
       // As such, the theory RATIONAL is contained in REAL. TODO: find a better solution.
       return FormulaType.RationalType;
-    } else if (t.isArray()) {
-      ArrayType arrayType = new ArrayType(t); // instead of casting, create a new type.
-      FormulaType<?> indexType = getFormulaTypeFromTermType(arrayType.getIndexType());
-      FormulaType<?> elementType = getFormulaTypeFromTermType(arrayType.getConstituentType());
-      return FormulaType.getArrayType(indexType, elementType);
     } else if (t.isString()) {
       return FormulaType.StringType;
     } else if (t.isRegExp()) {
       return FormulaType.RegexType;
     } else {
-      throw new AssertionError(
-          String.format("Unhandled type '%s' with base type '%s'.", t, t.getBaseType()));
+      return FormulaType.fromSMTLIBString(t.toString());
     }
   }
 
@@ -212,9 +185,8 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
     assert pType.equals(getFormulaType(pTerm))
             || (pType.equals(FormulaType.RationalType)
                 && getFormulaType(pTerm).equals(FormulaType.IntegerType))
-        : String.format(
-            "Trying to encapsulate formula %s of type %s as %s",
-            pTerm, getFormulaType(pTerm), pType);
+        : "Trying to encapsulate formula %s of type %s as %s"
+            .formatted(pTerm, getFormulaType(pTerm), pType);
     if (pType.isBooleanType()) {
       return (T) new CVC4BooleanFormula(pTerm);
     } else if (pType.isIntegerType()) {
@@ -245,23 +217,30 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
   @Override
   public BooleanFormula encapsulateBoolean(Expr pTerm) {
     assert getFormulaType(pTerm).isBooleanType()
-        : String.format(
-            "%s is not boolean, but %s (%s)", pTerm, pTerm.getType(), getFormulaType(pTerm));
+        : "%s is not boolean, but %s (%s)".formatted(pTerm, pTerm.getType(), getFormulaType(pTerm));
     return new CVC4BooleanFormula(pTerm);
   }
 
   @Override
   public BitvectorFormula encapsulateBitvector(Expr pTerm) {
     assert getFormulaType(pTerm).isBitvectorType()
-        : String.format("%s is no BV, but %s (%s)", pTerm, pTerm.getType(), getFormulaType(pTerm));
+        : "%s is no BV, but %s (%s)".formatted(pTerm, pTerm.getType(), getFormulaType(pTerm));
     return new CVC4BitvectorFormula(pTerm);
   }
 
   @Override
   protected FloatingPointFormula encapsulateFloatingPoint(Expr pTerm) {
     assert getFormulaType(pTerm).isFloatingPointType()
-        : String.format("%s is no FP, but %s (%s)", pTerm, pTerm.getType(), getFormulaType(pTerm));
+        : "%s is no FP, but %s (%s)".formatted(pTerm, pTerm.getType(), getFormulaType(pTerm));
     return new CVC4FloatingPointFormula(pTerm);
+  }
+
+  @Override
+  protected FloatingPointRoundingModeFormula encapsulateRoundingMode(Expr pTerm) {
+    assert getFormulaType(pTerm).isFloatingPointRoundingModeType()
+        : "%s is no FP rounding mode, but %s (%s)"
+            .formatted(pTerm, pTerm.getType(), getFormulaType(pTerm));
+    return new CVC4FloatingPointRoundingModeFormula(pTerm);
   }
 
   @Override
@@ -269,16 +248,14 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
   protected <TI extends Formula, TE extends Formula> ArrayFormula<TI, TE> encapsulateArray(
       Expr pTerm, FormulaType<TI> pIndexType, FormulaType<TE> pElementType) {
     assert getFormulaType(pTerm).equals(FormulaType.getArrayType(pIndexType, pElementType))
-        : String.format(
-            "%s is no array, but %s (%s)", pTerm, pTerm.getType(), getFormulaType(pTerm));
+        : "%s is no array, but %s (%s)".formatted(pTerm, pTerm.getType(), getFormulaType(pTerm));
     return new CVC4ArrayFormula<>(pTerm, pIndexType, pElementType);
   }
 
   @Override
   protected StringFormula encapsulateString(Expr pTerm) {
     assert getFormulaType(pTerm).isStringType()
-        : String.format(
-            "%s is no String, but %s (%s)", pTerm, pTerm.getType(), getFormulaType(pTerm));
+        : "%s is no String, but %s (%s)".formatted(pTerm, pTerm.getType(), getFormulaType(pTerm));
     return new CVC4StringFormula(pTerm);
   }
 
@@ -288,14 +265,15 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
     return new CVC4RegexFormula(pTerm);
   }
 
-  private static String getName(Expr e) {
+  static String getName(Expr e) {
     checkState(!e.isNull());
     if (!e.isConst() && !e.isVariable()) {
       e = e.getOperator();
     }
-    return dequote(e.toString());
+    return Tokenizer.dequote(e.toString());
   }
 
+  @SuppressWarnings("deprecation")
   @Override
   public <R> R visit(FormulaVisitor<R> visitor, Formula formula, final Expr f) {
     checkState(!f.isNull());
@@ -322,10 +300,9 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
       } else if (type.isFloatingPoint()) {
         return visitor.visitConstant(formula, convertFloatingPoint(f));
       } else if (type.isRoundingMode()) {
-        // TODO is this correct?
-        return visitor.visitConstant(formula, f.getConstRoundingMode());
+        return visitor.visitConstant(formula, getRoundingMode(f));
       } else if (type.isString()) {
-        return visitor.visitConstant(formula, f.getConstString());
+        return visitor.visitConstant(formula, f.getConstString().toString());
       } else if (type.isArray()) {
         ArrayStoreAll storeAll = f.getConstArrayStoreAll();
         Expr constant = storeAll.getExpr();
@@ -368,14 +345,18 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
       assert f.getKind() != Kind.BOUND_VARIABLE;
       return visitor.visitFreeVariable(formula, getName(f));
 
+    } else if (f.getKind() == Kind.SEP_NIL) {
+      return visitor.visitConstant(formula, null);
+
     } else {
       // Expressions like uninterpreted function calls (Kind.APPLY_UF) or operators (e.g. Kind.AND).
       // These are all treated like operators, so we can get the declaration by f.getOperator()!
       List<Formula> args = ImmutableList.copyOf(Iterables.transform(f, this::encapsulate));
       List<FormulaType<?>> argsTypes = new ArrayList<>();
       Expr operator = normalize(f.getOperator());
-      if (operator.getType().isFunction()) {
-        vectorType argTypes = new FunctionType(operator.getType()).getArgTypes();
+      if (operator.getType().isFunction()
+          && operator.getType() instanceof FunctionType functionType) {
+        vectorType argTypes = functionType.getArgTypes();
         for (int i = 0; i < argTypes.size(); i++) {
           argsTypes.add(getFormulaTypeFromTermType(argTypes.get(i)));
         }
@@ -437,6 +418,7 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
           .put(Kind.LEQ, FunctionDeclarationKind.LTE)
           .put(Kind.GT, FunctionDeclarationKind.GT)
           .put(Kind.GEQ, FunctionDeclarationKind.GTE)
+          .put(Kind.INT_TO_BITVECTOR, FunctionDeclarationKind.INT_TO_BV)
           // Bitvector theory
           .put(Kind.BITVECTOR_PLUS, FunctionDeclarationKind.BV_ADD)
           .put(Kind.BITVECTOR_SUB, FunctionDeclarationKind.BV_SUB)
@@ -466,6 +448,7 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
           .put(Kind.BITVECTOR_NEG, FunctionDeclarationKind.BV_NEG)
           .put(Kind.BITVECTOR_EXTRACT, FunctionDeclarationKind.BV_EXTRACT)
           .put(Kind.BITVECTOR_CONCAT, FunctionDeclarationKind.BV_CONCAT)
+          .put(Kind.BITVECTOR_TO_NAT, FunctionDeclarationKind.UBV_TO_INT)
           .put(Kind.BITVECTOR_SIGN_EXTEND, FunctionDeclarationKind.BV_SIGN_EXTENSION)
           .put(Kind.BITVECTOR_ZERO_EXTEND, FunctionDeclarationKind.BV_ZERO_EXTENSION)
           // Floating-point theory
@@ -529,6 +512,12 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
           .put(Kind.SELECT, FunctionDeclarationKind.SELECT)
           .put(Kind.STORE, FunctionDeclarationKind.STORE)
           .put(Kind.STORE_ALL, FunctionDeclarationKind.CONST)
+          // Separation logic
+          .put(Kind.SEP_EMP, FunctionDeclarationKind.SEP_EMP)
+          .put(Kind.SEP_NIL, FunctionDeclarationKind.SEP_NIL)
+          .put(Kind.SEP_PTO, FunctionDeclarationKind.SEP_PTO)
+          .put(Kind.SEP_STAR, FunctionDeclarationKind.SEP_STAR)
+          .put(Kind.SEP_WAND, FunctionDeclarationKind.SEP_WAND)
           .buildOrThrow();
 
   private FunctionDeclarationKind getDeclarationKind(Expr f) {
@@ -556,26 +545,41 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
   @Override
   public Expr callFunctionImpl(Expr pDeclaration, List<Expr> pArgs) {
     if (pArgs.isEmpty()) {
-      return exprManager.mkExpr(pDeclaration);
-    } else {
-      vectorExpr args = new vectorExpr();
-      for (Expr expr : pArgs) {
-        args.add(expr);
+      if (exprManager.getType(pDeclaration).isFunction()) {
+        // Builtin operator
+        return exprManager.mkExpr(pDeclaration);
+      } else {
+        // Uf
+        return pDeclaration;
       }
-      return exprManager.mkExpr(pDeclaration, args);
+    } else {
+      return exprManager.mkExpr(pDeclaration, new vectorExpr(exprManager, pArgs));
     }
   }
 
   @Override
   public Expr declareUFImpl(String pName, Type pReturnType, List<Type> pArgTypes) {
+    if (pArgTypes.isEmpty()) {
+      return makeVariable(pReturnType, pName);
+    }
     Expr exp = functionsCache.get(pName);
     if (exp == null) {
-      vectorType args = new vectorType();
-      for (Type t : pArgTypes) {
-        args.add(t);
-      }
-      exp = exprManager.mkVar(pName, exprManager.mkFunctionType(args, pReturnType));
+      exp =
+          exprManager.mkVar(
+              pName,
+              exprManager.mkFunctionType(new vectorType(exprManager, pArgTypes), pReturnType));
       functionsCache.put(pName, exp);
+    } else {
+      // We can't cast the cached type to FormulaType, even though it is a function type, due to a
+      // bug in the CVC4 Java bindings. As a workaround we create another function type for the
+      // current arguments and then compare it to the type from the cache
+      var argumentType =
+          exprManager.mkFunctionType(new vectorType(exprManager, pArgTypes), pReturnType);
+      var cachedType = exp.getType();
+      Preconditions.checkArgument(
+          cachedType.equals(argumentType),
+          "Function %s already defined with different types or a different number of arguments",
+          pName);
     }
     return exp;
   }
@@ -612,6 +616,9 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
     } else if (valueType.isFloatingPoint()) {
       return convertFloatingPoint(value);
 
+    } else if (valueType.isRoundingMode()) {
+      return getRoundingMode(value);
+
     } else if (valueType.isString()) {
       return unescapeUnicodeForSmtlib(value.getConstString().toString());
 
@@ -630,7 +637,8 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
     final var fp = fpExpr.getConstFloatingPoint();
     final var fpType = fp.getT();
     final var expWidth = Ints.checkedCast(fpType.exponentWidth());
-    final var mantWidth = Ints.checkedCast(fpType.significandWidth() - 1); // without sign bit
+    // CVC4 returns the mantissa with the hidden bit, hence - 1
+    final var mantWidthWithoutHiddenBit = Ints.checkedCast(fpType.significandWidth() - 1);
 
     final var sign = matcher.group("sign");
     final var exp = matcher.group("exp");
@@ -638,13 +646,34 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
 
     Preconditions.checkArgument("1".equals(sign) || "0".equals(sign));
     Preconditions.checkArgument(exp.length() == expWidth);
-    Preconditions.checkArgument(mant.length() == mantWidth);
+    Preconditions.checkArgument(mant.length() == mantWidthWithoutHiddenBit);
 
     return FloatingPointNumber.of(
         Sign.of(sign.charAt(0) == '1'),
         new BigInteger(exp, 2),
         new BigInteger(mant, 2),
-        expWidth,
-        mantWidth);
+        getFloatingPointTypeFromSizesWithoutHiddenBit(expWidth, mantWidthWithoutHiddenBit));
+  }
+
+  @Override
+  protected FloatingPointRoundingMode getRoundingMode(Expr pExpr) {
+    checkArgument(
+        pExpr.isConst() && pExpr.getType().isRoundingMode(),
+        "Expected a constant rounding mode, but got: %s",
+        pExpr);
+    RoundingMode rm = pExpr.getConstRoundingMode();
+    if (rm.equals(RoundingMode.roundNearestTiesToAway)) {
+      return FloatingPointRoundingMode.NEAREST_TIES_AWAY;
+    } else if (rm.equals(RoundingMode.roundNearestTiesToEven)) {
+      return FloatingPointRoundingMode.NEAREST_TIES_TO_EVEN;
+    } else if (rm.equals(RoundingMode.roundTowardNegative)) {
+      return FloatingPointRoundingMode.TOWARD_NEGATIVE;
+    } else if (rm.equals(RoundingMode.roundTowardPositive)) {
+      return FloatingPointRoundingMode.TOWARD_POSITIVE;
+    } else if (rm.equals(RoundingMode.roundTowardZero)) {
+      return FloatingPointRoundingMode.TOWARD_ZERO;
+    } else {
+      throw new IllegalArgumentException("Unknown rounding mode in Term '%s'.".formatted(pExpr));
+    }
   }
 }

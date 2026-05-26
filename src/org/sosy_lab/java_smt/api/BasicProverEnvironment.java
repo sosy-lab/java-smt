@@ -24,10 +24,14 @@ import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 public interface BasicProverEnvironment<T> extends AutoCloseable {
 
   String NO_MODEL_HELP = "Model computation failed. Are the pushed formulae satisfiable?";
+  String ASSUMPTION_SOLVING_NOT_SUPPORTED = "Solving with assumptions is not supported.";
+  String UNSAT_CORE_NOT_SUPPORTED = "Unsat core extraction is not supported.";
+  String UNSAT_CORE_WITH_ASSUMPTIONS_NOT_SUPPORTED =
+      "Unsat core with assumptions is not supported.";
 
   /**
    * Push a backtracking point and add a formula to the current stack, asserting it. The return
-   * value may be used to identify this formula later on in a query (this depends on the sub-type of
+   * value may be used to identify this formula later on in a query (this depends on the subtype of
    * the environment).
    */
   @Nullable
@@ -80,12 +84,21 @@ public interface BasicProverEnvironment<T> extends AutoCloseable {
 
   /**
    * Get a satisfying assignment. This method should be called only immediately after an {@link
-   * #isUnsat()} call that returned <code>false</code>. The returned model is guaranteed to stay
-   * constant and valid as long as the solver context is available, even if constraints are added
-   * to, pushed or popped from the prover stack.
+   * #isUnsat()} call that returned <code>false</code>.
    *
-   * <p>A model might contain additional symbols with their evaluation, if a solver uses its own
-   * temporary symbols. There should be at least a value-assignment for each free symbol.
+   * <p>Some solvers (such as MathSAT or Z3) guarantee that a model stays constant and valid as long
+   * as the solver context is available, even if constraints are added to, pushed or popped from the
+   * prover stack. If the solver does not provide this guarantee, the model will be invalidated by
+   * the next such operation, and using it will lead to an exception.
+   *
+   * <p>A model might not provide values for all symbols known to the solver, but it should at least
+   * provide values for all free symbols occurring in the asserted formulas. For other symbols, the
+   * behavior is solver-dependent, e.g., the model might provide default values or leave them
+   * undefined. For uninterpreted functions, the model should provide values for all instantiations.
+   * For arrays, the model should provide values for all accessed indices. For both, uninterpreted
+   * functions and arrays, some solvers do not provide all instantiations, but only most of them. A
+   * model might contain additional symbols with their evaluation, if a solver uses its own
+   * temporary symbols.
    */
   Model getModel() throws SolverException;
 
@@ -114,16 +127,24 @@ public interface BasicProverEnvironment<T> extends AutoCloseable {
   }
 
   /**
-   * Get an unsat core. This should be called only immediately after an {@link #isUnsat()} call that
-   * returned <code>false</code>.
+   * Get an unsat core.
+   *
+   * <p>This should be called only immediately after an {@link #isUnsat()} call that returned <code>
+   * false</code>. Requires the {@link ProverOptions#GENERATE_UNSAT_CORE} option to work.
    */
   List<BooleanFormula> getUnsatCore();
 
   /**
    * Returns an UNSAT core (if it exists, otherwise {@code Optional.empty()}), over the chosen
-   * assumptions. Does NOT require the {@link ProverOptions#GENERATE_UNSAT_CORE} option to work.
+   * assumptions. Neither {@link #isUnsat()}, nor {@link #isUnsatWithAssumptions(Collection)} needs
+   * to be called before using this method, as {@link #isUnsatWithAssumptions(Collection)} is
+   * automatically called with the given assumptions.
    *
-   * @param assumptions Selected assumptions
+   * <p>Requires the {@link ProverOptions#GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS} option to work.
+   * {@link ProverOptions#GENERATE_UNSAT_CORE} is not needed, but both options can be safely
+   * combined.
+   *
+   * @param assumptions Selected assumptions.
    * @return Empty optional if the constraints with assumptions are satisfiable, subset of
    *     assumptions which is unsatisfiable with the original constraints otherwise.
    */

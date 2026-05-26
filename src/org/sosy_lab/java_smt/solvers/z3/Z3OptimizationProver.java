@@ -8,6 +8,8 @@
 
 package org.sosy_lab.java_smt.solvers.z3;
 
+import static com.google.common.base.Preconditions.checkState;
+
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import com.microsoft.z3.Native;
@@ -67,13 +69,12 @@ class Z3OptimizationProver extends Z3AbstractProver implements OptimizationProve
 
   @Override
   public int minimize(Formula objective) {
-    Preconditions.checkState(!closed);
+    checkState(!closed);
     return Native.optimizeMinimize(z3context, z3optSolver, creator.extractInfo(objective));
   }
 
   @Override
-  public OptStatus check() throws InterruptedException, SolverException {
-    Preconditions.checkState(!closed);
+  protected OptStatus checkImpl() throws InterruptedException, SolverException {
     int status;
     try {
       status =
@@ -132,8 +133,7 @@ class Z3OptimizationProver extends Z3AbstractProver implements OptimizationProve
   }
 
   @Override
-  public boolean isUnsat() throws SolverException, InterruptedException {
-    Preconditions.checkState(!closed);
+  protected boolean isUnsatImpl() throws SolverException, InterruptedException {
     logSolverStack();
     return check() == OptStatus.UNSAT;
   }
@@ -141,16 +141,20 @@ class Z3OptimizationProver extends Z3AbstractProver implements OptimizationProve
   @Override
   public boolean isUnsatWithAssumptions(Collection<BooleanFormula> assumptions)
       throws SolverException, InterruptedException {
-    return false;
+    throw new UnsupportedOperationException(ASSUMPTION_SOLVING_NOT_SUPPORTED);
   }
 
   @Override
   public Optional<Rational> upper(int handle, Rational epsilon) {
+    checkState(!closed);
+    checkGenerateModels();
     return round(handle, epsilon, Native::optimizeGetUpperAsVector);
   }
 
   @Override
   public Optional<Rational> lower(int handle, Rational epsilon) {
+    checkState(!closed);
+    checkGenerateModels();
     return round(handle, epsilon, Native::optimizeGetLowerAsVector);
   }
 

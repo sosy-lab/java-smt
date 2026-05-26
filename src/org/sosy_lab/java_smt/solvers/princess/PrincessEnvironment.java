@@ -22,10 +22,8 @@ import ap.parser.IFormula;
 import ap.parser.IFunApp;
 import ap.parser.IFunction;
 import ap.parser.IIntFormula;
-import ap.parser.IPlus;
 import ap.parser.ITerm;
-import ap.parser.ITermITE;
-import ap.parser.ITimes;
+import ap.parser.Parser2InputAbsy.ParseException;
 import ap.parser.Parser2InputAbsy.TranslationException;
 import ap.parser.PartialEvaluator;
 import ap.parser.SMTLineariser;
@@ -33,6 +31,7 @@ import ap.parser.SMTParser2InputAbsy.SMTFunctionType;
 import ap.parser.SMTTypes.SMTType;
 import ap.terfor.ConstantTerm;
 import ap.terfor.preds.Predicate;
+import ap.theories.ADT.ADTProxySort;
 import ap.theories.arrays.ExtArray;
 import ap.theories.arrays.ExtArray.ArraySort;
 import ap.theories.bitvectors.ModuloArithmetic;
@@ -58,7 +57,6 @@ import java.lang.reflect.Method;
 import java.nio.file.Path;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -69,7 +67,6 @@ import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
 import java.util.TreeMap;
-import java.util.stream.Collectors;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.Appender;
 import org.sosy_lab.common.Appenders;
@@ -82,6 +79,7 @@ import org.sosy_lab.common.configuration.Options;
 import org.sosy_lab.common.io.PathCounterTemplate;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
+import org.sosy_lab.java_smt.solvers.princess.PrincessFunctionDeclaration.PrincessIFunctionDeclaration;
 import ostrich.OFlags;
 import ostrich.OstrichStringTheory;
 import scala.Tuple2;
@@ -175,7 +173,7 @@ class PrincessEnvironment {
 
   private final Map<String, ITerm> sortedVariablesCache = new HashMap<>();
 
-  private final Map<String, IFunction> functionsCache = new HashMap<>();
+  private final Map<String, PrincessIFunctionDeclaration> functionsCache = new HashMap<>();
 
   private final int randomSeed;
   private final @Nullable PathCounterTemplate basicLogfile;
@@ -222,7 +220,7 @@ class PrincessEnvironment {
     // add all symbols, that are available until now
     boolVariablesCache.values().forEach(newApi::addBooleanVariable);
     sortedVariablesCache.values().forEach(newApi::addConstant);
-    functionsCache.values().forEach(newApi::addFunction);
+    functionsCache.values().forEach(p -> newApi.addFunction(p.getFunction()));
 
     PrincessAbstractProver<?> prover;
     if (useForInterpolation) {
@@ -317,7 +315,7 @@ class PrincessEnvironment {
 
     try {
       parserResult = extractFromSTMLIB(s);
-    } catch (TranslationException | EnvironmentException nested) {
+    } catch (TranslationException | EnvironmentException | ParseException nested) {
       throw new IllegalArgumentException(nested);
     }
 
@@ -328,15 +326,15 @@ class PrincessEnvironment {
       declaredFunctions.addAll(creator.extractVariablesAndUFs(f, true).values());
     }
     for (IExpression var : declaredFunctions.build()) {
-      if (var instanceof IConstant) {
-        sortedVariablesCache.put(((IConstant) var).c().name(), (ITerm) var);
-        addSymbol((IConstant) var);
-      } else if (var instanceof IAtom) {
-        boolVariablesCache.put(((IAtom) var).pred().name(), (IFormula) var);
-        addSymbol((IAtom) var);
-      } else if (var instanceof IFunApp) {
-        IFunction fun = ((IFunApp) var).fun();
-        functionsCache.put(fun.name(), fun);
+      if (var instanceof IConstant iConstant) {
+        sortedVariablesCache.put(iConstant.c().name(), iConstant);
+        addSymbol(iConstant);
+      } else if (var instanceof IAtom iAtom) {
+        boolVariablesCache.put(iAtom.pred().name(), iAtom);
+        addSymbol(iAtom);
+      } else if (var instanceof IFunApp app) {
+        IFunction fun = app.fun();
+        functionsCache.put(fun.name(), new PrincessIFunctionDeclaration(app));
         addFunction(fun);
       }
     }
@@ -349,6 +347,7 @@ class PrincessEnvironment {
    *
    * @throws EnvironmentException from Princess when the parsing fails
    * @throws TranslationException from Princess when the parsing fails due to type mismatch
+   * @throws ParseException from Princess when the parsing fails due to syntax errors
    */
   /* EnvironmentException is not unused, but the Java compiler does not like Scala. */
   @SuppressWarnings("unused")
@@ -357,7 +356,8 @@ class PrincessEnvironment {
           scala.collection.immutable.Map<IFunction, SMTFunctionType>,
           scala.collection.immutable.Map<ConstantTerm, SMTType>,
           scala.collection.immutable.Map<Predicate, SMTFunctionType>>
-      extractFromSTMLIB(String s) throws EnvironmentException, TranslationException {
+      extractFromSTMLIB(String s)
+          throws EnvironmentException, TranslationException, ParseException {
     // replace let-terms and function definitions by their full term.
     final boolean fullyInlineLetsAndFunctions = true;
     return api.extractSMTLIBAssertionsSymbols(new StringReader(s), fullyInlineLetsAndFunctions);
@@ -370,7 +370,6 @@ class PrincessEnvironment {
    * Exception at run time.
    */
   @SuppressWarnings("unchecked")
-  @SuppressFBWarnings("THROWS_METHOD_THROWS_CLAUSE_THROWABLE")
   private static <E extends Throwable> void throwCheckedAsUnchecked(Throwable e) throws E {
     throw (E) e;
   }
@@ -429,10 +428,10 @@ class PrincessEnvironment {
         // declare normal symbols
         for (Entry<String, IExpression> symbol : symbols.entrySet()) {
           out.append(
-              String.format(
-                  "(declare-fun %s () %s)%n",
-                  SMTLineariser.quoteIdentifier(symbol.getKey()),
-                  getFormulaType(symbol.getValue()).toSMTLIBString()));
+              "(declare-fun %s () %s)%n"
+                  .formatted(
+                      SMTLineariser.quoteIdentifier(symbol.getKey()),
+                      getFormulaType(symbol.getValue()).toSMTLIBString()));
         }
 
         // declare UFs
@@ -441,11 +440,11 @@ class PrincessEnvironment {
               Lists.transform(
                   asJava(function.getValue().args()), a -> getFormulaType(a).toSMTLIBString());
           out.append(
-              String.format(
-                  "(declare-fun %s (%s) %s)%n",
-                  SMTLineariser.quoteIdentifier(function.getKey()),
-                  Joiner.on(" ").join(argSorts),
-                  getFormulaType(function.getValue()).toSMTLIBString()));
+              "(declare-fun %s (%s) %s)%n"
+                  .formatted(
+                      SMTLineariser.quoteIdentifier(function.getKey()),
+                      Joiner.on(" ").join(argSorts),
+                      getFormulaType(function.getValue()).toSMTLIBString()));
         }
 
         // now every symbol from the formula or from abbreviations are declared,
@@ -454,11 +453,11 @@ class PrincessEnvironment {
           IExpression abbrevFormula = usedAbbrevs.get(abbrev);
           IExpression fullFormula = abbrevMap.get(abbrevFormula);
           out.append(
-              String.format(
-                  "(define-fun %s () %s %s)%n",
-                  SMTLineariser.quoteIdentifier(abbrev),
-                  getFormulaType(fullFormula).toSMTLIBString(),
-                  SMTLineariser.asString(fullFormula)));
+              "(define-fun %s () %s %s)%n"
+                  .formatted(
+                      SMTLineariser.quoteIdentifier(abbrev),
+                      getFormulaType(fullFormula).toSMTLIBString(),
+                      SMTLineariser.asString(fullFormula)));
         }
 
         // now add the final assert
@@ -497,9 +496,9 @@ class PrincessEnvironment {
             Set<IExpression> varsFromAbbrev = getVariablesFromAbbreviation(var);
             Sets.difference(varsFromAbbrev, allVars).forEach(waitlistSymbols::push);
             allVars.addAll(varsFromAbbrev);
-          } else if (var instanceof IFunApp) {
+          } else if (var instanceof IFunApp iFunApp) {
             Preconditions.checkState(!ufs.containsKey(name));
-            ufs.put(name, (IFunApp) var);
+            ufs.put(name, iFunApp);
           } else {
             Preconditions.checkState(!symbols.containsKey(name));
             symbols.put(name, var);
@@ -550,74 +549,35 @@ class PrincessEnvironment {
   }
 
   private static String getName(IExpression var) {
-    if (var instanceof IAtom) {
-      return ((IAtom) var).pred().name();
+    if (var instanceof IAtom iAtom) {
+      return iAtom.pred().name();
     } else if (var instanceof IConstant) {
       return var.toString();
-    } else if (var instanceof IFunApp) {
-      String fullStr = ((IFunApp) var).fun().toString();
+    } else if (var instanceof IFunApp iFunApp) {
+      String fullStr = iFunApp.fun().toString();
       return fullStr.substring(0, fullStr.indexOf('/'));
-    } else if (var instanceof IIntFormula) {
-      return getName(((IIntFormula) var).t());
+    } else if (var instanceof IIntFormula iIntFormula) {
+      return getName(iIntFormula.t());
     }
 
     throw new IllegalArgumentException("The given parameter is no variable or function");
   }
 
   static FormulaType<?> getFormulaType(IExpression pFormula) {
-    // TODO: We could use Sort.sortof() here, but it sometimes returns `integer` even though the
-    //  term is rational. We should figure out why and then open a new issue for this.
     if (pFormula instanceof IFormula) {
       return FormulaType.BooleanType;
-    } else if (pFormula instanceof ITimes) {
-      // coeff is always INT, lets check the subterm.
-      ITimes times = (ITimes) pFormula;
-      return getFormulaType(times.subterm());
-    } else if (pFormula instanceof IPlus) {
-      IPlus plus = (IPlus) pFormula;
-      FormulaType<?> t1 = getFormulaType(plus.t1());
-      FormulaType<?> t2 = getFormulaType(plus.t2());
-      return mergeFormulaTypes(t1, t2);
-    } else if (pFormula instanceof ITermITE) {
-      ITermITE plus = (ITermITE) pFormula;
-      FormulaType<?> t1 = getFormulaType(plus.left());
-      FormulaType<?> t2 = getFormulaType(plus.right());
-      return mergeFormulaTypes(t1, t2);
     } else {
-      final Sort sort = Sort$.MODULE$.sortOf((ITerm) pFormula);
+      final Sort sort = Sort.sortOf((ITerm) pFormula);
       try {
         return getFormulaTypeFromSort(sort);
       } catch (IllegalArgumentException e) {
         // add more info about the formula, then rethrow
         throw new IllegalArgumentException(
-            String.format(
-                "Unknown formula type '%s' of sort '%s' for formula '%s'.",
-                pFormula.getClass(), sort.toString(), pFormula),
+            "Unknown formula type '%s' of sort '%s' for formula '%s'."
+                .formatted(pFormula.getClass(), sort.toString(), pFormula),
             e);
       }
     }
-  }
-
-  /**
-   * Merge INTEGER and RATIONAL type or INTEGER and BITVECTOR and return the more general type. The
-   * ordering is: RATIONAL > INTEGER > BITVECTOR.
-   *
-   * @throws IllegalArgumentException for any other type.
-   */
-  private static FormulaType<?> mergeFormulaTypes(FormulaType<?> type1, FormulaType<?> type2) {
-    if (type1.equals(type2)) {
-      return type1;
-    }
-    if ((type1.isIntegerType() || type1.isRationalType())
-        && (type2.isIntegerType() || type2.isRationalType())) {
-      return type1.isRationalType() ? type1 : type2;
-    }
-    if ((type1.isIntegerType() || type1.isBitvectorType())
-        && (type2.isIntegerType() || type2.isBitvectorType())) {
-      return type1.isIntegerType() ? type1 : type2;
-    }
-    throw new IllegalArgumentException(
-        String.format("Types %s and %s can not be merged.", type1, type2));
   }
 
   private static FormulaType<?> getFormulaTypeFromSort(final Sort sort) {
@@ -627,13 +587,15 @@ class PrincessEnvironment {
       return FormulaType.IntegerType;
     } else if (sort == PrincessEnvironment.FRACTION_SORT) {
       return FormulaType.RationalType;
-    } else if (sort == PrincessEnvironment.STRING_SORT) {
+    } else if (sort == PrincessEnvironment.STRING_SORT
+        || (sort instanceof ADTProxySort && "String".equals(sort.toString())) // string constant
+    ) {
       return FormulaType.StringType;
     } else if (sort == PrincessEnvironment.REGEX_SORT) {
       return FormulaType.RegexType;
-    } else if (sort instanceof ArraySort) {
-      Seq<Sort> indexSorts = ((ArraySort) sort).theory().indexSorts();
-      Sort elementSort = ((ArraySort) sort).theory().objSort();
+    } else if (sort instanceof ArraySort arraySort) {
+      Seq<Sort> indexSorts = arraySort.theory().indexSorts();
+      Sort elementSort = arraySort.theory().objSort();
       assert indexSorts.iterator().size() == 1 : "unexpected index type in Array type:" + sort;
       // assert indexSorts.size() == 1; // TODO Eclipse does not like simpler code.
       return FormulaType.getArrayType(
@@ -642,13 +604,16 @@ class PrincessEnvironment {
     } else if (sort instanceof MultipleValueBool$) {
       return FormulaType.BooleanType;
     } else {
+      // Check if it's a bitvector sort
       scala.Option<Object> bitWidth = getBitWidth(sort);
       if (bitWidth.isDefined()) {
         return FormulaType.getBitvectorTypeWithSize((Integer) bitWidth.get());
+      } else {
+        // Otherwise, fail
+        throw new IllegalArgumentException(
+            "Unknown formula type '%s' for sort '%s'.".formatted(sort.getClass(), sort));
       }
     }
-    throw new IllegalArgumentException(
-        String.format("Unknown formula type '%s' for sort '%s'.", sort.getClass(), sort));
   }
 
   static scala.Option<Object> getBitWidth(final Sort sort) {
@@ -661,6 +626,10 @@ class PrincessEnvironment {
 
   public IExpression makeVariable(Sort type, String varname) {
     if (type == BOOL_SORT) {
+      Preconditions.checkArgument(
+          !sortedVariablesCache.containsKey(varname),
+          "Variable %s already defined with a different type",
+          varname);
       if (boolVariablesCache.containsKey(varname)) {
         return boolVariablesCache.get(varname);
       } else {
@@ -670,7 +639,17 @@ class PrincessEnvironment {
         return var;
       }
     } else {
+      Preconditions.checkArgument(
+          !boolVariablesCache.containsKey(varname),
+          "Variable %s already defined with a different type",
+          varname);
       if (sortedVariablesCache.containsKey(varname)) {
+        var cached = sortedVariablesCache.get(varname);
+        Preconditions.checkArgument(
+            !boolVariablesCache.containsKey(varname)
+                && getFormulaType(cached).equals(getFormulaTypeFromSort(type)),
+            "Variable %s already defined with a different type",
+            varname);
         return sortedVariablesCache.get(varname);
       } else {
         ITerm var = api.createConstant(varname, type);
@@ -682,16 +661,29 @@ class PrincessEnvironment {
   }
 
   /** This function declares a new functionSymbol with the given argument types and result. */
-  public IFunction declareFun(String name, Sort returnType, List<Sort> args) {
+  public PrincessFunctionDeclaration declareFun(String name, Sort returnType, List<Sort> args) {
     if (functionsCache.containsKey(name)) {
+      var cached = functionsCache.get(name);
+      Preconditions.checkArgument(
+          cached
+                  .getArgSorts()
+                  .equals(Lists.transform(args, PrincessEnvironment::getFormulaTypeFromSort))
+              && cached.getReturnSort().equals(getFormulaTypeFromSort(returnType)),
+          "Function %s already defined with different types",
+          name);
       return functionsCache.get(name);
     } else {
       IFunction funcDecl =
           api.createFunction(
               name, toSeq(args), returnType, false, SimpleAPI.FunctionalityMode$.MODULE$.Full());
       addFunction(funcDecl);
-      functionsCache.put(name, funcDecl);
-      return funcDecl;
+      var uf =
+          new PrincessIFunctionDeclaration(
+              Lists.transform(args, PrincessEnvironment::getFormulaTypeFromSort),
+              getFormulaTypeFromSort(returnType),
+              funcDecl);
+      functionsCache.put(name, uf);
+      return uf;
     }
   }
 
@@ -724,8 +716,7 @@ class PrincessEnvironment {
   }
 
   public boolean hasArrayType(IExpression exp) {
-    if (exp instanceof ITerm) {
-      final ITerm t = (ITerm) exp;
+    if (exp instanceof ITerm t) {
       return Sort$.MODULE$.sortOf(t) instanceof ArraySort;
     } else {
       return false;
@@ -759,12 +750,11 @@ class PrincessEnvironment {
   }
 
   static Seq<ITerm> toITermSeq(List<IExpression> exprs) {
-    return PrincessEnvironment.toSeq(
-        exprs.stream().map(e -> (ITerm) e).collect(Collectors.toList()));
+    return PrincessEnvironment.toSeq(exprs.stream().map(e -> (ITerm) e).toList());
   }
 
   static Seq<ITerm> toITermSeq(IExpression... exprs) {
-    return toITermSeq(Arrays.asList(exprs));
+    return toITermSeq(ImmutableList.copyOf(exprs));
   }
 
   IExpression simplify(IExpression f) {

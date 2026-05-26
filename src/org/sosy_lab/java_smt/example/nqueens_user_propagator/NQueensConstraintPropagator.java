@@ -18,15 +18,7 @@ import org.sosy_lab.java_smt.api.BooleanFormula;
  */
 public class NQueensConstraintPropagator extends NQueensEnumeratingPropagator {
 
-  private static final class Coordinates {
-    final int x;
-    final int y;
-
-    private Coordinates(int pX, int pY) {
-      x = pX;
-      y = pY;
-    }
-  }
+  private record Coordinates(int x, int y) {}
 
   private final BooleanFormula[][] symbols;
   private final Map<BooleanFormula, Coordinates> symbolToCoordinates;

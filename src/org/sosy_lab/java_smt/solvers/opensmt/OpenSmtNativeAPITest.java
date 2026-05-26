@@ -98,6 +98,7 @@ public class OpenSmtNativeAPITest {
     PTRef f = logic.mkEq(varA, varB);
 
     SMTConfig config = new SMTConfig();
+    config.setOption(":produce-models", new SMTOption(true));
     MainSolver mainSolver = new MainSolver(logic, config, "opensmt-test");
 
     mainSolver.push();
@@ -417,7 +418,7 @@ public class OpenSmtNativeAPITest {
     mainSolver.push();
     mainSolver.insertFormula(f1);
 
-    mainSolver.stop();
+    mainSolver.notifyStop();
 
     sstat r = mainSolver.check();
     assertThat(r).isEqualTo(sstat.Undef());
@@ -447,5 +448,47 @@ public class OpenSmtNativeAPITest {
 
     VectorPTRef core = mainSolver.getUnsatCore();
     assertThat(core).containsExactly(b1, nb1);
+  }
+
+  @SuppressWarnings("MisleadingEscapedSpace")
+  @Test
+  public void proofTest() {
+    Logic logic = LogicFactory.getInstance(Logic_t.QF_UF);
+
+    PTRef q1 = logic.mkBoolVar("q1");
+    PTRef q2 = logic.mkBoolVar("q2");
+    PTRef nq1 = logic.mkNot(q1);
+    PTRef nq2 = logic.mkNot(q2);
+
+    SMTConfig config = new SMTConfig();
+    config.setOption(":produce-proofs", new SMTOption(true));
+
+    MainSolver mainSolver = new MainSolver(logic, config, "opensmt-test");
+
+    mainSolver.insertFormula(logic.mkOr(nq1, q2));
+    mainSolver.insertFormula(q1);
+    mainSolver.insertFormula(nq2);
+
+    sstat r = mainSolver.check();
+    assertThat(r).isEqualTo(sstat.False());
+
+    String expected =
+        """
+        (proof\s
+        (let (cls_13 q1 )
+        (let (cls_9 (or q2 (not q1) ))
+        ; q2\s
+        (let (cls_16 (res cls_9 cls_13 q1))
+        (let (cls_19 (not q2) )
+        ; -
+        (let (cls_4294967295 (res cls_19 cls_16 q2))
+        cls_0
+        )))))
+        :core
+        ( cls_9 cls_13 cls_19 )
+        )
+        """;
+
+    assertThat(mainSolver.printResolutionProofSMT2()).isEqualTo(expected);
   }
 }

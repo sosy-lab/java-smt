@@ -27,7 +27,7 @@ import java.util.List;
 import org.sosy_lab.java_smt.api.RegexFormula;
 import org.sosy_lab.java_smt.basicimpl.AbstractStringFormulaManager;
 
-public class PrincessStringFormulaManager
+class PrincessStringFormulaManager
     extends AbstractStringFormulaManager<
         IExpression, Sort, PrincessEnvironment, PrincessFunctionDeclaration> {
 
@@ -37,7 +37,6 @@ public class PrincessStringFormulaManager
 
   @Override
   protected IExpression makeStringImpl(String value) {
-    value = unescapeUnicodeForSmtlib(value);
     checkArgument(!containsSurrogatePair(value), "Princess does not support surrogate pairs.");
     IExpression strExpr = PrincessEnvironment.stringTheory.string2Term(value);
     return getFormulaCreator().getEnv().simplify(strExpr); // simplify MOD in chars

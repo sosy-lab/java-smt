@@ -9,7 +9,7 @@
 package org.sosy_lab.java_smt.delegate.debugging;
 
 import com.google.common.base.Preconditions;
-import java.util.List;
+import com.google.common.collect.ImmutableList;
 import org.sosy_lab.common.configuration.Configuration;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
@@ -54,15 +54,12 @@ class DebuggingAssertions {
 
   /** Assert that the function declaration belongs to this context. */
   public void assertDeclarationInContext(FunctionDeclaration<?> pFunctionDeclaration) {
-    if (List.of(FunctionDeclarationKind.VAR, FunctionDeclarationKind.UF)
+    if (ImmutableList.of(FunctionDeclarationKind.VAR, FunctionDeclarationKind.UF)
         .contains(pFunctionDeclaration.getKind())) {
       Preconditions.checkArgument(
           debugInfo.getDeclaredFunctions().contains(pFunctionDeclaration),
-          "Function was not declared "
-              + (debugInfo.isNoSharedDeclarations() ? "in this context." : "on this solver.")
-              + "\n%s"
-              + "\nnot in"
-              + "\n%s",
+          "Function was not declared %s\n%s\nnot in\n%s",
+          debugInfo.isNoSharedDeclarations() ? "in this context." : "on this solver.",
           pFunctionDeclaration,
           debugInfo.getDeclaredFunctions());
     }
@@ -86,11 +83,8 @@ class DebuggingAssertions {
   public void assertFormulaInContext(Formula pFormula) {
     Preconditions.checkArgument(
         debugInfo.getDefinedFormulas().contains(pFormula),
-        "Function was not declared "
-            + (debugInfo.isNoSharedFormulas() ? "in this context." : "on this solver.")
-            + "\n%s"
-            + "\nnot in"
-            + "\n%s",
+        "Function was not declared %s\n%s\nnot in\n%s",
+        debugInfo.isNoSharedFormulas() ? "in this context." : "on this solver.",
         pFormula,
         debugInfo.getDefinedFormulas());
   }

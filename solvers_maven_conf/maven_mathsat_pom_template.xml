@@ -6,16 +6,16 @@ This file is part of JavaSMT,
 an API wrapper for a collection of SMT solvers:
 https://github.com/sosy-lab/java-smt
 
-SPDX-FileCopyrightText: 2021 Dirk Beyer <https://www.sosy-lab.org>
+SPDX-FileCopyrightText: 2026 Dirk Beyer <https://www.sosy-lab.org>
 
 SPDX-License-Identifier: Apache-2.0
 -->
 
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.sosy-lab</groupId>
-  <artifactId>javasmt-solver-mathsat5</artifactId>
+  <artifactId>javasmt-solver-mathsat</artifactId>
   <packaging>pom</packaging>
-  <name>javasmt-solver-mathsat5</name>
+  <name>javasmt-solver-mathsat</name>
   <version>${stage.revision}</version>
   <description>Recompiled Version of the SMT solver Mathsat5 for use in JavaSMT</description>
   <url>https://github.com/sosy-lab/java-smt</url>
@@ -27,7 +27,7 @@ SPDX-License-Identifier: Apache-2.0
       </license>
       <license>
           <name>
-              MathSAT5 is copyrighted 2009-2020 by Fondazione Bruno Kessler, Trento, Italy,
+              MathSAT5 is copyrighted 2009-2026 by Fondazione Bruno Kessler, Trento, Italy,
               University of Trento, Italy, and others. All rights reserved.
 
               MathSAT5 is available for research and evaluation purposes only.
@@ -41,7 +41,7 @@ SPDX-License-Identifier: Apache-2.0
           <url>http://mathsat.fbk.eu/download.html</url>
       </license>
       <license>
-          <name>MPIR is licensed LGPL v3+</name>
+          <name>GMP is licensed both GNU LGPL v3 and GNU GPL v2</name>
           <url>https://www.gnu.org/licenses/lgpl-3.0.en.html</url>
       </license>
   </licenses>

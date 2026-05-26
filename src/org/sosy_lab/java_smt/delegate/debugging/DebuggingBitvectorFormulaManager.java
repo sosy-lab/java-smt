@@ -18,11 +18,11 @@ import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.FormulaType.BitvectorType;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 
-public class DebuggingBitvectorFormulaManager implements BitvectorFormulaManager {
+class DebuggingBitvectorFormulaManager implements BitvectorFormulaManager {
   private final BitvectorFormulaManager delegate;
   private final DebuggingAssertions debugging;
 
-  public DebuggingBitvectorFormulaManager(
+  DebuggingBitvectorFormulaManager(
       BitvectorFormulaManager pDelegate, DebuggingAssertions pDebugging) {
     delegate = checkNotNull(pDelegate);
     debugging = pDebugging;

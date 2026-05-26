@@ -2,7 +2,7 @@
 // an API wrapper for a collection of SMT solvers:
 // https://github.com/sosy-lab/java-smt
 //
-// SPDX-FileCopyrightText: 2023 Dirk Beyer <https://www.sosy-lab.org>
+// SPDX-FileCopyrightText: 2025 Dirk Beyer <https://www.sosy-lab.org>
 //
 // SPDX-License-Identifier: Apache-2.0
 
@@ -13,6 +13,7 @@ import java.util.Set;
 import java.util.function.Consumer;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.configuration.Configuration;
+import org.sosy_lab.common.configuration.IntegerOption;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.common.configuration.Option;
 import org.sosy_lab.common.configuration.Options;
@@ -25,6 +26,9 @@ import org.sosy_lab.java_smt.api.SolverContext;
 import org.sosy_lab.java_smt.basicimpl.AbstractNumeralFormulaManager.NonLinearArithmetic;
 import org.sosy_lab.java_smt.basicimpl.AbstractSolverContext;
 import org.sosy_lab.java_smt.solvers.opensmt.api.LogicFactory;
+import org.sosy_lab.java_smt.solvers.opensmt.interpolationAlgorithms.Core;
+import org.sosy_lab.java_smt.solvers.opensmt.interpolationAlgorithms.LA;
+import org.sosy_lab.java_smt.solvers.opensmt.interpolationAlgorithms.UF;
 
 public final class OpenSmtSolverContext extends AbstractSolverContext {
   private final OpenSmtFormulaCreator creator;
@@ -38,20 +42,48 @@ public final class OpenSmtSolverContext extends AbstractSolverContext {
 
   private boolean closed = false;
 
-  @Options(prefix = "solver.opensmt")
+  @Options(prefix = "solver.opensmt", deprecatedPrefix = "solver.opensmt")
   static class OpenSMTOptions {
 
     @Option(secure = true, description = "SMT-LIB2 name of the logic to be used by the solver.")
     Logics logic = Logics.QF_AUFLIRA;
 
-    @Option(secure = true, description = "Algorithm for boolean interpolation")
-    int algBool = 0;
+    @Option(
+        secure = true,
+        description = "Interpolation algorithm for boolean theory",
+        name = "interpolation.algorithm.booleanTheory",
+        deprecatedName = "algBool")
+    Core algBool = Core.MCMILLAN;
 
-    @Option(secure = true, description = "Algorithm for UF interpolation")
-    int algUf = 0;
+    @Option(
+        secure = true,
+        description = "Interpolation algorithm for UF theory",
+        name = "interpolation.algorithm.ufTheory",
+        deprecatedName = "algUf")
+    UF algUf = UF.STRONG;
 
-    @Option(secure = true, description = "Algorithm for LRA interpolation")
-    int algLra = 0;
+    @Option(
+        secure = true,
+        description = "Interpolation algorithm for LRA theory",
+        name = "interpolation.algorithm.lraTheory",
+        deprecatedName = "algLra")
+    LA algLra = LA.STRONG;
+
+    /**
+     * This option controls the level of simplification applied to interpolants.
+     *
+     * <p>For details, please see the original sources:
+     * https://github.com/usi-verification-and-security/opensmt/blob/7cef5bc983d7774874ffc177f06516c4e0f411f4/src/proof/InterpolationContext.cc#L933-L960
+     */
+    @IntegerOption(min = 0, max = 4)
+    @Option(
+        secure = true,
+        description =
+            "Level of simplification for interpolants,"
+                + "ranging from 0 (no simplification) to 4 (maximum simplification).",
+        name = "interpolation.simplificationLevel",
+        deprecatedName = "simplifyInterpolants")
+    int simplifyInterpolants = 0;
 
     final int randomSeed;
 

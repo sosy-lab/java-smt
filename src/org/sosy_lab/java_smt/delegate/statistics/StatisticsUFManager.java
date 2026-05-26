@@ -34,21 +34,8 @@ class StatisticsUFManager implements UFManager {
   }
 
   @Override
-  public <T extends Formula> FunctionDeclaration<T> declareUF(
-      String pName, FormulaType<T> pReturnType, FormulaType<?>... pArgs) {
-    stats.ufOperations.getAndIncrement();
-    return delegate.declareUF(pName, pReturnType, pArgs);
-  }
-
-  @Override
   public <T extends Formula> T callUF(
       FunctionDeclaration<T> pFuncType, List<? extends Formula> pArgs) {
-    stats.ufOperations.getAndIncrement();
-    return delegate.callUF(pFuncType, pArgs);
-  }
-
-  @Override
-  public <T extends Formula> T callUF(FunctionDeclaration<T> pFuncType, Formula... pArgs) {
     stats.ufOperations.getAndIncrement();
     return delegate.callUF(pFuncType, pArgs);
   }

@@ -21,8 +21,7 @@ public class DebuggingStringFormulaManager implements StringFormulaManager {
   private final StringFormulaManager delegate;
   private final DebuggingAssertions debugging;
 
-  public DebuggingStringFormulaManager(
-      StringFormulaManager pDelegate, DebuggingAssertions pDebugging) {
+  DebuggingStringFormulaManager(StringFormulaManager pDelegate, DebuggingAssertions pDebugging) {
     delegate = checkNotNull(pDelegate);
     debugging = pDebugging;
   }

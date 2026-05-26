@@ -32,11 +32,9 @@ import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_term
 import com.google.common.base.Preconditions;
 import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Lists;
 import com.google.common.primitives.Longs;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -76,15 +74,13 @@ abstract class Mathsat5AbstractProver<T2> extends AbstractProver<T2> {
 
   private long buildConfig(Set<ProverOptions> opts) {
     Map<String, String> config = new LinkedHashMap<>();
-    boolean generateUnsatCore =
-        opts.contains(ProverOptions.GENERATE_UNSAT_CORE)
-            || opts.contains(ProverOptions.GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS);
+    boolean generateUnsatCore = opts.contains(ProverOptions.GENERATE_UNSAT_CORE);
     config.put("model_generation", opts.contains(ProverOptions.GENERATE_MODELS) ? "true" : "false");
     config.put("unsat_core_generation", generateUnsatCore ? "1" : "0");
     if (generateUnsatCore) {
       config.put("theory.bv.eager", "false");
     }
-    createConfig(config); // ask sub-classes for their options
+    createConfig(config); // ask subclasses for their options
 
     long cfg = msat_create_config();
     for (Map.Entry<String, String> entry : config.entrySet()) {
@@ -97,12 +93,11 @@ abstract class Mathsat5AbstractProver<T2> extends AbstractProver<T2> {
   protected abstract void createConfig(Map<String, String> pConfig);
 
   @Override
-  public boolean isUnsat() throws InterruptedException, SolverException {
-    Preconditions.checkState(!closed);
-
+  protected boolean isUnsatImpl() throws InterruptedException, SolverException {
     final long hook = msat_set_termination_callback(curEnv, context.getTerminationTest());
     try {
-      return !msat_check_sat(curEnv);
+      boolean isSat = msat_check_sat(curEnv);
+      return !isSat;
     } finally {
       msat_free_termination_callback(hook);
     }
@@ -113,10 +108,16 @@ abstract class Mathsat5AbstractProver<T2> extends AbstractProver<T2> {
       throws SolverException, InterruptedException {
     Preconditions.checkState(!closed);
     checkForLiterals(pAssumptions);
+    changedSinceLastSatQuery = false;
+    wasLastSatCheckSatisfiable = false;
 
     final long hook = msat_set_termination_callback(curEnv, context.getTerminationTest());
     try {
-      return !msat_check_sat_with_assumptions(curEnv, getMsatTerm(pAssumptions));
+      boolean isSat = msat_check_sat_with_assumptions(curEnv, getMsatTerm(pAssumptions));
+      if (isSat) {
+        wasLastSatCheckSatisfiable = true;
+      }
+      return !isSat;
     } finally {
       msat_free_termination_callback(hook);
     }
@@ -136,10 +137,14 @@ abstract class Mathsat5AbstractProver<T2> extends AbstractProver<T2> {
     }
   }
 
+  @Override
+  protected boolean hasPersistentModel() {
+    return true;
+  }
+
   @SuppressWarnings("resource")
   @Override
   public Model getModel() throws SolverException {
-    Preconditions.checkState(!closed);
     checkGenerateModels();
     return new CachingModel(new Mathsat5Model(getMsatModel(), creator, this));
   }
@@ -155,7 +160,6 @@ abstract class Mathsat5AbstractProver<T2> extends AbstractProver<T2> {
   @SuppressWarnings("resource")
   @Override
   public Evaluator getEvaluator() {
-    Preconditions.checkState(!closed);
     checkGenerateModels();
     return registerEvaluator(new Mathsat5Evaluator(this, creator, curEnv));
   }
@@ -184,7 +188,6 @@ abstract class Mathsat5AbstractProver<T2> extends AbstractProver<T2> {
 
   @Override
   public List<BooleanFormula> getUnsatCore() {
-    Preconditions.checkState(!closed);
     checkGenerateUnsatCores();
     long[] terms = msat_get_unsat_core(curEnv);
     return encapsulate(terms);
@@ -194,6 +197,8 @@ abstract class Mathsat5AbstractProver<T2> extends AbstractProver<T2> {
   public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(
       Collection<BooleanFormula> assumptions) throws SolverException, InterruptedException {
     Preconditions.checkNotNull(assumptions);
+    checkGenerateUnsatCoresOverAssumptions();
+
     closeAllEvaluators();
 
     if (!isUnsatWithAssumptions(assumptions)) {
@@ -237,7 +242,6 @@ abstract class Mathsat5AbstractProver<T2> extends AbstractProver<T2> {
   @Override
   public <T> T allSat(AllSatCallback<T> callback, List<BooleanFormula> important)
       throws InterruptedException, SolverException {
-    Preconditions.checkState(!closed);
     checkGenerateAllSat();
     closeAllEvaluators();
 
@@ -274,9 +278,7 @@ abstract class Mathsat5AbstractProver<T2> extends AbstractProver<T2> {
     @Override
     public void callback(long[] model) throws InterruptedException {
       shutdownNotifier.shutdownIfNecessary();
-      clientCallback.apply(
-          Collections.unmodifiableList(
-              Lists.transform(Longs.asList(model), creator::encapsulateBoolean)));
+      clientCallback.apply(Longs.asList(model).stream().map(creator::encapsulateBoolean).toList());
     }
   }
 }

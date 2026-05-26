@@ -73,7 +73,7 @@ public interface OptimizationProverEnvironment extends BasicProverEnvironment<Vo
   /** Status of the optimization problem. */
   enum OptStatus {
 
-    /** The solution was found (may be unbounded). */
+    /** The solution was found (maybe unbounded). */
     OPT,
 
     /** The set of constraints is unsatisfiable. */

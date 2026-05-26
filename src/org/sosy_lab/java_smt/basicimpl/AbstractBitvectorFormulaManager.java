@@ -340,7 +340,7 @@ public abstract class AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv,
   protected TFormulaInfo rotateLeft(TFormulaInfo pNumber, TFormulaInfo pToRotate) {
     int length = getLength(wrap(pNumber));
     final TFormulaInfo lengthAsBv = makeBitvectorImpl(length, length);
-    final TFormulaInfo toRotateInRange = smodulo(pToRotate, lengthAsBv);
+    final TFormulaInfo toRotateInRange = remainder(pToRotate, lengthAsBv, false);
     return or(
         shiftLeft(pNumber, toRotateInRange),
         shiftRight(pNumber, subtract(lengthAsBv, toRotateInRange), false));
@@ -373,7 +373,7 @@ public abstract class AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv,
   protected TFormulaInfo rotateRight(TFormulaInfo pNumber, TFormulaInfo pToRotate) {
     int length = getLength(wrap(pNumber));
     final TFormulaInfo lengthAsBv = makeBitvectorImpl(length, length);
-    final TFormulaInfo toRotateInRange = smodulo(pToRotate, lengthAsBv);
+    final TFormulaInfo toRotateInRange = remainder(pToRotate, lengthAsBv, false);
     return or(
         shiftRight(pNumber, toRotateInRange, false),
         shiftLeft(pNumber, subtract(lengthAsBv, toRotateInRange)));

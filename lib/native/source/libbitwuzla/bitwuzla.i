@@ -24,6 +24,7 @@
 %template(Vector_Int) std::vector<int>;
 %template(Vector_String) std::vector<std::string>;
 %template(Vector_Term) std::vector<bitwuzla::Term>;
+%template(Vector_Vector_Term) std::vector<std::vector<bitwuzla::Term>>;
 %template(Vector_Sort) std::vector<bitwuzla::Sort>;
 
 %include <std_unordered_map.i>
@@ -48,17 +49,33 @@ namespace std {
 %ignore to_string(bitwuzla::Result result);
 }
 
-%include "include/bitwuzla/enums.h"
-%include "include/bitwuzla/option.h"
+namespace bitwuzla {
+%ignore operator<<(std::ostream &out, Result result);
+%ignore option::Exception;
+}
 
-%ignore bitwuzla::option::Exception;
+%include "bitwuzla/enums.h"
+%include "bitwuzla/option.h"
+%include "bitwuzla/result.h"
+
+namespace bitwuzla {
+/** Terminator */
+%insert("runtime") %{
+#define SWIG_JAVA_ATTACH_CURRENT_THREAD_AS_DAEMON
+%}
+%feature("director") Terminator;
+}
+
+%include "bitwuzla/cpp/terminator.h"
 
 namespace bitwuzla {
 /** Output streams */
 %ignore set_bv_format;
 %ignore set_letify;
-%ignore operator<< (std::ostream &ostream, const set_bv_format &f);
+%ignore operator<< (std::ostream &out, const set_bv_format &f);
+%ignore operator<< (std::ostream &out, const set_letify &l);
 %ignore operator<< (std::ostream &out, Result result);
+%ignore operator<< (std::ostream &out, const Term &term);
 %ignore operator<< (std::ostream &out, Kind kind);
 %ignore operator<< (std::ostream &out, RoundingMode rm);
 
@@ -69,6 +86,7 @@ namespace bitwuzla {
 %ignore Options::operator= (const Options &options);
 %ignore Options::set (Option option, const char *mode);
 %ignore Options::set (Option option, uint64_t value);
+%ignore Options::set_diagnostic_output_stream(std::ostream& out);
 %extend Options {
   void set(Option option, int value) {
     $self->set(option, value);
@@ -110,7 +128,12 @@ namespace bitwuzla {
 }
 %extend Term {
   std::string symbol() {
-    return $self->symbol().value();
+    std::string sym = $self->symbol().value();
+    if (sym.front() == '|' && sym.back() == '|') {
+      return sym.substr(1, sym.size() - 2);
+    } else {
+      return sym;
+    }
   }
 }
 
@@ -217,13 +240,6 @@ namespace bitwuzla {
   }
 %}
 
-/** Terminator */
-%insert("runtime") %{
-#define SWIG_JAVA_ATTACH_CURRENT_THREAD_AS_DAEMON
-%}
-
-%feature("director") Terminator;
-
 /** TermManager */
 %ignore TermManager::mk_rm_sort();
 %ignore TermManager::mk_uninterpreted_sort(const std::optional< std::string > &symbol=std::nullopt);
@@ -292,7 +308,7 @@ namespace bitwuzla {
 }
 
 /** Bitwuzla */
-%ignore Bitwuzla::Bitwuzla(const Options &options = Options());
+%ignore Bitwuzla::Bitwuzla(TermManager&, SatSolverFactory&, const Options& options = Options());
 %ignore Bitwuzla::is_unsat_assumption (const Term &term);
 %ignore Bitwuzla::print_unsat_core(std::ostream &out, const std::string &format = "smt2") const;
 %ignore Bitwuzla::print_formula (std::ostream &out, const std::string &format="smt2") const;
@@ -305,18 +321,26 @@ namespace bitwuzla {
 }
 %ignore Bitwuzla::statistics () const;
 %ignore Bitwuzla::simplify ();
+
+/** SatSolverFactory */
+%ignore SatSolverFactory;
 }
 
-%include "include/bitwuzla/cpp/bitwuzla.h"
+%include "bitwuzla/cpp/bitwuzla.h"
 
 namespace bitwuzla::parser {
+%ignore Parser::Parser(TermManager&, SatSolverFactory&, Options&, const std::string& language, std::ostream* out);
+%ignore Parser::Parser(TermManager&, SatSolverFactory&, Options&, const std::string& language);
+%ignore Parser::Parser(TermManager&, SatSolverFactory&, Options&);
 %ignore Parser::Parser(TermManager &tm, Options &options, const std::string &language, std::ostream *out);
 %ignore Parser::Parser(TermManager &tm, Options &options, std::ostream *out);
 %ignore Parser::configure_auto_print_model(bool value);
 %ignore Parser::parse(const std::string &infile_name, std::istream &input, bool parse_only=false);
+%ignore Parser::diagnostic_output_stream() const;
+%ignore Parser::statistics() const;
 
 /** Exception */
 %ignore Exception;
 }
 
-%include "include/bitwuzla/cpp/parser.h"
+%include "bitwuzla/cpp/parser.h"

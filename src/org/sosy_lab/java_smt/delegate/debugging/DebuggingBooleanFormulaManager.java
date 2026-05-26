@@ -21,12 +21,11 @@ import org.sosy_lab.java_smt.api.visitors.BooleanFormulaTransformationVisitor;
 import org.sosy_lab.java_smt.api.visitors.BooleanFormulaVisitor;
 import org.sosy_lab.java_smt.api.visitors.TraversalProcess;
 
-public class DebuggingBooleanFormulaManager implements BooleanFormulaManager {
+class DebuggingBooleanFormulaManager implements BooleanFormulaManager {
   private final BooleanFormulaManager delegate;
   private final DebuggingAssertions debugging;
 
-  public DebuggingBooleanFormulaManager(
-      BooleanFormulaManager pDelegate, DebuggingAssertions pDebugging) {
+  DebuggingBooleanFormulaManager(BooleanFormulaManager pDelegate, DebuggingAssertions pDebugging) {
     delegate = checkNotNull(pDelegate);
     debugging = pDebugging;
   }
@@ -131,17 +130,6 @@ public class DebuggingBooleanFormulaManager implements BooleanFormulaManager {
   }
 
   @Override
-  public BooleanFormula and(BooleanFormula... bits) {
-    debugging.assertThreadLocal();
-    for (BooleanFormula f : bits) {
-      debugging.assertFormulaInContext(f);
-    }
-    BooleanFormula result = delegate.and(bits);
-    debugging.addFormulaTerm(result);
-    return result;
-  }
-
-  @Override
   public Collector<BooleanFormula, ?, BooleanFormula> toConjunction() {
     return Collectors.collectingAndThen(
         Collectors.toList(),
@@ -167,17 +155,6 @@ public class DebuggingBooleanFormulaManager implements BooleanFormulaManager {
 
   @Override
   public BooleanFormula or(Collection<BooleanFormula> bits) {
-    debugging.assertThreadLocal();
-    for (BooleanFormula f : bits) {
-      debugging.assertFormulaInContext(f);
-    }
-    BooleanFormula result = delegate.or(bits);
-    debugging.addFormulaTerm(result);
-    return result;
-  }
-
-  @Override
-  public BooleanFormula or(BooleanFormula... bits) {
     debugging.assertThreadLocal();
     for (BooleanFormula f : bits) {
       debugging.assertFormulaInContext(f);

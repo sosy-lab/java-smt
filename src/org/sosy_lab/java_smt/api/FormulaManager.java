@@ -8,10 +8,15 @@
 
 package org.sosy_lab.java_smt.api;
 
+import static com.google.common.base.Preconditions.checkArgument;
+
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Iterables;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import org.sosy_lab.common.Appender;
 import org.sosy_lab.java_smt.api.visitors.FormulaTransformationVisitor;
 import org.sosy_lab.java_smt.api.visitors.FormulaVisitor;
@@ -19,6 +24,16 @@ import org.sosy_lab.java_smt.api.visitors.TraversalProcess;
 
 /** FormulaManager class contains all operations which can be performed on formulas. */
 public interface FormulaManager {
+
+  /**
+   * Standardized message for not implemented API methods.
+   *
+   * <p>This constant can be used in {@link UnsupportedOperationException} to indicate that a
+   * certain method is not implemented by some subclass. We recommend using this constant in API
+   * extensions where the default implementation throws an exception.
+   */
+  String API_METHOD_NOT_IMPLEMENTED =
+      "The requested method is not implemented in the current implementation of this interface.";
 
   /**
    * Returns the Integer-Theory. Because most SAT-solvers support automatic casting between Integer-
@@ -121,6 +136,46 @@ public interface FormulaManager {
    */
   <T extends Formula> T makeApplication(FunctionDeclaration<T> declaration, Formula... args);
 
+  /**
+   * Create an equality formula between the given arguments. We return "true" if all arguments are
+   * equal, even if there are less than two arguments.
+   *
+   * @param pArgs Arguments to be compared for equality, ordering does not matter.
+   * @return Equality formula
+   */
+  default BooleanFormula makeEqual(Formula... pArgs) {
+    return makeEqual(Arrays.asList(pArgs));
+  }
+
+  /**
+   * Create an equality formula between the given arguments. We return "true" if all arguments are
+   * equal, even if there are less than two arguments.
+   *
+   * @param pArgs Arguments to be compared for equality, ordering does not matter.
+   * @return Equality formula
+   */
+  BooleanFormula makeEqual(Iterable<Formula> pArgs);
+
+  /**
+   * Create a distinctness formula between the given arguments. We return "true" if all arguments
+   * are pairwise distinct, even if there are less than two arguments.
+   *
+   * @param pArgs Arguments to be compared for distinctness, ordering does not matter.
+   * @return Distinctness formula
+   */
+  default BooleanFormula makeDistinct(Formula... pArgs) {
+    return makeDistinct(Arrays.asList(pArgs));
+  }
+
+  /**
+   * Create a distinctness formula between the given arguments. We return "true" if all arguments
+   * are pairwise distinct, even if there are less than two arguments.
+   *
+   * @param pArgs Arguments to be compared for distinctness, ordering does not matter.
+   * @return Distinctness formula
+   */
+  BooleanFormula makeDistinct(Iterable<Formula> pArgs);
+
   /** Returns the type of the given Formula. */
   <T extends Formula> FormulaType<T> getFormulaType(T formula);
 
@@ -129,6 +184,24 @@ public interface FormulaManager {
    * assertion to be contained in the query.
    *
    * <p>Example: <code>(declare-fun x () Int)(assert (= 0 x))</code>
+   *
+   * @see #parseAll(String) for more details on the expected format and behavior of the SMT solver.
+   * @return A single formula from the assertion in the internal representation.
+   * @throws IllegalArgumentException If the string cannot be parsed, or if there is not exactly one
+   *     assertion in the query.
+   */
+  default BooleanFormula parse(String s) throws IllegalArgumentException {
+    List<BooleanFormula> formulas = parseAll(s);
+    checkArgument(!formulas.isEmpty(), "No assertion found in the SMTLIB string.");
+    checkArgument(
+        formulas.size() == 1,
+        "More than one assertion found in the SMT-LIB string, please use parseAll(String).");
+    return Objects.requireNonNull(Iterables.getOnlyElement(formulas));
+  }
+
+  /**
+   * Parse a boolean formula given as a String in an SMTLIB file format. We expect several (zero or
+   * more) assertions to be contained in the query.
    *
    * <p>It depends on the used SMT solver whether the given query must be self-contained and include
    * declarations for all used symbols or not, and also whether the query is allowed to contain
@@ -140,12 +213,14 @@ public interface FormulaManager {
    * <code>set-info</code>. Most solvers just ignore those commands.
    *
    * <p>Variables that are defined, but not used in the assertion, might be ignored by the SMT
-   * solver and they might not be available for later usage.
+   * solver, and they might not be available for later usage.
    *
-   * @return A single formula from the assertion in the internal representation.
+   * <p>Example: <code>(declare-fun x () Int)(assert (= 0 x))(assert (&lt; x 10))</code>
+   *
+   * @return A list of formulas from the assertions in the internal representation, in order.
    * @throws IllegalArgumentException If the string cannot be parsed.
    */
-  BooleanFormula parse(String s) throws IllegalArgumentException;
+  List<BooleanFormula> parseAll(String s) throws IllegalArgumentException;
 
   /**
    * Serialize an input formula to an SMT-LIB format. Very useful when passing formulas between
@@ -185,7 +260,7 @@ public interface FormulaManager {
   /**
    * Visit the formula with a given visitor.
    *
-   * <p>This method does <b>not recursively visit</b> sub-components of a formula its own, so the
+   * <p>This method does <b>not recursively visit</b> subcomponents of a formula its own, so the
    * given {@link FormulaVisitor} needs to call such visitation on its own.
    *
    * <p>Please be aware that calling this method might cause extensive stack usage depending on the
@@ -201,7 +276,7 @@ public interface FormulaManager {
 
   /**
    * Visit the formula recursively with a given {@link FormulaVisitor}. This method traverses
-   * sub-components of a formula automatically, depending on the return value of the {@link
+   * subcomponents of a formula automatically, depending on the return value of the {@link
    * TraversalProcess} in the given {@link FormulaVisitor}.
    *
    * <p>This method guarantees that the traversal is done iteratively, without using Java recursion,

@@ -8,17 +8,20 @@
 
 package org.sosy_lab.java_smt.solvers.yices2;
 
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_term_to_string;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.errorprone.annotations.Immutable;
+import com.sri.yices.Terms;
+import org.sosy_lab.java_smt.api.ArrayFormula;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
+import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
 
 @Immutable
-abstract class Yices2Formula implements Formula {
+abstract sealed class Yices2Formula implements Formula {
 
   private final int yicesTerm;
 
@@ -37,7 +40,7 @@ abstract class Yices2Formula implements Formula {
 
   @Override
   public final String toString() {
-    return yices_term_to_string(yicesTerm);
+    return Terms.toString(yicesTerm);
   }
 
   @Override
@@ -45,10 +48,7 @@ abstract class Yices2Formula implements Formula {
     if (o == this) {
       return true;
     }
-    if (!(o instanceof Yices2Formula)) {
-      return false;
-    }
-    return yicesTerm == ((Yices2Formula) o).yicesTerm;
+    return o instanceof Yices2Formula other && yicesTerm == other.yicesTerm;
   }
 
   @Immutable
@@ -76,6 +76,29 @@ abstract class Yices2Formula implements Formula {
   static final class Yices2BooleanFormula extends Yices2Formula implements BooleanFormula {
     Yices2BooleanFormula(int pTerm) {
       super(pTerm);
+    }
+  }
+
+  @SuppressWarnings({"ClassTypeParameterName", "MethodTypeParameterName"})
+  @Immutable
+  static final class Yices2ArrayFormula<TI extends Formula, TE extends Formula>
+      extends Yices2Formula implements ArrayFormula<TI, TE> {
+
+    private final FormulaType<TI> indexType;
+    private final FormulaType<TE> elementType;
+
+    Yices2ArrayFormula(Integer info, FormulaType<TI> pIndexType, FormulaType<TE> pElementType) {
+      super(info);
+      this.indexType = checkNotNull(pIndexType);
+      this.elementType = checkNotNull(pElementType);
+    }
+
+    public FormulaType<TI> getIndexType() {
+      return indexType;
+    }
+
+    public FormulaType<TE> getElementType() {
+      return elementType;
     }
   }
 }

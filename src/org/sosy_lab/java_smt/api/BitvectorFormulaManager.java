@@ -8,6 +8,7 @@
 
 package org.sosy_lab.java_smt.api;
 
+import com.google.common.collect.ImmutableList;
 import java.math.BigInteger;
 import java.util.List;
 import org.sosy_lab.java_smt.api.FormulaType.BitvectorType;
@@ -34,7 +35,7 @@ public interface BitvectorFormulaManager {
    * Convert/Cast/Interpret a numeral formula into a bitvector with given size.
    *
    * <p>If the numeral formula is too large for the given length, we cut off the largest bits and
-   * only use the lest significant bits.
+   * only use the least significant bits.
    */
   BitvectorFormula makeBitvector(int length, IntegerFormula pI);
 
@@ -413,4 +414,8 @@ public interface BitvectorFormulaManager {
 
   /** All given bitvectors are pairwise unequal. */
   BooleanFormula distinct(List<BitvectorFormula> pBits);
+
+  default BooleanFormula distinct(BitvectorFormula... pBits) {
+    return distinct(ImmutableList.copyOf(pBits));
+  }
 }

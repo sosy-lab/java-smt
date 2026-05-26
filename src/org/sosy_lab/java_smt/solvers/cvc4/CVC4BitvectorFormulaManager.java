@@ -13,7 +13,6 @@ import edu.stanford.CVC4.BitVectorExtract;
 import edu.stanford.CVC4.BitVectorRotateLeft;
 import edu.stanford.CVC4.BitVectorRotateRight;
 import edu.stanford.CVC4.BitVectorSignExtend;
-import edu.stanford.CVC4.BitVectorType;
 import edu.stanford.CVC4.BitVectorZeroExtend;
 import edu.stanford.CVC4.Expr;
 import edu.stanford.CVC4.ExprManager;
@@ -27,13 +26,12 @@ import java.util.List;
 import org.sosy_lab.java_smt.api.FormulaType.BitvectorType;
 import org.sosy_lab.java_smt.basicimpl.AbstractBitvectorFormulaManager;
 
-public class CVC4BitvectorFormulaManager
+class CVC4BitvectorFormulaManager
     extends AbstractBitvectorFormulaManager<Expr, Type, ExprManager, Expr> {
 
   private final ExprManager exprManager;
 
-  protected CVC4BitvectorFormulaManager(
-      CVC4FormulaCreator pCreator, CVC4BooleanFormulaManager pBmgr) {
+  CVC4BitvectorFormulaManager(CVC4FormulaCreator pCreator, CVC4BooleanFormulaManager pBmgr) {
     super(pCreator, pBmgr);
     exprManager = pCreator.getEnv();
   }
@@ -236,7 +234,7 @@ public class CVC4BitvectorFormulaManager
       // TODO check what is cheaper for the solver:
       // checking the first BV-bit or computing max-int-value for the given size
 
-      final int size = Math.toIntExact(new BitVectorType(pBv.getType()).getSize());
+      final int size = ((BitvectorType) formulaCreator.getFormulaType(pBv)).getSize();
       final BigInteger modulo = BigInteger.ONE.shiftLeft(size);
       final BigInteger maxInt = BigInteger.ONE.shiftLeft(size - 1).subtract(BigInteger.ONE);
       final Expr moduloExpr = exprManager.mkConst(new Rational(modulo.toString()));
@@ -255,8 +253,6 @@ public class CVC4BitvectorFormulaManager
 
   @Override
   protected Expr distinctImpl(List<Expr> pParam) {
-    vectorExpr param = new vectorExpr();
-    pParam.forEach(param::add);
-    return exprManager.mkExpr(Kind.DISTINCT, param);
+    return exprManager.mkExpr(Kind.DISTINCT, new vectorExpr(exprManager, pParam));
   }
 }

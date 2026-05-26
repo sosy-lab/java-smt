@@ -14,7 +14,6 @@ import static com.google.common.truth.TruthJUnit.assume;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
-import java.util.Arrays;
 import java.util.List;
 import java.util.function.Supplier;
 import org.junit.AssumptionViolatedException;
@@ -25,6 +24,7 @@ import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
 import org.sosy_lab.common.configuration.ConfigurationBuilder;
+import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.FormulaType;
@@ -42,19 +42,14 @@ public class NonLinearArithmeticTest<T extends NumeralFormula> extends SolverBas
   // INFO: OpenSmt does not suport nonlinear arithmetic
   static final ImmutableSet<Solvers> SOLVER_WITHOUT_NONLINEAR_ARITHMETIC =
       ImmutableSet.of(
-          Solvers.SMTINTERPOL,
-          Solvers.MATHSAT5,
-          Solvers.BOOLECTOR,
-          Solvers.CVC4,
-          Solvers.YICES2,
-          Solvers.OPENSMT);
+          Solvers.SMTINTERPOL, Solvers.MATHSAT5, Solvers.BOOLECTOR, Solvers.CVC4, Solvers.OPENSMT);
 
   @Parameters(name = "{0} {1} {2}")
   public static Iterable<Object[]> getAllSolversAndTheories() {
     return Lists.cartesianProduct(
-            Arrays.asList(ParameterizedSolverBasedTest0.getAllSolvers()),
+            ImmutableList.copyOf(ParameterizedSolverBasedTest0.getAllSolvers()),
             ImmutableList.of(FormulaType.IntegerType, FormulaType.RationalType),
-            Arrays.asList(NonLinearArithmetic.values()))
+            ImmutableList.copyOf(NonLinearArithmetic.values()))
         .stream()
         .map(List::toArray)
         .collect(toImmutableList());
@@ -91,7 +86,7 @@ public class NonLinearArithmeticTest<T extends NumeralFormula> extends SolverBas
   public NonLinearArithmetic nonLinearArithmetic;
 
   @Override
-  protected ConfigurationBuilder createTestConfigBuilder() {
+  protected ConfigurationBuilder createTestConfigBuilder() throws InvalidConfigurationException {
     return super.createTestConfigBuilder()
         .setOption("solver.nonLinearArithmetic", nonLinearArithmetic.name());
   }
@@ -205,18 +200,12 @@ public class NonLinearArithmeticTest<T extends NumeralFormula> extends SolverBas
     assume()
         .withMessage("Solver %s does not support division by zero", solverToUse())
         .that(solverToUse())
-        .isNoneOf(Solvers.YICES2, Solvers.OPENSMT);
-
-    if (formulaType.isRationalType()) {
-      // Division by zero does not work for rationals with Princess.
-      assume()
-          .withMessage("Solver %s does not support division by zero", solverToUse())
-          .that(solverToUse())
-          .isNotEqualTo(Solvers.PRINCESS);
-    }
+        .isNotEqualTo(Solvers.OPENSMT);
 
     T a = nmgr.makeVariable("a");
     T b = nmgr.makeVariable("b");
+    T c = nmgr.makeVariable("c");
+
     T zero = nmgr.makeNumber(0);
 
     BooleanFormula f =
@@ -225,6 +214,15 @@ public class NonLinearArithmeticTest<T extends NumeralFormula> extends SolverBas
             nmgr.equal(nmgr.divide(b, zero), nmgr.makeNumber(4)));
 
     assertThatFormula(f).isSatisfiable();
+
+    // Division by zero is still a function. So, if (/0 a) = b and (/0 a) = c, then b=c must hold
+    BooleanFormula g =
+        bmgr.and(
+            nmgr.equal(nmgr.divide(a, zero), b),
+            nmgr.equal(nmgr.divide(a, zero), c),
+            bmgr.not(nmgr.equal(b, c)));
+
+    assertThatFormula(g).isUnsatisfiable();
   }
 
   @Test

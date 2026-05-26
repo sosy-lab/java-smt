@@ -11,10 +11,10 @@ SPDX-License-Identifier: Apache-2.0
 # JavaSMT
 
 [![Build Status](https://gitlab.com/sosy-lab/software/java-smt/badges/master/pipeline.svg)](https://gitlab.com/sosy-lab/software/java-smt/pipelines)
-[![Build Status on Windows](https://ci.appveyor.com/api/projects/status/08sy37awx7kvflo7/branch/master?svg=true)](https://ci.appveyor.com/project/sosy-lab/java-smt/branch/master)
+[![Github CI](https://github.com/sosy-lab/java-smt/actions/workflows/ci.yml/badge.svg)](https://github.com/sosy-lab/java-smt/actions/workflows/ci.yml)
 ![Test Coverage](https://gitlab.com/sosy-lab/software/java-smt/badges/master/coverage.svg)
 [![Apache 2.0 License](https://img.shields.io/badge/license-Apache--2-brightgreen.svg?style=flat)](https://www.apache.org/licenses/LICENSE-2.0)
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.sosy-lab/java-smt/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.sosy-lab/java-smt)
+[![Maven Central](https://maven-badges.sml.io/maven-central/org.sosy-lab/java-smt/badge.svg)](https://maven-badges.sml.io/maven-central/org.sosy-lab/java-smt)
 
 JavaSMT is a common API layer for accessing various SMT solvers.
 The API is optimized for performance (using JavaSMT has very little runtime
@@ -52,6 +52,7 @@ JavaSMT can express formulas in the following theories:
  - Array
  - Uninterpreted Function
  - String and RegEx
+ - Separation Logic (experimental)
 
 The concrete support for a certain theory depends on the underlying SMT solver.
 Only a few SMT solvers provide support for theories like Arrays, Floating Point, String or RegEx.
@@ -60,23 +61,24 @@ Only a few SMT solvers provide support for theories like Arrays, Floating Point,
 
 JavaSMT supports several SMT solvers (see [Getting Started](doc/Getting-started.md) for installation):
 
-| SMT Solver |       Linux x64       |     Linux arm64     | Windows x64 | Windows arm64 |                       MacOS x64                        | MacOS arm64 | Description |
-| --- |:---------------------:|:-------------------:|:---:|:---:|:------------------------------------------------------:|:---:|:--- |
-| [Bitwuzla](https://bitwuzla.github.io/) |  :heavy_check_mark:²  | :heavy_check_mark:² | :heavy_check_mark: |  |                                                        |  | a fast solver for bitvector logic |
-| [Boolector](https://boolector.github.io/) |  :heavy_check_mark:   |                     |  |  |                                                        |  | a fast solver for bitvector logic, misses formula introspection, deprecated |
-| [CVC4](https://cvc4.github.io/) |  :heavy_check_mark:   |                     |  |  |                                                        |  |  |
-| [CVC5](https://cvc5.github.io/) |  :heavy_check_mark:   |                     |  |  |                                                        |  |  |
-| [MathSAT5](http://mathsat.fbk.eu/) |  :heavy_check_mark:   | :heavy_check_mark:  | :heavy_check_mark: |  | [maybe](https://github.com/sosy-lab/java-smt/pull/430)³ |  |  |
-| [OpenSMT](https://verify.inf.usi.ch/opensmt) |  :heavy_check_mark:²  | :heavy_check_mark:² |  |  |                                                        |  |  |
-| [OptiMathSAT](http://optimathsat.disi.unitn.it/) |  :heavy_check_mark:   |                     |  |  |                                                        |  | based on MathSAT5, with support for optimization queries |
-| [Princess](http://www.philipp.ruemmer.org/princess.shtml) |  :heavy_check_mark:   | :heavy_check_mark:  | :heavy_check_mark: | :heavy_check_mark: |                   :heavy_check_mark:                   | :heavy_check_mark: | Java-based SMT solver |
-| [SMTInterpol](https://ultimate.informatik.uni-freiburg.de/smtinterpol/) |  :heavy_check_mark:   | :heavy_check_mark:  | :heavy_check_mark: | :heavy_check_mark: |                   :heavy_check_mark:                   | :heavy_check_mark: | Java-based SMT solver |
-| [Yices2](https://yices.csl.sri.com/) |  :heavy_check_mark:   |                     | [maybe](https://github.com/sosy-lab/java-smt/pull/215) |  | [maybe](https://github.com/sosy-lab/java-smt/pull/400)³ |  |  |
-| [Z3](https://github.com/Z3Prover/z3) |  :heavy_check_mark:²  | :heavy_check_mark:² | :heavy_check_mark: | :heavy_check_mark: |                   :heavy_check_mark:                   | :heavy_check_mark: | mature and well-known solver |
+| SMT Solver                                                              |      Linux x64      |     Linux arm64     |    Windows x64     |   Windows arm64    |                        MacOS x64                        |    MacOS arm64     | Description                                                                 |
+|-------------------------------------------------------------------------|:-------------------:|:-------------------:|:------------------:|:------------------:|:-------------------------------------------------------:|:------------------:|:----------------------------------------------------------------------------|
+| [Bitwuzla](https://bitwuzla.github.io/)                                 | :heavy_check_mark:² | :heavy_check_mark:² | :heavy_check_mark: |                    |                                                         |                    | a fast solver for bitvector logic                                           |
+| [Boolector](https://boolector.github.io/)                               | :heavy_check_mark:  |                     |                    |                    |                                                         |                    | a fast solver for bitvector logic, misses formula introspection, deprecated |
+| [CVC4](https://cvc4.github.io/)                                         | :heavy_check_mark:  |                     |                    |                    |                                                         |                    |                                                                             |
+| [CVC5](https://cvc5.github.io/)                                         | :heavy_check_mark:  | :heavy_check_mark:  | :heavy_check_mark: | :heavy_check_mark: |                   :heavy_check_mark:                    | :heavy_check_mark: |                                                                             |
+| [MathSAT5](http://mathsat.fbk.eu/)                                      | :heavy_check_mark:³ | :heavy_check_mark:³ | :heavy_check_mark: |                    | [maybe](https://github.com/sosy-lab/java-smt/pull/430)⁴ |                    |                                                                             |
+| [OpenSMT](https://verify.inf.usi.ch/opensmt)                            | :heavy_check_mark:² | :heavy_check_mark:² |                    |                    |                                                         |                    |                                                                             |
+| [OptiMathSAT](http://optimathsat.disi.unitn.it/)                        | :heavy_check_mark:  |                     |                    |                    |                                                         |                    | based on MathSAT5, with support for optimization queries                    |
+| [Princess](http://www.philipp.ruemmer.org/princess.shtml)               | :heavy_check_mark:  | :heavy_check_mark:  | :heavy_check_mark: | :heavy_check_mark: |                   :heavy_check_mark:                    | :heavy_check_mark: | Java-based SMT solver                                                       |
+| [SMTInterpol](https://ultimate.informatik.uni-freiburg.de/smtinterpol/) | :heavy_check_mark:  | :heavy_check_mark:  | :heavy_check_mark: | :heavy_check_mark: |                   :heavy_check_mark:                    | :heavy_check_mark: | Java-based SMT solver                                                       |
+| [Yices2](https://yices.csl.sri.com/)                                    | :heavy_check_mark:  |                     | :heavy_check_mark: |                    | [maybe](https://github.com/sosy-lab/java-smt/pull/400)⁴ |                    |                                                                             |
+| [Z3](https://github.com/Z3Prover/z3)                                    | :heavy_check_mark:³ | :heavy_check_mark:³ | :heavy_check_mark: | :heavy_check_mark: |                   :heavy_check_mark:                    | :heavy_check_mark: | mature and well-known solver                                                |
+| [Z3_WITH_INTERPOLATION](https://github.com/Z3Prover/z3)                 | :heavy_check_mark:  | :heavy_check_mark:  |                    |                    |                                                         |                    | an older version of Z3 that still provides interpolation support            |
 
 We support a reasonable list of operating systems and versions.
 - Our main target is Linux (mainly Ubuntu or comparable Linux distributions).
-  Windows 10/11 and MacOS are supported for several SMT solvers.
+  Windows 10/11 and macOS are supported for several SMT solvers.
 - Our main development architecture is x64 (x86-64).
   We also provide some solvers for ARM64 (AArch64 for ARMv8-A), e.g., Java-based SMT solvers, Z3, and MathSAT.
   If a specific operating system or architecture is missing and required,
@@ -88,7 +90,9 @@ available with Ubuntu 18.04 or later.
 
 ² Solver requires at least `GLIBC_2.29`/`GLIBCXX_3.4.26` or `GLIBC_2.34`/`GLIBCXX_3.4.29`,
 available with Ubuntu 22.04 or later.  
-³ We do not provide a signed solver library for MacOS. The user needs to compile and sign it.
+³ Solver requires at least `GLIBC_2.38`/`GLIBCXX_3.4.31`,
+available with Ubuntu 24.04 or later.  
+⁴ We do not provide a signed solver library for macOS. The user needs to compile and sign it.
 
 #### Solver Features
 
@@ -101,6 +105,7 @@ The following features are supported (depending on the used SMT solver):
  - Multiple independent contexts
  - Model generation
  - Interpolation, including tree and sequential structure
+ - Unsatisfiable core generation
  - Formula transformation using built-in tactics
  - Formula introspection using visitors
 
@@ -109,30 +114,30 @@ If something specific is missing, please [look for or file an issue](https://git
 
 #### Multithreading Support
 
-| SMT Solver | Concurrent context usage⁴ | Concurrent prover usage⁵ |
-| --- |:---:|:---:|
-| [Bitwuzla](https://bitwuzla.github.io/) | :heavy_check_mark: |  |
-| [Boolector](https://boolector.github.io/) | :heavy_check_mark: |  |
-| [CVC4](https://cvc4.github.io/) | :heavy_check_mark: | :heavy_check_mark: |
-| [CVC5](https://cvc4.github.io/) | :question: |  |
-| [MathSAT5](http://mathsat.fbk.eu/) | :heavy_check_mark: |  |
-| [OpenSMT](https://verify.inf.usi.ch/opensmt) | :question: |  |
-| [OptiMathSAT](http://optimathsat.disi.unitn.it/) | :heavy_check_mark: |  |
-| [Princess](http://www.philipp.ruemmer.org/princess.shtml) | :heavy_check_mark: |  |
-| [SMTInterpol](https://ultimate.informatik.uni-freiburg.de/smtinterpol/) | :heavy_check_mark: |  |
-| [Yices2](https://yices.csl.sri.com/) |  |  |
-| [Z3](https://github.com/Z3Prover/z3) | :heavy_check_mark: |  |
+| SMT Solver                                                              | Concurrent context usage⁵ | Concurrent prover usage⁶ |
+|-------------------------------------------------------------------------|:-------------------------:|:------------------------:|
+| [Bitwuzla](https://bitwuzla.github.io/)                                 |    :heavy_check_mark:     |                          |
+| [Boolector](https://boolector.github.io/)                               |    :heavy_check_mark:     |                          |
+| [CVC4](https://cvc4.github.io/)                                         |    :heavy_check_mark:     |    :heavy_check_mark:    |
+| [CVC5](https://cvc4.github.io/)                                         |    :heavy_check_mark:     |                          |
+| [MathSAT5](http://mathsat.fbk.eu/)                                      |    :heavy_check_mark:     |                          |
+| [OpenSMT](https://verify.inf.usi.ch/opensmt)                            |    :heavy_check_mark:     |                          |
+| [OptiMathSAT](http://optimathsat.disi.unitn.it/)                        |    :heavy_check_mark:     |                          |
+| [Princess](http://www.philipp.ruemmer.org/princess.shtml)               |    :heavy_check_mark:     |                          |
+| [SMTInterpol](https://ultimate.informatik.uni-freiburg.de/smtinterpol/) |    :heavy_check_mark:     |                          |
+| [Yices2](https://yices.csl.sri.com/)                                    |    :heavy_check_mark:     |                          |
+| [Z3](https://github.com/Z3Prover/z3)                                    |    :heavy_check_mark:     |                          |
 
 Interruption using a [ShutdownNotifier][] may be used to interrupt a solver from any thread.
 Formulas are translatable in between contexts/provers/threads using _FormulaManager.translateFrom()_.
 
-⁴ Multiple contexts, but all operations on each context only from a single thread.  
-⁵ Multiple provers on one or more contexts, with each prover using its own thread.
+⁵ Multiple contexts, but all operations on each context only from a single thread.  
+⁶ Multiple provers on one or more contexts, with each prover using its own thread.
 
 #### Garbage Collection in Native Solvers
 
 JavaSMT exposes an API for performing garbage collection on solvers implemented in a native language.
-As a native solver has no way of knowing whether the created formula object is still referenced 
+As a native solver has no way of knowing whether the created formula object is still referenced
 by the client application, this API is necessary to avoid leaking memory.
 Note that several solvers already support _hash consing_ and thus,
 there is never more than one copy of an identical formula object in memory.
@@ -141,9 +146,9 @@ in the application, it is not necessary to perform any garbage collection at all
 Additionally, the memory for formulas created on user-side (i.e., via JavaSMT) is negligible
 compared to solver-internal memory-consumption when solving a hard SMT query.
 
-- **Z3**: The parameter `solver.z3.usePhantomReferences` may be used to control 
-  whether JavaSMT will attempt to decrease references on Z3 formula 
-  objects once they are no longer referenced.
+- **Z3**: The parameter `solver.z3.usePhantomReferences` may be used to control
+  whether JavaSMT will attempt to decrease references on Z3 formula objects
+  once they are no longer referenced.
 - **MathSAT5**: Currently we do not support performing garbage collection for MathSAT5.
 - **CVC4, CVC5, Bitwuzla, OpenSMT**: Solvers using SWIG bindings do perform garbage collection.
 - **Other native SMT solvers**: we do not perform garbage collection.
@@ -178,13 +183,66 @@ try (SolverContext context = SolverContextFactory.createSolverContext(
   }
 }
 ```
+You can find several example implementations in the folder `org/sosy_lab/java_smt/example`.
+These include examples for the usage of many of JavaSMTs solvers and features, for example:
+- AllSatExample: showcasing the usage of the AllSat feature, returning all satisfiable 
+  assignments for an input query. JavaSMT is capable of returning AllSat for many solvers even 
+  without them directly supporting this feature.
+- FormulaClassifier: showcases the usage of our formula visitor to classify the logic of an 
+  input SMT file.
+- Interpolation: presents how to utilize Craig-, sequential-, and tree-interpolation.
+- OptimizationFormulaWeights: shows how the weighting of constraints can be optimized in 
+  optimization solving, helping the solver in finding a result.
+- OptimizationIntReal: presents optimization solving for integer and real logics.
+- PrettyPrinter: showcases how to parse user-given SMT input into a pretty format.
+- SimpleUserPropagator: shows an example of a user propagator, prohibiting variables and/or 
+  expressions from being set to true. This can be used to guide an SMT solver in its 
+  solving process. More examples can be found in the folder `nqueens_user_propagator`.
+- SolverOverviewTable: prints out all available SMT solvers, including their theories and 
+  features. This can be used to determine which solvers are available on any machine executing it.
+
+Furthermore, JavaSMT provides users with additional features available for many solvers:
+- Debug-Mode: setting the option `useDebugMode=true`, in the configuration used to create a
+  `SolverContext`, applies additional checks to catch common usage errors. The checks 
+  performed by this option are solver-sensitive and throw exceptions on operations that 
+  are disallowed by a particular solver. For example, for most solvers, adding a constraint to a 
+  `ProverEnvironment` may only be allowed iff the constraint has been built by the same 
+  `SolverContext` that also created the used `ProverEnvironment`. Violating this rule while in 
+  debug-mode with a solver that does not allow this throws a `IllegalArgumentException` with 
+  information about the problem.
+- Synchronization: setting the option `synchronize=true`, in the configuration used to create a
+  `SolverContext`, all solver actions are synchronized with the owning instance being the 
+  `SolverContext`. This allows concurrent access, but strictly sequentializes all operations.
+- Statistics: setting the option `collectStatistics=true`, in the configuration used to create a
+  `SolverContext`, counts all operations and interactions towards the SMT solver of this context. 
+  These statistics can be access in the `SolverContext`.
+- Logging: setting the option `useLogger=true`, in the configuration used to create a 
+  `SolverContext`, logs all solver actions. Logging operations might slow down 
+  usage of JavaSMT though.
+- Assumption solving: in case an SMT solver does not support assumption solving natively, we 
+  automatically add this feature seamlessly through a self-developed layer. No difference in usage 
+  can be observed from a users' perspective.
+- AllSat: in case an SMT solver does not support assumption solving natively, we
+  automatically add this feature seamlessly through a self-developed layer. No difference in usage
+  can be observed from a users' perspective.
+- Formula visitation: we allow the inspection, traversal, and modification of formulas through 
+  our formula-visitor, as long as the chosen SMT solver supports this feature. Users can utilize 
+  many pre-built features based on this visitor like 
+  `BooleanFormulaManager.toDisjunctionArgs()`, returning a set of formulas such that a 
+  disjunction over them is equivalent to the input formula, or `FormulaManager.
+  extractVariablesAndUFs()`, which can be used to extract the names of all free variables and 
+  UFs in a formula. The visitor-pattern can also be used with user-defined operations.
+
+Many more options are available to configure SMT solvers by setting them in the `Configuration` 
+given to an `SolverContext`, including SMT solvers native configuration options.
 
 ## Authors
 
- - Project maintainers: [Karlheinz Friedberger][] and [Philipp Wendler][]
+ - Project maintainers: [Karlheinz Friedberger][] and [Daniel Baier][]
  - Former project maintainer: [George Karpenkov][]
  - Initial codebase, many design decisions: [Philipp Wendler][]
- - Contributions: [Daniel Baier][], [Thomas Stieglmaier][] and several others.
+ - Contributions: [Bajczi Levente][], Daniel Raffler, [Martin Spiessl][], [Thomas Stieglmaier][],
+   and many others. For a full list, see the [contributors overview][].
 
 [ConfigurationOptions]: https://sosy-lab.github.io/java-smt/ConfigurationOptions.txt
 [Manual Installation]: doc/Getting-started.md#manual-installation
@@ -195,5 +253,8 @@ try (SolverContext context = SolverContextFactory.createSolverContext(
 [Thomas Stieglmaier]: https://stieglmaier.me/
 [Karlheinz Friedberger]: https://www.sosy-lab.org/people/friedberger
 [Daniel Baier]: https://www.sosy-lab.org/people/baier
+[Martin Spiessl]: https://www.sosy-lab.org/people/spiessl/
+[Bajczi Levente]: leventebajczi.github.io
 [Ivy repository]: https://www.sosy-lab.org/ivy
 [Maven repository]: https://mvnrepository.com/artifact/org.sosy-lab/java-smt
+[contributors overview]: https://github.com/sosy-lab/java-smt/graphs/contributors

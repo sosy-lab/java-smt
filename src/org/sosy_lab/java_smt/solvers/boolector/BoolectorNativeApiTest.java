@@ -145,8 +145,8 @@ public class BoolectorNativeApiTest {
       for (String name : ImmutableList.of("a", "a", "b", "abc", "ABC")) {
         BooleanFormula f = bfmgr.makeVariable(name);
         String s = mgr.dumpFormula(f).toString();
-        assertThat(s).contains(String.format("(declare-fun %s () (_ BitVec 1))", name));
-        // assertThat(s).contains(String.format("(assert %s)", name)); // assertion not available
+        assertThat(s).contains("(declare-fun %s () (_ BitVec 1))".formatted(name));
+        // assertThat(s).contains("(assert %s)".formatted(name)); // assertion not available
       }
     }
   }
@@ -174,8 +174,8 @@ public class BoolectorNativeApiTest {
           // - first level comes from the constructor of ReusableStackTheoremProver.
           // - second level comes from the PUSH above.
           // We do actually not want to have such names in the dump.
-          assertThat(s).contains(String.format("(declare-fun BTOR_2@%s () (_ BitVec 1))", name));
-          // assertThat(s).contains(String.format("(assert "));
+          assertThat(s).contains("(declare-fun BTOR_2@%s () (_ BitVec 1))".formatted(name));
+          // assertThat(s).contains("(assert ");
         }
       }
     }
@@ -323,7 +323,7 @@ public class BoolectorNativeApiTest {
         .isEqualTo(BtorJNI.boolector_bv_assignment(btor, x));
     assertThat(BtorJNI.boolector_bv_assignment(btor, yValue))
         .isEqualTo(BtorJNI.boolector_bv_assignment(btor, y));
-    // The assignment_helper generates the assignments in a array of arrays!
+    // The assignment_helper generates the assignments in an array of arrays!
     String[][] arrayValueHelperArray = BtorJNI.boolector_array_assignment_helper(btor, arrayValue);
     String[] arrayValueIndices = arrayValueHelperArray[0];
     Arrays.sort(arrayValueIndices);

@@ -14,11 +14,11 @@ import org.sosy_lab.java_smt.api.EnumerationFormula;
 import org.sosy_lab.java_smt.api.EnumerationFormulaManager;
 import org.sosy_lab.java_smt.api.FormulaType.EnumerationFormulaType;
 
-public class DebuggingEnumerationFormulaManager implements EnumerationFormulaManager {
+class DebuggingEnumerationFormulaManager implements EnumerationFormulaManager {
   private final EnumerationFormulaManager delegate;
   private final DebuggingAssertions debugging;
 
-  public DebuggingEnumerationFormulaManager(
+  DebuggingEnumerationFormulaManager(
       EnumerationFormulaManager pDelegate, DebuggingAssertions pDebugging) {
     delegate = pDelegate;
     debugging = pDebugging;

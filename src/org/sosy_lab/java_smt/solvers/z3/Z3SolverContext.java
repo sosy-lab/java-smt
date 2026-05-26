@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 import java.util.logging.Level;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -46,7 +47,7 @@ public final class Z3SolverContext extends AbstractSolverContext {
   private final ExtraOptions extraOptions;
   private final Z3FormulaCreator creator;
   private final Z3FormulaManager manager;
-  private boolean closed = false;
+  private final AtomicBoolean closed = new AtomicBoolean(false);
 
   private static final String OPT_ENGINE_CONFIG_KEY = "optsmt_engine";
   private static final String OPT_PRIORITY_CONFIG_KEY = "priority";
@@ -215,7 +216,7 @@ public final class Z3SolverContext extends AbstractSolverContext {
 
   @Override
   protected ProverEnvironment newProverEnvironment0(Set<ProverOptions> options) {
-    Preconditions.checkState(!closed, "solver context is already closed");
+    Preconditions.checkState(!closed.get(), "solver context is already closed");
     final ImmutableMap<String, Object> solverOptions =
         ImmutableMap.<String, Object>builder()
             .put(":random-seed", extraOptions.randomSeed)
@@ -241,7 +242,7 @@ public final class Z3SolverContext extends AbstractSolverContext {
   @Override
   public OptimizationProverEnvironment newOptimizationProverEnvironment0(
       Set<ProverOptions> options) {
-    Preconditions.checkState(!closed, "solver context is already closed");
+    Preconditions.checkState(!closed.get(), "solver context is already closed");
     final ImmutableMap<String, Object> solverOptions =
         ImmutableMap.<String, Object>builder()
             // .put(":random-seed", extraOptions.randomSeed) // not supported here
@@ -269,8 +270,7 @@ public final class Z3SolverContext extends AbstractSolverContext {
 
   @Override
   public void close() {
-    if (!closed) {
-      closed = true;
+    if (!closed.getAndSet(true)) {
       long context = creator.getEnv();
       creator.forceClose();
       shutdownNotifier.unregister(interruptListener);

@@ -11,7 +11,9 @@ package org.sosy_lab.java_smt.test;
 import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.Truth.assert_;
 import static com.google.common.truth.TruthJUnit.assume;
+import static org.sosy_lab.common.collect.Collections3.transformedImmutableListCopy;
 
+import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableList;
 import java.util.ArrayList;
 import java.util.List;
@@ -27,6 +29,7 @@ import org.sosy_lab.java_smt.api.BasicProverEnvironment;
 import org.sosy_lab.java_smt.api.BasicProverEnvironment.AllSatCallback;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
+import org.sosy_lab.java_smt.api.Model.ValueAssignment;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
@@ -68,27 +71,20 @@ public class SolverAllSatTest extends SolverBasedTest0 {
   @Before
   public void setupEnvironment() {
     switch (proverEnv) {
-      case "normal":
-        env = context.newProverEnvironment(ProverOptions.GENERATE_ALL_SAT);
-        break;
-      case "itp":
+      case "normal" -> env = context.newProverEnvironment(ProverOptions.GENERATE_ALL_SAT);
+      case "itp" -> {
         requireInterpolation();
 
         // TODO how can we support allsat in MathSat5-interpolation-prover?
         assume().that(solverToUse()).isNotEqualTo(Solvers.MATHSAT5);
 
-        // CVC4 and Boolector do not support interpolation
-        assume().that(solverToUse()).isNoneOf(Solvers.CVC4, Solvers.BOOLECTOR, Solvers.Z3);
-
         env = context.newProverEnvironmentWithInterpolation(ProverOptions.GENERATE_ALL_SAT);
-        break;
-
-      case "opt":
+      }
+      case "opt" -> {
         requireOptimization();
         env = context.newOptimizationProverEnvironment(ProverOptions.GENERATE_ALL_SAT);
-        break;
-      default:
-        throw new AssertionError("unexpected");
+      }
+      default -> throw new AssertionError("unexpected");
     }
   }
 
@@ -117,6 +113,39 @@ public class SolverAllSatTest extends SolverBasedTest0 {
   }
 
   @Test
+  public void allSatIntegersTest() throws InterruptedException, SolverException {
+    // Adapted from the AllSat example in src/example
+    requireIntegers();
+
+    try (var prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
+
+      IntegerFormula a = imgr.makeVariable("a");
+      BooleanFormula p = bmgr.makeVariable("p");
+      BooleanFormula q = bmgr.makeVariable("q");
+
+      prover.addConstraint(imgr.lessOrEquals(imgr.makeNumber(1), a));
+      prover.addConstraint(imgr.lessOrEquals(a, imgr.makeNumber(3)));
+      prover.addConstraint(bmgr.equivalence(p, q));
+
+      // loop over all possible models for "1<=a<=3 AND p=q"
+      while (!prover.isUnsat()) {
+        ImmutableList<ValueAssignment> modelAssignments = prover.getModelAssignments();
+
+        // check that the model doesn't have any internal variables
+        assertThat(FluentIterable.from(modelAssignments).transform(ValueAssignment::getName))
+            .containsExactly("a", "p", "q");
+
+        // prevent next model from using the same assignment as a previous model
+        prover.addConstraint(
+            bmgr.not(
+                bmgr.and(
+                    transformedImmutableListCopy(
+                        modelAssignments, ValueAssignment::getAssignmentAsFormula))));
+      }
+    }
+  }
+
+  @Test
   public void allSatTest_unsat() throws SolverException, InterruptedException {
     requireIntegers();
 
@@ -141,7 +170,7 @@ public class SolverAllSatTest extends SolverBasedTest0 {
           @Override
           public void apply(List<BooleanFormula> pModel) {
             assert_()
-                .withMessage("Formula is unsat, but all-sat callback called with model " + pModel)
+                .withMessage("Formula is unsat, but all-sat callback called with model %s", pModel)
                 .fail();
           }
         };
@@ -149,10 +178,13 @@ public class SolverAllSatTest extends SolverBasedTest0 {
     assertThat(env.allSat(callback, ImmutableList.of(v1, v2))).isEqualTo(EXPECTED_RESULT);
   }
 
-  @Test
+  @Test(timeout = 5_000)
   public void allSatTest_xor() throws SolverException, InterruptedException {
     requireIntegers();
 
+    // We have the following constraint: '(i=1) XOR (i=2)'
+    // with the predicates b1 and b2 defined as: '(i=1) <=> b1' and '(i=2) <=> b2'.
+    // We expect exactly two models from ALLSAT: {b1,-b2} and {-b1, b2}.
     IntegerFormula a = imgr.makeVariable("i");
     IntegerFormula n1 = imgr.makeNumber(1);
     IntegerFormula n2 = imgr.makeNumber(2);
@@ -167,9 +199,6 @@ public class SolverAllSatTest extends SolverBasedTest0 {
 
     env.push(bmgr.equivalence(v1, cond1));
     env.push(bmgr.equivalence(v2, cond2));
-
-    // ((i=1) XOR (i=2)) & b1 <=> (i=1) & b2 <=> (i=2)
-    // query ALLSAT for predicates [b1, b2] --> {[b1,-b2], [-b1,b2]}
 
     TestAllSatCallback callback = new TestAllSatCallback();
 
@@ -205,7 +234,7 @@ public class SolverAllSatTest extends SolverBasedTest0 {
     assume()
         .withMessage("solver does only partially support quantifiers")
         .that(solverToUse())
-        .isNotEqualTo(Solvers.BOOLECTOR);
+        .isNoneOf(Solvers.BOOLECTOR, Solvers.YICES2);
 
     if ("opt".equals(proverEnv)) {
       assume()
@@ -217,13 +246,6 @@ public class SolverAllSatTest extends SolverBasedTest0 {
     if ("itp".equals(proverEnv)) {
       assume()
           .withMessage("solver reports a inconclusive sat-check when using interpolation")
-          .that(solverToUse())
-          .isNotEqualTo(Solvers.PRINCESS);
-    }
-
-    if ("normal".equals(proverEnv)) {
-      assume()
-          .withMessage("solver reports a partial model when using quantifiers")
           .that(solverToUse())
           .isNotEqualTo(Solvers.PRINCESS);
     }

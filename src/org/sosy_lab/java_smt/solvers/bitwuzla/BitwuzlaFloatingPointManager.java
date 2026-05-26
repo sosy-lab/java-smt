@@ -10,6 +10,7 @@ package org.sosy_lab.java_smt.solvers.bitwuzla;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import org.sosy_lab.common.UniqueIdGenerator;
 import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.api.FloatingPointFormula;
 import org.sosy_lab.java_smt.api.FloatingPointNumber.Sign;
@@ -23,20 +24,20 @@ import org.sosy_lab.java_smt.solvers.bitwuzla.api.Sort;
 import org.sosy_lab.java_smt.solvers.bitwuzla.api.Term;
 import org.sosy_lab.java_smt.solvers.bitwuzla.api.TermManager;
 
-public class BitwuzlaFloatingPointManager
-    extends AbstractFloatingPointFormulaManager<Term, Sort, Void, BitwuzlaDeclaration> {
+class BitwuzlaFloatingPointManager
+    extends AbstractFloatingPointFormulaManager<Term, Sort, TermManager, BitwuzlaDeclaration> {
   private final BitwuzlaFormulaCreator bitwuzlaCreator;
   private final TermManager termManager;
   private final Term roundingMode;
 
   // Keeps track of the temporary variables that are created for fp-to-bv casts
-  private static int counter = 0;
+  private static final UniqueIdGenerator counter = new UniqueIdGenerator();
 
-  protected BitwuzlaFloatingPointManager(
+  BitwuzlaFloatingPointManager(
       BitwuzlaFormulaCreator pCreator, FloatingPointRoundingMode pFloatingPointRoundingMode) {
     super(pCreator);
     bitwuzlaCreator = pCreator;
-    termManager = pCreator.getTermManager();
+    termManager = pCreator.getEnv();
     roundingMode = getRoundingModeImpl(pFloatingPointRoundingMode);
   }
 
@@ -47,20 +48,13 @@ public class BitwuzlaFloatingPointManager
 
   @Override
   protected Term getRoundingModeImpl(FloatingPointRoundingMode pFloatingPointRoundingMode) {
-    switch (pFloatingPointRoundingMode) {
-      case NEAREST_TIES_TO_EVEN:
-        return termManager.mk_rm_value(RoundingMode.RNE);
-      case NEAREST_TIES_AWAY:
-        return termManager.mk_rm_value(RoundingMode.RNA);
-      case TOWARD_POSITIVE:
-        return termManager.mk_rm_value(RoundingMode.RTP);
-      case TOWARD_NEGATIVE:
-        return termManager.mk_rm_value(RoundingMode.RTN);
-      case TOWARD_ZERO:
-        return termManager.mk_rm_value(RoundingMode.RTZ);
-      default:
-        throw new AssertionError("Unexpected value for Floating-Point rounding mode.");
-    }
+    return switch (pFloatingPointRoundingMode) {
+      case NEAREST_TIES_TO_EVEN -> termManager.mk_rm_value(RoundingMode.RNE);
+      case NEAREST_TIES_AWAY -> termManager.mk_rm_value(RoundingMode.RNA);
+      case TOWARD_POSITIVE -> termManager.mk_rm_value(RoundingMode.RTP);
+      case TOWARD_NEGATIVE -> termManager.mk_rm_value(RoundingMode.RTN);
+      case TOWARD_ZERO -> termManager.mk_rm_value(RoundingMode.RTZ);
+    };
   }
 
   @Override
@@ -68,6 +62,16 @@ public class BitwuzlaFloatingPointManager
     BigDecimal num = new BigDecimal(n.getNum());
     BigDecimal den = new BigDecimal(n.getDen());
     return makeNumber(num.divide(den), type);
+  }
+
+  @Override
+  public FloatingPointFormula makeNumber(
+      Rational n,
+      FormulaType.FloatingPointType type,
+      FloatingPointRoundingMode pFloatingPointRoundingMode) {
+    BigDecimal num = new BigDecimal(n.getNum());
+    BigDecimal den = new BigDecimal(n.getDen());
+    return makeNumber(num.divide(den), type, pFloatingPointRoundingMode);
   }
 
   @Override
@@ -84,7 +88,7 @@ public class BitwuzlaFloatingPointManager
     Sort expSort = termManager.mk_bv_sort(type.getExponentSize());
     Term expTerm = termManager.mk_bv_value(expSort, exponent.toString(2));
 
-    Sort mantissaSort = termManager.mk_bv_sort(type.getMantissaSize());
+    Sort mantissaSort = termManager.mk_bv_sort(type.getMantissaSizeWithoutHiddenBit());
     Term mantissaTerm = termManager.mk_bv_value(mantissaSort, mantissa.toString(2));
 
     return termManager.mk_fp_value(signTerm, expTerm, mantissaTerm);
@@ -134,7 +138,7 @@ public class BitwuzlaFloatingPointManager
           pRoundingMode,
           pNumber,
           targetType.getExponentSize(),
-          targetType.getMantissaSize() + 1);
+          targetType.getMantissaSizeWithHiddenBit());
     } else if (pTargetType.isBitvectorType()) {
       FormulaType.BitvectorType targetType = (FormulaType.BitvectorType) pTargetType;
       if (pSigned) {
@@ -161,14 +165,14 @@ public class BitwuzlaFloatingPointManager
             roundingMode,
             pNumber,
             pTargetType.getExponentSize(),
-            pTargetType.getMantissaSize() + 1);
+            pTargetType.getMantissaSizeWithHiddenBit());
       } else {
         return termManager.mk_term(
             Kind.FP_TO_FP_FROM_UBV,
             roundingMode,
             pNumber,
             pTargetType.getExponentSize(),
-            pTargetType.getMantissaSize() + 1);
+            pTargetType.getMantissaSizeWithHiddenBit());
       }
 
     } else {
@@ -183,7 +187,7 @@ public class BitwuzlaFloatingPointManager
         Kind.FP_TO_FP_FROM_BV,
         pNumber,
         pTargetType.getExponentSize(),
-        pTargetType.getMantissaSize() + 1);
+        pTargetType.getMantissaSizeWithHiddenBit());
   }
 
   @Override
@@ -212,7 +216,7 @@ public class BitwuzlaFloatingPointManager
 
     // TODO creating our own utility variables might eb unexpected from the user.
     //   We might need to exclude such variables in models and formula traversal.
-    String newVariable = "__JAVASMT__CAST_FROM_BV_" + counter++;
+    String newVariable = "__JAVASMT__CAST_FROM_BV_" + counter.getFreshId();
     Term bvVar = termManager.mk_const(bvSort, newVariable);
     Term equal =
         termManager.mk_term(

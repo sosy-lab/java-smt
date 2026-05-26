@@ -12,9 +12,14 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Splitter;
 import com.google.common.base.Splitter.MapSplitter;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.github.cvc5.CVC5ApiRecoverableException;
+import io.github.cvc5.Context;
 import io.github.cvc5.Solver;
+import io.github.cvc5.TermManager;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -78,6 +83,9 @@ public final class CVC5SolverContext extends AbstractSolverContext {
   private final CVC5Settings settings;
   private boolean closed = false;
 
+  /** Counts the number of (open) CVC5 solver contexts. * */
+  private static int instances = 0;
+
   private CVC5SolverContext(
       CVC5FormulaCreator pCreator,
       CVC5FormulaManager pManager,
@@ -95,7 +103,7 @@ public final class CVC5SolverContext extends AbstractSolverContext {
 
   @VisibleForTesting
   static void loadLibrary(Consumer<String> pLoader) {
-    pLoader.accept("cvc5jni");
+    loadLibrariesWithFallback(pLoader, ImmutableList.of("cvc5jni"), ImmutableList.of("libcvc5jni"));
 
     // disable CVC5's own loading mechanism,
     // see io.github.cvc5.Util#loadLibraries and https://github.com/cvc5/cvc5/pull/9047
@@ -113,13 +121,24 @@ public final class CVC5SolverContext extends AbstractSolverContext {
       Consumer<String> pLoader)
       throws InvalidConfigurationException {
 
+    synchronized (CVC5SolverContext.class) {
+      // Increase counter *before* any CVC5 objects are created
+      instances++;
+    }
+
     CVC5Settings settings = new CVC5Settings(pConfig);
 
     loadLibrary(pLoader);
 
-    // This Solver is the central class for creating expressions/terms/formulae.
+    // The TermManager is the central class for creating expressions/terms/formulae.
     // We keep this instance available until the whole context is closed.
-    Solver newSolver = new Solver();
+    TermManager termManager = new TermManager();
+
+    // Create a new solver instance
+    // We'll use this instance in some of the formula managers for simplifying terms and declaring
+    // datatypes. The actual solving is done on a different instance that is created by
+    // newProverEnvironment()
+    Solver newSolver = new Solver(termManager);
 
     try {
       setSolverOptions(newSolver, randomSeed, settings.furtherOptionsMap);
@@ -127,7 +146,7 @@ public final class CVC5SolverContext extends AbstractSolverContext {
       throw new InvalidConfigurationException(e.getMessage(), e);
     }
 
-    CVC5FormulaCreator pCreator = new CVC5FormulaCreator(newSolver);
+    CVC5FormulaCreator pCreator = new CVC5FormulaCreator(termManager, newSolver);
 
     // Create managers
     CVC5UFManager functionTheory = new CVC5UFManager(pCreator);
@@ -140,7 +159,7 @@ public final class CVC5SolverContext extends AbstractSolverContext {
         new CVC5BitvectorFormulaManager(pCreator, booleanTheory);
     CVC5FloatingPointFormulaManager fpTheory =
         new CVC5FloatingPointFormulaManager(pCreator, pFloatingPointRoundingMode);
-    CVC5QuantifiedFormulaManager qfTheory = new CVC5QuantifiedFormulaManager(pCreator);
+    CVC5QuantifiedFormulaManager qfTheory = new CVC5QuantifiedFormulaManager(pCreator, newSolver);
     CVC5ArrayFormulaManager arrayTheory = new CVC5ArrayFormulaManager(pCreator);
     CVC5SLFormulaManager slTheory = new CVC5SLFormulaManager(pCreator);
     CVC5StringFormulaManager strTheory = new CVC5StringFormulaManager(pCreator);
@@ -169,48 +188,44 @@ public final class CVC5SolverContext extends AbstractSolverContext {
    *
    * @throws CVC5ApiRecoverableException from native code.
    */
-  private static void setSolverOptions(
+  static void setSolverOptions(
       Solver pSolver, int randomSeed, ImmutableMap<String, String> furtherOptions)
       throws CVC5ApiRecoverableException {
     pSolver.setOption("seed", String.valueOf(randomSeed));
     pSolver.setOption("output-language", "smtlib2");
 
+    // Enable support for arbitrary size floating-point formats
+    pSolver.setOption("fp-exp", "true");
+
     for (Entry<String, String> option : furtherOptions.entrySet()) {
       pSolver.setOption(option.getKey(), option.getValue());
     }
-
-    // Set Strings option to enable all String features (such as lessOrEquals).
-    // This should not have any effect for non-string theories.
-    // pSolver.setOption("strings-exp", "true");
-
-    // pSolver.setOption("finite-model-find", "true");
-    // pSolver.setOption("sets-ext", "true");
-
-    // pSolver.setOption("produce-models", "true");
-    // pSolver.setOption("produce-unsat-cores", "true");
-
-    // Neither simplification, arith-rewrite-equalities, pb-rewrites provide rewrites of trivial
-    // formulas only.
-    // Note: with solver.getOptionNames() you can get all options
   }
 
   @Override
   public String getVersion() {
-    String version = solver.getInfo("version");
-    if (version.startsWith("\"") && version.endsWith("\"")) {
-      version = version.substring(1, version.length() - 1);
-    }
-    return "CVC5 " + version;
+    return "CVC5 " + solver.getVersion();
   }
 
+  @SuppressFBWarnings(
+      value = "ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD",
+      justification = "Static reference counter guarded by class-level synchronization")
   @Override
   public void close() {
-    if (creator != null) {
-      closed = true;
-      solver.deletePointer();
-      // Don't use Context.deletePointers(); as it deletes statically information from all
-      // existing contexts, not only this one!
+    synchronized (CVC5SolverContext.class) {
+      if (!closed) {
+        if (instances == 1) {
+          // Delete all solver objects if we're closing the last instance
+          Context.deletePointers();
+        } else {
+          // Otherwise, only delete the Solver, but keep the TermManager and all other objects
+          // Closing the TermManager here will cause a segfault later
+          solver.deletePointer();
+        }
+        instances--;
+      }
       creator = null;
+      closed = true;
     }
   }
 
@@ -226,7 +241,7 @@ public final class CVC5SolverContext extends AbstractSolverContext {
         creator,
         shutdownNotifier,
         randomSeed,
-        pOptions,
+        ImmutableSet.copyOf(pOptions),
         getFormulaManager(),
         settings.furtherOptionsMap);
   }
@@ -244,7 +259,7 @@ public final class CVC5SolverContext extends AbstractSolverContext {
         creator,
         shutdownNotifier,
         randomSeed,
-        pOptions,
+        ImmutableSet.copyOf(pOptions),
         getFormulaManager(),
         settings.furtherOptionsMap,
         settings.validateInterpolants);

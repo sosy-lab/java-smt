@@ -14,7 +14,7 @@
 package org.sosy_lab.java_smt.solvers.boolector;
 
 /** We keep this synchronized with "btortypes.h". */
-public enum BtorOption {
+enum BtorOption {
   BTOR_OPT_MODEL_GEN,
   BTOR_OPT_INCREMENTAL,
   BTOR_OPT_INCREMENTAL_SMT1,

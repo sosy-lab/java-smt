@@ -96,8 +96,7 @@ class Mathsat5OptimizationProver extends Mathsat5AbstractProver<Void>
   }
 
   @Override
-  public OptStatus check() throws InterruptedException, SolverException {
-    checkState(!closed);
+  protected OptStatus checkImpl() throws InterruptedException, SolverException {
     final boolean isSatisfiable = msat_check_sat(curEnv);
     if (isSatisfiable) {
       return OptStatus.OPT;
@@ -121,12 +120,14 @@ class Mathsat5OptimizationProver extends Mathsat5AbstractProver<Void>
   @Override
   public Optional<Rational> upper(int handle, Rational epsilon) {
     checkState(!closed);
+    checkGenerateModels();
     return getValue(handle, epsilon);
   }
 
   @Override
   public Optional<Rational> lower(int handle, Rational epsilon) {
     checkState(!closed);
+    checkGenerateModels();
     return getValue(handle, epsilon);
   }
 
@@ -147,6 +148,7 @@ class Mathsat5OptimizationProver extends Mathsat5AbstractProver<Void>
   @Override
   public Model getModel() throws SolverException {
     checkState(!closed);
+    checkGenerateModels(); // Needed before loading objective model!
     if (!objectiveMap.isEmpty()) {
       msat_load_objective_model(curEnv, objectiveMap.values().iterator().next());
     }

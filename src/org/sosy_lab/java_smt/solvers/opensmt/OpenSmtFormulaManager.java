@@ -18,6 +18,7 @@ import org.sosy_lab.java_smt.solvers.opensmt.api.PTRef;
 import org.sosy_lab.java_smt.solvers.opensmt.api.SRef;
 import org.sosy_lab.java_smt.solvers.opensmt.api.SymRef;
 import org.sosy_lab.java_smt.solvers.opensmt.api.Symbol;
+import org.sosy_lab.java_smt.solvers.opensmt.api.VectorPTRef;
 
 class OpenSmtFormulaManager extends AbstractFormulaManager<PTRef, SRef, Logic, SymRef> {
   private final OpenSmtFormulaCreator creator;
@@ -49,6 +50,26 @@ class OpenSmtFormulaManager extends AbstractFormulaManager<PTRef, SRef, Logic, S
   }
 
   @Override
+  protected PTRef equalImpl(Iterable<PTRef> pArgs) {
+    VectorPTRef array = new VectorPTRef(pArgs);
+    if (array.size() < 2) {
+      return getEnvironment().getTerm_true();
+    } else {
+      return getEnvironment().mkEq(array);
+    }
+  }
+
+  @Override
+  public PTRef distinctImpl(Iterable<PTRef> pArgs) {
+    VectorPTRef array = new VectorPTRef(pArgs);
+    if (array.size() < 2) {
+      return getEnvironment().getTerm_true();
+    } else {
+      return getEnvironment().mkDistinct(array);
+    }
+  }
+
+  @Override
   public PTRef parseImpl(String pS) throws IllegalArgumentException {
     return osmtLogic.parseFormula(pS);
   }
@@ -67,9 +88,9 @@ class OpenSmtFormulaManager extends AbstractFormulaManager<PTRef, SRef, Logic, S
       out.append("(declare-fun ")
           .append(osmtLogic.protectName(ref))
           .append(" (")
-          .append(Joiner.on(' ').join(Lists.transform(sym.getArgTypes(), osmtLogic::printSort)))
+          .append(Joiner.on(' ').join(Lists.transform(sym.getArgTypes(), osmtLogic::sortToString)))
           .append(") ")
-          .append(osmtLogic.printSort(sym.rsort()))
+          .append(osmtLogic.sortToString(sym.rsort()))
           .append(")\n");
     }
     out.append("(assert ").append(osmtLogic.dumpWithLets(f)).append(')');

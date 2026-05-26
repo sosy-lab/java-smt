@@ -8,7 +8,6 @@
 
 package org.sosy_lab.java_smt.solvers.princess;
 
-import static com.google.common.base.Preconditions.checkArgument;
 import static scala.collection.JavaConverters.asJava;
 import static scala.collection.JavaConverters.asScala;
 
@@ -56,11 +55,6 @@ class PrincessInterpolatingProver extends PrincessAbstractProver<Integer>
 
   @Override
   public BooleanFormula getInterpolant(Collection<Integer> pTermNamesOfA) throws SolverException {
-    Preconditions.checkState(!closed);
-    checkArgument(
-        getAssertedConstraintIds().containsAll(pTermNamesOfA),
-        "interpolation can only be done over previously asserted formulas.");
-
     Set<Integer> indexesOfA = ImmutableSet.copyOf(pTermNamesOfA);
 
     // calc difference: termNamesOfB := assertedFormulas - termNamesOfA
@@ -76,14 +70,6 @@ class PrincessInterpolatingProver extends PrincessAbstractProver<Integer>
   @Override
   public List<BooleanFormula> getSeqInterpolants(
       final List<? extends Collection<Integer>> pPartitions) throws SolverException {
-    Preconditions.checkState(!closed);
-    Preconditions.checkArgument(
-        !pPartitions.isEmpty(), "at least one partition should be available.");
-    final ImmutableSet<Integer> assertedConstraintIds = getAssertedConstraintIds();
-    checkArgument(
-        pPartitions.stream().allMatch(assertedConstraintIds::containsAll),
-        "interpolation can only be done over previously asserted formulas.");
-
     // convert to needed data-structure
     final ArrayBuffer<scala.collection.immutable.Set<Object>> args = new ArrayBuffer<>();
     for (Collection<Integer> partition : pPartitions) {
@@ -118,14 +104,6 @@ class PrincessInterpolatingProver extends PrincessAbstractProver<Integer>
   public List<BooleanFormula> getTreeInterpolants(
       List<? extends Collection<Integer>> partitionedFormulas, int[] startOfSubTree)
       throws SolverException {
-    Preconditions.checkState(!closed);
-    final ImmutableSet<Integer> assertedConstraintIds = getAssertedConstraintIds();
-    checkArgument(
-        partitionedFormulas.stream().allMatch(assertedConstraintIds::containsAll),
-        "interpolation can only be done over previously asserted formulas.");
-    assert InterpolatingProverEnvironment.checkTreeStructure(
-        partitionedFormulas.size(), startOfSubTree);
-
     // reconstruct the trees from the labels in post-order
     final Deque<Tree<scala.collection.immutable.Set<Object>>> stack = new ArrayDeque<>();
     final Deque<Integer> subtreeStarts = new ArrayDeque<>();

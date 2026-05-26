@@ -17,8 +17,7 @@ import java.math.BigInteger;
 import org.sosy_lab.java_smt.api.IntegerFormulaManager;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 
-public class CVC5IntegerFormulaManager
-    extends CVC5NumeralFormulaManager<IntegerFormula, IntegerFormula>
+class CVC5IntegerFormulaManager extends CVC5NumeralFormulaManager<IntegerFormula, IntegerFormula>
     implements IntegerFormulaManager {
 
   CVC5IntegerFormulaManager(CVC5FormulaCreator pCreator, NonLinearArithmetic pNonLinearArithmetic) {
@@ -42,7 +41,7 @@ public class CVC5IntegerFormulaManager
 
   @Override
   public Term divide(Term pParam1, Term pParam2) {
-    return solver.mkTerm(Kind.INTS_DIVISION, pParam1, pParam2);
+    return termManager.mkTerm(Kind.INTS_DIVISION, pParam1, pParam2);
   }
 
   @Override
@@ -56,10 +55,12 @@ public class CVC5IntegerFormulaManager
     if (BigInteger.ZERO.compareTo(pModulo) < 0) {
       Term n = makeNumberImpl(pModulo);
       Term x = subtract(pNumber1, pNumber2);
-      return solver.mkTerm(
-          Kind.EQUAL, x, solver.mkTerm(Kind.MULT, n, solver.mkTerm(Kind.INTS_DIVISION, x, n)));
+      return termManager.mkTerm(
+          Kind.EQUAL,
+          x,
+          termManager.mkTerm(Kind.MULT, n, termManager.mkTerm(Kind.INTS_DIVISION, x, n)));
     }
-    return solver.mkBoolean(true);
+    return termManager.mkBoolean(true);
   }
 
   @Override
@@ -73,7 +74,7 @@ public class CVC5IntegerFormulaManager
       throw new NumberFormatException("Number is not an integer value: " + pI);
     }
     try {
-      return solver.mkInteger(pI);
+      return termManager.mkInteger(pI);
     } catch (CVC5ApiException e) {
       throw new NumberFormatException("Number is not an integer value: " + pI);
     }

@@ -38,11 +38,6 @@ public abstract class BooleanFormulaTransformationVisitor
   }
 
   @Override
-  public BooleanFormula visitBoundVar(BooleanFormula var, int deBruijnIdx) {
-    return var;
-  }
-
-  @Override
   public BooleanFormula visitAtom(BooleanFormula pAtom, FunctionDeclaration<BooleanFormula> decl) {
     return pAtom;
   }

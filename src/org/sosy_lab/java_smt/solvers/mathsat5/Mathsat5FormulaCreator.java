@@ -8,6 +8,7 @@
 
 package org.sosy_lab.java_smt.solvers.mathsat5;
 
+import static org.sosy_lab.java_smt.api.FormulaType.getFloatingPointTypeFromSizesWithoutHiddenBit;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_AND;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_ARRAY_CONST;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_ARRAY_READ;
@@ -37,6 +38,7 @@ import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_BV_UREM;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_BV_XOR;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_BV_ZEXT;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_DIVIDE;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_EQ;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_FLOOR;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_FP_ABS;
@@ -65,13 +67,15 @@ import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_FP_TO_SBV;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_FP_TO_UBV;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_IFF;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_INT_FROM_SBV;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_INT_FROM_UBV;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_INT_TO_BV;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_ITE;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_LEQ;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_NOT;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_OR;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_PLUS;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_TIMES;
-import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_UNKNOWN;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_decl_get_arg_type;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_decl_get_name;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_decl_get_tag;
@@ -105,6 +109,10 @@ import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_term
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_term_get_type;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_term_is_constant;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_term_is_false;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_term_is_fp_roundingmode_minus_inf;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_term_is_fp_roundingmode_nearest_even;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_term_is_fp_roundingmode_plus_inf;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_term_is_fp_roundingmode_zero;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_term_is_number;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_term_is_true;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_term_is_uf;
@@ -127,6 +135,8 @@ import org.sosy_lab.java_smt.api.EnumerationFormula;
 import org.sosy_lab.java_smt.api.FloatingPointFormula;
 import org.sosy_lab.java_smt.api.FloatingPointNumber;
 import org.sosy_lab.java_smt.api.FloatingPointNumber.Sign;
+import org.sosy_lab.java_smt.api.FloatingPointRoundingMode;
+import org.sosy_lab.java_smt.api.FloatingPointRoundingModeFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.ArrayFormulaType;
@@ -149,7 +159,9 @@ class Mathsat5FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
   private static final Pattern FLOATING_POINT_PATTERN = Pattern.compile("^(\\d+)_(\\d+)_(\\d+)$");
   private static final Pattern BITVECTOR_PATTERN = Pattern.compile("^(\\d+)_(\\d+)$");
 
-  Mathsat5FormulaCreator(final Long msatEnv) {
+  private final boolean usingOptiMathSAT;
+
+  Mathsat5FormulaCreator(final Long msatEnv, boolean pUsingOptiMathSAT5) {
     super(
         msatEnv,
         msat_get_bool_type(msatEnv),
@@ -157,6 +169,7 @@ class Mathsat5FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
         msat_get_rational_type(msatEnv),
         null,
         null);
+    usingOptiMathSAT = pUsingOptiMathSAT5;
   }
 
   @Override
@@ -213,7 +226,7 @@ class Mathsat5FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
     } else if (msat_is_bv_type(env, type)) {
       return FormulaType.getBitvectorTypeWithSize(msat_get_bv_type_size(env, type));
     } else if (msat_is_fp_type(env, type)) {
-      return FormulaType.getFloatingPointType(
+      return FormulaType.getFloatingPointTypeFromSizesWithoutHiddenBit(
           msat_get_fp_type_exp_width(env, type), msat_get_fp_type_mant_width(env, type));
     } else if (msat_is_fp_roundingmode_type(env, type)) {
       return FormulaType.FloatingPointRoundingModeType;
@@ -241,7 +254,9 @@ class Mathsat5FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
 
   @Override
   public Long getFloatingPointType(FloatingPointType pType) {
-    return msat_get_fp_type(getEnv(), pType.getExponentSize(), pType.getMantissaSize());
+    // MathSAT5 automatically adds 1 to the mantissa, as it expects it to be without it.
+    return msat_get_fp_type(
+        getEnv(), pType.getExponentSize(), pType.getMantissaSizeWithoutHiddenBit());
   }
 
   @SuppressWarnings("unchecked")
@@ -250,8 +265,7 @@ class Mathsat5FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
     assert pType.equals(getFormulaType(pTerm))
             || (pType.equals(FormulaType.RationalType)
                 && getFormulaType(pTerm).equals(FormulaType.IntegerType))
-        : String.format(
-            "Trying to encapsulate formula of type %s as %s", getFormulaType(pTerm), pType);
+        : "Trying to encapsulate formula of type %s as %s".formatted(getFormulaType(pTerm), pType);
     if (pType.isBooleanType()) {
       return (T) new Mathsat5BooleanFormula(pTerm);
     } else if (pType.isIntegerType()) {
@@ -289,6 +303,12 @@ class Mathsat5FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
   protected FloatingPointFormula encapsulateFloatingPoint(Long pTerm) {
     assert getFormulaType(pTerm).isFloatingPointType();
     return new Mathsat5FloatingPointFormula(pTerm);
+  }
+
+  @Override
+  protected FloatingPointRoundingModeFormula encapsulateRoundingMode(Long pTerm) {
+    assert getFormulaType(pTerm).isFloatingPointRoundingModeType();
+    return new Mathsat5FloatingPointRoundingModeFormula(pTerm);
   }
 
   @Override
@@ -333,9 +353,12 @@ class Mathsat5FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
       return visitor.visitConstant(formula, true);
     } else if (msat_term_is_false(environment, f)) {
       return visitor.visitConstant(formula, false);
+    } else if (msat_is_fp_roundingmode_type(environment, msat_term_get_type(f))) {
+      return visitor.visitConstant(formula, getRoundingMode(f));
     } else if (msat_term_is_constant(environment, f)) {
       return visitor.visitFreeVariable(formula, msat_term_repr(f));
-    } else if (msat_is_enum_type(environment, msat_term_get_type(f))) {
+    } else if (!usingOptiMathSAT // OptiMathSAT does not support enumerations
+        && msat_is_enum_type(environment, msat_term_get_type(f))) {
       assert !msat_term_is_constant(environment, f) : "Enumeration constants are no variables";
       assert arity == 0 : "Enumeration constants have no parameters";
       return visitor.visitConstant(formula, msat_term_repr(f));
@@ -351,7 +374,7 @@ class Mathsat5FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
       ImmutableList.Builder<Formula> args = ImmutableList.builder();
       ImmutableList.Builder<FormulaType<?>> argTypes = ImmutableList.builder();
       for (int i = 0; i < arity; i++) {
-        // argumentType can be sub-type of parameterType, e.g., int < rational
+        // argumentType can be subtype of parameterType, e.g., int < rational
         long arg = msat_term_get_arg(f, i);
         FormulaType<?> argumentType = getFormulaType(arg);
         args.add(encapsulate(argumentType, arg));
@@ -372,6 +395,22 @@ class Mathsat5FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
     }
   }
 
+  @Override
+  protected FloatingPointRoundingMode getRoundingMode(Long f) {
+    if (msat_term_is_fp_roundingmode_nearest_even(environment, f)) {
+      return FloatingPointRoundingMode.NEAREST_TIES_TO_EVEN;
+    } else if (msat_term_is_fp_roundingmode_plus_inf(environment, f)) {
+      return FloatingPointRoundingMode.TOWARD_POSITIVE;
+    } else if (msat_term_is_fp_roundingmode_minus_inf(environment, f)) {
+      return FloatingPointRoundingMode.TOWARD_NEGATIVE;
+    } else if (msat_term_is_fp_roundingmode_zero(environment, f)) {
+      return FloatingPointRoundingMode.TOWARD_ZERO;
+    } else {
+      throw new IllegalArgumentException(
+          "Unknown rounding mode in Term '%s'.".formatted(msat_term_repr(f)));
+    }
+  }
+
   String getName(long term) {
     if (msat_term_is_uf(environment, term)) {
       return msat_decl_get_name(msat_term_get_decl(term));
@@ -388,156 +427,76 @@ class Mathsat5FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
 
     long decl = msat_term_get_decl(pF);
     int tag = msat_decl_get_tag(environment, decl);
-    switch (tag) {
-      case MSAT_TAG_AND:
-        return FunctionDeclarationKind.AND;
-      case MSAT_TAG_NOT:
-        return FunctionDeclarationKind.NOT;
-      case MSAT_TAG_OR:
-        return FunctionDeclarationKind.OR;
-      case MSAT_TAG_IFF:
-        return FunctionDeclarationKind.IFF;
-      case MSAT_TAG_ITE:
-        return FunctionDeclarationKind.ITE;
-
-      case MSAT_TAG_TIMES:
-        return FunctionDeclarationKind.MUL;
-      case MSAT_TAG_PLUS:
-        return FunctionDeclarationKind.ADD;
-      case MSAT_TAG_LEQ:
-        return FunctionDeclarationKind.LTE;
-      case MSAT_TAG_EQ:
-        return FunctionDeclarationKind.EQ;
-      case MSAT_TAG_ARRAY_READ:
-        return FunctionDeclarationKind.SELECT;
-      case MSAT_TAG_ARRAY_WRITE:
-        return FunctionDeclarationKind.STORE;
-      case MSAT_TAG_ARRAY_CONST:
-        return FunctionDeclarationKind.CONST;
-
-      case MSAT_TAG_BV_EXTRACT:
-        return FunctionDeclarationKind.BV_EXTRACT;
-      case MSAT_TAG_BV_CONCAT:
-        return FunctionDeclarationKind.BV_CONCAT;
-      case MSAT_TAG_BV_NOT:
-        return FunctionDeclarationKind.BV_NOT;
-      case MSAT_TAG_BV_NEG:
-        return FunctionDeclarationKind.BV_NEG;
-      case MSAT_TAG_BV_AND:
-        return FunctionDeclarationKind.BV_AND;
-      case MSAT_TAG_BV_OR:
-        return FunctionDeclarationKind.BV_OR;
-      case MSAT_TAG_BV_XOR:
-        return FunctionDeclarationKind.BV_XOR;
-      case MSAT_TAG_BV_ULT:
-        return FunctionDeclarationKind.BV_ULT;
-      case MSAT_TAG_BV_SLT:
-        return FunctionDeclarationKind.BV_SLT;
-      case MSAT_TAG_BV_ULE:
-        return FunctionDeclarationKind.BV_ULE;
-      case MSAT_TAG_BV_SLE:
-        return FunctionDeclarationKind.BV_SLE;
-      case MSAT_TAG_BV_ADD:
-        return FunctionDeclarationKind.BV_ADD;
-      case MSAT_TAG_BV_SUB:
-        return FunctionDeclarationKind.BV_SUB;
-      case MSAT_TAG_BV_MUL:
-        return FunctionDeclarationKind.BV_MUL;
-      case MSAT_TAG_BV_UDIV:
-        return FunctionDeclarationKind.BV_UDIV;
-      case MSAT_TAG_BV_SDIV:
-        return FunctionDeclarationKind.BV_SDIV;
-      case MSAT_TAG_BV_UREM:
-        return FunctionDeclarationKind.BV_UREM;
-      case MSAT_TAG_BV_SREM:
-        return FunctionDeclarationKind.BV_SREM;
-      case MSAT_TAG_BV_LSHL:
-        return FunctionDeclarationKind.BV_SHL;
-      case MSAT_TAG_BV_LSHR:
-        return FunctionDeclarationKind.BV_LSHR;
-      case MSAT_TAG_BV_ASHR:
-        return FunctionDeclarationKind.BV_ASHR;
-      case MSAT_TAG_BV_SEXT:
-        return FunctionDeclarationKind.BV_SIGN_EXTENSION;
-      case MSAT_TAG_BV_ZEXT:
-        return FunctionDeclarationKind.BV_ZERO_EXTENSION;
-      case MSAT_TAG_BV_ROL:
-        return FunctionDeclarationKind.BV_ROTATE_LEFT_BY_INT;
-      case MSAT_TAG_BV_ROR:
-        return FunctionDeclarationKind.BV_ROTATE_RIGHT_BY_INT;
-
-      case MSAT_TAG_FP_NEG:
-        return FunctionDeclarationKind.FP_NEG;
-      case MSAT_TAG_FP_ABS:
-        return FunctionDeclarationKind.FP_ABS;
-      case MSAT_TAG_FP_MAX:
-        return FunctionDeclarationKind.FP_MAX;
-      case MSAT_TAG_FP_MIN:
-        return FunctionDeclarationKind.FP_MIN;
-      case MSAT_TAG_FP_SQRT:
-        return FunctionDeclarationKind.FP_SQRT;
-      case MSAT_TAG_FP_ADD:
-        return FunctionDeclarationKind.FP_ADD;
-      case MSAT_TAG_FP_SUB:
-        return FunctionDeclarationKind.FP_SUB;
-      case MSAT_TAG_FP_DIV:
-        return FunctionDeclarationKind.FP_DIV;
-      case MSAT_TAG_FP_MUL:
-        return FunctionDeclarationKind.FP_MUL;
-      case MSAT_TAG_FP_LT:
-        return FunctionDeclarationKind.FP_LT;
-      case MSAT_TAG_FP_LE:
-        return FunctionDeclarationKind.FP_LE;
-      case MSAT_TAG_FP_EQ:
-        return FunctionDeclarationKind.FP_EQ;
-      case MSAT_TAG_FP_ROUND_TO_INT:
-        return FunctionDeclarationKind.FP_ROUND_TO_INTEGRAL;
-      case MSAT_TAG_FP_FROM_SBV:
-        return FunctionDeclarationKind.BV_SCASTTO_FP;
-      case MSAT_TAG_FP_FROM_UBV:
-        return FunctionDeclarationKind.BV_UCASTTO_FP;
-      case MSAT_TAG_FP_TO_SBV:
-        return FunctionDeclarationKind.FP_CASTTO_SBV;
-      case MSAT_TAG_FP_TO_UBV:
-        return FunctionDeclarationKind.FP_CASTTO_UBV;
-      case MSAT_TAG_FP_AS_IEEEBV:
-        return FunctionDeclarationKind.FP_AS_IEEEBV;
-      case MSAT_TAG_FP_CAST:
-        return FunctionDeclarationKind.FP_CASTTO_FP;
-      case MSAT_TAG_FP_ISNAN:
-        return FunctionDeclarationKind.FP_IS_NAN;
-      case MSAT_TAG_FP_ISINF:
-        return FunctionDeclarationKind.FP_IS_INF;
-      case MSAT_TAG_FP_ISZERO:
-        return FunctionDeclarationKind.FP_IS_ZERO;
-      case MSAT_TAG_FP_ISNEG:
-        return FunctionDeclarationKind.FP_IS_NEGATIVE;
-      case MSAT_TAG_FP_ISSUBNORMAL:
-        return FunctionDeclarationKind.FP_IS_SUBNORMAL;
-      case MSAT_TAG_FP_ISNORMAL:
-        return FunctionDeclarationKind.FP_IS_NORMAL;
-
-      case MSAT_TAG_UNKNOWN:
-        switch (msat_decl_get_name(decl)) {
-          case "`fprounding_even`":
-            return FunctionDeclarationKind.FP_ROUND_EVEN;
-          case "`fprounding_plus_inf`":
-            return FunctionDeclarationKind.FP_ROUND_POSITIVE;
-          case "`fprounding_minus_inf`":
-            return FunctionDeclarationKind.FP_ROUND_NEGATIVE;
-          case "`fprounding_zero`":
-            return FunctionDeclarationKind.FP_ROUND_ZERO;
-
-          default:
-            return FunctionDeclarationKind.OTHER;
-        }
-
-      case MSAT_TAG_FLOOR:
-        return FunctionDeclarationKind.FLOOR;
-
-      default:
-        return FunctionDeclarationKind.OTHER;
-    }
+    return switch (tag) {
+      case MSAT_TAG_AND -> FunctionDeclarationKind.AND;
+      case MSAT_TAG_NOT -> FunctionDeclarationKind.NOT;
+      case MSAT_TAG_OR -> FunctionDeclarationKind.OR;
+      case MSAT_TAG_IFF -> FunctionDeclarationKind.IFF;
+      case MSAT_TAG_ITE -> FunctionDeclarationKind.ITE;
+      case MSAT_TAG_TIMES -> FunctionDeclarationKind.MUL;
+      case MSAT_TAG_DIVIDE -> FunctionDeclarationKind.DIV;
+      case MSAT_TAG_PLUS -> FunctionDeclarationKind.ADD;
+      case MSAT_TAG_LEQ -> FunctionDeclarationKind.LTE;
+      case MSAT_TAG_EQ -> FunctionDeclarationKind.EQ;
+      case MSAT_TAG_INT_TO_BV -> FunctionDeclarationKind.INT_TO_BV;
+      case MSAT_TAG_ARRAY_READ -> FunctionDeclarationKind.SELECT;
+      case MSAT_TAG_ARRAY_WRITE -> FunctionDeclarationKind.STORE;
+      case MSAT_TAG_ARRAY_CONST -> FunctionDeclarationKind.CONST;
+      case MSAT_TAG_BV_EXTRACT -> FunctionDeclarationKind.BV_EXTRACT;
+      case MSAT_TAG_BV_CONCAT -> FunctionDeclarationKind.BV_CONCAT;
+      case MSAT_TAG_BV_NOT -> FunctionDeclarationKind.BV_NOT;
+      case MSAT_TAG_BV_NEG -> FunctionDeclarationKind.BV_NEG;
+      case MSAT_TAG_BV_AND -> FunctionDeclarationKind.BV_AND;
+      case MSAT_TAG_BV_OR -> FunctionDeclarationKind.BV_OR;
+      case MSAT_TAG_BV_XOR -> FunctionDeclarationKind.BV_XOR;
+      case MSAT_TAG_BV_ULT -> FunctionDeclarationKind.BV_ULT;
+      case MSAT_TAG_BV_SLT -> FunctionDeclarationKind.BV_SLT;
+      case MSAT_TAG_BV_ULE -> FunctionDeclarationKind.BV_ULE;
+      case MSAT_TAG_BV_SLE -> FunctionDeclarationKind.BV_SLE;
+      case MSAT_TAG_BV_ADD -> FunctionDeclarationKind.BV_ADD;
+      case MSAT_TAG_BV_SUB -> FunctionDeclarationKind.BV_SUB;
+      case MSAT_TAG_BV_MUL -> FunctionDeclarationKind.BV_MUL;
+      case MSAT_TAG_BV_UDIV -> FunctionDeclarationKind.BV_UDIV;
+      case MSAT_TAG_BV_SDIV -> FunctionDeclarationKind.BV_SDIV;
+      case MSAT_TAG_BV_UREM -> FunctionDeclarationKind.BV_UREM;
+      case MSAT_TAG_BV_SREM -> FunctionDeclarationKind.BV_SREM;
+      case MSAT_TAG_BV_LSHL -> FunctionDeclarationKind.BV_SHL;
+      case MSAT_TAG_BV_LSHR -> FunctionDeclarationKind.BV_LSHR;
+      case MSAT_TAG_BV_ASHR -> FunctionDeclarationKind.BV_ASHR;
+      case MSAT_TAG_BV_SEXT -> FunctionDeclarationKind.BV_SIGN_EXTENSION;
+      case MSAT_TAG_BV_ZEXT -> FunctionDeclarationKind.BV_ZERO_EXTENSION;
+      case MSAT_TAG_BV_ROL -> FunctionDeclarationKind.BV_ROTATE_LEFT_BY_INT;
+      case MSAT_TAG_BV_ROR -> FunctionDeclarationKind.BV_ROTATE_RIGHT_BY_INT;
+      case MSAT_TAG_INT_FROM_UBV -> FunctionDeclarationKind.UBV_TO_INT;
+      case MSAT_TAG_INT_FROM_SBV -> FunctionDeclarationKind.SBV_TO_INT;
+      case MSAT_TAG_FP_NEG -> FunctionDeclarationKind.FP_NEG;
+      case MSAT_TAG_FP_ABS -> FunctionDeclarationKind.FP_ABS;
+      case MSAT_TAG_FP_MAX -> FunctionDeclarationKind.FP_MAX;
+      case MSAT_TAG_FP_MIN -> FunctionDeclarationKind.FP_MIN;
+      case MSAT_TAG_FP_SQRT -> FunctionDeclarationKind.FP_SQRT;
+      case MSAT_TAG_FP_ADD -> FunctionDeclarationKind.FP_ADD;
+      case MSAT_TAG_FP_SUB -> FunctionDeclarationKind.FP_SUB;
+      case MSAT_TAG_FP_DIV -> FunctionDeclarationKind.FP_DIV;
+      case MSAT_TAG_FP_MUL -> FunctionDeclarationKind.FP_MUL;
+      case MSAT_TAG_FP_LT -> FunctionDeclarationKind.FP_LT;
+      case MSAT_TAG_FP_LE -> FunctionDeclarationKind.FP_LE;
+      case MSAT_TAG_FP_EQ -> FunctionDeclarationKind.FP_EQ;
+      case MSAT_TAG_FP_ROUND_TO_INT -> FunctionDeclarationKind.FP_ROUND_TO_INTEGRAL;
+      case MSAT_TAG_FP_FROM_SBV -> FunctionDeclarationKind.BV_SCASTTO_FP;
+      case MSAT_TAG_FP_FROM_UBV -> FunctionDeclarationKind.BV_UCASTTO_FP;
+      case MSAT_TAG_FP_TO_SBV -> FunctionDeclarationKind.FP_CASTTO_SBV;
+      case MSAT_TAG_FP_TO_UBV -> FunctionDeclarationKind.FP_CASTTO_UBV;
+      case MSAT_TAG_FP_AS_IEEEBV -> FunctionDeclarationKind.FP_AS_IEEEBV;
+      case MSAT_TAG_FP_CAST -> FunctionDeclarationKind.FP_CASTTO_FP;
+      case MSAT_TAG_FP_ISNAN -> FunctionDeclarationKind.FP_IS_NAN;
+      case MSAT_TAG_FP_ISINF -> FunctionDeclarationKind.FP_IS_INF;
+      case MSAT_TAG_FP_ISZERO -> FunctionDeclarationKind.FP_IS_ZERO;
+      case MSAT_TAG_FP_ISNEG -> FunctionDeclarationKind.FP_IS_NEGATIVE;
+      case MSAT_TAG_FP_ISSUBNORMAL -> FunctionDeclarationKind.FP_IS_SUBNORMAL;
+      case MSAT_TAG_FP_ISNORMAL -> FunctionDeclarationKind.FP_IS_NORMAL;
+      case MSAT_TAG_FLOOR -> FunctionDeclarationKind.FLOOR;
+      default -> FunctionDeclarationKind.OTHER;
+    };
   }
 
   @Override
@@ -575,13 +534,18 @@ class Mathsat5FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
 
     BigInteger bits = new BigInteger(matcher.group(1));
     int expWidth = Integer.parseInt(matcher.group(2));
-    int mantWidth = Integer.parseInt(matcher.group(3));
+    // The term representation in MathSAT5 does not include the hidden bit
+    int mantWidthWithoutHiddenBit = Integer.parseInt(matcher.group(3));
 
-    Sign sign = Sign.of(bits.testBit(expWidth + mantWidth));
-    BigInteger exponent = extractBitsFrom(bits, mantWidth, expWidth);
-    BigInteger mantissa = extractBitsFrom(bits, 0, mantWidth);
+    Sign sign = Sign.of(bits.testBit(expWidth + mantWidthWithoutHiddenBit));
+    BigInteger exponent = extractBitsFrom(bits, mantWidthWithoutHiddenBit, expWidth);
+    BigInteger mantissa = extractBitsFrom(bits, 0, mantWidthWithoutHiddenBit);
 
-    return FloatingPointNumber.of(sign, exponent, mantissa, expWidth, mantWidth);
+    return FloatingPointNumber.of(
+        sign,
+        exponent,
+        mantissa,
+        getFloatingPointTypeFromSizesWithoutHiddenBit(expWidth, mantWidthWithoutHiddenBit));
   }
 
   /**

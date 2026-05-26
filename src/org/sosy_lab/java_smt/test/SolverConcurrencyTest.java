@@ -30,7 +30,6 @@ import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReferenceArray;
-import java.util.stream.Collectors;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -134,9 +133,10 @@ public class SolverConcurrencyTest {
             Solvers.SMTINTERPOL,
             Solvers.BITWUZLA,
             Solvers.BOOLECTOR,
-            Solvers.OPENSMT, // INFO: OpenSMT does not support concurrent stacks
+            Solvers.OPENSMT,
             Solvers.MATHSAT5,
             Solvers.Z3,
+            Solvers.Z3_WITH_INTERPOLATION,
             Solvers.PRINCESS,
             Solvers.YICES2,
             Solvers.CVC5);
@@ -146,14 +146,14 @@ public class SolverConcurrencyTest {
     assume()
         .withMessage("Solver does not support integers")
         .that(solver)
-        .isNoneOf(Solvers.BOOLECTOR, Solvers.YICES2, Solvers.BITWUZLA);
+        .isNoneOf(Solvers.BOOLECTOR, Solvers.BITWUZLA);
   }
 
   private void requireBitvectors() {
     assume()
         .withMessage("Solver does not support bitvectors")
         .that(solver)
-        .isNoneOf(Solvers.SMTINTERPOL, Solvers.YICES2, Solvers.OPENSMT);
+        .isNoneOf(Solvers.SMTINTERPOL, Solvers.OPENSMT);
   }
 
   private void requireOptimization() {
@@ -168,7 +168,8 @@ public class SolverConcurrencyTest {
             Solvers.CVC5,
             Solvers.YICES2,
             Solvers.BITWUZLA,
-            Solvers.OPENSMT);
+            Solvers.OPENSMT,
+            Solvers.Z3_WITH_INTERPOLATION);
   }
 
   /**
@@ -292,13 +293,11 @@ public class SolverConcurrencyTest {
   public void testFormulaTranslationWithConcurrentContexts()
       throws InvalidConfigurationException, InterruptedException, SolverException {
     requireIntegers();
-    // CVC4 does not support parsing and therefore no translation.
-    // Princess has a wierd bug
-    // TODO: Look into the Princess problem
+    // CVC4 and Yices2 do not support parsing and therefore no translation.
     assume()
         .withMessage("Solver does not support translation of formulas")
         .that(solver)
-        .isNoneOf(Solvers.CVC4, Solvers.PRINCESS, Solvers.CVC5);
+        .isNoneOf(Solvers.CVC4, Solvers.YICES2);
 
     ConcurrentLinkedQueue<ContextAndFormula> contextAndFormulaList = new ConcurrentLinkedQueue<>();
 
@@ -348,11 +347,6 @@ public class SolverConcurrencyTest {
   public void testIntConcurrencyWithoutConcurrentContext() throws InvalidConfigurationException {
     requireIntegers();
 
-    assume()
-        .withMessage("Solver does not support concurrency without concurrent context.")
-        .that(solver)
-        .isNotEqualTo(Solvers.CVC5);
-
     ConcurrentLinkedQueue<SolverContext> contextList = new ConcurrentLinkedQueue<>();
     // Initialize contexts before using them in the threads
     for (int i = 0; i < NUMBER_OF_THREADS; i++) {
@@ -372,11 +366,6 @@ public class SolverConcurrencyTest {
   @Test
   public void testBvConcurrencyWithoutConcurrentContext() throws InvalidConfigurationException {
     requireBitvectors();
-
-    assume()
-        .withMessage("Solver does not support concurrency without concurrent context.")
-        .that(solver)
-        .isNotEqualTo(Solvers.CVC5);
 
     ConcurrentLinkedQueue<SolverContext> contextList = new ConcurrentLinkedQueue<>();
     // Initialize contexts before using them in the threads
@@ -539,13 +528,15 @@ public class SolverConcurrencyTest {
   @Test
   public void continuousRunningThreadFormulaTransferTranslateTest() {
     requireIntegers();
-    // CVC4 does not support parsing and therefore no translation.
-    // Princess has a wierd bug
-    // TODO: Look into the Princess problem
+    // CVC4 and Yices2 do not support parsing and therefore no translation.
     assume()
         .withMessage("Solver does not support translation of formulas")
         .that(solver)
-        .isNoneOf(Solvers.CVC4, Solvers.CVC5, Solvers.PRINCESS);
+        .isNoneOf(Solvers.CVC4, Solvers.YICES2);
+    assume()
+        .withMessage("Princess will run out of memory")
+        .that(solver)
+        .isNotEqualTo(Solvers.PRINCESS);
 
     // This is fine! We might access this more than once at a time,
     // but that gives only access to the bucket, which is threadsafe.
@@ -568,7 +559,7 @@ public class SolverConcurrencyTest {
     assertConcurrency(
         "continuousRunningThreadFormulaTransferTranslateTest",
         () -> {
-          // Start the threads such that they each get a unqiue id
+          // Start the threads such that they each get an unqiue id
           final int id = idGenerator.getFreshId();
           int nextBucket = (id + 1) % NUMBER_OF_THREADS;
           final BlockingQueue<ContextAndFormula> ownBucket = bucketQueue.get(id);
@@ -586,9 +577,8 @@ public class SolverConcurrencyTest {
 
               assertWithMessage(
                       "Test continuousRunningThreadFormulaTransferTranslateTest() "
-                          + "failed isUnsat() in thread with id: "
-                          + id
-                          + ".")
+                          + "failed isUnsat() in thread with id: %s.",
+                      id)
                   .that(stack.isUnsat())
                   .isTrue();
 
@@ -721,11 +711,11 @@ public class SolverConcurrencyTest {
               });
     }
     try {
-      assertWithMessage("Timeout initializing the Threads for " + testName)
+      assertWithMessage("Timeout initializing the Threads for %s", testName)
           .that(allExecutorThreadsReady.await(NUMBER_OF_THREADS * 20, TimeUnit.MILLISECONDS))
           .isTrue();
       afterInitBlocker.countDown();
-      assertWithMessage("Timeout in " + testName)
+      assertWithMessage("Timeout in %s", testName)
           .that(allDone.await(TIMEOUT_SECONDS, TimeUnit.SECONDS))
           .isTrue();
     } catch (Throwable e) {
@@ -743,7 +733,7 @@ public class SolverConcurrencyTest {
                   ex.printStackTrace(pw);
                   return sw.toString();
                 })
-            .collect(Collectors.toList());
+            .toList();
     assertWithMessage(
             "Test %s failed with exception(s): %s",
             testName, Joiner.on("\n").join(exceptionDetails))

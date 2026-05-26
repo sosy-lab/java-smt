@@ -54,7 +54,9 @@ public abstract class AbstractSolverContext implements SolverContext {
   public final InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation(
       ProverOptions... options) {
 
-    InterpolatingProverEnvironment<?> out = newProverEnvironmentWithInterpolation0(toSet(options));
+    InterpolatingProverEnvironment<?> out =
+        new InterpolatingProverDelegate<>(newProverEnvironmentWithInterpolation0(toSet(options)));
+
     if (!supportsAssumptionSolving()) {
       // In the case we do not already have a prover environment with assumptions,
       // we add a wrapper to it

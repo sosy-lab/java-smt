@@ -9,7 +9,7 @@
 package org.sosy_lab.java_smt.solvers.cvc5;
 
 import com.google.common.collect.ImmutableMap;
-import java.util.Set;
+import com.google.common.collect.ImmutableSet;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.java_smt.api.BasicProverEnvironment;
@@ -21,14 +21,14 @@ import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 class CVC5TheoremProver extends CVC5AbstractProver<Void>
     implements ProverEnvironment, BasicProverEnvironment<Void> {
 
-  protected CVC5TheoremProver(
+  CVC5TheoremProver(
       CVC5FormulaCreator pFormulaCreator,
       ShutdownNotifier pShutdownNotifier,
-      @SuppressWarnings("unused") int randomSeed,
-      Set<ProverOptions> pOptions,
+      int pRandomSeed,
+      ImmutableSet<ProverOptions> pOptions,
       FormulaManager pMgr,
       ImmutableMap<String, String> pFurtherOptionsMap) {
-    super(pFormulaCreator, pShutdownNotifier, randomSeed, pOptions, pMgr, pFurtherOptionsMap);
+    super(pFormulaCreator, pShutdownNotifier, pRandomSeed, pOptions, pMgr, pFurtherOptionsMap);
   }
 
   @Override

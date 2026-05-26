@@ -8,25 +8,55 @@
 
 package org.sosy_lab.java_smt.api;
 
-import com.google.auto.value.AutoValue;
+import static com.google.common.base.Preconditions.checkNotNull;
+import static org.sosy_lab.java_smt.api.FormulaType.getFloatingPointTypeFromSizesWithoutHiddenBit;
+
 import com.google.common.base.Preconditions;
 import com.google.errorprone.annotations.Immutable;
 import com.google.errorprone.annotations.InlineMe;
 import java.math.BigInteger;
 import java.util.BitSet;
+import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
 
 /**
  * Represents a floating-point number with customizable precision, consisting of sign, exponent, and
  * mantissa components.
  */
 @Immutable
-@AutoValue
-public abstract class FloatingPointNumber {
+public record FloatingPointNumber(
+    Sign mathSign, BigInteger exponent, BigInteger mantissa, FloatingPointType floatingPointType) {
 
+  public FloatingPointNumber {
+    checkNotNull(mathSign);
+    checkNotNull(exponent);
+    checkNotNull(mantissa);
+    checkNotNull(floatingPointType);
+  }
+
+  // TODO: remove deprecated constants from public API after 6.0 release (and delete the unused).
+  @Deprecated(since = "6.0", forRemoval = true)
   public static final int SINGLE_PRECISION_EXPONENT_SIZE = 8;
+
+  /**
+   * @deprecated this constant can be confusing, as the SMTLIB2 standard expects the mantissa to
+   *     include the hidden bit, but this constant does not.
+   */
+  @Deprecated(since = "6.0", forRemoval = true)
   public static final int SINGLE_PRECISION_MANTISSA_SIZE = 23;
+
+  static final int SINGLE_PRECISION_MANTISSA_SIZE_WITHOUT_HIDDEN_BIT = 23;
+
+  @Deprecated(since = "6.0", forRemoval = true)
   public static final int DOUBLE_PRECISION_EXPONENT_SIZE = 11;
+
+  /**
+   * @deprecated this constant can be confusing, as the SMTLIB2 standard expects the mantissa to
+   *     include the hidden bit, but this constant does not.
+   */
+  @Deprecated(since = "6.0", forRemoval = true)
   public static final int DOUBLE_PRECISION_MANTISSA_SIZE = 52;
+
+  static final int DOUBLE_PRECISION_MANTISSA_SIZE_WITHOUT_HIDDEN_BIT = 52;
 
   public enum Sign {
     POSITIVE,
@@ -57,30 +87,80 @@ public abstract class FloatingPointNumber {
   @InlineMe(
       replacement = "this.getMathSign() == Sign.NEGATIVE",
       imports = "org.sosy_lab.java_smt.api.FloatingPointNumber.Sign")
-  public final boolean getSign() {
+  public boolean getSign() {
     return getMathSign() == Sign.NEGATIVE;
   }
 
   /** The sign of the floating-point number, i.e. whether it is positive or negative. */
-  public abstract Sign getMathSign();
+  public Sign getMathSign() {
+    return mathSign;
+  }
 
   /**
    * The exponent of the floating-point number, given as numeric value from binary representation.
    * The number is unsigned (not negative) and includes a bias of 2^(exponentSize-1)-1 that is used
    * in IEEE 754.
    */
-  public abstract BigInteger getExponent();
+  public BigInteger getExponent() {
+    return exponent;
+  }
 
   /**
    * The mantissa (aka significand) of the floating-point number, given as numeric value from binary
    * representation. The mantissa does not include the hidden bit that is used to denote normalized
    * numbers in IEEE 754.
    */
-  public abstract BigInteger getMantissa();
+  public BigInteger getMantissa() {
+    return mantissa;
+  }
 
-  public abstract int getExponentSize();
+  /** Returns the {@link FloatingPointType} of this {@link FloatingPointNumber}. */
+  public FloatingPointType getFloatingPointType() {
+    return floatingPointType;
+  }
 
-  public abstract int getMantissaSize();
+  public int getExponentSize() {
+    return getFloatingPointType().getExponentSize();
+  }
+
+  /**
+   * Returns the size of the mantissa (also called a coefficient or significand), excluding the sign
+   * bit.
+   *
+   * @deprecated this method can be confusing, as the SMTLIB2 standard expects the mantissa to
+   *     include the hidden bit, but this does not. Use {@link #getMantissaSizeWithoutHiddenBit()}
+   *     instead if you want the mantissa without the hidden bit, and {@link
+   *     #getMantissaSizeWithHiddenBit()} if you want it to include the hidden bit.
+   */
+  @Deprecated(since = "6.0", forRemoval = true)
+  @SuppressWarnings("InlineMeSuggester")
+  public final int getMantissaSize() {
+    return getMantissaSizeWithoutHiddenBit();
+  }
+
+  /**
+   * Returns the size of the mantissa (also called a coefficient or significand), excluding the
+   * hidden bit.
+   */
+  public int getMantissaSizeWithoutHiddenBit() {
+    return getFloatingPointType().getMantissaSizeWithoutHiddenBit();
+  }
+
+  /**
+   * Returns the size of the mantissa (also called a coefficient or significand), including the
+   * hidden bit.
+   */
+  public int getMantissaSizeWithHiddenBit() {
+    return getFloatingPointType().getMantissaSizeWithHiddenBit();
+  }
+
+  /**
+   * Returns the size of the precision as defined by the SMTLIB2 standard, i.e. sign bit + the size
+   * of the exponent + the size of the mantissa (excluding the hidden bit).
+   */
+  public int getTotalSize() {
+    return 1 + getMantissaSizeWithoutHiddenBit() + getExponentSize();
+  }
 
   /**
    * Get a floating-point number with the given sign, exponent, and mantissa.
@@ -92,22 +172,26 @@ public abstract class FloatingPointNumber {
    * @param mantissa the mantissa of the floating-point number, given as unsigned (not negative)
    *     number without hidden bit
    * @param exponentSize the (maximum) size of the exponent in bits
-   * @param mantissaSize the (maximum) size of the mantissa in bits
-   * @see #of(Sign, BigInteger, BigInteger, int, int)
+   * @param mantissaSizeWithoutHiddenBit the (maximum) size of the mantissa in bits (excluding the
+   *     hidden bit)
+   * @deprecated Use {@link #of(Sign, BigInteger, BigInteger, FloatingPointType)} instead.
    */
   @Deprecated(
       since = "2025.01, because using a boolean flag as signBit is misleading",
       forRemoval = true)
-  @InlineMe(
-      replacement =
-          "FloatingPointNumber.of(Sign.of(sign), exponent, mantissa, exponentSize, mantissaSize)",
-      imports = {
-        "org.sosy_lab.java_smt.api.FloatingPointNumber",
-        "org.sosy_lab.java_smt.api.FloatingPointNumber.Sign"
-      })
   public static FloatingPointNumber of(
-      boolean sign, BigInteger exponent, BigInteger mantissa, int exponentSize, int mantissaSize) {
-    return of(Sign.of(sign), exponent, mantissa, exponentSize, mantissaSize);
+      boolean sign,
+      BigInteger exponent,
+      BigInteger mantissa,
+      int exponentSize,
+      int mantissaSizeWithoutHiddenBit) {
+    checkNotNull(exponent);
+    checkNotNull(mantissa);
+    return of(
+        Sign.of(sign),
+        exponent,
+        mantissa,
+        getFloatingPointTypeFromSizesWithoutHiddenBit(exponentSize, mantissaSizeWithoutHiddenBit));
   }
 
   /**
@@ -119,15 +203,53 @@ public abstract class FloatingPointNumber {
    * @param mantissa the mantissa of the floating-point number, given as unsigned (not negative)
    *     number without hidden bit
    * @param exponentSize the (maximum) size of the exponent in bits
-   * @param mantissaSize the (maximum) size of the mantissa in bits
+   * @param mantissaSizeWithoutHiddenBit the (maximum) size of the mantissa in bits (excluding the
+   *     hidden bit)
+   * @deprecated Use {@link #of(Sign, BigInteger, BigInteger, FloatingPointType)} instead.
+   */
+  @Deprecated(
+      since = "2026.01, because mantissa arguments with/without sign bits can be misleading",
+      forRemoval = true)
+  public static FloatingPointNumber of(
+      Sign sign,
+      BigInteger exponent,
+      BigInteger mantissa,
+      int exponentSize,
+      int mantissaSizeWithoutHiddenBit) {
+    checkNotNull(sign);
+    checkNotNull(exponent);
+    checkNotNull(mantissa);
+    return of(
+        sign,
+        exponent,
+        mantissa,
+        getFloatingPointTypeFromSizesWithoutHiddenBit(exponentSize, mantissaSizeWithoutHiddenBit));
+  }
+
+  /**
+   * Get a floating-point number with the given sign, exponent, and mantissa.
+   *
+   * @param sign the sign of the floating-point number.
+   * @param exponent the exponent of the floating-point number, given as unsigned (not negative)
+   *     number, including a bias of 2^(exponent size - 1) - 1.
+   * @param mantissa the mantissa of the floating-point number, given as unsigned (not negative)
+   *     number without hidden bit.
+   * @param floatingPointType {@link FloatingPointType} to use. Mantissa and exponent sizes are used
+   *     based on this type.
    */
   public static FloatingPointNumber of(
-      Sign sign, BigInteger exponent, BigInteger mantissa, int exponentSize, int mantissaSize) {
-    Preconditions.checkArgument(exponent.bitLength() <= exponentSize);
-    Preconditions.checkArgument(mantissa.bitLength() <= mantissaSize);
-    Preconditions.checkArgument(exponent.compareTo(BigInteger.ZERO) >= 0);
-    Preconditions.checkArgument(mantissa.compareTo(BigInteger.ZERO) >= 0);
-    return new AutoValue_FloatingPointNumber(sign, exponent, mantissa, exponentSize, mantissaSize);
+      Sign sign, BigInteger exponent, BigInteger mantissa, FloatingPointType floatingPointType) {
+    Preconditions.checkArgument(exponent.signum() >= 0, "Exponent must not be negative");
+    Preconditions.checkArgument(mantissa.signum() >= 0, "Mantissa must not be negative");
+    // Notice that the values for exponent and mantissa may contain leading zeroes. So their bit
+    // sizes might be smaller than the sizes from the type
+    Preconditions.checkArgument(
+        exponent.bitLength() <= floatingPointType.getExponentSize(),
+        "Exponent is too large for the exponent size");
+    Preconditions.checkArgument(
+        mantissa.bitLength() <= floatingPointType.getMantissaSizeWithoutHiddenBit(),
+        "Mantissa is too large for the mantissa size");
+    return new FloatingPointNumber(sign, exponent, mantissa, floatingPointType);
   }
 
   /**
@@ -135,48 +257,83 @@ public abstract class FloatingPointNumber {
    *
    * @param bits the bit-representation of the floating-point number, consisting of sign bit,
    *     exponent (without bias) and mantissa (without hidden bit) in this exact ordering
-   * @param exponentSize the size of the exponent in bits
-   * @param mantissaSize the size of the mantissa in bits
+   * @param exponentSize the size of the exponent in bits.
+   * @param mantissaSizeWithoutHiddenBit the size of the mantissa in bits (excluding the hidden bit)
+   * @deprecated Use {@link #of(String, FloatingPointType)} instead.
    */
-  public static FloatingPointNumber of(String bits, int exponentSize, int mantissaSize) {
-    Preconditions.checkArgument(0 < exponentSize);
-    Preconditions.checkArgument(0 < mantissaSize);
+  @Deprecated(
+      since = "2026.01, because mantissa arguments with/without sign bits can be misleading",
+      forRemoval = true)
+  public static FloatingPointNumber of(
+      String bits, int exponentSize, int mantissaSizeWithoutHiddenBit) {
+    checkNotNull(bits);
+    return of(
+        bits,
+        getFloatingPointTypeFromSizesWithoutHiddenBit(exponentSize, mantissaSizeWithoutHiddenBit));
+  }
+
+  /**
+   * Get a floating-point number encoded as bitvector as defined by IEEE 754.
+   *
+   * @param bits the bit-representation of the floating-point number, consisting of sign bit,
+   *     exponent (without bias) and mantissa (without hidden bit) in this exact ordering.
+   * @param floatingPointType {@link FloatingPointType} to use. Mantissa and exponent sizes are used
+   *     based on this type.
+   */
+  public static FloatingPointNumber of(String bits, FloatingPointType floatingPointType) {
+    // Note: sign bit + exponent size + mantissa size without hidden bit == exponent size + mantissa
+    // size with hidden bit
+    checkNotNull(bits);
+    checkNotNull(floatingPointType);
+    var exponentSize = floatingPointType.getExponentSize();
+    var mantissaSizeWithoutHiddenBit = floatingPointType.getMantissaSizeWithoutHiddenBit();
     Preconditions.checkArgument(
-        bits.length() == 1 + exponentSize + mantissaSize,
+        bits.length() == floatingPointType.getTotalSize(),
         "Bitsize (%s) of floating point numeral does not match the size of sign, exponent and "
             + "mantissa (%s + %s + %s).",
         bits.length(),
         1,
         exponentSize,
-        mantissaSize);
+        floatingPointType.getMantissaSizeWithoutHiddenBit());
     Preconditions.checkArgument(bits.chars().allMatch(c -> c == '0' || c == '1'));
     Sign sign = Sign.of(bits.charAt(0) == '1');
     BigInteger exponent = new BigInteger(bits.substring(1, 1 + exponentSize), 2);
     BigInteger mantissa =
-        new BigInteger(bits.substring(1 + exponentSize, 1 + exponentSize + mantissaSize), 2);
-    return of(sign, exponent, mantissa, exponentSize, mantissaSize);
+        new BigInteger(
+            bits.substring(1 + exponentSize, 1 + exponentSize + mantissaSizeWithoutHiddenBit), 2);
+    return of(sign, exponent, mantissa, floatingPointType);
   }
 
   /**
    * Returns true if this floating-point number is an IEEE-754-2008 single precision type with 32
-   * bits length consisting of an 8 bit exponent, a 23 bit mantissa and a single sign bit.
+   * bits total length consisting of the sign bit, an 8 bit exponent, and a 23 bit mantissa
+   * (excluding the hidden bit).
    *
    * @return true for IEEE-754 single precision type, false otherwise.
    */
   public boolean isIEEE754SinglePrecision() {
-    return getExponentSize() == SINGLE_PRECISION_EXPONENT_SIZE
-        && getMantissaSize() == SINGLE_PRECISION_MANTISSA_SIZE;
+    return getTotalSize()
+            == SINGLE_PRECISION_EXPONENT_SIZE
+                + SINGLE_PRECISION_MANTISSA_SIZE_WITHOUT_HIDDEN_BIT
+                + 1
+        && getExponentSize() == SINGLE_PRECISION_EXPONENT_SIZE
+        && getMantissaSizeWithoutHiddenBit() == SINGLE_PRECISION_MANTISSA_SIZE_WITHOUT_HIDDEN_BIT;
   }
 
   /**
    * Returns true if this floating-point number is an IEEE-754-2008 double precision type with 64
-   * bits length consisting of an 11 bit exponent, a 52 bit mantissa and a single sign bit.
+   * bits total length, consisting of the sign bit, an 11 bit exponent, and a 52 bit mantissa
+   * (excluding the hidden bit).
    *
    * @return true for IEEE-754 double precision type, false otherwise.
    */
   public boolean isIEEE754DoublePrecision() {
-    return getExponentSize() == DOUBLE_PRECISION_EXPONENT_SIZE
-        && getMantissaSize() == DOUBLE_PRECISION_MANTISSA_SIZE;
+    return getTotalSize()
+            == DOUBLE_PRECISION_EXPONENT_SIZE
+                + DOUBLE_PRECISION_MANTISSA_SIZE_WITHOUT_HIDDEN_BIT
+                + 1
+        && getExponentSize() == DOUBLE_PRECISION_EXPONENT_SIZE
+        && getMantissaSizeWithoutHiddenBit() == DOUBLE_PRECISION_MANTISSA_SIZE_WITHOUT_HIDDEN_BIT;
   }
 
   /** compute a representation as Java-based float value, if possible. */
@@ -196,7 +353,7 @@ public abstract class FloatingPointNumber {
         "Can not represent floating point number %s as Java-based double value.",
         this);
     if (isIEEE754SinglePrecision()) {
-      // lets be nice to the user and automatically convert from single to double precision
+      // let's be nice to the user and automatically convert from single to double precision
       return floatValue();
     }
     var bits = getBits();
@@ -204,19 +361,17 @@ public abstract class FloatingPointNumber {
   }
 
   private BitSet getBits() {
-    var mantissaSize = getMantissaSize();
+    var mantissaSizeWithoutHiddenBit = getMantissaSizeWithoutHiddenBit();
     var exponentSize = getExponentSize();
-    var mantissa = getMantissa();
-    var exponent = getExponent();
-    var bits = new BitSet(1 + exponentSize + mantissaSize);
+    var bits = new BitSet(getTotalSize());
     if (getMathSign().isNegative()) {
-      bits.set(exponentSize + mantissaSize); // if negative, set first bit to 1
+      bits.set(exponentSize + mantissaSizeWithoutHiddenBit); // if negative, set first bit to 1
     }
     for (int i = 0; i < exponentSize; i++) {
-      bits.set(mantissaSize + i, exponent.testBit(i));
+      bits.set(mantissaSizeWithoutHiddenBit + i, getExponent().testBit(i));
     }
-    for (int i = 0; i < mantissaSize; i++) {
-      bits.set(i, mantissa.testBit(i));
+    for (int i = 0; i < mantissaSizeWithoutHiddenBit; i++) {
+      bits.set(i, getMantissa().testBit(i));
     }
     return bits;
   }
@@ -226,8 +381,8 @@ public abstract class FloatingPointNumber {
    * bit-representations in this exact ordering.
    */
   @Override
-  public final String toString() {
-    var length = 1 + getExponentSize() + getMantissaSize();
+  public String toString() {
+    var length = getTotalSize();
     var str = new StringBuilder(length);
     var bits = getBits();
     for (int i = 0; i < length; i++) {

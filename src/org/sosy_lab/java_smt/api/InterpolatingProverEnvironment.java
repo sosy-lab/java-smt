@@ -55,7 +55,7 @@ public interface InterpolatingProverEnvironment<T> extends BasicProverEnvironmen
    * stack and not part of the partitioned list, will be used for background theory and its symbols
    * can appear in any interpolant.
    *
-   * @return a 'inductive sequence' of interpolants, such that the implication {@code AND(I_i, P_i)
+   * @return an 'inductive sequence' of interpolants, such that the implication {@code AND(I_i, P_i)
    *     => I_(i+1)} is satisfied for all i, where P_i is the conjunction of all formulas in
    *     partition i.
    * @throws SolverException if interpolant cannot be computed, for example because interpolation

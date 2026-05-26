@@ -14,11 +14,11 @@ import edu.stanford.CVC4.Kind;
 import edu.stanford.CVC4.Type;
 import org.sosy_lab.java_smt.basicimpl.AbstractSLFormulaManager;
 
-public class CVC4SLFormulaManager extends AbstractSLFormulaManager<Expr, Type, ExprManager, Expr> {
+class CVC4SLFormulaManager extends AbstractSLFormulaManager<Expr, Type, ExprManager, Expr> {
 
   private final ExprManager exprManager;
 
-  protected CVC4SLFormulaManager(CVC4FormulaCreator pCreator) {
+  CVC4SLFormulaManager(CVC4FormulaCreator pCreator) {
     super(pCreator);
     exprManager = pCreator.getEnv();
   }
@@ -45,6 +45,6 @@ public class CVC4SLFormulaManager extends AbstractSLFormulaManager<Expr, Type, E
 
   @Override
   protected Expr makeNilElement(Type pType) {
-    return exprManager.mkExpr(Kind.SEP_NIL, pType.mkGroundTerm());
+    return exprManager.mkNullaryOperator(pType, Kind.SEP_NIL);
   }
 }

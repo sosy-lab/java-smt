@@ -8,9 +8,7 @@
 
 package org.sosy_lab.java_smt.solvers.opensmt;
 
-import com.google.common.base.Preconditions;
 import com.google.common.collect.Collections2;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -25,7 +23,6 @@ import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Evaluator;
 import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.Model;
-import org.sosy_lab.java_smt.api.Model.ValueAssignment;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractProverWithAllSat;
@@ -41,15 +38,13 @@ import org.sosy_lab.java_smt.solvers.opensmt.api.SymRef;
 import org.sosy_lab.java_smt.solvers.opensmt.api.Symbol;
 import org.sosy_lab.java_smt.solvers.opensmt.api.sstat;
 
-public abstract class OpenSmtAbstractProver<T> extends AbstractProverWithAllSat<T> {
+abstract class OpenSmtAbstractProver<T> extends AbstractProverWithAllSat<T> {
 
   protected final OpenSmtFormulaCreator creator;
   protected final MainSolver osmtSolver;
   protected final SMTConfig osmtConfig;
 
-  private boolean changedSinceLastSatQuery = false;
-
-  protected OpenSmtAbstractProver(
+  OpenSmtAbstractProver(
       OpenSmtFormulaCreator pFormulaCreator,
       FormulaManager pMgr,
       ShutdownNotifier pShutdownNotifier,
@@ -65,7 +60,7 @@ public abstract class OpenSmtAbstractProver<T> extends AbstractProverWithAllSat<
     osmtSolver = new MainSolver(creator.getEnv(), pConfig, "JavaSmt");
   }
 
-  protected static SMTConfig getConfigInstance(
+  static SMTConfig getConfigInstance(
       Set<ProverOptions> pOptions, OpenSMTOptions pSolverOptions, boolean interpolation) {
     SMTConfig config = new SMTConfig();
     config.setOption(":random-seed", new SMTOption(pSolverOptions.randomSeed));
@@ -79,9 +74,14 @@ public abstract class OpenSmtAbstractProver<T> extends AbstractProverWithAllSat<
     config.setOption(":print-cores-full", optUnsatCore);
     config.setOption(":produce-interpolants", new SMTOption(interpolation));
     if (interpolation) {
-      config.setOption(":interpolation-bool-algorithm", new SMTOption(pSolverOptions.algBool));
-      config.setOption(":interpolation-euf-algorithm", new SMTOption(pSolverOptions.algUf));
-      config.setOption(":interpolation-lra-algorithm", new SMTOption(pSolverOptions.algLra));
+      config.setOption(
+          ":interpolation-bool-algorithm", new SMTOption(pSolverOptions.algBool.getValue()));
+      config.setOption(
+          ":interpolation-euf-algorithm", new SMTOption(pSolverOptions.algUf.getValue()));
+      config.setOption(
+          ":interpolation-lra-algorithm", new SMTOption(pSolverOptions.algLra.getValue()));
+      config.setOption(
+          ":simplify-interpolants", new SMTOption(pSolverOptions.simplifyInterpolants));
     }
     return config;
   }
@@ -91,14 +91,17 @@ public abstract class OpenSmtAbstractProver<T> extends AbstractProverWithAllSat<
   }
 
   @Override
+  protected boolean hasPersistentModel() {
+    return true;
+  }
+
+  @Override
   protected void pushImpl() {
-    setChanged();
     osmtSolver.push();
   }
 
   @Override
   protected void popImpl() {
-    setChanged();
     osmtSolver.pop();
   }
 
@@ -108,7 +111,6 @@ public abstract class OpenSmtAbstractProver<T> extends AbstractProverWithAllSat<
   @Override
   @Nullable
   protected T addConstraintImpl(BooleanFormula pF) throws InterruptedException {
-    setChanged();
     PTRef f = creator.extractInfo(pF);
     return addConstraintImpl(f);
   }
@@ -116,18 +118,14 @@ public abstract class OpenSmtAbstractProver<T> extends AbstractProverWithAllSat<
   @SuppressWarnings("resource")
   @Override
   public Model getModel() {
-    Preconditions.checkState(!closed);
     checkGenerateModels();
-
-    Model model =
+    return registerEvaluator(
         new OpenSmtModel(
-            this, creator, Collections2.transform(getAssertedFormulas(), creator::extractInfo));
-    return registerEvaluator(model);
+            this, creator, Collections2.transform(getAssertedFormulas(), creator::extractInfo)));
   }
 
   @Override
   public Evaluator getEvaluator() {
-    Preconditions.checkState(!closed);
     checkGenerateModels();
     return getEvaluatorWithoutChecks();
   }
@@ -136,20 +134,6 @@ public abstract class OpenSmtAbstractProver<T> extends AbstractProverWithAllSat<
   @Override
   protected Evaluator getEvaluatorWithoutChecks() {
     return registerEvaluator(new OpenSmtEvaluator(this, creator));
-  }
-
-  protected void setChanged() {
-    if (!changedSinceLastSatQuery) {
-      changedSinceLastSatQuery = true;
-      closeAllEvaluators();
-    }
-  }
-
-  @Override
-  public ImmutableList<ValueAssignment> getModelAssignments() throws SolverException {
-    Preconditions.checkState(!closed);
-    Preconditions.checkState(!changedSinceLastSatQuery);
-    return super.getModelAssignments();
   }
 
   /**
@@ -216,21 +200,17 @@ public abstract class OpenSmtAbstractProver<T> extends AbstractProverWithAllSat<
     if (errors.isEmpty()) {
       return "Unknown reason.";
     } else {
-      return String.format(
-          "Assertions use features %s that are not supported by the specified logic %s.",
-          errors, creator.getLogic());
+      return "Assertions use features %s that are not supported by the specified logic %s."
+          .formatted(errors, creator.getLogic());
     }
   }
 
   @Override
   @SuppressWarnings("try") // ShutdownHook is never referenced, and this is correct.
-  public boolean isUnsat() throws InterruptedException, SolverException {
-    Preconditions.checkState(!closed);
+  protected boolean isUnsatImpl() throws InterruptedException, SolverException {
     closeAllEvaluators();
-    changedSinceLastSatQuery = false;
-
     sstat result;
-    try (ShutdownHook listener = new ShutdownHook(shutdownNotifier, osmtSolver::stop)) {
+    try (ShutdownHook listener = new ShutdownHook(shutdownNotifier, osmtSolver::notifyStop)) {
       shutdownNotifier.shutdownIfNecessary();
       try {
         result = osmtSolver.check();
@@ -242,10 +222,10 @@ public abstract class OpenSmtAbstractProver<T> extends AbstractProverWithAllSat<
           // such that the solver can simplify and try to reason about a query as far as possible.
           // In several cases, the complex logics are not required for reasoning
           // and OpenSMT succeeds with solving a query.
-          String reason = String.format(" Most likely reason: %s", getReasonFromSolverFeatures());
+          String reason = " Most likely reason: %s".formatted(getReasonFromSolverFeatures());
           throw new SolverException(
-              String.format(
-                  "OpenSMT crashed while checking satisfiability. Most likely reason: %s", reason));
+              "OpenSMT crashed while checking satisfiability. Most likely reason: %s"
+                  .formatted(reason));
         } else {
           throw new SolverException("OpenSMT crashed while checking satisfiability.", e);
         }
@@ -264,22 +244,20 @@ public abstract class OpenSmtAbstractProver<T> extends AbstractProverWithAllSat<
 
   @Override
   public List<BooleanFormula> getUnsatCore() {
-    Preconditions.checkState(!closed);
     checkGenerateUnsatCores();
-    Preconditions.checkState(!changedSinceLastSatQuery);
     return Lists.transform(osmtSolver.getUnsatCore(), creator::encapsulateBoolean);
   }
 
   @Override
   public boolean isUnsatWithAssumptions(Collection<BooleanFormula> pAssumptions)
       throws SolverException, InterruptedException {
-    throw new UnsupportedOperationException("OpenSMT does not support solving with assumptions.");
+    throw new UnsupportedOperationException(ASSUMPTION_SOLVING_NOT_SUPPORTED);
   }
 
   @Override
   public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(
       Collection<BooleanFormula> pAssumptions) throws SolverException, InterruptedException {
-    throw new UnsupportedOperationException("OpenSMT does not support solving with assumptions.");
+    throw new UnsupportedOperationException(UNSAT_CORE_WITH_ASSUMPTIONS_NOT_SUPPORTED);
   }
 
   @Override

@@ -10,10 +10,12 @@ package org.sosy_lab.java_smt.solvers.bitwuzla;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static org.sosy_lab.common.collect.Collections3.transformedImmutableSetCopy;
+import static org.sosy_lab.java_smt.api.FormulaType.getFloatingPointTypeFromSizesWithHiddenBit;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Table;
 import java.math.BigInteger;
 import java.util.ArrayDeque;
@@ -21,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Deque;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -28,11 +31,14 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.BiConsumer;
 import org.sosy_lab.java_smt.api.ArrayFormula;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.FloatingPointFormula;
 import org.sosy_lab.java_smt.api.FloatingPointNumber;
+import org.sosy_lab.java_smt.api.FloatingPointRoundingMode;
+import org.sosy_lab.java_smt.api.FloatingPointRoundingModeFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.ArrayFormulaType;
@@ -56,8 +62,7 @@ import org.sosy_lab.java_smt.solvers.bitwuzla.api.Vector_Int;
 import org.sosy_lab.java_smt.solvers.bitwuzla.api.Vector_Sort;
 import org.sosy_lab.java_smt.solvers.bitwuzla.api.Vector_Term;
 
-public class BitwuzlaFormulaCreator extends FormulaCreator<Term, Sort, Void, BitwuzlaDeclaration> {
-  private final TermManager termManager;
+class BitwuzlaFormulaCreator extends FormulaCreator<Term, Sort, TermManager, BitwuzlaDeclaration> {
 
   private final Table<String, Sort, Term> formulaCache = HashBasedTable.create();
 
@@ -77,18 +82,13 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Term, Sort, Void, Bit
    */
   private final Map<String, Term> constraintsForVariables = new HashMap<>();
 
-  protected BitwuzlaFormulaCreator(TermManager pTermManager) {
-    super(null, pTermManager.mk_bool_sort(), null, null, null, null);
-    termManager = pTermManager;
-  }
-
-  TermManager getTermManager() {
-    return termManager;
+  BitwuzlaFormulaCreator(TermManager pTermManager) {
+    super(pTermManager, pTermManager.mk_bool_sort(), null, null, null, null);
   }
 
   @Override
   public Sort getBitvectorType(int bitwidth) {
-    return termManager.mk_bv_sort(bitwidth);
+    return environment.mk_bv_sort(bitwidth);
   }
 
   @Override
@@ -102,7 +102,7 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Term, Sort, Void, Bit
   // system instead use bitwuzla_mk_fp_value_from_real somehow or convert myself
   @Override
   public Sort getFloatingPointType(FloatingPointType type) {
-    return termManager.mk_fp_sort(type.getExponentSize(), type.getMantissaSize() + 1);
+    return environment.mk_fp_sort(type.getExponentSize(), type.getMantissaSizeWithHiddenBit());
   }
 
   @Override
@@ -121,14 +121,22 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Term, Sort, Void, Bit
 
   @Override
   public Sort getArrayType(Sort indexType, Sort elementType) {
-    return termManager.mk_array_sort(indexType, elementType);
+    return environment.mk_array_sort(indexType, elementType);
   }
 
   @Override
   protected FloatingPointFormula encapsulateFloatingPoint(Term pTerm) {
     assert getFormulaType(pTerm).isFloatingPointType()
-        : String.format("%s is no FP, but %s (%s)", pTerm, pTerm.sort(), getFormulaType(pTerm));
+        : "%s is no FP, but %s (%s)".formatted(pTerm, pTerm.sort(), getFormulaType(pTerm));
     return new BitwuzlaFloatingPointFormula(pTerm);
+  }
+
+  @Override
+  protected FloatingPointRoundingModeFormula encapsulateRoundingMode(Term pTerm) {
+    assert getFormulaType(pTerm).isFloatingPointRoundingModeType()
+        : "%s is no FP rounding mode, but %s (%s)"
+            .formatted(pTerm, pTerm.sort(), getFormulaType(pTerm));
+    return new BitwuzlaFloatingPointRoundingModeFormula(pTerm);
   }
 
   @Override
@@ -147,7 +155,7 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Term, Sort, Void, Bit
       return maybeFormula;
     }
 
-    Term newVar = termManager.mk_const(pSort, varName);
+    Term newVar = environment.mk_const(pSort, varName);
     formulaCache.put(varName, pSort, newVar);
     return newVar;
   }
@@ -161,7 +169,7 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Term, Sort, Void, Bit
     // return maybeVar;
     // }
 
-    Term newVar = termManager.mk_var(sort, name);
+    Term newVar = environment.mk_var(sort, name);
     // boundFormulaCache.put(name, sort, newVar);
     return newVar;
   }
@@ -170,8 +178,8 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Term, Sort, Void, Bit
     // UFs play by different rules. For them, we need to extract the domain
     if (pSort.is_fp()) {
       int exponent = pSort.fp_exp_size();
-      int mantissa = pSort.fp_sig_size() - 1;
-      return FormulaType.getFloatingPointType(exponent, mantissa);
+      int mantissaWithHiddenBit = pSort.fp_sig_size();
+      return getFloatingPointTypeFromSizesWithHiddenBit(exponent, mantissaWithHiddenBit);
     } else if (pSort.is_bv()) {
       return FormulaType.getBitvectorTypeWithSize(pSort.bv_size());
     } else if (pSort.is_array()) {
@@ -345,8 +353,7 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Term, Sort, Void, Bit
   @Override
   public <T extends Formula> T encapsulate(FormulaType<T> pType, Term pTerm) {
     assert pType.equals(getFormulaType(pTerm))
-        : String.format(
-            "Trying to encapsulate formula of type %s as %s", getFormulaType(pTerm), pType);
+        : "Trying to encapsulate formula of type %s as %s".formatted(getFormulaType(pTerm), pType);
     if (pType.isBooleanType()) {
       return (T) new BitwuzlaBooleanFormula(pTerm);
     } else if (pType.isArrayType()) {
@@ -379,8 +386,9 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Term, Sort, Void, Bit
             "FloatingPointFormula with actual type " + sort + ": " + pFormula);
       }
       int exp = sort.fp_exp_size();
-      int man = sort.fp_sig_size() - 1;
-      return (FormulaType<T>) FormulaType.getFloatingPointType(exp, man);
+      int mantissaWithHiddenBit = sort.fp_sig_size();
+      return (FormulaType<T>)
+          getFloatingPointTypeFromSizesWithHiddenBit(exp, mantissaWithHiddenBit);
     } else if (sort.is_rm()) {
       return (FormulaType<T>) FormulaType.FloatingPointRoundingModeType;
     }
@@ -393,6 +401,7 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Term, Sort, Void, Bit
     return bitwuzlaSortToType(pType);
   }
 
+  @SuppressWarnings("deprecation")
   @Override
   public <R> R visit(FormulaVisitor<R> visitor, Formula formula, Term f)
       throws UnsupportedOperationException {
@@ -440,7 +449,7 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Term, Sort, Void, Bit
       for (int i = 0; i < boundVars.length; i++) {
         map.put(boundVars[i], freeVars[i]);
       }
-      body = termManager.substitute_term(body, map);
+      body = environment.substitute_term(body, map);
 
       Quantifier quant = kind.equals(Kind.EXISTS) ? Quantifier.EXISTS : Quantifier.FORALL;
       return visitor.visitQuantifier(
@@ -475,7 +484,7 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Term, Sort, Void, Bit
       }
       if (f.num_indices() > 0) {
         // We need to retain the original formula as the declaration for indexed formulas,
-        // otherwise we loose the index info, but we also need to know if its a kind or term
+        // otherwise we loose the index info, but we also need to know if it's a kind or term
         decl = BitwuzlaDeclaration.create(f);
       }
 
@@ -491,41 +500,39 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Term, Sort, Void, Bit
   public Term callFunctionImpl(BitwuzlaDeclaration declaration, List<Term> args) {
     // For UFs the declaration needs to be a const wrapping of the function sort
     // For all other functions it needs to be the kind
-    // BUT, we can never use a bitwuzla_term_is... function on a KIND
-    if (!declaration.isKind() && declaration.getTerm().num_indices() > 0) {
-      // The term might be indexed, then we need index creation
-      Term term = declaration.getTerm();
-      Kind properKind = term.kind();
-      return termManager.mk_term(properKind, new Vector_Term(args), term.indices());
-    }
-
-    if (!declaration.isKind() && declaration.getTerm().sort().is_fun()) {
+    if (declaration.isTerm() && declaration.getTerm().sort().is_fun()) {
+      // UF symbol
       Vector_Term functionAndArgs = new Vector_Term();
       functionAndArgs.add(declaration.getTerm());
       functionAndArgs.addAll(args);
-      return termManager.mk_term(Kind.APPLY, functionAndArgs, new Vector_Int());
+      return environment.mk_term(Kind.APPLY, functionAndArgs, new Vector_Int());
+    } else if (declaration.isTerm() && declaration.getTerm().num_indices() == 0) {
+      // Constant UF symbol
+      return declaration.getTerm();
+    } else if (declaration.isTerm() && declaration.getTerm().num_indices() > 0) {
+      // Indexed operator
+      Term term = declaration.getTerm();
+      Kind properKind = term.kind();
+      return environment.mk_term(properKind, new Vector_Term(args), term.indices());
+    } else {
+      // Operator
+      return environment.mk_term(declaration.getKind(), new Vector_Term(args), new Vector_Int());
     }
-
-    assert declaration.isKind();
-
-    return termManager.mk_term(declaration.getKind(), new Vector_Term(args), new Vector_Int());
   }
 
   @Override
   public BitwuzlaDeclaration declareUFImpl(String name, Sort pReturnType, List<Sort> pArgTypes) {
-    if (pArgTypes.isEmpty()) {
-      // Bitwuzla does not support UFs with no args, so we make a variable
-      // TODO: implement
-      throw new UnsupportedOperationException("Bitwuzla does not support 0 arity UFs.");
-    }
-    Sort functionSort = termManager.mk_fun_sort(new Vector_Sort(pArgTypes), pReturnType);
+    Sort functionSort =
+        pArgTypes.isEmpty()
+            ? pReturnType
+            : environment.mk_fun_sort(new Vector_Sort(pArgTypes), pReturnType);
 
     Term maybeFormula = formulaCache.get(name, functionSort);
     if (maybeFormula != null) {
       return BitwuzlaDeclaration.create(maybeFormula);
     }
 
-    Term uf = termManager.mk_const(functionSort, name);
+    Term uf = environment.mk_const(functionSort, name);
     formulaCache.put(name, functionSort, uf);
     return BitwuzlaDeclaration.create(uf);
   }
@@ -583,15 +590,18 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Term, Sort, Void, Bit
       return term.to_bool();
     }
     if (sort.is_rm()) {
-      return term.to_rm();
+      return getRoundingMode(term);
     }
     if (sort.is_bv()) {
       return new BigInteger(term.to_bv(), 2);
     }
     if (sort.is_fp()) {
-      int sizeExponent = sort.fp_exp_size();
-      int sizeMantissa = sort.fp_sig_size() - 1;
-      return FloatingPointNumber.of(term.to_bv(), sizeExponent, sizeMantissa);
+      int exponentSize = sort.fp_exp_size();
+      int mantissaSizeWithHiddenBit = sort.fp_sig_size();
+      // We can also return REAL representations with fp_value_to_real_str()
+      return FloatingPointNumber.of(
+          term.to_bv(),
+          getFloatingPointTypeFromSizesWithHiddenBit(exponentSize, mantissaSizeWithHiddenBit));
     }
     throw new AssertionError("Unknown value type.");
   }
@@ -625,5 +635,58 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Term, Sort, Void, Bit
     }
 
     return transformedImmutableSetCopy(usedConstraintVariables, constraintsForVariables::get);
+  }
+
+  @Override
+  public void extractVariablesAndUFs(
+      final Formula pFormula,
+      final boolean extractUF,
+      final BiConsumer<String, Formula> pConsumer) {
+    ImmutableSet.Builder<Term> builder = ImmutableSet.builder();
+    var cache = new HashSet<Term>();
+    var work = new ArrayDeque<>(ImmutableList.of(extractInfo(pFormula)));
+    while (!work.isEmpty()) {
+      var term = work.pop();
+      if (cache.add(term)) {
+        var kind = term.kind();
+        if (kind == Kind.CONSTANT) {
+          builder.add(term);
+        } else if (kind == Kind.APPLY) {
+          if (extractUF) {
+            builder.add(term);
+          }
+          for (int c = 1; c < term.num_children(); c++) {
+            work.push(term.get(c));
+          }
+        } else {
+          for (int c = 0; c < term.num_children(); c++) {
+            work.push(term.get(c));
+          }
+        }
+      }
+    }
+    for (var term : builder.build()) {
+      pConsumer.accept(
+          term.kind() == Kind.APPLY ? term.get(0).symbol() : term.symbol(),
+          encapsulateWithTypeOf(term));
+    }
+  }
+
+  @Override
+  protected FloatingPointRoundingMode getRoundingMode(Term term) {
+    checkArgument(term.sort().is_rm(), "Term '%s' is not of rounding mode sort.", term);
+    if (term.is_rm_value_rna()) {
+      return FloatingPointRoundingMode.NEAREST_TIES_AWAY;
+    } else if (term.is_rm_value_rne()) {
+      return FloatingPointRoundingMode.NEAREST_TIES_TO_EVEN;
+    } else if (term.is_rm_value_rtn()) {
+      return FloatingPointRoundingMode.TOWARD_NEGATIVE;
+    } else if (term.is_rm_value_rtp()) {
+      return FloatingPointRoundingMode.TOWARD_POSITIVE;
+    } else if (term.is_rm_value_rtz()) {
+      return FloatingPointRoundingMode.TOWARD_ZERO;
+    } else {
+      throw new IllegalArgumentException("Unknown rounding mode in Term '%s'.".formatted(term));
+    }
   }
 }

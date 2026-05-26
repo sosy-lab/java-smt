@@ -11,8 +11,8 @@ package org.sosy_lab.java_smt.test;
 import static com.google.common.truth.TruthJUnit.assume;
 import static org.sosy_lab.java_smt.test.BooleanFormulaSubject.assertUsing;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
-import java.util.Arrays;
 import java.util.List;
 import org.junit.After;
 import org.junit.Before;
@@ -54,7 +54,7 @@ public class TranslateFormulaTest {
 
   @Parameters(name = "{index}: {0} --> {1}")
   public static List<Object[]> getSolverCombinations() {
-    List<Solvers> solvers = Arrays.asList(Solvers.values());
+    List<Solvers> solvers = ImmutableList.copyOf(Solvers.values());
     return Lists.transform(Lists.cartesianProduct(solvers, solvers), List::toArray);
   }
 
@@ -93,14 +93,27 @@ public class TranslateFormulaTest {
     assume()
         .withMessage("Solver %s does not support parsing formulae", translateTo)
         .that(translateTo)
-        .isNoneOf(Solvers.CVC4, Solvers.BOOLECTOR, Solvers.YICES2, Solvers.CVC5);
+        .isNoneOf(Solvers.CVC4, Solvers.BOOLECTOR, Solvers.YICES2);
+
+    assume()
+        .withMessage(
+            "Solver %s segfaults when parsing short queries or reports invalid length", translateTo)
+        .that(translateTo)
+        .isNotEqualTo(Solvers.Z3_WITH_INTERPOLATION);
   }
 
   private void requireParserFrom() {
     assume()
         .withMessage("Solver %s does not support parsing formulae", translateFrom)
         .that(translateFrom)
-        .isNoneOf(Solvers.CVC4, Solvers.BOOLECTOR, Solvers.YICES2, Solvers.CVC5);
+        .isNoneOf(Solvers.CVC4, Solvers.BOOLECTOR, Solvers.YICES2);
+
+    assume()
+        .withMessage(
+            "Solver %s segfaults when parsing short queries or reports invalid length",
+            translateFrom)
+        .that(translateFrom)
+        .isNotEqualTo(Solvers.Z3_WITH_INTERPOLATION);
   }
 
   private void requireIntegers() {
@@ -157,7 +170,7 @@ public class TranslateFormulaTest {
     assume()
         .withMessage("Solver does not support shared terms or dump/parse")
         .that(translateTo)
-        .isNoneOf(Solvers.CVC4, Solvers.CVC5, Solvers.YICES2);
+        .isNoneOf(Solvers.CVC4, Solvers.YICES2);
 
     BooleanFormula inputFrom = createTestFormula(managerFrom);
     BooleanFormula inputTo = createTestFormula(managerTo);

@@ -8,13 +8,11 @@
 
 package org.sosy_lab.java_smt.solvers.mathsat5;
 
-import static com.google.common.base.Preconditions.checkArgument;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_assert_formula;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_create_itp_group;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_get_interpolant;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_set_itp_group;
 
-import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
@@ -100,11 +98,6 @@ class Mathsat5InterpolatingProver extends Mathsat5AbstractProver<Integer>
 
   @Override
   public BooleanFormula getInterpolant(Collection<Integer> formulasOfA) throws SolverException {
-    Preconditions.checkState(!closed);
-    checkArgument(
-        getAssertedConstraintIds().containsAll(formulasOfA),
-        "interpolation can only be done over previously asserted formulas.");
-
     int[] groupsOfA = Ints.toArray(formulasOfA);
     long itp;
     try {
@@ -126,13 +119,6 @@ class Mathsat5InterpolatingProver extends Mathsat5AbstractProver<Integer>
   @Override
   public List<BooleanFormula> getSeqInterpolants(
       List<? extends Collection<Integer>> partitionedFormulas) throws SolverException {
-    Preconditions.checkArgument(
-        !partitionedFormulas.isEmpty(), "at least one partition should be available.");
-    final ImmutableSet<Integer> assertedConstraintIds = getAssertedConstraintIds();
-    checkArgument(
-        partitionedFormulas.stream().allMatch(assertedConstraintIds::containsAll),
-        "interpolation can only be done over previously asserted formulas.");
-
     // the fallback to a loop is sound and returns an inductive sequence of interpolants
     final List<BooleanFormula> itps = new ArrayList<>();
     for (int i = 1; i < partitionedFormulas.size(); i++) {

@@ -88,14 +88,12 @@ public final class PrettyPrinter {
       List<String> definitions = new ArrayList<>();
       for (String line : Files.readAllLines(path)) {
         // we assume a line-based content
-        if (Iterables.any(
-            ImmutableList.of(";", "(push ", "(pop ", "(reset", "(set-logic"), line::startsWith)) {
-          continue;
-        } else if (line.startsWith("(assert ")) {
+        if (line.startsWith("(assert ")) {
           BooleanFormula bf =
               context.getFormulaManager().parse(Joiner.on("").join(definitions) + line);
           formulas.add(bf);
-        } else {
+        } else if (!Iterables.any(
+            ImmutableList.of(";", "(push ", "(pop ", "(reset", "(set-logic"), line::startsWith)) {
           // it is a definition
           definitions.add(line);
         }
@@ -121,17 +119,12 @@ public final class PrettyPrinter {
 
   private static String formulaToString(
       BooleanFormula formula, org.sosy_lab.java_smt.utils.PrettyPrinter pp, Type type) {
-    switch (type) {
-      case DETAILED_TEXT:
-        return pp.formulaToString(formula);
-      case DOT:
-        return pp.formulaToDot(formula, PrinterOption.SPLIT_ONLY_BOOLEAN_OPERATIONS);
-      case DETAILED_DOT:
-        return pp.formulaToDot(formula);
-      case TEXT:
-      default:
-        return pp.formulaToString(formula, PrinterOption.SPLIT_ONLY_BOOLEAN_OPERATIONS);
-    }
+    return switch (type) {
+      case DETAILED_TEXT -> pp.formulaToString(formula);
+      case DOT -> pp.formulaToDot(formula, PrinterOption.SPLIT_ONLY_BOOLEAN_OPERATIONS);
+      case DETAILED_DOT -> pp.formulaToDot(formula);
+      default -> pp.formulaToString(formula, PrinterOption.SPLIT_ONLY_BOOLEAN_OPERATIONS);
+    };
   }
 
   private static void help() {

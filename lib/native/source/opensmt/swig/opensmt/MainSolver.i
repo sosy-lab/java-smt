@@ -67,7 +67,7 @@ namespace opensmt {
 %ignore MainSolver::getTheory();
 %ignore MainSolver::getTheory() const;
 %ignore MainSolver::getPartitionManager();
-%ignore MainSolver::insertFormula(PTRef, char**);
+%ignore MainSolver::addAssertion(PTRef);
 %ignore MainSolver::initialize();
 %ignore MainSolver::simplifyFormulas();
 
@@ -76,10 +76,19 @@ namespace opensmt {
 %ignore MainSolver::getCurrentAssertionsView() const;
 %ignore MainSolver::getAssertionsAtCurrentLevel() const;
 %ignore MainSolver::getAssertionsAtLevel(std::size_t) const;
+%ignore MainSolver::getAssertionsCount() const;
+%ignore MainSolver::tryAddNamedAssertion(PTRef, std::string const&);
+%ignore MainSolver::tryAddTermNameFor(PTRef, std::string const & name);
 
-// TODO These were also added recently. Are they useful to us?
 %ignore MainSolver::printResolutionProofSMT2() const;
 %ignore MainSolver::printResolutionProofSMT2(std::ostream &) const;
+%extend MainSolver {
+  std::string printResolutionProofSMT2() {
+    std::ostringstream out;
+    $self->printResolutionProofSMT2(out);
+    return out.str();
+  }
+}
 
 %ignore MainSolver::getUnsatCore() const;
 %ignore MainSolver::printFramesAsQuery() const;
