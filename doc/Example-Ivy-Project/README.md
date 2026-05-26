@@ -10,12 +10,13 @@ SPDX-License-Identifier: Apache-2.0
 
 This is an example application for using JavaSMT with Ant/Ivy.
 The example application prints a table of the available SMT solvers, along with their version
-number.
+number and supported features.
 
-The project supports the following build steps:
+The project supports the following build targets:
 
 - `resolve` retrieve dependencies with Ivy
 - `compile` compile the project
+- `test` run the tests
 - `package` build a .jar
 - `run` run the program
 - `clean` clean the project

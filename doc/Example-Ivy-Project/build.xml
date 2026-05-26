@@ -15,7 +15,7 @@ SPDX-License-Identifier: Apache-2.0
     <property name="project.jar" value="${project.module}.jar"/>
 
     <!-- Path to the "main" function -->
-    <property name="project.main" value="example.Main"/>
+    <property name="project.main" value="org.sosy_lab.java_smt_example.SolverOverviewTable"/>
 
     <target name="download-ivy" unless="skip.download">
         <mkdir dir="lib"/>
@@ -39,40 +39,40 @@ SPDX-License-Identifier: Apache-2.0
     <target name="copy" depends="resolve" description="--> copy solver libraries">
         <mkdir dir="lib/native/x86_64-windows"/>
         <copy todir="lib/native/x86_64-windows" flatten="true">
-            <fileset dir="lib/java/default">
+            <fileset dir="lib/java/runtime">
                 <include name="**/*.dll"/>
                 <exclude name="arm64/*.dll"/>
             </fileset>
         </copy>
         <mkdir dir="lib/native/arm64-windows"/>
         <copy todir="lib/native/arm64-windows" flatten="true">
-            <fileset dir="lib/java/default">
+            <fileset dir="lib/java/runtime">
                 <include name="arm64/*.dll"/>
             </fileset>
         </copy>
         <mkdir dir="lib/native/x86_64-linux"/>
         <copy todir="lib/native/x86_64-linux" flatten="true">
-            <fileset dir="lib/java/default">
+            <fileset dir="lib/java/runtime">
                 <include name="**/*.so"/>
                 <exclude name="arm64/*.so"/>
             </fileset>
         </copy>
         <mkdir dir="lib/native/arm64-linux"/>
         <copy todir="lib/native/arm64-linux" flatten="true">
-            <fileset dir="lib/java/default">
+            <fileset dir="lib/java/runtime">
                 <include name="arm64/*.so"/>
             </fileset>
         </copy>
         <mkdir dir="lib/native/x86_64-macos"/>
         <copy todir="lib/native/x86_64-macos" flatten="true">
-            <fileset dir="lib/java/default">
+            <fileset dir="lib/java/runtime">
                 <include name="**/*.dylib"/>
                 <exclude name="arm64/*.dylib"/>
             </fileset>
         </copy>
         <mkdir dir="lib/native/arm64-macos"/>
         <copy todir="lib/native/arm64-macos" flatten="true">
-            <fileset dir="lib/java/default">
+            <fileset dir="lib/java/runtime">
                 <include name="arm64/*.dll"/>
             </fileset>
         </copy>
@@ -84,13 +84,26 @@ SPDX-License-Identifier: Apache-2.0
             <pathelement location="build"/>
             <fileset dir="lib/java" includes="**/*.jar"/>
         </path>
-        <javac srcdir="src" destdir="build" classpathref="classpath.build"/>
+        <javac srcdir="src" destdir="build" classpathref="classpath.build" includeantruntime="false"/>
+    </target>
+
+    <target name="test" depends="compile">
+        <java classpathref="classpath.build" classname="org.junit.platform.console.ConsoleLauncher" fork="true"
+              failonerror="true">
+            <arg value="execute"/>
+            <arg value="--scan-classpath"/>
+            <arg line="--reports-dir build/test-report"/>
+        </java>
+        <junitreport todir="build/test-report">
+            <fileset dir="build/test-report" includes="TEST-*.xml"/>
+            <report format="noframes" todir="build/test-report/html"/>
+        </junitreport>
     </target>
 
     <target name="package" depends="compile" description="--> build a .jar">
         <manifestclasspath property="classpath.jar" jarfile="${project.jar}">
             <classpath>
-                <fileset dir="lib/java/default" includes="*.jar"/>
+                <fileset dir="lib/java/runtime" includes="*.jar"/>
             </classpath>
         </manifestclasspath>
         <jar basedir="build"

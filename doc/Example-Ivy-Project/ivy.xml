@@ -10,7 +10,22 @@ SPDX-License-Identifier: Apache-2.0
 
 <ivy-module version="2.0">
     <info organisation="${project.organization}" module="${project.module}"/>
+
+    <configurations>
+        <conf name="test" extends="runtime" visibility="private"/>
+        <conf name="runtime"/>
+    </configurations>
+
     <dependencies>
-        <dependency org="org.sosy_lab" name="java-smt" rev="6.0.0-148-gba08f432a" conf="default->runtime-x64,runtime-arm64"/>
+        <!-- JavaSMT -->
+        <dependency org="org.sosy_lab" name="java-smt" rev="6.0.0-148-gba08f432a" conf="runtime->runtime-x64,runtime-arm64"/>
+
+        <!-- JUnit6 -->
+        <dependency org="org.junit.jupiter" name="junit-jupiter-api" rev="6.1.0" conf="test->default"/>
+        <dependency org="org.junit.jupiter" name="junit-jupiter-params" rev="6.1.0" conf="test->default"/>
+        <dependency org="org.junit.jupiter" name="junit-jupiter-engine" rev="6.1.0" conf="test->default"/>
+
+        <!-- JUnit6 console launcher -->
+        <dependency org="org.junit.platform" name="junit-platform-console" rev="6.1.0" conf="test->default"/>
     </dependencies>
 </ivy-module>
