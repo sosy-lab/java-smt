@@ -8,7 +8,7 @@
 
 // This is an example for Gradle usage in Kotlin with Kotlin in Gradle
 
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     // Apply the kotlin.jvm plugin to add support for Kotlin.
@@ -17,6 +17,15 @@ plugins {
     // Apply the application plugin to add support for building a CLI application in Java.
     application
 }
+
+// Compile to Java 17
+// JavaSMT requires at least Java 17, but a newer version could be used here
+kotlin {
+    compilerOptions {
+        jvmTarget.set(JvmTarget.JVM_17)
+    }
+}
+java.sourceCompatibility = JavaVersion.VERSION_17
 
 // Globally define versions used for our dependencies
 val javasmtVersion = "6.0.0-148-gba08f432a"
