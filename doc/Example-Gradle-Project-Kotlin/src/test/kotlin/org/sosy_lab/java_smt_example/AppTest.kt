@@ -25,6 +25,7 @@ import org.sosy_lab.java_smt.SolverContextFactory.Solvers
 import org.sosy_lab.java_smt.api.SolverContext
 import org.sosy_lab.java_smt.example.Sudoku
 import java.util.*
+import java.util.logging.Level
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -100,6 +101,7 @@ class AppTest {
     @Test
     fun checkSudoku() {
         assumeTrue(isOperatingSystemSupported(solver))
+        logger.log(Level.INFO, "Executing " + solver + "...")
 
         val grid = readGridFromString(input)
 
