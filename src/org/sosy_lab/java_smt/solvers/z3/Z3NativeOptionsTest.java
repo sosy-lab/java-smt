@@ -8,10 +8,9 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-package org.sosy_lab.java_smt.test;
+package org.sosy_lab.java_smt.solvers.z3;
 
 import static com.google.common.truth.Truth.assertThat;
-import static com.google.common.truth.TruthJUnit.assume;
 import static org.junit.Assert.assertThrows;
 
 import com.google.common.collect.ImmutableSet;
@@ -27,8 +26,9 @@ import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BasicProverEnvironment;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.SolverException;
+import org.sosy_lab.java_smt.test.SolverBasedTest0;
 
-public class SolverNativeOptionsTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
+public class Z3NativeOptionsTest extends SolverBasedTest0 {
 
   // TODO: HORN test(s) will be moved once we have a dedicated HORN prover and tests
   // Small HORN problem in SMT2 (assertions should be asserted individually and not as a
@@ -40,11 +40,14 @@ public class SolverNativeOptionsTest extends SolverBasedTest0.ParameterizedSolve
       (assert (forall ((a Int) (b Int)) (=> (Itp a b) (not (< b a)))))
       """;
 
+  @Override
+  protected Solvers solverToUse() {
+    return Solvers.Z3;
+  }
+
   // TODO: HORN test(s) will be moved once we have a dedicated HORN prover and tests
   @Test
   public void simpleHornSolvingTimeoutTest() throws InterruptedException {
-    assume().that(solver).isEqualTo(Solvers.Z3);
-
     // (Do not ever use @Test(timeout = ...) on Z3! It SIGSEGVs!
     List<BooleanFormula> parsedCHC = mgr.parseAll(HORN_SMT2);
     try (BasicProverEnvironment<?> pe = context.newProverEnvironment()) {
@@ -61,8 +64,6 @@ public class SolverNativeOptionsTest extends SolverBasedTest0.ParameterizedSolve
   @Test
   public void simpleHornSolvingTest()
       throws InvalidConfigurationException, SolverException, InterruptedException {
-    assume().that(solver).isEqualTo(Solvers.Z3);
-
     // HORN program of simpleHornSolvingTimeoutTest() succeeds with HORN in Z3
     setAdditionalConfigOptionForSolver("solver.z3.logic", "HORN");
 
@@ -82,8 +83,6 @@ public class SolverNativeOptionsTest extends SolverBasedTest0.ParameterizedSolve
   @Test
   public void simpleHornSolvingWithSpacerTest()
       throws InvalidConfigurationException, SolverException, InterruptedException {
-    assume().that(solver).isEqualTo(Solvers.Z3);
-
     // HORN program of simpleHornSolvingTimeoutTest() succeeds with HORN in Spacer (Z3)
     // Note: seems like we don't need the option spacer.logic=HORN
     // The options are recommended for this kind of problem, but not needed in general.
@@ -112,7 +111,6 @@ public class SolverNativeOptionsTest extends SolverBasedTest0.ParameterizedSolve
   // TODO: generalize this for all solvers that support "additional" options
   @Test
   public void additionalOptionsTest() throws InvalidConfigurationException {
-    assume().that(solver).isEqualTo(Solvers.Z3);
     // We already test bool, symbol, string and unsigned int with the engine test
     // Start with 1 additional option
     setAdditionalConfigOptionForSolver("solver.z3.furtherOptions", "restart_factor=2");
@@ -130,7 +128,6 @@ public class SolverNativeOptionsTest extends SolverBasedTest0.ParameterizedSolve
   // Test that options are not allowed to be existing twice
   @Test
   public void additionalOptionsDoubleTest() {
-    assume().that(solver).isEqualTo(Solvers.Z3);
     assertThrows(
         IllegalArgumentException.class,
         () ->
@@ -141,7 +138,6 @@ public class SolverNativeOptionsTest extends SolverBasedTest0.ParameterizedSolve
   // TODO: generalize this for all solvers that support "additional" options
   @Test
   public void additionalOptionsFailTest() {
-    assume().that(solver).isEqualTo(Solvers.Z3);
     // Z3 disallows certain option combinations
     final Set<String> disallowedConfigurationOptionsZ3 =
         ImmutableSet.of(
@@ -166,8 +162,6 @@ public class SolverNativeOptionsTest extends SolverBasedTest0.ParameterizedSolve
   @Test
   public void z3QFBVLogicOnBvProblemTest()
       throws InvalidConfigurationException, SolverException, InterruptedException, IOException {
-    assume().that(solver).isEqualTo(Solvers.Z3);
-
     // QF_BV solves this problem in ~2s, much faster than ALL (~17s)
     // You can test this by commenting out the following line:
     setAdditionalConfigOptionForSolver("solver.z3.logic", "QF_BV");
@@ -194,8 +188,6 @@ public class SolverNativeOptionsTest extends SolverBasedTest0.ParameterizedSolve
   @Test
   public void z3FasterWithOptionsTest()
       throws SolverException, InterruptedException, IOException, InvalidConfigurationException {
-    assume().that(solver).isEqualTo(Solvers.Z3);
-
     // 'arith.solver=6' conforms to LRA (default) and solving takes about ~9s
     // 'arith.solver=2' uses a Simplex-based solver and solving takes roughly ~4.5s for this task
     // 'arith.solver=5' uses infinitary LRA and solving takes roughly ~4.5s
