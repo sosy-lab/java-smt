@@ -31,7 +31,7 @@ import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.OptimizationProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
-import org.sosy_lab.java_smt.solvers.z3.Z3SolverContext.ENGINE;
+import org.sosy_lab.java_smt.solvers.z3.Z3SolverContext.Engine;
 
 class Z3OptimizationProver extends Z3AbstractProver implements OptimizationProverEnvironment {
 
@@ -44,7 +44,7 @@ class Z3OptimizationProver extends Z3AbstractProver implements OptimizationProve
       LogManager pLogger,
       Z3FormulaManager pMgr,
       Optional<String> pLogic,
-      ENGINE pEngine,
+      Engine pEngine,
       Set<ProverOptions> pOptions,
       ImmutableMap<String, Object> pSolverOptions,
       @Nullable PathCounterTemplate pLogfile,

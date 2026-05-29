@@ -57,7 +57,7 @@ public final class Z3SolverContext extends AbstractSolverContext {
   private final Z3FormulaCreator creator;
   private final Z3FormulaManager manager;
   private final AtomicBoolean closed = new AtomicBoolean(false);
-  private final ENGINE engine;
+  private final Engine engine;
   private final Optional<String> logic;
 
   private final ImmutableMap<String, Object> solverOptionsFromConfig;
@@ -99,7 +99,7 @@ public final class Z3SolverContext extends AbstractSolverContext {
           OPT_PRIORITY_CONFIG_KEY,
           OPT_ENGINE_CONFIG_KEY);
 
-  enum ENGINE {
+  enum Engine {
     DEFAULT {
       @Override
       public String toString() {
@@ -204,18 +204,18 @@ public final class Z3SolverContext extends AbstractSolverContext {
     }
 
     /**
-     * Preprocesses the engine option string to {@link ENGINE}. Will also check for the correct
+     * Preprocesses the engine option string to {@link Engine}. Will also check for the correct
      * settings (as far as they are known) for non-default engines.
      */
-    ENGINE getZ3Engine() {
-      ENGINE z3Engine = ENGINE.DEFAULT;
+    Engine getZ3Engine() {
+      Engine z3Engine = Engine.DEFAULT;
       if (engine != null && !engine.strip().equalsIgnoreCase("AUTO-CONFIG")) {
-        z3Engine = ENGINE.valueOf(engine.toUpperCase(Locale.getDefault()).strip());
+        z3Engine = Engine.valueOf(engine.toUpperCase(Locale.getDefault()).strip());
       }
       // Spacer needs HORN logic
       // Note: seems like it does not need the option spacer.logic=HORN
       checkArgument(
-          z3Engine != ENGINE.SPACER || getLogic().orElse("ALL").equalsIgnoreCase("HORN"),
+          z3Engine != Engine.SPACER || getLogic().orElse("ALL").equalsIgnoreCase("HORN"),
           "Spacer requires HORN logic to be set");
       return z3Engine;
     }

@@ -36,7 +36,7 @@ import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractProverWithAllSat;
 import org.sosy_lab.java_smt.basicimpl.CachingModel;
-import org.sosy_lab.java_smt.solvers.z3.Z3SolverContext.ENGINE;
+import org.sosy_lab.java_smt.solvers.z3.Z3SolverContext.Engine;
 
 abstract class Z3AbstractProver extends AbstractProverWithAllSat<Void> {
 
@@ -44,7 +44,7 @@ abstract class Z3AbstractProver extends AbstractProverWithAllSat<Void> {
   protected final long z3context;
   protected final Z3FormulaManager mgr;
 
-  protected final ENGINE engine;
+  protected final Engine engine;
   protected final Optional<String> logic;
 
   private final UniqueIdGenerator trackId = new UniqueIdGenerator();
@@ -56,7 +56,7 @@ abstract class Z3AbstractProver extends AbstractProverWithAllSat<Void> {
       Z3FormulaCreator pCreator,
       Z3FormulaManager pMgr,
       Optional<String> pLogic,
-      ENGINE pEngine,
+      Engine pEngine,
       Set<ProverOptions> pOptions,
       @Nullable PathCounterTemplate pLogfile,
       ShutdownNotifier pShutdownNotifier) {
