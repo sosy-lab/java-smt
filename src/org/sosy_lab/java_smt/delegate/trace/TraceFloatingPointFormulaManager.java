@@ -245,7 +245,7 @@ class TraceFloatingPointFormulaManager implements FloatingPointFormulaManager {
   }
 
   @Override
-  public BooleanFormula toIeeeBitvector(
+  public BooleanFormula bitwiseEqual(
       FloatingPointFormula fpNumber, BitvectorFormula bitvectorFormulaSetToBeEqualToFpNumber) {
     return logger.logDef(
         "mgr.getFloatingPointFormulaManager()",
@@ -253,7 +253,7 @@ class TraceFloatingPointFormulaManager implements FloatingPointFormulaManager {
             .formatted(
                 logger.toVariable(fpNumber),
                 logger.toVariable(bitvectorFormulaSetToBeEqualToFpNumber)),
-        () -> delegate.toIeeeBitvector(fpNumber, bitvectorFormulaSetToBeEqualToFpNumber));
+        () -> delegate.bitwiseEqual(fpNumber, bitvectorFormulaSetToBeEqualToFpNumber));
   }
 
   @Override

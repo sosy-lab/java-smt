@@ -322,7 +322,7 @@ public abstract class AbstractFloatingPointFormulaManager<TFormulaInfo, TType, T
   }
 
   @Override
-  public BooleanFormula toIeeeBitvector(
+  public BooleanFormula bitwiseEqual(
       FloatingPointFormula fpNumber, BitvectorFormula bitvectorFormulaSetToBeEqualToFpNumber) {
     FormulaType.FloatingPointType fpType =
         (FloatingPointType) getFormulaCreator().getFormulaType(fpNumber);

@@ -499,7 +499,7 @@ public class SolverFormulaIOTest extends SolverBasedTest0.ParameterizedSolverBas
     BitvectorFormula someOtherBv = bvmgr.makeVariable(fpType.getTotalSize(), "someOtherBv");
     BitvectorFormula bvFromFpFallback =
         bvmgr.makeVariable(fpType.getTotalSize(), "bvFromFpFallback");
-    BooleanFormula fpToBvFallbackConstraint = fpmgr.toIeeeBitvector(fp, bvFromFpFallback);
+    BooleanFormula fpToBvFallbackConstraint = fpmgr.bitwiseEqual(fp, bvFromFpFallback);
 
     String fallbackDump =
         mgr.dumpFormula(
@@ -535,7 +535,7 @@ public class SolverFormulaIOTest extends SolverBasedTest0.ParameterizedSolverBas
     BitvectorFormula someOtherBv = bvmgr.makeVariable(fpType.getTotalSize(), "someOtherBv");
     BitvectorFormula bvFromFpFallback =
         bvmgr.makeVariable(fpType.getTotalSize(), "bvFromFpFallback");
-    BooleanFormula fpToBvFallbackConstraint = fpmgr.toIeeeBitvector(fpVar, bvFromFpFallback);
+    BooleanFormula fpToBvFallbackConstraint = fpmgr.bitwiseEqual(fpVar, bvFromFpFallback);
 
     String fallbackDump =
         mgr.dumpFormula(

@@ -204,10 +204,10 @@ class SynchronizedFloatingPointFormulaManager implements FloatingPointFormulaMan
   }
 
   @Override
-  public BooleanFormula toIeeeBitvector(
+  public BooleanFormula bitwiseEqual(
       FloatingPointFormula fpNumber, BitvectorFormula bitvectorFormulaSetToBeEqualToFpNumber) {
     synchronized (sync) {
-      return delegate.toIeeeBitvector(fpNumber, bitvectorFormulaSetToBeEqualToFpNumber);
+      return delegate.bitwiseEqual(fpNumber, bitvectorFormulaSetToBeEqualToFpNumber);
     }
   }
 

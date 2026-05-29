@@ -182,10 +182,10 @@ class StatisticsFloatingPointFormulaManager implements FloatingPointFormulaManag
   }
 
   @Override
-  public BooleanFormula toIeeeBitvector(
+  public BooleanFormula bitwiseEqual(
       FloatingPointFormula fpNumber, BitvectorFormula bitvectorFormulaSetToBeEqualToFpNumber) {
     stats.fpOperations.getAndIncrement();
-    return delegate.toIeeeBitvector(fpNumber, bitvectorFormulaSetToBeEqualToFpNumber);
+    return delegate.bitwiseEqual(fpNumber, bitvectorFormulaSetToBeEqualToFpNumber);
   }
 
   @Override

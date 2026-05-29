@@ -225,12 +225,12 @@ class DebuggingFloatingPointFormulaManager implements FloatingPointFormulaManage
   }
 
   @Override
-  public BooleanFormula toIeeeBitvector(
+  public BooleanFormula bitwiseEqual(
       FloatingPointFormula fpNumber, BitvectorFormula bitvectorFormulaSetToBeEqualToFpNumber) {
     debugging.assertThreadLocal();
     debugging.assertFormulaInContext(fpNumber);
     debugging.assertFormulaInContext(bitvectorFormulaSetToBeEqualToFpNumber);
-    BooleanFormula res = delegate.toIeeeBitvector(fpNumber, bitvectorFormulaSetToBeEqualToFpNumber);
+    BooleanFormula res = delegate.bitwiseEqual(fpNumber, bitvectorFormulaSetToBeEqualToFpNumber);
     debugging.addFormulaTerm(res);
     return res;
   }

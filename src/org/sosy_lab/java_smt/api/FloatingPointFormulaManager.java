@@ -304,8 +304,8 @@ public interface FloatingPointFormulaManager {
    * bitvector is equal to the total size of the {@link FloatingPointFormula}s {@link
    * FloatingPointType}. This method is not natively supported by all solvers, and SMTLIB2 output
    * generated containing formulas originating from this method is often not parsable by other
-   * solvers. You can use the method {@link #toIeeeBitvector(FloatingPointFormula,
-   * BitvectorFormula)} to avoid both problems.
+   * solvers. You can use the method {@link #bitwiseEqual(FloatingPointFormula, BitvectorFormula)}
+   * to avoid both problems.
    */
   BitvectorFormula toIeeeBitvector(FloatingPointFormula number);
 
@@ -339,7 +339,7 @@ public interface FloatingPointFormulaManager {
    * @return a {@link BooleanFormula} representing the result of the equality of the two parameters,
    *     i.e. (= ((_ to_fp eb sb) bitvectorFormulaSetToBeEqualToFpNumber) fpNumber).
    */
-  BooleanFormula toIeeeBitvector(
+  BooleanFormula bitwiseEqual(
       FloatingPointFormula fpNumber, BitvectorFormula bitvectorFormulaSetToBeEqualToFpNumber);
 
   FloatingPointFormula round(FloatingPointFormula formula, FloatingPointRoundingMode roundingMode);
