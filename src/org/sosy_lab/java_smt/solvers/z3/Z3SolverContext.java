@@ -520,7 +520,11 @@ public final class Z3SolverContext extends AbstractSolverContext {
   /**
    * Returns a {@link String} with all Z3 options (except tactic options as we can't use them).
    * Options are provided line by line (one option per line) with input types, information about the
-   * option, and default values. This requires a fully formed Z3FormulaCreator to work!
+   * option, and default values.
+   *
+   * <p>optionName{.detailedName} (type) infoText that may include brackets (default: defaultValue)
+   *
+   * <p>e.g.: local_ctx (bool) perform local (i.e., cheap) context simplifications (default: false)
    */
   String getAllZ3Options() {
     // Useful for retrieving all relevant Z3 options and their types

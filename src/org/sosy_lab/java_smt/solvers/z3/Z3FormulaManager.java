@@ -207,18 +207,6 @@ final class Z3FormulaManager extends AbstractFormulaManager<Long, Long, Long, Lo
     return serialized;
   }
 
-  /**
-   * Options string for all available options tied to the environment of the solver. The options are
-   * returned 1 per line, with the pattern:
-   *
-   * <p>optionName{.detailedName} (type) infoText that may include brackets (default: defaultValue)
-   *
-   * <p>e.g.: local_ctx (bool) perform local (i.e., cheap) context simplifications (default: false)
-   */
-  String getAllZ3Options() {
-    return Native.simplifyGetHelp(getEnvironment());
-  }
-
   @Override
   protected Long simplify(Long pF) throws InterruptedException {
     try {
