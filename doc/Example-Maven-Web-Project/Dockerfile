@@ -15,7 +15,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && apt-get install -y \
     openjdk-17-jdk \
     tomcat10 \
-    libgomp1 \ # Required by Z3 4.5
+    libgomp1 \
     && rm -rf /var/lib/apt/lists/*
 
 # 2. Set the environment so Tomcat knows where everything is

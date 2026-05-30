@@ -10,8 +10,9 @@ SPDX-FileCopyrightText: 2025 Dirk Beyer <https://www.sosy-lab.org>
 SPDX-License-Identifier: Apache-2.0
 -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>org.sosy_lab.java_smt_example</groupId>
@@ -69,9 +70,6 @@ SPDX-License-Identifier: Apache-2.0
     <project.dependency.relativepath>dependency</project.dependency.relativepath>
     <project.dependency.path>${project.build.directory}/${project.dependency.relativepath}</project.dependency.path>
 
-    <!-- Some solvers are provided for more than x64, e.g., also for arm64. -->
-    <system.arch>x64</system.arch>
-
     <!-- JavaSMT release version -->
     <!-- See https://central.sonatype.com/artifact/org.sosy-lab/java-smt for the latest version -->
     <javasmt.version>6.0.0-148-gba08f432a</javasmt.version>
@@ -94,7 +92,7 @@ SPDX-License-Identifier: Apache-2.0
     <princess.version>2025-11-17</princess.version>
     <ostrich.version>2.0</ostrich.version>
     <yices.version>2.7.0-gdc5687ca</yices.version>
-    <z3.version>4.16.0</z3.version>
+    <z3.version>4.15.0</z3.version>
     <z3-legacy.version>4.5.0-gd57a2a6dc</z3-legacy.version>
   </properties>
 
@@ -106,12 +104,14 @@ SPDX-License-Identifier: Apache-2.0
       <version>${javasmt.version}</version>
     </dependency>
 
-    <!-- Java-based Solvers - plain JAR dependencies are listed here -->
+    <!-- SMTInterpol -->
     <dependency>
       <groupId>de.uni-freiburg.informatik.ultimate</groupId>
       <artifactId>smtinterpol</artifactId>
       <version>${smtinterpol.version}</version>
     </dependency>
+
+    <!-- Princess/Ostrich -->
     <dependency>
       <groupId>io.github.uuverifiers</groupId>
       <artifactId>princess_2.13</artifactId>
@@ -123,139 +123,44 @@ SPDX-License-Identifier: Apache-2.0
       <version>${ostrich.version}</version>
     </dependency>
 
-    <!-- MathSAT5 has one dependency (on Linux) -->
+    <!-- Z3 -->
     <dependency>
       <groupId>org.sosy-lab</groupId>
-      <artifactId>javasmt-solver-mathsat</artifactId>
-      <version>${mathsat.version}</version>
-      <classifier>libmathsat5j-${system.arch}</classifier>
-      <type>so</type>
+      <artifactId>javasmt-solver-z3</artifactId>
+      <version>${z3.version}</version>
     </dependency>
 
-    <!-- Z3 has three dependencies (on Linux) -->
-    <dependency>
-      <groupId>org.sosy-lab</groupId>
-      <artifactId>javasmt-solver-z3</artifactId>
-      <version>${z3.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.sosy-lab</groupId>
-      <artifactId>javasmt-solver-z3</artifactId>
-      <version>${z3.version}</version>
-      <type>so</type>
-      <classifier>libz3-${system.arch}</classifier>
-    </dependency>
-    <dependency>
-      <groupId>org.sosy-lab</groupId>
-      <artifactId>javasmt-solver-z3</artifactId>
-      <version>${z3.version}</version>
-      <type>so</type>
-      <classifier>libz3java-${system.arch}</classifier>
-    </dependency>
-
-    <!-- Z3-Legacy has three dependencies (on Linux) -->
+    <!-- Z3-Legacy -->
     <dependency>
       <groupId>org.sosy-lab</groupId>
       <artifactId>javasmt-solver-z3-legacy</artifactId>
       <version>${z3-legacy.version}</version>
       <classifier>com.microsoft.z3legacy</classifier>
     </dependency>
-    <dependency>
-      <groupId>org.sosy-lab</groupId>
-      <artifactId>javasmt-solver-z3-legacy</artifactId>
-      <version>${z3-legacy.version}</version>
-      <type>so</type>
-      <classifier>libz3legacy-${system.arch}</classifier>
-    </dependency>
-    <dependency>
-      <groupId>org.sosy-lab</groupId>
-      <artifactId>javasmt-solver-z3-legacy</artifactId>
-      <version>${z3-legacy.version}</version>
-      <type>so</type>
-      <classifier>libz3javalegacy-${system.arch}</classifier>
-    </dependency>
 
-    <!-- Bitwuzla has two dependencies (on Linux) -->
+    <!-- Bitwuzla -->
     <dependency>
       <groupId>org.sosy-lab</groupId>
       <artifactId>javasmt-solver-bitwuzla</artifactId>
       <version>${bitwuzla.version}</version>
     </dependency>
-    <dependency>
-      <groupId>org.sosy-lab</groupId>
-      <artifactId>javasmt-solver-bitwuzla</artifactId>
-      <version>${bitwuzla.version}</version>
-      <type>so</type>
-      <classifier>libbitwuzlaj-${system.arch}</classifier>
-    </dependency>
 
-    <!-- Boolector has three dependencies (on Linux) -->
-    <dependency>
-      <groupId>org.sosy-lab</groupId>
-      <artifactId>javasmt-solver-boolector</artifactId>
-      <version>${boolector.version}</version>
-      <type>so</type>
-      <classifier>libboolector</classifier>
-    </dependency>
-    <dependency>
-      <groupId>org.sosy-lab</groupId>
-      <artifactId>javasmt-solver-boolector</artifactId>
-      <version>${boolector.version}</version>
-      <type>so</type>
-      <classifier>libminisat</classifier>
-    </dependency>
-    <dependency>
-      <groupId>org.sosy-lab</groupId>
-      <artifactId>javasmt-solver-boolector</artifactId>
-      <version>${boolector.version}</version>
-      <type>so</type>
-      <classifier>libpicosat</classifier>
-    </dependency>
-
-    <!-- CVC4 has four dependencies (on Linux) -->
+    <!-- CVC4 -->
     <dependency>
       <groupId>org.sosy-lab</groupId>
       <artifactId>javasmt-solver-cvc4</artifactId>
       <version>${cvc4.version}</version>
       <classifier>CVC4</classifier>
     </dependency>
-    <dependency>
-      <groupId>org.sosy-lab</groupId>
-      <artifactId>javasmt-solver-cvc4</artifactId>
-      <version>${cvc4.version}</version>
-      <type>so</type>
-      <classifier>libcvc4</classifier>
-    </dependency>
-    <dependency>
-      <groupId>org.sosy-lab</groupId>
-      <artifactId>javasmt-solver-cvc4</artifactId>
-      <version>${cvc4.version}</version>
-      <type>so</type>
-      <classifier>libcvc4jni</classifier>
-    </dependency>
-    <dependency>
-      <groupId>org.sosy-lab</groupId>
-      <artifactId>javasmt-solver-cvc4</artifactId>
-      <version>${cvc4.version}</version>
-      <type>so</type>
-      <classifier>libcvc4parser</classifier>
-    </dependency>
 
-    <!-- CVC5 has two dependencies (on Linux) -->
+    <!-- CVC5 -->
     <dependency>
       <groupId>org.sosy-lab</groupId>
       <artifactId>javasmt-solver-cvc5</artifactId>
       <version>${cvc5.version}</version>
     </dependency>
-    <dependency>
-      <groupId>org.sosy-lab</groupId>
-      <artifactId>javasmt-solver-cvc5</artifactId>
-      <version>${cvc5.version}</version>
-      <type>so</type>
-      <classifier>libcvc5jni-${system.arch}</classifier>
-    </dependency>
 
-    <!-- Yices2 has three dependencies (on Linux) -->
+    <!-- Yices2 -->
     <dependency>
       <groupId>org.sosy-lab</groupId>
       <artifactId>javasmt-yices2</artifactId>
@@ -272,36 +177,413 @@ SPDX-License-Identifier: Apache-2.0
       <artifactId>javasmt-solver-yices2</artifactId>
       <version>${yices.version}</version>
     </dependency>
-    <dependency>
-      <groupId>org.sosy-lab</groupId>
-      <artifactId>javasmt-solver-yices2</artifactId>
-      <version>${yices.version}</version>
-      <type>so</type>
-      <classifier>libyices2java-${system.arch}</classifier>
-    </dependency>
 
-    <!-- OpenSMT has two dependencies (on Linux) -->
+    <!-- OpenSMT -->
     <dependency>
       <groupId>org.sosy-lab</groupId>
       <artifactId>javasmt-solver-opensmt</artifactId>
       <version>${opensmt.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.sosy-lab</groupId>
-      <artifactId>javasmt-solver-opensmt</artifactId>
-      <version>${opensmt.version}</version>
-      <type>so</type>
-      <classifier>libopensmtj-${system.arch}</classifier>
     </dependency>
 
     <!-- JUnit for testing -->
     <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>4.13.2</version>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter-api</artifactId>
+      <version>6.1.0</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter-params</artifactId>
+      <version>6.1.0</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter-engine</artifactId>
+      <version>6.1.0</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
+
+  <profiles>
+    <profile>
+      <id>x64-linux</id>
+      <activation>
+        <os>
+          <family>linux</family>
+          <arch>amd64</arch>
+        </os>
+      </activation>
+      <dependencies>
+        <!-- MathSAT5 -->
+        <dependency>
+          <groupId>org.sosy-lab</groupId>
+          <artifactId>javasmt-solver-mathsat</artifactId>
+          <version>${mathsat.version}</version>
+          <classifier>libmathsat5j-x64</classifier>
+          <type>so</type>
+        </dependency>
+
+        <!-- Z3 -->
+        <dependency>
+          <groupId>org.sosy-lab</groupId>
+          <artifactId>javasmt-solver-z3</artifactId>
+          <version>${z3.version}</version>
+          <type>so</type>
+          <classifier>libz3-x64</classifier>
+        </dependency>
+        <dependency>
+          <groupId>org.sosy-lab</groupId>
+          <artifactId>javasmt-solver-z3</artifactId>
+          <version>${z3.version}</version>
+          <type>so</type>
+          <classifier>libz3java-x64</classifier>
+        </dependency>
+
+        <!-- Z3-Legacy -->
+        <dependency>
+          <groupId>org.sosy-lab</groupId>
+          <artifactId>javasmt-solver-z3-legacy</artifactId>
+          <version>${z3-legacy.version}</version>
+          <type>so</type>
+          <classifier>libz3legacy-x64</classifier>
+        </dependency>
+        <dependency>
+          <groupId>org.sosy-lab</groupId>
+          <artifactId>javasmt-solver-z3-legacy</artifactId>
+          <version>${z3-legacy.version}</version>
+          <type>so</type>
+          <classifier>libz3javalegacy-x64</classifier>
+        </dependency>
+
+        <!-- Bitwuzla -->
+        <dependency>
+          <groupId>org.sosy-lab</groupId>
+          <artifactId>javasmt-solver-bitwuzla</artifactId>
+          <version>${bitwuzla.version}</version>
+          <type>so</type>
+          <classifier>libbitwuzlaj-x64</classifier>
+        </dependency>
+
+        <!-- Boolector -->
+        <dependency>
+          <groupId>org.sosy-lab</groupId>
+          <artifactId>javasmt-solver-boolector</artifactId>
+          <version>${boolector.version}</version>
+          <type>so</type>
+          <classifier>libboolector</classifier>
+        </dependency>
+        <dependency>
+          <groupId>org.sosy-lab</groupId>
+          <artifactId>javasmt-solver-boolector</artifactId>
+          <version>${boolector.version}</version>
+          <type>so</type>
+          <classifier>libminisat</classifier>
+        </dependency>
+        <dependency>
+          <groupId>org.sosy-lab</groupId>
+          <artifactId>javasmt-solver-boolector</artifactId>
+          <version>${boolector.version}</version>
+          <type>so</type>
+          <classifier>libpicosat</classifier>
+        </dependency>
+
+        <!-- CVC4 -->
+        <dependency>
+          <groupId>org.sosy-lab</groupId>
+          <artifactId>javasmt-solver-cvc4</artifactId>
+          <version>${cvc4.version}</version>
+          <type>so</type>
+          <classifier>libcvc4</classifier>
+        </dependency>
+        <dependency>
+          <groupId>org.sosy-lab</groupId>
+          <artifactId>javasmt-solver-cvc4</artifactId>
+          <version>${cvc4.version}</version>
+          <type>so</type>
+          <classifier>libcvc4jni</classifier>
+        </dependency>
+        <dependency>
+          <groupId>org.sosy-lab</groupId>
+          <artifactId>javasmt-solver-cvc4</artifactId>
+          <version>${cvc4.version}</version>
+          <type>so</type>
+          <classifier>libcvc4parser</classifier>
+        </dependency>
+
+        <!-- CVC5 -->
+        <dependency>
+          <groupId>org.sosy-lab</groupId>
+          <artifactId>javasmt-solver-cvc5</artifactId>
+          <version>${cvc5.version}</version>
+          <type>so</type>
+          <classifier>libcvc5jni-x64</classifier>
+        </dependency>
+
+        <!-- Yices2 -->
+        <dependency>
+          <groupId>org.sosy-lab</groupId>
+          <artifactId>javasmt-solver-yices2</artifactId>
+          <version>${yices.version}</version>
+          <type>so</type>
+          <classifier>libyices2java-x64</classifier>
+        </dependency>
+
+        <!-- OpenSMT -->
+        <dependency>
+          <groupId>org.sosy-lab</groupId>
+          <artifactId>javasmt-solver-opensmt</artifactId>
+          <version>${opensmt.version}</version>
+          <type>so</type>
+          <classifier>libopensmtj-x64</classifier>
+        </dependency>
+      </dependencies>
+    </profile>
+    <profile>
+      <id>arm64-linux</id>
+      <activation>
+        <os>
+          <family>linux</family>
+          <arch>aarch64</arch>
+        </os>
+      </activation>
+      <dependencies>
+        <!-- MathSAT5 -->
+        <dependency>
+          <groupId>org.sosy-lab</groupId>
+          <artifactId>javasmt-solver-mathsat</artifactId>
+          <version>${mathsat.version}</version>
+          <classifier>libmathsat5j-arm64</classifier>
+          <type>so</type>
+        </dependency>
+
+        <!-- Z3 -->
+        <dependency>
+          <groupId>org.sosy-lab</groupId>
+          <artifactId>javasmt-solver-z3</artifactId>
+          <version>${z3.version}</version>
+          <type>so</type>
+          <classifier>libz3-arm64</classifier>
+        </dependency>
+        <dependency>
+          <groupId>org.sosy-lab</groupId>
+          <artifactId>javasmt-solver-z3</artifactId>
+          <version>${z3.version}</version>
+          <type>so</type>
+          <classifier>libz3java-arm64</classifier>
+        </dependency>
+
+        <!-- Bitwuzla -->
+        <dependency>
+          <groupId>org.sosy-lab</groupId>
+          <artifactId>javasmt-solver-bitwuzla</artifactId>
+          <version>${bitwuzla.version}</version>
+          <type>so</type>
+          <classifier>libbitwuzlaj-arm64</classifier>
+        </dependency>
+
+        <!-- CVC5 -->
+        <dependency>
+          <groupId>org.sosy-lab</groupId>
+          <artifactId>javasmt-solver-cvc5</artifactId>
+          <version>${cvc5.version}</version>
+          <type>so</type>
+          <classifier>libcvc5jni-arm64</classifier>
+        </dependency>
+
+        <!-- OpenSMT -->
+        <dependency>
+          <groupId>org.sosy-lab</groupId>
+          <artifactId>javasmt-solver-opensmt</artifactId>
+          <version>${opensmt.version}</version>
+          <type>so</type>
+          <classifier>libopensmtj-arm64</classifier>
+        </dependency>
+      </dependencies>
+    </profile>
+    <profile>
+      <id>x64-windows</id>
+      <activation>
+        <os>
+          <family>windows</family>
+          <arch>amd64</arch>
+        </os>
+      </activation>
+      <dependencies>
+        <!-- MathSAT5 -->
+        <dependency>
+          <groupId>org.sosy-lab</groupId>
+          <artifactId>javasmt-solver-mathsat</artifactId>
+          <version>${mathsat.version}</version>
+          <classifier>mathsat5j-x64</classifier>
+          <type>dll</type>
+        </dependency>
+        <dependency>
+          <groupId>org.sosy-lab</groupId>
+          <artifactId>javasmt-solver-mathsat</artifactId>
+          <version>${mathsat.version}</version>
+          <classifier>mathsat-x64</classifier>
+          <type>dll</type>
+        </dependency>
+        <dependency>
+          <groupId>org.sosy-lab</groupId>
+          <artifactId>javasmt-solver-mathsat</artifactId>
+          <version>${mathsat.version}</version>
+          <classifier>gmp-x64</classifier>
+          <type>dll</type>
+        </dependency>
+
+        <!-- Z3 -->
+        <dependency>
+          <groupId>org.sosy-lab</groupId>
+          <artifactId>javasmt-solver-z3</artifactId>
+          <version>${z3.version}</version>
+          <type>dll</type>
+          <classifier>libz3-x64</classifier>
+        </dependency>
+        <dependency>
+          <groupId>org.sosy-lab</groupId>
+          <artifactId>javasmt-solver-z3</artifactId>
+          <version>${z3.version}</version>
+          <type>dll</type>
+          <classifier>libz3java-x64</classifier>
+        </dependency>
+
+        <!-- Bitwuzla -->
+        <dependency>
+          <groupId>org.sosy-lab</groupId>
+          <artifactId>javasmt-solver-bitwuzla</artifactId>
+          <version>${bitwuzla.version}</version>
+          <type>dll</type>
+          <classifier>libbitwuzlaj-x64</classifier>
+        </dependency>
+
+        <!-- CVC5 -->
+        <dependency>
+          <groupId>org.sosy-lab</groupId>
+          <artifactId>javasmt-solver-cvc5</artifactId>
+          <version>${cvc5.version}</version>
+          <type>dll</type>
+          <classifier>libcvc5jni-x64</classifier>
+        </dependency>
+
+        <!-- Yices2 -->
+        <dependency>
+          <groupId>org.sosy-lab</groupId>
+          <artifactId>javasmt-solver-yices2</artifactId>
+          <version>${yices.version}</version>
+          <type>dll</type>
+          <classifier>yices2java-x64</classifier>
+        </dependency>
+      </dependencies>
+    </profile>
+    <profile>
+      <id>arm64-windows</id>
+      <activation>
+        <os>
+          <family>windows</family>
+          <arch>aarch64</arch>
+        </os>
+      </activation>
+      <dependencies>
+        <!-- Z3 -->
+        <dependency>
+          <groupId>org.sosy-lab</groupId>
+          <artifactId>javasmt-solver-z3</artifactId>
+          <version>${z3.version}</version>
+          <type>dll</type>
+          <classifier>libz3-arm64</classifier>
+        </dependency>
+        <dependency>
+          <groupId>org.sosy-lab</groupId>
+          <artifactId>javasmt-solver-z3</artifactId>
+          <version>${z3.version}</version>
+          <type>dll</type>
+          <classifier>libz3java-arm64</classifier>
+        </dependency>
+
+        <!-- CVC5 -->
+        <dependency>
+          <groupId>org.sosy-lab</groupId>
+          <artifactId>javasmt-solver-cvc5</artifactId>
+          <version>${cvc5.version}</version>
+          <type>dll</type>
+          <classifier>libcvc5jni-arm64</classifier>
+        </dependency>
+      </dependencies>
+    </profile>
+    <profile>
+      <id>x64-macosx</id>
+      <activation>
+        <os>
+          <family>mac</family>
+          <arch>x86_64</arch>
+        </os>
+      </activation>
+      <dependencies>
+        <!-- Z3 -->
+        <dependency>
+          <groupId>org.sosy-lab</groupId>
+          <artifactId>javasmt-solver-z3</artifactId>
+          <version>${z3.version}</version>
+          <type>dylib</type>
+          <classifier>libz3-x64</classifier>
+        </dependency>
+        <dependency>
+          <groupId>org.sosy-lab</groupId>
+          <artifactId>javasmt-solver-z3</artifactId>
+          <version>${z3.version}</version>
+          <type>dylib</type>
+          <classifier>libz3java-x64</classifier>
+        </dependency>
+
+        <!-- CVC5 -->
+        <dependency>
+          <groupId>org.sosy-lab</groupId>
+          <artifactId>javasmt-solver-cvc5</artifactId>
+          <version>${cvc5.version}</version>
+          <type>dylib</type>
+          <classifier>libcvc5jni-x64</classifier>
+        </dependency>
+      </dependencies>
+    </profile>
+    <profile>
+      <id>arm64-macosx</id>
+      <activation>
+        <os>
+          <family>mac</family>
+          <arch>aarch64</arch>
+        </os>
+      </activation>
+      <dependencies>
+        <!-- Z3 -->
+        <dependency>
+          <groupId>org.sosy-lab</groupId>
+          <artifactId>javasmt-solver-z3</artifactId>
+          <version>${z3.version}</version>
+          <type>dylib</type>
+          <classifier>libz3-arm64</classifier>
+        </dependency>
+        <dependency>
+          <groupId>org.sosy-lab</groupId>
+          <artifactId>javasmt-solver-z3</artifactId>
+          <version>${z3.version}</version>
+          <type>dylib</type>
+          <classifier>libz3java-arm64</classifier>
+        </dependency>
+
+        <!-- CVC5 -->
+        <dependency>
+          <groupId>org.sosy-lab</groupId>
+          <artifactId>javasmt-solver-cvc5</artifactId>
+          <version>${cvc5.version}</version>
+          <type>dylib</type>
+          <classifier>libcvc5jni-arm64</classifier>
+        </dependency>
+      </dependencies>
+    </profile>
+  </profiles>
 
   <build>
     <plugins>
@@ -401,7 +683,9 @@ SPDX-License-Identifier: Apache-2.0
                   <fileset dir="${project.build.directory}/temp-natives" includes="**/*"/>
                   <!-- example mapping: from javasmt-solver-z3-libz3java-x64.so to libz3.so, version got already removed above.
                        "\1" is the library name, "\2" is the file extension. -->
-                  <regexpmapper from="^javasmt-solver-(?:bitwuzla|boolector|cvc4|cvc5|mathsat|opensmt|yices2|z3-legacy|z3)-(.*?)(?:-${system.arch})?\.(so|dll|dylib)$" to="\1.\2" />
+                  <regexpmapper
+                          from="^javasmt-solver-(?:bitwuzla|boolector|cvc4|cvc5|mathsat|opensmt|yices2|z3-legacy|z3)-(.*?)(?:-arm64|-x64)?\.(so|dll|dylib)$"
+                          to="\1.\2"/>
                 </copy>
                 <delete dir="${project.build.directory}/temp-natives"/>
               </target>

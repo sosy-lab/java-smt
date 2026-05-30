@@ -6,13 +6,11 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-plugins {
-    id 'java'
-    id 'application'
-}
+import org.gradle.nativeplatform.platform.internal.DefaultNativePlatform
 
-application {
-    mainClass = 'org.sosy_lab.java_smt_example.SolverOverviewTable'
+plugins {
+  id 'java'
+  id 'application'
 }
 
 // Globally define versions used for our dependencies
@@ -30,36 +28,37 @@ def version = [
   'princess': '2025-11-17',
   'ostrich': '2.0',
   'yices2': '2.7.0-gdc5687ca',
-  'z3': '4.16.0',
+  'z3': '4.15.0',
   'z3legacy': '4.5.0-gd57a2a6dc',
 
-  'junit4': '4.13.2'
+  'junit6': '6.1.0'
 ];
 
-def architecture = "x64"
+def os = DefaultNativePlatform.getCurrentOperatingSystem()
+def arch = DefaultNativePlatform.getCurrentArchitecture()
 
 repositories {
   // try to resolve by pom first
   mavenCentral {
     metadataSources {
-      mavenPom()
+    mavenPom()
     }
   }
   // try to get artifacts if no useful pom is found
   mavenCentral {
     metadataSources {
-      artifact()
+    artifact()
     }
   }
   // Ivy can be used as well
   ivy {
     url = "https://www.sosy-lab.org/ivy"
     patternLayout {
-      artifact "/[organisation]/[module]/[classifier]-[revision].[ext]"
-      // ivy "/[organisation]/[module]/ivy-[revision].xml"
+    artifact "/[organisation]/[module]/[classifier]-[revision].[ext]"
+    // ivy "/[organisation]/[module]/ivy-[revision].xml"
     }
     metadataSources {
-       artifact()
+     artifact()
     }
   }
 }
@@ -73,68 +72,177 @@ configurations {
 
 // You can manage the JavaSMT dependencies via a config if you need to split them from your regular dependencies
 dependencies {
-  // JUnit 4
-  testImplementation "junit:junit:${version.junit4}"
+  // JUnit
+  testImplementation("org.junit.jupiter:junit-jupiter-api:$version.junit6")
+  testImplementation("org.junit.jupiter:junit-jupiter-params:$version.junit6")
+  testImplementation("org.junit.jupiter:junit-jupiter-engine:$version.junit6")
+  testRuntimeOnly("org.junit.platform:junit-platform-launcher:$version.junit6")
 
-  // Retrieve JavaSMT with Maven and transitive dependencies via a pom.xml
-  implementation "org.sosy-lab:java-smt:${version.javasmt}"
+  // JavaSMT dependencies
+  implementation("org.sosy-lab:java-smt:$version.javasmt")
 
-  // Princess
-  implementation "io.github.uuverifiers:princess_2.13:${version.princess}"
-  implementation "io.github.uuverifiers:ostrich_2.13:${version.ostrich}"
+  // Princess/Ostrich
+  runtimeOnly("io.github.uuverifiers:princess_2.13:$version.princess")
+  runtimeOnly("io.github.uuverifiers:ostrich_2.13:$version.ostrich")
 
   // SMTInterpol
-  implementation "de.uni-freiburg.informatik.ultimate:smtinterpol:${version.smtInterpol}"
-
-  // Mathsat5
-  runtimeOnly("org.sosy-lab:javasmt-solver-mathsat:${version.mathsat5}:libmathsat5j-${architecture}@so")
+  runtimeOnly("de.uni-freiburg.informatik.ultimate:smtinterpol:$version.smtInterpol")
 
   // Z3
-  runtimeOnly("org.sosy-lab:javasmt-solver-z3:${version.z3}@jar")
-  runtimeOnly("org.sosy-lab:javasmt-solver-z3:${version.z3}:libz3-${architecture}@so")
-  runtimeOnly("org.sosy-lab:javasmt-solver-z3:${version.z3}:libz3java-${architecture}@so")
+  runtimeOnly("org.sosy-lab:javasmt-solver-z3:$version.z3@jar")
 
   // Z3 4.5
-  runtimeOnly("org.sosy-lab:javasmt-solver-z3-legacy:${version.z3legacy}:com.microsoft.z3legacy@jar")
-  runtimeOnly("org.sosy-lab:javasmt-solver-z3-legacy:${version.z3legacy}:libz3legacy-${architecture}@so")
-  runtimeOnly("org.sosy-lab:javasmt-solver-z3-legacy:${version.z3legacy}:libz3javalegacy-${architecture}@so")
+  runtimeOnly("org.sosy-lab:javasmt-solver-z3-legacy:$version.z3legacy:com.microsoft.z3legacy@jar")
 
   // Bitwuzla
-  runtimeOnly("org.sosy-lab:javasmt-solver-bitwuzla:${version.bitwuzla}@jar")
-  runtimeOnly("org.sosy-lab:javasmt-solver-bitwuzla:${version.bitwuzla}:libbitwuzlaj-${architecture}@so")
+  runtimeOnly("org.sosy-lab:javasmt-solver-bitwuzla:$version.bitwuzla@jar")
 
   // CVC4
-  runtimeOnly("org.sosy-lab:javasmt-solver-cvc4:${version.cvc4}:CVC4@jar")
-  runtimeOnly("org.sosy-lab:javasmt-solver-cvc4:${version.cvc4}:libcvc4@so")
-  runtimeOnly("org.sosy-lab:javasmt-solver-cvc4:${version.cvc4}:libcvc4jni@so")
-  runtimeOnly("org.sosy-lab:javasmt-solver-cvc4:${version.cvc4}:libcvc4parser@so")
+  runtimeOnly("org.sosy-lab:javasmt-solver-cvc4:$version.cvc4:CVC4@jar")
 
   // CVC5
-  runtimeOnly("org.sosy-lab:javasmt-solver-cvc5:${version.cvc5}@jar")
-  runtimeOnly("org.sosy-lab:javasmt-solver-cvc5:${version.cvc5}:libcvc5jni-${architecture}@so")
-
-  // Boolector
-  runtimeOnly("org.sosy-lab:javasmt-solver-boolector:${version.boolector}:libboolector@so")
-  runtimeOnly("org.sosy-lab:javasmt-solver-boolector:${version.boolector}:libminisat@so")
-  runtimeOnly("org.sosy-lab:javasmt-solver-boolector:${version.boolector}:libpicosat@so")
+  runtimeOnly("org.sosy-lab:javasmt-solver-cvc5:$version.cvc5@jar")
 
   // Yices2
-  runtimeOnly("org.sosy-lab:javasmt-yices2:${version.javasmtYices2}@jar")
-  runtimeOnly("org.sosy-lab:javasmt-solver-yices2:${version.yices}@jar")
-  runtimeOnly("org.sosy-lab:javasmt-solver-yices2:${version.yices2}:libyices2java-${architecture}@so")
+  runtimeOnly("org.sosy-lab:javasmt-yices2:$version.javasmtYices2@jar")
+  runtimeOnly("org.sosy-lab:javasmt-solver-yices2:$version.yices2@jar")
 
   // OpenSMT
-  runtimeOnly("org.sosy-lab:javasmt-solver-opensmt:${version.opensmt}@jar")
-  runtimeOnly("org.sosy-lab:javasmt-solver-opensmt:${version.opensmt}:libopensmtj-${architecture}@so")
+  runtimeOnly("org.sosy-lab:javasmt-solver-opensmt:$version.opensmt@jar")
+
+  if(os.isLinux() && arch.isAmd64()) {
+    // Mathsat5
+    runtimeOnly("org.sosy-lab:javasmt-solver-mathsat:$version.mathsat5:libmathsat5j-x64@so")
+
+    // Z3
+    runtimeOnly("org.sosy-lab:javasmt-solver-z3:$version.z3:libz3-x64@so")
+    runtimeOnly("org.sosy-lab:javasmt-solver-z3:$version.z3:libz3java-x64@so")
+
+    // Z3 4.5
+    runtimeOnly("org.sosy-lab:javasmt-solver-z3-legacy:$version.z3legacy:libz3legacy-x64@so")
+    runtimeOnly("org.sosy-lab:javasmt-solver-z3-legacy:$version.z3legacy:libz3javalegacy-x64@so")
+
+    // Bitwuzla
+    runtimeOnly("org.sosy-lab:javasmt-solver-bitwuzla:$version.bitwuzla:libbitwuzlaj-x64@so")
+
+    // CVC4
+    runtimeOnly("org.sosy-lab:javasmt-solver-cvc4:$version.cvc4:libcvc4@so")
+    runtimeOnly("org.sosy-lab:javasmt-solver-cvc4:$version.cvc4:libcvc4jni@so")
+    runtimeOnly("org.sosy-lab:javasmt-solver-cvc4:$version.cvc4:libcvc4parser@so")
+
+    // CVC5
+    runtimeOnly("org.sosy-lab:javasmt-solver-cvc5:$version.cvc5:libcvc5jni-x64@so")
+
+    // Boolector
+    runtimeOnly("org.sosy-lab:javasmt-solver-boolector:$version.boolector:libboolector@so")
+    runtimeOnly("org.sosy-lab:javasmt-solver-boolector:$version.boolector:libminisat@so")
+    runtimeOnly("org.sosy-lab:javasmt-solver-boolector:$version.boolector:libpicosat@so")
+
+    // Yices2
+    runtimeOnly("org.sosy-lab:javasmt-solver-yices2:$version.yices2:libyices2java-x64@so")
+
+    // OpenSMT
+    runtimeOnly("org.sosy-lab:javasmt-solver-opensmt:$version.opensmt:libopensmtj-x64@so")
+
+  } else if (os.isLinux() && arch.isArm64()) {
+    // Mathsat5
+    runtimeOnly("org.sosy-lab:javasmt-solver-mathsat:$version.mathsat5:libmathsat5j-arm64@so")
+
+    // Z3
+    runtimeOnly("org.sosy-lab:javasmt-solver-z3:$version.z3:libz3-arm64@so")
+    runtimeOnly("org.sosy-lab:javasmt-solver-z3:$version.z3:libz3java-arm64@so")
+
+    // Z3 4.5
+    runtimeOnly("org.sosy-lab:javasmt-solver-z3-legacy:$version.z3Legacy:libz3legacy-arm64@so")
+    runtimeOnly("org.sosy-lab:javasmt-solver-z3-legacy:$version.z3Legacy:libz3javalegacy-arm64@so")
+
+    // Bitwuzla
+    runtimeOnly("org.sosy-lab:javasmt-solver-bitwuzla:$version.bitwuzla:libbitwuzlaj-arm64@so")
+
+    // CVC5
+    runtimeOnly("org.sosy-lab:javasmt-solver-cvc5:$version.cvc5:libcvc5jni-arm64@so")
+
+    // OpenSMT
+    runtimeOnly("org.sosy-lab:javasmt-solver-opensmt:$version.opensmt:libopensmtj-arm64@so")
+
+  } else if(os.isWindows() && arch.isAmd64()) {
+    // Mathsat5
+    runtimeOnly("org.sosy-lab:javasmt-solver-mathsat:$version.mathsat5:mathsat5j-x64@dll")
+    runtimeOnly("org.sosy-lab:javasmt-solver-mathsat:$version.mathsat5:mathsat-x64@dll")
+    runtimeOnly("org.sosy-lab:javasmt-solver-mathsat:$version.mathsat5:gmp-x64@dll")
+
+    // Z3
+    runtimeOnly("org.sosy-lab:javasmt-solver-z3:$version.z3:libz3-x64@dll")
+    runtimeOnly("org.sosy-lab:javasmt-solver-z3:$version.z3:libz3java-x64@dll")
+
+    // Bitwuzla
+    runtimeOnly("org.sosy-lab:javasmt-solver-bitwuzla:$version.bitwuzla:libbitwuzlaj-x64@dll")
+
+    // CVC5
+    runtimeOnly("org.sosy-lab:javasmt-solver-cvc5:$version.cvc5:libcvc5jni-x64@dll")
+
+    // Yices2
+    runtimeOnly("org.sosy-lab:javasmt-solver-yices2:$version.yices2:yices2java-x64@dll")
+
+  } else if (os.isWindows() && arch.isArm64()){
+    // Z3
+    runtimeOnly("org.sosy-lab:javasmt-solver-z3:$version.z3:libz3-arm64@dll")
+    runtimeOnly("org.sosy-lab:javasmt-solver-z3:$version.z3:libz3java-arm64@dll")
+
+    // CVC5
+    runtimeOnly("org.sosy-lab:javasmt-solver-cvc5:$version.cvc5:libcvc5jni-arm64@dll")
+
+  } else if(os.isMacOsX() && arch.isAmd64()) {
+    // Z3
+    runtimeOnly("org.sosy-lab:javasmt-solver-z3:$version.z3:libz3-x64@dylib")
+    runtimeOnly("org.sosy-lab:javasmt-solver-z3:$version.z3:libz3java-x64@dylib")
+
+    // CVC5
+    runtimeOnly("org.sosy-lab:javasmt-solver-cvc5:$version.cvc5:libcvc5jni-x64@dylib")
+
+  } else if(os.isMacOsX() && arch.isArm64()) {
+    // Z3
+    runtimeOnly("org.sosy-lab:javasmt-solver-z3:$version.z3:libz3-arm64@dylib")
+    runtimeOnly("org.sosy-lab:javasmt-solver-z3:$version.z3:libz3java-arm64@dylib")
+
+    // CVC5
+    runtimeOnly("org.sosy-lab:javasmt-solver-cvc5:$version.cvc5:libcvc5jni-arm64@dylib")
+
+  } else {
+    throw new GradleException('Unsupported OS or architecture')
+  }
 
   // Tell implementation config to use the JavaSMT + dependencies from our dependencies folder
   implementation fileTree(dir: 'build/dependencies', include: '*.jar')
 }
 
-// Test with JUnit4 (see dependencies) and 1gig heap
+// Test with JUnit (see dependencies) and 1gig heap
 test {
-  useJUnit()
+  useJUnitPlatform()
   maxHeapSize = '1G'
+}
+
+// Define the main class for the application.
+application {
+  mainClass = 'org.sosy_lab.java_smt_example.SolverOverviewTable'
+}
+
+// Compile to Java 17
+// JavaSMT requires at least Java 17, but a newer version could be used here
+java.sourceCompatibility = JavaVersion.VERSION_17
+
+def shorten(full) {
+  def match = full =~ /(.*)(?:-x64|-arm64)\.(so|dll|dylib)$/
+  def clipped = full
+  if (match) {
+    clipped = match[0][1] + "." + match[0][2]
+  }
+  def match2 = clipped =~ /.*-(.*).(so|dll|dylib)$/
+  if (match2) {
+    return match2[0][1] + "." + match2[0][2]
+  } else {
+    return clipped
+  }
 }
 
 // Copy and rename all JavaSMT dependencies
@@ -147,7 +255,7 @@ task copyDependencies(type: Copy) {
   from configurations.javaSMTConfig
   into 'build/dependencies'
   // Renames the dependencies
-  rename '.*(lib[^-]*)-?.*.so', '$1.so'
+  rename(this.&shorten)
 }
 
 // Cleans the dependencies folder
