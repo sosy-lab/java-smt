@@ -63,17 +63,17 @@ SPDX-License-Identifier: Apache-2.0
                 <include name="arm64/*.so"/>
             </fileset>
         </copy>
-        <mkdir dir="lib/native/x86_64-macos"/>
-        <copy todir="lib/native/x86_64-macos" flatten="true">
+        <mkdir dir="lib/native/x86_64-macosx"/>
+        <copy todir="lib/native/x86_64-macosx" flatten="true">
             <fileset dir="lib/java/runtime">
                 <include name="**/*.dylib"/>
                 <exclude name="arm64/*.dylib"/>
             </fileset>
         </copy>
-        <mkdir dir="lib/native/arm64-macos"/>
-        <copy todir="lib/native/arm64-macos" flatten="true">
+        <mkdir dir="lib/native/arm64-macosx"/>
+        <copy todir="lib/native/arm64-macosx" flatten="true">
             <fileset dir="lib/java/runtime">
-                <include name="arm64/*.dll"/>
+                <include name="arm64/*.dylib"/>
             </fileset>
         </copy>
     </target>
