@@ -32,7 +32,7 @@ SPDX-License-Identifier: Apache-2.0
         <typefound name="junitlauncher"/>
     </condition>
     <target name="load-junit" depends="resolve-dependencies" unless="ant.junit.available">
-        <taskdef name="junit"
+        <taskdef name="junitlauncher"
                  classname="org.apache.tools.ant.taskdefs.optional.junitlauncher.confined.JUnitLauncherTask"
                  classpath="${ivy.jar.dir}/ant-junitlauncher.jar:${ivy.jar.dir}/ant-junit.jar"/>
         <taskdef name="junitreport"
