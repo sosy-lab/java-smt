@@ -24,7 +24,7 @@ import org.sosy_lab.java_smt.api.SolverException;
  * Uses bitvector theory if there is no integer theory available. Notice: Boolector does not support
  * bitvectors length 1.
  */
-public class BooleanFormulaSubjectTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
+public class BooleanFormulaSubjectTest extends SolverBasedTest.ParameterizedSolverBasedTest {
 
   private BooleanFormula simpleFormula;
   private BooleanFormula contradiction;

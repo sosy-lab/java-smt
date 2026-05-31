@@ -37,7 +37,7 @@ import org.sosy_lab.java_smt.api.visitors.DefaultFormulaVisitor;
 import org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager;
 
 @SuppressFBWarnings(value = "DLS_DEAD_LOCAL_STORE")
-public class VariableNamesTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
+public class VariableNamesTest extends SolverBasedTest.ParameterizedSolverBasedTest {
 
   private static final ImmutableList<String> NAMES =
       ImmutableList.of(

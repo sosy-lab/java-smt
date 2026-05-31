@@ -32,7 +32,7 @@ import org.sosy_lab.java_smt.api.Tactic;
 import org.sosy_lab.java_smt.api.visitors.BooleanFormulaVisitor;
 
 @SuppressWarnings("LocalVariableName")
-public class SolverTacticsTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
+public class SolverTacticsTest extends SolverBasedTest.ParameterizedSolverBasedTest {
 
   @Test
   public void nnfTacticDefaultTest1() throws SolverException, InterruptedException {

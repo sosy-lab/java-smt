@@ -58,7 +58,6 @@ import org.sosy_lab.java_smt.api.OptimizationProverEnvironment.OptStatus;
 import org.sosy_lab.java_smt.api.SolverContext;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
-import org.sosy_lab.java_smt.test.SolverBasedTest0.ParameterizedSolverBasedTest0;
 
 @SuppressWarnings("resource")
 @ParameterizedClass
@@ -98,7 +97,7 @@ public class SolverConcurrencyTest {
           40);
 
   public static Object[] getAllSolvers() {
-    return ParameterizedSolverBasedTest0.getAllSolvers();
+    return SolverBasedTest.ParameterizedSolverBasedTest.getAllSolvers();
   }
 
   @Parameter(0)

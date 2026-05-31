@@ -37,7 +37,7 @@ import org.sosy_lab.java_smt.api.SolverContext;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.api.UFManager;
 
-public class DebugModeTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
+public class DebugModeTest extends SolverBasedTest.ParameterizedSolverBasedTest {
   private SolverContextFactory debugFactory;
 
   private SolverContext debugContext;

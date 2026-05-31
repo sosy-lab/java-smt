@@ -15,7 +15,7 @@ import org.junit.jupiter.api.Test;
 import org.sosy_lab.java_smt.api.FormulaType;
 
 @SuppressFBWarnings(value = "DLS_DEAD_LOCAL_STORE")
-public class VariableNamesInvalidTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
+public class VariableNamesInvalidTest extends SolverBasedTest.ParameterizedSolverBasedTest {
 
   // currently the only invalid String is the empty String
 

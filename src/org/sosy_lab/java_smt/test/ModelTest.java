@@ -61,7 +61,7 @@ import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.api.visitors.DefaultFormulaVisitor;
 
 /** Test that values from models are appropriately parsed. */
-public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
+public class ModelTest extends SolverBasedTest.ParameterizedSolverBasedTest {
 
   // A list of variables to test that model variable names are correctly applied
   private static final ImmutableList<String> VARIABLE_NAMES =

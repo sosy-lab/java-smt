@@ -27,7 +27,7 @@ import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
 import org.sosy_lab.java_smt.api.SolverException;
 
-public class MixedArithmeticsTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
+public class MixedArithmeticsTest extends SolverBasedTest.ParameterizedSolverBasedTest {
 
   /** Require that the solver supports mixed integer-real arithmetics. */
   @BeforeEach

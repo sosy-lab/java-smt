@@ -18,7 +18,7 @@ import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.FunctionDeclarationKind;
 import org.sosy_lab.java_smt.test.SolverVisitorTest.FunctionDeclarationVisitorNoOther;
 
-public class RotationVisitorTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
+public class RotationVisitorTest extends SolverBasedTest.ParameterizedSolverBasedTest {
 
   private BitvectorFormula a;
   private BitvectorFormula y;

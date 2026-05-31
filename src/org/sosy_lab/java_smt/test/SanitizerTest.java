@@ -17,7 +17,7 @@ import org.junit.jupiter.api.Test;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.SolverException;
 
-public class SanitizerTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
+public class SanitizerTest extends SolverBasedTest.ParameterizedSolverBasedTest {
   @BeforeEach
   public void init() {
     requireParser();

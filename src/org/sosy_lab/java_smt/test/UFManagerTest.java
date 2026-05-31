@@ -25,7 +25,7 @@ import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.api.visitors.ExpectedFormulaVisitor;
 
-public class UFManagerTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
+public class UFManagerTest extends SolverBasedTest.ParameterizedSolverBasedTest {
 
   private static final ImmutableList<String> VALID_NAMES = ImmutableList.of("Func", "(Func)");
 

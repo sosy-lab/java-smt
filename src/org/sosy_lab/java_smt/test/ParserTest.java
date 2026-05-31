@@ -24,7 +24,7 @@ import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.SolverException;
 
-public class ParserTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
+public class ParserTest extends SolverBasedTest.ParameterizedSolverBasedTest {
 
   @BeforeEach
   public void setUp() {

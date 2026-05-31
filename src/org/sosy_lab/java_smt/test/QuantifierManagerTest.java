@@ -35,7 +35,7 @@ import org.sosy_lab.java_smt.api.Tactic;
 import org.sosy_lab.java_smt.api.visitors.DefaultFormulaVisitor;
 
 @SuppressFBWarnings(value = "DLS_DEAD_LOCAL_STORE", justification = "test code")
-public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
+public class QuantifierManagerTest extends SolverBasedTest.ParameterizedSolverBasedTest {
 
   private IntegerFormula x;
   private ArrayFormula<IntegerFormula, IntegerFormula> a;

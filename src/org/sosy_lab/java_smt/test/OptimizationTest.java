@@ -32,7 +32,7 @@ import org.sosy_lab.java_smt.api.OptimizationProverEnvironment.OptStatus;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 
-public class OptimizationTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
+public class OptimizationTest extends SolverBasedTest.ParameterizedSolverBasedTest {
 
   @Override
   protected ConfigurationBuilder createTestConfigBuilder() throws InvalidConfigurationException {

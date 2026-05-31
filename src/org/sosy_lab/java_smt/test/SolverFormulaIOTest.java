@@ -34,7 +34,7 @@ import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.Tokenizer;
 
 @SuppressWarnings("checkstyle:linelength")
-public class SolverFormulaIOTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
+public class SolverFormulaIOTest extends SolverBasedTest.ParameterizedSolverBasedTest {
 
   private static final String BOOL_CHECK =
       "(declare-fun x () Bool)(declare-fun y () Bool)(assert (= y x))";

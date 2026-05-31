@@ -33,7 +33,7 @@ import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.solvers.opensmt.Logics;
 
-public class SolverThreadLocalityTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
+public class SolverThreadLocalityTest extends SolverBasedTest.ParameterizedSolverBasedTest {
   private ExecutorService executor;
 
   private HardIntegerFormulaGenerator hardProblem;

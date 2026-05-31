@@ -28,7 +28,7 @@ import org.sosy_lab.java_smt.utils.SolverUtils;
 import org.sosy_lab.java_smt.utils.UfElimination;
 import org.sosy_lab.java_smt.utils.UfElimination.Result;
 
-public class UfEliminationTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
+public class UfEliminationTest extends SolverBasedTest.ParameterizedSolverBasedTest {
 
   private UfElimination ackermannization;
 

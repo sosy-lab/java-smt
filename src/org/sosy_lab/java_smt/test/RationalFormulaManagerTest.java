@@ -27,7 +27,7 @@ import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.api.visitors.DefaultFormulaVisitor;
 
-public class RationalFormulaManagerTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
+public class RationalFormulaManagerTest extends SolverBasedTest.ParameterizedSolverBasedTest {
 
   private static final double[] SOME_DOUBLES =
       new double[] {

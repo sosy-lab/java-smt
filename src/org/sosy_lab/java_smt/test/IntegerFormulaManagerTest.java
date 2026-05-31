@@ -13,9 +13,9 @@ import java.math.BigInteger;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.sosy_lab.java_smt.api.SolverException;
-import org.sosy_lab.java_smt.test.SolverBasedTest0.ParameterizedSolverBasedTest0;
+import org.sosy_lab.java_smt.test.SolverBasedTest.ParameterizedSolverBasedTest;
 
-public class IntegerFormulaManagerTest extends ParameterizedSolverBasedTest0 {
+public class IntegerFormulaManagerTest extends ParameterizedSolverBasedTest {
 
   @BeforeEach
   public void init() {

@@ -30,7 +30,7 @@ import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.api.visitors.DefaultFormulaVisitor;
 import org.sosy_lab.java_smt.api.visitors.TraversalProcess;
 
-public class EnumerationFormulaManagerTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
+public class EnumerationFormulaManagerTest extends SolverBasedTest.ParameterizedSolverBasedTest {
 
   @BeforeEach
   public void init() {

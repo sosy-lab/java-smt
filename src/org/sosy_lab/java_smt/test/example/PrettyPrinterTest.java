@@ -14,11 +14,11 @@ import static com.google.common.truth.Truth.assertThat;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.sosy_lab.java_smt.test.SolverBasedTest0.ParameterizedSolverBasedTest0;
+import org.sosy_lab.java_smt.test.SolverBasedTest;
 import org.sosy_lab.java_smt.utils.PrettyPrinter;
 import org.sosy_lab.java_smt.utils.PrettyPrinter.PrinterOption;
 
-public class PrettyPrinterTest extends ParameterizedSolverBasedTest0 {
+public class PrettyPrinterTest extends SolverBasedTest.ParameterizedSolverBasedTest {
 
   private PrettyPrinter pp;
 

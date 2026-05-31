@@ -31,7 +31,7 @@ import org.sosy_lab.java_smt.solvers.opensmt.Logics;
 /** Check that timeout is handled gracefully. */
 @ParameterizedClass
 @MethodSource("getAllSolversAndDelays")
-public class TimeoutTest extends SolverBasedTest0 {
+public class TimeoutTest extends SolverBasedTest {
 
   private static final int TIMEOUT_MILLISECONDS = 20000;
 
@@ -39,7 +39,7 @@ public class TimeoutTest extends SolverBasedTest0 {
 
   public static List<Object[]> getAllSolversAndDelays() {
     List<Object[]> lst = new ArrayList<>();
-    for (Solvers solver : ParameterizedSolverBasedTest0.getAllSolvers()) {
+    for (Solvers solver : ParameterizedSolverBasedTest.getAllSolvers()) {
       for (int delay : DELAY_IN_MILLISECONDS) {
         lst.add(new Object[] {solver, delay});
       }

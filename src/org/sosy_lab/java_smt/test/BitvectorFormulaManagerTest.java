@@ -38,7 +38,7 @@ import org.sosy_lab.java_smt.api.SolverException;
  * Tests bitvectors for all solvers that support it. Notice: Boolector does not support integer
  * theory or bitvectors length 1.
  */
-public class BitvectorFormulaManagerTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
+public class BitvectorFormulaManagerTest extends SolverBasedTest.ParameterizedSolverBasedTest {
 
   private static final BitvectorType bvType4 = FormulaType.getBitvectorTypeWithSize(4);
 

@@ -31,7 +31,7 @@ import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.api.StringFormula;
 
 /** Tests Arrays for all solvers that support it. */
-public class ArrayFormulaManagerTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
+public class ArrayFormulaManagerTest extends SolverBasedTest.ParameterizedSolverBasedTest {
 
   @BeforeEach
   public void init() {

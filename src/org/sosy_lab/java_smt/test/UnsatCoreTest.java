@@ -20,7 +20,7 @@ import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 
-public class UnsatCoreTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
+public class UnsatCoreTest extends SolverBasedTest.ParameterizedSolverBasedTest {
 
   // Tests that unsat cores can not be requested after changes to the stack have been made after
   // UNSAT has been established.

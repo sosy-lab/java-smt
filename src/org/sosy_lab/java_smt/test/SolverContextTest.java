@@ -27,7 +27,7 @@ import org.sosy_lab.java_smt.api.SolverContext;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 
-public class SolverContextTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
+public class SolverContextTest extends SolverBasedTest.ParameterizedSolverBasedTest {
 
   @Test
   public void testMultipleContextClose() {

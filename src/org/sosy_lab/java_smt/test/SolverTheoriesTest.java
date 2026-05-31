@@ -36,7 +36,7 @@ import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 
 @SuppressWarnings("LocalVariableName")
-public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
+public class SolverTheoriesTest extends SolverBasedTest.ParameterizedSolverBasedTest {
 
   @Test
   public void basicBoolTest() throws SolverException, InterruptedException {

@@ -34,7 +34,7 @@ import org.sosy_lab.java_smt.basicimpl.AbstractNumeralFormulaManager.NonLinearAr
 
 @ParameterizedClass
 @MethodSource("getAllSolversAndTheories")
-public class NonLinearArithmeticTest<T extends NumeralFormula> extends SolverBasedTest0 {
+public class NonLinearArithmeticTest<T extends NumeralFormula> extends SolverBasedTest {
 
   // Boolector, CVC4, SMTInterpol, MathSAT5 and OpenSMT do not fully support non-linear arithmetic
   // (though SMTInterpol and MathSAT5 support some parts)
@@ -46,7 +46,7 @@ public class NonLinearArithmeticTest<T extends NumeralFormula> extends SolverBas
 
   public static Iterable<Object[]> getAllSolversAndTheories() {
     return Lists.cartesianProduct(
-            ImmutableList.copyOf(ParameterizedSolverBasedTest0.getAllSolvers()),
+            ImmutableList.copyOf(ParameterizedSolverBasedTest.getAllSolvers()),
             ImmutableList.of(FormulaType.IntegerType, FormulaType.RationalType),
             ImmutableList.copyOf(NonLinearArithmetic.values()))
         .stream()

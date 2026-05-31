@@ -27,7 +27,7 @@ import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.api.visitors.DefaultFormulaVisitor;
 
-public class NumeralFormulaManagerTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
+public class NumeralFormulaManagerTest extends SolverBasedTest.ParameterizedSolverBasedTest {
 
   @Test
   public void divZeroTest() throws SolverException, InterruptedException {

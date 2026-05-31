@@ -60,7 +60,7 @@ import org.sosy_lab.java_smt.api.visitors.FormulaTransformationVisitor;
 import org.sosy_lab.java_smt.api.visitors.FormulaVisitor;
 import org.sosy_lab.java_smt.api.visitors.TraversalProcess;
 
-public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
+public class SolverVisitorTest extends SolverBasedTest.ParameterizedSolverBasedTest {
 
   /** visit a formula and fail on OTHER, i.e., unexpected function declaration type. */
   public static final class FunctionDeclarationVisitorNoOther

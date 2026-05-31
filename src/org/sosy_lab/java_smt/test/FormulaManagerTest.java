@@ -39,7 +39,7 @@ import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.api.visitors.FormulaTransformationVisitor;
 
-public class FormulaManagerTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
+public class FormulaManagerTest extends SolverBasedTest.ParameterizedSolverBasedTest {
 
   @Test
   public void testWrongSorts() {

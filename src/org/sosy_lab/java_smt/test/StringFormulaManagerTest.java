@@ -35,7 +35,7 @@ import org.sosy_lab.java_smt.basicimpl.AbstractStringFormulaManager;
 
 @SuppressWarnings("ConstantConditions")
 @SuppressFBWarnings(value = "DLS_DEAD_LOCAL_STORE", justification = "test code")
-public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
+public class StringFormulaManagerTest extends SolverBasedTest.ParameterizedSolverBasedTest {
 
   private static final ImmutableList<String> WORDS =
       ImmutableList.of(

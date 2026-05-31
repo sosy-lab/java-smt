@@ -38,11 +38,11 @@ import org.sosy_lab.java_smt.solvers.opensmt.Logics;
 
 @ParameterizedClass
 @MethodSource("getAllSolvers")
-public class SolverAllSatTest extends SolverBasedTest0 {
+public class SolverAllSatTest extends SolverBasedTest {
 
   public static Iterable<Object[]> getAllSolvers() {
     List<Object[]> junitParams = new ArrayList<>();
-    for (Solvers solver : ParameterizedSolverBasedTest0.getAllSolvers()) {
+    for (Solvers solver : ParameterizedSolverBasedTest.getAllSolvers()) {
       junitParams.add(new Object[] {solver, "normal"});
       junitParams.add(new Object[] {solver, "itp"});
       junitParams.add(new Object[] {solver, "opt"});

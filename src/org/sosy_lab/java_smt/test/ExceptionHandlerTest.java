@@ -13,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import org.junit.jupiter.api.Test;
 
 /** Test that exception handling is set up properly. */
-public class ExceptionHandlerTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
+public class ExceptionHandlerTest extends SolverBasedTest.ParameterizedSolverBasedTest {
 
   @Test
   public void testErrorHandling() {

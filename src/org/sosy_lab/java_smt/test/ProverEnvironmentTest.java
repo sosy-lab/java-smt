@@ -27,7 +27,7 @@ import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 
-public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
+public class ProverEnvironmentTest extends SolverBasedTest.ParameterizedSolverBasedTest {
 
   @Test
   public void assumptionsTest() throws SolverException, InterruptedException {

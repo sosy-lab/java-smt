@@ -30,11 +30,11 @@ import org.sosy_lab.java_smt.basicimpl.AbstractNumeralFormulaManager.NonLinearAr
 
 @ParameterizedClass
 @MethodSource("getAllSolversAndTheories")
-public class NonLinearArithmeticWithModuloTest extends SolverBasedTest0 {
+public class NonLinearArithmeticWithModuloTest extends SolverBasedTest {
 
   public static Iterable<Object[]> getAllSolversAndTheories() {
     return Lists.cartesianProduct(
-            ImmutableList.copyOf(ParameterizedSolverBasedTest0.getAllSolvers()),
+            ImmutableList.copyOf(ParameterizedSolverBasedTest.getAllSolvers()),
             ImmutableList.copyOf(NonLinearArithmetic.values()))
         .stream()
         .map(List::toArray)

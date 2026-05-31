@@ -16,7 +16,7 @@ import org.junit.jupiter.api.Test;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.example.FormulaClassifier;
 
-public class FormulaClassifierTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
+public class FormulaClassifierTest extends SolverBasedTest.ParameterizedSolverBasedTest {
 
   private FormulaClassifier classifier;
 

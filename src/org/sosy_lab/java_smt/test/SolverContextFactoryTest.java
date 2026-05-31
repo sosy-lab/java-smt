@@ -29,7 +29,6 @@ import org.sosy_lab.java_smt.SolverContextFactory;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.SolverContext;
-import org.sosy_lab.java_smt.test.SolverBasedTest0.ParameterizedSolverBasedTest0;
 
 /**
  * This JUnit test class is mainly intended for automated CI checks on different operating systems,
@@ -55,7 +54,7 @@ public class SolverContextFactoryTest {
   protected ShutdownManager shutdownManager = ShutdownManager.create();
 
   public static Object[] getAllSolvers() {
-    return ParameterizedSolverBasedTest0.getAllSolvers();
+    return SolverBasedTest.ParameterizedSolverBasedTest.getAllSolvers();
   }
 
   @Parameter(0)

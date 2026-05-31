@@ -23,7 +23,7 @@ import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 
-public class ProverEnvironmentSubjectTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
+public class ProverEnvironmentSubjectTest extends SolverBasedTest.ParameterizedSolverBasedTest {
 
   private BooleanFormula simpleFormula;
   private BooleanFormula contradiction;

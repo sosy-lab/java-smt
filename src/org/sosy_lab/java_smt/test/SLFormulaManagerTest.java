@@ -36,7 +36,7 @@ import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.api.visitors.DefaultFormulaVisitor;
 import org.sosy_lab.java_smt.api.visitors.TraversalProcess;
 
-public class SLFormulaManagerTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
+public class SLFormulaManagerTest extends SolverBasedTest.ParameterizedSolverBasedTest {
 
   private BooleanFormula makeStarAll(List<BooleanFormula> formulas) {
     return formulas.stream().reduce(slmgr::makeStar).orElse(bmgr.makeTrue());
