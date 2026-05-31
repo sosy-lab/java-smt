@@ -106,7 +106,6 @@ public class PrincessHornConverter {
 
     private Clause toClause(final IAtom head, final IBinFormula rest) {
       List<IAtom> body = new ArrayList<>();
-      IFormula constraint = this.constraint;
 
       for (IFormula and : flatten(rest)) {
         if (and instanceof IAtom) {
