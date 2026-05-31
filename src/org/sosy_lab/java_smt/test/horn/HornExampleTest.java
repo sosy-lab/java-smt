@@ -13,7 +13,6 @@ package org.sosy_lab.java_smt.test.horn;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import java.util.HashMap;
 import lazabs.GlobalParameters;
 import org.junit.Test;
 import org.sosy_lab.java_smt.SolverContextFactory;
@@ -21,9 +20,6 @@ import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.HornProverEnvironment;
 import org.sosy_lab.java_smt.test.Yes;
-import scala.collection.immutable.List;
-import scala.collection.immutable.Map;
-import scala.jdk.javaapi.CollectionConverters;
 
 public class HornExampleTest {
   public void booleanJavaSMT() throws Exception {
@@ -165,14 +161,28 @@ public class HornExampleTest {
 
 
   @Test
-  public void smtlib2() throws Exception {
+  public void smt_02_c_000() throws Exception {
     var prover = solveSmtLib2("02.c_000");
 
     assertFalse(prover.isUnsat());
   }
 
   @Test
-  public void smtlib2SmallUnsat() throws Exception {
+  public void smt_01_c_bv_000() throws Exception {
+    var prover = solveSmtLib2("01.c-bv_000");
+
+    assertFalse(prover.isUnsat());
+  }
+
+  @Test
+  public void smt_ch_triangle_location_nr_2_bv_000() throws Exception {
+    var prover = solveSmtLib2("ch-triangle-location-nr.2-bv_000");
+
+    assertTrue(prover.isUnsat());
+  }
+
+  @Test
+  public void smt_small_unsat() throws Exception {
     GlobalParameters.get().setLogLevel(3);
     /*
     mc(A,B) :- ((A + -100) >= 1),(B = (A + -10)).
@@ -187,7 +197,7 @@ public class HornExampleTest {
 
 
   @Test
-  public void smtlib2SmallSat() throws Exception {
+  public void smt_small_sat() throws Exception {
     /*
     mc(A,B) :- ((A + -100) >= 1),(B = (A + -10)).
     mc(A,B) :- (A =< 100),mc(C,B),(D = (A + 11)),mc(D,C).
@@ -200,7 +210,7 @@ public class HornExampleTest {
   }
 
 
-  private  <A> java.util.List<A> jList(A... vars) {
+  private <A> java.util.List<A> jList(A... vars) {
     return java.util.Arrays.asList(vars);
   }
 }
