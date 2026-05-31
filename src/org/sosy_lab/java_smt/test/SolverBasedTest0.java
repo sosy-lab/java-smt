@@ -14,6 +14,7 @@ import static org.sosy_lab.java_smt.test.BooleanFormulaSubject.assertUsing;
 import static org.sosy_lab.java_smt.test.ProverEnvironmentSubject.assertThat;
 
 import com.google.common.truth.Truth;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Collection;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.junit.After;
@@ -91,6 +92,7 @@ import org.sosy_lab.java_smt.solvers.opensmt.Logics;
  * <p>Test that rely on a theory that not all solvers support should call one of the {@code require}
  * methods at the beginning.
  */
+@SuppressFBWarnings("URF_UNREAD_PUBLIC_OR_PROTECTED_FIELD")
 public abstract class SolverBasedTest0 {
 
   @Rule public TestName testName = new TestName();
