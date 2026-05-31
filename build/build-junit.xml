@@ -29,15 +29,15 @@ SPDX-License-Identifier: Apache-2.0
 
     <!-- Load the JUnit plugin for Ant if it's not installed. -->
     <condition property="ant.junit.available">
-        <typefound name="junit"/>
+        <typefound name="junitlauncher"/>
     </condition>
     <target name="load-junit" depends="resolve-dependencies" unless="ant.junit.available">
         <taskdef name="junit"
-                 classname="org.apache.tools.ant.taskdefs.optional.junit.JUnitTask"
-                 classpath="${ivy.jar.dir}/ant-junit.jar:${ivy.jar.dir}/ant-junit4.jar"/>
+                 classname="org.apache.tools.ant.taskdefs.optional.junitlauncher.confined.JUnitLauncherTask"
+                 classpath="${ivy.jar.dir}/ant-junitlauncher.jar:${ivy.jar.dir}/ant-junit.jar"/>
         <taskdef name="junitreport"
                  classname="org.apache.tools.ant.taskdefs.optional.junit.XMLResultAggregator"
-                 classpath="${ivy.jar.dir}/ant-junit.jar:${ivy.jar.dir}/ant-junit4.jar"/>
+                 classpath="${ivy.jar.dir}/ant-junit.jar"/>
     </target>
 
     <target name="init-unit-tests">
