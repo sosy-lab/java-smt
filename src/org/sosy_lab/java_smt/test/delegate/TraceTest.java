@@ -48,7 +48,7 @@ public class TraceTest {
   private Path traceFile;
 
   @BeforeEach
-  public void setUp() throws InvalidConfigurationException, IOException {
+  public void setUp() throws InvalidConfigurationException {
     traceFile = tempDir.resolve("trace.java");
     FileTypeConverter fileTypeConverter =
         FileTypeConverter.create(Configuration.defaultConfiguration());
