@@ -32,6 +32,8 @@ import ap.terfor.ConstantTerm;
 import ap.terfor.conjunctions.Quantifier.ALL$;
 import ap.terfor.preds.Predicate;
 import ap.types.MonoSortedIFunction;
+import ap.types.Sort.Integer$;
+import ap.types.SortedConstantTerm;
 import java.util.ArrayList;
 import java.util.List;
 import lazabs.horn.bottomup.HornClauses;
@@ -108,8 +110,8 @@ public class PrincessHornConverter {
       List<IAtom> body = new ArrayList<>();
 
       for (IFormula and : flatten(rest)) {
-        if (and instanceof IAtom) {
-          body.add((IAtom) and);
+        if (and instanceof IAtom atom && atom.args().isEmpty()) {
+          body.add(new IAtom(atom.pred(), toTerm(atom.args())));
           continue;
         }
         if (and instanceof IIntFormula) {
@@ -152,6 +154,9 @@ public class PrincessHornConverter {
     }
 
     private IConstant addConstraint(final ITerm term) {
+      if (term instanceof IConstant) {
+        return (IConstant) term;
+      }
       var variable = new IConstant(new ConstantTerm("T" + ++variables));
       var constraint = new IEquation(variable, term);
 
@@ -160,12 +165,27 @@ public class PrincessHornConverter {
       return variable;
     }
 
+    private IAtom toFormula(final IAtom atom) {
+      return new IAtom(atom.pred(), toTerm(atom.args()));
+    }
+
+    private IIntFormula toFormula(final IIntFormula i) {
+      return new IIntFormula(i.rel(), toTerm(i.t()));
+    }
+
+    private IEquation toFormula(final IEquation equation) {
+      return new IEquation(toTerm(equation.left()), toTerm(equation.right()));
+    }
+
     private IFormula toFormula(final IFormula formula) {
+      if (formula instanceof IAtom atom) {
+        return toFormula(atom);
+      }
       if (formula instanceof IIntFormula i) {
-        return new IIntFormula(i.rel(), toTerm(i.t()));
+        return toFormula(i);
       }
       if (formula instanceof IEquation equation) {
-        return new IEquation(toTerm(equation.left()), toTerm(equation.right()));
+        return toFormula(equation);
       }
 
       return formula;
@@ -174,13 +194,21 @@ public class PrincessHornConverter {
     private IConstant toVariable(final ISortedVariable variable) {
       var name = "V" + variable.index();
 
-      for(IConstant constant : parameters) {
-        if(constant.c().name().equals(name)) {
+      for (IConstant constant : parameters) {
+        if (constant.c().name().equals(name)) {
           return constant;
         }
       }
 
-      var constant = new IConstant(new ConstantTerm(name));
+      ConstantTerm term;
+
+      if (variable.sort() == Integer$.MODULE$) {
+        term = new ConstantTerm(name);
+      } else {
+        term = new SortedConstantTerm(name, variable.sort());
+      }
+
+      var constant = new IConstant(term);
       parameters.add(constant);
       return constant;
     }
@@ -213,6 +241,9 @@ public class PrincessHornConverter {
       }
       if (term instanceof ISortedVariable variable) {
         return toVariable(variable);
+      }
+      if (term instanceof IFunApp fun) {
+        return addConstraint(new IFunApp(fun.fun(), toTerm(fun.args())));
       }
       return addConstraint(toTerm(term));
     }
@@ -271,8 +302,8 @@ public class PrincessHornConverter {
 
       IAtom head;
 
-      if (other instanceof IAtom) {
-        head = (IAtom) other;
+      if (other instanceof IAtom atom) {
+        head = toFormula(atom);
       } else if (other instanceof IIntFormula) {
         head = toAtom((IIntFormula) other);
         if (head == null) {

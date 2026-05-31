@@ -13,7 +13,6 @@ package org.sosy_lab.java_smt.test.horn;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import lazabs.GlobalParameters;
 import org.junit.Test;
 import org.sosy_lab.java_smt.SolverContextFactory;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
@@ -22,26 +21,12 @@ import org.sosy_lab.java_smt.api.HornProverEnvironment;
 import org.sosy_lab.java_smt.test.Yes;
 
 public class HornExampleTest {
-  public void booleanJavaSMT() throws Exception {
-    final var context = SolverContextFactory.createSolverContext(Solvers.PRINCESS);
+  // TODO: Test with all solvers, not just eldarica (ParameterizedSolverBasedTest0)
 
-    var formulas = context.getFormulaManager();
-
-    var varA = formulas.getIntegerFormulaManager().makeVariable("a");
-    var varB = formulas.getIntegerFormulaManager().makeVariable("b");
-    var varC = formulas.getIntegerFormulaManager().makeNumber(5);
-
-    var formular1 = formulas.getIntegerFormulaManager().equal(varA, varB);
-    var formular2 = formulas.getIntegerFormulaManager().greaterOrEquals(varA, varC);
-
-    var formular = formulas.getBooleanFormulaManager().and(formular1, formular2);
-
-    var prover = context.newProverEnvironment();
-
-    prover.addConstraint(formular);
-
-    assertFalse(prover.isUnsat());
-  }
+  // static {
+  //   GlobalParameters.get().setLogLevel(3);
+  //   GlobalParameters.get().log_$eq(true);
+  // }
 
   @Test
   public void hornJavaSMT() throws Exception {
@@ -183,7 +168,6 @@ public class HornExampleTest {
 
   @Test
   public void smt_small_unsat() throws Exception {
-    GlobalParameters.get().setLogLevel(3);
     /*
     mc(A,B) :- ((A + -100) >= 1),(B = (A + -10)).
     mc(A,B) :- (A =< 100),mc(C,B),(D = (A + 11)),mc(D,C).

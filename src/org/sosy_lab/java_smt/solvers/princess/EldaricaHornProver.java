@@ -74,11 +74,6 @@ public class EldaricaHornProver extends PrincessAbstractProver<Void> implements
 
     var clause = converter.toClause(assertion);
 
-    clause.constants();
-    clause.constants();
-    clause.constants();
-    clause.constants();
-
     this.clauses.add(clause);
   }
 
