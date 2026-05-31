@@ -10,15 +10,15 @@
 
 package org.sosy_lab.java_smt.test;
 
-import static org.junit.Assert.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.SolverException;
 
 public class SanitizerTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
-  @Before
+  @BeforeEach
   public void init() {
     requireParser();
     requireIntegers();

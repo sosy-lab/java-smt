@@ -10,14 +10,14 @@ package org.sosy_lab.java_smt.test;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.test.SolverBasedTest0.ParameterizedSolverBasedTest0;
 
 public class IntegerFormulaManagerTest extends ParameterizedSolverBasedTest0 {
 
-  @Before
+  @BeforeEach
   public void init() {
     requireIntegers();
   }

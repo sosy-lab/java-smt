@@ -10,17 +10,16 @@ package org.sosy_lab.java_smt.test;
 
 import static com.google.common.truth.Truth.assert_;
 import static com.google.common.truth.TruthJUnit.assume;
-import static org.junit.Assert.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.google.common.base.StandardSystemProperty;
 import java.util.Locale;
 import java.util.regex.Pattern;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameter;
-import org.junit.runners.Parameterized.Parameters;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.Parameter;
+import org.junit.jupiter.params.ParameterizedClass;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.sosy_lab.common.NativeLibraries;
 import org.sosy_lab.common.ShutdownManager;
 import org.sosy_lab.common.configuration.Configuration;
@@ -36,7 +35,8 @@ import org.sosy_lab.java_smt.test.SolverBasedTest0.ParameterizedSolverBasedTest0
  * This JUnit test class is mainly intended for automated CI checks on different operating systems,
  * where a plain environment without pre-installed solvers is guaranteed.
  */
-@RunWith(Parameterized.class)
+@ParameterizedClass
+@MethodSource("getAllSolvers")
 public class SolverContextFactoryTest {
 
   private static final String OS =
@@ -54,7 +54,6 @@ public class SolverContextFactoryTest {
   protected final LogManager logger = LogManager.createTestLogManager();
   protected ShutdownManager shutdownManager = ShutdownManager.create();
 
-  @Parameters(name = "{0}")
   public static Object[] getAllSolvers() {
     return ParameterizedSolverBasedTest0.getAllSolvers();
   }
@@ -158,7 +157,7 @@ public class SolverContextFactoryTest {
     };
   }
 
-  @Before
+  @BeforeEach
   public final void initSolver() throws InvalidConfigurationException {
     config = Configuration.builder().setOption("solver.solver", solverToUse().toString()).build();
   }
@@ -242,9 +241,9 @@ public class SolverContextFactoryTest {
     // Verify that creating the context fails with UnsatisfiedLinkError
     InvalidConfigurationException thrown =
         assertThrows(
-            "Expected InvalidConfigurationException due to failure in loading native library",
             InvalidConfigurationException.class,
-            factory::generateContext);
+            factory::generateContext,
+            "Expected InvalidConfigurationException due to failure in loading native library");
     assert_().that(thrown).hasCauseThat().isInstanceOf(UnsatisfiedLinkError.class);
     assert_()
         .that(thrown)

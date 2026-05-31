@@ -8,9 +8,9 @@
 
 package org.sosy_lab.java_smt.test;
 
-import static org.junit.Assert.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /** Test that exception handling is set up properly. */
 public class ExceptionHandlerTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {

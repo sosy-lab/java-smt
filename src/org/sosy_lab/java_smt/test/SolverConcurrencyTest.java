@@ -30,12 +30,11 @@ import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReferenceArray;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameter;
-import org.junit.runners.Parameterized.Parameters;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.Parameter;
+import org.junit.jupiter.params.ParameterizedClass;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.sosy_lab.common.ShutdownManager;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.UniqueIdGenerator;
@@ -62,7 +61,8 @@ import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.test.SolverBasedTest0.ParameterizedSolverBasedTest0;
 
 @SuppressWarnings("resource")
-@RunWith(Parameterized.class)
+@ParameterizedClass
+@MethodSource("getAllSolvers")
 public class SolverConcurrencyTest {
 
   private static final int NUMBER_OF_THREADS = 4;
@@ -97,7 +97,6 @@ public class SolverConcurrencyTest {
           Solvers.Z3,
           40);
 
-  @Parameters(name = "{0}")
   public static Object[] getAllSolvers() {
     return ParameterizedSolverBasedTest0.getAllSolvers();
   }
@@ -113,7 +112,7 @@ public class SolverConcurrencyTest {
    * If UnsatisfiedLinkError (wrapped in InvalidConfigurationException) is thrown, abort the test.
    * On some systems (like Windows), some solvers are not available.
    */
-  @Before
+  @BeforeEach
   public void checkThatSolverIsAvailable() throws InvalidConfigurationException {
     initSolver().close();
 

@@ -9,15 +9,15 @@
 package org.sosy_lab.java_smt.test;
 
 import static com.google.common.truth.Truth.assert_;
-import static org.junit.Assert.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.sosy_lab.java_smt.api.FormulaType.BooleanType;
 import static org.sosy_lab.java_smt.api.FormulaType.IntegerType;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.truth.Truth;
 import java.util.EnumSet;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -27,7 +27,7 @@ import org.sosy_lab.java_smt.api.SolverException;
 public class SolverFormulaIODeclarationsTest
     extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
 
-  @Before
+  @BeforeEach
   public void checkThatSolverIsAvailable() {
     requireParser();
   }

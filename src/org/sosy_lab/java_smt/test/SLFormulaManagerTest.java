@@ -9,7 +9,7 @@
 package org.sosy_lab.java_smt.test;
 
 import static com.google.common.truth.Truth.assertThat;
-import static org.junit.Assert.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.sosy_lab.java_smt.api.FunctionDeclarationKind.SEP_EMP;
 import static org.sosy_lab.java_smt.api.FunctionDeclarationKind.SEP_PTO;
 import static org.sosy_lab.java_smt.api.FunctionDeclarationKind.SEP_STAR;
@@ -20,8 +20,8 @@ import com.google.common.collect.Iterables;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
@@ -42,7 +42,7 @@ public class SLFormulaManagerTest extends SolverBasedTest0.ParameterizedSolverBa
     return formulas.stream().reduce(slmgr::makeStar).orElse(bmgr.makeTrue());
   }
 
-  @Before
+  @BeforeEach
   public void setup() {
     requireSeparationLogic();
   }

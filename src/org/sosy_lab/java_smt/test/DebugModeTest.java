@@ -8,7 +8,7 @@
 
 package org.sosy_lab.java_smt.test;
 
-import static org.junit.Assert.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.sosy_lab.java_smt.test.ProverEnvironmentSubject.assertThat;
 
 import com.google.common.base.Throwables;
@@ -18,9 +18,9 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.sosy_lab.common.configuration.Configuration;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.java_smt.SolverContextFactory;
@@ -47,7 +47,7 @@ public class DebugModeTest extends SolverBasedTest0.ParameterizedSolverBasedTest
 
   private static final int DEFAULT_PROBLEM_SIZE = 8;
 
-  @Before
+  @BeforeEach
   public void init() throws InvalidConfigurationException {
     Configuration debugConfig =
         Configuration.builder()
@@ -67,7 +67,7 @@ public class DebugModeTest extends SolverBasedTest0.ParameterizedSolverBasedTest
     }
   }
 
-  @After
+  @AfterEach
   public void cleanup() {
     if (debugContext != null) {
       debugContext.close();

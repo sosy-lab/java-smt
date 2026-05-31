@@ -10,7 +10,7 @@ package org.sosy_lab.java_smt.test;
 
 import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.TruthJUnit.assume;
-import static org.junit.Assert.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.sosy_lab.java_smt.basicimpl.AbstractStringFormulaManager.unescapeUnicodeForSmtlib;
 
 import com.google.common.collect.ImmutableList;
@@ -18,9 +18,9 @@ import com.google.common.collect.ImmutableMap;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
@@ -79,7 +79,7 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
   private StringFormula hello;
   private RegexFormula a2z;
 
-  @Before
+  @BeforeEach
   public void setup() {
     requireStrings();
     assume()
@@ -1512,7 +1512,7 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
   }
 
   // Neither CVC4 nor Z3 can solve this!
-  @Ignore
+  @Disabled
   @Test
   public void testStringVariableReplacePrefix() throws SolverException, InterruptedException {
     StringFormula var1 = smgr.makeVariable("var1");

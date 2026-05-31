@@ -10,7 +10,7 @@ package org.sosy_lab.java_smt.test;
 
 import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.TruthJUnit.assume;
-import static org.junit.Assert.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.sosy_lab.java_smt.test.ProverEnvironmentSubject.assertThat;
 
 import com.google.common.collect.ImmutableList;
@@ -19,9 +19,9 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-import org.junit.AssumptionViolatedException;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+import org.opentest4j.TestAbortedException;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.ArrayFormula;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
@@ -633,7 +633,7 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
   }
 
   @Test
-  @Ignore
+  @Disabled
   public void quantifierEliminationTest2() throws SolverException, InterruptedException {
     requireQuantifiers();
     requireIntegers();
@@ -826,7 +826,7 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
     } catch (UnsupportedOperationException e) {
       // do nothing, this exception is fine here, because solvers do not need
       // to support non-linear arithmetic, we can then skip the test completely
-      throw new AssumptionViolatedException("Support for non-linear arithmetic is optional", e);
+      throw new TestAbortedException("Support for non-linear arithmetic is optional", e);
     }
 
     BooleanFormula x_equal_2 = imgr.equal(i2, x);
@@ -861,7 +861,7 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
     } catch (UnsupportedOperationException e) {
       // do nothing, this exception is fine here, because solvers do not need
       // to support non-linear arithmetic, we can then skip the test completely
-      throw new AssumptionViolatedException("Support for non-linear arithmetic is optional", e);
+      throw new TestAbortedException("Support for non-linear arithmetic is optional", e);
     }
 
     try (ProverEnvironment env = context.newProverEnvironment()) {
@@ -894,7 +894,7 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
     } catch (UnsupportedOperationException e) {
       // do nothing, this exception is fine here, because solvers do not need
       // to support non-linear arithmetic, we can then skip the test completely
-      throw new AssumptionViolatedException("Support for non-linear arithmetic is optional", e);
+      throw new TestAbortedException("Support for non-linear arithmetic is optional", e);
     }
 
     try (ProverEnvironment env = context.newProverEnvironment()) {
@@ -948,7 +948,7 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
     } catch (UnsupportedOperationException e) {
       // do nothing, this exception is fine here, because solvers do not need
       // to support non-linear arithmetic, we can then skip the test completely
-      throw new AssumptionViolatedException("Support for non-linear arithmetic is optional", e);
+      throw new TestAbortedException("Support for non-linear arithmetic is optional", e);
     }
 
     try (ProverEnvironment env = context.newProverEnvironment()) {
@@ -977,7 +977,7 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
     } catch (UnsupportedOperationException e) {
       // do nothing, this exception is fine here, because solvers do not need
       // to support non-linear arithmetic, we can then skip the test completely
-      throw new AssumptionViolatedException("Support for non-linear arithmetic is optional", e);
+      throw new TestAbortedException("Support for non-linear arithmetic is optional", e);
     }
 
     try (ProverEnvironment env = context.newProverEnvironment()) {
@@ -1015,7 +1015,7 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
     } catch (UnsupportedOperationException e) {
       // do nothing, this exception is fine here, because solvers do not need
       // to support non-linear arithmetic, we can then skip the test completely
-      throw new AssumptionViolatedException("Support for non-linear arithmetic is optional", e);
+      throw new TestAbortedException("Support for non-linear arithmetic is optional", e);
     }
 
     BooleanFormula x_equal_4 = imgr.equal(i4, x);

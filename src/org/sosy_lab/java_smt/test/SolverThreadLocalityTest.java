@@ -17,9 +17,9 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BasicProverEnvironment;
@@ -39,17 +39,17 @@ public class SolverThreadLocalityTest extends SolverBasedTest0.ParameterizedSolv
   private HardIntegerFormulaGenerator hardProblem;
   private static final int DEFAULT_PROBLEM_SIZE = 8;
 
-  @Before
+  @BeforeEach
   public void makeThreads() {
     executor = Executors.newFixedThreadPool(2);
   }
 
-  @Before
+  @BeforeEach
   public void initProblemGenerator() {
     hardProblem = new HardIntegerFormulaGenerator(imgr, bmgr);
   }
 
-  @After
+  @AfterEach
   public void releaseThreads() {
     // All threads should have terminated by now as we always wait in the test
     if (executor != null) {

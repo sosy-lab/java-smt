@@ -11,8 +11,8 @@ package org.sosy_lab.java_smt.test;
 import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.TruthJUnit.assume;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.example.FormulaClassifier;
 
@@ -44,7 +44,7 @@ public class FormulaClassifierTest extends SolverBasedTest0.ParameterizedSolverB
       (declare-fun bvfoo ((_ BitVec 4)) (_ BitVec 4))\
       """;
 
-  @Before
+  @BeforeEach
   public void init() {
     classifier = new FormulaClassifier(context);
   }

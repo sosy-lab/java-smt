@@ -16,14 +16,12 @@ import static org.sosy_lab.java_smt.test.ProverEnvironmentSubject.assertThat;
 import com.google.common.truth.Truth;
 import java.util.Collection;
 import org.checkerframework.checker.nullness.qual.Nullable;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.rules.TestName;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameter;
-import org.junit.runners.Parameterized.Parameters;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.TestInfo;
+import org.junit.jupiter.params.Parameter;
+import org.junit.jupiter.params.ParameterizedClass;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.sosy_lab.common.ShutdownManager;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.configuration.Configuration;
@@ -92,8 +90,7 @@ import org.sosy_lab.java_smt.solvers.opensmt.Logics;
  * methods at the beginning.
  */
 public abstract class SolverBasedTest0 {
-
-  @Rule public TestName testName = new TestName();
+  private TestInfo testInfo;
 
   protected Configuration config;
   protected final LogManager logger = LogManager.createTestLogManager();
@@ -139,7 +136,7 @@ public abstract class SolverBasedTest0 {
       String tracefile =
           "traces/%s/trace_%s_%s.java"
               .formatted(
-                  this.getClass().getSimpleName(), testName.getMethodName(), System.nanoTime());
+                  this.getClass().getSimpleName(), testInfo.getDisplayName(), System.nanoTime());
       newConfig.setOption("solver.trace", "true").setOption("solver.tracefile", tracefile);
       FileTypeConverter fileTypeConverter =
           FileTypeConverter.create(Configuration.defaultConfiguration());
@@ -178,8 +175,9 @@ public abstract class SolverBasedTest0 {
     return false;
   }
 
-  @Before
-  public final void initSolver() throws InvalidConfigurationException {
+  @BeforeEach
+  public final void initSolver(TestInfo info) throws InvalidConfigurationException {
+    testInfo = info;
     config = createTestConfigBuilder().build();
 
     factory = new SolverContextFactory(config, logger, shutdownNotifierToUse());
@@ -245,7 +243,7 @@ public abstract class SolverBasedTest0 {
     }
   }
 
-  @After
+  @AfterEach
   public final void closeSolver() {
     if (context != null) {
       context.close();
@@ -580,11 +578,11 @@ public abstract class SolverBasedTest0 {
     throw new IllegalArgumentException();
   }
 
-  @RunWith(Parameterized.class)
+  @ParameterizedClass
+  @MethodSource("getAllSolvers")
   public abstract static class ParameterizedSolverBasedTest0 extends SolverBasedTest0 {
-
-    @Parameters(name = "{0}")
     public static Solvers[] getAllSolvers() {
+      // return new Solvers[] {Solvers.CVC5};
       return Solvers.values();
     }
 

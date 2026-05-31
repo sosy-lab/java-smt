@@ -15,8 +15,8 @@ import com.google.common.base.Throwables;
 import com.google.common.truth.ExpectFailure;
 import com.google.common.truth.ExpectFailure.SimpleSubjectBuilderCallback;
 import com.google.common.truth.SimpleSubjectBuilder;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.SolverException;
 
@@ -30,7 +30,7 @@ public class BooleanFormulaSubjectTest extends SolverBasedTest0.ParameterizedSol
   private BooleanFormula contradiction;
   private BooleanFormula tautology;
 
-  @Before
+  @BeforeEach
   public void setupFormulas() {
     if (imgr != null) {
       simpleFormula = imgr.equal(imgr.makeVariable("a"), imgr.makeNumber(1));
