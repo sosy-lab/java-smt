@@ -88,12 +88,17 @@ SPDX-License-Identifier: Apache-2.0
     </target>
 
     <target name="test" depends="compile">
-        <java classpathref="classpath.build" classname="org.junit.platform.console.ConsoleLauncher" fork="true"
-              failonerror="true">
-            <arg value="execute"/>
-            <arg value="--scan-classpath"/>
-            <arg line="--reports-dir build/test-report"/>
-        </java>
+        <mkdir dir="build/test-report"/>
+        <junitlauncher printsummary="true" failureproperty="junit.failed">
+            <classpath refid="classpath.build"/>
+            <testclasses outputdir="build/test-report">
+                <fileset dir="build">
+                    <include name="**/*Test.*"/>
+                </fileset>
+                <listener type="legacy-brief" sendSysOut="true"/>
+                <listener type="legacy-xml" sendSysErr="true" sendSysOut="true"/>
+            </testclasses>
+        </junitlauncher>
         <junitreport todir="build/test-report">
             <fileset dir="build/test-report" includes="TEST-*.xml"/>
             <report format="noframes" todir="build/test-report/html"/>
