@@ -21,7 +21,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.TestInfo;
 import org.junit.jupiter.params.Parameter;
 import org.junit.jupiter.params.ParameterizedClass;
-import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.sosy_lab.common.ShutdownManager;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.configuration.Configuration;
@@ -579,13 +579,13 @@ public abstract class SolverBasedTest {
   }
 
   @ParameterizedClass
-  @MethodSource("getAllSolvers")
+  @EnumSource(Solvers.class)
   public abstract static class ParameterizedSolverBasedTest extends SolverBasedTest {
-    public static Solvers[] getAllSolvers() {
+    static Solvers[] getAllSolvers() {
       return Solvers.values();
     }
 
-    @Parameter(0)
+    @Parameter
     public Solvers solver;
 
     @Override

@@ -19,7 +19,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.Parameter;
 import org.junit.jupiter.params.ParameterizedClass;
-import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.sosy_lab.common.NativeLibraries;
 import org.sosy_lab.common.ShutdownManager;
 import org.sosy_lab.common.configuration.Configuration;
@@ -35,7 +35,7 @@ import org.sosy_lab.java_smt.api.SolverContext;
  * where a plain environment without pre-installed solvers is guaranteed.
  */
 @ParameterizedClass
-@MethodSource("getAllSolvers")
+@EnumSource(Solvers.class)
 public class SolverContextFactoryTest {
 
   private static final String OS =
@@ -53,11 +53,7 @@ public class SolverContextFactoryTest {
   protected final LogManager logger = LogManager.createTestLogManager();
   protected ShutdownManager shutdownManager = ShutdownManager.create();
 
-  public static Object[] getAllSolvers() {
-    return SolverBasedTest.ParameterizedSolverBasedTest.getAllSolvers();
-  }
-
-  @Parameter(0)
+  @Parameter
   public Solvers solver;
 
   private Solvers solverToUse() {
