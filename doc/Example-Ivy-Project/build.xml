@@ -14,13 +14,17 @@ SPDX-License-Identifier: Apache-2.0
     <property name="project.module" value="${ant.project.name}"/>
     <property name="project.jar" value="${project.module}.jar"/>
 
+    <!-- Ivy download path and version -->
+    <property name="ivy.repo.url" value="https://www.sosy-lab.org/ivy"/>
+    <property name="ivy.target_version" value="2.5.2"/>
+
     <!-- Path to the "main" function -->
     <property name="project.main" value="org.sosy_lab.java_smt_example.SolverOverviewTable"/>
 
     <target name="download-ivy" unless="skip.download">
         <mkdir dir="lib"/>
-        <get src="https://repo1.maven.org/maven2/org/apache/ivy/ivy/2.5.0/ivy-2.5.0.jar"
-             dest="lib/ivy.jar" usetimestamp="true"/>
+        <get src="${ivy.repo.url}/org.apache.ivy/ivy/ivy-${ivy.target_version}.jar" dest="lib/ivy.jar"
+             usetimestamp="true"/>
     </target>
 
     <target name="init-ivy" depends="download-ivy">
