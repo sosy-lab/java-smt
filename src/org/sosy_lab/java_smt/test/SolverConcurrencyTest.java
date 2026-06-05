@@ -13,6 +13,7 @@ import static com.google.common.truth.Truth.assertWithMessage;
 import static com.google.common.truth.TruthJUnit.assume;
 
 import com.google.common.base.Joiner;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -453,7 +454,7 @@ public class SolverConcurrencyTest extends SolverBasedTest.ParameterizedSolverBa
    * formulas with contexts in (concurrent) use.
    */
   @Test
-  public void continuousRunningThreadFormulaTransferTranslateTest() {
+  public void continuousRunningThreadFormulaTransferTranslateTest() throws InterruptedException {
     requireIntegers();
     // CVC4 and Yices2 do not support parsing and therefore no translation.
     assume()
@@ -480,6 +481,9 @@ public class SolverConcurrencyTest extends SolverBasedTest.ParameterizedSolverBa
     // Bind unique IDs to each thread with a (threadsafe) unique ID generator
     final UniqueIdGenerator idGenerator = new UniqueIdGenerator();
 
+    // Collect used context in a list so that we can close them later
+    ImmutableList.Builder<SolverContext> garbage = ImmutableList.builder();
+
     // Take the formula from the bucket of itself, solve it, once solved give the formula to the
     // bucket of the next thread (have a counter for in which bucket we transferred the formula and
     // +1 the counter)
@@ -490,40 +494,47 @@ public class SolverConcurrencyTest extends SolverBasedTest.ParameterizedSolverBa
           final int id = idGenerator.getFreshId();
           int nextBucket = (id + 1) % NUMBER_OF_THREADS;
           final BlockingQueue<ContextAndFormula> ownBucket = bucketQueue.get(id);
-          try (SolverContext context = newContext()) {
-            FormulaManager mgr = context.getFormulaManager();
-            IntegerFormulaManager imgr = mgr.getIntegerFormulaManager();
-            BooleanFormulaManager bmgr = mgr.getBooleanFormulaManager();
-            HardIntegerFormulaGenerator gen = new HardIntegerFormulaGenerator(imgr, bmgr);
-            BooleanFormula threadFormula =
-                gen.generate(INTEGER_FORMULA_GEN.getOrDefault(solver, 9) - id);
-            try (BasicProverEnvironment<?> stack = context.newProverEnvironment()) {
-              // Repeat till the bucket counter reaches itself again
-              while (nextBucket != id) {
-                stack.push(threadFormula);
+          SolverContext context = newContext();
+          synchronized (garbage) {
+            garbage.add(context);
+          }
+          FormulaManager mgr = context.getFormulaManager();
+          IntegerFormulaManager imgr = mgr.getIntegerFormulaManager();
+          BooleanFormulaManager bmgr = mgr.getBooleanFormulaManager();
+          HardIntegerFormulaGenerator gen = new HardIntegerFormulaGenerator(imgr, bmgr);
+          BooleanFormula threadFormula =
+              gen.generate(INTEGER_FORMULA_GEN.getOrDefault(solver, 9) - id);
+          try (BasicProverEnvironment<?> stack = context.newProverEnvironment()) {
+            // Repeat till the bucket counter reaches itself again
+            while (nextBucket != id) {
+              stack.push(threadFormula);
 
-                assertWithMessage(
-                        "Test continuousRunningThreadFormulaTransferTranslateTest() "
-                            + "failed isUnsat() in thread with id: %s.",
-                        id)
-                    .that(stack.isUnsat())
-                    .isTrue();
+              assertWithMessage(
+                      "Test continuousRunningThreadFormulaTransferTranslateTest() "
+                          + "failed isUnsat() in thread with id: %s.",
+                      id)
+                  .that(stack.isUnsat())
+                  .isTrue();
 
-                // Take another formula from its own bucket or wait for one.
-                bucketQueue.get(nextBucket).add(new ContextAndFormula(context, threadFormula));
+              // Take another formula from its own bucket or wait for one.
+              bucketQueue.get(nextBucket).add(new ContextAndFormula(context, threadFormula));
 
-                // Translate the formula into its own context and start solving
-                ContextAndFormula newFormulaAndContext = ownBucket.take();
-                threadFormula =
-                    mgr.translateFrom(
-                        newFormulaAndContext.getFormula(),
-                        newFormulaAndContext.getContext().getFormulaManager());
+              // Translate the formula into its own context and start solving
+              ContextAndFormula newFormulaAndContext = ownBucket.take();
+              threadFormula =
+                  mgr.translateFrom(
+                      newFormulaAndContext.getFormula(),
+                      newFormulaAndContext.getContext().getFormulaManager());
 
-                nextBucket = (nextBucket + 1) % NUMBER_OF_THREADS;
-              }
+              nextBucket = (nextBucket + 1) % NUMBER_OF_THREADS;
             }
           }
         });
+
+    // Close all open solver contexts
+    for (var context : garbage.build()) {
+      context.close();
+    }
   }
 
   // As optimization is not used much at the moment this small test is ok
