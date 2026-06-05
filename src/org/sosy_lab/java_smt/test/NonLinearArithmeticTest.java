@@ -8,19 +8,19 @@
 
 package org.sosy_lab.java_smt.test;
 
-import static com.google.common.collect.ImmutableList.toImmutableList;
 import static com.google.common.truth.TruthJUnit.assume;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Lists;
 import java.util.List;
 import java.util.function.Supplier;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.Parameter;
 import org.junit.jupiter.params.ParameterizedClass;
-import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.EnumSource;
+import org.junit.jupiter.params.provider.FieldSource;
 import org.opentest4j.TestAbortedException;
 import org.sosy_lab.common.configuration.ConfigurationBuilder;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
@@ -33,252 +33,246 @@ import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractNumeralFormulaManager.NonLinearArithmetic;
 
 @ParameterizedClass
-@MethodSource("getAllSolversAndTheories")
-public class NonLinearArithmeticTest<T extends NumeralFormula> extends SolverBasedTest {
+@EnumSource(NonLinearArithmetic.class)
+public class NonLinearArithmeticTest<T extends NumeralFormula> {
+  @Parameter public NonLinearArithmetic nonLinearArithmetic;
 
-  // Boolector, CVC4, SMTInterpol, MathSAT5 and OpenSMT do not fully support non-linear arithmetic
-  // (though SMTInterpol and MathSAT5 support some parts)
-
-  // INFO: OpenSmt does not suport nonlinear arithmetic
-  static final ImmutableSet<Solvers> SOLVER_WITHOUT_NONLINEAR_ARITHMETIC =
-      ImmutableSet.of(
-          Solvers.SMTINTERPOL, Solvers.MATHSAT5, Solvers.BOOLECTOR, Solvers.CVC4, Solvers.OPENSMT);
-
-  public static Iterable<Object[]> getAllSolversAndTheories() {
-    return Lists.cartesianProduct(
-            ImmutableList.copyOf(ParameterizedSolverBasedTest.getAllSolvers()),
-            ImmutableList.of(FormulaType.IntegerType, FormulaType.RationalType),
-            ImmutableList.copyOf(NonLinearArithmetic.values()))
-        .stream()
-        .map(List::toArray)
-        .collect(toImmutableList());
-  }
-
-  @Parameter(0)
-  public Solvers solver;
-
-  @Override
-  protected Solvers solverToUse() {
-    return solver;
-  }
-
-  @Parameter(1)
-  public FormulaType<?> formulaType;
-
-  private NumeralFormulaManager<T, T> nmgr;
-
-  @SuppressWarnings("unchecked")
-  @BeforeEach
-  public void chooseNumeralFormulaManager() {
-    if (formulaType.isIntegerType()) {
-      requireIntegers();
-      nmgr = (NumeralFormulaManager<T, T>) imgr;
-    } else if (formulaType.isRationalType()) {
-      requireRationals();
-      nmgr = (NumeralFormulaManager<T, T>) rmgr;
-    } else {
-      throw new AssertionError();
+  @Nested
+  class Solver extends SolverBasedTest.ParameterizedSolverBasedTest {
+    @Override
+    protected ConfigurationBuilder createTestConfigBuilder() throws InvalidConfigurationException {
+      return super.createTestConfigBuilder()
+          .setOption("solver.nonLinearArithmetic", nonLinearArithmetic.name());
     }
-  }
 
-  @Parameter(2)
-  public NonLinearArithmetic nonLinearArithmetic;
+    // Boolector, CVC4, SMTInterpol, MathSAT5 and OpenSMT do not fully support non-linear arithmetic
+    // (though SMTInterpol and MathSAT5 support some parts)
+    static final ImmutableSet<Solvers> SOLVER_WITHOUT_NONLINEAR_ARITHMETIC =
+        ImmutableSet.of(
+            Solvers.SMTINTERPOL,
+            Solvers.MATHSAT5,
+            Solvers.BOOLECTOR,
+            Solvers.CVC4,
+            Solvers.OPENSMT);
 
-  @Override
-  protected ConfigurationBuilder createTestConfigBuilder() throws InvalidConfigurationException {
-    return super.createTestConfigBuilder()
-        .setOption("solver.nonLinearArithmetic", nonLinearArithmetic.name());
-  }
+    @ParameterizedClass
+    @FieldSource("theories")
+    @Nested
+    class Theory {
+      static List<?> theories = ImmutableList.of(FormulaType.IntegerType, FormulaType.RationalType);
 
-  private T handleExpectedException(Supplier<T> supplier) {
-    try {
-      return supplier.get();
-    } catch (UnsupportedOperationException e) {
-      if (nonLinearArithmetic == NonLinearArithmetic.USE
-          && SOLVER_WITHOUT_NONLINEAR_ARITHMETIC.contains(solver)) {
-        throw new TestAbortedException(
-            "Expected UnsupportedOperationException was thrown correctly");
+      @Parameter public FormulaType<?> formulaType;
+
+      private NumeralFormulaManager<T, T> nmgr;
+
+      @SuppressWarnings("unchecked")
+      @BeforeEach
+      public void chooseNumeralFormulaManager() {
+        if (formulaType.isIntegerType()) {
+          requireIntegers();
+          nmgr = (NumeralFormulaManager<T, T>) imgr;
+        } else if (formulaType.isRationalType()) {
+          requireRationals();
+          nmgr = (NumeralFormulaManager<T, T>) rmgr;
+        } else {
+          throw new AssertionError();
+        }
       }
-      throw e;
-    }
-  }
 
-  private void assertExpectedUnsatifiabilityForNonLinearArithmetic(BooleanFormula f)
-      throws SolverException, InterruptedException {
-    if (nonLinearArithmetic == NonLinearArithmetic.USE
-        || (nonLinearArithmetic == NonLinearArithmetic.APPROXIMATE_FALLBACK
-            && !SOLVER_WITHOUT_NONLINEAR_ARITHMETIC.contains(solver))) {
-      assertThatFormula(f).isUnsatisfiable();
-    } else {
-      assertThatFormula(f).isSatisfiable();
-    }
-  }
+      private T handleExpectedException(Supplier<T> supplier) {
+        try {
+          return supplier.get();
+        } catch (UnsupportedOperationException e) {
+          if (nonLinearArithmetic == NonLinearArithmetic.USE
+              && SOLVER_WITHOUT_NONLINEAR_ARITHMETIC.contains(solver)) {
+            throw new TestAbortedException(
+                "Expected UnsupportedOperationException was thrown correctly");
+          }
+          throw e;
+        }
+      }
 
-  @Test
-  public void testLinearMultiplication() throws SolverException, InterruptedException {
-    T a = nmgr.makeVariable("a");
+      private void assertExpectedUnsatifiabilityForNonLinearArithmetic(BooleanFormula f)
+          throws SolverException, InterruptedException {
+        if (nonLinearArithmetic == NonLinearArithmetic.USE
+            || (nonLinearArithmetic == NonLinearArithmetic.APPROXIMATE_FALLBACK
+                && !SOLVER_WITHOUT_NONLINEAR_ARITHMETIC.contains(solver))) {
+          assertThatFormula(f).isUnsatisfiable();
+        } else {
+          assertThatFormula(f).isSatisfiable();
+        }
+      }
 
-    BooleanFormula f =
-        bmgr.and(
-            nmgr.equal(a, nmgr.multiply(nmgr.makeNumber(2), nmgr.makeNumber(3))),
-            nmgr.equal(nmgr.makeNumber(2 * 3 * 5), nmgr.multiply(a, nmgr.makeNumber(5))),
-            nmgr.equal(nmgr.makeNumber(2 * 3 * 5), nmgr.multiply(nmgr.makeNumber(5), a)));
+      @Test
+      public void testLinearMultiplication() throws SolverException, InterruptedException {
+        T a = nmgr.makeVariable("a");
 
-    assertThatFormula(f).isSatisfiable();
-  }
-
-  @Test
-  public void testLinearMultiplicationWithConstantUnsatisfiable()
-      throws SolverException, InterruptedException {
-    T a = nmgr.makeVariable("a");
-
-    BooleanFormula f =
-        bmgr.and(
-            nmgr.equal(a, nmgr.multiply(nmgr.makeNumber(2), nmgr.makeNumber(3))),
-            bmgr.xor(
+        BooleanFormula f =
+            bmgr.and(
+                nmgr.equal(a, nmgr.multiply(nmgr.makeNumber(2), nmgr.makeNumber(3))),
                 nmgr.equal(nmgr.makeNumber(2 * 3 * 5), nmgr.multiply(a, nmgr.makeNumber(5))),
-                nmgr.equal(nmgr.makeNumber(2 * 3 * 5), nmgr.multiply(nmgr.makeNumber(5), a))));
+                nmgr.equal(nmgr.makeNumber(2 * 3 * 5), nmgr.multiply(nmgr.makeNumber(5), a)));
 
-    assertThatFormula(f).isUnsatisfiable();
-  }
+        assertThatFormula(f).isSatisfiable();
+      }
 
-  @Test
-  public void testMultiplicationOfVariables() throws SolverException, InterruptedException {
-    T a = nmgr.makeVariable("a");
-    T b = nmgr.makeVariable("b");
-    T c = nmgr.makeVariable("c");
+      @Test
+      public void testLinearMultiplicationWithConstantUnsatisfiable()
+          throws SolverException, InterruptedException {
+        T a = nmgr.makeVariable("a");
 
-    BooleanFormula f =
-        bmgr.and(
-            nmgr.equal(c, handleExpectedException(() -> nmgr.multiply(a, b))),
-            nmgr.equal(c, nmgr.makeNumber(2 * 3)));
+        BooleanFormula f =
+            bmgr.and(
+                nmgr.equal(a, nmgr.multiply(nmgr.makeNumber(2), nmgr.makeNumber(3))),
+                bmgr.xor(
+                    nmgr.equal(nmgr.makeNumber(2 * 3 * 5), nmgr.multiply(a, nmgr.makeNumber(5))),
+                    nmgr.equal(nmgr.makeNumber(2 * 3 * 5), nmgr.multiply(nmgr.makeNumber(5), a))));
 
-    assertThatFormula(f).isSatisfiable();
-  }
+        assertThatFormula(f).isUnsatisfiable();
+      }
 
-  @Test
-  public void testMultiplicationOfVariablesUnsatisfiable()
-      throws SolverException, InterruptedException {
-    T a = nmgr.makeVariable("a");
-    T b = nmgr.makeVariable("b");
-    T c = nmgr.makeVariable("c");
+      @Test
+      public void testMultiplicationOfVariables() throws SolverException, InterruptedException {
+        T a = nmgr.makeVariable("a");
+        T b = nmgr.makeVariable("b");
+        T c = nmgr.makeVariable("c");
 
-    BooleanFormula f =
-        bmgr.and(
-            nmgr.equal(handleExpectedException(() -> nmgr.multiply(a, b)), c),
-            nmgr.equal(a, nmgr.makeNumber(3)),
-            nmgr.equal(b, nmgr.makeNumber(5)),
-            bmgr.not(nmgr.equal(c, nmgr.makeNumber(15))));
+        BooleanFormula f =
+            bmgr.and(
+                nmgr.equal(c, handleExpectedException(() -> nmgr.multiply(a, b))),
+                nmgr.equal(c, nmgr.makeNumber(2 * 3)));
 
-    if (solver == Solvers.MATHSAT5
-        && nonLinearArithmetic != NonLinearArithmetic.APPROXIMATE_ALWAYS) {
-      // MathSAT supports non-linear multiplication
-      assertThatFormula(f).isUnsatisfiable();
+        assertThatFormula(f).isSatisfiable();
+      }
 
-    } else {
-      assertExpectedUnsatifiabilityForNonLinearArithmetic(f);
-    }
-  }
+      @Test
+      public void testMultiplicationOfVariablesUnsatisfiable()
+          throws SolverException, InterruptedException {
+        T a = nmgr.makeVariable("a");
+        T b = nmgr.makeVariable("b");
+        T c = nmgr.makeVariable("c");
 
-  @Test
-  public void testDivisionByConstant() throws SolverException, InterruptedException {
-    T a = nmgr.makeVariable("a");
+        BooleanFormula f =
+            bmgr.and(
+                nmgr.equal(handleExpectedException(() -> nmgr.multiply(a, b)), c),
+                nmgr.equal(a, nmgr.makeNumber(3)),
+                nmgr.equal(b, nmgr.makeNumber(5)),
+                bmgr.not(nmgr.equal(c, nmgr.makeNumber(15))));
 
-    BooleanFormula f =
-        bmgr.and(
-            nmgr.equal(nmgr.makeNumber(2 * 3), a),
-            nmgr.equal(nmgr.divide(a, nmgr.makeNumber(3)), nmgr.makeNumber(2)),
-            nmgr.equal(nmgr.divide(a, nmgr.makeNumber(2)), nmgr.makeNumber(3)));
+        if (solver == Solvers.MATHSAT5
+            && nonLinearArithmetic != NonLinearArithmetic.APPROXIMATE_ALWAYS) {
+          // MathSAT supports non-linear multiplication
+          assertThatFormula(f).isUnsatisfiable();
 
-    assertThatFormula(f).isSatisfiable();
-  }
+        } else {
+          assertExpectedUnsatifiabilityForNonLinearArithmetic(f);
+        }
+      }
 
-  @Test
-  public void testDivisionByZero() throws SolverException, InterruptedException {
-    // OpenSmt and Yices do not allow division by zero and throw an exception.
-    assume()
-        .withMessage("Solver %s does not support division by zero", solverToUse())
-        .that(solverToUse())
-        .isNotEqualTo(Solvers.OPENSMT);
+      @Test
+      public void testDivisionByConstant() throws SolverException, InterruptedException {
+        T a = nmgr.makeVariable("a");
 
-    T a = nmgr.makeVariable("a");
-    T b = nmgr.makeVariable("b");
-    T c = nmgr.makeVariable("c");
-
-    T zero = nmgr.makeNumber(0);
-
-    BooleanFormula f =
-        bmgr.and(
-            nmgr.equal(nmgr.divide(a, zero), nmgr.makeNumber(2)),
-            nmgr.equal(nmgr.divide(b, zero), nmgr.makeNumber(4)));
-
-    assertThatFormula(f).isSatisfiable();
-
-    // Division by zero is still a function. So, if (/0 a) = b and (/0 a) = c, then b=c must hold
-    BooleanFormula g =
-        bmgr.and(
-            nmgr.equal(nmgr.divide(a, zero), b),
-            nmgr.equal(nmgr.divide(a, zero), c),
-            bmgr.not(nmgr.equal(b, c)));
-
-    assertThatFormula(g).isUnsatisfiable();
-  }
-
-  @Test
-  public void testDivisionByConstantUnsatisfiable() throws SolverException, InterruptedException {
-    T a = nmgr.makeVariable("a");
-
-    BooleanFormula f =
-        bmgr.and(
-            nmgr.equal(a, nmgr.makeNumber(2 * 3)),
-            bmgr.xor(
+        BooleanFormula f =
+            bmgr.and(
+                nmgr.equal(nmgr.makeNumber(2 * 3), a),
                 nmgr.equal(nmgr.divide(a, nmgr.makeNumber(3)), nmgr.makeNumber(2)),
-                nmgr.equal(nmgr.divide(a, nmgr.makeNumber(2)), nmgr.makeNumber(3))));
+                nmgr.equal(nmgr.divide(a, nmgr.makeNumber(2)), nmgr.makeNumber(3)));
 
-    if (formulaType.equals(FormulaType.IntegerType)
-        && nonLinearArithmetic == NonLinearArithmetic.APPROXIMATE_ALWAYS) {
-      // Integer division is always non-linear due to rounding rules
-      assertThatFormula(f).isSatisfiable();
+        assertThatFormula(f).isSatisfiable();
+      }
 
-    } else {
-      assertThatFormula(f).isUnsatisfiable();
-    }
-  }
+      @Test
+      public void testDivisionByZero() throws SolverException, InterruptedException {
+        // OpenSmt and Yices do not allow division by zero and throw an exception.
+        assume()
+            .withMessage("Solver %s does not support division by zero", solverToUse())
+            .that(solverToUse())
+            .isNotEqualTo(Solvers.OPENSMT);
 
-  @Test
-  public void testDivision() throws SolverException, InterruptedException {
-    T a = nmgr.makeVariable("a");
+        T a = nmgr.makeVariable("a");
+        T b = nmgr.makeVariable("b");
+        T c = nmgr.makeVariable("c");
 
-    // (a == 2) && (3 == 6 / a)
-    BooleanFormula f =
-        bmgr.and(
-            nmgr.equal(a, nmgr.makeNumber(2)),
-            nmgr.equal(
-                nmgr.makeNumber(3),
-                handleExpectedException(() -> nmgr.divide(nmgr.makeNumber(2 * 3), a))));
+        T zero = nmgr.makeNumber(0);
 
-    assertThatFormula(f).isSatisfiable();
-  }
+        BooleanFormula f =
+            bmgr.and(
+                nmgr.equal(nmgr.divide(a, zero), nmgr.makeNumber(2)),
+                nmgr.equal(nmgr.divide(b, zero), nmgr.makeNumber(4)));
 
-  @Test
-  public void testDivisionUnsatisfiable() throws SolverException, InterruptedException {
-    T a = nmgr.makeVariable("a");
+        assertThatFormula(f).isSatisfiable();
 
-    BooleanFormula f =
-        bmgr.and(
-            bmgr.not(nmgr.equal(a, nmgr.makeNumber(2))),
-            bmgr.not(nmgr.equal(a, nmgr.makeNumber(0))), // some solver produce model a=0 otherwise
-            nmgr.equal(
-                nmgr.makeNumber(3),
-                handleExpectedException(() -> nmgr.divide(nmgr.makeNumber(2 * 3), a))));
+        // Division by zero is still a function. So, if (/0 a) = b and (/0 a) = c, then b=c must
+        // hold
+        BooleanFormula g =
+            bmgr.and(
+                nmgr.equal(nmgr.divide(a, zero), b),
+                nmgr.equal(nmgr.divide(a, zero), c),
+                bmgr.not(nmgr.equal(b, c)));
 
-    if (ImmutableSet.of(Solvers.MATHSAT5, Solvers.CVC4).contains(solver)
-        && nonLinearArithmetic != NonLinearArithmetic.APPROXIMATE_ALWAYS) {
-      // some solvers support non-linear multiplication (partially)
-      assertThatFormula(f).isUnsatisfiable();
+        assertThatFormula(g).isUnsatisfiable();
+      }
 
-    } else {
-      assertExpectedUnsatifiabilityForNonLinearArithmetic(f);
+      @Test
+      public void testDivisionByConstantUnsatisfiable()
+          throws SolverException, InterruptedException {
+        T a = nmgr.makeVariable("a");
+
+        BooleanFormula f =
+            bmgr.and(
+                nmgr.equal(a, nmgr.makeNumber(2 * 3)),
+                bmgr.xor(
+                    nmgr.equal(nmgr.divide(a, nmgr.makeNumber(3)), nmgr.makeNumber(2)),
+                    nmgr.equal(nmgr.divide(a, nmgr.makeNumber(2)), nmgr.makeNumber(3))));
+
+        if (formulaType.equals(FormulaType.IntegerType)
+            && nonLinearArithmetic == NonLinearArithmetic.APPROXIMATE_ALWAYS) {
+          // Integer division is always non-linear due to rounding rules
+          assertThatFormula(f).isSatisfiable();
+
+        } else {
+          assertThatFormula(f).isUnsatisfiable();
+        }
+      }
+
+      @Test
+      public void testDivision() throws SolverException, InterruptedException {
+        T a = nmgr.makeVariable("a");
+
+        // (a == 2) && (3 == 6 / a)
+        BooleanFormula f =
+            bmgr.and(
+                nmgr.equal(a, nmgr.makeNumber(2)),
+                nmgr.equal(
+                    nmgr.makeNumber(3),
+                    handleExpectedException(() -> nmgr.divide(nmgr.makeNumber(2 * 3), a))));
+
+        assertThatFormula(f).isSatisfiable();
+      }
+
+      @Test
+      public void testDivisionUnsatisfiable() throws SolverException, InterruptedException {
+        T a = nmgr.makeVariable("a");
+
+        BooleanFormula f =
+            bmgr.and(
+                bmgr.not(nmgr.equal(a, nmgr.makeNumber(2))),
+                bmgr.not(
+                    nmgr.equal(a, nmgr.makeNumber(0))), // some solver produce model a=0 otherwise
+                nmgr.equal(
+                    nmgr.makeNumber(3),
+                    handleExpectedException(() -> nmgr.divide(nmgr.makeNumber(2 * 3), a))));
+
+        if (ImmutableSet.of(Solvers.MATHSAT5, Solvers.CVC4).contains(solver)
+            && nonLinearArithmetic != NonLinearArithmetic.APPROXIMATE_ALWAYS) {
+          // some solvers support non-linear multiplication (partially)
+          assertThatFormula(f).isUnsatisfiable();
+
+        } else {
+          assertExpectedUnsatifiabilityForNonLinearArithmetic(f);
+        }
+      }
     }
   }
 }

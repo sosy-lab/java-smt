@@ -20,11 +20,12 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
 import org.junit.jupiter.params.Parameter;
 import org.junit.jupiter.params.ParameterizedClass;
-import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BasicProverEnvironment;
 import org.sosy_lab.java_smt.api.BasicProverEnvironment.AllSatCallback;
@@ -37,256 +38,241 @@ import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.solvers.opensmt.Logics;
 
 @ParameterizedClass
-@MethodSource("getAllSolvers")
-public class SolverAllSatTest extends SolverBasedTest {
+@ValueSource(strings = {"normal", "itp", "opt"})
+public class SolverAllSatTest {
 
-  public static Iterable<Object[]> getAllSolvers() {
-    List<Object[]> junitParams = new ArrayList<>();
-    for (Solvers solver : ParameterizedSolverBasedTest.getAllSolvers()) {
-      junitParams.add(new Object[] {solver, "normal"});
-      junitParams.add(new Object[] {solver, "itp"});
-      junitParams.add(new Object[] {solver, "opt"});
-    }
-    return junitParams;
-  }
+  @Parameter public String proverEnv;
 
-  @Parameter(0)
-  public Solvers solver;
-
-  @Parameter(1)
-  public String proverEnv;
-
-  @Override
-  protected Solvers solverToUse() {
-    return solver;
-  }
-
-  // INFO: OpenSmt only support interpolation for QF_LIA, QF_LRA and QF_UF
-  @Override
-  protected Logics logicToUse() {
-    return Logics.QF_LIA;
-  }
-
-  private BasicProverEnvironment<?> env;
-
-  @BeforeEach
-  public void setupEnvironment() {
-    switch (proverEnv) {
-      case "normal" -> env = context.newProverEnvironment(ProverOptions.GENERATE_ALL_SAT);
-      case "itp" -> {
-        requireInterpolation();
-
-        // TODO how can we support allsat in MathSat5-interpolation-prover?
-        assume().that(solverToUse()).isNotEqualTo(Solvers.MATHSAT5);
-
-        env = context.newProverEnvironmentWithInterpolation(ProverOptions.GENERATE_ALL_SAT);
-      }
-      case "opt" -> {
-        requireOptimization();
-        env = context.newOptimizationProverEnvironment(ProverOptions.GENERATE_ALL_SAT);
-      }
-      default -> throw new AssertionError("unexpected");
-    }
-  }
-
-  @AfterEach
-  public void closeEnvironment() {
-    if (env != null) {
-      env.close();
-    }
-  }
-
-  private static final String EXPECTED_RESULT = "AllSatTest_unsat";
-
-  private static class TestAllSatCallback implements AllSatCallback<String> {
-
-    private final List<List<BooleanFormula>> models = new ArrayList<>();
-
+  @Nested
+  class Tests extends SolverBasedTest.ParameterizedSolverBasedTest {
+    // INFO: OpenSmt only support interpolation for QF_LIA, QF_LRA and QF_UF
     @Override
-    public void apply(List<BooleanFormula> pModel) {
-      models.add(ImmutableList.copyOf(pModel));
+    protected Logics logicToUse() {
+      return Logics.QF_LIA;
     }
 
-    @Override
-    public String getResult() {
-      return EXPECTED_RESULT;
-    }
-  }
+    private BasicProverEnvironment<?> env;
 
-  @Test
-  public void allSatIntegersTest() throws InterruptedException, SolverException {
-    // Adapted from the AllSat example in src/example
-    requireIntegers();
+    @BeforeEach
+    public void setupEnvironment() {
+      switch (proverEnv) {
+        case "normal" -> env = context.newProverEnvironment(ProverOptions.GENERATE_ALL_SAT);
+        case "itp" -> {
+          requireInterpolation();
 
-    try (var prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
+          // TODO how can we support allsat in MathSat5-interpolation-prover?
+          assume().that(solverToUse()).isNotEqualTo(Solvers.MATHSAT5);
 
-      IntegerFormula a = imgr.makeVariable("a");
-      BooleanFormula p = bmgr.makeVariable("p");
-      BooleanFormula q = bmgr.makeVariable("q");
-
-      prover.addConstraint(imgr.lessOrEquals(imgr.makeNumber(1), a));
-      prover.addConstraint(imgr.lessOrEquals(a, imgr.makeNumber(3)));
-      prover.addConstraint(bmgr.equivalence(p, q));
-
-      // loop over all possible models for "1<=a<=3 AND p=q"
-      while (!prover.isUnsat()) {
-        ImmutableList<ValueAssignment> modelAssignments = prover.getModelAssignments();
-
-        // check that the model doesn't have any internal variables
-        assertThat(FluentIterable.from(modelAssignments).transform(ValueAssignment::getName))
-            .containsExactly("a", "p", "q");
-
-        // prevent next model from using the same assignment as a previous model
-        prover.addConstraint(
-            bmgr.not(
-                bmgr.and(
-                    transformedImmutableListCopy(
-                        modelAssignments, ValueAssignment::getAssignmentAsFormula))));
+          env = context.newProverEnvironmentWithInterpolation(ProverOptions.GENERATE_ALL_SAT);
+        }
+        case "opt" -> {
+          requireOptimization();
+          env = context.newOptimizationProverEnvironment(ProverOptions.GENERATE_ALL_SAT);
+        }
+        default -> throw new AssertionError("unexpected");
       }
     }
-  }
 
-  @Test
-  public void allSatTest_unsat() throws SolverException, InterruptedException {
-    requireIntegers();
-
-    IntegerFormula a = imgr.makeVariable("i");
-    IntegerFormula n1 = imgr.makeNumber(1);
-    IntegerFormula n2 = imgr.makeNumber(2);
-
-    BooleanFormula cond1 = imgr.equal(a, n1);
-    BooleanFormula cond2 = imgr.equal(a, n2);
-
-    BooleanFormula v1 = bmgr.makeVariable("b1");
-    BooleanFormula v2 = bmgr.makeVariable("b2");
-
-    env.push(cond1);
-    env.push(cond2);
-
-    env.push(bmgr.equivalence(v1, cond1));
-    env.push(bmgr.equivalence(v2, cond2));
-
-    TestAllSatCallback callback =
-        new TestAllSatCallback() {
-          @Override
-          public void apply(List<BooleanFormula> pModel) {
-            assert_()
-                .withMessage("Formula is unsat, but all-sat callback called with model %s", pModel)
-                .fail();
-          }
-        };
-
-    assertThat(env.allSat(callback, ImmutableList.of(v1, v2))).isEqualTo(EXPECTED_RESULT);
-  }
-
-  @Test
-  @Timeout(value = 5, unit = TimeUnit.SECONDS)
-  public void allSatTest_xor() throws SolverException, InterruptedException {
-    requireIntegers();
-
-    // We have the following constraint: '(i=1) XOR (i=2)'
-    // with the predicates b1 and b2 defined as: '(i=1) <=> b1' and '(i=2) <=> b2'.
-    // We expect exactly two models from ALLSAT: {b1,-b2} and {-b1, b2}.
-    IntegerFormula a = imgr.makeVariable("i");
-    IntegerFormula n1 = imgr.makeNumber(1);
-    IntegerFormula n2 = imgr.makeNumber(2);
-
-    BooleanFormula cond1 = imgr.equal(a, n1);
-    BooleanFormula cond2 = imgr.equal(a, n2);
-
-    BooleanFormula v1 = bmgr.makeVariable("b1");
-    BooleanFormula v2 = bmgr.makeVariable("b2");
-
-    env.push(bmgr.xor(cond1, cond2));
-
-    env.push(bmgr.equivalence(v1, cond1));
-    env.push(bmgr.equivalence(v2, cond2));
-
-    TestAllSatCallback callback = new TestAllSatCallback();
-
-    assertThat(env.allSat(callback, ImmutableList.of(v1, v2))).isEqualTo(EXPECTED_RESULT);
-
-    assertThat(callback.models)
-        .containsExactly(ImmutableList.of(v1, bmgr.not(v2)), ImmutableList.of(bmgr.not(v1), v2));
-  }
-
-  @Test
-  public void allSatTest_nondetValue() throws SolverException, InterruptedException {
-    BooleanFormula v1 = bmgr.makeVariable("b1");
-    BooleanFormula v2 = bmgr.makeVariable("b2");
-
-    env.push(v1);
-
-    TestAllSatCallback callback = new TestAllSatCallback();
-
-    assertThat(env.allSat(callback, ImmutableList.of(v1, v2))).isEqualTo(EXPECTED_RESULT);
-
-    assertThat(callback.models)
-        .isAnyOf(
-            ImmutableList.of(ImmutableList.of(v1)),
-            ImmutableList.of(ImmutableList.of(v1, v2), ImmutableList.of(v1, bmgr.not(v2))),
-            ImmutableList.of(ImmutableList.of(v1, bmgr.not(v2)), ImmutableList.of(v1, v2)));
-  }
-
-  @Test
-  public void allSatTest_withQuantifier() throws SolverException, InterruptedException {
-    requireBitvectors();
-    requireQuantifiers();
-
-    assume()
-        .withMessage("solver does only partially support quantifiers")
-        .that(solverToUse())
-        .isNoneOf(Solvers.BOOLECTOR, Solvers.YICES2);
-
-    if ("opt".equals(proverEnv)) {
-      assume()
-          .withMessage("solver reports a partial model when using optimization")
-          .that(solverToUse())
-          .isNotEqualTo(Solvers.Z3);
+    @AfterEach
+    public void closeEnvironment() {
+      if (env != null) {
+        env.close();
+      }
     }
 
-    if ("itp".equals(proverEnv)) {
-      assume()
-          .withMessage("solver reports a inconclusive sat-check when using interpolation")
-          .that(solverToUse())
-          .isNotEqualTo(Solvers.PRINCESS);
+    private static final String EXPECTED_RESULT = "AllSatTest_unsat";
+
+    private static class TestAllSatCallback implements AllSatCallback<String> {
+
+      private final List<List<BooleanFormula>> models = new ArrayList<>();
+
+      @Override
+      public void apply(List<BooleanFormula> pModel) {
+        models.add(ImmutableList.copyOf(pModel));
+      }
+
+      @Override
+      public String getResult() {
+        return EXPECTED_RESULT;
+      }
     }
 
-    // (y = 1)
-    // & (PRED1 <-> (y = 1))
-    // & (PRED3 <-> ALL x_0. (3 * x_0 != y))
-    // query ALLSAT for predicates [PRED1, PRED3] --> {[PRED1, -PRED3]}
+    @Test
+    public void allSatIntegersTest() throws InterruptedException, SolverException {
+      // Adapted from the AllSat example in src/example
+      requireIntegers();
 
-    // ugly detail in bitvector theory: 2863311531*3=1 mod 2^32,
-    // thus the quantified part from above is FALSE.
+      try (var prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
 
-    int bitsize = 32;
-    BitvectorFormula y = bvmgr.makeVariable(bitsize, "y");
-    BitvectorFormula one = bvmgr.makeBitvector(bitsize, 1);
-    BitvectorFormula three = bvmgr.makeBitvector(bitsize, 3);
-    BitvectorFormula bound = bvmgr.makeVariable(bitsize, "x_0");
-    BooleanFormula pred1 = bmgr.makeVariable("pred1");
-    BooleanFormula pred3 = bmgr.makeVariable("pred3");
+        IntegerFormula a = imgr.makeVariable("a");
+        BooleanFormula p = bmgr.makeVariable("p");
+        BooleanFormula q = bmgr.makeVariable("q");
 
-    BooleanFormula query =
-        bmgr.and(
-            bvmgr.equal(y, one),
-            bmgr.equivalence(pred1, bvmgr.equal(y, one)),
-            bmgr.equivalence(
-                pred3,
-                qmgr.forall(
-                    ImmutableList.of(bound),
-                    bmgr.not(bvmgr.equal(y, bvmgr.multiply(three, bound))))));
+        prover.addConstraint(imgr.lessOrEquals(imgr.makeNumber(1), a));
+        prover.addConstraint(imgr.lessOrEquals(a, imgr.makeNumber(3)));
+        prover.addConstraint(bmgr.equivalence(p, q));
 
-    env.push(query);
+        // loop over all possible models for "1<=a<=3 AND p=q"
+        while (!prover.isUnsat()) {
+          ImmutableList<ValueAssignment> modelAssignments = prover.getModelAssignments();
 
-    assertThat(env.isUnsat()).isFalse();
+          // check that the model doesn't have any internal variables
+          assertThat(FluentIterable.from(modelAssignments).transform(ValueAssignment::getName))
+              .containsExactly("a", "p", "q");
 
-    TestAllSatCallback callback = new TestAllSatCallback();
+          // prevent next model from using the same assignment as a previous model
+          prover.addConstraint(
+              bmgr.not(
+                  bmgr.and(
+                      transformedImmutableListCopy(
+                          modelAssignments, ValueAssignment::getAssignmentAsFormula))));
+        }
+      }
+    }
 
-    assertThat(env.allSat(callback, ImmutableList.of(pred1, pred3))).isEqualTo(EXPECTED_RESULT);
+    @Test
+    public void allSatTest_unsat() throws SolverException, InterruptedException {
+      requireIntegers();
 
-    assertThat(callback.models)
-        .isEqualTo(ImmutableList.of(ImmutableList.of(pred1, bmgr.not(pred3))));
+      IntegerFormula a = imgr.makeVariable("i");
+      IntegerFormula n1 = imgr.makeNumber(1);
+      IntegerFormula n2 = imgr.makeNumber(2);
+
+      BooleanFormula cond1 = imgr.equal(a, n1);
+      BooleanFormula cond2 = imgr.equal(a, n2);
+
+      BooleanFormula v1 = bmgr.makeVariable("b1");
+      BooleanFormula v2 = bmgr.makeVariable("b2");
+
+      env.push(cond1);
+      env.push(cond2);
+
+      env.push(bmgr.equivalence(v1, cond1));
+      env.push(bmgr.equivalence(v2, cond2));
+
+      TestAllSatCallback callback =
+          new TestAllSatCallback() {
+            @Override
+            public void apply(List<BooleanFormula> pModel) {
+              assert_()
+                  .withMessage(
+                      "Formula is unsat, but all-sat callback called with model %s", pModel)
+                  .fail();
+            }
+          };
+
+      assertThat(env.allSat(callback, ImmutableList.of(v1, v2))).isEqualTo(EXPECTED_RESULT);
+    }
+
+    @Test
+    @Timeout(value = 5, unit = TimeUnit.SECONDS)
+    public void allSatTest_xor() throws SolverException, InterruptedException {
+      requireIntegers();
+
+      // We have the following constraint: '(i=1) XOR (i=2)'
+      // with the predicates b1 and b2 defined as: '(i=1) <=> b1' and '(i=2) <=> b2'.
+      // We expect exactly two models from ALLSAT: {b1,-b2} and {-b1, b2}.
+      IntegerFormula a = imgr.makeVariable("i");
+      IntegerFormula n1 = imgr.makeNumber(1);
+      IntegerFormula n2 = imgr.makeNumber(2);
+
+      BooleanFormula cond1 = imgr.equal(a, n1);
+      BooleanFormula cond2 = imgr.equal(a, n2);
+
+      BooleanFormula v1 = bmgr.makeVariable("b1");
+      BooleanFormula v2 = bmgr.makeVariable("b2");
+
+      env.push(bmgr.xor(cond1, cond2));
+
+      env.push(bmgr.equivalence(v1, cond1));
+      env.push(bmgr.equivalence(v2, cond2));
+
+      TestAllSatCallback callback = new TestAllSatCallback();
+
+      assertThat(env.allSat(callback, ImmutableList.of(v1, v2))).isEqualTo(EXPECTED_RESULT);
+
+      assertThat(callback.models)
+          .containsExactly(ImmutableList.of(v1, bmgr.not(v2)), ImmutableList.of(bmgr.not(v1), v2));
+    }
+
+    @Test
+    public void allSatTest_nondetValue() throws SolverException, InterruptedException {
+      BooleanFormula v1 = bmgr.makeVariable("b1");
+      BooleanFormula v2 = bmgr.makeVariable("b2");
+
+      env.push(v1);
+
+      TestAllSatCallback callback = new TestAllSatCallback();
+
+      assertThat(env.allSat(callback, ImmutableList.of(v1, v2))).isEqualTo(EXPECTED_RESULT);
+
+      assertThat(callback.models)
+          .isAnyOf(
+              ImmutableList.of(ImmutableList.of(v1)),
+              ImmutableList.of(ImmutableList.of(v1, v2), ImmutableList.of(v1, bmgr.not(v2))),
+              ImmutableList.of(ImmutableList.of(v1, bmgr.not(v2)), ImmutableList.of(v1, v2)));
+    }
+
+    @Test
+    public void allSatTest_withQuantifier() throws SolverException, InterruptedException {
+      requireBitvectors();
+      requireQuantifiers();
+
+      assume()
+          .withMessage("solver does only partially support quantifiers")
+          .that(solverToUse())
+          .isNoneOf(Solvers.BOOLECTOR, Solvers.YICES2);
+
+      if ("opt".equals(proverEnv)) {
+        assume()
+            .withMessage("solver reports a partial model when using optimization")
+            .that(solverToUse())
+            .isNotEqualTo(Solvers.Z3);
+      }
+
+      if ("itp".equals(proverEnv)) {
+        assume()
+            .withMessage("solver reports a inconclusive sat-check when using interpolation")
+            .that(solverToUse())
+            .isNotEqualTo(Solvers.PRINCESS);
+      }
+
+      // (y = 1)
+      // & (PRED1 <-> (y = 1))
+      // & (PRED3 <-> ALL x_0. (3 * x_0 != y))
+      // query ALLSAT for predicates [PRED1, PRED3] --> {[PRED1, -PRED3]}
+
+      // ugly detail in bitvector theory: 2863311531*3=1 mod 2^32,
+      // thus the quantified part from above is FALSE.
+
+      int bitsize = 32;
+      BitvectorFormula y = bvmgr.makeVariable(bitsize, "y");
+      BitvectorFormula one = bvmgr.makeBitvector(bitsize, 1);
+      BitvectorFormula three = bvmgr.makeBitvector(bitsize, 3);
+      BitvectorFormula bound = bvmgr.makeVariable(bitsize, "x_0");
+      BooleanFormula pred1 = bmgr.makeVariable("pred1");
+      BooleanFormula pred3 = bmgr.makeVariable("pred3");
+
+      BooleanFormula query =
+          bmgr.and(
+              bvmgr.equal(y, one),
+              bmgr.equivalence(pred1, bvmgr.equal(y, one)),
+              bmgr.equivalence(
+                  pred3,
+                  qmgr.forall(
+                      ImmutableList.of(bound),
+                      bmgr.not(bvmgr.equal(y, bvmgr.multiply(three, bound))))));
+
+      env.push(query);
+
+      assertThat(env.isUnsat()).isFalse();
+
+      TestAllSatCallback callback = new TestAllSatCallback();
+
+      assertThat(env.allSat(callback, ImmutableList.of(pred1, pred3))).isEqualTo(EXPECTED_RESULT);
+
+      assertThat(callback.models)
+          .isEqualTo(ImmutableList.of(ImmutableList.of(pred1, bmgr.not(pred3))));
+    }
   }
 }

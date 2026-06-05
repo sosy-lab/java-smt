@@ -8,17 +8,13 @@
 
 package org.sosy_lab.java_smt.test;
 
-import static com.google.common.collect.ImmutableList.toImmutableList;
-
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Lists;
-import java.util.List;
 import java.util.function.Supplier;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.Parameter;
 import org.junit.jupiter.params.ParameterizedClass;
-import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.opentest4j.TestAbortedException;
 import org.sosy_lab.common.configuration.ConfigurationBuilder;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
@@ -29,137 +25,123 @@ import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractNumeralFormulaManager.NonLinearArithmetic;
 
 @ParameterizedClass
-@MethodSource("getAllSolversAndTheories")
-public class NonLinearArithmeticWithModuloTest extends SolverBasedTest {
+@EnumSource(NonLinearArithmetic.class)
+public class NonLinearArithmeticWithModuloTest {
+  @Parameter public NonLinearArithmetic nonLinearArithmetic;
 
-  public static Iterable<Object[]> getAllSolversAndTheories() {
-    return Lists.cartesianProduct(
-            ImmutableList.copyOf(ParameterizedSolverBasedTest.getAllSolvers()),
-            ImmutableList.copyOf(NonLinearArithmetic.values()))
-        .stream()
-        .map(List::toArray)
-        .collect(toImmutableList());
-  }
-
-  @Parameter(0)
-  public Solvers solver;
-
-  @Override
-  protected Solvers solverToUse() {
-    return solver;
-  }
-
-  @Parameter(1)
-  public NonLinearArithmetic nonLinearArithmetic;
-
-  @Override
-  protected ConfigurationBuilder createTestConfigBuilder() throws InvalidConfigurationException {
-    return super.createTestConfigBuilder()
-        .setOption("solver.nonLinearArithmetic", nonLinearArithmetic.name());
-  }
-
-  private IntegerFormula handleExpectedException(Supplier<IntegerFormula> supplier) {
-    try {
-      return supplier.get();
-    } catch (UnsupportedOperationException e) {
-      if (nonLinearArithmetic == NonLinearArithmetic.USE
-          && NonLinearArithmeticTest.SOLVER_WITHOUT_NONLINEAR_ARITHMETIC.contains(solver)) {
-        throw new TestAbortedException(
-            "Expected UnsupportedOperationException was thrown correctly");
-      }
-      throw e;
+  @Nested
+  class Tests extends SolverBasedTest.ParameterizedSolverBasedTest {
+    @Override
+    protected ConfigurationBuilder createTestConfigBuilder() throws InvalidConfigurationException {
+      return super.createTestConfigBuilder()
+          .setOption("solver.nonLinearArithmetic", nonLinearArithmetic.name());
     }
-  }
 
-  private void assertExpectedUnsatifiabilityForNonLinearArithmetic(BooleanFormula f)
-      throws SolverException, InterruptedException {
-    if (nonLinearArithmetic == NonLinearArithmetic.USE
-        || (nonLinearArithmetic == NonLinearArithmetic.APPROXIMATE_FALLBACK
-            && !NonLinearArithmeticTest.SOLVER_WITHOUT_NONLINEAR_ARITHMETIC.contains(solver))) {
-      assertThatFormula(f).isUnsatisfiable();
-    } else {
+    private IntegerFormula handleExpectedException(Supplier<IntegerFormula> supplier) {
+      try {
+        return supplier.get();
+      } catch (UnsupportedOperationException e) {
+        if (nonLinearArithmetic == NonLinearArithmetic.USE
+            && NonLinearArithmeticTest.Solver.SOLVER_WITHOUT_NONLINEAR_ARITHMETIC.contains(
+                solver)) {
+          throw new TestAbortedException(
+              "Expected UnsupportedOperationException was thrown correctly");
+        }
+        throw e;
+      }
+    }
+
+    private void assertExpectedUnsatifiabilityForNonLinearArithmetic(BooleanFormula f)
+        throws SolverException, InterruptedException {
+      if (nonLinearArithmetic == NonLinearArithmetic.USE
+          || (nonLinearArithmetic == NonLinearArithmetic.APPROXIMATE_FALLBACK
+              && !NonLinearArithmeticTest.Solver.SOLVER_WITHOUT_NONLINEAR_ARITHMETIC.contains(
+                  solver))) {
+        assertThatFormula(f).isUnsatisfiable();
+      } else {
+        assertThatFormula(f).isSatisfiable();
+      }
+    }
+
+    @Test
+    public void testModuloConstant() throws SolverException, InterruptedException {
+      requireIntegers();
+      IntegerFormula a = imgr.makeVariable("a");
+
+      BooleanFormula f =
+          bmgr.and(
+              imgr.equal(a, imgr.makeNumber(3)),
+              imgr.equal(
+                  imgr.makeNumber(1),
+                  handleExpectedException(() -> imgr.modulo(a, imgr.makeNumber(2)))));
+
       assertThatFormula(f).isSatisfiable();
     }
-  }
 
-  @Test
-  public void testModuloConstant() throws SolverException, InterruptedException {
-    requireIntegers();
-    IntegerFormula a = imgr.makeVariable("a");
+    @Test
+    public void testModuloConstantUnsatisfiable() throws SolverException, InterruptedException {
+      requireIntegers();
+      IntegerFormula a = imgr.makeVariable("a");
 
-    BooleanFormula f =
-        bmgr.and(
-            imgr.equal(a, imgr.makeNumber(3)),
-            imgr.equal(
-                imgr.makeNumber(1),
-                handleExpectedException(() -> imgr.modulo(a, imgr.makeNumber(2)))));
+      BooleanFormula f =
+          bmgr.and(
+              imgr.equal(a, imgr.makeNumber(5)),
+              imgr.equal(
+                  imgr.makeNumber(1),
+                  handleExpectedException(() -> imgr.modulo(a, imgr.makeNumber(3)))));
 
-    assertThatFormula(f).isSatisfiable();
-  }
+      // INFO: OpenSMT does support modulo with constants
+      if (ImmutableSet.of(
+                  Solvers.SMTINTERPOL,
+                  Solvers.CVC4,
+                  Solvers.YICES2,
+                  Solvers.OPENSMT,
+                  Solvers.MATHSAT5)
+              .contains(solver)
+          && nonLinearArithmetic == NonLinearArithmetic.APPROXIMATE_FALLBACK) {
+        // some solvers support modulo with constants
+        assertThatFormula(f).isUnsatisfiable();
 
-  @Test
-  public void testModuloConstantUnsatisfiable() throws SolverException, InterruptedException {
-    requireIntegers();
-    IntegerFormula a = imgr.makeVariable("a");
-
-    BooleanFormula f =
-        bmgr.and(
-            imgr.equal(a, imgr.makeNumber(5)),
-            imgr.equal(
-                imgr.makeNumber(1),
-                handleExpectedException(() -> imgr.modulo(a, imgr.makeNumber(3)))));
-
-    // INFO: OpenSMT does support modulo with constants
-    if (ImmutableSet.of(
-                Solvers.SMTINTERPOL,
-                Solvers.CVC4,
-                Solvers.YICES2,
-                Solvers.OPENSMT,
-                Solvers.MATHSAT5)
-            .contains(solver)
-        && nonLinearArithmetic == NonLinearArithmetic.APPROXIMATE_FALLBACK) {
-      // some solvers support modulo with constants
-      assertThatFormula(f).isUnsatisfiable();
-
-    } else {
-      assertExpectedUnsatifiabilityForNonLinearArithmetic(f);
+      } else {
+        assertExpectedUnsatifiabilityForNonLinearArithmetic(f);
+      }
     }
-  }
 
-  @Test
-  public void testModulo() throws SolverException, InterruptedException {
-    requireIntegers();
-    IntegerFormula a = imgr.makeVariable("a");
+    @Test
+    public void testModulo() throws SolverException, InterruptedException {
+      requireIntegers();
+      IntegerFormula a = imgr.makeVariable("a");
 
-    BooleanFormula f =
-        bmgr.and(
-            imgr.equal(a, imgr.makeNumber(2)),
-            imgr.equal(
-                imgr.makeNumber(1),
-                handleExpectedException(() -> imgr.modulo(imgr.makeNumber(3), a))));
+      BooleanFormula f =
+          bmgr.and(
+              imgr.equal(a, imgr.makeNumber(2)),
+              imgr.equal(
+                  imgr.makeNumber(1),
+                  handleExpectedException(() -> imgr.modulo(imgr.makeNumber(3), a))));
 
-    assertThatFormula(f).isSatisfiable();
-  }
+      assertThatFormula(f).isSatisfiable();
+    }
 
-  @Test
-  public void testModuloUnsatisfiable() throws SolverException, InterruptedException {
-    requireIntegers();
-    IntegerFormula a = imgr.makeVariable("a");
+    @Test
+    public void testModuloUnsatisfiable() throws SolverException, InterruptedException {
+      requireIntegers();
+      IntegerFormula a = imgr.makeVariable("a");
 
-    BooleanFormula f =
-        bmgr.and(
-            imgr.equal(a, imgr.makeNumber(3)),
-            imgr.equal(
-                imgr.makeNumber(1),
-                handleExpectedException(() -> imgr.modulo(imgr.makeNumber(5), a))));
+      BooleanFormula f =
+          bmgr.and(
+              imgr.equal(a, imgr.makeNumber(3)),
+              imgr.equal(
+                  imgr.makeNumber(1),
+                  handleExpectedException(() -> imgr.modulo(imgr.makeNumber(5), a))));
 
-    if (ImmutableSet.of(Solvers.CVC4, Solvers.MATHSAT5).contains(solver)
-        && nonLinearArithmetic != NonLinearArithmetic.APPROXIMATE_ALWAYS) {
-      // some solvers support non-linear multiplication (partially)
-      assertThatFormula(f).isUnsatisfiable();
+      if (ImmutableSet.of(Solvers.CVC4, Solvers.MATHSAT5).contains(solver)
+          && nonLinearArithmetic != NonLinearArithmetic.APPROXIMATE_ALWAYS) {
+        // some solvers support non-linear multiplication (partially)
+        assertThatFormula(f).isUnsatisfiable();
 
-    } else {
-      assertExpectedUnsatifiabilityForNonLinearArithmetic(f);
+      } else {
+        assertExpectedUnsatifiabilityForNonLinearArithmetic(f);
+      }
     }
   }
 }

@@ -11,17 +11,16 @@ package org.sosy_lab.java_smt.test;
 import static com.google.common.truth.TruthJUnit.assume;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
 import org.junit.jupiter.params.Parameter;
 import org.junit.jupiter.params.ParameterizedClass;
-import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BasicProverEnvironment;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -30,125 +29,107 @@ import org.sosy_lab.java_smt.solvers.opensmt.Logics;
 
 /** Check that timeout is handled gracefully. */
 @ParameterizedClass
-@MethodSource("getAllSolversAndDelays")
-public class TimeoutTest extends SolverBasedTest {
+@ValueSource(ints = {5, 10, 20, 50, 100})
+public class TimeoutTest {
 
   private static final int TIMEOUT_MILLISECONDS = 20000;
 
-  private static final int[] DELAY_IN_MILLISECONDS = {5, 10, 20, 50, 100};
+  @Parameter public int delay;
 
-  public static List<Object[]> getAllSolversAndDelays() {
-    List<Object[]> lst = new ArrayList<>();
-    for (Solvers solver : ParameterizedSolverBasedTest.getAllSolvers()) {
-      for (int delay : DELAY_IN_MILLISECONDS) {
-        lst.add(new Object[] {solver, delay});
-      }
+  @Nested
+  class Tests extends SolverBasedTest.ParameterizedSolverBasedTest {
+    // INFO: OpenSmt only support interpolation for QF_LIA, QF_LRA and QF_UF
+    @Override
+    protected Logics logicToUse() {
+      return Logics.QF_LIA;
     }
-    return lst;
-  }
 
-  @Parameter(0)
-  public Solvers solver;
+    @BeforeEach
+    public void setUp() {
+      // FIXME CVC5 does not support interruption and will segfault once the timeout is reached
+      //   The issue here seems to be that CVC5SolverContext.close() will free the C++ objects while
+      //   the solver is still running. We could consider finding a work-around for this, or maybe
+      //   ask the developers for a way to interrupt the solver.
+      // TODO Add interruption for Princess
+      assume()
+          .withMessage("%s does not support interruption", solverToUse())
+          .that(solverToUse())
+          .isNoneOf(Solvers.PRINCESS, Solvers.CVC5);
+    }
 
-  @Parameter(1)
-  public int delay;
+    @Test
+    @SuppressWarnings("CheckReturnValue")
+    public void testTacticTimeout() {
+      assume().withMessage("Only Z3 has native tactics").that(solverToUse()).isEqualTo(Solvers.Z3);
+      Fuzzer fuzzer = new Fuzzer(mgr, new Random(0));
+      String msg = "ShutdownRequest";
+      BooleanFormula test = fuzzer.fuzz(20, 3);
+      shutdownManager.requestShutdown(msg);
+      assertThrows(InterruptedException.class, () -> mgr.applyTactic(test, Tactic.NNF), msg);
+    }
 
-  @Override
-  protected Solvers solverToUse() {
-    return solver;
-  }
+    @Test
+    @Timeout(value = TIMEOUT_MILLISECONDS, unit = TimeUnit.MILLISECONDS)
+    public void testProverTimeoutInt() throws InterruptedException {
+      requireIntegers();
+      testBasicProverTimeoutInt(() -> context.newProverEnvironment());
+    }
 
-  // INFO: OpenSmt only support interpolation for QF_LIA, QF_LRA and QF_UF
-  @Override
-  protected Logics logicToUse() {
-    return Logics.QF_LIA;
-  }
+    @Test
+    @Timeout(value = TIMEOUT_MILLISECONDS, unit = TimeUnit.MILLISECONDS)
+    public void testProverTimeoutBv() throws InterruptedException {
+      requireBitvectors();
+      testBasicProverTimeoutBv(() -> context.newProverEnvironment());
+    }
 
-  @BeforeEach
-  public void setUp() {
-    // FIXME CVC5 does not support interruption and will segfault once the timeout is reached
-    //   The issue here seems to be that CVC5SolverContext.close() will free the C++ objects while
-    //   the solver is still running. We could consider finding a work-around for this, or maybe
-    //   ask the developers for a way to interrupt the solver.
-    // TODO Add interruption for Princess
-    assume()
-        .withMessage("%s does not support interruption", solverToUse())
-        .that(solverToUse())
-        .isNoneOf(Solvers.PRINCESS, Solvers.CVC5);
-  }
+    @Test
+    @Timeout(value = TIMEOUT_MILLISECONDS, unit = TimeUnit.MILLISECONDS)
+    public void testInterpolationProverTimeout() throws InterruptedException {
+      requireInterpolation();
+      requireIntegers();
+      testBasicProverTimeoutInt(() -> context.newProverEnvironmentWithInterpolation());
+    }
 
-  @Test
-  @SuppressWarnings("CheckReturnValue")
-  public void testTacticTimeout() {
-    assume().withMessage("Only Z3 has native tactics").that(solverToUse()).isEqualTo(Solvers.Z3);
-    Fuzzer fuzzer = new Fuzzer(mgr, new Random(0));
-    String msg = "ShutdownRequest";
-    BooleanFormula test = fuzzer.fuzz(20, 3);
-    shutdownManager.requestShutdown(msg);
-    assertThrows(InterruptedException.class, () -> mgr.applyTactic(test, Tactic.NNF), msg);
-  }
+    @Test
+    @Timeout(value = TIMEOUT_MILLISECONDS, unit = TimeUnit.MILLISECONDS)
+    public void testOptimizationProverTimeout() throws InterruptedException {
+      requireOptimization();
+      requireIntegers();
+      testBasicProverTimeoutInt(() -> context.newOptimizationProverEnvironment());
+    }
 
-  @Test
-  @Timeout(value = TIMEOUT_MILLISECONDS, unit = TimeUnit.MILLISECONDS)
-  public void testProverTimeoutInt() throws InterruptedException {
-    requireIntegers();
-    testBasicProverTimeoutInt(() -> context.newProverEnvironment());
-  }
+    private void testBasicProverTimeoutInt(Supplier<BasicProverEnvironment<?>> proverConstructor)
+        throws InterruptedException {
+      HardIntegerFormulaGenerator gen = new HardIntegerFormulaGenerator(imgr, bmgr);
+      testBasicProverTimeout(proverConstructor, gen.generate(200));
+    }
 
-  @Test
-  @Timeout(value = TIMEOUT_MILLISECONDS, unit = TimeUnit.MILLISECONDS)
-  public void testProverTimeoutBv() throws InterruptedException {
-    requireBitvectors();
-    testBasicProverTimeoutBv(() -> context.newProverEnvironment());
-  }
+    private void testBasicProverTimeoutBv(Supplier<BasicProverEnvironment<?>> proverConstructor)
+        throws InterruptedException {
+      HardBitvectorFormulaGenerator gen = new HardBitvectorFormulaGenerator(bvmgr, bmgr);
+      testBasicProverTimeout(proverConstructor, gen.generate(200));
+    }
 
-  @Test
-  @Timeout(value = TIMEOUT_MILLISECONDS, unit = TimeUnit.MILLISECONDS)
-  public void testInterpolationProverTimeout() throws InterruptedException {
-    requireInterpolation();
-    requireIntegers();
-    testBasicProverTimeoutInt(() -> context.newProverEnvironmentWithInterpolation());
-  }
+    @SuppressWarnings("CheckReturnValue")
+    private void testBasicProverTimeout(
+        Supplier<BasicProverEnvironment<?>> proverConstructor, BooleanFormula instance)
+        throws InterruptedException {
+      Thread t =
+          new Thread(
+              () -> {
+                try {
+                  Thread.sleep(delay);
+                  shutdownManager.requestShutdown("Shutdown Request");
+                } catch (InterruptedException exception) {
+                  throw new UnsupportedOperationException("Unexpected interrupt", exception);
+                }
+              });
 
-  @Test
-  @Timeout(value = TIMEOUT_MILLISECONDS, unit = TimeUnit.MILLISECONDS)
-  public void testOptimizationProverTimeout() throws InterruptedException {
-    requireOptimization();
-    requireIntegers();
-    testBasicProverTimeoutInt(() -> context.newOptimizationProverEnvironment());
-  }
-
-  private void testBasicProverTimeoutInt(Supplier<BasicProverEnvironment<?>> proverConstructor)
-      throws InterruptedException {
-    HardIntegerFormulaGenerator gen = new HardIntegerFormulaGenerator(imgr, bmgr);
-    testBasicProverTimeout(proverConstructor, gen.generate(200));
-  }
-
-  private void testBasicProverTimeoutBv(Supplier<BasicProverEnvironment<?>> proverConstructor)
-      throws InterruptedException {
-    HardBitvectorFormulaGenerator gen = new HardBitvectorFormulaGenerator(bvmgr, bmgr);
-    testBasicProverTimeout(proverConstructor, gen.generate(200));
-  }
-
-  @SuppressWarnings("CheckReturnValue")
-  private void testBasicProverTimeout(
-      Supplier<BasicProverEnvironment<?>> proverConstructor, BooleanFormula instance)
-      throws InterruptedException {
-    Thread t =
-        new Thread(
-            () -> {
-              try {
-                Thread.sleep(delay);
-                shutdownManager.requestShutdown("Shutdown Request");
-              } catch (InterruptedException exception) {
-                throw new UnsupportedOperationException("Unexpected interrupt", exception);
-              }
-            });
-
-    try (BasicProverEnvironment<?> pe = proverConstructor.get()) {
-      pe.push(instance);
-      t.start();
-      assertThrows(InterruptedException.class, pe::isUnsat);
+      try (BasicProverEnvironment<?> pe = proverConstructor.get()) {
+        pe.push(instance);
+        t.start();
+        assertThrows(InterruptedException.class, pe::isUnsat);
+      }
     }
   }
 }
