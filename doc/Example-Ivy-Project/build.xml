@@ -21,7 +21,7 @@ SPDX-License-Identifier: Apache-2.0
     <!-- Path to the "main" function -->
     <property name="project.main" value="org.sosy_lab.java_smt_example.SolverOverviewTable"/>
 
-    <target name="download-ivy" unless="skip.download">
+    <target name="download-ivy">
         <mkdir dir="lib"/>
         <get src="${ivy.repo.url}/org.apache.ivy/ivy/ivy-${ivy.target_version}.jar" dest="lib/ivy.jar"
              usetimestamp="true"/>
