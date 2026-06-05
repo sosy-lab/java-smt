@@ -8,7 +8,6 @@
 
 package org.sosy_lab.java_smt.solvers.cvc5;
 
-import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkState;
 import static org.sosy_lab.common.collect.Collections3.transformedImmutableSetCopy;
 
@@ -74,11 +73,6 @@ class CVC5InterpolatingProver extends CVC5AbstractProver<String>
   @Override
   public BooleanFormula getInterpolant(Collection<String> pFormulasOfA)
       throws SolverException, InterruptedException {
-    checkGenerateInterpolants();
-    checkArgument(
-        getAssertedConstraintIds().containsAll(pFormulasOfA),
-        "interpolation can only be done over previously asserted formulas.");
-
     final Set<Term> assertedFormulas =
         transformedImmutableSetCopy(getAssertedFormulas(), creator::extractInfo);
     final Set<Term> formulasOfA =
@@ -92,13 +86,6 @@ class CVC5InterpolatingProver extends CVC5AbstractProver<String>
   @Override
   public List<BooleanFormula> getSeqInterpolants(List<? extends Collection<String>> partitions)
       throws SolverException, InterruptedException {
-    checkGenerateInterpolants();
-    checkArgument(!partitions.isEmpty(), "at least one partition should be available.");
-    final ImmutableSet<String> assertedConstraintIds = getAssertedConstraintIds();
-    checkArgument(
-        partitions.stream().allMatch(assertedConstraintIds::containsAll),
-        "interpolation can only be done over previously asserted formulas.");
-
     final int n = partitions.size();
     final List<BooleanFormula> itps = new ArrayList<>();
     Term previousItp = termManager.mkTrue();

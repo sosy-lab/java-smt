@@ -10,6 +10,12 @@ package org.sosy_lab.java_smt.basicimpl;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
+import static org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager.SMTLIB2ProgramState.ASSERT_MODE;
+import static org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager.SMTLIB2ProgramState.EXITED_STATE;
+import static org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager.SMTLIB2ProgramState.RESULT_MODE;
+import static org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager.SMTLIB2ProgramState.SAT_MODE;
+import static org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager.SMTLIB2ProgramState.START_MODE;
+import static org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager.SMTLIB2ProgramState.UNSAT_MODE;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.CharMatcher;
@@ -392,21 +398,40 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
     List<String> tokens = Tokenizer.tokenize(formulaStr);
 
     StringBuilder builder = new StringBuilder();
-    int pos = 0; // index of the current token
+
+    // SMTLIB2ProgramStateMachine models and tracks that the SMTLIB2 query conforms to the rules
+    // outlined in the standard, i.e. which command can follow on which etc.
+    // We allow a slightly more lenient version than the standard, allowing implicit logic
+    // selection, as most solvers export and support SMTLIB2 like this.
+    SMTLIB2ProgramStateMachine smtLibStateMachine = new SMTLIB2ProgramStateMachine(false);
 
     for (String token : tokens) {
-      if (Tokenizer.isSetLogicToken(token)) {
-        // Skip the (set-logic ...) command at the beginning of the input
-        Preconditions.checkArgument(pos == 0);
+      if (Tokenizer.isSetInfoToken(token)) {
+        // set-info call is allowed to be the very first command in the benchmark, but can also
+        // appear repeatedly throughout a SMT2 program
+        // Technically it is even required to be the very first command, and it must set the
+        //  :smt-lib-version attribute. See SMT-LIB 2.7 §3.11.3
+        // TODO: check that version >= 2 for attribute :smt-lib-version?
+        smtLibStateMachine.applyGSIOCommand();
+
+      } else if (Tokenizer.isSetLogicToken(token)) {
+        // (set-logic ...) commands must appear before an assertion is made. They may appear
+        // throughout an SMT-LIB2 program to set the 'current logic' to a new logic, but the 'reset'
+        // command has to be used before doing so every time.
+        // The logic 'ALL' is the logic describing all available logics of a solver.
+        // The following commands are allowed to be used before the very first 'set-logic':
+        // echo, reset, reset-assertions, get-info, get-option, set-info, set-option
+        smtLibStateMachine.applySetLogicCommand();
 
       } else if (Tokenizer.isExitToken(token)) {
         // Skip the (exit) command at the end of the input
-        Preconditions.checkArgument(pos == tokens.size() - 1);
+        smtLibStateMachine.applyExitCommand();
 
       } else if (Tokenizer.isDeclarationToken(token)
           || Tokenizer.isDefinitionToken(token)
           || Tokenizer.isAssertToken(token)) {
         // Keep only declaration, definitions and assertion
+        smtLibStateMachine.applyAssertDeclareCommands();
         builder.append(token).append('\n');
 
       } else if (Tokenizer.isForbiddenToken(token)) {
@@ -417,16 +442,20 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
         // moment. If needed, this feature can still be added later.
         String message;
         if (Tokenizer.isPushToken(token)) {
+          smtLibStateMachine.applyPCommand();
           message = "(push ...)";
         } else if (Tokenizer.isPopToken(token)) {
+          smtLibStateMachine.applyPCommand();
           message = "(pop ...)";
         } else if (Tokenizer.isResetAssertionsToken(token)) {
+          smtLibStateMachine.applyResetAssertionsCommand();
           message = "(reset-assertions)";
         } else if (Tokenizer.isResetToken(token)) {
+          smtLibStateMachine.applyResetCommand();
           message = "(reset)";
         } else {
           // Should be unreachable
-          throw new UnsupportedOperationException();
+          throw new UnsupportedOperationException("Unknown token " + checkNotNull(token));
         }
         throw new IllegalArgumentException(
             "SMTLIB command '%s' is not supported when parsing formulas.".formatted(message));
@@ -434,8 +463,8 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
       } else {
         // Remove everything else, such as unknown or solver-specific commands, comments, etc.
       }
-      pos++;
     }
+
     return builder.toString();
   }
 
@@ -800,5 +829,214 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
       return str.toString();
     }
     return pVar; // unchanged
+  }
+
+  public enum SMTLIB2ProgramState {
+    /** Initial state. Can be re-entered using the 'reset' command. */
+    START_MODE,
+    /**
+     * Mode entered after the initial setup is done by executing the 'set-logic' command. In this
+     * state, formulas can be defined/asserted etc.
+     */
+    ASSERT_MODE,
+    /** Mode entered after SAT has been returned after calling 'check-set'. */
+    SAT_MODE,
+    /** Mode entered after UNSAT has been returned after calling 'check-set'. */
+    UNSAT_MODE,
+    /**
+     * Joined alternative to SAT_MODE and UNSAT_MODE. Used if we don't solve, i.e. don't know
+     * whether we are in a SAT/UNSAT state after 'check-sat'.
+     */
+    RESULT_MODE,
+    /**
+     * State after 'exit' has been called. No operations are possible anymore and everything ends in
+     * an error.
+     */
+    EXITED_STATE
+  }
+
+  /**
+   * As defined by the <a
+   * href="https://smt-lib.org/papers/smt-lib-reference-v2.6-r2021-05-12.pdf">SMT-LIB2 standard</a>
+   * an SMT-LIB2 program is allowed to utilize certain commands only if certain preconditions are
+   * met. This state-machine models this in two ways:
+   *
+   * <p>- a lenient parse mode, that replaces the SAT_MODE and UNSAT_MODE with a joined RESULT_MODE,
+   * as we are only interested in the resulting {@link BooleanFormula}s and don't solve the queries,
+   * hence we can't decide whether we are in SAT/UNSAT_MODE.
+   *
+   * <p>- parsing including solving utilizes the SAT_MODE and UNSAT_MODE after 'check-sat'.
+   *
+   * <p>All methods return either the new state (which may be equal to the old), or throw a {@link
+   * IllegalArgumentException} with an error message explaining the problem.
+   */
+  static class SMTLIB2ProgramStateMachine {
+
+    private SMTLIB2ProgramState state = START_MODE;
+
+    private final boolean strictLogicSelectionRequired;
+
+    // TODO: track current logic
+    // private LOGIC currentLogic;
+
+    private static final String EXIT_ERROR_MSG =
+        "It is not allowed to call any more SMT-LIB2 commands " + "after 'exit' has been used";
+
+    /**
+     * Creates a new SMTLIB2ProgramStateMachine for a new SMTLIB2 query (parsing or dumping).
+     *
+     * @param pRequiresStrictLogicSelection if false, no logic has to be set before switching to
+     *     assertion mode, assuming logic 'ALL' implicitly. If true, logic selection is strictly
+     *     required before defining, declaring or asserting terms etc., as specified by the SMT-LIB2
+     *     standard.
+     */
+    SMTLIB2ProgramStateMachine(boolean pRequiresStrictLogicSelection) {
+      strictLogicSelectionRequired = pRequiresStrictLogicSelection;
+    }
+
+    /**
+     * Transitions into the SMTLIB2 program state after the 'exit' command, that disallows any
+     * further commands.
+     */
+    void applyExitCommand() {
+      checkArgument(state != EXITED_STATE, EXIT_ERROR_MSG);
+      state = EXITED_STATE;
+    }
+
+    /**
+     * Used to get the new SMTLIB2 program state for commands: 'declare-*', 'define-*', and
+     * 'assert'.
+     */
+    void applyAssertDeclareCommands() {
+      checkArgument(state != EXITED_STATE, EXIT_ERROR_MSG);
+      if (state != START_MODE) {
+        state = ASSERT_MODE;
+      } else if (!strictLogicSelectionRequired) {
+        checkArgument(state == START_MODE);
+        // Not part of the logic above as we still want to reject later 'set-logic' commands!
+        state = ASSERT_MODE;
+      } else {
+        throw new IllegalArgumentException(
+            "SMT-LIB2 command 'assert', or any of the 'declare-*' and 'define-*' commands are only"
+                + " allowed to be used after a logic has been set via the 'set-logic' command");
+      }
+    }
+
+    /** Used to get the new SMTLIB2 program state for command: 'check-sat'. */
+    void applyCheckSatCommand() {
+      checkArgument(state != EXITED_STATE, EXIT_ERROR_MSG);
+      if (state != START_MODE || !strictLogicSelectionRequired) {
+        // Switches to SAT or UNSAT mode, but we don't solve, we parse,
+        //  hence we use a collective state.
+        // Also, if we allow implicit logic selection, no assertion is required for trivial results
+        state = RESULT_MODE;
+      } else {
+        throw new IllegalArgumentException(
+            "SMT-LIB2 command 'check-sat' is only allowed to be used after a logic has been set via"
+                + " the 'set-logic' command");
+      }
+    }
+
+    /**
+     * Used to get the new SMTLIB2 program state for the 'echo' command. This options transition
+     * always into the current state and calling this method is not necessary.
+     */
+    void applyEchoCommand() {
+      checkArgument(state != EXITED_STATE, EXIT_ERROR_MSG);
+    }
+
+    /** Used to transition into the new SMTLIB2 program state for the 'get-assertion' command. */
+    void applyGetAssertionCommand() {
+      checkArgument(state != EXITED_STATE, EXIT_ERROR_MSG);
+      // Funnily, you are allowed to use 'get-assertion' without asserting something.
+      // TODO: Section 4.1.7 of the standard (2.6) says:
+      //  "The command can be issued only if the :produce-assertions option, which is set to
+      //  false by default, is set to true."
+      checkArgument(
+          state != START_MODE || !strictLogicSelectionRequired,
+          "SMT-LIB2 command 'get-assertion' is only allowed to be used after a logic has been set"
+              + " via the 'set-logic' command");
+      /*
+      checkArgument(options.contains(PRODUCE_ASSERTIONS),
+          "SMT-LIB2 command 'get-assertion' is only allowed to be used after the "
+              + ":produce-assertions option has been set");
+       */
+    }
+
+    /**
+     * Used to transition into the new SMTLIB2 program state for commands: 'get-assignment',
+     * 'get-model', and 'get-value'.
+     */
+    void applyGAMVCommand() {
+      checkArgument(state != EXITED_STATE, EXIT_ERROR_MSG);
+      checkArgument(
+          state == SAT_MODE || state == RESULT_MODE,
+          "SMT-LIB2 commands 'get-model', 'get-assignment', and 'get-value' are only allowed to be"
+              + " used after 'check-sat' has been called and returned SAT");
+    }
+
+    /**
+     * Used to transition into the new SMTLIB2 program state for commands: 'get-info', 'get-option',
+     * 'set-info', 'set-option'. These options transition always into the current state and calling
+     * this method is not necessary.
+     */
+    void applyGSIOCommand() {
+      checkArgument(state != EXITED_STATE, EXIT_ERROR_MSG);
+    }
+
+    /**
+     * Used to transition into the new SMTLIB2 program state for commands: 'get-unsat-*',
+     * 'get-proof'.
+     */
+    void applyGPUCommand() {
+      checkArgument(state != EXITED_STATE, EXIT_ERROR_MSG);
+      checkArgument(
+          state == UNSAT_MODE || state == RESULT_MODE,
+          "SMT-LIB2 command 'get-proof' and all 'get-unsat-*' commands are only allowed to be"
+              + " used after 'check-sat' has been called and returned UNSAT");
+    }
+
+    /** Used to transition into the new SMTLIB2 program state for the 'push' and 'pop' commands. */
+    void applyPCommand() {
+      checkArgument(state != EXITED_STATE, EXIT_ERROR_MSG);
+      if (state != START_MODE || !strictLogicSelectionRequired) {
+        state = ASSERT_MODE;
+      } else {
+        throw new IllegalArgumentException(
+            "SMT-LIB2 commands 'push' and 'pop' are only allowed to "
+                + "be used once a logic has been set");
+      }
+    }
+
+    /** Used to transition into the new SMTLIB2 program state for the 'reset' command. */
+    void applyResetCommand() {
+      checkArgument(state != EXITED_STATE, EXIT_ERROR_MSG);
+      state = START_MODE;
+    }
+
+    /** Used to transition into the new SMTLIB2 program state for the 'reset-assertions' command. */
+    void applyResetAssertionsCommand() {
+      checkArgument(state != EXITED_STATE, EXIT_ERROR_MSG);
+      if (state != START_MODE && state != ASSERT_MODE) {
+        state = ASSERT_MODE;
+      }
+    }
+
+    /** Used to transition into the new SMTLIB2 program state for the 'set-logic' command. */
+    void applySetLogicCommand() {
+      checkArgument(state != EXITED_STATE, EXIT_ERROR_MSG);
+      if (state == START_MODE) {
+        state = ASSERT_MODE;
+      } else if (!strictLogicSelectionRequired) {
+        // We allowed implicit logic selection and assumed 'ALL' already (by asserting or defining)
+        throw new IllegalArgumentException(
+            "SMT-LIB2 command 'set-logic' is not allowed to be used after declaring, defining or "
+                + "asserting terms");
+      } else {
+        throw new IllegalArgumentException(
+            "SMT-LIB2 command 'set-logic' is not allowed to be used more than once without calling"
+                + " 'reset' first");
+      }
+    }
   }
 }
