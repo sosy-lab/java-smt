@@ -584,7 +584,7 @@ public class SolverConcurrencyTest extends SolverBasedTest.ParameterizedSolverBa
    */
   @SuppressWarnings("resource")
   private static void assertConcurrency(String testName, Run runnable) {
-    // TODO ExecutorService was made auto closable in Java 19. Remember to change this when we upgrade
+    // TODO ExecutorService was made auto closable in Java 19
     final ExecutorService threadPool = Executors.newFixedThreadPool(NUMBER_OF_THREADS);
     final List<Throwable> exceptionsList = Collections.synchronizedList(new ArrayList<>());
 
