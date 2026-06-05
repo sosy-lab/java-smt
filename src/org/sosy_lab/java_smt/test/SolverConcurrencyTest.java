@@ -215,6 +215,7 @@ public class SolverConcurrencyTest extends SolverBasedTest.ParameterizedSolverBa
    * thread where they are translated to the main-thread context, anded and asserted.
    */
   @Test
+  @SuppressWarnings("resource")
   public void testFormulaTranslationWithConcurrentContexts()
       throws InterruptedException, SolverException {
     requireIntegers();
@@ -243,12 +244,12 @@ public class SolverConcurrencyTest extends SolverBasedTest.ParameterizedSolverBa
     List<BooleanFormula> translatedFormulas = new ArrayList<>();
 
     for (ContextAndFormula currentContAndForm : contextAndFormulaList) {
-      SolverContext threadedContext = currentContAndForm.context;
-      BooleanFormula threadedFormula = currentContAndForm.formula;
-      BooleanFormula translatedFormula =
-          mgr.translateFrom(threadedFormula, threadedContext.getFormulaManager());
-      translatedFormulas.add(translatedFormula);
-      threadedContext.close();
+      try (var threadedContext = currentContAndForm.context) {
+        BooleanFormula threadedFormula = currentContAndForm.formula;
+        BooleanFormula translatedFormula =
+            mgr.translateFrom(threadedFormula, threadedContext.getFormulaManager());
+        translatedFormulas.add(translatedFormula);
+      }
     }
     assertThat(translatedFormulas).hasSize(NUMBER_OF_THREADS);
     BooleanFormula finalFormula = bmgr.and(translatedFormulas);
@@ -326,6 +327,7 @@ public class SolverConcurrencyTest extends SolverBasedTest.ParameterizedSolverBa
    * the Threads).
    */
   @Test
+  @SuppressWarnings("resource")
   public void testConcurrentIntegerStack() throws InterruptedException {
     requireIntegers();
     requireConcurrentMultipleStackSupport();
@@ -346,6 +348,11 @@ public class SolverConcurrencyTest extends SolverBasedTest.ParameterizedSolverBa
               .that(stack.isUnsat())
               .isTrue();
         });
+
+    // Close all provers
+    for (var prover : proverList) {
+      prover.close();
+    }
   }
 
   /**
@@ -353,6 +360,7 @@ public class SolverConcurrencyTest extends SolverBasedTest.ParameterizedSolverBa
    * the Threads).
    */
   @Test
+  @SuppressWarnings("resource")
   public void testConcurrentBitvectorStack() throws InterruptedException {
     requireBitvectors();
     requireConcurrentMultipleStackSupport();
@@ -373,6 +381,11 @@ public class SolverConcurrencyTest extends SolverBasedTest.ParameterizedSolverBa
               .that(stack.isUnsat())
               .isTrue();
         });
+
+    // Close all provers
+    for (var prover : proverList) {
+      prover.close();
+    }
   }
 
   /**
@@ -436,6 +449,7 @@ public class SolverConcurrencyTest extends SolverBasedTest.ParameterizedSolverBa
    * formulas with contexts in (concurrent) use.
    */
   @Test
+  @SuppressWarnings("resource")
   public void continuousRunningThreadFormulaTransferTranslateTest() {
     requireIntegers();
     // CVC4 and Yices2 do not support parsing and therefore no translation.
@@ -568,7 +582,9 @@ public class SolverConcurrencyTest extends SolverBasedTest.ParameterizedSolverBa
    *     parallel, i.e. no internal state except the solver itself.
    * @param testName Name of the test for accurate error messages
    */
+  @SuppressWarnings("resource")
   private static void assertConcurrency(String testName, Run runnable) {
+    // TODO ExecutorService was made auto closable in Java 19. Remember to change this when we upgrade
     final ExecutorService threadPool = Executors.newFixedThreadPool(NUMBER_OF_THREADS);
     final List<Throwable> exceptionsList = Collections.synchronizedList(new ArrayList<>());
 
