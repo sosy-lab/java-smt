@@ -173,13 +173,13 @@ public class SolverConcurrencyTest extends SolverBasedTest.ParameterizedSolverBa
         () -> {
           ContextAndFormula[] ctxAndFormulas =
               contextAndFormulaList.toArray(new ContextAndFormula[0]);
-          SolverContext threadContext = ctxAndFormulas[0].getContext();
+          SolverContext threadContext = ctxAndFormulas[0].context;
           FormulaManager threadMgr = threadContext.getFormulaManager();
           BooleanFormulaManager threadBmgr = threadMgr.getBooleanFormulaManager();
-          BooleanFormula threadTrue = ctxAndFormulas[0].getFormula();
-          BooleanFormula threadFalse = ctxAndFormulas[1].getFormula();
-          BooleanFormula threadTrueFormula = ctxAndFormulas[2].getFormula();
-          BooleanFormula threadFalseFormula = ctxAndFormulas[3].getFormula();
+          BooleanFormula threadTrue = ctxAndFormulas[0].formula;
+          BooleanFormula threadFalse = ctxAndFormulas[1].formula;
+          BooleanFormula threadTrueFormula = ctxAndFormulas[2].formula;
+          BooleanFormula threadFalseFormula = ctxAndFormulas[3].formula;
 
           checkBooleanFormulas(
               threadBmgr, threadTrue, threadFalse, threadTrueFormula, threadFalseFormula);
@@ -207,23 +207,7 @@ public class SolverConcurrencyTest extends SolverBasedTest.ParameterizedSolverBa
   }
 
   /** Helperclass to pack a SolverContext together with a Formula. */
-  private static class ContextAndFormula {
-    private final SolverContext context;
-    private final BooleanFormula formula;
-
-    private ContextAndFormula(SolverContext context, BooleanFormula formula) {
-      this.context = context;
-      this.formula = formula;
-    }
-
-    SolverContext getContext() {
-      return context;
-    }
-
-    BooleanFormula getFormula() {
-      return formula;
-    }
-  }
+  private record ContextAndFormula(SolverContext context, BooleanFormula formula) {}
 
   /**
    * Test translation of formulas used on distinct contexts to a new, unrelated context. Every
@@ -259,8 +243,8 @@ public class SolverConcurrencyTest extends SolverBasedTest.ParameterizedSolverBa
     List<BooleanFormula> translatedFormulas = new ArrayList<>();
 
     for (ContextAndFormula currentContAndForm : contextAndFormulaList) {
-      SolverContext threadedContext = currentContAndForm.getContext();
-      BooleanFormula threadedFormula = currentContAndForm.getFormula();
+      SolverContext threadedContext = currentContAndForm.context;
+      BooleanFormula threadedFormula = currentContAndForm.formula;
       BooleanFormula translatedFormula =
           mgr.translateFrom(threadedFormula, threadedContext.getFormulaManager());
       translatedFormulas.add(translatedFormula);
@@ -523,8 +507,8 @@ public class SolverConcurrencyTest extends SolverBasedTest.ParameterizedSolverBa
               ContextAndFormula newFormulaAndContext = ownBucket.take();
               threadFormula =
                   mgr.translateFrom(
-                      newFormulaAndContext.getFormula(),
-                      newFormulaAndContext.getContext().getFormulaManager());
+                      newFormulaAndContext.formula,
+                      newFormulaAndContext.context.getFormulaManager());
 
               nextBucket = (nextBucket + 1) % NUMBER_OF_THREADS;
             }
