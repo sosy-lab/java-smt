@@ -126,8 +126,8 @@ public class SolverConcurrencyTest extends SolverBasedTest.ParameterizedSolverBa
     assertConcurrency(
         "testIntConcurrencyWithConcurrentContext",
         () -> {
-          try (SolverContext context = newContext()) {
-            intConcurrencyTest(context);
+          try (SolverContext newContext = newContext()) {
+            intConcurrencyTest(newContext);
           }
         });
   }
@@ -142,8 +142,8 @@ public class SolverConcurrencyTest extends SolverBasedTest.ParameterizedSolverBa
     assertConcurrency(
         "testBvConcurrencyWithConcurrentContext",
         () -> {
-          try (SolverContext context = newContext()) {
-            bvConcurrencyTest(context);
+          try (SolverContext newContext = newContext()) {
+            bvConcurrencyTest(newContext);
           }
         });
   }
@@ -154,7 +154,7 @@ public class SolverConcurrencyTest extends SolverBasedTest.ParameterizedSolverBa
    * a solver in the past, even when all other tests in this class worked!
    */
   @Test
-  public void testConcurrencyWithConcurrentManagers() throws InvalidConfigurationException {
+  public void testConcurrencyWithConcurrentManagers() {
     ConcurrentLinkedQueue<ContextAndFormula> contextAndFormulaList = new ConcurrentLinkedQueue<>();
     BooleanFormula tru = bmgr.makeTrue();
     BooleanFormula fls = bmgr.makeFalse();
@@ -216,7 +216,7 @@ public class SolverConcurrencyTest extends SolverBasedTest.ParameterizedSolverBa
    */
   @Test
   public void testFormulaTranslationWithConcurrentContexts()
-      throws InvalidConfigurationException, InterruptedException, SolverException {
+      throws InterruptedException, SolverException {
     requireIntegers();
     // CVC4 and Yices2 do not support parsing and therefore no translation.
     assume()
@@ -229,14 +229,14 @@ public class SolverConcurrencyTest extends SolverBasedTest.ParameterizedSolverBa
     assertConcurrency(
         "testFormulaTranslationWithConcurrentContexts",
         () -> {
-          SolverContext context = newContext();
-          FormulaManager mgr = context.getFormulaManager();
-          IntegerFormulaManager imgr = mgr.getIntegerFormulaManager();
-          BooleanFormulaManager bmgr = mgr.getBooleanFormulaManager();
-          HardIntegerFormulaGenerator gen = new HardIntegerFormulaGenerator(imgr, bmgr);
+          SolverContext newContext = newContext();
+          FormulaManager newMgr = newContext.getFormulaManager();
+          IntegerFormulaManager newImgr = newMgr.getIntegerFormulaManager();
+          BooleanFormulaManager newBmgr = newMgr.getBooleanFormulaManager();
+          HardIntegerFormulaGenerator gen = new HardIntegerFormulaGenerator(newImgr, newBmgr);
           BooleanFormula threadFormula = gen.generate(INTEGER_FORMULA_GEN.getOrDefault(solver, 9));
           // We need to know the context from which the formula was created
-          contextAndFormulaList.add(new ContextAndFormula(context, threadFormula));
+          contextAndFormulaList.add(new ContextAndFormula(newContext, threadFormula));
         });
 
     assertThat(contextAndFormulaList).hasSize(NUMBER_OF_THREADS);
@@ -277,8 +277,8 @@ public class SolverConcurrencyTest extends SolverBasedTest.ParameterizedSolverBa
     assertConcurrency(
         "testIntConcurrencyWithoutConcurrentContext",
         () -> {
-          try (SolverContext context = contextList.poll()) {
-            intConcurrencyTest(context);
+          try (SolverContext newContext = contextList.poll()) {
+            intConcurrencyTest(newContext);
           }
         });
   }
@@ -297,8 +297,8 @@ public class SolverConcurrencyTest extends SolverBasedTest.ParameterizedSolverBa
     assertConcurrency(
         "testBvConcurrencyWithoutConcurrentContext",
         () -> {
-          try (SolverContext context = contextList.poll()) {
-            bvConcurrencyTest(context);
+          try (SolverContext newContext = contextList.poll()) {
+            bvConcurrencyTest(newContext);
           }
         });
   }
@@ -315,8 +315,8 @@ public class SolverConcurrencyTest extends SolverBasedTest.ParameterizedSolverBa
     assertConcurrency(
         "testConcurrentOptimization",
         () -> {
-          try (SolverContext context = newContext()) {
-            optimizationTest(context);
+          try (SolverContext newContext = newContext()) {
+            optimizationTest(newContext);
           }
         });
   }
@@ -326,8 +326,7 @@ public class SolverConcurrencyTest extends SolverBasedTest.ParameterizedSolverBa
    * the Threads).
    */
   @Test
-  public void testConcurrentIntegerStack()
-      throws InvalidConfigurationException, InterruptedException {
+  public void testConcurrentIntegerStack() throws InterruptedException {
     requireIntegers();
     requireConcurrentMultipleStackSupport();
     HardIntegerFormulaGenerator gen = new HardIntegerFormulaGenerator(imgr, bmgr);
@@ -354,8 +353,7 @@ public class SolverConcurrencyTest extends SolverBasedTest.ParameterizedSolverBa
    * the Threads).
    */
   @Test
-  public void testConcurrentBitvectorStack()
-      throws InvalidConfigurationException, InterruptedException {
+  public void testConcurrentBitvectorStack() throws InterruptedException {
     requireBitvectors();
     requireConcurrentMultipleStackSupport();
     HardBitvectorFormulaGenerator gen = new HardBitvectorFormulaGenerator(bvmgr, bmgr);
@@ -384,17 +382,17 @@ public class SolverConcurrencyTest extends SolverBasedTest.ParameterizedSolverBa
    * requireBitvector() because the exceptionList would collect it and throw an exception failing
    * the test!).
    *
-   * @param context used context for the test-thread (Do not reuse contexts!)
+   * @param newContext used context for the test-thread (Do not reuse contexts!)
    */
-  private void bvConcurrencyTest(SolverContext context)
+  private void bvConcurrencyTest(SolverContext newContext)
       throws SolverException, InterruptedException {
-    FormulaManager mgr = context.getFormulaManager();
-    BitvectorFormulaManager bvmgr = mgr.getBitvectorFormulaManager();
-    BooleanFormulaManager bmgr = mgr.getBooleanFormulaManager();
+    FormulaManager newMgr = newContext.getFormulaManager();
+    BitvectorFormulaManager newBvmgr = newMgr.getBitvectorFormulaManager();
+    BooleanFormulaManager newBmgr = newMgr.getBooleanFormulaManager();
 
-    HardBitvectorFormulaGenerator gen = new HardBitvectorFormulaGenerator(bvmgr, bmgr);
+    HardBitvectorFormulaGenerator gen = new HardBitvectorFormulaGenerator(newBvmgr, newBmgr);
     BooleanFormula instance = gen.generate(BITVECTOR_FORMULA_GEN.getOrDefault(solver, 9));
-    try (BasicProverEnvironment<?> pe = context.newProverEnvironment()) {
+    try (BasicProverEnvironment<?> pe = newContext.newProverEnvironment()) {
       pe.push(instance);
       assertWithMessage("Solver %s failed a concurrency test", solverToUse())
           .that(pe.isUnsat())
@@ -409,18 +407,18 @@ public class SolverConcurrencyTest extends SolverBasedTest.ParameterizedSolverBa
    * requireIntegers() because the exceptionList would collect it and throw an exception failing the
    * test!).
    *
-   * @param context used context for the test-thread (Do not reuse contexts unless you know what you
-   *     are doing!)
+   * @param newContext used context for the test-thread (Do not reuse contexts unless you know what
+   *     you are doing!)
    */
-  private void intConcurrencyTest(SolverContext context)
+  private void intConcurrencyTest(SolverContext newContext)
       throws SolverException, InterruptedException {
-    FormulaManager mgr = context.getFormulaManager();
-    IntegerFormulaManager imgr = mgr.getIntegerFormulaManager();
-    BooleanFormulaManager bmgr = mgr.getBooleanFormulaManager();
+    FormulaManager newMgr = newContext.getFormulaManager();
+    IntegerFormulaManager newImgr = newMgr.getIntegerFormulaManager();
+    BooleanFormulaManager newBmgr = newMgr.getBooleanFormulaManager();
 
-    HardIntegerFormulaGenerator gen = new HardIntegerFormulaGenerator(imgr, bmgr);
+    HardIntegerFormulaGenerator gen = new HardIntegerFormulaGenerator(newImgr, newBmgr);
     BooleanFormula instance = gen.generate(INTEGER_FORMULA_GEN.getOrDefault(solver, 9));
-    try (BasicProverEnvironment<?> pe = context.newProverEnvironment()) {
+    try (BasicProverEnvironment<?> pe = newContext.newProverEnvironment()) {
       pe.push(instance);
       assertWithMessage("Solver %s failed a concurrency test", solverToUse())
           .that(pe.isUnsat())
@@ -438,7 +436,7 @@ public class SolverConcurrencyTest extends SolverBasedTest.ParameterizedSolverBa
    * formulas with contexts in (concurrent) use.
    */
   @Test
-  public void continuousRunningThreadFormulaTransferTranslateTest() throws InterruptedException {
+  public void continuousRunningThreadFormulaTransferTranslateTest() {
     requireIntegers();
     // CVC4 and Yices2 do not support parsing and therefore no translation.
     assume()
@@ -478,17 +476,17 @@ public class SolverConcurrencyTest extends SolverBasedTest.ParameterizedSolverBa
           final int id = idGenerator.getFreshId();
           int nextBucket = (id + 1) % NUMBER_OF_THREADS;
           final BlockingQueue<ContextAndFormula> ownBucket = bucketQueue.get(id);
-          SolverContext context = newContext();
+          SolverContext newContext = newContext();
           synchronized (garbage) {
             garbage.add(context);
           }
-          FormulaManager mgr = context.getFormulaManager();
-          IntegerFormulaManager imgr = mgr.getIntegerFormulaManager();
-          BooleanFormulaManager bmgr = mgr.getBooleanFormulaManager();
-          HardIntegerFormulaGenerator gen = new HardIntegerFormulaGenerator(imgr, bmgr);
+          FormulaManager newMgr = newContext.getFormulaManager();
+          IntegerFormulaManager newImgr = newMgr.getIntegerFormulaManager();
+          BooleanFormulaManager newBmgr = newMgr.getBooleanFormulaManager();
+          HardIntegerFormulaGenerator gen = new HardIntegerFormulaGenerator(newImgr, newBmgr);
           BooleanFormula threadFormula =
               gen.generate(INTEGER_FORMULA_GEN.getOrDefault(solver, 9) - id);
-          try (BasicProverEnvironment<?> stack = context.newProverEnvironment()) {
+          try (BasicProverEnvironment<?> stack = newContext.newProverEnvironment()) {
             // Repeat till the bucket counter reaches itself again
             while (nextBucket != id) {
               stack.push(threadFormula);
@@ -501,12 +499,12 @@ public class SolverConcurrencyTest extends SolverBasedTest.ParameterizedSolverBa
                   .isTrue();
 
               // Take another formula from its own bucket or wait for one.
-              bucketQueue.get(nextBucket).add(new ContextAndFormula(context, threadFormula));
+              bucketQueue.get(nextBucket).add(new ContextAndFormula(newContext, threadFormula));
 
               // Translate the formula into its own context and start solving
               ContextAndFormula newFormulaAndContext = ownBucket.take();
               threadFormula =
-                  mgr.translateFrom(
+                  newMgr.translateFrom(
                       newFormulaAndContext.formula,
                       newFormulaAndContext.context.getFormulaManager());
 
@@ -516,30 +514,30 @@ public class SolverConcurrencyTest extends SolverBasedTest.ParameterizedSolverBa
         });
 
     // Close all open solver contexts
-    for (var context : garbage.build()) {
-      context.close();
+    for (var newContext : garbage.build()) {
+      newContext.close();
     }
   }
 
   // As optimization is not used much at the moment this small test is ok
-  private void optimizationTest(SolverContext context)
+  private void optimizationTest(SolverContext newContext)
       throws InterruptedException, SolverException {
-    FormulaManager mgr = context.getFormulaManager();
-    IntegerFormulaManager imgr = mgr.getIntegerFormulaManager();
-    BooleanFormulaManager bmgr = mgr.getBooleanFormulaManager();
+    FormulaManager newMgr = newContext.getFormulaManager();
+    IntegerFormulaManager newImgr = newMgr.getIntegerFormulaManager();
+    BooleanFormulaManager newBmgr = newMgr.getBooleanFormulaManager();
     try (OptimizationProverEnvironment prover =
-        context.newOptimizationProverEnvironment(ProverOptions.GENERATE_MODELS)) {
+        newContext.newOptimizationProverEnvironment(ProverOptions.GENERATE_MODELS)) {
 
-      IntegerFormula x = imgr.makeVariable("x");
-      IntegerFormula y = imgr.makeVariable("y");
-      IntegerFormula obj = imgr.makeVariable("obj");
+      IntegerFormula x = newImgr.makeVariable("x");
+      IntegerFormula y = newImgr.makeVariable("y");
+      IntegerFormula obj = newImgr.makeVariable("obj");
 
       prover.addConstraint(
-          bmgr.and(
-              imgr.lessOrEquals(x, imgr.makeNumber(10)),
-              imgr.lessOrEquals(y, imgr.makeNumber(15)),
-              imgr.equal(obj, imgr.add(x, y)),
-              imgr.greaterOrEquals(imgr.subtract(x, y), imgr.makeNumber(1))));
+          newBmgr.and(
+              newImgr.lessOrEquals(x, newImgr.makeNumber(10)),
+              newImgr.lessOrEquals(y, newImgr.makeNumber(15)),
+              newImgr.equal(obj, newImgr.add(x, y)),
+              newImgr.greaterOrEquals(newImgr.subtract(x, y), newImgr.makeNumber(1))));
       int handle = prover.maximize(obj);
 
       // Maximize for x.
