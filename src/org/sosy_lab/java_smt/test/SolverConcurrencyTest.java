@@ -34,7 +34,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.Parameter;
 import org.junit.jupiter.params.ParameterizedClass;
-import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.sosy_lab.common.ShutdownManager;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.UniqueIdGenerator;
@@ -61,7 +61,7 @@ import org.sosy_lab.java_smt.api.SolverException;
 
 @SuppressWarnings("resource")
 @ParameterizedClass
-@MethodSource("getAllSolvers")
+@EnumSource(Solvers.class)
 public class SolverConcurrencyTest {
 
   private static final int NUMBER_OF_THREADS = 4;
@@ -96,11 +96,7 @@ public class SolverConcurrencyTest {
           Solvers.Z3,
           40);
 
-  public static Object[] getAllSolvers() {
-    return SolverBasedTest.ParameterizedSolverBasedTest.getAllSolvers();
-  }
-
-  @Parameter(0)
+  @Parameter
   public Solvers solver;
 
   protected Solvers solverToUse() {
