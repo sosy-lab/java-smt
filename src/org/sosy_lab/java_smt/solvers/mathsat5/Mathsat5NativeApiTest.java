@@ -9,9 +9,11 @@
 package org.sosy_lab.java_smt.solvers.mathsat5;
 
 import static com.google.common.truth.Truth.assertThat;
+import static org.junit.Assert.assertThrows;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_assert_formula;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_check_sat;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_create_config;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_create_default_config;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_create_env;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_decl_get_arity;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_decl_get_name;
@@ -96,6 +98,34 @@ public class Mathsat5NativeApiTest extends Mathsat5AbstractNativeApiTest {
     const1 = msat_make_number(env, "1");
     long rationalType = msat_get_rational_type(env);
     var = msat_make_variable(env, "rat", rationalType);
+  }
+
+  @Test
+  public void createEnvironmentWithLogicAll() throws SolverException, InterruptedException {
+    long cfgWithLogic = msat_create_default_config("ALL");
+    msat_set_option_checked(cfgWithLogic, "model_generation", "true");
+
+    long envWithLogic = msat_create_env(cfgWithLogic);
+    msat_destroy_config(cfgWithLogic);
+
+    long const0WithLogic = msat_make_number(envWithLogic, "0");
+    long const1WithLogic = msat_make_number(envWithLogic, "1");
+    long rationalType = msat_get_rational_type(envWithLogic);
+    long varWithLogic = msat_make_variable(envWithLogic, "rat", rationalType);
+
+    long sin = msat_make_sin(envWithLogic, varWithLogic);
+
+    msat_push_backtrack_point(envWithLogic);
+
+    msat_assert_formula(envWithLogic, msat_make_equal(envWithLogic, varWithLogic, const0WithLogic));
+    msat_assert_formula(envWithLogic, msat_make_equal(envWithLogic, sin, const0WithLogic));
+
+    assertThat(msat_check_sat(envWithLogic)).isTrue();
+  }
+
+  @Test
+  public void createConfigWithInvalidLogic() {
+    assertThrows(IllegalArgumentException.class, () -> msat_create_default_config("unfug"));
   }
 
   @Test
