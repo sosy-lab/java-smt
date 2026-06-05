@@ -11,20 +11,7 @@ package org.sosy_lab.java_smt.test;
 import static com.google.common.truth.TruthJUnit.assume;
 import static org.sosy_lab.java_smt.test.BooleanFormulaSubject.assertUsing;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
-import java.util.List;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.Parameter;
-import org.junit.jupiter.params.ParameterizedClass;
-import org.junit.jupiter.params.provider.MethodSource;
-import org.sosy_lab.common.ShutdownManager;
-import org.sosy_lab.common.configuration.Configuration;
-import org.sosy_lab.common.configuration.InvalidConfigurationException;
-import org.sosy_lab.common.log.LogManager;
-import org.sosy_lab.java_smt.SolverContextFactory;
+import org.junit.jupiter.api.*;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.BooleanFormulaManager;
@@ -35,173 +22,128 @@ import org.sosy_lab.java_smt.api.SolverContext;
 import org.sosy_lab.java_smt.api.SolverException;
 
 /** Testing formula serialization. */
-@ParameterizedClass
-@MethodSource("getSolverCombinations")
-public class TranslateFormulaTest {
-
-  private final LogManager logger = LogManager.createTestLogManager();
-
-  private SolverContext from;
-  private SolverContext to;
+public class TranslateFormulaTest extends SolverBasedTest.ParameterizedSolverBasedTest {
   private FormulaManager managerFrom;
-  private FormulaManager managerTo;
-
-  @Parameter(0)
-  public Solvers translateFrom;
-
-  @Parameter(1)
-  public Solvers translateTo;
-
-  public static List<Object[]> getSolverCombinations() {
-    List<Solvers> solvers = ImmutableList.copyOf(Solvers.values());
-    return Lists.transform(Lists.cartesianProduct(solvers, solvers), List::toArray);
-  }
+  private SolverContext from;
+  private Solvers translateFrom;
 
   @BeforeEach
-  public void initSolvers() throws InvalidConfigurationException {
-    Configuration empty = Configuration.builder().build();
-    SolverContextFactory factory =
-        new SolverContextFactory(empty, logger, ShutdownManager.create().getNotifier());
-
-    try {
-      from = factory.generateContext(translateFrom);
-      to = factory.generateContext(translateTo);
-    } catch (InvalidConfigurationException e) {
-      assume()
-          .withMessage(e.getMessage())
-          .that(e)
-          .hasCauseThat()
-          .isNotInstanceOf(UnsatisfiedLinkError.class);
-      throw e;
-    }
-    managerFrom = from.getFormulaManager();
-    managerTo = to.getFormulaManager();
+  public void beforeEach() {
+    managerFrom = mgr;
+    from = context;
+    translateFrom = solver;
   }
 
-  @AfterEach
-  public void close() {
-    if (from != null) {
-      from.close();
-    }
-    if (to != null) {
-      to.close();
-    }
-  }
-
-  private void requireParserTo() {
-    assume()
-        .withMessage("Solver %s does not support parsing formulae", translateTo)
-        .that(translateTo)
-        .isNoneOf(Solvers.CVC4, Solvers.BOOLECTOR, Solvers.YICES2);
-
-    assume()
-        .withMessage(
-            "Solver %s segfaults when parsing short queries or reports invalid length", translateTo)
-        .that(translateTo)
-        .isNotEqualTo(Solvers.Z3_WITH_INTERPOLATION);
+  private void requireIntegersFrom() {
+    requireIntegers();
   }
 
   private void requireParserFrom() {
-    assume()
-        .withMessage("Solver %s does not support parsing formulae", translateFrom)
-        .that(translateFrom)
-        .isNoneOf(Solvers.CVC4, Solvers.BOOLECTOR, Solvers.YICES2);
-
-    assume()
-        .withMessage(
-            "Solver %s segfaults when parsing short queries or reports invalid length",
-            translateFrom)
-        .that(translateFrom)
-        .isNotEqualTo(Solvers.Z3_WITH_INTERPOLATION);
+    requireParser();
   }
 
-  private void requireIntegers() {
-    assume()
-        .withMessage("Solver %s does not support integer theory", translateFrom)
-        .that(translateFrom)
-        .isNoneOf(Solvers.BOOLECTOR, Solvers.BITWUZLA);
-    assume()
-        .withMessage("Solver %s does not support integer theory", translateTo)
-        .that(translateTo)
-        .isNoneOf(Solvers.BOOLECTOR, Solvers.BITWUZLA);
-  }
+  @Nested
+  @DisplayName("to")
+  class Translate extends SolverBasedTest.ParameterizedSolverBasedTest {
+    private FormulaManager managerTo;
+    private SolverContext to;
+    private Solvers translateTo;
 
-  @Test
-  public void testDumpingAndParsing() throws SolverException, InterruptedException {
-    requireParserTo();
+    @BeforeEach
+    public void beforeEach() {
+      managerTo = mgr;
+      to = context;
+      translateTo = solver;
+    }
 
-    BooleanFormula input = createTestFormula(managerFrom);
-    String out = managerFrom.dumpFormula(input).toString();
-    BooleanFormula parsed = managerTo.parse(out);
+    private void requireIntegersTo() {
+      requireIntegers();
+    }
 
-    assertUsing(to).that(createTestFormula(managerTo)).isEquivalentTo(parsed);
-  }
+    private void requireParserTo() {
+      requireParser();
+    }
 
-  @Test
-  public void testTranslating() throws SolverException, InterruptedException {
-    requireParserTo();
+    @Test
+    public void testDumpingAndParsing() throws SolverException, InterruptedException {
+      requireParserTo();
 
-    BooleanFormula inputFrom = createTestFormula(managerFrom);
-    BooleanFormula inputTo = createTestFormula(managerTo);
-    BooleanFormula translatedInput = managerTo.translateFrom(inputFrom, managerFrom);
+      BooleanFormula input = createTestFormula(managerFrom);
+      String out = managerFrom.dumpFormula(input).toString();
+      BooleanFormula parsed = managerTo.parse(out);
 
-    assertUsing(to).that(inputTo).isEquivalentTo(translatedInput);
-  }
+      assertUsing(to).that(createTestFormula(managerTo)).isEquivalentTo(parsed);
+    }
 
-  @Test
-  public void testTranslatingForIContextIdentity() throws SolverException, InterruptedException {
-    requireIntegers();
-    assume().that(translateTo).isEqualTo(translateFrom);
-    FormulaManager manager = managerFrom;
+    @Test
+    public void testTranslating() throws SolverException, InterruptedException {
+      requireParserTo();
 
-    BooleanFormula inputFrom = createTestFormula(manager);
-    BooleanFormula inputTo = createTestFormula(manager);
-    BooleanFormula translatedInput = manager.translateFrom(inputFrom, manager);
+      BooleanFormula inputFrom = createTestFormula(managerFrom);
+      BooleanFormula inputTo = createTestFormula(managerTo);
+      BooleanFormula translatedInput = managerTo.translateFrom(inputFrom, managerFrom);
 
-    assertUsing(to).that(inputTo).isEquivalentTo(translatedInput);
-  }
+      assertUsing(to).that(inputTo).isEquivalentTo(translatedInput);
+    }
 
-  @Test
-  public void testTranslatingForContextSibling() throws SolverException, InterruptedException {
-    requireIntegers();
-    assume().that(translateTo).isEqualTo(translateFrom);
+    @Test
+    public void testTranslatingForIContextIdentity() throws SolverException, InterruptedException {
+      requireIntegersTo();
+      requireIntegersFrom();
+      assume().that(translateTo).isEqualTo(translateFrom);
+      FormulaManager manager = managerFrom;
 
-    assume()
-        .withMessage("Solver does not support shared terms or dump/parse")
-        .that(translateTo)
-        .isNoneOf(Solvers.CVC4, Solvers.YICES2);
+      BooleanFormula inputFrom = createTestFormula(manager);
+      BooleanFormula inputTo = createTestFormula(manager);
+      BooleanFormula translatedInput = manager.translateFrom(inputFrom, manager);
 
-    BooleanFormula inputFrom = createTestFormula(managerFrom);
-    BooleanFormula inputTo = createTestFormula(managerTo);
-    BooleanFormula translatedInput = managerTo.translateFrom(inputFrom, managerFrom);
+      assertUsing(to).that(inputTo).isEquivalentTo(translatedInput);
+    }
 
-    assertUsing(to).that(inputTo).isEquivalentTo(translatedInput);
-  }
+    @Test
+    public void testTranslatingForContextSibling() throws SolverException, InterruptedException {
+      requireIntegersTo();
+      requireIntegersFrom();
+      assume().that(translateTo).isEqualTo(translateFrom);
 
-  @Test
-  public void testTranslatingAndReverse() throws SolverException, InterruptedException {
-    requireParserTo();
-    requireParserFrom();
+      assume()
+          .withMessage("Solver does not support shared terms or dump/parse")
+          .that(translateTo)
+          .isNoneOf(Solvers.CVC4, Solvers.YICES2);
 
-    BooleanFormula inputFrom = createTestFormula(managerFrom);
-    BooleanFormula translatedInput = managerTo.translateFrom(inputFrom, managerFrom);
-    BooleanFormula translatedReverseInput = managerFrom.translateFrom(translatedInput, managerTo);
+      BooleanFormula inputFrom = createTestFormula(managerFrom);
+      BooleanFormula inputTo = createTestFormula(managerTo);
+      BooleanFormula translatedInput = managerTo.translateFrom(inputFrom, managerFrom);
 
-    assertUsing(from).that(inputFrom).isEquivalentTo(translatedReverseInput);
-  }
+      assertUsing(to).that(inputTo).isEquivalentTo(translatedInput);
+    }
 
-  private BooleanFormula createTestFormula(FormulaManager mgr) {
-    requireIntegers();
+    @Test
+    public void testTranslatingAndReverse() throws SolverException, InterruptedException {
+      requireParserTo();
+      requireParserFrom();
 
-    BooleanFormulaManager bfmgr = mgr.getBooleanFormulaManager();
-    IntegerFormulaManager ifmgr = mgr.getIntegerFormulaManager();
-    IntegerFormula x = ifmgr.makeVariable("x");
-    IntegerFormula y = ifmgr.makeVariable("y");
-    IntegerFormula z = ifmgr.makeVariable("z");
-    BooleanFormula t =
-        bfmgr.and(
-            bfmgr.or(ifmgr.equal(x, y), ifmgr.equal(x, ifmgr.makeNumber(2))),
-            bfmgr.or(ifmgr.equal(y, z), ifmgr.equal(z, ifmgr.makeNumber(10))));
-    return t;
+      BooleanFormula inputFrom = createTestFormula(managerFrom);
+      BooleanFormula translatedInput = managerTo.translateFrom(inputFrom, managerFrom);
+      BooleanFormula translatedReverseInput = managerFrom.translateFrom(translatedInput, managerTo);
+
+      assertUsing(from).that(inputFrom).isEquivalentTo(translatedReverseInput);
+    }
+
+    private BooleanFormula createTestFormula(FormulaManager mgr) {
+      requireIntegersTo();
+      requireIntegersFrom();
+
+      BooleanFormulaManager bfmgr = mgr.getBooleanFormulaManager();
+      IntegerFormulaManager ifmgr = mgr.getIntegerFormulaManager();
+      IntegerFormula x = ifmgr.makeVariable("x");
+      IntegerFormula y = ifmgr.makeVariable("y");
+      IntegerFormula z = ifmgr.makeVariable("z");
+      BooleanFormula t =
+          bfmgr.and(
+              bfmgr.or(ifmgr.equal(x, y), ifmgr.equal(x, ifmgr.makeNumber(2))),
+              bfmgr.or(ifmgr.equal(y, z), ifmgr.equal(z, ifmgr.makeNumber(10))));
+      return t;
+    }
   }
 }
