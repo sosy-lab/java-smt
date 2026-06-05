@@ -580,12 +580,9 @@ public class SolverBasedTest {
 
   @ParameterizedClass
   @EnumSource(Solvers.class)
-  public static class ParameterizedSolverBasedTest extends SolverBasedTest {
-    static Solvers[] getAllSolvers() {
-      return Solvers.values();
-    }
-
-    @Parameter public Solvers solver;
+  public abstract static class ParameterizedSolverBasedTest extends SolverBasedTest {
+    @Parameter
+    public Solvers solver;
 
     @Override
     protected Solvers solverToUse() {

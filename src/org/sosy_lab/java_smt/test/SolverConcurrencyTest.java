@@ -96,7 +96,8 @@ public class SolverConcurrencyTest {
           Solvers.Z3,
           40);
 
-  @Parameter public Solvers solver;
+  @Parameter
+  public Solvers solver;
 
   protected Solvers solverToUse() {
     return solver;
