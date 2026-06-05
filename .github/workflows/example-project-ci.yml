@@ -238,7 +238,7 @@ jobs:
           archive: false
 
   kotlin:
-    name: Kotlin Example Project
+    name: Kotlin Gradle Example Project
     strategy:
       fail-fast: false
       matrix:
