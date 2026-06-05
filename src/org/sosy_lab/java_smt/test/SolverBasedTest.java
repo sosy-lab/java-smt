@@ -22,7 +22,6 @@ import org.junit.jupiter.api.TestInfo;
 import org.junit.jupiter.params.Parameter;
 import org.junit.jupiter.params.ParameterizedClass;
 import org.junit.jupiter.params.provider.EnumSource;
-import org.junit.jupiter.params.provider.MethodSource;
 import org.sosy_lab.common.ShutdownManager;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.configuration.Configuration;
@@ -182,16 +181,8 @@ public abstract class SolverBasedTest {
     config = createTestConfigBuilder().build();
 
     factory = new SolverContextFactory(config, logger, shutdownNotifierToUse());
-    try {
-      context = factory.generateContext();
-    } catch (InvalidConfigurationException e) {
-      assume()
-          .withMessage(e.getMessage())
-          .that(e)
-          .hasCauseThat()
-          .isNotInstanceOf(UnsatisfiedLinkError.class);
-      throw e;
-    }
+    context = newContext();
+
     mgr = context.getFormulaManager();
 
     fmgr = mgr.getUFManager();
@@ -241,6 +232,20 @@ public abstract class SolverBasedTest {
       slmgr = mgr.getSLFormulaManager();
     } catch (UnsupportedOperationException e) {
       slmgr = null;
+    }
+  }
+
+  @SuppressWarnings("resources")
+  protected SolverContext newContext() throws InvalidConfigurationException {
+    try {
+      return factory.generateContext();
+    } catch (InvalidConfigurationException e) {
+      assume()
+          .withMessage(e.getMessage())
+          .that(e)
+          .hasCauseThat()
+          .isNotInstanceOf(UnsatisfiedLinkError.class);
+      throw e;
     }
   }
 
@@ -582,8 +587,7 @@ public abstract class SolverBasedTest {
   @ParameterizedClass
   @EnumSource(Solvers.class)
   public abstract static class ParameterizedSolverBasedTest extends SolverBasedTest {
-    @Parameter
-    public Solvers solver;
+    @Parameter public Solvers solver;
 
     @Override
     protected Solvers solverToUse() {

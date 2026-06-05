@@ -32,18 +32,9 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReferenceArray;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.Parameter;
-import org.junit.jupiter.params.ParameterizedClass;
-import org.junit.jupiter.params.provider.EnumSource;
-import org.sosy_lab.common.ShutdownManager;
-import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.UniqueIdGenerator;
-import org.sosy_lab.common.configuration.Configuration;
-import org.sosy_lab.common.configuration.ConfigurationBuilder;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
-import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.common.rationals.Rational;
-import org.sosy_lab.java_smt.SolverContextFactory;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BasicProverEnvironment;
 import org.sosy_lab.java_smt.api.BitvectorFormulaManager;
@@ -59,10 +50,7 @@ import org.sosy_lab.java_smt.api.SolverContext;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 
-@SuppressWarnings("resource")
-@ParameterizedClass
-@EnumSource(Solvers.class)
-public class SolverConcurrencyTest {
+public class SolverConcurrencyTest extends SolverBasedTest.ParameterizedSolverBasedTest {
 
   private static final int NUMBER_OF_THREADS = 4;
   private static final int TIMEOUT_SECONDS = 30;
@@ -96,21 +84,12 @@ public class SolverConcurrencyTest {
           Solvers.Z3,
           40);
 
-  @Parameter
-  public Solvers solver;
-
-  protected Solvers solverToUse() {
-    return solver;
-  }
-
   /**
    * If UnsatisfiedLinkError (wrapped in InvalidConfigurationException) is thrown, abort the test.
    * On some systems (like Windows), some solvers are not available.
    */
   @BeforeEach
-  public void checkThatSolverIsAvailable() throws InvalidConfigurationException {
-    initSolver().close();
-
+  public void checkThatSolverIsAvailable() {
     if (System.getProperty("os.name").toLowerCase(Locale.getDefault()).startsWith("win")) {
       assume()
           .withMessage("MathSAT5 is not reentant on Windows")
@@ -136,36 +115,6 @@ public class SolverConcurrencyTest {
             Solvers.CVC5);
   }
 
-  private void requireIntegers() {
-    assume()
-        .withMessage("Solver does not support integers")
-        .that(solver)
-        .isNoneOf(Solvers.BOOLECTOR, Solvers.BITWUZLA);
-  }
-
-  private void requireBitvectors() {
-    assume()
-        .withMessage("Solver does not support bitvectors")
-        .that(solver)
-        .isNoneOf(Solvers.SMTINTERPOL, Solvers.OPENSMT);
-  }
-
-  private void requireOptimization() {
-    assume()
-        .withMessage("Solver does not support optimization")
-        .that(solver)
-        .isNoneOf(
-            Solvers.SMTINTERPOL,
-            Solvers.BOOLECTOR,
-            Solvers.PRINCESS,
-            Solvers.CVC4,
-            Solvers.CVC5,
-            Solvers.YICES2,
-            Solvers.BITWUZLA,
-            Solvers.OPENSMT,
-            Solvers.Z3_WITH_INTERPOLATION);
-  }
-
   /**
    * Test concurrency of integers (while every thread creates its unique context on its own
    * concurrently).
@@ -176,9 +125,9 @@ public class SolverConcurrencyTest {
     assertConcurrency(
         "testIntConcurrencyWithConcurrentContext",
         () -> {
-          SolverContext context = initSolver();
-          intConcurrencyTest(context);
-          closeSolver(context);
+          try (SolverContext context = newContext()) {
+            intConcurrencyTest(context);
+          }
         });
   }
 
@@ -192,9 +141,9 @@ public class SolverConcurrencyTest {
     assertConcurrency(
         "testBvConcurrencyWithConcurrentContext",
         () -> {
-          SolverContext context = initSolver();
-          bvConcurrencyTest(context);
-          closeSolver(context);
+          try (SolverContext context = newContext()) {
+            bvConcurrencyTest(context);
+          }
         });
   }
 
@@ -206,9 +155,6 @@ public class SolverConcurrencyTest {
   @Test
   public void testConcurrencyWithConcurrentManagers() throws InvalidConfigurationException {
     ConcurrentLinkedQueue<ContextAndFormula> contextAndFormulaList = new ConcurrentLinkedQueue<>();
-    SolverContext context = initSolver();
-    FormulaManager mgr = context.getFormulaManager();
-    BooleanFormulaManager bmgr = mgr.getBooleanFormulaManager();
     BooleanFormula tru = bmgr.makeTrue();
     BooleanFormula fls = bmgr.makeFalse();
     contextAndFormulaList.add(new ContextAndFormula(context, tru));
@@ -298,7 +244,7 @@ public class SolverConcurrencyTest {
     assertConcurrency(
         "testFormulaTranslationWithConcurrentContexts",
         () -> {
-          SolverContext context = initSolver();
+          SolverContext context = newContext();
           FormulaManager mgr = context.getFormulaManager();
           IntegerFormulaManager imgr = mgr.getIntegerFormulaManager();
           BooleanFormulaManager bmgr = mgr.getBooleanFormulaManager();
@@ -309,9 +255,6 @@ public class SolverConcurrencyTest {
         });
 
     assertThat(contextAndFormulaList).hasSize(NUMBER_OF_THREADS);
-    SolverContext context = initSolver();
-    FormulaManager mgr = context.getFormulaManager();
-    BooleanFormulaManager bmgr = mgr.getBooleanFormulaManager();
     List<BooleanFormula> translatedFormulas = new ArrayList<>();
 
     for (ContextAndFormula currentContAndForm : contextAndFormulaList) {
@@ -344,14 +287,14 @@ public class SolverConcurrencyTest {
     ConcurrentLinkedQueue<SolverContext> contextList = new ConcurrentLinkedQueue<>();
     // Initialize contexts before using them in the threads
     for (int i = 0; i < NUMBER_OF_THREADS; i++) {
-      contextList.add(initSolver());
+      contextList.add(newContext());
     }
     assertConcurrency(
         "testIntConcurrencyWithoutConcurrentContext",
         () -> {
-          SolverContext context = contextList.poll();
-          intConcurrencyTest(context);
-          closeSolver(context);
+          try (SolverContext context = contextList.poll()) {
+            intConcurrencyTest(context);
+          }
         });
   }
 
@@ -364,14 +307,14 @@ public class SolverConcurrencyTest {
     ConcurrentLinkedQueue<SolverContext> contextList = new ConcurrentLinkedQueue<>();
     // Initialize contexts before using them in the threads
     for (int i = 0; i < NUMBER_OF_THREADS; i++) {
-      contextList.add(initSolver());
+      contextList.add(newContext());
     }
     assertConcurrency(
         "testBvConcurrencyWithoutConcurrentContext",
         () -> {
-          SolverContext context = contextList.poll();
-          bvConcurrencyTest(context);
-          closeSolver(context);
+          try (SolverContext context = contextList.poll()) {
+            bvConcurrencyTest(context);
+          }
         });
   }
 
@@ -387,9 +330,9 @@ public class SolverConcurrencyTest {
     assertConcurrency(
         "testConcurrentOptimization",
         () -> {
-          SolverContext context = initSolver("solver.mathsat5.loadOptimathsat5", "true");
-          optimizationTest(context);
-          closeSolver(context);
+          try (SolverContext context = newContext()) {
+            optimizationTest(context);
+          }
         });
   }
 
@@ -402,10 +345,6 @@ public class SolverConcurrencyTest {
       throws InvalidConfigurationException, InterruptedException {
     requireIntegers();
     requireConcurrentMultipleStackSupport();
-    SolverContext context = initSolver();
-    FormulaManager mgr = context.getFormulaManager();
-    IntegerFormulaManager imgr = mgr.getIntegerFormulaManager();
-    BooleanFormulaManager bmgr = mgr.getBooleanFormulaManager();
     HardIntegerFormulaGenerator gen = new HardIntegerFormulaGenerator(imgr, bmgr);
 
     ConcurrentLinkedQueue<BasicProverEnvironment<?>> proverList = new ConcurrentLinkedQueue<>();
@@ -423,7 +362,6 @@ public class SolverConcurrencyTest {
               .that(stack.isUnsat())
               .isTrue();
         });
-    closeSolver(context);
   }
 
   /**
@@ -435,10 +373,6 @@ public class SolverConcurrencyTest {
       throws InvalidConfigurationException, InterruptedException {
     requireBitvectors();
     requireConcurrentMultipleStackSupport();
-    SolverContext context = initSolver();
-    FormulaManager mgr = context.getFormulaManager();
-    BitvectorFormulaManager bvmgr = mgr.getBitvectorFormulaManager();
-    BooleanFormulaManager bmgr = mgr.getBooleanFormulaManager();
     HardBitvectorFormulaGenerator gen = new HardBitvectorFormulaGenerator(bvmgr, bmgr);
 
     ConcurrentLinkedQueue<BasicProverEnvironment<?>> proverList = new ConcurrentLinkedQueue<>();
@@ -456,7 +390,6 @@ public class SolverConcurrencyTest {
               .that(stack.isUnsat())
               .isTrue();
         });
-    closeSolver(context);
   }
 
   /**
@@ -557,36 +490,37 @@ public class SolverConcurrencyTest {
           final int id = idGenerator.getFreshId();
           int nextBucket = (id + 1) % NUMBER_OF_THREADS;
           final BlockingQueue<ContextAndFormula> ownBucket = bucketQueue.get(id);
-          SolverContext context = initSolver();
-          FormulaManager mgr = context.getFormulaManager();
-          IntegerFormulaManager imgr = mgr.getIntegerFormulaManager();
-          BooleanFormulaManager bmgr = mgr.getBooleanFormulaManager();
-          HardIntegerFormulaGenerator gen = new HardIntegerFormulaGenerator(imgr, bmgr);
-          BooleanFormula threadFormula =
-              gen.generate(INTEGER_FORMULA_GEN.getOrDefault(solver, 9) - id);
-          try (BasicProverEnvironment<?> stack = context.newProverEnvironment()) {
-            // Repeat till the bucket counter reaches itself again
-            while (nextBucket != id) {
-              stack.push(threadFormula);
+          try (SolverContext context = newContext()) {
+            FormulaManager mgr = context.getFormulaManager();
+            IntegerFormulaManager imgr = mgr.getIntegerFormulaManager();
+            BooleanFormulaManager bmgr = mgr.getBooleanFormulaManager();
+            HardIntegerFormulaGenerator gen = new HardIntegerFormulaGenerator(imgr, bmgr);
+            BooleanFormula threadFormula =
+                gen.generate(INTEGER_FORMULA_GEN.getOrDefault(solver, 9) - id);
+            try (BasicProverEnvironment<?> stack = context.newProverEnvironment()) {
+              // Repeat till the bucket counter reaches itself again
+              while (nextBucket != id) {
+                stack.push(threadFormula);
 
-              assertWithMessage(
-                      "Test continuousRunningThreadFormulaTransferTranslateTest() "
-                          + "failed isUnsat() in thread with id: %s.",
-                      id)
-                  .that(stack.isUnsat())
-                  .isTrue();
+                assertWithMessage(
+                        "Test continuousRunningThreadFormulaTransferTranslateTest() "
+                            + "failed isUnsat() in thread with id: %s.",
+                        id)
+                    .that(stack.isUnsat())
+                    .isTrue();
 
-              // Take another formula from its own bucket or wait for one.
-              bucketQueue.get(nextBucket).add(new ContextAndFormula(context, threadFormula));
+                // Take another formula from its own bucket or wait for one.
+                bucketQueue.get(nextBucket).add(new ContextAndFormula(context, threadFormula));
 
-              // Translate the formula into its own context and start solving
-              ContextAndFormula newFormulaAndContext = ownBucket.take();
-              threadFormula =
-                  mgr.translateFrom(
-                      newFormulaAndContext.getFormula(),
-                      newFormulaAndContext.getContext().getFormulaManager());
+                // Translate the formula into its own context and start solving
+                ContextAndFormula newFormulaAndContext = ownBucket.take();
+                threadFormula =
+                    mgr.translateFrom(
+                        newFormulaAndContext.getFormula(),
+                        newFormulaAndContext.getContext().getFormulaManager());
 
-              nextBucket = (nextBucket + 1) % NUMBER_OF_THREADS;
+                nextBucket = (nextBucket + 1) % NUMBER_OF_THREADS;
+              }
             }
           }
         });
@@ -629,43 +563,6 @@ public class SolverConcurrencyTest {
         assertThat(xValue).isEqualTo(BigInteger.valueOf(10));
         assertThat(yValue).isEqualTo(BigInteger.valueOf(9));
       }
-    }
-  }
-
-  /**
-   * Creates and returns a completely new SolverContext for the currently used solver (We need this
-   * to get more than one Context in 1 method in a controlled way).
-   *
-   * @param additionalOptions a list of pairs (key, value) for creating a new solver context.
-   * @return new and unique SolverContext for current solver (Parameter(0))
-   */
-  private SolverContext initSolver(String... additionalOptions)
-      throws InvalidConfigurationException {
-    try {
-      ConfigurationBuilder options =
-          Configuration.builder().setOption("solver.solver", solverToUse().toString());
-      for (int i = 0; i < additionalOptions.length; i += 2) {
-        options.setOption(additionalOptions[i], additionalOptions[i + 1]);
-      }
-      Configuration config = options.build();
-      LogManager logger = LogManager.createTestLogManager();
-      ShutdownNotifier shutdownNotifier = ShutdownManager.create().getNotifier();
-
-      SolverContextFactory factory = new SolverContextFactory(config, logger, shutdownNotifier);
-      return factory.generateContext();
-    } catch (InvalidConfigurationException e) {
-      assume()
-          .withMessage(e.getMessage())
-          .that(e)
-          .hasCauseThat()
-          .isNotInstanceOf(UnsatisfiedLinkError.class);
-      throw e;
-    }
-  }
-
-  private void closeSolver(SolverContext context) {
-    if (context != null) {
-      context.close();
     }
   }
 
