@@ -133,12 +133,12 @@ public class TranslateFormulaTest extends SolverBasedTest.ParameterizedSolverBas
       assertUsing(from).that(inputFrom).isEquivalentTo(translatedReverseInput);
     }
 
-    private BooleanFormula createTestFormula(FormulaManager mgr) {
+    private BooleanFormula createTestFormula(FormulaManager manager) {
       requireIntegersTo();
       requireIntegersFrom();
 
-      BooleanFormulaManager bfmgr = mgr.getBooleanFormulaManager();
-      IntegerFormulaManager ifmgr = mgr.getIntegerFormulaManager();
+      BooleanFormulaManager bfmgr = manager.getBooleanFormulaManager();
+      IntegerFormulaManager ifmgr = manager.getIntegerFormulaManager();
       IntegerFormula x = ifmgr.makeVariable("x");
       IntegerFormula y = ifmgr.makeVariable("y");
       IntegerFormula z = ifmgr.makeVariable("z");
