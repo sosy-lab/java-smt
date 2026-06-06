@@ -32,11 +32,12 @@ import org.sosy_lab.common.log.BasicLogManager;
 import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.java_smt.SolverContextFactory;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
+import org.sosy_lab.java_smt.api.BasicProverEnvironment;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.FormulaManager;
-import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext;
 import org.sosy_lab.java_smt.api.SolverException;
+import org.sosy_lab.java_smt.cmdline.JavaSMTMain.MainOptions.Environments;
 
 /**
  * Main entry point for JavaSMT command-line interface. Executes SMT2 files using a selected solver
@@ -57,7 +58,7 @@ public final class JavaSMTMain {
     Locale.setDefault(Locale.US);
 
     if (args.length == 0) {
-      args = new String[] {"--help"};
+      args = new String[]{"--help"};
     }
 
     final Configuration config;
@@ -114,6 +115,16 @@ public final class JavaSMTMain {
 
     @Option(secure = true, name = "solver.solver", description = "The SMT solver to use")
     private Solvers solver = Solvers.SMTINTERPOL;
+
+    @Option(secure = true, name = "solver.environment", description = "The prover environment use")
+    private Environments environment = Environments.DEFAULT;
+
+    enum Environments {
+      DEFAULT,
+      HORN,
+      OPTIMIZATION,
+      INTERPOLATION,
+    }
   }
 
   /**
@@ -136,6 +147,17 @@ public final class JavaSMTMain {
     return config;
   }
 
+  private static BasicProverEnvironment<?> createProverEnvironment(
+      Environments type,
+      SolverContext context) {
+    return switch (type) {
+      case DEFAULT -> context.newProverEnvironment();
+      case OPTIMIZATION -> context.newOptimizationProverEnvironment();
+      case INTERPOLATION -> context.newProverEnvironmentWithInterpolation();
+      case HORN -> context.newHornProverEnvironment();
+    };
+  }
+
   private static void run(Configuration config, LogManager logManager, MainOptions options) {
 
     String input;
@@ -149,8 +171,9 @@ public final class JavaSMTMain {
     ShutdownNotifier notifier = shutdownManager.getNotifier();
 
     try (SolverContext context =
-            SolverContextFactory.createSolverContext(config, logManager, notifier, options.solver);
-        ProverEnvironment prover = context.newProverEnvironment()) {
+             SolverContextFactory.createSolverContext(config, logManager, notifier, options.solver);
+         BasicProverEnvironment<?> prover = createProverEnvironment(options.environment,
+             context)) {
 
       FormulaManager formulaManager = context.getFormulaManager();
       List<BooleanFormula> formulas = formulaManager.parseAll(input);
@@ -175,5 +198,6 @@ public final class JavaSMTMain {
     }
   }
 
-  private JavaSMTMain() {}
+  private JavaSMTMain() {
+  }
 }

@@ -31,6 +31,9 @@ public final class CmdLineArguments {
           new CmdLineArgument1("--solver", "-solver")
               .settingOption("solver.solver")
               .withDescription("Set SMT solver to use"),
+          new CmdLineArgument1("--environment", "-environment")
+              .settingOption("solver.environment")
+              .withDescription("Set the prover environemnt to use"),
           new CmdLineArgument1("--logic", "-logic")
               .settingOption("solver.opensmt.logic")
               .withDescription("Set SMT logic (only for OpenSMT)"),
