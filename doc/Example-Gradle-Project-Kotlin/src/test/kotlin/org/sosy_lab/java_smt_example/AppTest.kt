@@ -14,6 +14,7 @@ import com.google.common.base.StandardSystemProperty
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Assumptions.assumeTrue
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.params.Parameter
 import org.junit.jupiter.params.ParameterizedClass
 import org.junit.jupiter.params.provider.MethodSource
@@ -84,9 +85,13 @@ class AppTest {
     val logger = BasicLogManager.create(config)
     val notifier = ShutdownNotifier.createDummy()
 
+    @BeforeEach
+    fun init() {
+        assumeTrue(isSupportedOperatingSystemAndArchitecture(solver))
+    }
+
     @Test
     fun checkSudoku() {
-        assumeTrue(isSupportedOperatingSystemAndArchitecture(solver))
         logger.log(Level.INFO, "Executing " + solver + "...")
 
         SolverContextFactory.createSolverContext(config, logger, notifier, solver).use {

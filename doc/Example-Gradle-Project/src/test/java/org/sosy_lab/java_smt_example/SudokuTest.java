@@ -132,6 +132,8 @@ public class SudokuTest {
 
   @BeforeEach
   public void init() throws InvalidConfigurationException {
+    assumeTrue(isSupportedOperatingSystemAndArchitecture(solver));
+
     config = Configuration.defaultConfiguration();
     logger = BasicLogManager.create(config);
     notifier = ShutdownNotifier.createDummy();
@@ -192,8 +194,6 @@ public class SudokuTest {
   @Test
   public void checkSudoku()
       throws InvalidConfigurationException, InterruptedException, SolverException {
-    assumeTrue(isSupportedOperatingSystemAndArchitecture(solver));
-
     logger.log(Level.INFO, "Executing " + solver + "...");
 
     context = SolverContextFactory.createSolverContext(config, logger, notifier, solver);
