@@ -123,7 +123,9 @@ public class Mathsat5NativeApiTest extends Mathsat5AbstractNativeApiTest {
   @Test
   public void createEnvironmentWithLogics() throws SolverException, InterruptedException {
     for (String logic : LOGICS_TO_TEST) {
+      // Logics just set certain default settings in MathSAT5
       long cfgWithLogic = msat_create_default_config(logic);
+      // Set some option just to check whether there are problems
       msat_set_option_checked(cfgWithLogic, "model_generation", "true");
 
       long envWithLogic = msat_create_env(cfgWithLogic);
