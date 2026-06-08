@@ -18,6 +18,7 @@ import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_crea
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_decl_get_arity;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_decl_get_name;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_destroy_config;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_destroy_env;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_destroy_model_iterator;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_destroy_proof_manager;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_from_smtlib2;
@@ -61,6 +62,8 @@ import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_term
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_type_equals;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_type_repr;
 
+import com.google.common.collect.ImmutableSet;
+import java.util.Set;
 import org.junit.AssumptionViolatedException;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -70,6 +73,23 @@ import org.sosy_lab.common.NativeLibraries;
 import org.sosy_lab.java_smt.api.SolverException;
 
 public class Mathsat5NativeApiTest extends Mathsat5AbstractNativeApiTest {
+
+  private static final Set<String> LOGICS_TO_TEST =
+      ImmutableSet.of(
+          "",
+          "ALL",
+          "QF_LIA",
+          "QF_LRA",
+          "QF_LIRA",
+          "LIRA",
+          "QF_UFLIA",
+          "QF_UFLRA",
+          "QF_UFLIRA",
+          "QF_ALIA",
+          "QF_ALRA",
+          "QF_ALIRA",
+          "UF_AUFLIRA",
+          "AUFLIRA");
 
   private long const0;
   private long const1;
@@ -101,26 +121,30 @@ public class Mathsat5NativeApiTest extends Mathsat5AbstractNativeApiTest {
   }
 
   @Test
-  public void createEnvironmentWithLogicAll() throws SolverException, InterruptedException {
-    long cfgWithLogic = msat_create_default_config("ALL");
-    msat_set_option_checked(cfgWithLogic, "model_generation", "true");
+  public void createEnvironmentWithLogics() throws SolverException, InterruptedException {
+    for (String logic : LOGICS_TO_TEST) {
+      long cfgWithLogic = msat_create_default_config(logic);
+      msat_set_option_checked(cfgWithLogic, "model_generation", "true");
 
-    long envWithLogic = msat_create_env(cfgWithLogic);
-    msat_destroy_config(cfgWithLogic);
+      long envWithLogic = msat_create_env(cfgWithLogic);
+      msat_destroy_config(cfgWithLogic);
 
-    long const0WithLogic = msat_make_number(envWithLogic, "0");
-    long const1WithLogic = msat_make_number(envWithLogic, "1");
-    long rationalType = msat_get_rational_type(envWithLogic);
-    long varWithLogic = msat_make_variable(envWithLogic, "rat", rationalType);
+      long const0WithLogic = msat_make_number(envWithLogic, "0");
+      long const1WithLogic = msat_make_number(envWithLogic, "1");
+      long rationalType = msat_get_rational_type(envWithLogic);
+      long varWithLogic = msat_make_variable(envWithLogic, "rat", rationalType);
 
-    long sin = msat_make_sin(envWithLogic, varWithLogic);
+      long sin = msat_make_sin(envWithLogic, varWithLogic);
 
-    msat_push_backtrack_point(envWithLogic);
+      msat_push_backtrack_point(envWithLogic);
 
-    msat_assert_formula(envWithLogic, msat_make_equal(envWithLogic, varWithLogic, const0WithLogic));
-    msat_assert_formula(envWithLogic, msat_make_equal(envWithLogic, sin, const0WithLogic));
+      msat_assert_formula(
+          envWithLogic, msat_make_equal(envWithLogic, varWithLogic, const1WithLogic));
+      msat_assert_formula(envWithLogic, msat_make_equal(envWithLogic, sin, const0WithLogic));
 
-    assertThat(msat_check_sat(envWithLogic)).isTrue();
+      assertThat(msat_check_sat(envWithLogic)).isFalse();
+      msat_destroy_env(envWithLogic);
+    }
   }
 
   @Test
