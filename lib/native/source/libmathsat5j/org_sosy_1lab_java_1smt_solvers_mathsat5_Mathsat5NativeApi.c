@@ -98,9 +98,10 @@ CONF_RETURN
  *  A new configuration. In case of errors, a cfg s.t. MSAT_ERROR_CONFIG(cfg) is true is returned. 
  *  CONF_RETURN checks this and throws for errors.
  */
-DEFINE_FUNC(jconf, 1create_1default_1config) WITH_ONE_ARG
+DEFINE_FUNC(jconf, 1create_1default_1config) WITH_ONE_ARG(string)
 STRING_ARG(1)
 CALL1(msat_config, create_default_config)
+FREE_STRING_ARG(1)
 CONF_RETURN
 
 /*
