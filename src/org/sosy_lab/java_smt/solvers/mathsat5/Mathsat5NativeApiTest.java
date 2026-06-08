@@ -2,14 +2,13 @@
 // an API wrapper for a collection of SMT solvers:
 // https://github.com/sosy-lab/java-smt
 //
-// SPDX-FileCopyrightText: 2020 Dirk Beyer <https://www.sosy-lab.org>
+// SPDX-FileCopyrightText: 2026 Dirk Beyer <https://www.sosy-lab.org>
 //
 // SPDX-License-Identifier: Apache-2.0
 
 package org.sosy_lab.java_smt.solvers.mathsat5;
 
 import static com.google.common.truth.Truth.assertThat;
-import static org.junit.Assert.assertThrows;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_assert_formula;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_check_sat;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_create_config;
@@ -74,8 +73,10 @@ import org.sosy_lab.java_smt.api.SolverException;
 
 public class Mathsat5NativeApiTest extends Mathsat5AbstractNativeApiTest {
 
+  // Some logics and other strings to test how mathsat reacts to them
   private static final Set<String> LOGICS_TO_TEST =
       ImmutableSet.of(
+          "unfug",
           "",
           "ALL",
           "QF_LIA",
@@ -120,6 +121,7 @@ public class Mathsat5NativeApiTest extends Mathsat5AbstractNativeApiTest {
     var = msat_make_variable(env, "rat", rationalType);
   }
 
+  // MathSAT5 seems to ignore invalid input for logics
   @Test
   public void createEnvironmentWithLogics() throws SolverException, InterruptedException {
     for (String logic : LOGICS_TO_TEST) {
@@ -147,11 +149,6 @@ public class Mathsat5NativeApiTest extends Mathsat5AbstractNativeApiTest {
       assertThat(msat_check_sat(envWithLogic)).isFalse();
       msat_destroy_env(envWithLogic);
     }
-  }
-
-  @Test
-  public void createConfigWithInvalidLogic() {
-    assertThrows(IllegalArgumentException.class, () -> msat_create_default_config("unfug"));
   }
 
   @Test
