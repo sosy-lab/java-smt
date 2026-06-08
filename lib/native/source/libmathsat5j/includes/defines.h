@@ -323,12 +323,7 @@ typedef jlong jjproof;
 typedef jlong jjconf;
 #define CONF_ARG(num) STRUCT_ARG(msat_config, num)
 #define CONF_ARG_VOID(num) STRUCT_ARG_VOID(msat_config, num)
-#define CONF_RETURN \
-  if (retval.repr == NULL) { \
-    throwException(jenv, "java/lang/IllegalArgumentException", "Invalid configuration. MathSAT returned null"); \
-  } \
-  return (jlong)((size_t)(retval.repr)); \
-}
+#define CONF_RETURN STRUCT_RETURN
 
 typedef jlong jjterm;
 #define TERM_ARG(num) STRUCT_ARG(msat_term, num)
