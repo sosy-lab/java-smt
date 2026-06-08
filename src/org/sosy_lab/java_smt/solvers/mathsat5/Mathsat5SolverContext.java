@@ -88,7 +88,7 @@ public final class Mathsat5SolverContext extends AbstractSolverContext {
         description =
             "SMT-LIB logic to configure the SMT solvers (i.e. all Provers created from a"
                 + " SolverContext with this option) with. Default: ALL")
-    private final String logic = "ALL";
+    private String logic = "ALL";
 
     private final @Nullable PathCounterTemplate logfile;
 
