@@ -20,7 +20,6 @@ import java.util.ArrayList;
 import java.util.Set;
 import lazabs.horn.CEGARHornWrapper;
 import lazabs.horn.HornAPI;
-import lazabs.horn.HornWrapper;
 import lazabs.horn.Util.Dag;
 import lazabs.horn.abstractions.EmptyVerificationHints$;
 import lazabs.horn.bottomup.HornClauses.Clause;
