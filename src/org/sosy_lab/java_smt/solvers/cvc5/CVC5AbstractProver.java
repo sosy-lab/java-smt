@@ -174,7 +174,7 @@ abstract class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
   }
 
   @Override
-  public Evaluator getEvaluatorImpl() {
+  protected Evaluator getEvaluatorImpl() {
     return getEvaluatorWithoutChecks();
   }
 

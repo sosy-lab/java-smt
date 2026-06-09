@@ -130,7 +130,7 @@ abstract class PrincessAbstractProver<E> extends AbstractProverWithAllSat<E> {
 
   @SuppressWarnings("resource")
   @Override
-  public Model getModelImpl() throws SolverException {
+  protected Model getModelImpl() throws SolverException {
     return new CachingModel(getEvaluatorWithoutChecks());
   }
 

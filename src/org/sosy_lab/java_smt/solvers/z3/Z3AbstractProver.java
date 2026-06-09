@@ -116,7 +116,7 @@ abstract class Z3AbstractProver extends AbstractProverWithAllSat<Void> {
 
   @SuppressWarnings("resource")
   @Override
-  public Model getModelImpl() throws SolverException {
+  protected Model getModelImpl() throws SolverException {
     return new CachingModel(getEvaluatorWithoutChecks());
   }
 

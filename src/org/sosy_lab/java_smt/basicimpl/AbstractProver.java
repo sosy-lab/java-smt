@@ -301,7 +301,7 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
     return getModelImpl();
   }
 
-  public abstract Model getModelImpl() throws SolverException;
+  protected abstract Model getModelImpl() throws SolverException;
 
   @Override
   public final Evaluator getEvaluator() throws SolverException {
@@ -309,7 +309,7 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
     return getEvaluatorImpl();
   }
 
-  public Evaluator getEvaluatorImpl() throws SolverException {
+  protected Evaluator getEvaluatorImpl() throws SolverException {
     return getModel();
   }
 

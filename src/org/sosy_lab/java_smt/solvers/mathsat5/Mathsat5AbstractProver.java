@@ -144,7 +144,7 @@ abstract class Mathsat5AbstractProver<T2> extends AbstractProver<T2> {
 
   @SuppressWarnings("resource")
   @Override
-  public Model getModelImpl() throws SolverException {
+  protected Model getModelImpl() throws SolverException {
     return new CachingModel(new Mathsat5Model(getMsatModel(), creator, this));
   }
 
@@ -158,7 +158,7 @@ abstract class Mathsat5AbstractProver<T2> extends AbstractProver<T2> {
 
   @SuppressWarnings("resource")
   @Override
-  public Evaluator getEvaluatorImpl() {
+  protected Evaluator getEvaluatorImpl() {
     return registerEvaluator(new Mathsat5Evaluator(this, creator, curEnv));
   }
 
