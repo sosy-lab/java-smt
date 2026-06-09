@@ -32,7 +32,6 @@ import ap.types.Sort;
 import ap.types.Sort.Integer$;
 import java.util.Arrays;
 import org.junit.Test;
-import org.sosy_lab.java_smt.solvers.princess.EldaricaHornProver;
 import org.sosy_lab.java_smt.solvers.princess.eldarica.PrincessHornConverter;
 import scala.collection.immutable.Seq;
 import scala.collection.immutable.Seq$;
