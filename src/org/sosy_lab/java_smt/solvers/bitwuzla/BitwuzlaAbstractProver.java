@@ -181,8 +181,7 @@ abstract class BitwuzlaAbstractProver<T> extends AbstractProverWithAllSat<T> {
    * returned <code>false</code>.
    */
   @Override
-  public List<BooleanFormula> getUnsatCore() {
-    checkGenerateUnsatCores();
+  public List<BooleanFormula> getUnsatCoreImpl() {
     return Lists.transform(env.get_unsat_core(), creator::encapsulateBoolean);
   }
 

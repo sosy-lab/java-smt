@@ -211,8 +211,7 @@ class CVC4TheoremProver extends AbstractProverWithAllSat<Void>
   }
 
   @Override
-  public List<BooleanFormula> getUnsatCore() {
-    checkGenerateUnsatCores();
+  public List<BooleanFormula> getUnsatCoreImpl() {
     List<BooleanFormula> converted = new ArrayList<>();
     for (Expr aCore : smtEngine.getUnsatCore()) {
       converted.add(creator.encapsulateBoolean(exportExpr(aCore)));

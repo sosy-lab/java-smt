@@ -325,6 +325,19 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
   }
 
   @Override
+  public final List<BooleanFormula> getUnsatCore() {
+    checkGenerateUnsatCores();
+    return getUnsatCoreImpl();
+  }
+
+  /**
+   * @implSpec override and implement if a solver supports UNSAT-CORE generation.
+   */
+  public List<BooleanFormula> getUnsatCoreImpl() {
+    throw new UnsupportedOperationException(UNSAT_CORE_NOT_SUPPORTED);
+  }
+
+  @Override
   public void close() {
     assertedFormulas.clear();
     closeAllEvaluators();

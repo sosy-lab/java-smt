@@ -77,9 +77,9 @@ class LoggingSmtInterpolInterpolatingProver extends SmtInterpolInterpolatingProv
   }
 
   @Override
-  public List<BooleanFormula> getUnsatCore() {
+  public List<BooleanFormula> getUnsatCoreImpl() {
     out.println("(get-unsat-core)");
-    return super.getUnsatCore();
+    return super.getUnsatCoreImpl();
   }
 
   @Override

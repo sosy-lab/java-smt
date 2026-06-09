@@ -143,11 +143,6 @@ class BoolectorTheoremProver extends AbstractProverWithAllSat<Void> implements P
   }
 
   @Override
-  public List<BooleanFormula> getUnsatCore() {
-    throw new UnsupportedOperationException(UNSAT_CORE_NOT_SUPPORTED);
-  }
-
-  @Override
   public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(
       Collection<BooleanFormula> pAssumptions) throws SolverException, InterruptedException {
     throw new UnsupportedOperationException(UNSAT_CORE_WITH_ASSUMPTIONS_NOT_SUPPORTED);
