@@ -73,7 +73,7 @@ public class PrincessHornConverter {
         return flattenAnd(input);
       }
 
-      throw new IllegalArgumentException("Illegal horn clause: " + input);
+      return List.of(toFormula(input));
     }
 
     private List<IFormula> flattenAnd(final IBinFormula input) {
@@ -177,6 +177,15 @@ public class PrincessHornConverter {
       return new IEquation(toTerm(equation.left()), toTerm(equation.right()));
     }
 
+    private IBinFormula toFormula(final IBinFormula bin) {
+      return new IBinFormula(bin.j(), toFormula(bin.f1()),
+          toFormula(bin.f2()));
+    }
+
+    private INot toFormula(final INot not) {
+      return new INot(toFormula(not.subformula()));
+    }
+
     private IFormula toFormula(final IFormula formula) {
       if (formula instanceof IAtom atom) {
         return toFormula(atom);
@@ -186,6 +195,12 @@ public class PrincessHornConverter {
       }
       if (formula instanceof IEquation equation) {
         return toFormula(equation);
+      }
+      if (formula instanceof IBinFormula bin) {
+        return toFormula(bin);
+      }
+      if (formula instanceof INot bin) {
+        return toFormula(bin);
       }
 
       return formula;
