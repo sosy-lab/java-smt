@@ -172,8 +172,8 @@ abstract class PrincessAbstractProver<E> extends AbstractProverWithAllSat<E> {
   }
 
   @Override
-  public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(
-      Collection<BooleanFormula> assumptions) {
+  protected Optional<List<BooleanFormula>> unsatCoreOverAssumptionsImpl(
+      Collection<BooleanFormula> pAssumptions) {
     throw new UnsupportedOperationException(UNSAT_CORE_WITH_ASSUMPTIONS_NOT_SUPPORTED);
   }
 

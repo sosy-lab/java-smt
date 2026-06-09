@@ -251,9 +251,8 @@ abstract class Yices2AbstractProver<T> extends AbstractProverWithAllSat<T>
   }
 
   @Override
-  public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(
+  protected Optional<List<BooleanFormula>> unsatCoreOverAssumptionsImpl(
       Collection<BooleanFormula> pAssumptions) throws SolverException, InterruptedException {
-    checkGenerateUnsatCoresOverAssumptions();
     boolean sat = !isUnsatWithAssumptions(pAssumptions);
     return sat ? Optional.empty() : Optional.of(encapsulate(curEnv.getUnsatCore()));
   }

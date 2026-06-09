@@ -188,9 +188,8 @@ abstract class Z3AbstractProver extends AbstractProverWithAllSat<Void> {
   }
 
   @Override
-  public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(
+  protected Optional<List<BooleanFormula>> unsatCoreOverAssumptionsImpl(
       Collection<BooleanFormula> assumptions) throws SolverException, InterruptedException {
-    checkGenerateUnsatCoresOverAssumptions();
     if (!isUnsatWithAssumptions(assumptions)) {
       return Optional.empty();
     }

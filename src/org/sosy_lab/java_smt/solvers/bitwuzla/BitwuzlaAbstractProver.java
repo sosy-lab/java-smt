@@ -8,7 +8,6 @@
 
 package org.sosy_lab.java_smt.solvers.bitwuzla;
 
-import com.google.common.base.Preconditions;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.Lists;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
@@ -194,11 +193,8 @@ abstract class BitwuzlaAbstractProver<T> extends AbstractProverWithAllSat<T> {
    *     assumptions which is unsatisfiable with the original constraints otherwise.
    */
   @Override
-  public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(
+  protected Optional<List<BooleanFormula>> unsatCoreOverAssumptionsImpl(
       Collection<BooleanFormula> assumptions) throws SolverException, InterruptedException {
-    Preconditions.checkNotNull(assumptions);
-    checkGenerateUnsatCoresOverAssumptions();
-
     changedSinceLastSatQuery = true;
 
     Collection<Term> newAssumptions = new LinkedHashSet<>();

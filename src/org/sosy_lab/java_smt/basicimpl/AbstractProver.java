@@ -25,6 +25,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.Set;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.java_smt.api.BasicProverEnvironment;
@@ -86,18 +87,23 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
   }
 
   protected final void checkGenerateUnsatCores() {
+    // TODO: should this close all evaluators as well?
     Preconditions.checkState(generateUnsatCores, TEMPLATE, ProverOptions.GENERATE_UNSAT_CORE);
     Preconditions.checkState(!closed);
     Preconditions.checkState(!changedSinceLastSatQuery);
     Preconditions.checkState(!wasLastSatCheckSatisfiable);
   }
 
-  protected final void checkGenerateUnsatCoresOverAssumptions() {
+  protected final void checkGenerateUnsatCoresOverAssumptions(
+      Collection<BooleanFormula> assumptions) {
+    // TODO: should this close all evaluators as well?
     Preconditions.checkState(!closed);
+    Preconditions.checkNotNull(assumptions);
     Preconditions.checkState(
         generateUnsatCoresOverAssumptions,
         TEMPLATE,
         ProverOptions.GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS);
+    // TODO: why is there no check for changedSinceLastSatQuery or wasLastSatCheckSatisfiable?
   }
 
   /**
@@ -109,6 +115,7 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
   }
 
   private void checkGenerateInterpolants() {
+    // TODO: should this close all evaluators as well?
     Preconditions.checkState(!closed);
     Preconditions.checkState(
         !changedSinceLastSatQuery,
@@ -333,9 +340,26 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
   /**
    * @implSpec override and implement if a solver supports UNSAT-CORE generation.
    */
-  public List<BooleanFormula> getUnsatCoreImpl() {
+  protected List<BooleanFormula> getUnsatCoreImpl() {
     throw new UnsupportedOperationException(UNSAT_CORE_NOT_SUPPORTED);
   }
+
+  @Override
+  public final Optional<List<BooleanFormula>> unsatCoreOverAssumptions(
+      Collection<BooleanFormula> assumptions) throws SolverException, InterruptedException {
+    checkGenerateUnsatCoresOverAssumptions(assumptions);
+    return unsatCoreOverAssumptionsImpl(assumptions);
+  }
+
+  /**
+   * TODO: once javac does not complain if we use a default impl here, add one.
+   *
+   * @implSpec override and implement if a solver supports the generation of UNSAT-COREs over
+   *     assumptions. Else, override and throw a {@link UnsupportedOperationException} with {@link
+   *     BasicProverEnvironment#UNSAT_CORE_WITH_ASSUMPTIONS_NOT_SUPPORTED}
+   */
+  protected abstract Optional<List<BooleanFormula>> unsatCoreOverAssumptionsImpl(
+      Collection<BooleanFormula> assumptions) throws SolverException, InterruptedException;
 
   @Override
   public void close() {

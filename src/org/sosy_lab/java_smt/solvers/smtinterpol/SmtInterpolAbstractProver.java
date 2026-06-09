@@ -186,9 +186,8 @@ abstract class SmtInterpolAbstractProver<T> extends AbstractProver<T> {
   }
 
   @Override
-  public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(
+  protected Optional<List<BooleanFormula>> unsatCoreOverAssumptionsImpl(
       Collection<BooleanFormula> assumptions) throws InterruptedException, SolverException {
-    checkGenerateUnsatCoresOverAssumptions();
     Map<String, BooleanFormula> annotatedConstraints = new LinkedHashMap<>();
     push();
     for (BooleanFormula assumption : assumptions) {
