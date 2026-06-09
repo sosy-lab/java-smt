@@ -82,6 +82,7 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
   }
 
   protected final void checkGenerateAllSat() {
+    // TODO: should this close all evaluators as well?
     Preconditions.checkState(!closed);
     Preconditions.checkState(generateAllSat, TEMPLATE, ProverOptions.GENERATE_ALL_SAT);
   }
@@ -360,6 +361,16 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
    */
   protected abstract Optional<List<BooleanFormula>> unsatCoreOverAssumptionsImpl(
       Collection<BooleanFormula> assumptions) throws SolverException, InterruptedException;
+
+  @Override
+  public final <R> R allSat(AllSatCallback<R> callback, List<BooleanFormula> important)
+      throws InterruptedException, SolverException {
+    checkGenerateAllSat();
+    return allSatImpl(callback, important);
+  }
+
+  protected abstract <R> R allSatImpl(AllSatCallback<R> callback, List<BooleanFormula> important)
+      throws InterruptedException, SolverException;
 
   @Override
   public void close() {

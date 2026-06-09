@@ -233,9 +233,8 @@ abstract class Mathsat5AbstractProver<T2> extends AbstractProver<T2> {
   }
 
   @Override
-  public <T> T allSat(AllSatCallback<T> callback, List<BooleanFormula> important)
+  protected <T> T allSatImpl(AllSatCallback<T> callback, List<BooleanFormula> important)
       throws InterruptedException, SolverException {
-    checkGenerateAllSat();
     closeAllEvaluators();
 
     long[] imp = new long[important.size()];

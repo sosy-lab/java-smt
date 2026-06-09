@@ -83,10 +83,10 @@ class LoggingSmtInterpolInterpolatingProver extends SmtInterpolInterpolatingProv
   }
 
   @Override
-  public <R> R allSat(AllSatCallback<R> callback, List<BooleanFormula> predicates)
+  protected <R> R allSatImpl(AllSatCallback<R> callback, List<BooleanFormula> predicates)
       throws InterruptedException, SolverException {
     out.println("(all-sat (" + Joiner.on(", ").join(predicates) + "))");
-    return super.allSat(callback, predicates);
+    return super.allSatImpl(callback, predicates);
   }
 
   @Override
