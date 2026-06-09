@@ -152,7 +152,6 @@ abstract class Mathsat5AbstractProver<T2> extends AbstractProver<T2> {
    * @throws SolverException if an expected MathSAT failure occurs
    */
   protected long getMsatModel() throws SolverException {
-    checkGenerateModels();
     return Mathsat5NativeApi.msat_get_model(curEnv);
   }
 
