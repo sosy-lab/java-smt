@@ -31,6 +31,7 @@ import org.sosy_lab.java_smt.api.BasicProverEnvironment;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Evaluator;
 import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
+import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.OptimizationProverEnvironment;
 import org.sosy_lab.java_smt.api.OptimizationProverEnvironment.OptStatus;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
@@ -285,6 +286,24 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
       }
     }
     return builder.buildOrThrow();
+  }
+
+  @Override
+  public final Model getModel() throws SolverException {
+    checkGenerateModels();
+    return getModelImpl();
+  }
+
+  public abstract Model getModelImpl() throws SolverException;
+
+  @Override
+  public final Evaluator getEvaluator() throws SolverException {
+    checkGenerateModels();
+    return getEvaluatorImpl();
+  }
+
+  public Evaluator getEvaluatorImpl() throws SolverException {
+    return getModel();
   }
 
   /**

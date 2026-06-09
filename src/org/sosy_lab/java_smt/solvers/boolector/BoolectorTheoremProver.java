@@ -127,8 +127,7 @@ class BoolectorTheoremProver extends AbstractProverWithAllSat<Void> implements P
   }
 
   @Override
-  public Model getModel() throws SolverException {
-    checkGenerateModels();
+  public Model getModelImpl() throws SolverException {
     return getEvaluatorWithoutChecks();
   }
 

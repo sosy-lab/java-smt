@@ -165,8 +165,7 @@ abstract class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
 
   @SuppressWarnings("resource")
   @Override
-  public CVC5Model getModel() throws SolverException {
-    checkGenerateModels();
+  public CVC5Model getModelImpl() throws SolverException {
     // special case for CVC5: Models are not permanent and need to be closed
     // before any change is applied to the prover stack. So, we register the Model as Evaluator.
     return registerEvaluator(
@@ -175,8 +174,7 @@ abstract class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
   }
 
   @Override
-  public Evaluator getEvaluator() {
-    checkGenerateModels();
+  public Evaluator getEvaluatorImpl() {
     return getEvaluatorWithoutChecks();
   }
 

@@ -165,8 +165,7 @@ abstract class BitwuzlaAbstractProver<T> extends AbstractProverWithAllSat<T> {
    */
   @SuppressWarnings("resource")
   @Override
-  public Model getModel() throws SolverException {
-    checkGenerateModels();
+  public Model getModelImpl() throws SolverException {
     // special case for Bitwuzla: Models are not permanent and need to be closed
     // before any change is applied to the prover stack. So, we register the Model as Evaluator.
     return registerEvaluator(
