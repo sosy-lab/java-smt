@@ -155,7 +155,7 @@ class CVC4TheoremProver extends AbstractProverWithAllSat<Void>
   }
 
   @Override
-  public Evaluator getEvaluatorImpl() {
+  protected Evaluator getEvaluatorImpl() {
     return getEvaluatorWithoutChecks();
   }
 
