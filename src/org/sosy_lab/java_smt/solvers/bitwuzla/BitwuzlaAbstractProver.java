@@ -131,7 +131,7 @@ abstract class BitwuzlaAbstractProver<T> extends AbstractProverWithAllSat<T> {
       return false;
     } else if (resultValue == Result.UNSAT) {
       return true;
-    } else if (resultValue == Result.UNKNOWN && contextShutdownNotifier.shouldShutdown()) {
+    } else if (resultValue == Result.UNKNOWN && shouldShutdown()) {
       throw new InterruptedException();
     } else {
       throw new SolverException("Bitwuzla returned UNKNOWN.");

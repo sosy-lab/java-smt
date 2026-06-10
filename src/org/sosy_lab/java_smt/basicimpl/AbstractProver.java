@@ -127,6 +127,10 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
     contextShutdownNotifier.shutdownIfNecessary();
   }
 
+  protected final boolean shouldShutdown() {
+    return contextShutdownNotifier.shouldShutdown();
+  }
+
   private void checkGenerateInterpolants() throws InterruptedException {
     // TODO: should this close all evaluators as well?
     Preconditions.checkState(!closed);
