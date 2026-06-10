@@ -65,7 +65,7 @@ public abstract class AbstractProverWithAllSat<T> extends AbstractProver<T> {
       throws SolverException, InterruptedException {
     final Set<ImmutableList<BooleanFormula>> modelEvaluations = new LinkedHashSet<>();
     while (!isUnsat()) {
-      contextShutdownNotifier.shutdownIfNecessary();
+      shutdownIfNecessary();
 
       ImmutableList.Builder<BooleanFormula> valuesOfModel = ImmutableList.builder();
       try (Evaluator evaluator = getEvaluatorWithoutChecks()) {
@@ -90,11 +90,11 @@ public abstract class AbstractProverWithAllSat<T> extends AbstractProver<T> {
           "The model evaluation %s was found before. ALLSAT computation did not make progress.",
           values);
       callback.apply(values);
-      contextShutdownNotifier.shutdownIfNecessary();
+      shutdownIfNecessary();
 
       BooleanFormula negatedModel = bmgr.not(bmgr.and(values));
       addConstraint(negatedModel);
-      contextShutdownNotifier.shutdownIfNecessary();
+      shutdownIfNecessary();
     }
   }
 
@@ -115,7 +115,7 @@ public abstract class AbstractProverWithAllSat<T> extends AbstractProver<T> {
       Deque<BooleanFormula> valuesOfModel)
       throws SolverException, InterruptedException {
 
-    contextShutdownNotifier.shutdownIfNecessary();
+    shutdownIfNecessary();
 
     if (isUnsat()) {
       return;
@@ -136,7 +136,7 @@ public abstract class AbstractProverWithAllSat<T> extends AbstractProver<T> {
       valuesOfModel.pop();
 
       // negated predicate
-      contextShutdownNotifier.shutdownIfNecessary();
+      shutdownIfNecessary();
       final BooleanFormula notPredicate = bmgr.not(predicates.get(0));
       valuesOfModel.push(notPredicate);
       push(notPredicate);

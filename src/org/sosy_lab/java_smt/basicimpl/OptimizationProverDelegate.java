@@ -39,29 +39,33 @@ public class OptimizationProverDelegate implements OptimizationProverEnvironment
 
   @SuppressWarnings("resource")
   @Override
-  public int maximize(Formula objective) {
+  public int maximize(Formula objective) throws InterruptedException {
     getDelegateAsAbstractProver().checkClosed();
+    getDelegateAsAbstractProver().shutdownIfNecessary();
     return optimizationProver.maximize(objective);
   }
 
   @SuppressWarnings("resource")
   @Override
-  public int minimize(Formula objective) {
+  public int minimize(Formula objective) throws InterruptedException {
     getDelegateAsAbstractProver().checkClosed();
+    getDelegateAsAbstractProver().shutdownIfNecessary();
     return optimizationProver.minimize(objective);
   }
 
   @SuppressWarnings("resource")
   @Override
-  public Optional<Rational> upper(int handle, Rational epsilon) {
+  public Optional<Rational> upper(int handle, Rational epsilon) throws InterruptedException {
     getDelegateAsAbstractProver().checkGenerateModels();
+    getDelegateAsAbstractProver().shutdownIfNecessary();
     return optimizationProver.upper(handle, epsilon);
   }
 
   @SuppressWarnings("resource")
   @Override
-  public Optional<Rational> lower(int handle, Rational epsilon) {
+  public Optional<Rational> lower(int handle, Rational epsilon) throws InterruptedException {
     getDelegateAsAbstractProver().checkGenerateModels();
+    getDelegateAsAbstractProver().shutdownIfNecessary();
     return optimizationProver.lower(handle, epsilon);
   }
 

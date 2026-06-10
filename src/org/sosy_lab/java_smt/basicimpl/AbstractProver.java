@@ -119,10 +119,14 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
     Preconditions.checkState(!closed);
   }
 
+  protected final void shutdownIfNecessary() throws InterruptedException {
+    contextShutdownNotifier.shutdownIfNecessary();
+  }
+
   private void checkGenerateInterpolants() throws InterruptedException {
     // TODO: should this close all evaluators as well?
     Preconditions.checkState(!closed);
-    contextShutdownNotifier.shutdownIfNecessary();
+    shutdownIfNecessary();
     Preconditions.checkState(
         !changedSinceLastSatQuery,
         "Interpolants can only be calculated right after a call to isUnsat()");
@@ -195,7 +199,7 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
   @Override
   public final void pop() throws InterruptedException {
     checkState(!closed);
-    contextShutdownNotifier.shutdownIfNecessary();
+    shutdownIfNecessary();
     checkState(assertedFormulas.size() > 1, "initial level must remain until close");
     assertedFormulas.remove(assertedFormulas.size() - 1); // remove last
     popImpl();
@@ -208,7 +212,7 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
   @CanIgnoreReturnValue
   public final @Nullable T addConstraint(BooleanFormula constraint) throws InterruptedException {
     checkState(!closed);
-    contextShutdownNotifier.shutdownIfNecessary();
+    shutdownIfNecessary();
     T t = addConstraintImpl(constraint);
     setChanged();
     Iterables.getLast(assertedFormulas).put(constraint, t);
@@ -249,6 +253,7 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
    */
   public final OptStatus check() throws InterruptedException, SolverException {
     checkState(!closed);
+    shutdownIfNecessary();
     wasLastSatCheckSatisfiable = false;
     changedSinceLastSatQuery = false;
     final OptStatus status = checkImpl();

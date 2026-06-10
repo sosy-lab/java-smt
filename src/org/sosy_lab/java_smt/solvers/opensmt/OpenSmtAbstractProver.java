@@ -210,7 +210,7 @@ abstract class OpenSmtAbstractProver<T> extends AbstractProverWithAllSat<T> {
     sstat result;
     try (ShutdownHook listener =
         new ShutdownHook(contextShutdownNotifier, osmtSolver::notifyStop)) {
-      contextShutdownNotifier.shutdownIfNecessary();
+      shutdownIfNecessary();
       try {
         result = osmtSolver.check();
       } catch (Exception e) {
@@ -229,7 +229,7 @@ abstract class OpenSmtAbstractProver<T> extends AbstractProverWithAllSat<T> {
           throw new SolverException("OpenSMT crashed while checking satisfiability.", e);
         }
       }
-      contextShutdownNotifier.shutdownIfNecessary();
+      shutdownIfNecessary();
     }
 
     if (result.equals(sstat.Error())) {
