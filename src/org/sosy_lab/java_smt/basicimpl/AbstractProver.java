@@ -187,6 +187,7 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
   @Override
   public int size() {
     checkState(!closed);
+    // TODO: can the solver calls used in the implementations cause interrupts?
     return assertedFormulas.size() - 1;
   }
 
