@@ -43,9 +43,9 @@ class PrincessInterpolatingProver extends PrincessAbstractProver<Integer>
       PrincessFormulaManager pMgr,
       PrincessFormulaCreator creator,
       SimpleAPI pApi,
-      ShutdownNotifier pShutdownNotifier,
+      ShutdownNotifier pContextShutdownNotifier,
       Set<ProverOptions> pOptions) {
-    super(pMgr, creator, pApi, pShutdownNotifier, pOptions);
+    super(pMgr, creator, pApi, pContextShutdownNotifier, pOptions);
   }
 
   @Override

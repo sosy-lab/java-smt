@@ -55,10 +55,10 @@ abstract class BitwuzlaAbstractProver<T> extends AbstractProverWithAllSat<T> {
   BitwuzlaAbstractProver(
       BitwuzlaFormulaManager pManager,
       BitwuzlaFormulaCreator pCreator,
-      ShutdownNotifier pShutdownNotifier,
+      ShutdownNotifier pContextShutdownNotifier,
       Set<ProverOptions> pOptions,
       Options pSolverOptions) {
-    super(pOptions, pManager.getBooleanFormulaManager(), pShutdownNotifier);
+    super(pOptions, pManager.getBooleanFormulaManager(), pContextShutdownNotifier);
     creator = pCreator;
 
     // Bitwuzla guarantees that Terms and Sorts are shared

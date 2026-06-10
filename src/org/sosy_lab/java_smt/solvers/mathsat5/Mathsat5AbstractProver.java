@@ -57,19 +57,17 @@ abstract class Mathsat5AbstractProver<T2> extends AbstractProver<T2> {
   protected final long curEnv;
   private final long curConfig;
   protected final Mathsat5FormulaCreator creator;
-  private final ShutdownNotifier shutdownNotifier;
 
   protected Mathsat5AbstractProver(
       Mathsat5SolverContext pContext,
       Set<ProverOptions> pOptions,
       Mathsat5FormulaCreator pCreator,
-      ShutdownNotifier pShutdownNotifier) {
-    super(pOptions, pShutdownNotifier);
+      ShutdownNotifier pContextShutdownNotifier) {
+    super(pOptions, pContextShutdownNotifier);
     context = pContext;
     creator = pCreator;
     curConfig = buildConfig(pOptions);
     curEnv = context.createEnvironment(curConfig);
-    shutdownNotifier = pShutdownNotifier;
   }
 
   private long buildConfig(Set<ProverOptions> opts) {
@@ -268,7 +266,7 @@ abstract class Mathsat5AbstractProver<T2> extends AbstractProver<T2> {
 
     @Override
     public void callback(long[] model) throws InterruptedException {
-      shutdownNotifier.shutdownIfNecessary();
+      contextShutdownNotifier.shutdownIfNecessary();
       clientCallback.apply(Longs.asList(model).stream().map(creator::encapsulateBoolean).toList());
     }
   }

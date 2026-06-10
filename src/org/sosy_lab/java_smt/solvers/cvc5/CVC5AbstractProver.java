@@ -64,12 +64,12 @@ abstract class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
 
   CVC5AbstractProver(
       CVC5FormulaCreator pFormulaCreator,
-      ShutdownNotifier pShutdownNotifier,
+      ShutdownNotifier pContextShutdownNotifier,
       int pRandomSeed,
       ImmutableSet<ProverOptions> pOptions,
       FormulaManager pMgr,
       ImmutableMap<String, String> pFurtherOptionsMap) {
-    super(pOptions, pMgr.getBooleanFormulaManager(), pShutdownNotifier);
+    super(pOptions, pMgr.getBooleanFormulaManager(), pContextShutdownNotifier);
 
     creator = pFormulaCreator;
     furtherOptionsMap = pFurtherOptionsMap;

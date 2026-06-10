@@ -51,7 +51,6 @@ abstract class SmtInterpolAbstractProver<T> extends AbstractProver<T> {
   protected final FormulaCreator<Term, Sort, Script, FunctionSymbol> creator;
   protected final SmtInterpolFormulaManager mgr;
   protected final Deque<PersistentMap<String, BooleanFormula>> annotatedTerms = new ArrayDeque<>();
-  protected final ShutdownNotifier shutdownNotifier;
 
   private static final String PREFIX = "term_"; // for termnames
   private static final UniqueIdGenerator termIdGenerator =
@@ -61,12 +60,11 @@ abstract class SmtInterpolAbstractProver<T> extends AbstractProver<T> {
       SmtInterpolFormulaManager pMgr,
       Script pEnv,
       Set<ProverOptions> options,
-      ShutdownNotifier pShutdownNotifier) {
-    super(options, pShutdownNotifier);
+      ShutdownNotifier pContextShutdownNotifier) {
+    super(options, pContextShutdownNotifier);
     mgr = pMgr;
     creator = pMgr.getFormulaCreator();
     env = pEnv;
-    shutdownNotifier = pShutdownNotifier;
     annotatedTerms.add(PathCopyingPersistentTreeMap.of());
   }
 
@@ -111,7 +109,7 @@ abstract class SmtInterpolAbstractProver<T> extends AbstractProver<T> {
     // by using a shutdown listener. However, SmtInterpol resets the
     // mStopEngine flag in DPLLEngine before starting to solve,
     // so we check here, too.
-    shutdownNotifier.shutdownIfNecessary();
+    contextShutdownNotifier.shutdownIfNecessary();
 
     LBool result = env.checkSat();
     return switch (result) {
@@ -127,7 +125,7 @@ abstract class SmtInterpolAbstractProver<T> extends AbstractProver<T> {
               // SMTInterpol catches OOM, but we want to have it thrown.
               throw new OutOfMemoryError("Out of memory during SMTInterpol operation");
           case CANCELLED -> {
-            shutdownNotifier.shutdownIfNecessary(); // expected if we requested termination
+            contextShutdownNotifier.shutdownIfNecessary(); // expected if we requested termination
             throw new SMTLIBException("checkSat returned UNKNOWN with unexpected reason " + reason);
           }
           default ->
@@ -235,7 +233,7 @@ abstract class SmtInterpolAbstractProver<T> extends AbstractProver<T> {
     // by using a shutdown listener. However, SmtInterpol resets the
     // mStopEngine flag in DPLLEngine before starting to solve,
     // so we check here, too.
-    shutdownNotifier.shutdownIfNecessary();
+    contextShutdownNotifier.shutdownIfNecessary();
     for (Term[] model : env.checkAllsat(importantTerms)) {
       callback.apply(Collections3.transformedImmutableListCopy(model, creator::encapsulateBoolean));
     }

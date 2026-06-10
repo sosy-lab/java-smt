@@ -47,10 +47,10 @@ abstract class OpenSmtAbstractProver<T> extends AbstractProverWithAllSat<T> {
   OpenSmtAbstractProver(
       OpenSmtFormulaCreator pFormulaCreator,
       FormulaManager pMgr,
-      ShutdownNotifier pShutdownNotifier,
+      ShutdownNotifier pContextShutdownNotifier,
       SMTConfig pConfig,
       Set<ProverOptions> pOptions) {
-    super(pOptions, pMgr.getBooleanFormulaManager(), pShutdownNotifier);
+    super(pOptions, pMgr.getBooleanFormulaManager(), pContextShutdownNotifier);
 
     creator = pFormulaCreator;
 

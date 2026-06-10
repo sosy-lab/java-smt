@@ -28,8 +28,8 @@ class Z3LegacyTheoremProver extends Z3LegacyAbstractProver<Void> implements Prov
       Set<ProverOptions> pOptions,
       ImmutableMap<String, Object> pSolverOptions,
       @Nullable PathCounterTemplate pLogfile,
-      ShutdownNotifier pShutdownNotifier) {
-    super(creator, pMgr, pOptions, pLogfile, pShutdownNotifier);
+      ShutdownNotifier pContextShutdownNotifier) {
+    super(creator, pMgr, pOptions, pLogfile, pContextShutdownNotifier);
     long z3params = Native.mkParams(z3context);
     Native.paramsIncRef(z3context, z3params);
     for (Entry<String, Object> entry : pSolverOptions.entrySet()) {

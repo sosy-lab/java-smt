@@ -54,10 +54,10 @@ class Mathsat5InterpolatingProver extends Mathsat5AbstractProver<Integer>
 
   Mathsat5InterpolatingProver(
       Mathsat5SolverContext pMgr,
-      ShutdownNotifier pShutdownNotifier,
+      ShutdownNotifier pContextShutdownNotifier,
       Mathsat5FormulaCreator creator,
       Set<ProverOptions> options) {
-    super(pMgr, options, creator, pShutdownNotifier);
+    super(pMgr, options, creator, pContextShutdownNotifier);
   }
 
   @Override

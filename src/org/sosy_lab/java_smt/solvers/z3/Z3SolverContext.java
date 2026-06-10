@@ -51,7 +51,7 @@ import org.sosy_lab.java_smt.basicimpl.AbstractSolverContext;
 public final class Z3SolverContext extends AbstractSolverContext {
 
   private final ShutdownRequestListener interruptListener;
-  private final ShutdownNotifier shutdownNotifier;
+  private final ShutdownNotifier contextShutdownNotifier;
   private final LogManager logger;
   private final ExtraOptions extraOptions;
   private final Z3FormulaCreator creator;
@@ -235,7 +235,7 @@ public final class Z3SolverContext extends AbstractSolverContext {
 
   private Z3SolverContext(
       Z3FormulaCreator pFormulaCreator,
-      ShutdownNotifier pShutdownNotifier,
+      ShutdownNotifier pContextShutdownNotifier,
       LogManager pLogger,
       Z3FormulaManager pManager,
       ExtraOptions pExtraOptions) {
@@ -243,8 +243,8 @@ public final class Z3SolverContext extends AbstractSolverContext {
 
     creator = pFormulaCreator;
     interruptListener = reason -> Native.interrupt(pFormulaCreator.getEnv());
-    shutdownNotifier = pShutdownNotifier;
-    pShutdownNotifier.register(interruptListener);
+    contextShutdownNotifier = pContextShutdownNotifier;
+    pContextShutdownNotifier.register(interruptListener);
     logger = pLogger;
     manager = pManager;
     extraOptions = pExtraOptions;
@@ -259,7 +259,7 @@ public final class Z3SolverContext extends AbstractSolverContext {
   public static synchronized Z3SolverContext create(
       LogManager logger,
       Configuration config,
-      ShutdownNotifier pShutdownNotifier,
+      ShutdownNotifier pContextShutdownNotifier,
       @Nullable PathCounterTemplate solverLogfile,
       long randomSeed,
       FloatingPointRoundingMode pFloatingPointRoundingMode,
@@ -322,7 +322,7 @@ public final class Z3SolverContext extends AbstractSolverContext {
             stringSort,
             regexSort,
             config,
-            pShutdownNotifier);
+            pContextShutdownNotifier);
 
     // Create managers
     Z3UFManager functionTheory = new Z3UFManager(creator);
@@ -358,7 +358,7 @@ public final class Z3SolverContext extends AbstractSolverContext {
             arrayManager,
             stringTheory,
             enumTheory);
-    return new Z3SolverContext(creator, pShutdownNotifier, logger, manager, extraOptions);
+    return new Z3SolverContext(creator, pContextShutdownNotifier, logger, manager, extraOptions);
   }
 
   @Override
@@ -372,7 +372,7 @@ public final class Z3SolverContext extends AbstractSolverContext {
         options,
         buildSolverOptions(options),
         extraOptions.logfile,
-        shutdownNotifier);
+        contextShutdownNotifier);
   }
 
   @Override
@@ -394,7 +394,7 @@ public final class Z3SolverContext extends AbstractSolverContext {
         options,
         buildOptimizationSolverOptions(),
         extraOptions.logfile,
-        shutdownNotifier);
+        contextShutdownNotifier);
   }
 
   @Override
@@ -417,7 +417,7 @@ public final class Z3SolverContext extends AbstractSolverContext {
     if (!closed.getAndSet(true)) {
       long context = creator.getEnv();
       creator.forceClose();
-      shutdownNotifier.unregister(interruptListener);
+      contextShutdownNotifier.unregister(interruptListener);
       Native.closeLog();
       Native.delContext(context);
     }

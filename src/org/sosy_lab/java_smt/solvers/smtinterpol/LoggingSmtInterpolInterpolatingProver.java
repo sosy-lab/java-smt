@@ -37,10 +37,10 @@ class LoggingSmtInterpolInterpolatingProver extends SmtInterpolInterpolatingProv
       SmtInterpolFormulaManager pMgr,
       Script pScript,
       Set<ProverOptions> pOptions,
-      ShutdownNotifier pShutdownNotifier,
+      ShutdownNotifier pContextShutdownNotifier,
       Map<String, Object> pGlobalOptions,
       Path pLogfile) {
-    super(pMgr, pScript, pOptions, pShutdownNotifier);
+    super(pMgr, pScript, pOptions, pContextShutdownNotifier);
     try {
       out = initializeLoggerForInterpolation(pGlobalOptions, pLogfile);
     } catch (IOException e) {

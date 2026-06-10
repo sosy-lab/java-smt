@@ -60,8 +60,8 @@ abstract class Z3LegacyAbstractProver<T> extends AbstractProverWithAllSat<T> {
       Z3LegacyFormulaManager pMgr,
       Set<ProverOptions> pOptions,
       @Nullable PathCounterTemplate pLogfile,
-      ShutdownNotifier pShutdownNotifier) {
-    super(pOptions, pMgr.getBooleanFormulaManager(), pShutdownNotifier);
+      ShutdownNotifier pContextShutdownNotifier) {
+    super(pOptions, pMgr.getBooleanFormulaManager(), pContextShutdownNotifier);
     creator = pCreator;
     z3context = creator.getEnv();
     z3solver = Native.mkSolver(z3context);
@@ -239,7 +239,7 @@ abstract class Z3LegacyAbstractProver<T> extends AbstractProverWithAllSat<T> {
   private void undefinedStatusToException(int solverStatus)
       throws SolverException, InterruptedException {
     if (solverStatus == Z3_lbool.Z3_L_UNDEF.toInt()) {
-      creator.shutdownNotifier.shutdownIfNecessary();
+      creator.contextShutdownNotifier.shutdownIfNecessary();
       final String reason = Native.solverGetReasonUnknown(z3context, z3solver);
       switch (reason) {
         // see Z3:

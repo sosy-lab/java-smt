@@ -59,8 +59,8 @@ abstract class Z3AbstractProver extends AbstractProverWithAllSat<Void> {
       Engine pEngine,
       Set<ProverOptions> pOptions,
       @Nullable PathCounterTemplate pLogfile,
-      ShutdownNotifier pShutdownNotifier) {
-    super(pOptions, pMgr.getBooleanFormulaManager(), pShutdownNotifier);
+      ShutdownNotifier pContextShutdownNotifier) {
+    super(pOptions, pMgr.getBooleanFormulaManager(), pContextShutdownNotifier);
     creator = pCreator;
     z3context = creator.getEnv();
     logic = pLogic;

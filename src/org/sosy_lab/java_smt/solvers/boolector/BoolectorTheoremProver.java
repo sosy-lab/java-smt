@@ -41,14 +41,14 @@ class BoolectorTheoremProver extends AbstractProverWithAllSat<Void> implements P
       BoolectorFormulaManager manager,
       BoolectorFormulaCreator creator,
       long btor,
-      ShutdownNotifier pShutdownNotifier,
+      ShutdownNotifier pContextShutdownNotifier,
       Set<ProverOptions> pOptions,
       AtomicBoolean pIsAnyStackAlive) {
-    super(pOptions, manager.getBooleanFormulaManager(), pShutdownNotifier);
+    super(pOptions, manager.getBooleanFormulaManager(), pContextShutdownNotifier);
     this.manager = manager;
     this.creator = creator;
     this.btor = btor;
-    terminationCallback = pShutdownNotifier::shouldShutdown;
+    terminationCallback = pContextShutdownNotifier::shouldShutdown;
     terminationCallbackHelper = addTerminationCallback();
 
     isAnyStackAlive = pIsAnyStackAlive;

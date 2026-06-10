@@ -58,11 +58,11 @@ class CVC4TheoremProver extends AbstractProverWithAllSat<Void>
 
   CVC4TheoremProver(
       CVC4FormulaCreator pFormulaCreator,
-      ShutdownNotifier pShutdownNotifier,
+      ShutdownNotifier pContextShutdownNotifier,
       int pRandomSeed,
       Set<ProverOptions> pOptions,
       BooleanFormulaManager pBmgr) {
-    super(pOptions, pBmgr, pShutdownNotifier);
+    super(pOptions, pBmgr, pContextShutdownNotifier);
 
     creator = pFormulaCreator;
     randomSeed = pRandomSeed;

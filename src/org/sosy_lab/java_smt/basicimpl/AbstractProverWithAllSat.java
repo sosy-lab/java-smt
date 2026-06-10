@@ -34,8 +34,8 @@ public abstract class AbstractProverWithAllSat<T> extends AbstractProver<T> {
   protected AbstractProverWithAllSat(
       Set<ProverOptions> pOptions,
       BooleanFormulaManager pBmgr,
-      ShutdownNotifier pShutdownNotifier) {
-    super(pOptions, pShutdownNotifier);
+      ShutdownNotifier pContextShutdownNotifier) {
+    super(pOptions, pContextShutdownNotifier);
     bmgr = pBmgr;
   }
 
