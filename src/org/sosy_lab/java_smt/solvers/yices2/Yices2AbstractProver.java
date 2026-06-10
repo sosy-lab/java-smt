@@ -32,7 +32,7 @@ import org.sosy_lab.java_smt.api.BooleanFormulaManager;
 import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
-import org.sosy_lab.java_smt.basicimpl.AbstractProverWithAllSat;
+import org.sosy_lab.java_smt.basicimpl.AbstractProver;
 import org.sosy_lab.java_smt.basicimpl.CachingModel;
 import org.sosy_lab.java_smt.basicimpl.ShutdownHook;
 
@@ -49,7 +49,7 @@ import org.sosy_lab.java_smt.basicimpl.ShutdownHook;
  * incremental solving, but is more complex to implement. Let's keep this idea is future work for
  * optimization.
  */
-abstract class Yices2AbstractProver<T> extends AbstractProverWithAllSat<T>
+abstract class Yices2AbstractProver<T> extends AbstractProver<T>
     implements BasicProverEnvironment<T> {
 
   static final Parameters DEFAULT_PARAMS = new Parameters(); // use default setting in the solver
@@ -264,5 +264,10 @@ abstract class Yices2AbstractProver<T> extends AbstractProverWithAllSat<T>
       stackSizeToUnsat = Integer.MAX_VALUE;
     }
     super.close();
+  }
+
+  @Override
+  protected <R> R allSatImpl(AllSatCallback<R> callback, List<BooleanFormula> important) {
+    throw new UnsupportedOperationException("Native AllSAT not supported by Yices2");
   }
 }

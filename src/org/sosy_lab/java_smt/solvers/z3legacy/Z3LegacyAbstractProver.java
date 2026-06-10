@@ -39,10 +39,10 @@ import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
-import org.sosy_lab.java_smt.basicimpl.AbstractProverWithAllSat;
+import org.sosy_lab.java_smt.basicimpl.AbstractProver;
 import org.sosy_lab.java_smt.basicimpl.CachingModel;
 
-abstract class Z3LegacyAbstractProver<T> extends AbstractProverWithAllSat<T> {
+abstract class Z3LegacyAbstractProver<T> extends AbstractProver<T> {
 
   protected final long z3solver;
   protected final Z3LegacyFormulaCreator creator;
@@ -389,7 +389,7 @@ abstract class Z3LegacyAbstractProver<T> extends AbstractProverWithAllSat<T> {
   protected <R> R allSatImpl(AllSatCallback<R> callback, List<BooleanFormula> important)
       throws InterruptedException, SolverException {
     try {
-      return super.allSatImpl(callback, important);
+      return super.independentAllSatImpl(callback, important);
     } catch (Z3Exception e) {
       throw creator.handleZ3Exception(e);
     }

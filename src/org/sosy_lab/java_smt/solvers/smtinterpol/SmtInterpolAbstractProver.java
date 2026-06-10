@@ -51,7 +51,6 @@ abstract class SmtInterpolAbstractProver<T> extends AbstractProver<T> {
   protected final FormulaCreator<Term, Sort, Script, FunctionSymbol> creator;
   protected final SmtInterpolFormulaManager mgr;
   protected final Deque<PersistentMap<String, BooleanFormula>> annotatedTerms = new ArrayDeque<>();
-  protected final ShutdownNotifier shutdownNotifier;
 
   private static final String PREFIX = "term_"; // for termnames
   private static final UniqueIdGenerator termIdGenerator =
@@ -62,11 +61,10 @@ abstract class SmtInterpolAbstractProver<T> extends AbstractProver<T> {
       Script pEnv,
       Set<ProverOptions> options,
       ShutdownNotifier pShutdownNotifier) {
-    super(options);
+    super(options, pMgr.getBooleanFormulaManager(), pShutdownNotifier);
     mgr = pMgr;
     creator = pMgr.getFormulaCreator();
     env = pEnv;
-    shutdownNotifier = pShutdownNotifier;
     annotatedTerms.add(PathCopyingPersistentTreeMap.of());
   }
 

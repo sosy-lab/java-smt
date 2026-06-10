@@ -36,12 +36,12 @@ import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
-import org.sosy_lab.java_smt.basicimpl.AbstractProverWithAllSat;
+import org.sosy_lab.java_smt.basicimpl.AbstractProver;
 import org.sosy_lab.java_smt.basicimpl.CachingModel;
 import scala.Enumeration.Value;
 
 @SuppressWarnings("ClassTypeParameterName")
-abstract class PrincessAbstractProver<E> extends AbstractProverWithAllSat<E> {
+abstract class PrincessAbstractProver<E> extends AbstractProver<E> {
 
   protected final SimpleAPI api;
   protected final PrincessFormulaManager mgr;
@@ -188,6 +188,11 @@ abstract class PrincessAbstractProver<E> extends AbstractProverWithAllSat<E> {
       partitions.clear();
     }
     super.close();
+  }
+
+  @Override
+  protected <R> R allSatImpl(AllSatCallback<R> callback, List<BooleanFormula> important) {
+    throw new UnsupportedOperationException("Native AllSAT not supported by Princess");
   }
 
   /** add external definition: boolean variable. */

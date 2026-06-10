@@ -19,8 +19,10 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Multimap;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Deque;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -28,8 +30,10 @@ import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.java_smt.api.BasicProverEnvironment;
 import org.sosy_lab.java_smt.api.BooleanFormula;
+import org.sosy_lab.java_smt.api.BooleanFormulaManager;
 import org.sosy_lab.java_smt.api.Evaluator;
 import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
 import org.sosy_lab.java_smt.api.Model;
@@ -42,7 +46,7 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
 
   // flags for option
   protected final boolean generateModels;
-  protected final boolean generateAllSat;
+  protected final Optional<ProverOptions> generateAllSat;
   protected final boolean generateUnsatCores;
   protected final boolean generateUnsatCoresOverAssumptions;
   protected final boolean enableSL;
@@ -54,6 +58,9 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
 
   private final Set<Evaluator> evaluators = new LinkedHashSet<>();
 
+  protected final ShutdownNotifier shutdownNotifier;
+  private final BooleanFormulaManager bmgr;
+
   /**
    * This data-structure tracks all formulas that were asserted on different levels. We can assert a
    * formula multiple times on the same or also distinct levels and return a new ID for each
@@ -61,17 +68,49 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
    */
   private final List<Multimap<BooleanFormula, T>> assertedFormulas = new ArrayList<>();
 
-  private static final String TEMPLATE = "Please set the prover option %s.";
+  private static final String TEMPLATE = "Please set a prover option including %s.";
 
-  protected AbstractProver(Set<ProverOptions> pOptions) {
+  protected AbstractProver(
+      Set<ProverOptions> pOptions,
+      BooleanFormulaManager pBmgr,
+      ShutdownNotifier pShutdownNotifier) {
     generateModels = pOptions.contains(ProverOptions.GENERATE_MODELS);
-    generateAllSat = pOptions.contains(ProverOptions.GENERATE_ALL_SAT);
+    generateAllSat = getAllSatOption(pOptions);
     generateUnsatCores = pOptions.contains(ProverOptions.GENERATE_UNSAT_CORE);
     generateUnsatCoresOverAssumptions =
         pOptions.contains(ProverOptions.GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS);
     enableSL = pOptions.contains(ProverOptions.ENABLE_SEPARATION_LOGIC);
 
     assertedFormulas.add(LinkedHashMultimap.create());
+
+    bmgr = pBmgr;
+    shutdownNotifier = pShutdownNotifier;
+  }
+
+  private Optional<ProverOptions> getAllSatOption(Set<ProverOptions> pOptions) {
+    Optional<ProverOptions> allSatOp = Optional.empty();
+    for (ProverOptions op : pOptions) {
+      if (ImmutableSet.of(
+              ProverOptions.GENERATE_ALL_SAT,
+              ProverOptions.GENERATE_ALL_SAT_NATIVE,
+              ProverOptions.GENERATE_ALL_SAT_MODEL_BASED,
+              ProverOptions.GENERATE_ALL_SAT_MODEL_BASED_W_FALLBACK,
+              ProverOptions.GENERATE_ALL_SAT_PREDICATE_COMBINATIONS,
+              ProverOptions.GENERATE_ALL_SAT_PREDICATE_COMBINATIONS_W_FALLBACK)
+          .contains(op)) {
+        if (allSatOp.isEmpty()) {
+          allSatOp = Optional.of(op);
+        } else {
+          throw new IllegalArgumentException(
+              "Only a single AllSAT ProverOption is allowed. Found"
+                  + " "
+                  + op
+                  + " and "
+                  + allSatOp.orElseThrow());
+        }
+      }
+    }
+    return allSatOp;
   }
 
   protected final void checkGenerateModels() {
@@ -84,7 +123,7 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
   protected final void checkGenerateAllSat() {
     // TODO: should this close all evaluators as well?
     Preconditions.checkState(!closed);
-    Preconditions.checkState(generateAllSat, TEMPLATE, ProverOptions.GENERATE_ALL_SAT);
+    Preconditions.checkState(generateAllSat.isPresent(), TEMPLATE, ProverOptions.GENERATE_ALL_SAT);
   }
 
   protected final void checkGenerateUnsatCores() {
@@ -297,20 +336,22 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
   }
 
   @Override
-  public final Model getModel() throws SolverException {
+  public final Model getModel() throws SolverException, InterruptedException {
     checkGenerateModels();
+    shutdownNotifier.shutdownIfNecessary();
     return getModelImpl();
   }
 
   protected abstract Model getModelImpl() throws SolverException;
 
   @Override
-  public final Evaluator getEvaluator() throws SolverException {
+  public final Evaluator getEvaluator() throws SolverException, InterruptedException {
     checkGenerateModels();
     return getEvaluatorImpl();
   }
 
-  protected Evaluator getEvaluatorImpl() throws SolverException {
+  protected Evaluator getEvaluatorImpl() throws SolverException, InterruptedException {
+    shutdownNotifier.shutdownIfNecessary();
     return getModel();
   }
 
@@ -366,9 +407,26 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
   public final <R> R allSat(AllSatCallback<R> callback, List<BooleanFormula> important)
       throws InterruptedException, SolverException {
     checkGenerateAllSat();
-    return allSatImpl(callback, important);
+
+    ProverOptions allSatOp = generateAllSat.orElseThrow();
+    if (allSatOp.equals(ProverOptions.GENERATE_ALL_SAT_NATIVE)) {
+      return allSatImpl(callback, important);
+    } else if (allSatOp.equals(ProverOptions.GENERATE_ALL_SAT)) {
+      try {
+        return allSatImpl(callback, important);
+      } catch (UnsupportedOperationException e) {
+        // Fallthrough to independent AllSAT
+      }
+    }
+
+    return independentAllSatImpl(callback, important);
   }
 
+  /**
+   * @implSpec override and implement if a solver offers its own AllSAT procedure. In cases in which
+   *     solvers need special handling, e.g. for exceptions, this must call independentAllSatImpl().
+   *     Otherwise, throw a {@link UnsupportedOperationException}.
+   */
   protected abstract <R> R allSatImpl(AllSatCallback<R> callback, List<BooleanFormula> important)
       throws InterruptedException, SolverException;
 
@@ -377,5 +435,150 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
     assertedFormulas.clear();
     closeAllEvaluators();
     closed = true;
+  }
+
+  protected <R> R independentAllSatImpl(
+      AllSatCallback<R> callback, List<BooleanFormula> importantPredicates)
+      throws InterruptedException, SolverException {
+    ProverOptions allSatOp = generateAllSat.orElseThrow();
+    push();
+    if (allSatOp.equals(ProverOptions.GENERATE_ALL_SAT_NATIVE)) {
+      // Needed due to Z3
+      throw new UnsupportedOperationException("Solver does not support native AllSAT computation");
+    } else if (allSatOp.equals(ProverOptions.GENERATE_ALL_SAT)
+        || allSatOp.equals(ProverOptions.GENERATE_ALL_SAT_MODEL_BASED_W_FALLBACK)
+        || allSatOp.equals(ProverOptions.GENERATE_ALL_SAT_MODEL_BASED)) {
+      try {
+        // try model-based computation of ALLSAT
+        iterateOverAllModels(callback, importantPredicates);
+      } catch (SolverException e) {
+        if (allSatOp.equals(ProverOptions.GENERATE_ALL_SAT_MODEL_BASED)) {
+          throw e;
+        }
+        // fallback to direct SAT/UNSAT-based computation of ALLSAT
+        iterateOverAllPredicateCombinations(callback, importantPredicates, new ArrayDeque<>());
+        // TODO should we completely switch to the second method?
+      }
+    } else if (allSatOp.equals(ProverOptions.GENERATE_ALL_SAT_PREDICATE_COMBINATIONS)
+        || allSatOp.equals(ProverOptions.GENERATE_ALL_SAT_PREDICATE_COMBINATIONS_W_FALLBACK)) {
+      try {
+        // fallback to direct SAT/UNSAT-based computation of ALLSAT
+        iterateOverAllPredicateCombinations(callback, importantPredicates, new ArrayDeque<>());
+      } catch (SolverException e) {
+        if (allSatOp.equals(ProverOptions.GENERATE_ALL_SAT_PREDICATE_COMBINATIONS)) {
+          throw e;
+        }
+        // try model-based computation of ALLSAT
+        iterateOverAllModels(callback, importantPredicates);
+      }
+    } else {
+      throw new IllegalStateException("Should not be reachable. Reached with option " + allSatOp);
+    }
+    pop();
+    return callback.getResult();
+  }
+
+  /**
+   * This method computes all satisfiable assignments for the given predicates by iterating over all
+   * models. The SMT solver can choose the ordering of variables and shortcut model generation.
+   */
+  private <R> void iterateOverAllModels(
+      AllSatCallback<R> callback, List<BooleanFormula> importantPredicates)
+      throws SolverException, InterruptedException {
+    final Set<ImmutableList<BooleanFormula>> modelEvaluations = new LinkedHashSet<>();
+    while (!isUnsat()) {
+      shutdownNotifier.shutdownIfNecessary();
+
+      ImmutableList.Builder<BooleanFormula> valuesOfModel = ImmutableList.builder();
+      try (Evaluator evaluator = getEvaluatorWithoutChecks()) {
+        for (BooleanFormula formula : importantPredicates) {
+          Boolean value = evaluator.evaluate(formula);
+          if (value == null) {
+            // This is a legal return value for evaluation.
+            // The value doesn't matter. We ignore this assignment.
+            // This step aim for shortcutting the ALLSAT-loop.
+          } else if (value) {
+            valuesOfModel.add(formula);
+          } else {
+            valuesOfModel.add(bmgr.not(formula));
+          }
+        }
+      }
+
+      final ImmutableList<BooleanFormula> values = valuesOfModel.build();
+      // avoid endless loops in case of repeated models.
+      Preconditions.checkState(
+          modelEvaluations.add(values),
+          "The model evaluation %s was found before. ALLSAT computation did not make progress.",
+          values);
+      callback.apply(values);
+      shutdownNotifier.shutdownIfNecessary();
+
+      BooleanFormula negatedModel = bmgr.not(bmgr.and(values));
+      addConstraint(negatedModel);
+      shutdownNotifier.shutdownIfNecessary();
+    }
+  }
+
+  /**
+   * This method computes all satisfiable assignments for the given predicates by (recursively)
+   * traversing the decision tree over the given variables. The ordering of variables is fixed, and
+   * we can only ignore unsatisfiable subtrees.
+   *
+   * <p>In contrast to {@link #iterateOverAllModels} we do not use model generation here, which is a
+   * benefit for some solvers or theory combinations.
+   *
+   * @param predicates remaining predicates in the decision tree.
+   * @param valuesOfModel already chosen predicate values, ordered as appearing in the tree.
+   */
+  private <R> void iterateOverAllPredicateCombinations(
+      AllSatCallback<R> callback,
+      List<BooleanFormula> predicates,
+      Deque<BooleanFormula> valuesOfModel)
+      throws SolverException, InterruptedException {
+
+    shutdownNotifier.shutdownIfNecessary();
+
+    if (isUnsat()) {
+      return;
+
+    } else if (predicates.isEmpty()) {
+      // we aim at providing the same order of predicates as given as parameter, thus reverse.
+      callback.apply(ImmutableList.copyOf(valuesOfModel).reverse());
+
+    } else {
+
+      // positive predicate
+      final BooleanFormula predicate = predicates.get(0);
+      valuesOfModel.push(predicate);
+      push(predicate);
+      iterateOverAllPredicateCombinations(
+          callback, predicates.subList(1, predicates.size()), valuesOfModel);
+      pop();
+      valuesOfModel.pop();
+
+      // negated predicate
+      final BooleanFormula notPredicate = bmgr.not(predicates.get(0));
+      valuesOfModel.push(notPredicate);
+      push(notPredicate);
+      iterateOverAllPredicateCombinations(
+          callback, predicates.subList(1, predicates.size()), valuesOfModel);
+      pop();
+      valuesOfModel.pop();
+    }
+  }
+
+  /**
+   * Get an evaluator instance for model evaluation without executing checks for prover options.
+   *
+   * <p>This method allows model evaluation without explicitly enabling the prover-option {@link
+   * ProverOptions#GENERATE_MODELS}. We only use this method internally, when we know about a valid
+   * solver state. The returned evaluator does not have caching or any direct optimization for user
+   * interaction.
+   *
+   * @throws SolverException if model can not be constructed.
+   */
+  protected Evaluator getEvaluatorWithoutChecks() throws SolverException, InterruptedException {
+    return getEvaluatorImpl();
   }
 }

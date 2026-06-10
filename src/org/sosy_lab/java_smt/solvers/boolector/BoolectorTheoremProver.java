@@ -22,10 +22,10 @@ import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
-import org.sosy_lab.java_smt.basicimpl.AbstractProverWithAllSat;
+import org.sosy_lab.java_smt.basicimpl.AbstractProver;
 import org.sosy_lab.java_smt.solvers.boolector.BtorJNI.TerminationCallback;
 
-class BoolectorTheoremProver extends AbstractProverWithAllSat<Void> implements ProverEnvironment {
+class BoolectorTheoremProver extends AbstractProver<Void> implements ProverEnvironment {
 
   /** Boolector does not support multiple solver stacks. */
   private final AtomicBoolean isAnyStackAlive;
@@ -168,5 +168,10 @@ class BoolectorTheoremProver extends AbstractProverWithAllSat<Void> implements P
   private long addTerminationCallback() {
     Preconditions.checkState(!closed, "solver context is already closed");
     return BtorJNI.boolector_set_termination(btor, terminationCallback);
+  }
+
+  @Override
+  protected <R> R allSatImpl(AllSatCallback<R> callback, List<BooleanFormula> important) {
+    throw new UnsupportedOperationException("Native AllSAT not supported by Boolector");
   }
 }

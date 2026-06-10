@@ -31,10 +31,10 @@ import org.sosy_lab.java_smt.api.Evaluator;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
-import org.sosy_lab.java_smt.basicimpl.AbstractProverWithAllSat;
+import org.sosy_lab.java_smt.basicimpl.AbstractProver;
 import org.sosy_lab.java_smt.basicimpl.ShutdownHook;
 
-class CVC4TheoremProver extends AbstractProverWithAllSat<Void>
+class CVC4TheoremProver extends AbstractProver<Void>
     implements ProverEnvironment, BasicProverEnvironment<Void> {
 
   private final CVC4FormulaCreator creator;
@@ -229,6 +229,11 @@ class CVC4TheoremProver extends AbstractProverWithAllSat<Void>
   protected Optional<List<BooleanFormula>> unsatCoreOverAssumptionsImpl(
       Collection<BooleanFormula> pAssumptions) {
     throw new UnsupportedOperationException(UNSAT_CORE_WITH_ASSUMPTIONS_NOT_SUPPORTED);
+  }
+
+  @Override
+  protected <R> R allSatImpl(AllSatCallback<R> callback, List<BooleanFormula> important) {
+    throw new UnsupportedOperationException("Native AllSAT not supported by CVC4");
   }
 
   @Override

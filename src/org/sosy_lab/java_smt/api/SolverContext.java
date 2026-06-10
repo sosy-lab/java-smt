@@ -38,6 +38,11 @@ public interface SolverContext extends AutoCloseable {
      * Whether the solver should allow to query all satisfying assignments for satisfiable formulas.
      */
     GENERATE_ALL_SAT,
+    GENERATE_ALL_SAT_NATIVE,
+    GENERATE_ALL_SAT_MODEL_BASED,
+    GENERATE_ALL_SAT_PREDICATE_COMBINATIONS,
+    GENERATE_ALL_SAT_MODEL_BASED_W_FALLBACK,
+    GENERATE_ALL_SAT_PREDICATE_COMBINATIONS_W_FALLBACK,
 
     /**
      * Whether the solver should generate an unsat core for unsatisfiable formulas. Unsat core is

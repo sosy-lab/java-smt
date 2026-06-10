@@ -26,7 +26,7 @@ import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
-import org.sosy_lab.java_smt.basicimpl.AbstractProverWithAllSat;
+import org.sosy_lab.java_smt.basicimpl.AbstractProver;
 import org.sosy_lab.java_smt.solvers.bitwuzla.api.Bitwuzla;
 import org.sosy_lab.java_smt.solvers.bitwuzla.api.Kind;
 import org.sosy_lab.java_smt.solvers.bitwuzla.api.Option;
@@ -36,7 +36,7 @@ import org.sosy_lab.java_smt.solvers.bitwuzla.api.Term;
 import org.sosy_lab.java_smt.solvers.bitwuzla.api.Terminator;
 import org.sosy_lab.java_smt.solvers.bitwuzla.api.Vector_Term;
 
-abstract class BitwuzlaAbstractProver<T> extends AbstractProverWithAllSat<T> {
+abstract class BitwuzlaAbstractProver<T> extends AbstractProver<T> {
   private final Terminator terminator =
       new Terminator() {
         @Override
@@ -222,6 +222,11 @@ abstract class BitwuzlaAbstractProver<T> extends AbstractProverWithAllSat<T> {
       env.close();
     }
     super.close();
+  }
+
+  @Override
+  protected <R> R allSatImpl(AllSatCallback<R> callback, List<BooleanFormula> important) {
+    throw new UnsupportedOperationException("Native AllSAT not supported by Bitwuzla");
   }
 
   @SuppressWarnings("resource")

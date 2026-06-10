@@ -68,7 +68,7 @@ public interface OptimizationProverEnvironment extends BasicProverEnvironment<Vo
    * (epsilon is irrelevant here and can be zero). The model returns the optimal assignment x=9.
    */
   @Override
-  Model getModel() throws SolverException;
+  Model getModel() throws SolverException, InterruptedException;
 
   /** Status of the optimization problem. */
   enum OptStatus {

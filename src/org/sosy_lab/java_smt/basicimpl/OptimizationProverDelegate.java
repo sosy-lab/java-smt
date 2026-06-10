@@ -74,7 +74,7 @@ public class OptimizationProverDelegate implements OptimizationProverEnvironment
 
   @SuppressWarnings("resource")
   @Override
-  public Model getModel() throws SolverException {
+  public Model getModel() throws SolverException, InterruptedException {
     return optimizationProver.getModel();
   }
 

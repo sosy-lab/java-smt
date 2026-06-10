@@ -25,7 +25,7 @@ import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
-import org.sosy_lab.java_smt.basicimpl.AbstractProverWithAllSat;
+import org.sosy_lab.java_smt.basicimpl.AbstractProver;
 import org.sosy_lab.java_smt.basicimpl.ShutdownHook;
 import org.sosy_lab.java_smt.solvers.opensmt.OpenSmtSolverContext.OpenSMTOptions;
 import org.sosy_lab.java_smt.solvers.opensmt.api.Logic;
@@ -38,7 +38,7 @@ import org.sosy_lab.java_smt.solvers.opensmt.api.SymRef;
 import org.sosy_lab.java_smt.solvers.opensmt.api.Symbol;
 import org.sosy_lab.java_smt.solvers.opensmt.api.sstat;
 
-abstract class OpenSmtAbstractProver<T> extends AbstractProverWithAllSat<T> {
+abstract class OpenSmtAbstractProver<T> extends AbstractProver<T> {
 
   protected final OpenSmtFormulaCreator creator;
   protected final MainSolver osmtSolver;
@@ -132,6 +132,11 @@ abstract class OpenSmtAbstractProver<T> extends AbstractProverWithAllSat<T> {
   @Override
   protected Evaluator getEvaluatorWithoutChecks() {
     return registerEvaluator(new OpenSmtEvaluator(this, creator));
+  }
+
+  @Override
+  protected <R> R allSatImpl(AllSatCallback<R> callback, List<BooleanFormula> important) {
+    throw new UnsupportedOperationException("Native AllSAT not supported by OpenSMT2");
   }
 
   /**

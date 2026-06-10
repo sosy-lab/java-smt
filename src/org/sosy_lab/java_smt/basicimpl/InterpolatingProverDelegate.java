@@ -98,7 +98,7 @@ class InterpolatingProverDelegate<T> implements InterpolatingProverEnvironment<T
   }
 
   @Override
-  public Model getModel() throws SolverException {
+  public Model getModel() throws SolverException, InterruptedException {
     return itpProver.getModel();
   }
 

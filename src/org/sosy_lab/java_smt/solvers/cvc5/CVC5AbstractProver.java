@@ -43,9 +43,9 @@ import org.sosy_lab.java_smt.api.Evaluator;
 import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
-import org.sosy_lab.java_smt.basicimpl.AbstractProverWithAllSat;
+import org.sosy_lab.java_smt.basicimpl.AbstractProver;
 
-abstract class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
+abstract class CVC5AbstractProver<T> extends AbstractProver<T> {
 
   private static final UniqueIdGenerator ID_GENERATOR = new UniqueIdGenerator();
 
@@ -118,6 +118,11 @@ abstract class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
     }
 
     return newSolver;
+  }
+
+  @Override
+  protected <R> R allSatImpl(AllSatCallback<R> callback, List<BooleanFormula> important) {
+    throw new UnsupportedOperationException("Native AllSAT not supported by CVC5");
   }
 
   @Override
