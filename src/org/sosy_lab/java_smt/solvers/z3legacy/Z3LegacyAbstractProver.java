@@ -327,10 +327,7 @@ abstract class Z3LegacyAbstractProver<T> extends AbstractProverWithAllSat<T> {
   }
 
   @Override
-  public ImmutableMap<String, String> getStatistics() {
-    // Z3 sigsevs if you try to get statistics for closed environments
-    Preconditions.checkState(!closed);
-
+  public ImmutableMap<String, String> getStatisticsImpl() {
     ImmutableMap.Builder<String, String> builder = ImmutableMap.builder();
     Set<String> seenKeys = new HashSet<>();
 

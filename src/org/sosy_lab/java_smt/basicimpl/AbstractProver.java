@@ -377,6 +377,19 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
       throws InterruptedException, SolverException;
 
   @Override
+  public final ImmutableMap<String, String> getStatistics() {
+    Preconditions.checkState(!closed);
+    return getStatisticsImpl();
+  }
+
+  /**
+   * @implSpec override and implement for solvers that provide statistics.
+   */
+  protected ImmutableMap<String, String> getStatisticsImpl() {
+    return ImmutableMap.of();
+  }
+
+  @Override
   public void close() {
     assertedFormulas.clear();
     closeAllEvaluators();
