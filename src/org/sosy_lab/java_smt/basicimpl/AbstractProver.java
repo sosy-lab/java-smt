@@ -369,9 +369,9 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
     return allSatImpl(callback, important);
   }
 
-  // TODO: move AllSAT basic impl here?
   /**
-   * @implSpec only override and implement if a solver offers its own AllSAT procedure.
+   * @implSpec only override and implement if a solver offers its own AllSAT procedure, otherwise
+   *     inherit {@link AbstractProverWithAllSat} instead of this class.
    */
   protected abstract <R> R allSatImpl(AllSatCallback<R> callback, List<BooleanFormula> important)
       throws InterruptedException, SolverException;
