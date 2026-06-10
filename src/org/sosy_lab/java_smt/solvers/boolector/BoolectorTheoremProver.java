@@ -23,7 +23,6 @@ import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractProverWithAllSat;
-import org.sosy_lab.java_smt.solvers.boolector.BtorJNI.TerminationCallback;
 
 class BoolectorTheoremProver extends AbstractProverWithAllSat<Void> implements ProverEnvironment {
 
@@ -33,7 +32,6 @@ class BoolectorTheoremProver extends AbstractProverWithAllSat<Void> implements P
   private final long btor;
   private final BoolectorFormulaManager manager;
   private final BoolectorFormulaCreator creator;
-  private final TerminationCallback terminationCallback;
   private final long terminationCallbackHelper;
 
   // Used/Built by TheoremProver
@@ -48,7 +46,6 @@ class BoolectorTheoremProver extends AbstractProverWithAllSat<Void> implements P
     this.manager = manager;
     this.creator = creator;
     this.btor = btor;
-    terminationCallback = pContextShutdownNotifier::shouldShutdown;
     terminationCallbackHelper = addTerminationCallback();
 
     isAnyStackAlive = pIsAnyStackAlive;
@@ -167,6 +164,6 @@ class BoolectorTheoremProver extends AbstractProverWithAllSat<Void> implements P
 
   private long addTerminationCallback() {
     Preconditions.checkState(!closed, "solver context is already closed");
-    return BtorJNI.boolector_set_termination(btor, terminationCallback);
+    return BtorJNI.boolector_set_termination(btor, this::shouldShutdown);
   }
 }

@@ -41,8 +41,7 @@ abstract class BitwuzlaAbstractProver<T> extends AbstractProverWithAllSat<T> {
       new Terminator() {
         @Override
         public boolean terminate() {
-          return contextShutdownNotifier
-              .shouldShutdown(); // shutdownNotifer is defined in the superclass
+          return shouldShutdown();
         }
       };
   private static final UniqueIdGenerator ID_GENERATOR = new UniqueIdGenerator();
