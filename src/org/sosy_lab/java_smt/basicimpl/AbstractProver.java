@@ -78,31 +78,35 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
     contextShutdownNotifier = pContextShutdownNotifier;
   }
 
-  protected final void checkGenerateModels() {
+  protected final void checkGenerateModels() throws InterruptedException {
     Preconditions.checkState(generateModels, TEMPLATE, ProverOptions.GENERATE_MODELS);
     Preconditions.checkState(!closed);
+    shutdownIfNecessary();
     Preconditions.checkState(!changedSinceLastSatQuery);
     Preconditions.checkState(wasLastSatCheckSatisfiable, NO_MODEL_HELP);
   }
 
-  protected final void checkGenerateAllSat() {
+  protected final void checkGenerateAllSat() throws InterruptedException {
     // TODO: should this close all evaluators as well?
     Preconditions.checkState(!closed);
+    shutdownIfNecessary();
     Preconditions.checkState(generateAllSat, TEMPLATE, ProverOptions.GENERATE_ALL_SAT);
   }
 
-  protected final void checkGenerateUnsatCores() {
+  protected final void checkGenerateUnsatCores() throws InterruptedException {
     // TODO: should this close all evaluators as well?
     Preconditions.checkState(generateUnsatCores, TEMPLATE, ProverOptions.GENERATE_UNSAT_CORE);
     Preconditions.checkState(!closed);
+    shutdownIfNecessary();
     Preconditions.checkState(!changedSinceLastSatQuery);
     Preconditions.checkState(!wasLastSatCheckSatisfiable);
   }
 
   protected final void checkGenerateUnsatCoresOverAssumptions(
-      Collection<BooleanFormula> assumptions) {
+      Collection<BooleanFormula> assumptions) throws InterruptedException {
     // TODO: should this close all evaluators as well?
     Preconditions.checkState(!closed);
+    shutdownIfNecessary();
     Preconditions.checkNotNull(assumptions);
     Preconditions.checkState(
         generateUnsatCoresOverAssumptions,
@@ -189,6 +193,7 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
   @Override
   public final void push() throws InterruptedException {
     checkState(!closed);
+    shutdownIfNecessary();
     pushImpl();
     setChanged();
     assertedFormulas.add(LinkedHashMultimap.create());
@@ -226,6 +231,7 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
   @Override
   public final boolean isUnsat() throws SolverException, InterruptedException {
     checkState(!closed);
+    shutdownIfNecessary();
     changedSinceLastSatQuery = false;
     wasLastSatCheckSatisfiable = false;
     final boolean isUnsat = isUnsatImpl();
@@ -393,6 +399,7 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
   @Override
   public final ImmutableMap<String, String> getStatistics() throws InterruptedException {
     Preconditions.checkState(!closed);
+    shutdownIfNecessary();
     return getStatisticsImpl();
   }
 
