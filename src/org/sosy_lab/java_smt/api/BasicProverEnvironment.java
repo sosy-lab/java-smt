@@ -45,7 +45,7 @@ public interface BasicProverEnvironment<T> extends AutoCloseable {
    * Remove one backtracking point/level from the current stack. This removes the latest level
    * including all of its formulas, i.e., all formulas that were added for this backtracking point.
    */
-  void pop();
+  void pop() throws InterruptedException;
 
   /** Add a constraint to the latest backtracking point. */
   @Nullable
@@ -100,7 +100,7 @@ public interface BasicProverEnvironment<T> extends AutoCloseable {
    * model might contain additional symbols with their evaluation, if a solver uses its own
    * temporary symbols.
    */
-  Model getModel() throws SolverException;
+  Model getModel() throws SolverException, InterruptedException;
 
   /**
    * Get a temporary view on the current satisfying assignment. This should be called only
@@ -108,7 +108,7 @@ public interface BasicProverEnvironment<T> extends AutoCloseable {
    * should no longer be used as soon as any constraints are added to, pushed, or popped from the
    * prover stack.
    */
-  default Evaluator getEvaluator() throws SolverException {
+  default Evaluator getEvaluator() throws SolverException, InterruptedException {
     return getModel();
   }
 
@@ -120,7 +120,8 @@ public interface BasicProverEnvironment<T> extends AutoCloseable {
    * <p>Note that if you need to iterate multiple times over the model it may be more efficient to
    * use this method instead of {@link #getModel()} (depending on the solver).
    */
-  default ImmutableList<Model.ValueAssignment> getModelAssignments() throws SolverException {
+  default ImmutableList<Model.ValueAssignment> getModelAssignments()
+      throws SolverException, InterruptedException {
     try (Model model = getModel()) {
       return model.asList();
     }
@@ -132,7 +133,7 @@ public interface BasicProverEnvironment<T> extends AutoCloseable {
    * <p>This should be called only immediately after an {@link #isUnsat()} call that returned <code>
    * false</code>. Requires the {@link ProverOptions#GENERATE_UNSAT_CORE} option to work.
    */
-  List<BooleanFormula> getUnsatCore();
+  List<BooleanFormula> getUnsatCore() throws InterruptedException;
 
   /**
    * Returns an UNSAT core (if it exists, otherwise {@code Optional.empty()}), over the chosen
@@ -166,9 +167,7 @@ public interface BasicProverEnvironment<T> extends AutoCloseable {
    *
    * @see SolverContext#getStatistics()
    */
-  default ImmutableMap<String, String> getStatistics() {
-    return ImmutableMap.of();
-  }
+  ImmutableMap<String, String> getStatistics() throws InterruptedException;
 
   /**
    * Closes the prover environment. The object should be discarded, and should not be used after

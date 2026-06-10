@@ -182,13 +182,13 @@ class CVC4TheoremProver extends AbstractProverWithAllSat<Void>
     }
 
     Result result;
-    try (ShutdownHook hook = new ShutdownHook(shutdownNotifier, smtEngine::interrupt)) {
-      shutdownNotifier.shutdownIfNecessary();
+    try (ShutdownHook hook = new ShutdownHook(contextShutdownNotifier, smtEngine::interrupt)) {
+      contextShutdownNotifier.shutdownIfNecessary();
       result = smtEngine.checkSat();
     } catch (Exception e) {
       throw new SolverException("CVC4 failed during satisfiability check", e);
     } finally {
-      shutdownNotifier.shutdownIfNecessary();
+      contextShutdownNotifier.shutdownIfNecessary();
     }
     return convertSatResult(result);
   }

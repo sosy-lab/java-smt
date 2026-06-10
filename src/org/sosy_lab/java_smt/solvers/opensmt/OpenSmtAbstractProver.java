@@ -208,8 +208,9 @@ abstract class OpenSmtAbstractProver<T> extends AbstractProverWithAllSat<T> {
   protected boolean isUnsatImpl() throws InterruptedException, SolverException {
     closeAllEvaluators();
     sstat result;
-    try (ShutdownHook listener = new ShutdownHook(shutdownNotifier, osmtSolver::notifyStop)) {
-      shutdownNotifier.shutdownIfNecessary();
+    try (ShutdownHook listener =
+        new ShutdownHook(contextShutdownNotifier, osmtSolver::notifyStop)) {
+      contextShutdownNotifier.shutdownIfNecessary();
       try {
         result = osmtSolver.check();
       } catch (Exception e) {
@@ -228,7 +229,7 @@ abstract class OpenSmtAbstractProver<T> extends AbstractProverWithAllSat<T> {
           throw new SolverException("OpenSMT crashed while checking satisfiability.", e);
         }
       }
-      shutdownNotifier.shutdownIfNecessary();
+      contextShutdownNotifier.shutdownIfNecessary();
     }
 
     if (result.equals(sstat.Error())) {

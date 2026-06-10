@@ -162,12 +162,12 @@ abstract class Yices2AbstractProver<T> extends AbstractProverWithAllSat<T>
           !satCheckWithShutdownNotifier(
               () -> curEnv.checkWithAssumptions(DEFAULT_PARAMS, getAllConstraints()),
               curEnv,
-              shutdownNotifier);
+              contextShutdownNotifier);
 
     } else {
       unsat =
           !satCheckWithShutdownNotifier(
-              () -> curEnv.check(DEFAULT_PARAMS), curEnv, shutdownNotifier);
+              () -> curEnv.check(DEFAULT_PARAMS), curEnv, contextShutdownNotifier);
 
       if (unsat && stackSizeToUnsat == Integer.MAX_VALUE) {
         stackSizeToUnsat = size();
@@ -198,7 +198,7 @@ abstract class Yices2AbstractProver<T> extends AbstractProverWithAllSat<T>
         !satCheckWithShutdownNotifier(
             () -> curEnv.checkWithAssumptions(DEFAULT_PARAMS, uncapsulate(pAssumptions)),
             curEnv,
-            shutdownNotifier);
+            contextShutdownNotifier);
     if (!isUnsat) {
       wasLastSatCheckSatisfiable = true;
     }

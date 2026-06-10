@@ -210,7 +210,7 @@ abstract class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
       throw new SolverException("CVC5 failed during satisfiability check", e);
     } finally {
       /* Shutdown currently not possible in CVC5. */
-      shutdownNotifier.shutdownIfNecessary();
+      contextShutdownNotifier.shutdownIfNecessary();
     }
     return convertSatResult(result);
   }

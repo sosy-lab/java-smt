@@ -62,7 +62,7 @@ abstract class SmtInterpolAbstractProver<T> extends AbstractProver<T> {
       Script pEnv,
       Set<ProverOptions> options,
       ShutdownNotifier pShutdownNotifier) {
-    super(options);
+    super(options, pShutdownNotifier);
     mgr = pMgr;
     creator = pMgr.getFormulaCreator();
     env = pEnv;

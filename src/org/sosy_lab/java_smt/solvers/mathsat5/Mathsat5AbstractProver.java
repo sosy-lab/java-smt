@@ -64,7 +64,7 @@ abstract class Mathsat5AbstractProver<T2> extends AbstractProver<T2> {
       Set<ProverOptions> pOptions,
       Mathsat5FormulaCreator pCreator,
       ShutdownNotifier pShutdownNotifier) {
-    super(pOptions);
+    super(pOptions, pShutdownNotifier);
     context = pContext;
     creator = pCreator;
     curConfig = buildConfig(pOptions);

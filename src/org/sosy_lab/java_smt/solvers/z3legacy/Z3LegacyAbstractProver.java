@@ -69,7 +69,7 @@ abstract class Z3LegacyAbstractProver<T> extends AbstractProverWithAllSat<T> {
     Native.solverIncRef(z3context, z3solver);
 
     interruptListener = reason -> Native.interrupt(z3context);
-    shutdownNotifier.register(interruptListener);
+    contextShutdownNotifier.register(interruptListener);
 
     if (pOptions.contains(ProverOptions.GENERATE_UNSAT_CORE)) {
       storedConstraints = new ArrayDeque<>();
@@ -374,7 +374,7 @@ abstract class Z3LegacyAbstractProver<T> extends AbstractProverWithAllSat<T> {
 
       Native.solverReset(z3context, z3solver); // remove all assertions from the solver
       Native.solverDecRef(z3context, z3solver);
-      shutdownNotifier.unregister(interruptListener);
+      contextShutdownNotifier.unregister(interruptListener);
       if (storedConstraints != null) {
         storedConstraints.clear();
       }

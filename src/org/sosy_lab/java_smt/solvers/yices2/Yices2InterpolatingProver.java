@@ -71,9 +71,9 @@ class Yices2InterpolatingProver extends Yices2AbstractProver<Integer>
 
       // TODO How to abort this?
       // For now, let's just check before and after the call:
-      shutdownNotifier.shutdownIfNecessary();
+      contextShutdownNotifier.shutdownIfNecessary();
       var status = context.check(DEFAULT_PARAMS, false);
-      shutdownNotifier.shutdownIfNecessary();
+      contextShutdownNotifier.shutdownIfNecessary();
       if (status == Status.UNSAT) {
         return context.getInterpolant();
       } else {

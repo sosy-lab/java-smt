@@ -28,6 +28,7 @@ import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.java_smt.api.BasicProverEnvironment;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Evaluator;
@@ -54,6 +55,8 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
 
   private final Set<Evaluator> evaluators = new LinkedHashSet<>();
 
+  protected final ShutdownNotifier contextShutdownNotifier;
+
   /**
    * This data-structure tracks all formulas that were asserted on different levels. We can assert a
    * formula multiple times on the same or also distinct levels and return a new ID for each
@@ -63,7 +66,7 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
 
   private static final String TEMPLATE = "Please set the prover option %s.";
 
-  protected AbstractProver(Set<ProverOptions> pOptions) {
+  protected AbstractProver(Set<ProverOptions> pOptions, ShutdownNotifier pContextShutdownNotifier) {
     generateModels = pOptions.contains(ProverOptions.GENERATE_MODELS);
     generateAllSat = pOptions.contains(ProverOptions.GENERATE_ALL_SAT);
     generateUnsatCores = pOptions.contains(ProverOptions.GENERATE_UNSAT_CORE);
@@ -72,6 +75,7 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
     enableSL = pOptions.contains(ProverOptions.ENABLE_SEPARATION_LOGIC);
 
     assertedFormulas.add(LinkedHashMultimap.create());
+    contextShutdownNotifier = pContextShutdownNotifier;
   }
 
   protected final void checkGenerateModels() {
@@ -115,9 +119,10 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
     Preconditions.checkState(!closed);
   }
 
-  private void checkGenerateInterpolants() {
+  private void checkGenerateInterpolants() throws InterruptedException {
     // TODO: should this close all evaluators as well?
     Preconditions.checkState(!closed);
+    contextShutdownNotifier.shutdownIfNecessary();
     Preconditions.checkState(
         !changedSinceLastSatQuery,
         "Interpolants can only be calculated right after a call to isUnsat()");
@@ -127,7 +132,8 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
             + "unsatisfiable.");
   }
 
-  protected final void checkGenerateInterpolants(Collection<T> formulasOfA) {
+  protected final void checkGenerateInterpolants(Collection<T> formulasOfA)
+      throws InterruptedException {
     checkGenerateInterpolants();
     checkArgument(
         getAssertedConstraintIds().containsAll(formulasOfA),
@@ -135,7 +141,7 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
   }
 
   protected final void checkGenerateSeqInterpolants(
-      List<? extends Collection<T>> partitionedFormulas) {
+      List<? extends Collection<T>> partitionedFormulas) throws InterruptedException {
     checkGenerateInterpolants();
     Preconditions.checkArgument(
         !partitionedFormulas.isEmpty(), "at least one partition should be available.");
@@ -146,7 +152,8 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
   }
 
   protected final void checkGenerateTreeInterpolants(
-      List<? extends Collection<T>> partitionedFormulas, int[] startOfSubTree) {
+      List<? extends Collection<T>> partitionedFormulas, int[] startOfSubTree)
+      throws InterruptedException {
     checkGenerateSeqInterpolants(partitionedFormulas);
     assert InterpolatingProverEnvironment.checkTreeStructure(
         partitionedFormulas.size(), startOfSubTree);
@@ -186,8 +193,9 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
   protected abstract void pushImpl() throws InterruptedException;
 
   @Override
-  public final void pop() {
+  public final void pop() throws InterruptedException {
     checkState(!closed);
+    contextShutdownNotifier.shutdownIfNecessary();
     checkState(assertedFormulas.size() > 1, "initial level must remain until close");
     assertedFormulas.remove(assertedFormulas.size() - 1); // remove last
     popImpl();
@@ -200,6 +208,7 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
   @CanIgnoreReturnValue
   public final @Nullable T addConstraint(BooleanFormula constraint) throws InterruptedException {
     checkState(!closed);
+    contextShutdownNotifier.shutdownIfNecessary();
     T t = addConstraintImpl(constraint);
     setChanged();
     Iterables.getLast(assertedFormulas).put(constraint, t);
@@ -297,7 +306,7 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
   }
 
   @Override
-  public final Model getModel() throws SolverException {
+  public final Model getModel() throws SolverException, InterruptedException {
     checkGenerateModels();
     return getModelImpl();
   }
@@ -305,12 +314,12 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
   protected abstract Model getModelImpl() throws SolverException;
 
   @Override
-  public final Evaluator getEvaluator() throws SolverException {
+  public final Evaluator getEvaluator() throws SolverException, InterruptedException {
     checkGenerateModels();
     return getEvaluatorImpl();
   }
 
-  protected Evaluator getEvaluatorImpl() throws SolverException {
+  protected Evaluator getEvaluatorImpl() throws SolverException, InterruptedException {
     return getModel();
   }
 
@@ -333,7 +342,7 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
   }
 
   @Override
-  public final List<BooleanFormula> getUnsatCore() {
+  public final List<BooleanFormula> getUnsatCore() throws InterruptedException {
     checkGenerateUnsatCores();
     return getUnsatCoreImpl();
   }
@@ -377,7 +386,7 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
       throws InterruptedException, SolverException;
 
   @Override
-  public final ImmutableMap<String, String> getStatistics() {
+  public final ImmutableMap<String, String> getStatistics() throws InterruptedException {
     Preconditions.checkState(!closed);
     return getStatisticsImpl();
   }

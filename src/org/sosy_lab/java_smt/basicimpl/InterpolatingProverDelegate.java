@@ -12,6 +12,7 @@ package org.sosy_lab.java_smt.basicimpl;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.google.common.collect.ImmutableMap;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -67,7 +68,7 @@ class InterpolatingProverDelegate<T> implements InterpolatingProverEnvironment<T
   /* ########################## Delegate methods of ProverEnvironment ########################## */
 
   @Override
-  public void pop() {
+  public void pop() throws InterruptedException {
     itpProver.pop();
   }
 
@@ -98,12 +99,12 @@ class InterpolatingProverDelegate<T> implements InterpolatingProverEnvironment<T
   }
 
   @Override
-  public Model getModel() throws SolverException {
+  public Model getModel() throws SolverException, InterruptedException {
     return itpProver.getModel();
   }
 
   @Override
-  public List<BooleanFormula> getUnsatCore() {
+  public List<BooleanFormula> getUnsatCore() throws InterruptedException {
     return itpProver.getUnsatCore();
   }
 
@@ -111,6 +112,11 @@ class InterpolatingProverDelegate<T> implements InterpolatingProverEnvironment<T
   public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(
       Collection<BooleanFormula> assumptions) throws SolverException, InterruptedException {
     return itpProver.unsatCoreOverAssumptions(assumptions);
+  }
+
+  @Override
+  public ImmutableMap<String, String> getStatistics() throws InterruptedException {
+    return itpProver.getStatistics();
   }
 
   @Override

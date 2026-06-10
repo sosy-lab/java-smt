@@ -29,7 +29,7 @@ class BasicProverWithAssumptionsWrapper<T, P extends BasicProverEnvironment<T>>
     delegate = pDelegate;
   }
 
-  protected void clearAssumptions() {
+  protected void clearAssumptions() throws InterruptedException {
     for (int i = 0; i < solverAssumptionsAsFormula.size(); i++) {
       delegate.pop();
     }
@@ -37,7 +37,7 @@ class BasicProverWithAssumptionsWrapper<T, P extends BasicProverEnvironment<T>>
   }
 
   @Override
-  public void pop() {
+  public void pop() throws InterruptedException {
     clearAssumptions();
     delegate.pop();
   }
@@ -82,17 +82,18 @@ class BasicProverWithAssumptionsWrapper<T, P extends BasicProverEnvironment<T>>
   protected void registerPushedFormula(@SuppressWarnings("unused") T pPushResult) {}
 
   @Override
-  public Model getModel() throws SolverException {
+  public Model getModel() throws SolverException, InterruptedException {
     return delegate.getModel();
   }
 
   @Override
-  public ImmutableList<Model.ValueAssignment> getModelAssignments() throws SolverException {
+  public ImmutableList<Model.ValueAssignment> getModelAssignments()
+      throws SolverException, InterruptedException {
     return delegate.getModelAssignments();
   }
 
   @Override
-  public List<BooleanFormula> getUnsatCore() {
+  public List<BooleanFormula> getUnsatCore() throws InterruptedException {
     return delegate.getUnsatCore();
   }
 
@@ -110,7 +111,7 @@ class BasicProverWithAssumptionsWrapper<T, P extends BasicProverEnvironment<T>>
   }
 
   @Override
-  public ImmutableMap<String, String> getStatistics() {
+  public ImmutableMap<String, String> getStatistics() throws InterruptedException {
     return delegate.getStatistics();
   }
 

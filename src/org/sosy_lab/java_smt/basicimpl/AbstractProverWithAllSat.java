@@ -29,16 +29,14 @@ import org.sosy_lab.java_smt.api.SolverException;
  */
 public abstract class AbstractProverWithAllSat<T> extends AbstractProver<T> {
 
-  protected final ShutdownNotifier shutdownNotifier;
   private final BooleanFormulaManager bmgr;
 
   protected AbstractProverWithAllSat(
       Set<ProverOptions> pOptions,
       BooleanFormulaManager pBmgr,
       ShutdownNotifier pShutdownNotifier) {
-    super(pOptions);
+    super(pOptions, pShutdownNotifier);
     bmgr = pBmgr;
-    shutdownNotifier = pShutdownNotifier;
   }
 
   @Override
@@ -67,7 +65,7 @@ public abstract class AbstractProverWithAllSat<T> extends AbstractProver<T> {
       throws SolverException, InterruptedException {
     final Set<ImmutableList<BooleanFormula>> modelEvaluations = new LinkedHashSet<>();
     while (!isUnsat()) {
-      shutdownNotifier.shutdownIfNecessary();
+      contextShutdownNotifier.shutdownIfNecessary();
 
       ImmutableList.Builder<BooleanFormula> valuesOfModel = ImmutableList.builder();
       try (Evaluator evaluator = getEvaluatorWithoutChecks()) {
@@ -92,11 +90,11 @@ public abstract class AbstractProverWithAllSat<T> extends AbstractProver<T> {
           "The model evaluation %s was found before. ALLSAT computation did not make progress.",
           values);
       callback.apply(values);
-      shutdownNotifier.shutdownIfNecessary();
+      contextShutdownNotifier.shutdownIfNecessary();
 
       BooleanFormula negatedModel = bmgr.not(bmgr.and(values));
       addConstraint(negatedModel);
-      shutdownNotifier.shutdownIfNecessary();
+      contextShutdownNotifier.shutdownIfNecessary();
     }
   }
 
@@ -117,7 +115,7 @@ public abstract class AbstractProverWithAllSat<T> extends AbstractProver<T> {
       Deque<BooleanFormula> valuesOfModel)
       throws SolverException, InterruptedException {
 
-    shutdownNotifier.shutdownIfNecessary();
+    contextShutdownNotifier.shutdownIfNecessary();
 
     if (isUnsat()) {
       return;
@@ -138,6 +136,7 @@ public abstract class AbstractProverWithAllSat<T> extends AbstractProver<T> {
       valuesOfModel.pop();
 
       // negated predicate
+      contextShutdownNotifier.shutdownIfNecessary();
       final BooleanFormula notPredicate = bmgr.not(predicates.get(0));
       valuesOfModel.push(notPredicate);
       push(notPredicate);

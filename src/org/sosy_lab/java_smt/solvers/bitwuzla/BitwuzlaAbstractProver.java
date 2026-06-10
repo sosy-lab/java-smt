@@ -41,7 +41,8 @@ abstract class BitwuzlaAbstractProver<T> extends AbstractProverWithAllSat<T> {
       new Terminator() {
         @Override
         public boolean terminate() {
-          return shutdownNotifier.shouldShutdown(); // shutdownNotifer is defined in the superclass
+          return contextShutdownNotifier
+              .shouldShutdown(); // shutdownNotifer is defined in the superclass
         }
       };
   private static final UniqueIdGenerator ID_GENERATOR = new UniqueIdGenerator();
@@ -130,7 +131,7 @@ abstract class BitwuzlaAbstractProver<T> extends AbstractProverWithAllSat<T> {
       return false;
     } else if (resultValue == Result.UNSAT) {
       return true;
-    } else if (resultValue == Result.UNKNOWN && shutdownNotifier.shouldShutdown()) {
+    } else if (resultValue == Result.UNKNOWN && contextShutdownNotifier.shouldShutdown()) {
       throw new InterruptedException();
     } else {
       throw new SolverException("Bitwuzla returned UNKNOWN.");

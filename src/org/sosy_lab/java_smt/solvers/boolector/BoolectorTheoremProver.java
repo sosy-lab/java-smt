@@ -48,7 +48,7 @@ class BoolectorTheoremProver extends AbstractProverWithAllSat<Void> implements P
     this.manager = manager;
     this.creator = creator;
     this.btor = btor;
-    terminationCallback = shutdownNotifier::shouldShutdown;
+    terminationCallback = pShutdownNotifier::shouldShutdown;
     terminationCallbackHelper = addTerminationCallback();
 
     isAnyStackAlive = pIsAnyStackAlive;
