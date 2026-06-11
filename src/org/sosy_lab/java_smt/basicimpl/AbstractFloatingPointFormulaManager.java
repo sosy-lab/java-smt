@@ -323,25 +323,24 @@ public abstract class AbstractFloatingPointFormulaManager<TFormulaInfo, TType, T
 
   @Override
   public BooleanFormula bitwiseEqual(
-      FloatingPointFormula fpNumber, BitvectorFormula bitvectorFormulaSetToBeEqualToFpNumber) {
+      FloatingPointFormula floatValue, BitvectorFormula bitvectorValue) {
     FormulaType.FloatingPointType fpType =
-        (FloatingPointType) getFormulaCreator().getFormulaType(fpNumber);
+        (FloatingPointType) getFormulaCreator().getFormulaType(floatValue);
     checkArgument(
-        fpType.getTotalSize() == bvMgr.getLength(bitvectorFormulaSetToBeEqualToFpNumber),
+        fpType.getTotalSize() == bvMgr.getLength(bitvectorValue),
         "The size of the bitvector term %s is %s, but needs to be equal to the size of"
             + " the Floating-Point term %s with size %s",
-        bitvectorFormulaSetToBeEqualToFpNumber,
-        bvMgr.getLength(bitvectorFormulaSetToBeEqualToFpNumber),
-        fpNumber,
+        bitvectorValue,
+        bvMgr.getLength(bitvectorValue),
+        floatValue,
         fpType.getTotalSize());
 
-    FloatingPointFormula fromIeeeBitvector =
-        fromIeeeBitvector(bitvectorFormulaSetToBeEqualToFpNumber, fpType);
+    FloatingPointFormula fromIeeeBitvector = fromIeeeBitvector(bitvectorValue, fpType);
 
     // We use assignment(), as it allows a fp value to be NaN etc.
     // Note: All fp.to_* functions are unspecified for NaN and infinity input values in the
     // standard, what solvers return might be distinct.
-    return assignment(fromIeeeBitvector, fpNumber);
+    return assignment(fromIeeeBitvector, floatValue);
   }
 
   @Override

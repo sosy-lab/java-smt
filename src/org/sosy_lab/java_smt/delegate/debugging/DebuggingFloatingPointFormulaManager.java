@@ -226,11 +226,11 @@ class DebuggingFloatingPointFormulaManager implements FloatingPointFormulaManage
 
   @Override
   public BooleanFormula bitwiseEqual(
-      FloatingPointFormula fpNumber, BitvectorFormula bitvectorFormulaSetToBeEqualToFpNumber) {
+      FloatingPointFormula floatValue, BitvectorFormula bitvectorValue) {
     debugging.assertThreadLocal();
-    debugging.assertFormulaInContext(fpNumber);
-    debugging.assertFormulaInContext(bitvectorFormulaSetToBeEqualToFpNumber);
-    BooleanFormula res = delegate.bitwiseEqual(fpNumber, bitvectorFormulaSetToBeEqualToFpNumber);
+    debugging.assertFormulaInContext(floatValue);
+    debugging.assertFormulaInContext(bitvectorValue);
+    BooleanFormula res = delegate.bitwiseEqual(floatValue, bitvectorValue);
     debugging.addFormulaTerm(res);
     return res;
   }

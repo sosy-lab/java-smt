@@ -323,25 +323,24 @@ public interface FloatingPointFormulaManager {
    * and eb + sb equal to the bit size of the used {@link BitvectorFormula} parameter, illustrated
    * in SMTLIB2 as:
    *
-   * <p>(= ((_ to_fp eb sb) bitvectorFormulaSetToBeEqualToFpNumber) fpNumber)
+   * <p>(= ((_ to_fp eb sb) bitvectorValue) floatValue)
    *
    * <p>Example usage in SMTLIB2, asserting the equality of the 2 parameters:
    *
-   * <p>(declare-fun bitvectorFormulaSetToBeEqualToFpNumber () (_ BitVec m))
+   * <p>(declare-fun bitvectorValue () (_ BitVec m))
    *
-   * <p>(assert (= ((_ to_fp eb sb) bitvectorFormulaSetToBeEqualToFpNumber) fpNumber))
+   * <p>(assert (= ((_ to_fp eb sb) bitvectorValue) floatValue))
    *
    * <p>Note: SMTLIB2 output of this method uses the SMTLIB2 function symbol 'to_fp' as described
    * above.
    *
-   * @param fpNumber the {@link FloatingPointFormula} to be converted into an IEEE bitvector.
-   * @param bitvectorFormulaSetToBeEqualToFpNumber a {@link BitvectorFormula} that is set to be
-   *     equal to the IEEE bitvector representation of the {@link FloatingPointFormula} parameter.
+   * @param floatValue the {@link FloatingPointFormula} to be converted into an IEEE bitvector.
+   * @param bitvectorValue a {@link BitvectorFormula} that is set to be equal to the IEEE bitvector
+   *     representation of the {@link FloatingPointFormula} parameter.
    * @return a {@link BooleanFormula} representing the result of the equality of the two parameters,
-   *     i.e. (= ((_ to_fp eb sb) bitvectorFormulaSetToBeEqualToFpNumber) fpNumber).
+   *     i.e. (= ((_ to_fp eb sb) bitvectorValue) floatValue).
    */
-  BooleanFormula bitwiseEqual(
-      FloatingPointFormula fpNumber, BitvectorFormula bitvectorFormulaSetToBeEqualToFpNumber);
+  BooleanFormula bitwiseEqual(FloatingPointFormula floatValue, BitvectorFormula bitvectorValue);
 
   FloatingPointFormula round(FloatingPointFormula formula, FloatingPointRoundingMode roundingMode);
 
