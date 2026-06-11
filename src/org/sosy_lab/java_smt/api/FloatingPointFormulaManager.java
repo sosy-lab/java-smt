@@ -331,7 +331,8 @@ public interface FloatingPointFormulaManager {
    *
    * <p>(assert (= ((_ to_fp eb sb) bitvectorFormulaSetToBeEqualToFpNumber) fpNumber))
    *
-   * <p>Note: SMTLIB2 output of this method uses the SMTLIB2 keyword 'to_fp' as described above.
+   * <p>Note: SMTLIB2 output of this method uses the SMTLIB2 function symbol 'to_fp' as described
+   * above.
    *
    * @param fpNumber the {@link FloatingPointFormula} to be converted into an IEEE bitvector.
    * @param bitvectorFormulaSetToBeEqualToFpNumber a {@link BitvectorFormula} that is set to be
