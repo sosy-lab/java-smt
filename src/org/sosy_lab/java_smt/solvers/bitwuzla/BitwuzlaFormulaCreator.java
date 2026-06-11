@@ -20,10 +20,7 @@ import java.math.BigInteger;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map.Entry;
-import java.util.Optional;
 import java.util.function.BiConsumer;
 import org.sosy_lab.java_smt.api.ArrayFormula;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
@@ -539,22 +536,6 @@ class BitwuzlaFormulaCreator extends FormulaCreator<Term, Sort, TermManager, Bit
 
   protected Table<String, Sort, Term> getCache() {
     return formulaCache;
-  }
-
-  // True if the entered String has an existing variable in the cache.
-  protected boolean formulaCacheContains(String variable) {
-    // There is always only 1 type permitted per variable
-    return formulaCache.containsRow(variable);
-  }
-
-  // Optional that contains the variable to the entered String if there is one.
-  protected Optional<Term> getFormulaFromCache(String variable) {
-    Iterator<Entry<Sort, Term>> entrySetIter = formulaCache.row(variable).entrySet().iterator();
-    if (entrySetIter.hasNext()) {
-      // If there is a non-empty row for an entry, there is only one entry
-      return Optional.of(entrySetIter.next().getValue());
-    }
-    return Optional.empty();
   }
 
   @Override

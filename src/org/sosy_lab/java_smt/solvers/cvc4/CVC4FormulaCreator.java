@@ -54,7 +54,7 @@ import org.sosy_lab.java_smt.api.StringFormula;
 import org.sosy_lab.java_smt.api.visitors.FormulaVisitor;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 import org.sosy_lab.java_smt.basicimpl.FunctionDeclarationImpl;
-import org.sosy_lab.java_smt.basicimpl.Tokenizer;
+import org.sosy_lab.java_smt.basicimpl.SMTLibTokenizer;
 import org.sosy_lab.java_smt.solvers.cvc4.CVC4Formula.CVC4ArrayFormula;
 import org.sosy_lab.java_smt.solvers.cvc4.CVC4Formula.CVC4BitvectorFormula;
 import org.sosy_lab.java_smt.solvers.cvc4.CVC4Formula.CVC4BooleanFormula;
@@ -268,7 +268,7 @@ class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, Expr> {
     if (!e.isConst() && !e.isVariable()) {
       e = e.getOperator();
     }
-    return Tokenizer.dequote(e.toString());
+    return SMTLibTokenizer.dequoteSMTLib(e.toString());
   }
 
   @SuppressWarnings("deprecation")

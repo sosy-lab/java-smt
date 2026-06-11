@@ -188,6 +188,13 @@ class BitwuzlaFloatingPointManager
   }
 
   @Override
+  protected Term toIeeeBitvectorImpl(Term pNumber) {
+    throw new UnsupportedOperationException(
+        "Bitwuzla does not support transforming "
+            + "floating-point formulas to IEEE bitvectors natively");
+  }
+
+  @Override
   protected Term negate(Term pParam1) {
     return termManager.mk_term(Kind.FP_NEG, pParam1);
   }

@@ -371,21 +371,30 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
 
   @ForOverride
   protected List<TFormulaInfo> parseAllImpl(String formulaStr) throws IllegalArgumentException {
+    // The fallback implementation splits the input into declarations and assertions,
+    // and parses each assertion separately,
+    // which is not very efficient, but it works for simple cases and is better than nothing
+    ImmutableList.Builder<String> declarationTokens = ImmutableList.builder();
+    ImmutableList.Builder<String> definitionTokens = ImmutableList.builder();
+    ImmutableList.Builder<String> assertTokens = ImmutableList.builder();
     try {
-      // The fallback implementation splits the input into declarations and assertions,
-      // and parses each assertion separately,
-      // which is not very efficient, but it works for simple cases and is better than nothing
-      List<String> tokens = Tokenizer.tokenize(formulaStr);
-
-      List<String> declarationTokens =
-          tokens.stream().filter(Tokenizer::isDeclarationToken).toList();
-      List<String> definitionTokens = tokens.stream().filter(Tokenizer::isDefinitionToken).toList();
-      List<String> assertTokens = tokens.stream().filter(Tokenizer::isAssertToken).toList();
+      for (String token : SMTLibTokenizer.of(formulaStr)) {
+        if (SMTLibTokenizer.isDeclarationToken(token)) {
+          declarationTokens.add(token);
+        }
+        if (SMTLibTokenizer.isDefinitionToken(token)) {
+          definitionTokens.add(token);
+        }
+        if (SMTLibTokenizer.isAssertToken(token)) {
+          assertTokens.add(token);
+        }
+      }
       String definitions =
-          Joiner.on("").join(declarationTokens) + Joiner.on("").join(definitionTokens);
+          Joiner.on("").join(declarationTokens.build())
+              + Joiner.on("").join(definitionTokens.build());
 
       return Collections3.transformedImmutableListCopy(
-          assertTokens, assertion -> parseImpl(definitions + assertion));
+          assertTokens.build(), assertion -> parseImpl(definitions + assertion));
 
     } catch (IllegalArgumentException illegalArgumentException) {
       throw throwIllegalArgumentExceptionWithBetterErrorMessage(illegalArgumentException);
@@ -401,18 +410,15 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
    * only occur as the last command.
    */
   private String sanitize(String formulaStr) {
-    List<String> tokens = Tokenizer.tokenize(formulaStr);
-
-    StringBuilder builder = new StringBuilder();
-
     // SMTLIB2ProgramStateMachine models and tracks that the SMTLIB2 query conforms to the rules
     // outlined in the standard, i.e. which command can follow on which etc.
     // We allow a slightly more lenient version than the standard, allowing implicit logic
     // selection, as most solvers export and support SMTLIB2 like this.
     SMTLIB2ProgramStateMachine smtLibStateMachine = new SMTLIB2ProgramStateMachine(false);
+    StringBuilder builder = new StringBuilder();
 
-    for (String token : tokens) {
-      if (Tokenizer.isSetInfoToken(token)) {
+    for (String token : SMTLibTokenizer.of(formulaStr)) {
+      if (SMTLibTokenizer.isSetInfoToken(token)) {
         // set-info call is allowed to be the very first command in the benchmark, but can also
         // appear repeatedly throughout a SMT2 program
         // Technically it is even required to be the very first command, and it must set the
@@ -420,7 +426,7 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
         // TODO: check that version >= 2 for attribute :smt-lib-version?
         smtLibStateMachine.applyGSIOCommand();
 
-      } else if (Tokenizer.isSetLogicToken(token)) {
+      } else if (SMTLibTokenizer.isSetLogicToken(token)) {
         // (set-logic ...) commands must appear before an assertion is made. They may appear
         // throughout an SMT-LIB2 program to set the 'current logic' to a new logic, but the 'reset'
         // command has to be used before doing so every time.
@@ -429,34 +435,34 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
         // echo, reset, reset-assertions, get-info, get-option, set-info, set-option
         smtLibStateMachine.applySetLogicCommand();
 
-      } else if (Tokenizer.isExitToken(token)) {
+      } else if (SMTLibTokenizer.isExitToken(token)) {
         // Skip the (exit) command at the end of the input
         smtLibStateMachine.applyExitCommand();
 
-      } else if (Tokenizer.isDeclarationToken(token)
-          || Tokenizer.isDefinitionToken(token)
-          || Tokenizer.isAssertToken(token)) {
+      } else if (SMTLibTokenizer.isDeclarationToken(token)
+          || SMTLibTokenizer.isDefinitionToken(token)
+          || SMTLibTokenizer.isAssertToken(token)) {
         // Keep only declaration, definitions and assertion
         smtLibStateMachine.applyAssertDeclareCommands();
         builder.append(token).append('\n');
 
-      } else if (Tokenizer.isForbiddenToken(token)) {
+      } else if (SMTLibTokenizer.isForbiddenToken(token)) {
         // Throw an exception if the script contains commands like (pop) or (reset) that change the
         // state of the assertion stack.
         // We could keep track of the state of the stack and only consider the formulas that remain
         // on the stack at the end of the script. However, this does not seem worth it at the
         // moment. If needed, this feature can still be added later.
         String message;
-        if (Tokenizer.isPushToken(token)) {
+        if (SMTLibTokenizer.isPushToken(token)) {
           smtLibStateMachine.applyPCommand();
           message = "(push ...)";
-        } else if (Tokenizer.isPopToken(token)) {
+        } else if (SMTLibTokenizer.isPopToken(token)) {
           smtLibStateMachine.applyPCommand();
           message = "(pop ...)";
-        } else if (Tokenizer.isResetAssertionsToken(token)) {
+        } else if (SMTLibTokenizer.isResetAssertionsToken(token)) {
           smtLibStateMachine.applyResetAssertionsCommand();
           message = "(reset-assertions)";
-        } else if (Tokenizer.isResetToken(token)) {
+        } else if (SMTLibTokenizer.isResetToken(token)) {
           smtLibStateMachine.applyResetCommand();
           message = "(reset)";
         } else {
