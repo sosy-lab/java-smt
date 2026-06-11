@@ -301,8 +301,8 @@ public interface FloatingPointFormulaManager {
   /**
    * Returns a {@link BitvectorFormula} equal to the representation of the given floating-point
    * value as a bitvector conforming to the IEEE 754-2008 FP format. The bit size of the resulting
-   * bitvector is equal to the total size of the {@link FloatingPointFormula}s {@link
-   * FloatingPointType}. This method is not natively supported by all solvers, and SMTLIB2 output
+   * bitvector is equal to the {@link FloatingPointType#getTotalSize()} of the {@link
+   * FloatingPointFormula}. This method is not natively supported by all solvers, and SMTLIB2 output
    * generated containing formulas originating from this method is often not parsable by other
    * solvers. You can use the method {@link #bitwiseEqual(FloatingPointFormula, BitvectorFormula)}
    * to avoid both problems.
