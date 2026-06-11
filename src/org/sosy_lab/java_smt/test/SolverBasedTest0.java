@@ -299,7 +299,7 @@ public abstract class SolverBasedTest0 {
   }
 
   @SuppressWarnings("CheckReturnValue")
-  protected final void requireNativeFPToBitvector() {
+  final void requireNativeFPToBitvector() {
     requireFloats();
     try {
       fpmgr.toIeeeBitvector(fpmgr.makeNumber(0, getSinglePrecisionFloatingPointType()));
