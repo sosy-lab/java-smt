@@ -301,8 +301,9 @@ public abstract class SolverBasedTest0 {
   @SuppressWarnings("CheckReturnValue")
   final void requireNativeFPToBitvector() {
     requireFloats();
+    var someFP = fpmgr.makeNumber(0, getSinglePrecisionFloatingPointType());
     try {
-      fpmgr.toIeeeBitvector(fpmgr.makeNumber(0, getSinglePrecisionFloatingPointType()));
+      fpmgr.toIeeeBitvector(someFP);
     } catch (UnsupportedOperationException e) {
       assume()
           .withMessage(
