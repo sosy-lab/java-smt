@@ -311,15 +311,14 @@ public interface FloatingPointFormulaManager {
 
   /**
    * Create a {@link BooleanFormula} representing the equality of the bitvector representation of
-   * the given {@link FloatingPointFormula}s value with the given {@link BitvectorFormula},
-   * conforming to the IEEE 754-2008 floating-point format. The size of the given {@link
-   * BitvectorFormula} has to be equal to the size returned by {@link
-   * FloatingPointType#getTotalSize()} of the given {@link FloatingPointFormula}. This
-   * implementation can be used independently of {@link #toIeeeBitvector(FloatingPointFormula)}, as
-   * it does not rely on an SMT solvers support for {@link #toIeeeBitvector(FloatingPointFormula)}.
-   * Behavior for special FP values (NaN, Inf, etc.) is solver dependent. This method is based on a
-   * suggestion in the (<a href="https://smt-lib.org/theories-FloatingPoint.shtml">SMTLIB2
-   * standard</a>) and is equal to:
+   * the given {@link FloatingPointFormula}s value, conforming to the IEEE 754-2008 floating-point
+   * format, with the given {@link BitvectorFormula}. The size of the given {@link BitvectorFormula}
+   * has to be equal to the size returned by {@link FloatingPointType#getTotalSize()} of the given
+   * {@link FloatingPointFormula}. This implementation can be used independently of {@link
+   * #toIeeeBitvector(FloatingPointFormula)}, as it does not rely on an SMT solvers support for
+   * {@link #toIeeeBitvector(FloatingPointFormula)}. Behavior for special FP values (NaN, Inf, etc.)
+   * is solver dependent. This method is based on a suggestion in the (<a
+   * href="https://smt-lib.org/theories-FloatingPoint.shtml">SMTLIB2 standard</a>) and is equal to:
    *
    * <p>assignment(fromIeeeBitvector(bitvectorValue), floatValue)
    *
