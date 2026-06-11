@@ -318,21 +318,15 @@ public interface FloatingPointFormulaManager {
    * be used independently of {@link #toIeeeBitvector(FloatingPointFormula)}, as it does not rely on
    * an SMT solvers support for {@link #toIeeeBitvector(FloatingPointFormula)}. Behavior for special
    * FP values (NaN, Inf, etc.) is solver dependent. This method is based on a suggestion in the (<a
-   * href="https://smt-lib.org/theories-FloatingPoint.shtml">SMTLIB2 standard</a>), with eb being
-   * the {@link FloatingPointFormula}s exponent bit size, sb being its mantissa with the hidden bit,
-   * and eb + sb equal to the bit size of the used {@link BitvectorFormula} parameter, illustrated
-   * in SMTLIB2 as:
+   * href="https://smt-lib.org/theories-FloatingPoint.shtml">SMTLIB2 standard</a>) and is equal to:
    *
-   * <p>(= ((_ to_fp eb sb) bitvectorValue) floatValue)
+   * <p>assignment(fromIeeeBitvector(bitvectorValue), floatValue)
    *
-   * <p>Example usage in SMTLIB2, asserting the equality of the 2 parameters:
-   *
-   * <p>(declare-fun bitvectorValue () (_ BitVec m))
-   *
-   * <p>(assert (= ((_ to_fp eb sb) bitvectorValue) floatValue))
-   *
-   * <p>Note: SMTLIB2 output of this method uses the SMTLIB2 function symbol 'to_fp' as described
-   * above.
+   * <p>Note: SMTLIB2 output of this method uses the SMTLIB2 function symbol 'to_fp', for example
+   * like this: (assert (= ((_ to_fp eb sb) bitvectorValue) floatValue)) with eb being the bit size
+   * returned by {@link FloatingPointType#getExponentSize()} and sb being the bit size returned by
+   * {@link FloatingPointType#getMantissaSizeWithHiddenBit()} of the {@link FloatingPointType} of
+   * floatValue.
    *
    * @param floatValue the {@link FloatingPointFormula} to be converted into an IEEE bitvector.
    * @param bitvectorValue a {@link BitvectorFormula} that is set to be equal to the IEEE bitvector
