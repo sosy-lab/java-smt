@@ -99,6 +99,14 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
         ProverOptions.GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS);
   }
 
+  /**
+   * Checks whether the prover has been closed already. Only to be used if this is the only check
+   * performed in a call.
+   */
+  protected void checkClosed() {
+    Preconditions.checkState(!closed);
+  }
+
   private void checkGenerateInterpolants() {
     Preconditions.checkState(!closed);
     Preconditions.checkState(

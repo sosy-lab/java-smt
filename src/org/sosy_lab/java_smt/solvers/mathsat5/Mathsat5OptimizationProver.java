@@ -8,7 +8,6 @@
 
 package org.sosy_lab.java_smt.solvers.mathsat5;
 
-import static com.google.common.base.Preconditions.checkState;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5FormulaManager.getMsatTerm;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_OPTIMUM;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_assert_formula;
@@ -77,7 +76,6 @@ class Mathsat5OptimizationProver extends Mathsat5AbstractProver<Void>
 
   @Override
   public int maximize(Formula objective) {
-    checkState(!closed);
     long objectiveId = msat_make_maximize(curEnv, getMsatTerm(objective));
     msat_assert_objective(curEnv, objectiveId);
     int id = idGenerator.getFreshId(); // mapping needed to avoid long-int-conversion
@@ -87,7 +85,6 @@ class Mathsat5OptimizationProver extends Mathsat5AbstractProver<Void>
 
   @Override
   public int minimize(Formula objective) {
-    checkState(!closed);
     long objectiveId = msat_make_minimize(curEnv, getMsatTerm(objective));
     msat_assert_objective(curEnv, objectiveId);
     int id = idGenerator.getFreshId(); // mapping needed to avoid long-int-conversion
@@ -119,15 +116,11 @@ class Mathsat5OptimizationProver extends Mathsat5AbstractProver<Void>
 
   @Override
   public Optional<Rational> upper(int handle, Rational epsilon) {
-    checkState(!closed);
-    checkGenerateModels();
     return getValue(handle, epsilon);
   }
 
   @Override
   public Optional<Rational> lower(int handle, Rational epsilon) {
-    checkState(!closed);
-    checkGenerateModels();
     return getValue(handle, epsilon);
   }
 
@@ -147,8 +140,6 @@ class Mathsat5OptimizationProver extends Mathsat5AbstractProver<Void>
 
   @Override
   public Model getModel() throws SolverException {
-    checkState(!closed);
-    checkGenerateModels(); // Needed before loading objective model!
     if (!objectiveMap.isEmpty()) {
       msat_load_objective_model(curEnv, objectiveMap.values().iterator().next());
     }
