@@ -24,8 +24,7 @@ import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.solvers.opensmt.Logics;
 
-public class SolverFormulaWithAssumptionsTest
-    extends SolverBasedTest.ParameterizedSolverBasedTest {
+public class SolverFormulaWithAssumptionsTest extends SolverBasedTest.ParameterizedSolverBasedTest {
 
   // INFO: OpenSmt only support interpolation for QF_LIA, QF_LRA and QF_UF
   @Override

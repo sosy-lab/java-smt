@@ -53,8 +53,7 @@ public class SolverContextFactoryTest {
   protected final LogManager logger = LogManager.createTestLogManager();
   protected ShutdownManager shutdownManager = ShutdownManager.create();
 
-  @Parameter
-  public Solvers solver;
+  @Parameter public Solvers solver;
 
   private Solvers solverToUse() {
     return solver;
