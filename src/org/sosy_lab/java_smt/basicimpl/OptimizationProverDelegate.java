@@ -10,6 +10,7 @@
 
 package org.sosy_lab.java_smt.basicimpl;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.ImmutableMap;
@@ -34,6 +35,7 @@ public class OptimizationProverDelegate implements OptimizationProverEnvironment
   private final OptimizationProverEnvironment optimizationProver;
 
   OptimizationProverDelegate(OptimizationProverEnvironment pBaseProver) {
+    checkArgument(pBaseProver instanceof AbstractProver<?>);
     optimizationProver = checkNotNull(pBaseProver);
   }
 
