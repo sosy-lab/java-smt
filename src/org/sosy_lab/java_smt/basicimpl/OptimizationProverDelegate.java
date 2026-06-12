@@ -77,8 +77,6 @@ public class OptimizationProverDelegate implements OptimizationProverEnvironment
   @SuppressWarnings("resource")
   @Override
   public Model getModel() throws SolverException {
-    // getModel does not use a implementation/delegate and needs to be checked here!
-    getDelegateAsAbstractProver().checkGenerateModels();
     return optimizationProver.getModel();
   }
 

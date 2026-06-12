@@ -139,10 +139,10 @@ class Mathsat5OptimizationProver extends Mathsat5AbstractProver<Void>
   }
 
   @Override
-  public Model getModel() throws SolverException {
+  protected Model getModelImpl() throws SolverException {
     if (!objectiveMap.isEmpty()) {
       msat_load_objective_model(curEnv, objectiveMap.values().iterator().next());
     }
-    return super.getModel();
+    return super.getModelImpl();
   }
 }
