@@ -60,9 +60,9 @@ import org.sosy_lab.java_smt.api.UFManager;
 import org.sosy_lab.java_smt.solvers.opensmt.Logics;
 
 /**
- * Abstract base class with helpful utilities for writing tests that use an SMT solver. It
- * instantiates and closes the SMT solver before and after each test, and provides fields with
- * direct access to the most relevant instances.
+ * Base class with helpful utilities for writing tests that use an SMT solver. It instantiates and
+ * closes the SMT solver before and after each test, and provides fields with direct access to the
+ * most relevant instances.
  *
  * <p>To run the tests using all available solvers, add the following code to your class:
  *
@@ -89,7 +89,7 @@ import org.sosy_lab.java_smt.solvers.opensmt.Logics;
  * <p>Test that rely on a theory that not all solvers support should call one of the {@code require}
  * methods at the beginning.
  */
-public abstract class SolverBasedTest {
+public class SolverBasedTest {
   private TestInfo testInfo;
 
   protected Configuration config;
@@ -580,13 +580,12 @@ public abstract class SolverBasedTest {
 
   @ParameterizedClass
   @EnumSource(Solvers.class)
-  public abstract static class ParameterizedSolverBasedTest extends SolverBasedTest {
+  public static class ParameterizedSolverBasedTest extends SolverBasedTest {
     static Solvers[] getAllSolvers() {
       return Solvers.values();
     }
 
-    @Parameter
-    public Solvers solver;
+    @Parameter public Solvers solver;
 
     @Override
     protected Solvers solverToUse() {
