@@ -354,6 +354,12 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
     return isUnsat;
   }
 
+  /**
+   * @implNote implementing this assumes that {@link
+   *     AbstractSolverContext#supportsAssumptionSolving()} is also overridden returning {@code
+   *     true} in the {@link org.sosy_lab.java_smt.api.SolverContext} implementation of this solver,
+   *     as otherwise this method is ignored.
+   */
   protected abstract boolean isUnsatWithAssumptionsImpl(Collection<BooleanFormula> assumptions)
       throws SolverException, InterruptedException;
 
