@@ -189,18 +189,16 @@ abstract class SmtInterpolAbstractProver<T> extends AbstractProver<T> {
   protected Optional<List<BooleanFormula>> unsatCoreOverAssumptionsImpl(
       Collection<BooleanFormula> assumptions) throws InterruptedException, SolverException {
     Map<String, BooleanFormula> annotatedConstraints = new LinkedHashMap<>();
-    changedSinceLastSatQuery = true;
     push();
     for (BooleanFormula assumption : assumptions) {
       String name = addConstraint0(assumption);
       annotatedConstraints.put(name, assumption);
     }
-    // FIXME: we don't establish UNSAT before generating the UNSAT-CORE!!!!!
     Optional<List<BooleanFormula>> result =
         isUnsat() ? Optional.of(getUnsatCore0(annotatedConstraints)) : Optional.empty();
     pop();
-    // You can not trust the solver anymore due to the pop! Hence, we don't
-    // change changedSinceLastSatQuery to false.
+    // Note: You can not trust the solver anymore due to the pop. The pop() also changes
+    // changedSinceLastSatQuery to true!
     return result;
   }
 
@@ -224,6 +222,9 @@ abstract class SmtInterpolAbstractProver<T> extends AbstractProver<T> {
   @Override
   protected boolean isUnsatWithAssumptionsImpl(Collection<BooleanFormula> pAssumptions)
       throws SolverException, InterruptedException {
+    // While SMTInterpol provides checkSatAssuming(), it requires the assumptions to be
+    // non-annotated, which we don't want due to this conflicting with unsat-core/interpolation
+    // support.
     throw new UnsupportedOperationException(ASSUMPTION_SOLVING_NOT_SUPPORTED);
   }
 
