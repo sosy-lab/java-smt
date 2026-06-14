@@ -140,7 +140,7 @@ abstract class SmtInterpolAbstractProver<T> extends AbstractProver<T> {
 
   @SuppressWarnings("resource")
   @Override
-  public org.sosy_lab.java_smt.api.Model getModelImpl() {
+  protected org.sosy_lab.java_smt.api.Model getModelImpl() {
     final Model model;
     try {
       model = env.getModel();
