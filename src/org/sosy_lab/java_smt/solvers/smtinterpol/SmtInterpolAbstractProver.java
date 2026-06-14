@@ -165,7 +165,7 @@ abstract class SmtInterpolAbstractProver<T> extends AbstractProver<T> {
   }
 
   @Override
-  public List<BooleanFormula> getUnsatCoreImpl() {
+  protected List<BooleanFormula> getUnsatCoreImpl() {
     return getUnsatCore0(annotatedTerms.peek());
   }
 

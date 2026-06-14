@@ -246,7 +246,7 @@ abstract class Yices2AbstractProver<T> extends AbstractProverWithAllSat<T>
   }
 
   @Override
-  public List<BooleanFormula> getUnsatCoreImpl() {
+  protected List<BooleanFormula> getUnsatCoreImpl() {
     return encapsulate(curEnv.getUnsatCore());
   }
 

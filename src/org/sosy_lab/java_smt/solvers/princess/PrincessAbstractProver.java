@@ -162,7 +162,7 @@ abstract class PrincessAbstractProver<E> extends AbstractProverWithAllSat<E> {
   }
 
   @Override
-  public List<BooleanFormula> getUnsatCoreImpl() {
+  protected List<BooleanFormula> getUnsatCoreImpl() {
     final List<BooleanFormula> result = new ArrayList<>();
     final Set<Object> core = asJava(api.getUnsatCore());
     for (Object partitionId : core) {

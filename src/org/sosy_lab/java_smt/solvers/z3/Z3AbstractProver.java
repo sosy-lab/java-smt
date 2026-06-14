@@ -167,7 +167,7 @@ abstract class Z3AbstractProver extends AbstractProverWithAllSat<Void> {
   protected abstract long getUnsatCore0();
 
   @Override
-  public List<BooleanFormula> getUnsatCoreImpl() {
+  protected List<BooleanFormula> getUnsatCoreImpl() {
     if (storedConstraints == null) {
       throw new UnsupportedOperationException(
           "Option to generate the UNSAT core wasn't enabled when creating the prover environment.");

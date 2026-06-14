@@ -165,7 +165,7 @@ abstract class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
 
   @SuppressWarnings("resource")
   @Override
-  public CVC5Model getModelImpl() throws SolverException {
+  protected CVC5Model getModelImpl() throws SolverException {
     // special case for CVC5: Models are not permanent and need to be closed
     // before any change is applied to the prover stack. So, we register the Model as Evaluator.
     return registerEvaluator(
@@ -294,7 +294,7 @@ abstract class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
   }
 
   @Override
-  public List<BooleanFormula> getUnsatCoreImpl() {
+  protected List<BooleanFormula> getUnsatCoreImpl() {
     List<BooleanFormula> converted = new ArrayList<>();
     for (Term aCore : solver.getUnsatCore()) {
       converted.add(creator.encapsulateBoolean(aCore));

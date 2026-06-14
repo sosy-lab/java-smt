@@ -184,7 +184,7 @@ abstract class Mathsat5AbstractProver<T2> extends AbstractProver<T2> {
   }
 
   @Override
-  public List<BooleanFormula> getUnsatCoreImpl() {
+  protected List<BooleanFormula> getUnsatCoreImpl() {
     long[] terms = msat_get_unsat_core(curEnv);
     return encapsulate(terms);
   }

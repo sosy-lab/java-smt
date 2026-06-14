@@ -241,7 +241,7 @@ abstract class OpenSmtAbstractProver<T> extends AbstractProverWithAllSat<T> {
   }
 
   @Override
-  public List<BooleanFormula> getUnsatCoreImpl() {
+  protected List<BooleanFormula> getUnsatCoreImpl() {
     return Lists.transform(osmtSolver.getUnsatCore(), creator::encapsulateBoolean);
   }
 
