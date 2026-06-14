@@ -207,7 +207,7 @@ abstract class Z3AbstractProver extends AbstractProverWithAllSat<Void> {
   protected abstract long getStatistics0();
 
   @Override
-  public ImmutableMap<String, String> getStatisticsImpl() {
+  protected ImmutableMap<String, String> getStatisticsImpl() {
     ImmutableMap.Builder<String, String> builder = ImmutableMap.builder();
     Set<String> seenKeys = new HashSet<>();
 

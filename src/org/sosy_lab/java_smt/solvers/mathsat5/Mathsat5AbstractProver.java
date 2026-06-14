@@ -211,7 +211,7 @@ abstract class Mathsat5AbstractProver<T2> extends AbstractProver<T2> {
   }
 
   @Override
-  public ImmutableMap<String, String> getStatisticsImpl() {
+  protected ImmutableMap<String, String> getStatisticsImpl() {
     // Mathsat sigsevs if you try to get statistics for closed environments
     final String stats = msat_get_search_stats(curEnv);
     return ImmutableMap.copyOf(
