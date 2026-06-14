@@ -98,13 +98,14 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
   protected final void checkGenerateUnsatCoresOverAssumptions(
       Collection<BooleanFormula> assumptions) {
     // TODO: should this close all evaluators as well?
+    // No need to no check for changedSinceLastSatQuery or wasLastSatCheckSatisfiable, as we
+    // guarantee a call to isUnsatOverAssumptions()
     Preconditions.checkState(!closed);
     Preconditions.checkNotNull(assumptions);
     Preconditions.checkState(
         generateUnsatCoresOverAssumptions,
         TEMPLATE,
         ProverOptions.GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS);
-    // TODO: why is there no check for changedSinceLastSatQuery or wasLastSatCheckSatisfiable?
   }
 
   /**
@@ -353,11 +354,12 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
   }
 
   /**
-   * TODO: once javac does not complain if we use a default impl here, add one.
-   *
    * @implSpec override and implement if a solver supports the generation of UNSAT-COREs over
-   *     assumptions. Else, override and throw a {@link UnsupportedOperationException} with {@link
-   *     BasicProverEnvironment#UNSAT_CORE_WITH_ASSUMPTIONS_NOT_SUPPORTED}
+   *     assumptions. This implementation must guarantee that {@link
+   *     BasicProverEnvironment#isUnsatWithAssumptions(Collection)} (or equivalent code that also
+   *     sets the flags correctly) is called to establish the ground truth for satisfiability. Else,
+   *     override and throw a {@link UnsupportedOperationException} with {@link
+   *     BasicProverEnvironment#UNSAT_CORE_WITH_ASSUMPTIONS_NOT_SUPPORTED}.
    */
   protected abstract Optional<List<BooleanFormula>> unsatCoreOverAssumptionsImpl(
       Collection<BooleanFormula> assumptions) throws SolverException, InterruptedException;
