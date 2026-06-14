@@ -211,12 +211,8 @@ abstract class Z3LegacyAbstractProver<T> extends AbstractProverWithAllSat<T> {
   }
 
   @Override
-  public boolean isUnsatWithAssumptions(Collection<BooleanFormula> assumptions)
+  protected boolean isUnsatWithAssumptionsImpl(Collection<BooleanFormula> assumptions)
       throws SolverException, InterruptedException {
-    Preconditions.checkState(!closed);
-    changedSinceLastSatQuery = false;
-    wasLastSatCheckSatisfiable = false;
-
     int result;
     try {
       result =
@@ -229,11 +225,7 @@ abstract class Z3LegacyAbstractProver<T> extends AbstractProverWithAllSat<T> {
       throw creator.handleZ3Exception(e);
     }
     undefinedStatusToException(result);
-    boolean isUnsat = result == Z3_lbool.Z3_L_FALSE.toInt();
-    if (!isUnsat) {
-      wasLastSatCheckSatisfiable = true;
-    }
-    return isUnsat;
+    return result == Z3_lbool.Z3_L_FALSE.toInt();
   }
 
   private void undefinedStatusToException(int solverStatus)

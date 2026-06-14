@@ -104,20 +104,13 @@ abstract class Mathsat5AbstractProver<T2> extends AbstractProver<T2> {
   }
 
   @Override
-  public boolean isUnsatWithAssumptions(Collection<BooleanFormula> pAssumptions)
+  protected boolean isUnsatWithAssumptionsImpl(Collection<BooleanFormula> pAssumptions)
       throws SolverException, InterruptedException {
-    Preconditions.checkState(!closed);
     checkForLiterals(pAssumptions);
-    changedSinceLastSatQuery = false;
-    wasLastSatCheckSatisfiable = false;
 
     final long hook = msat_set_termination_callback(curEnv, context.getTerminationTest());
     try {
-      boolean isSat = msat_check_sat_with_assumptions(curEnv, getMsatTerm(pAssumptions));
-      if (isSat) {
-        wasLastSatCheckSatisfiable = true;
-      }
-      return !isSat;
+      return !msat_check_sat_with_assumptions(curEnv, getMsatTerm(pAssumptions));
     } finally {
       msat_free_termination_callback(hook);
     }

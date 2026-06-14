@@ -8,7 +8,6 @@
 
 package org.sosy_lab.java_smt.solvers.yices2;
 
-import com.google.common.base.Preconditions;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import com.sri.yices.Config;
 import com.sri.yices.Context;
@@ -187,22 +186,12 @@ abstract class Yices2AbstractProver<T> extends AbstractProverWithAllSat<T>
   }
 
   @Override
-  public boolean isUnsatWithAssumptions(Collection<BooleanFormula> pAssumptions)
+  protected boolean isUnsatWithAssumptionsImpl(Collection<BooleanFormula> pAssumptions)
       throws SolverException, InterruptedException {
-    Preconditions.checkState(!closed);
-    Preconditions.checkNotNull(pAssumptions);
-    changedSinceLastSatQuery = false;
-    wasLastSatCheckSatisfiable = false;
-
-    final boolean isUnsat =
-        !satCheckWithShutdownNotifier(
-            () -> curEnv.checkWithAssumptions(DEFAULT_PARAMS, uncapsulate(pAssumptions)),
-            curEnv,
-            shutdownNotifier);
-    if (!isUnsat) {
-      wasLastSatCheckSatisfiable = true;
-    }
-    return isUnsat;
+    return !satCheckWithShutdownNotifier(
+        () -> curEnv.checkWithAssumptions(DEFAULT_PARAMS, uncapsulate(pAssumptions)),
+        curEnv,
+        shutdownNotifier);
   }
 
   @SuppressWarnings("resource")
