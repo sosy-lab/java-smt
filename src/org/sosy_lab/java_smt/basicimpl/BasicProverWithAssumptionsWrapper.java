@@ -1,12 +1,17 @@
-// This file is part of JavaSMT,
-// an API wrapper for a collection of SMT solvers:
-// https://github.com/sosy-lab/java-smt
-//
-// SPDX-FileCopyrightText: 2020 Dirk Beyer <https://www.sosy-lab.org>
-//
-// SPDX-License-Identifier: Apache-2.0
+/*
+ * This file is part of JavaSMT,
+ * an API wrapper for a collection of SMT solvers:
+ * https://github.com/sosy-lab/java-smt
+ *
+ * SPDX-FileCopyrightText: 2026 Dirk Beyer <https://www.sosy-lab.org>
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
 
-package org.sosy_lab.java_smt.basicimpl.withAssumptionsWrapper;
+package org.sosy_lab.java_smt.basicimpl;
+
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -26,7 +31,12 @@ class BasicProverWithAssumptionsWrapper<T, P extends BasicProverEnvironment<T>>
   protected final List<BooleanFormula> solverAssumptionsAsFormula = new ArrayList<>();
 
   BasicProverWithAssumptionsWrapper(P pDelegate) {
-    delegate = pDelegate;
+    // We may need to access the AbstractProver in a nested fashion if P is also a delegate
+    checkArgument(
+        pDelegate instanceof AbstractProver<?>
+            || pDelegate instanceof InterpolatingProverDelegate<?>
+            || pDelegate instanceof OptimizationProverDelegate);
+    delegate = checkNotNull(pDelegate);
   }
 
   protected void clearAssumptions() {
@@ -65,10 +75,12 @@ class BasicProverWithAssumptionsWrapper<T, P extends BasicProverEnvironment<T>>
     return delegate.isUnsat();
   }
 
+  @SuppressWarnings("resource")
   @Override
   public boolean isUnsatWithAssumptions(Collection<BooleanFormula> assumptions)
       throws SolverException, InterruptedException {
     clearAssumptions();
+    getDelegateAsAbstractProver().checkIsUnsatOverAssumptions(assumptions);
     solverAssumptionsAsFormula.addAll(assumptions);
     // Since we are using the delegates isUnsat() impl, we don't need to update
     // wasLastSatCheckSatisfiable etc.
@@ -129,5 +141,18 @@ class BasicProverWithAssumptionsWrapper<T, P extends BasicProverEnvironment<T>>
       throws InterruptedException, SolverException {
     clearAssumptions();
     return delegate.allSat(pCallback, pImportant);
+  }
+
+  @SuppressWarnings("unchecked")
+  private AbstractProver<?> getDelegateAsAbstractProver() {
+    if (delegate instanceof AbstractProver<?> pAbstractProverDelegate) {
+      return pAbstractProverDelegate;
+    } else if (delegate instanceof InterpolatingProverDelegate<?> pInterpolatingProverDelegate) {
+      return pInterpolatingProverDelegate.getDelegateAsAbstractProver();
+    } else if (delegate instanceof OptimizationProverDelegate pOptimizationProverDelegate) {
+      return pOptimizationProverDelegate.getDelegateAsAbstractProver();
+    }
+    // Should never happen due to the check in the constructor
+    throw new IllegalStateException();
   }
 }

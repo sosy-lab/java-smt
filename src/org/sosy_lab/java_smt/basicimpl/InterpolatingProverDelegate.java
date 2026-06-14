@@ -128,7 +128,7 @@ class InterpolatingProverDelegate<T> implements InterpolatingProverEnvironment<T
 
   /* ############################### Utility methods ############################### */
   @SuppressWarnings("unchecked")
-  private AbstractProver<T> getDelegateAsAbstractProver() {
+  AbstractProver<T> getDelegateAsAbstractProver() {
     return (AbstractProver<T>) itpProver;
   }
 }

@@ -135,7 +135,7 @@ public class OptimizationProverDelegate implements OptimizationProverEnvironment
 
   /* ############################### Utility methods ############################### */
   @SuppressWarnings("unchecked")
-  private AbstractProver<?> getDelegateAsAbstractProver() {
+  AbstractProver<?> getDelegateAsAbstractProver() {
     return (AbstractProver<?>) optimizationProver;
   }
 }
