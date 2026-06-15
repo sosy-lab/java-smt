@@ -18,7 +18,6 @@ import org.sosy_lab.java_smt.SolverContextFactory;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.HornProverEnvironment;
-import org.sosy_lab.java_smt.test.Yes;
 
 public class HornExampleTest {
   // TODO: Test with all solvers, not just eldarica (ParameterizedSolverBasedTest0)
@@ -127,7 +126,7 @@ public class HornExampleTest {
 
   private HornProverEnvironment solveSmtLib2(final String file) throws Exception {
     var input =
-        new String(Yes.class.getResourceAsStream("/org/sosy_lab/java_smt/test/horn/" + file +
+        new String(HornExampleTest.class.getResourceAsStream("/org/sosy_lab/java_smt/test/horn/" + file +
             ".smt2").readAllBytes());
 
     final var context = SolverContextFactory.createSolverContext(Solvers.ELDARICA);
