@@ -13,6 +13,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import org.sosy_lab.java_smt.api.BasicProverEnvironment;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.BooleanFormulaManager;
 import org.sosy_lab.java_smt.api.FormulaManager;
@@ -22,6 +23,12 @@ import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.api.visitors.BooleanFormulaTransformationVisitor;
 
+/**
+ * This wrapper provides solver-independent support for assumption solving with interpolation. The
+ * implementations in this class only call other methods provided by {@link BasicProverEnvironment}
+ * and {@link InterpolatingProverEnvironment}. Preconditions for using the API are therefore fully
+ * checked.
+ */
 public class InterpolatingProverWithAssumptionsWrapper<T>
     extends BasicProverWithAssumptionsWrapper<T, InterpolatingProverEnvironment<T>>
     implements InterpolatingProverEnvironment<T> {

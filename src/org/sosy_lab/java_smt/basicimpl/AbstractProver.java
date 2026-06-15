@@ -341,6 +341,10 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
     evaluators.clear();
   }
 
+  // Note: this is also overridden and implemented in our assumptions wrapper (i.e.
+  // BasicProverWithAssumptionsWrapper and its children), without checks/flags. But the
+  // implementation in the assumptions wrapper is guaranteed to use other methods that are
+  // checked and set the flags correctly (push() and isUnsat()), so we can safely ignore it.
   @Override
   public final boolean isUnsatWithAssumptions(Collection<BooleanFormula> assumptions)
       throws SolverException, InterruptedException {
