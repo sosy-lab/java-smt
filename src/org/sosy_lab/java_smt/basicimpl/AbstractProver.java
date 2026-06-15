@@ -341,9 +341,6 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
     evaluators.clear();
   }
 
-  // BasicProverWithAssumptionsWrapper also implements isUnsatWithAssumptions(), but uses
-  // checkIsUnsatOverAssumptions(). Changes in checks or other things here should be reflected in
-  // BasicProverWithAssumptionsWrapper, or be done such that checkIsUnsatOverAssumptions() is used.
   @Override
   public final boolean isUnsatWithAssumptions(Collection<BooleanFormula> assumptions)
       throws SolverException, InterruptedException {

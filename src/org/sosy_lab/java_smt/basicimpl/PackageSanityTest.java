@@ -21,7 +21,6 @@ public class PackageSanityTest extends AbstractPackageSanityTests {
     ignoreClasses(
         c ->
             c.equals(InterpolatingProverDelegate.class)
-                || c.equals(OptimizationProverDelegate.class)
-                || c.equals(BasicProverWithAssumptionsWrapper.class));
+                || c.equals(OptimizationProverDelegate.class));
   }
 }
