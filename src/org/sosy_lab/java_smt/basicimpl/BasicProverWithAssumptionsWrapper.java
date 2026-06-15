@@ -10,9 +10,6 @@
 
 package org.sosy_lab.java_smt.basicimpl;
 
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import java.util.ArrayList;
@@ -25,18 +22,12 @@ import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.SolverException;
 
 class BasicProverWithAssumptionsWrapper<T, P extends BasicProverEnvironment<T>>
-    implements BasicProverEnvironment<T> {
+    extends AbstractProverDelegate<T, P> {
 
-  protected final P delegate;
   protected final List<BooleanFormula> solverAssumptionsAsFormula = new ArrayList<>();
 
   BasicProverWithAssumptionsWrapper(P pDelegate) {
-    // We may need to access the AbstractProver in a nested fashion if P is also a delegate
-    checkArgument(
-        pDelegate instanceof AbstractProver<?>
-            || pDelegate instanceof InterpolatingProverDelegate<?>
-            || pDelegate instanceof OptimizationProverDelegate);
-    delegate = checkNotNull(pDelegate);
+    super(pDelegate);
   }
 
   protected void clearAssumptions() {
@@ -80,7 +71,6 @@ class BasicProverWithAssumptionsWrapper<T, P extends BasicProverEnvironment<T>>
   public boolean isUnsatWithAssumptions(Collection<BooleanFormula> assumptions)
       throws SolverException, InterruptedException {
     clearAssumptions();
-    getDelegateAsAbstractProver().checkIsUnsatOverAssumptions(assumptions);
     solverAssumptionsAsFormula.addAll(assumptions);
     // Since we are using the delegates isUnsat() impl, we don't need to update
     // wasLastSatCheckSatisfiable etc.
@@ -141,18 +131,5 @@ class BasicProverWithAssumptionsWrapper<T, P extends BasicProverEnvironment<T>>
       throws InterruptedException, SolverException {
     clearAssumptions();
     return delegate.allSat(pCallback, pImportant);
-  }
-
-  @SuppressWarnings("unchecked")
-  private AbstractProver<?> getDelegateAsAbstractProver() {
-    if (delegate instanceof AbstractProver<?> pAbstractProverDelegate) {
-      return pAbstractProverDelegate;
-    } else if (delegate instanceof InterpolatingProverDelegate<?> pInterpolatingProverDelegate) {
-      return pInterpolatingProverDelegate.getDelegateAsAbstractProver();
-    } else if (delegate instanceof OptimizationProverDelegate pOptimizationProverDelegate) {
-      return pOptimizationProverDelegate.getDelegateAsAbstractProver();
-    }
-    // Should never happen due to the check in the constructor
-    throw new IllegalStateException();
   }
 }

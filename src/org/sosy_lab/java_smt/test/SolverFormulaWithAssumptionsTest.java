@@ -38,7 +38,7 @@ public class SolverFormulaWithAssumptionsTest
    * parameterize the test.
    */
   @SuppressWarnings({"unchecked", "rawtypes", "CheckReturnValue"})
-  protected <T> InterpolatingProverEnvironment<T> newEnvironmentForTest()
+  protected final <T> InterpolatingProverEnvironment<T> newEnvironmentForTest()
       throws SolverException, InterruptedException {
 
     // check if we support assumption-solving

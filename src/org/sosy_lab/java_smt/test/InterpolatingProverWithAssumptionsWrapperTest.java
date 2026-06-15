@@ -8,8 +8,6 @@
 
 package org.sosy_lab.java_smt.test;
 
-import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
-import org.sosy_lab.java_smt.basicimpl.InterpolatingProverWithAssumptionsWrapper;
 import org.sosy_lab.java_smt.solvers.opensmt.Logics;
 
 public class InterpolatingProverWithAssumptionsWrapperTest
@@ -19,13 +17,5 @@ public class InterpolatingProverWithAssumptionsWrapperTest
   @Override
   protected Logics logicToUse() {
     return Logics.QF_LIA;
-  }
-
-  @Override
-  @SuppressWarnings({"unchecked", "rawtypes", "resource"})
-  protected <T> InterpolatingProverEnvironment<T> newEnvironmentForTest() {
-    final InterpolatingProverEnvironment<?> proverEnvironment =
-        context.newProverEnvironmentWithInterpolation();
-    return new InterpolatingProverWithAssumptionsWrapper(proverEnvironment, mgr);
   }
 }

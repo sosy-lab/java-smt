@@ -20,8 +20,11 @@ public class PackageSanityTest extends AbstractPackageSanityTests {
     setDefault(ShutdownNotifier.class, ShutdownManager.create().getNotifier());
     ignoreClasses(
         c ->
-            c.equals(InterpolatingProverDelegate.class)
-                || c.equals(OptimizationProverDelegate.class)
+            c.equals(ProverWithAssumptionsWrapper.class)
+                || c.equals(InterpolatingProverWithAssumptionsWrapper.class)
+                || c.equals(OptimizationProverDelegateWithChecks.class)
+                || c.equals(InterpolatingProverDelegateWithChecks.class)
+                || c.equals(ProverEnvironmentDelegateWithChecks.class)
                 || c.equals(BasicProverWithAssumptionsWrapper.class));
   }
 }
