@@ -74,33 +74,29 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
     assertedFormulas.add(LinkedHashMultimap.create());
   }
 
-  /**
-   * This checks all common preconditions that need to be fulfilled for all methods of all {@link
-   * BasicProverEnvironment} implementations and extensions.
-   */
-  final void checkProverState() {
-    Preconditions.checkState(!closed);
-  }
-
   protected final void checkGenerateModels() {
     Preconditions.checkState(generateModels, TEMPLATE, ProverOptions.GENERATE_MODELS);
+    Preconditions.checkState(!closed);
     Preconditions.checkState(!changedSinceLastSatQuery);
     Preconditions.checkState(wasLastSatCheckSatisfiable, NO_MODEL_HELP);
   }
 
   protected final void checkGenerateAllSat() {
     // TODO: should this close all evaluators as well?
+    Preconditions.checkState(!closed);
     Preconditions.checkState(generateAllSat, TEMPLATE, ProverOptions.GENERATE_ALL_SAT);
   }
 
   protected final void checkGenerateUnsatCores() {
     // TODO: should this close all evaluators as well?
     Preconditions.checkState(generateUnsatCores, TEMPLATE, ProverOptions.GENERATE_UNSAT_CORE);
+    Preconditions.checkState(!closed);
     Preconditions.checkState(!changedSinceLastSatQuery);
     Preconditions.checkState(!wasLastSatCheckSatisfiable);
   }
 
   protected final void checkIsUnsatOverAssumptions(Collection<BooleanFormula> assumptions) {
+    Preconditions.checkState(!closed);
     Preconditions.checkNotNull(assumptions);
   }
 
@@ -116,8 +112,17 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
         ProverOptions.GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS);
   }
 
+  /**
+   * Checks whether the prover has been closed already. Only to be used if this is the only check
+   * performed in a call.
+   */
+  protected void checkClosed() {
+    Preconditions.checkState(!closed);
+  }
+
   private void checkGenerateInterpolants() {
     // TODO: should this close all evaluators as well?
+    Preconditions.checkState(!closed);
     Preconditions.checkState(
         !changedSinceLastSatQuery,
         "Interpolants can only be calculated right after a call to isUnsat()");
@@ -127,7 +132,7 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
             + "unsatisfiable.");
   }
 
-  protected final void checkGenerateInterpolants(Collection<?> formulasOfA) {
+  protected final void checkGenerateInterpolants(Collection<T> formulasOfA) {
     checkGenerateInterpolants();
     checkArgument(
         getAssertedConstraintIds().containsAll(formulasOfA),
@@ -135,7 +140,7 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
   }
 
   protected final void checkGenerateSeqInterpolants(
-      List<? extends Collection<?>> partitionedFormulas) {
+      List<? extends Collection<T>> partitionedFormulas) {
     checkGenerateInterpolants();
     Preconditions.checkArgument(
         !partitionedFormulas.isEmpty(), "at least one partition should be available.");
@@ -146,13 +151,14 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
   }
 
   protected final void checkGenerateTreeInterpolants(
-      List<? extends Collection<?>> partitionedFormulas, int[] startOfSubTree) {
+      List<? extends Collection<T>> partitionedFormulas, int[] startOfSubTree) {
     checkGenerateSeqInterpolants(partitionedFormulas);
     assert InterpolatingProverEnvironment.checkTreeStructure(
         partitionedFormulas.size(), startOfSubTree);
   }
 
   protected final void checkEnableSeparationLogic() {
+    Preconditions.checkState(!closed);
     Preconditions.checkState(enableSL, TEMPLATE, ProverOptions.ENABLE_SEPARATION_LOGIC);
   }
 
@@ -174,11 +180,13 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
 
   @Override
   public int size() {
+    checkState(!closed);
     return assertedFormulas.size() - 1;
   }
 
   @Override
   public final void push() throws InterruptedException {
+    checkState(!closed);
     pushImpl();
     setChanged();
     assertedFormulas.add(LinkedHashMultimap.create());
@@ -188,6 +196,7 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
 
   @Override
   public final void pop() {
+    checkState(!closed);
     checkState(assertedFormulas.size() > 1, "initial level must remain until close");
     assertedFormulas.remove(assertedFormulas.size() - 1); // remove last
     popImpl();
@@ -199,6 +208,7 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
   @Override
   @CanIgnoreReturnValue
   public final @Nullable T addConstraint(BooleanFormula constraint) throws InterruptedException {
+    checkState(!closed);
     T t = addConstraintImpl(constraint);
     setChanged();
     Iterables.getLast(assertedFormulas).put(constraint, t);
@@ -211,6 +221,7 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
   /** Check whether the conjunction of all formulas on the stack is unsatisfiable. */
   @Override
   public final boolean isUnsat() throws SolverException, InterruptedException {
+    checkState(!closed);
     changedSinceLastSatQuery = false;
     wasLastSatCheckSatisfiable = false;
     final boolean isUnsat = isUnsatImpl();
@@ -237,6 +248,7 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
    * @return the optimization status; {@link OptStatus#OPT} indicates a satisfiable/optimal result
    */
   public final OptStatus check() throws InterruptedException, SolverException {
+    checkState(!closed);
     wasLastSatCheckSatisfiable = false;
     changedSinceLastSatQuery = false;
     final OptStatus status = checkImpl();
@@ -404,6 +416,7 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
 
   @Override
   public final ImmutableMap<String, String> getStatistics() {
+    Preconditions.checkState(!closed);
     return getStatisticsImpl();
   }
 
