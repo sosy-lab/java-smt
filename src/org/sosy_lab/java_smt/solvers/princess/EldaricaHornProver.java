@@ -15,6 +15,7 @@ import ap.parser.IAtom;
 import ap.parser.IFormula;
 import ap.terfor.preds.Predicate;
 import com.google.common.base.Preconditions;
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Set;
 import lazabs.GlobalParameters;
@@ -31,6 +32,7 @@ import org.sosy_lab.java_smt.api.HornProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.solvers.princess.eldarica.PrincessHornConverter;
+import scala.Console$;
 import scala.Function0;
 import scala.collection.immutable.Map;
 import scala.jdk.javaapi.CollectionConverters;
@@ -96,17 +98,25 @@ public class EldaricaHornProver extends PrincessAbstractProver<Void> implements
   }
 
   private Either<Function0<Map<Predicate, IFormula>>, Function0<Dag<IAtom>>> solve() {
-    var clauses = CollectionConverters.asScala(this.clauses).toSeq();
-    var preprocessor = new DefaultPreprocessor();
-    var preprocessed = preprocessor.process(clauses, EmptyVerificationHints$.MODULE$);
+    var stream = DEBUG_LOGGING ? System.err : new PrintStream(NullStream$.MODULE$);
 
-    var stream = DEBUG_LOGGING ? System.err : NullStream$.MODULE$;
+    var err = Console$.MODULE$.err();
+    try {
+      Console$.MODULE$.setErrDirect(stream);
 
-    var result = new CEGARHornWrapper(clauses, preprocessed._1(), preprocessed._2(),
-        preprocessed._3(), false, stream).result();
+      var clauses = CollectionConverters.asScala(this.clauses).toSeq();
+      var preprocessor = new DefaultPreprocessor();
+      var preprocessed = preprocessor.process(clauses, EmptyVerificationHints$.MODULE$);
 
 
-    return result;
+      var result = new CEGARHornWrapper(clauses, preprocessed._1(), preprocessed._2(),
+          preprocessed._3(), false, stream).result();
+
+
+      return result;
+    } finally {
+      Console$.MODULE$.setErrDirect(err);
+    }
   }
 
   @Override

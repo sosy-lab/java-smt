@@ -22,11 +22,6 @@ import org.sosy_lab.java_smt.api.HornProverEnvironment;
 public class HornExampleTest {
   // TODO: Test with all solvers, not just eldarica (ParameterizedSolverBasedTest0)
 
-  // static {
-  //   GlobalParameters.get().setLogLevel(3);
-  //   GlobalParameters.get().log_$eq(true);
-  // }
-
   @Test
   public void hornJavaSMT() throws Exception {
     final var context = SolverContextFactory.createSolverContext(Solvers.ELDARICA);
