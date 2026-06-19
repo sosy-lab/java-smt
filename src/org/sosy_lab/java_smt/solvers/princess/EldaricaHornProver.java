@@ -10,7 +10,6 @@
 
 package org.sosy_lab.java_smt.solvers.princess;
 
-import ap.CmdlMain.NullStream$;
 import ap.api.SimpleAPI;
 import ap.parser.IAtom;
 import ap.parser.IFormula;
@@ -18,9 +17,10 @@ import ap.terfor.preds.Predicate;
 import com.google.common.base.Preconditions;
 import java.util.ArrayList;
 import java.util.Set;
+import lazabs.GlobalParameters;
 import lazabs.horn.CEGARHornWrapper;
-import lazabs.horn.HornAPI;
 import lazabs.horn.Util.Dag;
+import lazabs.horn.Util.NullStream$;
 import lazabs.horn.abstractions.EmptyVerificationHints$;
 import lazabs.horn.bottomup.HornClauses.Clause;
 import lazabs.horn.preprocessor.DefaultPreprocessor;
@@ -38,9 +38,21 @@ import scala.util.Either;
 
 public class EldaricaHornProver extends PrincessAbstractProver<Void> implements
                                                                      HornProverEnvironment {
-//  private final HornAPI horn;
+  //  private final HornAPI horn;
   private final ArrayList<Clause> clauses = new ArrayList<>();
   private final PrincessHornConverter converter = new PrincessHornConverter();
+
+  private static final boolean DEBUG_LOGGING = "true".equals(System.getenv("ELDARICA_DEBUG"));
+
+  static {
+    if (DEBUG_LOGGING) {
+      GlobalParameters.get().setLogLevel(3);
+      GlobalParameters.get().log_$eq(true);
+    } else {
+      GlobalParameters.get().setLogLevel(0);
+      GlobalParameters.get().log_$eq(false);
+    }
+  }
 
   public EldaricaHornProver(
       PrincessFormulaManager pMgr,
@@ -49,7 +61,7 @@ public class EldaricaHornProver extends PrincessAbstractProver<Void> implements
       ShutdownNotifier pShutdownNotifier,
       Set<ProverOptions> pOptions) {
     super(pMgr, creator, pApi, pShutdownNotifier, pOptions);
-   // this.horn = new HornAPI(new HornAPI.CEGAROptions()); // TODO: options
+    // this.horn = new HornAPI(new HornAPI.CEGAROptions()); // TODO: options
   }
 
   private void addConstraint1(BooleanFormula constraint) {
@@ -86,10 +98,12 @@ public class EldaricaHornProver extends PrincessAbstractProver<Void> implements
   private Either<Function0<Map<Predicate, IFormula>>, Function0<Dag<IAtom>>> solve() {
     var clauses = CollectionConverters.asScala(this.clauses).toSeq();
     var preprocessor = new DefaultPreprocessor();
-    var preprocessed = preprocessor.process(clauses,EmptyVerificationHints$.MODULE$);
+    var preprocessed = preprocessor.process(clauses, EmptyVerificationHints$.MODULE$);
+
+    var stream = DEBUG_LOGGING ? System.err : NullStream$.MODULE$;
 
     var result = new CEGARHornWrapper(clauses, preprocessed._1(), preprocessed._2(),
-        preprocessed._3(), false, System.err).result();
+        preprocessed._3(), false, stream).result();
 
 
     return result;
@@ -100,7 +114,7 @@ public class EldaricaHornProver extends PrincessAbstractProver<Void> implements
     var result = solve();
 
     return result.isRight();
-   // return !this.horn.isSat(CollectionConverters.asScala(this.clauses));
+    // return !this.horn.isSat(CollectionConverters.asScala(this.clauses));
   }
 
   // TODO: Model, push/pop?.
