@@ -27,6 +27,7 @@ import ap.parser.IPlus;
 import ap.parser.ISortedQuantified;
 import ap.parser.ISortedVariable;
 import ap.parser.ITerm;
+import ap.parser.ITermITE;
 import ap.parser.ITimes;
 import ap.terfor.ConstantTerm;
 import ap.terfor.conjunctions.Quantifier.ALL$;
@@ -243,6 +244,9 @@ public class PrincessHornConverter {
       if(term instanceof IFunApp fun) {
         return new IFunApp(fun.fun(), toTerm(fun.args()));
       }
+     if(term instanceof ITermITE ite) {
+       return new ITermITE(toFormula(ite.cond()), toTerm(ite.left()), toTerm(ite.right()));
+     }
 
       throw new IllegalArgumentException("Unhandled term: " + term);
     }
