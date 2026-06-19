@@ -176,10 +176,12 @@ SPDX-License-Identifier: Apache-2.0
         <dependency org="uuverifiers" name="eldarica_2.13" rev="2.2.1" conf="runtime-eldarica->master; contrib->sources"/>
 
         <!-- Princess and Ostrich for our Maven release -->
-        <dependency org="io.github.uuverifiers" name="princess_2.13" rev="2025-11-17" conf="runtime-princess-with-javacup->default; contrib->sources,javadoc"/>
+        <dependency org="io.github.uuverifiers" name="princess_2.13" rev="2025-05-20"
+                    conf="runtime-princess-with-javacup->default; contrib->sources,javadoc"/>
         <dependency org="io.github.uuverifiers" name="ostrich_2.13" rev="2.0" conf="runtime-princess-with-javacup->default; contrib->sources,javadoc"/>
         <!-- Princess and Ostrich for our Ivy release -->
-        <dependency org="io.github.uuverifiers" name="princess_2.13" rev="2025-11-17" conf="runtime-princess->default; contrib->sources,javadoc">
+        <dependency org="io.github.uuverifiers" name="princess_2.13" rev="2026-05-20"
+                    conf="runtime-princess->default; contrib->sources,javadoc">
             <!-- Exclude dependency on java-cup and replace it with java-cup-runtime, which is enough.
                We use the JAR that is published by us instead of the one from net.sf.squirrel-sql.thirdparty-non-maven
                because the latter does not provide a separate JAR for java-cup-runtime. -->
