@@ -173,7 +173,8 @@ SPDX-License-Identifier: Apache-2.0
         <dependency org="de.uni-freiburg.informatik.ultimate" name="smtinterpol" rev="2.5-1242-g5c50fb6d" conf="runtime-smtinterpol->master; contrib->sources,javadoc"/>
 
         <!-- Eldarica -->
-        <dependency org="uuverifiers" name="eldarica_2.13" rev="2.2.1" conf="runtime-eldarica->master; contrib->sources"/>
+        <dependency org="uuverifiers" name="eldarica_2.13" rev="2.3"
+                    conf="runtime-eldarica->master; contrib->sources"/>
 
         <!-- Princess and Ostrich for our Maven release -->
         <dependency org="io.github.uuverifiers" name="princess_2.13" rev="2025-05-20"
