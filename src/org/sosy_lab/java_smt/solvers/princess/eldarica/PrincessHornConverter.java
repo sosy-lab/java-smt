@@ -45,6 +45,7 @@ import scala.collection.immutable.List$;
 import scala.collection.immutable.Seq;
 import scala.jdk.javaapi.CollectionConverters;
 
+@SuppressWarnings({"unchecked", "PatternMatchingInstanceof"})
 public class PrincessHornConverter {
   private final ArrayList<Predicate> predicates = new ArrayList<>();
   private final ArrayList<IConstant> parameters = new ArrayList<>();
@@ -70,7 +71,7 @@ public class PrincessHornConverter {
 
 
     private List<IFormula> flatten(final IBinFormula input) {
-      if (input.j() == IBinJunctor.And()) {
+      if (input.j().equals(IBinJunctor.And())) {
         return flattenAnd(input);
       }
 
@@ -221,10 +222,6 @@ public class PrincessHornConverter {
       return constant;
     }
 
-    private ITerm toTerm(final IdealInt term) {
-      return new IIntLit(term);
-    }
-
     private ITerm toTerm(final ITerm term) {
       if (term instanceof IIntLit lit) {
         return lit;
@@ -259,7 +256,7 @@ public class PrincessHornConverter {
         return toVariable(variable);
       }
       if (term instanceof IFunApp fun) {
-        return addConstraint(new IFunApp(fun.fun(), toTerm(fun.args())));
+        return new IFunApp(fun.fun(), toTerm(fun.args()));
       }
       return addConstraint(toTerm(term));
     }
@@ -276,7 +273,7 @@ public class PrincessHornConverter {
 
     @Nullable
     private IAtom toAtom(final IIntFormula formula) {
-      if (formula.t() instanceof IFunApp t && formula.rel() == IIntRelation.EqZero()) {
+      if (formula.t() instanceof IFunApp t && formula.rel().equals(IIntRelation.EqZero())) {
         if (t.fun() instanceof MonoSortedIFunction fun) {
           return new IAtom(toPredicate(fun), toTerm(t.args()));
         }
@@ -298,7 +295,7 @@ public class PrincessHornConverter {
     }
 
     private Clause toClause(final IBinFormula input) {
-      if (input.j() != IBinJunctor.Or()) {
+      if (!input.j().equals(IBinJunctor.Or())) {
         throw new IllegalArgumentException("Illegal horn clause: " + input);
       }
 

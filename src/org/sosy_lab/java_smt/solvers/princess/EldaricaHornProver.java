@@ -38,7 +38,7 @@ import scala.util.Either;
 
 public class EldaricaHornProver extends PrincessAbstractProver<Void> implements
                                                                      HornProverEnvironment {
-  private final HornAPI horn;
+//  private final HornAPI horn;
   private final ArrayList<Clause> clauses = new ArrayList<>();
   private final PrincessHornConverter converter = new PrincessHornConverter();
 
@@ -49,7 +49,7 @@ public class EldaricaHornProver extends PrincessAbstractProver<Void> implements
       ShutdownNotifier pShutdownNotifier,
       Set<ProverOptions> pOptions) {
     super(pMgr, creator, pApi, pShutdownNotifier, pOptions);
-    this.horn = new HornAPI(new HornAPI.CEGAROptions()); // TODO: options
+   // this.horn = new HornAPI(new HornAPI.CEGAROptions()); // TODO: options
   }
 
   private void addConstraint1(BooleanFormula constraint) {

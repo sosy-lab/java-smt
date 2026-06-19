@@ -8,22 +8,14 @@
 
 package org.sosy_lab.java_smt.delegate.synchronize;
 
-import java.util.Collection;
-import java.util.List;
-import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.HornProverEnvironment;
-import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext;
-import org.sosy_lab.java_smt.api.SolverException;
 
 class SynchronizedHornProverEnvironment extends SynchronizedBasicProverEnvironment<Void>
     implements HornProverEnvironment {
 
-  private final HornProverEnvironment delegate;
-
   SynchronizedHornProverEnvironment(
       HornProverEnvironment pDelegate, SolverContext pSync) {
     super(pDelegate, pSync);
-    delegate = pDelegate;
   }
 }

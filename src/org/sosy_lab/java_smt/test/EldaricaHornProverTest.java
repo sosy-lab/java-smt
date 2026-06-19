@@ -30,6 +30,7 @@ import ap.terfor.preds.Predicate;
 import ap.types.MonoSortedIFunction;
 import ap.types.Sort;
 import ap.types.Sort.Integer$;
+import com.google.j2objc.annotations.Property.Suppress;
 import java.util.Arrays;
 import org.junit.Test;
 import org.sosy_lab.java_smt.solvers.princess.eldarica.PrincessHornConverter;
@@ -40,14 +41,19 @@ import scala.jdk.javaapi.CollectionConverters;
 
 public class EldaricaHornProverTest {
 
+  @SuppressWarnings("unchecked")
   private IAtom atom(String name) {
     return new IAtom(new Predicate(name, 0), (Seq<ITerm>) Seq$.MODULE$.empty());
   }
 
+  @SuppressWarnings("varargs")
+  @SafeVarargs
   private <T> Set<T> set(T... values) {
     return CollectionConverters.asScala(Arrays.asList(values)).toSet();
   }
 
+  @SuppressWarnings("varargs")
+  @SafeVarargs
   private <T> Seq<T> seq(T... values) {
     return CollectionConverters.asScala(Arrays.asList(values)).toSeq();
   }

@@ -13,11 +13,8 @@ import org.sosy_lab.java_smt.api.HornProverEnvironment;
 class StatisticsHornProverEnvironment extends StatisticsBasicProverEnvironment<Void>
     implements HornProverEnvironment {
 
-  private final HornProverEnvironment delegate;
-
   StatisticsHornProverEnvironment(
       HornProverEnvironment pDelegate, SolverStatistics pStats) {
     super(pDelegate, pStats);
-    delegate = pDelegate;
   }
 }

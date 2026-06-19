@@ -46,6 +46,7 @@ abstract class CmdLineArgument implements Comparable<CmdLineArgument> {
   }
 
   @Override
+  @SuppressWarnings("PatternMatchingInstanceof")
   public boolean equals(Object o) {
     if (this == o) {
       return true;

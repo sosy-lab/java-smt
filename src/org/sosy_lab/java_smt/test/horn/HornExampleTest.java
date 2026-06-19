@@ -37,14 +37,12 @@ public class HornExampleTest {
     var varA = horn.makeVariable("a");
     var varB = horn.makeVariable("b");
     var varC = horn.makeVariable("c");
-    var varD = horn.makeVariable("d");
 
     var varE = intf.makeVariable("e");
     var n1 = intf.makeNumber(1);
 
 
     var clause1 = horn.makeHornClause(varA, jList(varB, varC), intf.greaterOrEquals(varE, n1));
-    var clause11 = horn.makeHornClause(varA, jList(), intf.greaterThan(varE, n1));
     var clause2 = horn.makeHornClause(jList(varB)); // TODO: Simplify to true???
     var clause3 = horn.makeHornClause(varA, jList(varC));
     {
@@ -124,6 +122,7 @@ public class HornExampleTest {
     }
   }
 
+  @SuppressWarnings("DefaultCharset")
   private HornProverEnvironment solveSmtLib2(final String file) throws Exception {
     var input =
         new String(HornExampleTest.class.getResourceAsStream("/org/sosy_lab/java_smt/test/horn/" + file +
@@ -192,7 +191,8 @@ public class HornExampleTest {
     assertFalse(prover.isUnsat());
   }
 
-
+  @SuppressWarnings("varargs")
+  @SafeVarargs
   private <A> java.util.List<A> jList(A... vars) {
     return java.util.Arrays.asList(vars);
   }
