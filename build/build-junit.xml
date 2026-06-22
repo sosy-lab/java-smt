@@ -58,6 +58,7 @@ SPDX-License-Identifier: Apache-2.0
                     <fork forkmode="perTestClass">
                         <sysproperty key="java.awt.headless" value="true"/>
                         <jvmarg value="-ea"/>
+                        <jvmarg value="--enable-native-access=ALL-UNNAMED"/>
                     </fork>
                     <fileset dir="${class.dir}">
                         <patternset refid="test.sources"/>
@@ -125,6 +126,7 @@ SPDX-License-Identifier: Apache-2.0
                     <sysproperty key="java.awt.headless" value="true"/>
                     <jvmarg value="${jacocoagent}"/>
                     <jvmarg value="-ea"/>
+                    <jvmarg value="--enable-native-access=ALL-UNNAMED"/>
                 </fork>
                 <fileset dir="${class.dir}">
                     <include name="**/*Test.*"/>
