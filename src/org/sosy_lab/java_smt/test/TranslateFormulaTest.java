@@ -53,7 +53,8 @@ public class TranslateFormulaTest {
   public Solvers translateTo;
 
   public static List<Object[]> getSolverCombinations() {
-    List<Solvers> solvers = ImmutableList.copyOf(Solvers.values());
+    List<Solvers> solvers =
+        ImmutableList.copyOf(SolverBasedTest.ParameterizedSolverBasedTest.getAllSolvers());
     return Lists.transform(Lists.cartesianProduct(solvers, solvers), List::toArray);
   }
 
