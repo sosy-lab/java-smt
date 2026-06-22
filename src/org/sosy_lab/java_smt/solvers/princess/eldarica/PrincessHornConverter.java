@@ -10,7 +10,6 @@
 
 package org.sosy_lab.java_smt.solvers.princess.eldarica;
 
-import ap.basetypes.IdealInt;
 import ap.parser.IAtom;
 import ap.parser.IBinFormula;
 import ap.parser.IBinJunctor;
@@ -18,6 +17,7 @@ import ap.parser.IBoolLit;
 import ap.parser.IConstant;
 import ap.parser.IEquation;
 import ap.parser.IFormula;
+import ap.parser.IFormulaITE;
 import ap.parser.IFunApp;
 import ap.parser.IIntFormula;
 import ap.parser.IIntLit;
@@ -99,6 +99,12 @@ public class PrincessHornConverter {
           this.constraint);
     }
 
+    private Clause toClause(final IAtom head, final IBoolLit rest) {
+      this.constraint = this.constraint.andSimplify(rest);
+
+      return new Clause(head, List$.MODULE$.empty(), this.constraint);
+    }
+
     private Clause toClause(final IAtom head, final IIntFormula rest) {
       var atom = toAtom(rest);
       if (atom != null) {
@@ -134,14 +140,17 @@ public class PrincessHornConverter {
     }
 
     private Clause toClause(final IAtom head, final IFormula rest) {
-      if (rest instanceof IAtom) {
-        return toClause(head, (IAtom) rest);
+      if (rest instanceof IAtom atom) {
+        return toClause(head, atom);
       }
-      if (rest instanceof IIntFormula) {
-        return toClause(head, (IIntFormula) rest);
+      if (rest instanceof IIntFormula _int) {
+        return toClause(head, _int);
       }
-      if (rest instanceof IBinFormula) {
-        return toClause(head, (IBinFormula) rest);
+      if (rest instanceof IBinFormula bin) {
+        return toClause(head, bin);
+      }
+      if (rest instanceof IBoolLit lit) {
+        return toClause(head, lit);
       }
 
       throw new RuntimeException("Unhandled clause: " + rest);
@@ -196,6 +205,12 @@ public class PrincessHornConverter {
       if (formula instanceof INot bin) {
         return toFormula(bin);
       }
+      if (formula instanceof IBoolLit lit) {
+        return lit;
+      }
+      if (formula instanceof IFormulaITE ite) {
+        return new IFormulaITE(toFormula(ite.cond()), toFormula(ite.left()), toFormula(ite.right()));
+      }
 
       throw new IllegalArgumentException("Unhandled formula: " + formula);
     }
@@ -226,7 +241,7 @@ public class PrincessHornConverter {
       if (term instanceof IIntLit lit) {
         return lit;
       }
-      if(term instanceof IConstant constant) {
+      if (term instanceof IConstant constant) {
         return constant;
       }
       if (term instanceof ISortedVariable variable) {
@@ -238,12 +253,12 @@ public class PrincessHornConverter {
       if (term instanceof ITimes times) {
         return new ITimes(times.coeff(), toTerm(times.subterm()));
       }
-      if(term instanceof IFunApp fun) {
+      if (term instanceof IFunApp fun) {
         return new IFunApp(fun.fun(), toTerm(fun.args()));
       }
-     if(term instanceof ITermITE ite) {
-       return new ITermITE(toFormula(ite.cond()), toTerm(ite.left()), toTerm(ite.right()));
-     }
+      if (term instanceof ITermITE ite) {
+        return new ITermITE(toFormula(ite.cond()), toTerm(ite.left()), toTerm(ite.right()));
+      }
 
       throw new IllegalArgumentException("Unhandled term: " + term);
     }
@@ -291,7 +306,8 @@ public class PrincessHornConverter {
         throw new IllegalArgumentException("Invalid quantifier: " + input);
       }
 
-      return toClause(input.subformula()); // TODO: Really?
+      // Eldarica seems to always use for all quantifiers, so it is just removed
+      return toClause(input.subformula());
     }
 
     private Clause toClause(final IBinFormula input) {
