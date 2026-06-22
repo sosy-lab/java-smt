@@ -42,7 +42,6 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.sosy_lab.java_smt.api.SolverException;
 
-@Disabled("prevent this abstract class being executed as testcase by ant")
 public abstract class Mathsat5AbstractNativeApiTest {
 
   protected long env;
