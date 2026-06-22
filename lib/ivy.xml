@@ -132,6 +132,7 @@ SPDX-License-Identifier: Apache-2.0
         <dependency org="org.junit.jupiter" name="junit-jupiter-api" rev="6.1.0" conf="test->default"/>
         <dependency org="org.junit.jupiter" name="junit-jupiter-params" rev="6.1.0" conf="test->default"/>
         <dependency org="org.junit.jupiter" name="junit-jupiter-engine" rev="6.1.0" conf="test->default"/>
+        <dependency org="org.junit.vintage" name="junit-vintage-engine" rev="6.1.0" conf="test->default"/>
         <dependency org="org.junit.platform" name="junit-platform-launcher" rev="6.1.0" conf="test->default"/>
 
         <!-- JaCoCo
