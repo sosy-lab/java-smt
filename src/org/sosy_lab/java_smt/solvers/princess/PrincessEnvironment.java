@@ -37,6 +37,7 @@ import ap.theories.arrays.ExtArray.ArraySort;
 import ap.theories.bitvectors.ModuloArithmetic;
 import ap.theories.rationals.Rationals$;
 import ap.theories.strings.StringTheory;
+import ap.types.ProxySort;
 import ap.types.Sort;
 import ap.types.Sort$;
 import ap.types.Sort.MultipleValueBool$;
@@ -606,6 +607,15 @@ class PrincessEnvironment {
           getFormulaTypeFromSort(elementSort));
     } else if (sort instanceof MultipleValueBool$) {
       return FormulaType.BooleanType;
+    } else if (sort instanceof ADTProxySort adt) {
+      var type = getProxyName(adt);
+      if ("int".equals(type)) {
+        return FormulaType.IntegerType;
+      }
+      if (type.startsWith("int[")) {
+        return FormulaType.getArrayType(FormulaType.IntegerType, FormulaType.IntegerType);
+      }
+      throw new IllegalArgumentException("Can not get formula type " + type);
     } else {
       // Check if it's a bitvector sort
       scala.Option<Object> bitWidth = getBitWidth(sort);
@@ -766,5 +776,16 @@ class PrincessEnvironment {
       f = BooleanCompactifier.apply((IFormula) f);
     }
     return PartialEvaluator.apply(f);
+  }
+
+  private static String getProxyName(final ADTProxySort sort) {
+    try {
+      var field = ProxySort.class.getDeclaredField("name");
+      field.setAccessible(true);
+
+      return (String) field.get(sort);
+    } catch (Exception error) {
+      throw new RuntimeException(error);
+    }
   }
 }
