@@ -144,7 +144,7 @@ public class PrincessHornConverter {
         return toClause(head, (IBinFormula) rest);
       }
 
-      throw new RuntimeException("TODO");
+      throw new RuntimeException("Unhandled clause: " + rest);
     }
 
     private IConstant addConstraint(final ITerm term) {
@@ -197,7 +197,7 @@ public class PrincessHornConverter {
         return toFormula(bin);
       }
 
-      return formula;
+      throw new IllegalArgumentException("Unhandled formula: " + formula);
     }
 
     private IConstant toVariable(final ISortedVariable variable) {
@@ -288,7 +288,7 @@ public class PrincessHornConverter {
 
     private Clause toClause(final ISortedQuantified input) {
       if (input.quan() != ALL$.MODULE$) {
-        throw new IllegalArgumentException("Illegal horn clause: " + input);
+        throw new IllegalArgumentException("Invalid quantifier: " + input);
       }
 
       return toClause(input.subformula()); // TODO: Really?
@@ -296,7 +296,7 @@ public class PrincessHornConverter {
 
     private Clause toClause(final IBinFormula input) {
       if (!input.j().equals(IBinJunctor.Or())) {
-        throw new IllegalArgumentException("Illegal horn clause: " + input);
+        throw new IllegalArgumentException("Invalid formlar junctor: " + input);
       }
 
       INot not;
@@ -310,7 +310,7 @@ public class PrincessHornConverter {
         not = (INot) input.f2();
         other = input.f1();
       } else {
-        throw new RuntimeException("TODO");
+        throw new IllegalArgumentException("Unhandled clause: " + input);
       }
 
       IAtom head;
@@ -351,7 +351,7 @@ public class PrincessHornConverter {
         return toClause(toAtom((IIntFormula) input));
       }
 
-      throw new IllegalArgumentException("Illegal horn clause: " + input);
+      throw new IllegalArgumentException("Unhandled clause: " + input);
     }
   }
 
