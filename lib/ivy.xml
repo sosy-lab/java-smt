@@ -133,7 +133,13 @@ SPDX-License-Identifier: Apache-2.0
         <dependency org="org.junit.jupiter" name="junit-jupiter-params" rev="6.1.0" conf="test->default"/>
         <dependency org="org.junit.jupiter" name="junit-jupiter-engine" rev="6.1.0" conf="test->default"/>
         <dependency org="org.junit.vintage" name="junit-vintage-engine" rev="6.1.0" conf="test->default"/>
+
         <dependency org="org.junit.platform" name="junit-platform-launcher" rev="6.1.0" conf="test->default"/>
+        <dependency org="org.junit.platform" name="junit-platform-reporting" rev="6.1.0" conf="test->default"/>
+
+        <!-- Open Test Reporting
+             CLI tool for generate test reports -->
+        <dependency org="org.opentest4j.reporting" name="open-test-reporting-cli" rev="0.2.5" conf="test->default"/>
 
         <!-- JaCoCo
              Library for code coverage -->

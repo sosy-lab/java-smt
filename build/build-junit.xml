@@ -54,8 +54,10 @@ SPDX-License-Identifier: Apache-2.0
         <sequential>
             <junitlauncher printsummary="true" failureproperty="junit.failed">
                 <classpath refid="classpath.junit"/>
-                <testclasses outputdir="${junit.dir}">
+                <testclasses>
                     <fork forkmode="perTestClass">
+                        <sysproperty key="junit.platform.reporting.open.xml.enabled" value="true"/>
+                        <sysproperty key="junit.platform.reporting.output.dir" value="${junit.dir}/{uniqueNumber}"/>
                         <sysproperty key="java.awt.headless" value="true"/>
                         <jvmarg value="-ea"/>
                         <jvmarg value="--enable-native-access=ALL-UNNAMED"/>
@@ -63,15 +65,18 @@ SPDX-License-Identifier: Apache-2.0
                     <fileset dir="${class.dir}">
                         <patternset refid="test.sources"/>
                     </fileset>
-                    <listener type="legacy-brief" sendSysOut="true"/>
-                    <listener type="legacy-xml" sendSysErr="true" sendSysOut="true"/>
                 </testclasses>
             </junitlauncher>
-            <junitreport todir="${junit.dir}">
-                <fileset dir="${junit.dir}" includes="TEST-*.xml"/>
-                <report format="noframes"/>
-            </junitreport>
-            <move file="junit-noframes.html" tofile="JUnit.html"/>
+            <fileset id="opentest.reports" dir="${junit.dir}" includes="**/*.xml"/>
+            <pathconvert refid="opentest.reports" property="reports" pathsep=" "/>
+            <!-- Generate the html report -->
+            <java classname="org.opentest4j.reporting.cli.ReportingCli">
+                <classpath refid="classpath.junit"/>
+                <arg value="html-report"/>
+                <arg value="--output"/>
+                <arg value="JUnit.html"/>
+                <arg line="${reports}"/>
+            </java>
             <fail if="junit.failed" message="JUnit tests failed, look at JUnit.html"/>
         </sequential>
     </macrodef>
