@@ -94,15 +94,27 @@ public class PrincessHornConverter {
       return List.of(toFormula(input));
     }
 
+
     private Clause toClause(final IAtom head, final IAtom rest) {
-      return new Clause(head, CollectionConverters.asScala(List.of(rest)).toList(),
+      return new Clause(head, CollectionConverters.asScala(List.of(toFormula(rest))).toList(),
           this.constraint);
     }
 
     private Clause toClause(final IAtom head, final IBoolLit rest) {
       this.constraint = this.constraint.andSimplify(rest);
+      return toClause(head);
+    }
 
-      return new Clause(head, List$.MODULE$.empty(), this.constraint);
+    private Clause toClause(final IAtom head, final IEquation rest) {
+      this.constraint = this.constraint.andSimplify(toFormula(rest));
+
+      return toClause(head);
+    }
+
+    private Clause toClause(final IAtom head, final INot rest) {
+      this.constraint = this.constraint.andSimplify(toFormula(rest));
+
+      return toClause(head);
     }
 
     private Clause toClause(final IAtom head, final IIntFormula rest) {
@@ -113,7 +125,7 @@ public class PrincessHornConverter {
       }
       // TODO: Is that duplicating the constraint?
       this.constraint = this.constraint.andSimplify(toFormula(rest));
-      return new Clause(head, List$.MODULE$.empty(), this.constraint);
+      return toClause(head);
     }
 
     private Clause toClause(final IAtom head, final IBinFormula rest) {
@@ -152,7 +164,12 @@ public class PrincessHornConverter {
       if (rest instanceof IBoolLit lit) {
         return toClause(head, lit);
       }
-
+      if (rest instanceof IEquation eq) {
+        return toClause(head, eq);
+      }
+      if (rest instanceof INot not) {
+        return toClause(head, not);
+      }
       throw new RuntimeException("Unhandled clause: " + rest);
     }
 
@@ -209,7 +226,8 @@ public class PrincessHornConverter {
         return lit;
       }
       if (formula instanceof IFormulaITE ite) {
-        return new IFormulaITE(toFormula(ite.cond()), toFormula(ite.left()), toFormula(ite.right()));
+        return new IFormulaITE(toFormula(ite.cond()), toFormula(ite.left()),
+            toFormula(ite.right()));
       }
 
       throw new IllegalArgumentException("Unhandled formula: " + formula);
@@ -297,8 +315,8 @@ public class PrincessHornConverter {
       return null;
     }
 
-    private Clause toClause(final IAtom input) {
-      return new Clause(input, List$.MODULE$.empty(), this.constraint);
+    private Clause toClause(final IAtom head) {
+      return new Clause(head, List$.MODULE$.empty(), this.constraint);
     }
 
     private Clause toClause(final ISortedQuantified input) {
@@ -308,6 +326,20 @@ public class PrincessHornConverter {
 
       // Eldarica seems to always use for all quantifiers, so it is just removed
       return toClause(input.subformula());
+    }
+
+    private IFormula simplify(IFormula formula) {
+      if (formula instanceof INot not) {
+        return simplify(not);
+      }
+      return formula;
+    }
+
+    private IFormula simplify(INot not) {
+      if (not.subformula() instanceof INot sub) {
+        return simplify(sub);
+      }
+      return not;
     }
 
     private Clause toClause(final IBinFormula input) {
@@ -336,19 +368,17 @@ public class PrincessHornConverter {
       } else if (other instanceof IIntFormula) {
         head = toAtom((IIntFormula) other);
         if (head == null) {
-          throw new RuntimeException("TODO");
+          throw new RuntimeException("No head found: " + input);
         }
       } else {
         head = new IAtom(HornClauses.FALSE(), (Seq<ITerm>) Seq$.MODULE$.empty());
-        this.constraint = this.constraint.andSimplify(toFormula(other).notSimplify());
+        this.constraint = this.constraint.andSimplify(simplify(toFormula(other).notSimplify()));
 
-        // TODO: (expected) Clause(FALSE,List(mc(P1, P0)),!(!((101 + -1 * P1) >= 0) | (P0 = 92)))
-        // TODO: (actual  ) Clause(FALSE,List(mc(P1, P0)),(((101 + -1 * P1) >= 0) & !(P0 = 91)))
-        return toClause(head, not.subformula());
+        return toClause(head, simplify(not.subformula()));
       }
 
 
-      return toClause(head, not.subformula());
+      return toClause(head, simplify(not.subformula()));
     }
 
     public Clause toClause(IFormula input) {
