@@ -84,8 +84,8 @@ import org.sosy_lab.java_smt.solvers.opensmt.Logics;
  *  }
  * </pre>
  *
- * In your tests {@link #assertThatFormula(BooleanFormula)} can be used to easily write assertions
- * about formulas using Truth.
+ * {@link #assertThatFormula(BooleanFormula)} can be used to easily write assertions about formulas
+ * using Truth.
  *
  * <p>Test that rely on a theory that not all solvers support should call one of the {@code require}
  * methods at the beginning.
