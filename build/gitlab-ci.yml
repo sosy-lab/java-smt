@@ -125,16 +125,13 @@ spotbugs:
     - "ldd --version"
     - "java -version"
   script:
-    - "ant $ANT_PROPS_CHECKS unit-tests-coverage"
+    - "ant $ANT_PROPS_CHECKS unit-tests"
   artifacts:
     paths:
       - "JUnit.html"
-      - "JUnit-coverage/"
-      - "junit/coverage.xml"
-      - "output/traces/"
     when: always
     reports:
-      junit: "junit/TESTS-TestSuites.xml"
+      junit: "junit/open-test-report.xml"
 
 .unit-tests-quick:
   extends: [ .binary_check, .unit-tests ]

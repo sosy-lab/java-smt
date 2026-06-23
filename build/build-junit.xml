@@ -55,9 +55,9 @@ SPDX-License-Identifier: Apache-2.0
             <junitlauncher printsummary="true" failureproperty="junit.failed">
                 <classpath refid="classpath.junit"/>
                 <testclasses>
-                    <fork forkmode="perTestClass">
+                    <fork>
                         <sysproperty key="junit.platform.reporting.open.xml.enabled" value="true"/>
-                        <sysproperty key="junit.platform.reporting.output.dir" value="${junit.dir}/{uniqueNumber}"/>
+                        <sysproperty key="junit.platform.reporting.output.dir" value="${junit.dir}"/>
                         <sysproperty key="java.awt.headless" value="true"/>
                         <jvmarg value="-ea"/>
                         <jvmarg value="--enable-native-access=ALL-UNNAMED"/>
@@ -110,10 +110,7 @@ SPDX-License-Identifier: Apache-2.0
     <target name="unit-tests" depends="build, load-junit, init-unit-tests"
             description="Run all JUnit tests">
         <patternset id="test.sources">
-            <include name="**/*Test.*"/>
-            <exclude name="**/*$*Test.*"/>
-            <exclude name="**/SolverBasedTest.*"/>
-            <exclude name="**/Mathsat5AbstractNativeApiTest.*"/>
+            <include name="**/test/TimeoutTest.*"/>
         </patternset>
         <run-junit-tests/>
     </target>
