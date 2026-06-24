@@ -173,11 +173,15 @@ public class PrincessHornConverter {
       throw new RuntimeException("Unhandled clause: " + rest);
     }
 
+    private IConstant createVariable() {
+      return new IConstant(new ConstantTerm("T" + ++variables));
+    }
+
     private IConstant addConstraint(final ITerm term) {
       if (term instanceof IConstant) {
         return (IConstant) term;
       }
-      var variable = new IConstant(new ConstantTerm("T" + ++variables));
+      var variable = createVariable();
       var constraint = new IEquation(variable, term);
 
       this.constraint = this.constraint.andSimplify(constraint);
@@ -189,7 +193,7 @@ public class PrincessHornConverter {
       return new IAtom(atom.pred(), toTerm(atom.args()));
     }
 
-    private IIntFormula toFormula(final IIntFormula i) {
+    private IFormula toFormula(final IIntFormula i) {
       return new IIntFormula(i.rel(), toTerm(i.t()));
     }
 
@@ -204,6 +208,19 @@ public class PrincessHornConverter {
 
     private IFormula toFormula(final INot not) {
       return toFormula(not.subformula()).notSimplify();
+    }
+
+    private IFormula toFormula(final IFormulaITE ite) {
+      //return new IFormulaITE(toFormula(ite.cond()), toFormula(ite.left()),
+      //    toFormula(ite.right()));
+
+      var condition = toFormula(ite.cond());
+
+      var a = new IBinFormula(IBinJunctor.And(), condition.notSimplify(), toFormula(ite.left()));
+      var b = new IBinFormula(IBinJunctor.And(), condition, toFormula(ite.right()));
+
+
+      return a.orSimplify(b);
     }
 
     private IFormula toFormula(final IFormula formula) {
@@ -226,8 +243,7 @@ public class PrincessHornConverter {
         return lit;
       }
       if (formula instanceof IFormulaITE ite) {
-        return new IFormulaITE(toFormula(ite.cond()), toFormula(ite.left()),
-            toFormula(ite.right()));
+        return toFormula(ite);
       }
 
       throw new IllegalArgumentException("Unhandled formula: " + formula);
@@ -255,6 +271,25 @@ public class PrincessHornConverter {
       return constant;
     }
 
+    private ITerm toTerm(final ITermITE ite) {
+      // return new ITermITE(toFormula(ite.cond()), toTerm(ite.left()), toTerm(ite.right()));
+      var variable = createVariable();
+
+      var condition = toFormula(ite.cond());
+
+      var left = new IEquation(variable, toTerm(ite.left()));
+      var right = new IEquation(variable, toTerm(ite.right()));
+
+
+      var a = new IBinFormula(IBinJunctor.And(), condition.notSimplify(), left);
+      var b = new IBinFormula(IBinJunctor.And(), condition, right);
+
+
+      this.constraint = this.constraint.andSimplify(a.orSimplify(b));
+
+      return variable;
+    }
+
     private ITerm toTerm(final ITerm term) {
       if (term instanceof IIntLit lit) {
         return lit;
@@ -275,7 +310,7 @@ public class PrincessHornConverter {
         return new IFunApp(fun.fun(), toTerm(fun.args()));
       }
       if (term instanceof ITermITE ite) {
-        return new ITermITE(toFormula(ite.cond()), toTerm(ite.left()), toTerm(ite.right()));
+        return toTerm(ite);
       }
 
       throw new IllegalArgumentException("Unhandled term: " + term);
