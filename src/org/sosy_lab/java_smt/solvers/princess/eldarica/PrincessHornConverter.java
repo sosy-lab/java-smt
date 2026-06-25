@@ -372,7 +372,7 @@ public class PrincessHornConverter {
 
     private IFormula simplify(INot not) {
       if (not.subformula() instanceof INot sub) {
-        return simplify(sub);
+        return simplify(sub.subformula());
       }
       return not;
     }
