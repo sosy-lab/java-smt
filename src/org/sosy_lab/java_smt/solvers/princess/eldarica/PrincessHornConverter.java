@@ -216,8 +216,8 @@ public class PrincessHornConverter {
 
       var condition = toFormula(ite.cond());
 
-      var a = new IBinFormula(IBinJunctor.And(), condition.notSimplify(), toFormula(ite.left()));
-      var b = new IBinFormula(IBinJunctor.And(), condition, toFormula(ite.right()));
+      var a = new IBinFormula(IBinJunctor.And(), condition, toFormula(ite.left()));
+      var b = new IBinFormula(IBinJunctor.And(), condition.notSimplify(), toFormula(ite.right()));
 
 
       return a.orSimplify(b);
@@ -281,8 +281,8 @@ public class PrincessHornConverter {
       var right = new IEquation(variable, toTerm(ite.right()));
 
 
-      var a = new IBinFormula(IBinJunctor.And(), condition.notSimplify(), left);
-      var b = new IBinFormula(IBinJunctor.And(), condition, right);
+      var a = new IBinFormula(IBinJunctor.And(), condition, left);
+      var b = new IBinFormula(IBinJunctor.And(), condition.notSimplify(), right);
 
 
       this.constraint = this.constraint.andSimplify(a.orSimplify(b));
