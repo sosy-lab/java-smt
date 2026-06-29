@@ -49,7 +49,6 @@ import scala.jdk.javaapi.CollectionConverters;
 @SuppressWarnings({"unchecked", "PatternMatchingInstanceof"})
 public class PrincessHornConverter {
   private final ArrayList<Predicate> predicates = new ArrayList<>();
-  private int variables = 0;
 
   private Predicate toPredicate(final MonoSortedIFunction function) {
     // Predicate does not implement hashCode nor equals, this deduplicates the objects.
@@ -177,22 +176,6 @@ public class PrincessHornConverter {
       throw new RuntimeException("Unhandled clause: " + rest);
     }
 
-    private IConstant createVariable() {
-      return new IConstant(new ConstantTerm("T" + ++variables));
-    }
-
-    private IConstant addConstraint(final ITerm term) {
-      if (term instanceof IConstant) {
-        return (IConstant) term;
-      }
-      var variable = createVariable();
-      var constraint = new IEquation(variable, toTerm(term));
-
-      this.constraint = this.constraint.andSimplify(constraint);
-
-      return variable;
-    }
-
     private IAtom toFormula(final IAtom atom) {
       return new IAtom(atom.pred(), toTerm(atom.args()));
     }
@@ -310,23 +293,6 @@ public class PrincessHornConverter {
       return constant;
     }
 
-    private ITerm toTerm(final ITermITE ite) {
-      var condition = toFormula(ite.cond());
-
-      var variable = createVariable();
-      var left = new IEquation(variable, toTerm(ite.left()));
-      var right = new IEquation(variable, toTerm(ite.right()));
-
-
-      var a = condition.andSimplify(left);
-      var b = condition.notSimplify().andSimplify(right);
-
-
-      this.constraint = this.constraint.andSimplify(a.orSimplify(b));
-
-      return variable;
-    }
-
     private ITerm toTerm(final ITerm term) {
       if (term instanceof IIntLit lit) {
         return lit;
@@ -347,39 +313,17 @@ public class PrincessHornConverter {
         return new IFunApp(fun.fun(), toTerm(fun.args()));
       }
       if (term instanceof ITermITE ite) {
-        return toTerm(ite);
+        throw new IllegalArgumentException("Eldarica does not support ITE terms: " + ite);
       }
 
       throw new IllegalArgumentException("Unhandled term: " + term);
-    }
-
-    private ITerm toConstraint(final ITerm term) {
-      if (term instanceof IConstant constant) {
-        return constant;
-      }
-      if (term instanceof IIntLit lit) {
-        return lit;
-      }
-      if (term instanceof ISortedVariable variable) {
-        return toVariable(variable);
-      }
-      if (term instanceof IFunApp fun) {
-        return new IFunApp(fun.fun(), toTerm(fun.args()));
-      }
-    //  if(term instanceof IPlus plus) {
-    //    return new IPlus(toTerm(plus.t1()), toTerm(plus.t2()));
-    //  }
-    //  if(term instanceof ITimes times) {
-    //    return new ITimes(times.coeff(), toTerm(times.subterm()));
-    //  }
-      return addConstraint(toTerm(term));
     }
 
     private Seq<ITerm> toTerm(final Seq<ITerm> terms) {
       final var output = new ArrayList<ITerm>();
 
       for (ITerm term : CollectionConverters.asJava(terms)) {
-        output.add(toConstraint(term));
+        output.add(toTerm(term));
       }
 
       return CollectionConverters.asScala(output).toSeq();
