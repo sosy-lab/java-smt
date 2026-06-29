@@ -33,6 +33,7 @@ import ap.terfor.ConstantTerm;
 import ap.terfor.conjunctions.Quantifier.ALL$;
 import ap.terfor.preds.Predicate;
 import ap.types.MonoSortedIFunction;
+import ap.types.MonoSortedPredicate;
 import ap.types.Sort.Integer$;
 import ap.types.SortedConstantTerm;
 import java.util.ArrayList;
@@ -48,25 +49,29 @@ import scala.jdk.javaapi.CollectionConverters;
 @SuppressWarnings({"unchecked", "PatternMatchingInstanceof"})
 public class PrincessHornConverter {
   private final ArrayList<Predicate> predicates = new ArrayList<>();
-  private final ArrayList<IConstant> parameters = new ArrayList<>();
   private int variables = 0;
 
   private Predicate toPredicate(final MonoSortedIFunction function) {
-    // Predicate does not implement hashCode nor equals, this deduplicates the objects. Not 100%
-    // sure if that is needed
+    // Predicate does not implement hashCode nor equals, this deduplicates the objects.
     for (Predicate predicate : this.predicates) {
       if (!predicate.name().equals(function.name()) || predicate.arity() != function.arity()) {
         continue;
       }
       return predicate;
     }
-    Predicate predicate = new Predicate(function.name(), function.arity());
+    Predicate predicate;
+    if (function.argSorts().isEmpty()) {
+      predicate = new Predicate(function.name(), function.arity());
+    } else {
+      predicate = new MonoSortedPredicate(function.name(), function.argSorts());
+    }
     this.predicates.add(predicate);
 
     return predicate;
   }
 
   class ClauseContext {
+    private final ArrayList<IConstant> parameters = new ArrayList<>();
     private IFormula constraint = new IBoolLit(true);
 
 
@@ -96,8 +101,8 @@ public class PrincessHornConverter {
 
 
     private Clause toClause(final IAtom head, final IAtom rest) {
-      return new Clause(head, CollectionConverters.asScala(List.of(toFormula(rest))).toList(),
-          this.constraint);
+      var body = CollectionConverters.asScala(List.of(toFormula(rest))).toList();
+      return new Clause(head, body, this.constraint);
     }
 
     private Clause toClause(final IAtom head, final IBoolLit rest) {
@@ -123,7 +128,6 @@ public class PrincessHornConverter {
         return new Clause(head, CollectionConverters.asScala(List.of(atom)).toList(),
             this.constraint);
       }
-      // TODO: Is that duplicating the constraint?
       this.constraint = this.constraint.andSimplify(toFormula(rest));
       return toClause(head);
     }
@@ -182,7 +186,7 @@ public class PrincessHornConverter {
         return (IConstant) term;
       }
       var variable = createVariable();
-      var constraint = new IEquation(variable, term);
+      var constraint = new IEquation(variable, toTerm(term));
 
       this.constraint = this.constraint.andSimplify(constraint);
 
@@ -194,16 +198,54 @@ public class PrincessHornConverter {
     }
 
     private IFormula toFormula(final IIntFormula i) {
+      if (i.rel().equals(IIntRelation.EqZero()) && i.t() instanceof ITermITE ite) {
+        if (ite.left() instanceof IIntLit lit && lit.value().isZero()) {
+          return toFormula(ite.cond());
+        }
+        if (ite.right() instanceof IIntLit lit && lit.value().isZero()) {
+          return toFormula(ite.cond().notSimplify());
+        }
+      }
+      if (i.t() instanceof ITermITE) {
+        throw new RuntimeException("ITE (TODO): " + i.t());
+      }
       return new IIntFormula(i.rel(), toTerm(i.t()));
     }
 
-    private IEquation toFormula(final IEquation equation) {
+    private IFormula toFormula(ITerm value, ITermITE ite) {
+      value = toTerm(value);
+
+      var condition = toFormula(ite.cond());
+
+      var a = condition.andSimplify(new IEquation(value, toTerm(ite.left())));
+      var b = condition.notSimplify().andSimplify(new IEquation(value, toTerm(ite.right())));
+
+      return a.orSimplify(b);
+    }
+
+    private IFormula toFormula(final IEquation equation) {
+      if (equation.left() instanceof ITermITE ite) {
+        return toFormula(equation.right(), ite);
+      }
+      if (equation.right() instanceof ITermITE ite) {
+        return toFormula(equation.left(), ite);
+      }
       return new IEquation(toTerm(equation.left()), toTerm(equation.right()));
     }
 
-    private IBinFormula toFormula(final IBinFormula bin) {
-      return new IBinFormula(bin.j(), toFormula(bin.f1()),
-          toFormula(bin.f2()));
+    private IFormula toFormula(final IBinFormula bin) {
+      var f1 = toFormula(bin.f1());
+      var f2 = toFormula(bin.f2());
+      if (bin.j().equals(IBinJunctor.Eqv())) {
+        var a = f1.andSimplify(f2);
+        var b = f1.notSimplify().andSimplify(f2.notSimplify());
+
+        return a.orSimplify(b);
+      }
+      if (bin.j().equals(IBinJunctor.Or())) {
+        return (f1.notSimplify().andSimplify(f2.notSimplify())).notSimplify();
+      }
+      return new IBinFormula(bin.j(), f1, f2);
     }
 
     private IFormula toFormula(final INot not) {
@@ -211,13 +253,10 @@ public class PrincessHornConverter {
     }
 
     private IFormula toFormula(final IFormulaITE ite) {
-      //return new IFormulaITE(toFormula(ite.cond()), toFormula(ite.left()),
-      //    toFormula(ite.right()));
-
       var condition = toFormula(ite.cond());
 
-      var a = new IBinFormula(IBinJunctor.And(), condition, toFormula(ite.left()));
-      var b = new IBinFormula(IBinJunctor.And(), condition.notSimplify(), toFormula(ite.right()));
+      var a = condition.andSimplify(toFormula(ite.left()));
+      var b = condition.notSimplify().andSimplify(toFormula(ite.right()));
 
 
       return a.orSimplify(b);
@@ -272,17 +311,15 @@ public class PrincessHornConverter {
     }
 
     private ITerm toTerm(final ITermITE ite) {
-      // return new ITermITE(toFormula(ite.cond()), toTerm(ite.left()), toTerm(ite.right()));
-      var variable = createVariable();
-
       var condition = toFormula(ite.cond());
 
+      var variable = createVariable();
       var left = new IEquation(variable, toTerm(ite.left()));
       var right = new IEquation(variable, toTerm(ite.right()));
 
 
-      var a = new IBinFormula(IBinJunctor.And(), condition, left);
-      var b = new IBinFormula(IBinJunctor.And(), condition.notSimplify(), right);
+      var a = condition.andSimplify(left);
+      var b = condition.notSimplify().andSimplify(right);
 
 
       this.constraint = this.constraint.andSimplify(a.orSimplify(b));
@@ -317,6 +354,9 @@ public class PrincessHornConverter {
     }
 
     private ITerm toConstraint(final ITerm term) {
+      if (term instanceof IConstant constant) {
+        return constant;
+      }
       if (term instanceof IIntLit lit) {
         return lit;
       }
@@ -326,6 +366,12 @@ public class PrincessHornConverter {
       if (term instanceof IFunApp fun) {
         return new IFunApp(fun.fun(), toTerm(fun.args()));
       }
+    //  if(term instanceof IPlus plus) {
+    //    return new IPlus(toTerm(plus.t1()), toTerm(plus.t2()));
+    //  }
+    //  if(term instanceof ITimes times) {
+    //    return new ITimes(times.coeff(), toTerm(times.subterm()));
+    //  }
       return addConstraint(toTerm(term));
     }
 
@@ -351,6 +397,7 @@ public class PrincessHornConverter {
     }
 
     private Clause toClause(final IAtom head) {
+      assert head != null;
       return new Clause(head, List$.MODULE$.empty(), this.constraint);
     }
 
@@ -379,7 +426,7 @@ public class PrincessHornConverter {
 
     private Clause toClause(final IBinFormula input) {
       if (!input.j().equals(IBinJunctor.Or())) {
-        throw new IllegalArgumentException("Invalid formlar junctor: " + input);
+        throw new IllegalArgumentException("Invalid formula junctor: " + input);
       }
 
       INot not;
@@ -412,8 +459,14 @@ public class PrincessHornConverter {
         return toClause(head, simplify(not.subformula()));
       }
 
+      var subformula = simplify(not.subformula());
+      if (subformula instanceof IAtom atom) {
+        this.constraint = this.constraint.andSimplify(toFormula(atom).notSimplify());
+        return toClause(head);
+      }
 
-      return toClause(head, simplify(not.subformula()));
+
+      return toClause(head, subformula);
     }
 
     public Clause toClause(IFormula input) {
@@ -424,8 +477,6 @@ public class PrincessHornConverter {
         return toClause((IAtom) input);
       }
       if (input instanceof IBinFormula) {
-        // (!(((((((((_0 = _8) & (_1 = _9)) & (_2 = _10)) & (_3 = _11)) & (_4 = _12)) & (_5 = _13)) & (_6 = _14)) & (_7 = _15)) & true) | (h1(_15, _14, _13, _12, _11, _10, _9, _8, _7, _6, _5, _4, _3, _2, _1, _0) = 0))
-        // Clause(h1(P15, P14, P13, P12, P11, P10, P9, P8, P7, P6, P5, P4, P3, P2, P1, P0),List(),((((((((P0 = P8) & (P1 = P9)) & (P2 = P10)) & (P3 = P11)) & (P4 = P12)) & (P5 = P13)) & (P6 = P14)) & (P7 = P15)))
         return toClause((IBinFormula) input);
       }
       if (input instanceof IIntFormula) {
