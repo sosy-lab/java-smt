@@ -616,6 +616,14 @@ class PrincessEnvironment {
         return FormulaType.getArrayType(FormulaType.IntegerType, FormulaType.IntegerType);
       }
       throw new IllegalArgumentException("Can not get formula type " + type);
+    } else if (sort instanceof Sort.Interval) {
+      if ("int".equals(sort.name())) {
+        return FormulaType.IntegerType;
+      }
+      if (sort.name().startsWith("int[")) {
+        return FormulaType.getArrayType(FormulaType.IntegerType, FormulaType.IntegerType);
+      }
+      throw new IllegalArgumentException("Can not get formula type " + sort.name());
     } else {
       // Check if it's a bitvector sort
       scala.Option<Object> bitWidth = getBitWidth(sort);
