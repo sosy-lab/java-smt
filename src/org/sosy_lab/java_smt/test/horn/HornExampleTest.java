@@ -120,8 +120,9 @@ public class HornExampleTest {
   @SuppressWarnings("DefaultCharset")
   private HornProverEnvironment solveSmtLib2(final String file) throws Exception {
     var input =
-        new String(HornExampleTest.class.getResourceAsStream("/org/sosy_lab/java_smt/test/horn/" + file +
-            ".smt2").readAllBytes());
+        new String(
+            HornExampleTest.class.getResourceAsStream("/org/sosy_lab/java_smt/test/horn/" + file +
+                ".smt2").readAllBytes());
 
     final var context = SolverContextFactory.createSolverContext(Solvers.ELDARICA);
 
@@ -155,6 +156,34 @@ public class HornExampleTest {
   @Test
   public void smt_ch_triangle_location_nr_2_bv_000() throws Exception {
     var prover = solveSmtLib2("ch-triangle-location-nr.2-bv_000");
+
+    assertTrue(prover.isUnsat());
+  }
+
+  @Test
+  public void smt_prusti_3_pass_paper_Examples_points_compress_000() throws Exception {
+    var prover = solveSmtLib2("prusti-3-pass-paper_examples-points-compress_000");
+
+    assertFalse(prover.isUnsat());
+  }
+
+  // @Test // TODO: enable when https://github.com/sosy-lab/java-smt/issues/682 is fixed
+  public void smt_38_c_000() throws Exception {
+    var prover = solveSmtLib2("38.c_000");
+
+    assertFalse(prover.isUnsat());
+  }
+
+  @Test
+  public void smt_two_counters_e3_325_000() throws Exception {
+    var prover = solveSmtLib2("two_counters_e3_325_000");
+
+    assertTrue(prover.isUnsat());
+  }
+
+  @Test
+  public void smt_O0_fibo_10_false_unreach_call_000() throws Exception {
+    var prover = solveSmtLib2("O0_fibo_10_false-unreach-call_000");
 
     assertTrue(prover.isUnsat());
   }
