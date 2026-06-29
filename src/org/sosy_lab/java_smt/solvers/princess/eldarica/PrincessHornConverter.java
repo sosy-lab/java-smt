@@ -122,7 +122,7 @@ public class PrincessHornConverter {
     }
 
     private Clause toClause(final IAtom head, final IIntFormula rest) {
-      var atom = toAtom(rest);
+      var atom = toPredicateAtom(rest);
       if (atom != null) {
         return new Clause(head, CollectionConverters.asScala(List.of(atom)).toList(),
             this.constraint);
@@ -136,18 +136,18 @@ public class PrincessHornConverter {
 
       for (IFormula and : flatten(rest)) {
         if (and instanceof IAtom atom && atom.args().isEmpty()) {
-          body.add(new IAtom(atom.pred(), toTerm(atom.args())));
+          body.add(new IAtom(atom.pred(), atom.args()));
           continue;
         }
         if (and instanceof IIntFormula) {
-          var atom = toAtom((IIntFormula) and);
+          var atom = toPredicateAtom((IIntFormula) and);
           if (atom != null) {
             body.add(atom);
             continue;
           }
         }
 
-        constraint = constraint.andSimplify(toFormula(and));
+        constraint = constraint.andSimplify(and);
       }
 
 
@@ -330,7 +330,7 @@ public class PrincessHornConverter {
     }
 
     @Nullable
-    private IAtom toAtom(final IIntFormula formula) {
+    private IAtom toPredicateAtom(final IIntFormula formula) {
       if (formula.t() instanceof IFunApp t && formula.rel().equals(IIntRelation.EqZero())) {
         if (t.fun() instanceof MonoSortedIFunction fun) {
           return new IAtom(toPredicate(fun), toTerm(t.args()));
@@ -392,7 +392,7 @@ public class PrincessHornConverter {
       if (other instanceof IAtom atom) {
         head = toFormula(atom);
       } else if (other instanceof IIntFormula) {
-        head = toAtom((IIntFormula) other);
+        head = toPredicateAtom((IIntFormula) other);
         if (head == null) {
           throw new RuntimeException("No head found: " + input);
         }
@@ -424,7 +424,7 @@ public class PrincessHornConverter {
         return toClause((IBinFormula) input);
       }
       if (input instanceof IIntFormula) {
-        return toClause(toAtom((IIntFormula) input));
+        return toClause(toPredicateAtom((IIntFormula) input));
       }
 
       throw new IllegalArgumentException("Unhandled clause: " + input);
