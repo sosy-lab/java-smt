@@ -305,7 +305,6 @@ class PrincessEnvironment {
   }
 
   public List<? extends IExpression> parseStringToTerms(String s, PrincessFormulaCreator creator) {
-
     Tuple4<
             Seq<IFormula>,
             scala.collection.immutable.Map<IFunction, SMTFunctionType>,
@@ -319,26 +318,23 @@ class PrincessEnvironment {
       throw new IllegalArgumentException(nested);
     }
 
-    final List<IFormula> formulas = asJava(parserResult._1());
+    List<IFormula> asserts = asJava(parserResult._1());
+    Map<IFunction, SMTFunctionType> ufs = asJava(parserResult._2());
+    Map<ConstantTerm, SMTType> constants = asJava(parserResult._3());
+    Map<Predicate, SMTFunctionType> nullaryPredicates = asJava(parserResult._4());
 
-    ImmutableSet.Builder<IExpression> declaredFunctions = ImmutableSet.builder();
-    for (IExpression f : formulas) {
-      declaredFunctions.addAll(creator.extractVariablesAndUFs(f, true).values());
+    for (Entry<IFunction, SMTFunctionType> entry : ufs.entrySet()) {
+      functionsCache.put(
+          entry.getKey().name(),
+          new PrincessIFunctionDeclaration(entry.getKey(), entry.getValue()));
     }
-    for (IExpression var : declaredFunctions.build()) {
-      if (var instanceof IConstant iConstant) {
-        sortedVariablesCache.put(iConstant.c().name(), iConstant);
-        addSymbol(iConstant);
-      } else if (var instanceof IAtom iAtom) {
-        boolVariablesCache.put(iAtom.pred().name(), iAtom);
-        addSymbol(iAtom);
-      } else if (var instanceof IFunApp app) {
-        IFunction fun = app.fun();
-        functionsCache.put(fun.name(), new PrincessIFunctionDeclaration(app));
-        addFunction(fun);
-      }
+    for (ConstantTerm constant : constants.keySet()) {
+      sortedVariablesCache.put(constant.name(), new IConstant(constant));
     }
-    return formulas;
+    for (Predicate predicate : nullaryPredicates.keySet()) {
+      boolVariablesCache.put(predicate.name(), new IAtom(predicate, toSeq(ImmutableList.of())));
+    }
+    return asserts;
   }
 
   /**
@@ -580,7 +576,7 @@ class PrincessEnvironment {
     }
   }
 
-  private static FormulaType<?> getFormulaTypeFromSort(final Sort sort) {
+  static FormulaType<?> getFormulaTypeFromSort(final Sort sort) {
     if (sort == PrincessEnvironment.BOOL_SORT) {
       return FormulaType.BooleanType;
     } else if (sort == PrincessEnvironment.INTEGER_SORT || sort == PrincessEnvironment.NAT_SORT) {
