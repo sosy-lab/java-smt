@@ -304,7 +304,7 @@ class PrincessEnvironment {
     Preconditions.checkState(registeredProvers.isEmpty());
   }
 
-  public List<? extends IExpression> parseStringToTerms(String s, PrincessFormulaCreator creator) {
+  public List<? extends IExpression> parseStringToTerms(String s) {
     Tuple4<
             Seq<IFormula>,
             scala.collection.immutable.Map<IFunction, SMTFunctionType>,
