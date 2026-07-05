@@ -285,4 +285,14 @@ public class ParserTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
 
     assertThat(g).isEqualTo(f);
   }
+
+  @Test
+  public void parseAllEpsilonTermTest() throws SolverException, InterruptedException {
+    // Princess rewrites the assertion as an epsilon term, which caused issues while parsing as it
+    // introduces a new variable
+    requireRationals();
+    BooleanFormula f = mgr.parse("(assert (> (/ 1.0 2.0) 0.0))");
+
+    assertThatFormula(f).isTautological();
+  }
 }
