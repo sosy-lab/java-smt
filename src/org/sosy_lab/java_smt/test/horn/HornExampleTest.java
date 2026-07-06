@@ -18,14 +18,13 @@ import org.sosy_lab.java_smt.SolverContextFactory;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.HornProverEnvironment;
+import org.sosy_lab.java_smt.test.SolverBasedTest0;
 
-public class HornExampleTest {
-  // TODO: Test with all solvers, not just eldarica (ParameterizedSolverBasedTest0)
+public class HornExampleTest extends SolverBasedTest0.ParameterizedSolverBasedTest0  {
 
   @Test
   public void hornJavaSMT() throws Exception {
-    final var context = SolverContextFactory.createSolverContext(Solvers.ELDARICA);
-
+    requireHorn();
     var intf = context.getFormulaManager().getIntegerFormulaManager();
     var horn = context.getFormulaManager().getBooleanFormulaManager();
 
@@ -51,7 +50,6 @@ public class HornExampleTest {
       assertFalse(prover.isUnsat());
     }
     {
-
       var prover = context.newHornProverEnvironment();
 
       prover.addConstraint(clause1);
@@ -64,8 +62,7 @@ public class HornExampleTest {
 
   @Test
   public void hornJavaSMTPredicate() throws Exception {
-    final var context = SolverContextFactory.createSolverContext(Solvers.ELDARICA);
-
+    requireHorn();
     // Pretty much taken from https://github.com/uuverifiers/eldarica/blob/master/src/test/scala/lazabs/horn/HornAPI.scala#L55
     var integer = context.getFormulaManager().getIntegerFormulaManager();
     var horn = context.getFormulaManager().getBooleanFormulaManager();
@@ -119,12 +116,9 @@ public class HornExampleTest {
 
   @SuppressWarnings("DefaultCharset")
   private HornProverEnvironment solveSmtLib2(final String file) throws Exception {
-    var input =
-        new String(
-            HornExampleTest.class.getResourceAsStream("/org/sosy_lab/java_smt/test/horn/" + file +
-                ".smt2").readAllBytes());
-
-    final var context = SolverContextFactory.createSolverContext(Solvers.ELDARICA);
+    requireHorn();
+    var path = "/org/sosy_lab/java_smt/test/horn/" + file + ".smt2";
+    var input = new String(HornExampleTest.class.getResourceAsStream(path).readAllBytes());
 
     var formula = context.getFormulaManager();
     var constraints = formula.parseAll(input);
