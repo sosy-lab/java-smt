@@ -71,7 +71,7 @@ SPDX-License-Identifier: Apache-2.0
 
     <path id="classpath">
         <pathelement location="${class.dir}"/>
-        <fileset dir="${ivy.lib.dir}" includes="runtime-*/*.jar test/*.jar build/annotations.jar build/auto-value-annotations.jar build/error_prone_annotations.jar"/>
+        <fileset dir="${ivy.lib.dir}" includes="runtime-*/*.jar test/*.jar build/error_prone_annotations.jar"/>
     </path>
 
     <!-- Needs to include all annotation processors and error-prone -->

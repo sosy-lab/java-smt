@@ -207,8 +207,7 @@ abstract class Yices2AbstractProver<T> extends AbstractProverWithAllSat<T>
 
   @SuppressWarnings("resource")
   @Override
-  public Model getModel() throws SolverException {
-    checkGenerateModels();
+  protected Model getModelImpl() throws SolverException {
     return new CachingModel(getEvaluatorWithoutChecks());
   }
 

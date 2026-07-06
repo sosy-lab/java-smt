@@ -143,8 +143,7 @@ class CVC4TheoremProver extends AbstractProverWithAllSat<Void>
 
   @SuppressWarnings("resource")
   @Override
-  public CVC4Model getModel() throws SolverException {
-    checkGenerateModels();
+  public CVC4Model getModelImpl() throws SolverException {
     // special case for CVC4: Models are not permanent and need to be closed
     // before any change is applied to the prover stack. So, we register the Model as Evaluator.
     return registerEvaluator(
@@ -156,8 +155,7 @@ class CVC4TheoremProver extends AbstractProverWithAllSat<Void>
   }
 
   @Override
-  public Evaluator getEvaluator() {
-    checkGenerateModels();
+  protected Evaluator getEvaluatorImpl() {
     return getEvaluatorWithoutChecks();
   }
 

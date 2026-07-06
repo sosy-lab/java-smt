@@ -73,7 +73,7 @@ public abstract class AbstractSolverContext implements SolverContext {
   @Override
   public final OptimizationProverEnvironment newOptimizationProverEnvironment(
       ProverOptions... options) {
-    return newOptimizationProverEnvironment0(toSet(options));
+    return new OptimizationProverDelegate(newOptimizationProverEnvironment0(toSet(options)));
   }
 
   protected abstract OptimizationProverEnvironment newOptimizationProverEnvironment0(

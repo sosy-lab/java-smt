@@ -20,7 +20,6 @@ SPDX-License-Identifier: Apache-2.0
 	<classpathentry kind="lib" path="lib/java/test/hamcrest-core.jar"/>
 	<classpathentry kind="lib" path="lib/java/core/spotbugs-annotations.jar" sourcepath="lib/java-contrib/spotbugs-annotations-sources.jar"/>
 	<classpathentry kind="lib" path="lib/java/core/jsr305.jar" sourcepath="lib/java-contrib/jsr305-sources.jar"/>
-	<classpathentry kind="lib" path="lib/java/build/auto-value-annotations.jar"/>
 	<classpathentry kind="lib" path="lib/java/build/error_prone_annotations.jar" sourcepath="lib/java-contrib/error_prone_annotations-sources.jar"/>
 	<classpathentry kind="lib" path="lib/java/core/common.jar" sourcepath="lib/java-contrib/common-sources.jar"/>
 	<classpathentry kind="lib" path="lib/java/runtime-smtinterpol/smtinterpol.jar" sourcepath="lib/java-contrib/smtinterpol-sources.jar"/>
@@ -41,6 +40,8 @@ SPDX-License-Identifier: Apache-2.0
 	<classpathentry kind="lib" path="lib/java/core/checker-qual.jar" sourcepath="lib/java-contrib/checker-qual-sources.jar"/>
 	<classpathentry kind="lib" path="lib/java/runtime-opensmt/opensmt.jar" sourcepath="lib/java-contrib/opensmt-sources.jar"/>
 	<classpathentry kind="lib" path="lib/java/runtime-bitwuzla/bitwuzla.jar" sourcepath="lib/java-contrib/bitwuzla-sources.jar"/>
+	<classpathentry kind="lib" path="lib/java/core/jspecify.jar"/>
+	<classpathentry kind="lib" path="lib/java/runtime-yices2/yices.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-17">
 		<attributes>
 			<attribute name="module" value="true"/>
