@@ -39,7 +39,9 @@ public class DebuggingEvaluator implements Evaluator {
     debugging.assertThreadLocal();
     debugging.assertFormulaInContext(formula);
     T result = delegate.eval(formula);
-    debugging.addFormulaTerm(result);
+    if (result != null) {
+      debugging.addFormulaTerm(result);
+    }
     return result;
   }
 
