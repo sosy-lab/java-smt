@@ -97,6 +97,7 @@ class StatisticsBasicProverEnvironment<T> implements BasicProverEnvironment<T> {
     return new StatisticsModel(delegate.getModel(), stats);
   }
 
+  @SuppressWarnings("resource")
   @Override
   public Evaluator getEvaluator() throws SolverException {
     return new StatisticsEvaluator(delegate.getEvaluator(), stats);

@@ -88,6 +88,7 @@ class DebuggingBasicProverEnvironment<T> implements BasicProverEnvironment<T> {
     return new DebuggingModel(delegate.getModel(), debugging);
   }
 
+  @SuppressWarnings("resource")
   @Override
   public Evaluator getEvaluator() throws SolverException {
     debugging.assertThreadLocal();

@@ -91,6 +91,7 @@ class TraceBasicProverEnvironment<T> implements BasicProverEnvironment<T> {
         () -> new TraceModel(delegate.getModel(), mgr, logger));
   }
 
+  @SuppressWarnings("resource")
   @Override
   public Evaluator getEvaluator() throws SolverException {
     return logger.logDefKeep(

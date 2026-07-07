@@ -92,6 +92,7 @@ class SynchronizedBasicProverEnvironment<T> implements BasicProverEnvironment<T>
     }
   }
 
+  @SuppressWarnings("resource")
   @Override
   public Evaluator getEvaluator() throws SolverException {
     synchronized (sync) {
