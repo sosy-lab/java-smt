@@ -23,6 +23,7 @@ import org.sosy_lab.java_smt.api.FunctionDeclarationKind;
 public record FunctionDeclarationImpl<F extends Formula, T>(
     FunctionDeclarationKind getKind,
     String getName,
+    ImmutableList<Integer> getIndices,
     FormulaType<F> getType,
     ImmutableList<FormulaType<?>> getArgumentTypes,
     T getSolverDeclaration)
@@ -31,6 +32,7 @@ public record FunctionDeclarationImpl<F extends Formula, T>(
   public FunctionDeclarationImpl {
     checkNotNull(getKind);
     checkNotNull(getName);
+    checkNotNull(getIndices);
     checkNotNull(getType);
     checkNotNull(getArgumentTypes);
     checkNotNull(getSolverDeclaration);
@@ -39,11 +41,26 @@ public record FunctionDeclarationImpl<F extends Formula, T>(
   public static <F extends Formula, T> FunctionDeclarationImpl<F, T> of(
       String name,
       FunctionDeclarationKind kind,
+      List<Integer> pIndices,
       List<FormulaType<?>> pArgumentTypes,
       FormulaType<F> pReturnType,
       T pDeclaration) {
     return new FunctionDeclarationImpl<>(
-        kind, name, pReturnType, ImmutableList.copyOf(pArgumentTypes), pDeclaration);
+        kind,
+        name,
+        ImmutableList.copyOf(pIndices),
+        pReturnType,
+        ImmutableList.copyOf(pArgumentTypes),
+        pDeclaration);
+  }
+
+  public static <F extends Formula, T> FunctionDeclaration<F> of(
+      String name,
+      FunctionDeclarationKind kind,
+      List<FormulaType<?>> pArgumentTypes,
+      FormulaType<F> pReturnType,
+      T pDeclaration) {
+    return of(name, kind, ImmutableList.of(), pArgumentTypes, pReturnType, pDeclaration);
   }
 
   @Override

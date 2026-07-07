@@ -456,6 +456,9 @@ class CVC5FormulaCreator extends FormulaCreator<Term, Sort, TermManager, Term> {
       } else if (f.getKind() == Kind.CONSTANT) {
         return visitor.visitFreeVariable(formula, SMTLibTokenizer.dequoteSMTLib(f.toString()));
 
+      } else if (f.getKind() == Kind.SEP_NIL) {
+        return visitor.visitConstant(formula, null);
+
       } else if (f.getKind() == Kind.APPLY_CONSTRUCTOR) {
         checkState(
             f.getNumChildren() == 1, "Unexpected formula '%s' with sort '%s'", f, f.getSort());
@@ -464,38 +467,48 @@ class CVC5FormulaCreator extends FormulaCreator<Term, Sort, TermManager, Term> {
       } else {
         // Term expressions like uninterpreted function calls (Kind.APPLY_UF) or operators (e.g.
         // Kind.AND).
-        // These are all treated like operators, so we can get the declaration by f.getOperator()!
-
-        ImmutableList.Builder<Formula> argsBuilder = ImmutableList.builder();
-
-        List<FormulaType<?>> argsTypes = new ArrayList<>();
-
-        // Term operator = normalize(f.getSort());
         Kind kind = f.getKind();
+
+        // Collect indices
+        ImmutableList.Builder<Integer> indexBuilder = ImmutableList.builder();
+        if (f.hasOp()) {
+          Op operator = f.getOp();
+          for (int p = 0; p < operator.getNumIndices(); p++) {
+            Term index = operator.get(p);
+            if (index.isIntegerValue()) {
+              indexBuilder.add(index.getIntegerValue().intValueExact());
+            }
+          }
+        }
+
+        // Collect arguments
+        ImmutableList.Builder<Formula> argsBuilder = ImmutableList.builder();
+        ImmutableList.Builder<FormulaType<?>> argTypesBuilder = ImmutableList.builder();
+
         if (sort.isFunction() || kind == Kind.APPLY_UF) {
           // The arguments are all children except the first one
           for (int i = 1; i < f.getNumChildren(); i++) {
-            argsTypes.add(getFormulaTypeFromTermType(f.getChild(i).getSort()));
+            argTypesBuilder.add(getFormulaTypeFromTermType(f.getChild(i).getSort()));
             // CVC5s first argument in a function/Uf is the declaration, we don't need that here
             argsBuilder.add(encapsulate(f.getChild(i)));
           }
         } else {
           for (Term arg : f) {
-            argsTypes.add(getFormulaType(arg));
+            argTypesBuilder.add(getFormulaType(arg));
             argsBuilder.add(encapsulate(arg));
           }
         }
 
-        // TODO some operations (BV_SIGN_EXTEND, BV_ZERO_EXTEND, maybe more) encode information as
-        // part of the operator itself, thus the arity is one too small and there might be no
-        // possibility to access the information from user side. Should we encode such information
-        // as additional parameters? We do so for some methods of Princess.
         if (sort.isFunction()) {
           return visitor.visitFunction(
               formula,
               argsBuilder.build(),
               FunctionDeclarationImpl.of(
-                  getName(f), getDeclarationKind(f), argsTypes, getFormulaType(f), normalize(f)));
+                  getName(f),
+                  getDeclarationKind(f),
+                  argTypesBuilder.build(),
+                  getFormulaType(f),
+                  normalize(f)));
         } else if (kind == Kind.APPLY_UF) {
           return visitor.visitFunction(
               formula,
@@ -503,7 +516,7 @@ class CVC5FormulaCreator extends FormulaCreator<Term, Sort, TermManager, Term> {
               FunctionDeclarationImpl.of(
                   getName(f),
                   getDeclarationKind(f),
-                  argsTypes,
+                  argTypesBuilder.build(),
                   getFormulaType(f),
                   normalize(f.getChild(0))));
         } else {
@@ -512,7 +525,12 @@ class CVC5FormulaCreator extends FormulaCreator<Term, Sort, TermManager, Term> {
               formula,
               argsBuilder.build(),
               FunctionDeclarationImpl.of(
-                  getName(f), getDeclarationKind(f), argsTypes, getFormulaType(f), normalize(f)));
+                  getName(f),
+                  getDeclarationKind(f),
+                  indexBuilder.build(),
+                  argTypesBuilder.build(),
+                  getFormulaType(f),
+                  normalize(f)));
         }
       }
     } catch (CVC5ApiException e) {
