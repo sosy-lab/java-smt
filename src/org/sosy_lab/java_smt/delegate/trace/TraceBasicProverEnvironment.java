@@ -41,8 +41,10 @@ class TraceBasicProverEnvironment<T> implements BasicProverEnvironment<T> {
 
   @Override
   public @Nullable T push(BooleanFormula f) throws InterruptedException {
-    logger.logStmt(logger.toVariable(this), "push()", delegate::push);
-    return null;
+    return logger.logDefKeep(
+        logger.toVariable(this),
+        "push(%s)".formatted(logger.toVariable(f)),
+        () -> delegate.push(f));
   }
 
   @Override
