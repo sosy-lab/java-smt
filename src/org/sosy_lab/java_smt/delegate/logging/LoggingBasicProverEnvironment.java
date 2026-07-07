@@ -55,6 +55,7 @@ class LoggingBasicProverEnvironment<T> implements BasicProverEnvironment<T> {
 
   @Override
   public @Nullable T addConstraint(BooleanFormula constraint) throws InterruptedException {
+    logger.log(Level.FINE, "formula asserted:", constraint);
     return wrapped.addConstraint(constraint);
   }
 
