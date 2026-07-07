@@ -10,17 +10,19 @@
 
 package org.sosy_lab.java_smt.test.horn;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
-import org.sosy_lab.java_smt.SolverContextFactory;
-import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.HornProverEnvironment;
+import org.sosy_lab.java_smt.api.SolverContext;
+import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.test.SolverBasedTest0;
 
-public class HornExampleTest extends SolverBasedTest0.ParameterizedSolverBasedTest0  {
+public class HornExampleTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
 
   @Test
   public void hornJavaSMT() throws Exception {
@@ -115,15 +117,19 @@ public class HornExampleTest extends SolverBasedTest0.ParameterizedSolverBasedTe
   }
 
   @SuppressWarnings("DefaultCharset")
-  private HornProverEnvironment solveSmtLib2(final String file) throws Exception {
+  private HornProverEnvironment solveSmtLib2(
+      final String file,
+      SolverContext.ProverOptions... options) throws Exception {
     requireHorn();
     var path = "/org/sosy_lab/java_smt/test/horn/" + file + ".smt2";
-    var input = new String(HornExampleTest.class.getResourceAsStream(path).readAllBytes());
+    var stream = HornExampleTest.class.getResourceAsStream(path);
+    var input = new String(stream.readAllBytes());
+    stream.close();
 
     var formula = context.getFormulaManager();
     var constraints = formula.parseAll(input);
 
-    var prover = context.newHornProverEnvironment();
+    var prover = context.newHornProverEnvironment(options);
 
     for (var constraint : constraints) {
       prover.addConstraint(constraint);
@@ -207,6 +213,24 @@ public class HornExampleTest extends SolverBasedTest0.ParameterizedSolverBasedTe
     var prover = solveSmtLib2("small_sat");
 
     assertFalse(prover.isUnsat());
+  }
+
+  @Test
+  public void smt_small_unsat_model() throws Exception {
+    var prover = solveSmtLib2("small_unsat", ProverOptions.GENERATE_MODELS);
+
+    prover.isUnsat();
+    assertThrows(Exception.class, () -> prover.getModel());
+  }
+
+  @Test
+  public void smt_small_sat_model() throws Exception {
+    var prover = solveSmtLib2("small_sat", ProverOptions.GENERATE_MODELS);
+
+    prover.isUnsat();
+    var model = prover.getModel().asList();
+
+    assertEquals("fun", model.iterator().next().getName());
   }
 
   @SuppressWarnings("varargs")

@@ -17,6 +17,9 @@ import ap.terfor.preds.Predicate;
 import com.google.common.base.Preconditions;
 import java.io.PrintStream;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import lazabs.GlobalParameters;
 import lazabs.horn.CEGARHornWrapper;
@@ -29,22 +32,27 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.HornProverEnvironment;
+import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.solvers.princess.eldarica.PrincessHornConverter;
 import scala.Console$;
 import scala.Function0;
+import scala.collection.JavaConverters;
 import scala.collection.immutable.Map;
 import scala.jdk.javaapi.CollectionConverters;
 import scala.util.Either;
 
-public class EldaricaHornProver extends PrincessAbstractProver<Void> implements
-                                                                     HornProverEnvironment {
-  //  private final HornAPI horn;
+public class EldaricaHornProver extends PrincessAbstractProver<Void>
+    implements HornProverEnvironment {
   private final ArrayList<Clause> clauses = new ArrayList<>();
   private final PrincessHornConverter converter = new PrincessHornConverter();
 
+  @Nullable
+  private Either<Function0<Map<Predicate, IFormula>>, Function0<Dag<IAtom>>> result = null;
+
   private static final boolean DEBUG_LOGGING = "true".equals(System.getenv("ELDARICA_DEBUG"));
+
 
   static {
     if (DEBUG_LOGGING) {
@@ -56,6 +64,7 @@ public class EldaricaHornProver extends PrincessAbstractProver<Void> implements
     }
   }
 
+
   public EldaricaHornProver(
       PrincessFormulaManager pMgr,
       PrincessFormulaCreator creator,
@@ -63,41 +72,34 @@ public class EldaricaHornProver extends PrincessAbstractProver<Void> implements
       ShutdownNotifier pShutdownNotifier,
       Set<ProverOptions> pOptions) {
     super(pMgr, creator, pApi, pShutdownNotifier, pOptions);
-    // this.horn = new HornAPI(new HornAPI.CEGAROptions()); // TODO: options
   }
 
-  private void addConstraint1(BooleanFormula constraint) {
-    Preconditions.checkState(!closed);
-
-    final int formulaId = idGenerator.getFreshId();
-    partitions.push(partitions.pop().putAndCopy(formulaId, constraint));
-    api.setPartitionNumber(formulaId);
-
-    final IFormula formula = (IFormula) mgr.extractInfo(constraint);
-    // TODO: purpose?
-    var assertion =
-        api.abbrevSharedExpressions(formula, creator.getEnv().getMinAtomsForAbbreviation());
-
-    if (assertion.isFalse()) {
-      throw new RuntimeException("TODO: handle false");
-    }
-    if (assertion.isTrue()) {
-      return;
-    }
-
-    var clause = converter.toClause(assertion);
-
-    this.clauses.add(clause);
-  }
 
   @Override
   @Nullable
-  protected Void addConstraintImpl(BooleanFormula constraint) throws InterruptedException {
-    addConstraint1(constraint);
+  protected Void addConstraintImpl(BooleanFormula constraint) {
+    Preconditions.checkState(!closed);
+
+    final IFormula formula = (IFormula) mgr.extractInfo(constraint);
+
+    if (formula.isFalse()) {
+      throw new RuntimeException("TODO: handle false");
+    }
+    if (formula.isTrue()) {
+      return null;
+    }
+
+    var clause = converter.toClause(formula);
+
+    this.clauses.add(clause);
+
     return null;
   }
 
   private Either<Function0<Map<Predicate, IFormula>>, Function0<Dag<IAtom>>> solve() {
+    if (this.result != null) {
+      return this.result;
+    }
     var stream = DEBUG_LOGGING ? System.err : new PrintStream(NullStream$.MODULE$);
 
     var err = Console$.MODULE$.err();
@@ -113,6 +115,7 @@ public class EldaricaHornProver extends PrincessAbstractProver<Void> implements
           preprocessed._3(), false, stream).result();
 
 
+      this.result = result;
       return result;
     } finally {
       Console$.MODULE$.setErrDirect(err);
@@ -124,8 +127,58 @@ public class EldaricaHornProver extends PrincessAbstractProver<Void> implements
     var result = solve();
 
     return result.isRight();
-    // return !this.horn.isSat(CollectionConverters.asScala(this.clauses));
   }
 
-  // TODO: Model, push/pop?.
+  @Override
+  protected void setChanged() {
+    result = null;
+  }
+
+  @Override
+  public Model getModelImpl() throws SolverException {
+    var result = solve();
+    if (result.isRight()) {
+      throw new IllegalStateException("Unsat, no model available!");
+    }
+
+    var solution = result.left().get().apply();
+
+    return new EldaricaModel(JavaConverters.asJava(solution), this, creator);
+  }
+
+  @Override
+  public List<BooleanFormula> getUnsatCore() {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(Collection<BooleanFormula> assumptions) {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public boolean isUnsatWithAssumptions(Collection<BooleanFormula> assumptions)
+      throws SolverException, InterruptedException {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  protected boolean hasPersistentModel() {
+    return false;
+  }
+
+  @Override
+  public @Nullable Void push(BooleanFormula f) throws InterruptedException {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  protected void popImpl() {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  protected PrincessModel getEvaluatorWithoutChecks() throws SolverException {
+    throw new UnsupportedOperationException();
+  }
 }

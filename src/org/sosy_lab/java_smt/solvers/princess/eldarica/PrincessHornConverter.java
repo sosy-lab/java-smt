@@ -189,8 +189,8 @@ public class PrincessHornConverter {
           return toFormula(ite.cond().notSimplify());
         }
       }
-      if (i.t() instanceof ITermITE) {
-        throw new RuntimeException("ITE (TODO): " + i.t());
+      if (i.t() instanceof ITermITE ite) {
+        throw new RuntimeException("ITE (TODO): " + ite);
       }
       return new IIntFormula(i.rel(), toTerm(i.t()));
     }
@@ -313,6 +313,9 @@ public class PrincessHornConverter {
         return new IFunApp(fun.fun(), toTerm(fun.args()));
       }
       if (term instanceof ITermITE ite) {
+        // TODO: Most times this is already covered, as ITEs can only occur in Equations
+        //  (mostly EqZero). This could be handled by pushing/popping a stack and adding every
+        //  single possible case as constraint (or the fomular with OR)
         throw new IllegalArgumentException("Eldarica does not support ITE terms: " + ite);
       }
 
