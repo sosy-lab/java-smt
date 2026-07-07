@@ -10,14 +10,18 @@ package org.sosy_lab.java_smt.delegate.statistics;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.java_smt.api.BasicProverEnvironment;
 import org.sosy_lab.java_smt.api.BooleanFormula;
+import org.sosy_lab.java_smt.api.Evaluator;
 import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.SolverException;
+import org.sosy_lab.java_smt.api.UserPropagator;
 import org.sosy_lab.java_smt.delegate.statistics.TimerPool.TimerWrapper;
 
 class StatisticsBasicProverEnvironment<T> implements BasicProverEnvironment<T> {
@@ -33,6 +37,13 @@ class StatisticsBasicProverEnvironment<T> implements BasicProverEnvironment<T> {
     unsatTimer = stats.unsat.getNewTimer();
     allSatTimer = stats.allSat.getNewTimer();
     stats.provers.getAndIncrement();
+  }
+
+  @Override
+  public @Nullable T push(BooleanFormula f) throws InterruptedException {
+    stats.push.getAndIncrement();
+    stats.pop.getAndIncrement();
+    return delegate.push(f);
   }
 
   @Override
@@ -87,6 +98,18 @@ class StatisticsBasicProverEnvironment<T> implements BasicProverEnvironment<T> {
   }
 
   @Override
+  public Evaluator getEvaluator() throws SolverException {
+    return new StatisticsEvaluator(delegate.getEvaluator(), stats);
+  }
+
+  @Override
+  public ImmutableList<Model.ValueAssignment> getModelAssignments() throws SolverException {
+    stats.model.getAndIncrement();
+    stats.modelListings.getAndIncrement();
+    return delegate.getModelAssignments();
+  }
+
+  @Override
   public List<BooleanFormula> getUnsatCore() {
     stats.unsatCore.getAndIncrement();
     return delegate.getUnsatCore();
@@ -97,6 +120,11 @@ class StatisticsBasicProverEnvironment<T> implements BasicProverEnvironment<T> {
       Collection<BooleanFormula> pAssumptions) throws SolverException, InterruptedException {
     stats.unsatCore.getAndIncrement();
     return delegate.unsatCoreOverAssumptions(pAssumptions);
+  }
+
+  @Override
+  public ImmutableMap<String, String> getStatistics() {
+    return ImmutableMap.of();
   }
 
   @Override
@@ -118,5 +146,10 @@ class StatisticsBasicProverEnvironment<T> implements BasicProverEnvironment<T> {
     } finally {
       allSatTimer.stop();
     }
+  }
+
+  @Override
+  public boolean registerUserPropagator(UserPropagator propagator) {
+    throw new UnsupportedOperationException();
   }
 }

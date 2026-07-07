@@ -10,14 +10,19 @@
 
 package org.sosy_lab.java_smt.delegate.trace;
 
+import com.google.common.collect.FluentIterable;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.java_smt.api.BasicProverEnvironment;
 import org.sosy_lab.java_smt.api.BooleanFormula;
+import org.sosy_lab.java_smt.api.Evaluator;
 import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.SolverException;
+import org.sosy_lab.java_smt.api.UserPropagator;
 
 class TraceBasicProverEnvironment<T> implements BasicProverEnvironment<T> {
   private final BasicProverEnvironment<T> delegate;
@@ -32,6 +37,12 @@ class TraceBasicProverEnvironment<T> implements BasicProverEnvironment<T> {
     delegate = pDelegate;
     mgr = pFormulaManager;
     logger = pLogger;
+  }
+
+  @Override
+  public @Nullable T push(BooleanFormula f) throws InterruptedException {
+    logger.logStmt(logger.toVariable(this), "push()", delegate::push);
+    return null;
   }
 
   @Override
@@ -81,6 +92,38 @@ class TraceBasicProverEnvironment<T> implements BasicProverEnvironment<T> {
   }
 
   @Override
+  public Evaluator getEvaluator() throws SolverException {
+    return logger.logDefKeep(
+        logger.toVariable(this),
+        "getEvaluator()",
+        () -> new TraceEvaluator(delegate.getEvaluator(), mgr, logger));
+  }
+
+  @Override
+  public ImmutableList<Model.ValueAssignment> getModelAssignments() throws SolverException {
+    ImmutableList<Model.ValueAssignment> result =
+        logger.logDefDiscard(
+            logger.toVariable(this), "getModelAssignments()", delegate::getModelAssignments);
+    return FluentIterable.from(result)
+        // TODO Fix this in the Z3 model
+        .filter((Model.ValueAssignment assignment) -> !assignment.getName().startsWith("#"))
+        .transform(
+            (Model.ValueAssignment assigment) -> {
+              var key = mgr.rebuild(assigment.getKey());
+              var val = mgr.rebuild(assigment.getValueAsFormula());
+              var map = mgr.rebuild(assigment.getAssignmentAsFormula());
+              return new Model.ValueAssignment(
+                  key,
+                  val,
+                  map,
+                  assigment.getName(),
+                  assigment.getValue(),
+                  assigment.getArgumentsInterpretation());
+            })
+        .toList();
+  }
+
+  @Override
   public List<BooleanFormula> getUnsatCore() {
     return mgr.rebuildAll(
         logger.logDefDiscard(logger.toVariable(this), "getUnsatCore()", delegate::getUnsatCore));
@@ -96,6 +139,11 @@ class TraceBasicProverEnvironment<T> implements BasicProverEnvironment<T> {
                 .formatted(logger.toVariables(assumptions)),
             () -> delegate.unsatCoreOverAssumptions(assumptions))
         .map(mgr::rebuildAll);
+  }
+
+  @Override
+  public ImmutableMap<String, String> getStatistics() {
+    return delegate.getStatistics();
   }
 
   @Override
@@ -127,5 +175,10 @@ class TraceBasicProverEnvironment<T> implements BasicProverEnvironment<T> {
                   }
                 },
                 important));
+  }
+
+  @Override
+  public boolean registerUserPropagator(UserPropagator propagator) {
+    throw new UnsupportedOperationException();
   }
 }

@@ -21,9 +21,11 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.java_smt.api.BasicProverEnvironment;
 import org.sosy_lab.java_smt.api.BooleanFormula;
+import org.sosy_lab.java_smt.api.Evaluator;
 import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.Model.ValueAssignment;
 import org.sosy_lab.java_smt.api.SolverException;
+import org.sosy_lab.java_smt.api.UserPropagator;
 
 /** Wraps a basic prover environment with a logging object. */
 class LoggingBasicProverEnvironment<T> implements BasicProverEnvironment<T> {
@@ -94,6 +96,11 @@ class LoggingBasicProverEnvironment<T> implements BasicProverEnvironment<T> {
   }
 
   @Override
+  public Evaluator getEvaluator() throws SolverException {
+    return wrapped.getEvaluator();
+  }
+
+  @Override
   public ImmutableList<ValueAssignment> getModelAssignments() throws SolverException {
     ImmutableList<ValueAssignment> m = wrapped.getModelAssignments();
     logger.log(Level.FINE, "model", m);
@@ -137,5 +144,10 @@ class LoggingBasicProverEnvironment<T> implements BasicProverEnvironment<T> {
     R result = wrapped.allSat(callback, important);
     logger.log(Level.FINE, "allsat-result:", result);
     return result;
+  }
+
+  @Override
+  public boolean registerUserPropagator(UserPropagator propagator) {
+    throw new UnsupportedOperationException();
   }
 }
