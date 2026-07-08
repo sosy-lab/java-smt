@@ -8,7 +8,6 @@
 
 package org.sosy_lab.java_smt.solvers.bitwuzla;
 
-import com.google.common.base.Preconditions;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.Lists;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
@@ -122,7 +121,11 @@ abstract class BitwuzlaAbstractProver<T> extends AbstractProverWithAllSat<T> {
     stack.push(stack.peek());
   }
 
-  private boolean readSATResult(Result resultValue) throws SolverException, InterruptedException {
+  /**
+   * @param resultValue {@code true} iff the given resultValue is UNSAT. {@code false} iff it is
+   *     SAT. {@link SolverException} for UNKNOWN. {@link InterruptedException} for interrupts.
+   */
+  private boolean isUNSATResult(Result resultValue) throws SolverException, InterruptedException {
     if (resultValue == Result.SAT) {
       return false;
     } else if (resultValue == Result.UNSAT) {
@@ -130,13 +133,13 @@ abstract class BitwuzlaAbstractProver<T> extends AbstractProverWithAllSat<T> {
     } else if (resultValue == Result.UNKNOWN && shutdownNotifier.shouldShutdown()) {
       throw new InterruptedException();
     } else {
-      throw new SolverException("Bitwuzla returned UNKNOWN.");
+      throw new SolverException("Bitwuzla returned UNKNOWN");
     }
   }
 
   @Override
   protected boolean isUnsatImpl() throws SolverException, InterruptedException {
-    return readSATResult(env.check_sat());
+    return isUNSATResult(env.check_sat());
   }
 
   /**
@@ -146,7 +149,7 @@ abstract class BitwuzlaAbstractProver<T> extends AbstractProverWithAllSat<T> {
    * @param assumptions A list of literals.
    */
   @Override
-  public boolean isUnsatWithAssumptions(Collection<BooleanFormula> assumptions) {
+  protected boolean isUnsatWithAssumptionsImpl(Collection<BooleanFormula> assumptions) {
     throw new UnsupportedOperationException();
   }
 
@@ -177,8 +180,7 @@ abstract class BitwuzlaAbstractProver<T> extends AbstractProverWithAllSat<T> {
    * returned <code>false</code>.
    */
   @Override
-  public List<BooleanFormula> getUnsatCore() {
-    checkGenerateUnsatCores();
+  protected List<BooleanFormula> getUnsatCoreImpl() {
     return Lists.transform(env.get_unsat_core(), creator::encapsulateBoolean);
   }
 
@@ -191,11 +193,8 @@ abstract class BitwuzlaAbstractProver<T> extends AbstractProverWithAllSat<T> {
    *     assumptions which is unsatisfiable with the original constraints otherwise.
    */
   @Override
-  public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(
+  protected Optional<List<BooleanFormula>> unsatCoreOverAssumptionsImpl(
       Collection<BooleanFormula> assumptions) throws SolverException, InterruptedException {
-    Preconditions.checkNotNull(assumptions);
-    checkGenerateUnsatCoresOverAssumptions();
-
     changedSinceLastSatQuery = true;
 
     Collection<Term> newAssumptions = new LinkedHashSet<>();
@@ -203,11 +202,15 @@ abstract class BitwuzlaAbstractProver<T> extends AbstractProverWithAllSat<T> {
       Term term = creator.extractInfo(formula);
       newAssumptions.add(term);
     }
-    Result result = env.check_sat(new Vector_Term(newAssumptions));
+    final boolean isUnsat = isUNSATResult(env.check_sat(new Vector_Term(newAssumptions)));
 
-    return !readSATResult(result)
-        ? Optional.empty()
-        : Optional.of(Lists.transform(env.get_unsat_assumptions(), creator::encapsulateBoolean));
+    if (!isUnsat) {
+      changedSinceLastSatQuery = false;
+      wasLastSatCheckSatisfiable = true;
+      return Optional.empty();
+    }
+    wasLastSatCheckSatisfiable = false;
+    return Optional.of(Lists.transform(env.get_unsat_assumptions(), creator::encapsulateBoolean));
   }
 
   /**

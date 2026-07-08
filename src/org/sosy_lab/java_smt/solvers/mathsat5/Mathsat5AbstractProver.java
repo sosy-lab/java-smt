@@ -104,20 +104,13 @@ abstract class Mathsat5AbstractProver<T2> extends AbstractProver<T2> {
   }
 
   @Override
-  public boolean isUnsatWithAssumptions(Collection<BooleanFormula> pAssumptions)
+  protected boolean isUnsatWithAssumptionsImpl(Collection<BooleanFormula> pAssumptions)
       throws SolverException, InterruptedException {
-    Preconditions.checkState(!closed);
     checkForLiterals(pAssumptions);
-    changedSinceLastSatQuery = false;
-    wasLastSatCheckSatisfiable = false;
 
     final long hook = msat_set_termination_callback(curEnv, context.getTerminationTest());
     try {
-      boolean isSat = msat_check_sat_with_assumptions(curEnv, getMsatTerm(pAssumptions));
-      if (isSat) {
-        wasLastSatCheckSatisfiable = true;
-      }
-      return !isSat;
+      return !msat_check_sat_with_assumptions(curEnv, getMsatTerm(pAssumptions));
     } finally {
       msat_free_termination_callback(hook);
     }
@@ -184,18 +177,14 @@ abstract class Mathsat5AbstractProver<T2> extends AbstractProver<T2> {
   }
 
   @Override
-  public List<BooleanFormula> getUnsatCore() {
-    checkGenerateUnsatCores();
+  protected List<BooleanFormula> getUnsatCoreImpl() {
     long[] terms = msat_get_unsat_core(curEnv);
     return encapsulate(terms);
   }
 
   @Override
-  public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(
+  protected Optional<List<BooleanFormula>> unsatCoreOverAssumptionsImpl(
       Collection<BooleanFormula> assumptions) throws SolverException, InterruptedException {
-    Preconditions.checkNotNull(assumptions);
-    checkGenerateUnsatCoresOverAssumptions();
-
     closeAllEvaluators();
 
     if (!isUnsatWithAssumptions(assumptions)) {
@@ -215,9 +204,8 @@ abstract class Mathsat5AbstractProver<T2> extends AbstractProver<T2> {
   }
 
   @Override
-  public ImmutableMap<String, String> getStatistics() {
+  protected ImmutableMap<String, String> getStatisticsImpl() {
     // Mathsat sigsevs if you try to get statistics for closed environments
-    Preconditions.checkState(!closed);
     final String stats = msat_get_search_stats(curEnv);
     return ImmutableMap.copyOf(
         Splitter.on("\n").trimResults().omitEmptyStrings().withKeyValueSeparator(" ").split(stats));
@@ -237,9 +225,8 @@ abstract class Mathsat5AbstractProver<T2> extends AbstractProver<T2> {
   }
 
   @Override
-  public <T> T allSat(AllSatCallback<T> callback, List<BooleanFormula> important)
+  protected <T> T allSatImpl(AllSatCallback<T> callback, List<BooleanFormula> important)
       throws InterruptedException, SolverException {
-    checkGenerateAllSat();
     closeAllEvaluators();
 
     long[] imp = new long[important.size()];
