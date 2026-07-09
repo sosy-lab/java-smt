@@ -10,7 +10,6 @@ package org.sosy_lab.java_smt.solvers.smtinterpol;
 
 import static org.sosy_lab.common.collect.Collections3.transformedImmutableSetCopy;
 
-import com.google.common.base.Preconditions;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableMap;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
@@ -70,10 +69,6 @@ abstract class SmtInterpolAbstractProver<T> extends AbstractProver<T> {
     annotatedTerms.add(PathCopyingPersistentTreeMap.of());
   }
 
-  protected boolean isClosed() {
-    return closed;
-  }
-
   @Override
   protected boolean hasPersistentModel() {
     return true;
@@ -93,7 +88,7 @@ abstract class SmtInterpolAbstractProver<T> extends AbstractProver<T> {
 
   @CanIgnoreReturnValue
   protected String addConstraint0(BooleanFormula constraint) {
-    Preconditions.checkState(!closed);
+    checkNotClosed();
 
     // create a term-name, used for unsat-core or interpolation, otherwise there is no overhead.
     String termName = generateTermName();
@@ -211,7 +206,7 @@ abstract class SmtInterpolAbstractProver<T> extends AbstractProver<T> {
 
   @Override
   public void close() {
-    if (!closed) {
+    if (!isClosed()) {
       annotatedTerms.clear();
       env.resetAssertions();
       env.exit();

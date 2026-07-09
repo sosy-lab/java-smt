@@ -259,7 +259,7 @@ abstract class OpenSmtAbstractProver<T> extends AbstractProverWithAllSat<T> {
 
   @Override
   public void close() {
-    if (!closed) {
+    if (!isClosed()) {
       osmtSolver.delete();
     }
     super.close();

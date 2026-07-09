@@ -167,7 +167,7 @@ abstract class Mathsat5AbstractProver<T2> extends AbstractProver<T2> {
 
   @Override
   public int size() {
-    Preconditions.checkState(!closed);
+    checkNotClosed();
     Preconditions.checkState(
         msat_num_backtrack_points(curEnv) == super.size(),
         "prover-size %s does not match stack-size %s",
@@ -213,15 +213,11 @@ abstract class Mathsat5AbstractProver<T2> extends AbstractProver<T2> {
 
   @Override
   public void close() {
-    if (!closed) {
+    if (!isClosed()) {
       msat_destroy_env(curEnv);
       msat_destroy_config(curConfig);
     }
     super.close();
-  }
-
-  protected boolean isClosed() {
-    return closed;
   }
 
   @Override

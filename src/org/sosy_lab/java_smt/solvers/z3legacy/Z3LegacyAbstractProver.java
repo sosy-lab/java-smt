@@ -166,7 +166,7 @@ abstract class Z3LegacyAbstractProver<T> extends AbstractProverWithAllSat<T> {
   @SuppressWarnings("unchecked")
   @Override
   protected T addConstraintImpl(BooleanFormula f) throws InterruptedException {
-    Preconditions.checkState(!closed);
+    checkNotClosed();
     long e = creator.extractInfo(f);
     try {
       if (storedConstraints != null) { // Unsat core generation is on.
@@ -184,14 +184,14 @@ abstract class Z3LegacyAbstractProver<T> extends AbstractProverWithAllSat<T> {
   }
 
   protected void push0() {
-    Preconditions.checkState(!closed);
+    checkNotClosed();
     if (storedConstraints != null) {
       storedConstraints.push(storedConstraints.peek());
     }
   }
 
   protected void pop0() {
-    Preconditions.checkState(!closed);
+    checkNotClosed();
     if (storedConstraints != null) {
       storedConstraints.pop();
     }
@@ -261,7 +261,7 @@ abstract class Z3LegacyAbstractProver<T> extends AbstractProverWithAllSat<T> {
 
   @Override
   public int size() {
-    Preconditions.checkState(!closed);
+    checkNotClosed();
     Preconditions.checkState(
         Native.solverGetNumScopes(z3context, z3solver) == super.size(),
         "prover-size %s does not match stack-size %s",
@@ -276,7 +276,7 @@ abstract class Z3LegacyAbstractProver<T> extends AbstractProverWithAllSat<T> {
 
   @Override
   public String toString() {
-    Preconditions.checkState(!closed);
+    checkNotClosed();
     return Native.solverToString(z3context, z3solver);
   }
 
@@ -359,7 +359,7 @@ abstract class Z3LegacyAbstractProver<T> extends AbstractProverWithAllSat<T> {
 
   @Override
   public void close() {
-    if (!closed) {
+    if (!isClosed()) {
       Preconditions.checkArgument(
           Native.solverGetNumScopes(z3context, z3solver) >= 0,
           "a negative number of scopes is not allowed");

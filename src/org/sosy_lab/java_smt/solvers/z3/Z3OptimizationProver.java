@@ -8,7 +8,6 @@
 
 package org.sosy_lab.java_smt.solvers.z3;
 
-import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import com.microsoft.z3.Native;
 import com.microsoft.z3.Native.IntPtr;
@@ -158,7 +157,7 @@ class Z3OptimizationProver extends Z3AbstractProver implements OptimizationProve
   }
 
   private Optional<Rational> round(int handle, Rational epsilon, RoundingFunction direction) {
-    Preconditions.checkState(!closed);
+    checkNotClosed();
 
     // Z3 exposes the rounding result as a tuple (infinity, number, epsilon)
     long vector = direction.round(z3context, z3optSolver, handle);
@@ -212,13 +211,13 @@ class Z3OptimizationProver extends Z3AbstractProver implements OptimizationProve
   /** Dumps the optimized objectives and the constraints on the solver in the SMT-lib format. */
   @Override
   public String toString() {
-    Preconditions.checkState(!closed);
+    checkNotClosed();
     return Native.optimizeToString(z3context, z3optSolver);
   }
 
   @Override
   public void close() {
-    if (!closed) {
+    if (!isClosed()) {
       Native.optimizeDecRef(z3context, z3optSolver);
     }
     super.close();

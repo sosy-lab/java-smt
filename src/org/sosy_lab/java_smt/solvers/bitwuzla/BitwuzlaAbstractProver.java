@@ -68,6 +68,10 @@ abstract class BitwuzlaAbstractProver<T> extends AbstractProverWithAllSat<T> {
     stack.push(PathCopyingPersistentTreeMap.of());
   }
 
+  Bitwuzla getProverEnvironment() {
+    return env;
+  }
+
   private Bitwuzla createEnvironment(Set<ProverOptions> pProverOptions, Options pSolverOptions) {
     if (pProverOptions.contains(ProverOptions.GENERATE_MODELS)
         || pProverOptions.contains(ProverOptions.GENERATE_ALL_SAT)) {
@@ -195,21 +199,17 @@ abstract class BitwuzlaAbstractProver<T> extends AbstractProverWithAllSat<T> {
   @Override
   protected Optional<List<BooleanFormula>> unsatCoreOverAssumptionsImpl(
       Collection<BooleanFormula> assumptions) throws SolverException, InterruptedException {
-    changedSinceLastSatQuery = true;
-
     Collection<Term> newAssumptions = new LinkedHashSet<>();
     for (BooleanFormula formula : assumptions) {
       Term term = creator.extractInfo(formula);
       newAssumptions.add(term);
     }
-    final boolean isUnsat = isUNSATResult(env.check_sat(new Vector_Term(newAssumptions)));
+    final boolean isUnsat =
+        setProverStateByIsUnsat(isUNSATResult(env.check_sat(new Vector_Term(newAssumptions))));
 
     if (!isUnsat) {
-      changedSinceLastSatQuery = false;
-      wasLastSatCheckSatisfiable = true;
       return Optional.empty();
     }
-    wasLastSatCheckSatisfiable = false;
     return Optional.of(Lists.transform(env.get_unsat_assumptions(), creator::encapsulateBoolean));
   }
 
@@ -220,8 +220,7 @@ abstract class BitwuzlaAbstractProver<T> extends AbstractProverWithAllSat<T> {
    */
   @Override
   public void close() {
-    if (!closed) {
-      closed = true;
+    if (!isClosed()) {
       env.close();
     }
     super.close();
@@ -231,9 +230,5 @@ abstract class BitwuzlaAbstractProver<T> extends AbstractProverWithAllSat<T> {
   @Override
   protected BitwuzlaEvaluator getEvaluatorWithoutChecks() {
     return registerEvaluator(new BitwuzlaEvaluator(this, creator));
-  }
-
-  public boolean isClosed() {
-    return closed;
   }
 }

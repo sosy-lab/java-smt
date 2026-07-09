@@ -18,7 +18,6 @@ import ap.api.SimpleAPI.SimpleAPIException;
 import ap.parser.IFormula;
 import ap.parser.IFunction;
 import ap.parser.ITerm;
-import com.google.common.base.Preconditions;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -94,7 +93,7 @@ abstract class PrincessAbstractProver<E> extends AbstractProverWithAllSat<E> {
 
   @CanIgnoreReturnValue
   protected int addConstraint0(BooleanFormula constraint) {
-    Preconditions.checkState(!closed);
+    checkNotClosed();
 
     final int formulaId = idGenerator.getFreshId();
     partitions.push(partitions.pop().putAndCopy(formulaId, constraint));
@@ -181,7 +180,7 @@ abstract class PrincessAbstractProver<E> extends AbstractProverWithAllSat<E> {
   public void close() {
     checkNotNull(api);
     checkNotNull(mgr);
-    if (!closed) {
+    if (!isClosed()) {
       api.shutDown();
       api.reset(); // cleanup memory, even if we keep a reference to "api" and "mgr"
       creator.getEnv().unregisterStack(this);
@@ -192,7 +191,7 @@ abstract class PrincessAbstractProver<E> extends AbstractProverWithAllSat<E> {
 
   /** add external definition: boolean variable. */
   void addSymbol(IFormula f) {
-    Preconditions.checkState(!closed);
+    checkNotClosed();
     api.addBooleanVariable(f);
     if (!trackingStack.isEmpty()) {
       trackingStack.peek().booleanSymbols.add(f);
@@ -201,7 +200,7 @@ abstract class PrincessAbstractProver<E> extends AbstractProverWithAllSat<E> {
 
   /** add external definition: theory variable (integer, rational, string, etc.). */
   void addSymbol(ITerm f) {
-    Preconditions.checkState(!closed);
+    checkNotClosed();
     api.addConstant(f);
     if (!trackingStack.isEmpty()) {
       trackingStack.peek().theorySymbols.add(f);
@@ -210,7 +209,7 @@ abstract class PrincessAbstractProver<E> extends AbstractProverWithAllSat<E> {
 
   /** add external definition: uninterpreted function. */
   void addSymbol(IFunction f) {
-    Preconditions.checkState(!closed);
+    checkNotClosed();
     api.addFunction(f);
     if (!trackingStack.isEmpty()) {
       trackingStack.peek().functionSymbols.add(f);

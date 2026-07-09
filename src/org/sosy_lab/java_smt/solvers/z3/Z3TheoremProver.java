@@ -163,7 +163,7 @@ class Z3TheoremProver extends Z3AbstractProver implements ProverEnvironment {
 
   @Override
   public int size() {
-    Preconditions.checkState(!closed);
+    checkNotClosed();
     Preconditions.checkState(
         Native.solverGetNumScopes(z3context, z3solver) == super.size(),
         "prover-size %s does not match stack-size %s",
@@ -179,7 +179,7 @@ class Z3TheoremProver extends Z3AbstractProver implements ProverEnvironment {
 
   @Override
   public boolean registerUserPropagator(UserPropagator prop) {
-    Preconditions.checkState(!closed);
+    checkNotClosed();
     if (propagator != null) {
       propagator.close();
     }
@@ -190,13 +190,13 @@ class Z3TheoremProver extends Z3AbstractProver implements ProverEnvironment {
 
   @Override
   public String toString() {
-    Preconditions.checkState(!closed);
+    checkNotClosed();
     return Native.solverToString(z3context, z3solver);
   }
 
   @Override
   public void close() {
-    if (!closed) {
+    if (!isClosed()) {
       checkArgument(
           Native.solverGetNumScopes(z3context, z3solver) >= 0,
           "a negative number of scopes is not allowed");

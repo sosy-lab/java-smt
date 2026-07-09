@@ -9,7 +9,6 @@
 package org.sosy_lab.java_smt.solvers.cvc5;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.base.Preconditions.checkState;
 
 import com.google.common.collect.Collections2;
 import com.google.common.collect.HashMultimap;
@@ -153,7 +152,7 @@ abstract class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
 
   @CanIgnoreReturnValue
   protected String addConstraint0(BooleanFormula pF) {
-    checkState(!closed);
+    checkNotClosed();
     Term exp = creator.extractInfo(pF);
     if (incremental) {
       solver.assertFormula(exp);
@@ -316,7 +315,7 @@ abstract class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
 
   @Override
   public void close() {
-    if (!closed) {
+    if (!isClosed()) {
       assertedTerms.clear();
       solver.deletePointer();
     }

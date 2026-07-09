@@ -76,10 +76,6 @@ abstract class Yices2AbstractProver<T> extends AbstractProverWithAllSat<T>
     stack.push(PathCopyingPersistentTreeMap.of());
   }
 
-  boolean isClosed() {
-    return closed;
-  }
-
   @Override
   protected boolean hasPersistentModel() {
     return true;
@@ -248,7 +244,7 @@ abstract class Yices2AbstractProver<T> extends AbstractProverWithAllSat<T>
 
   @Override
   public void close() {
-    if (!closed) {
+    if (!isClosed()) {
       curEnv.close();
       stackSizeToUnsat = Integer.MAX_VALUE;
     }

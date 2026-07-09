@@ -8,7 +8,6 @@
 
 package org.sosy_lab.java_smt.solvers.z3;
 
-import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.io.MoreFiles;
 import com.microsoft.z3.Native;
@@ -133,7 +132,7 @@ abstract class Z3AbstractProver extends AbstractProverWithAllSat<Void> {
 
   @Override
   protected Void addConstraintImpl(BooleanFormula f) throws InterruptedException {
-    Preconditions.checkState(!closed);
+    checkNotClosed();
     long e = creator.extractInfo(f);
     try {
       if (storedConstraints != null) { // Unsat core generation is on.
@@ -151,14 +150,14 @@ abstract class Z3AbstractProver extends AbstractProverWithAllSat<Void> {
   }
 
   protected void push0() {
-    Preconditions.checkState(!closed);
+    checkNotClosed();
     if (storedConstraints != null) {
       storedConstraints.push(storedConstraints.peek());
     }
   }
 
   protected void pop0() {
-    Preconditions.checkState(!closed);
+    checkNotClosed();
     if (storedConstraints != null) {
       storedConstraints.pop();
     }
@@ -247,7 +246,7 @@ abstract class Z3AbstractProver extends AbstractProverWithAllSat<Void> {
 
   @Override
   public void close() {
-    if (!closed) {
+    if (!isClosed()) {
       if (storedConstraints != null) {
         storedConstraints.clear();
       }

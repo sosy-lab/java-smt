@@ -41,14 +41,14 @@ public class OptimizationProverDelegate implements OptimizationProverEnvironment
   @SuppressWarnings("resource")
   @Override
   public int maximize(Formula objective) {
-    getDelegateAsAbstractProver().checkClosed();
+    getDelegateAsAbstractProver().checkNotClosed();
     return optimizationProver.maximize(objective);
   }
 
   @SuppressWarnings("resource")
   @Override
   public int minimize(Formula objective) {
-    getDelegateAsAbstractProver().checkClosed();
+    getDelegateAsAbstractProver().checkNotClosed();
     return optimizationProver.minimize(objective);
   }
 

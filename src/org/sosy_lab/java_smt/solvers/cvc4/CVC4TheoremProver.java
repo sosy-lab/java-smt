@@ -8,7 +8,6 @@
 
 package org.sosy_lab.java_smt.solvers.cvc4;
 
-import com.google.common.base.Preconditions;
 import com.google.common.collect.Collections2;
 import edu.stanford.CVC4.Exception;
 import edu.stanford.CVC4.Expr;
@@ -125,7 +124,7 @@ class CVC4TheoremProver extends AbstractProverWithAllSat<Void>
 
   @Override
   protected @Nullable Void addConstraintImpl(BooleanFormula pF) throws InterruptedException {
-    Preconditions.checkState(!closed);
+    checkNotClosed();
     if (incremental) {
       assertFormula(pF);
     }
@@ -233,9 +232,7 @@ class CVC4TheoremProver extends AbstractProverWithAllSat<Void>
 
   @Override
   public void close() {
-    if (!closed) {
-      // Never close the context
-    }
+    // Don't close the context!
     super.close();
   }
 }
