@@ -8,7 +8,6 @@
 
 package org.sosy_lab.java_smt.delegate.synchronize;
 
-import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.ImmutableList;
 import org.sosy_lab.java_smt.api.FormulaManager;
@@ -17,13 +16,9 @@ import org.sosy_lab.java_smt.api.SolverContext;
 
 class SynchronizedModelWithContext extends SynchronizedEvaluatorWithContext implements Model {
 
-  @SuppressWarnings("unused")
-  private final Model delegate;
-
   SynchronizedModelWithContext(
       Model pDelegate, SolverContext pSync, FormulaManager pManager, FormulaManager pOtherManager) {
     super(pDelegate, pSync, pManager, pOtherManager);
-    delegate = checkNotNull(pDelegate);
   }
 
   @Override
