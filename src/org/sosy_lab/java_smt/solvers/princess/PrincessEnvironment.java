@@ -43,6 +43,7 @@ import ap.types.Sort.MultipleValueBool$;
 import ap.util.Debug;
 import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
+import com.google.common.base.Verify;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
@@ -332,6 +333,7 @@ class PrincessEnvironment {
       sortedVariablesCache.put(constant.name(), new IConstant(constant));
     }
     for (Predicate predicate : nullaryPredicates.keySet()) {
+      Verify.verify(predicate.arity() == 0);
       boolVariablesCache.put(predicate.name(), new IAtom(predicate, toSeq(ImmutableList.of())));
     }
     return asserts;
