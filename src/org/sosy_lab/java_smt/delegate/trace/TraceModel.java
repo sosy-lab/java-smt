@@ -12,7 +12,6 @@ package org.sosy_lab.java_smt.delegate.trace;
 
 import static org.sosy_lab.common.collect.Collections3.transformedImmutableListCopy;
 
-import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableList;
 import org.sosy_lab.java_smt.api.Model;
 
@@ -33,17 +32,19 @@ class TraceModel extends TraceEvaluator implements Model {
   public ImmutableList<ValueAssignment> asList() {
     ImmutableList<ValueAssignment> result =
         logger.logDefDiscard(logger.toVariable(this), "asList()", delegate::asList);
-    return transformedImmutableListCopy(result, (ValueAssignment assigment) -> {
-              var key = mgr.rebuild(assigment.getKey());
-              var val = mgr.rebuild(assigment.getValueAsFormula());
-              var map = mgr.rebuild(assigment.getAssignmentAsFormula());
-              return new ValueAssignment(
-                  key,
-                  val,
-                  map,
-                  assigment.getName(),
-                  assigment.getValue(),
-                  assigment.getArgumentsInterpretation());
-            });
+    return transformedImmutableListCopy(
+        result,
+        (ValueAssignment assigment) -> {
+          var key = mgr.rebuild(assigment.getKey());
+          var val = mgr.rebuild(assigment.getValueAsFormula());
+          var map = mgr.rebuild(assigment.getAssignmentAsFormula());
+          return new ValueAssignment(
+              key,
+              val,
+              map,
+              assigment.getName(),
+              assigment.getValue(),
+              assigment.getArgumentsInterpretation());
+        });
   }
 }
