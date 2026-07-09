@@ -124,9 +124,7 @@ public class EldaricaHornProver extends PrincessAbstractProver<Void>
 
   @Override
   protected boolean isUnsatImpl() throws SolverException {
-    var result = solve();
-
-    return result.isRight();
+    return solve().isRight();
   }
 
   @Override
@@ -136,14 +134,9 @@ public class EldaricaHornProver extends PrincessAbstractProver<Void>
 
   @Override
   public Model getModelImpl() throws SolverException {
-    var result = solve();
-    if (result.isRight()) {
-      throw new IllegalStateException("Unsat, no model available!");
-    }
+    var model = solve().left().get().apply();
 
-    var solution = result.left().get().apply();
-
-    return new EldaricaModel(JavaConverters.asJava(solution), this, creator);
+    return new EldaricaModel(JavaConverters.asJava(model), this, creator);
   }
 
   @Override
