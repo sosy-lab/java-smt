@@ -32,8 +32,6 @@ class TraceModel extends TraceEvaluator implements Model {
     ImmutableList<ValueAssignment> result =
         logger.logDefDiscard(logger.toVariable(this), "asList()", delegate::asList);
     return FluentIterable.from(result)
-        // TODO Fix this in the Z3 model
-        .filter((ValueAssignment assignment) -> !assignment.getName().startsWith("#"))
         .transform(
             (ValueAssignment assigment) -> {
               var key = mgr.rebuild(assigment.getKey());

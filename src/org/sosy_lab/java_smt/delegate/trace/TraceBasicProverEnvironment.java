@@ -108,8 +108,6 @@ class TraceBasicProverEnvironment<T> implements BasicProverEnvironment<T> {
         logger.logDefDiscard(
             logger.toVariable(this), "getModelAssignments()", delegate::getModelAssignments);
     return FluentIterable.from(result)
-        // TODO Fix this in the Z3 model
-        .filter((Model.ValueAssignment assignment) -> !assignment.getName().startsWith("#"))
         .transform(
             (Model.ValueAssignment assigment) -> {
               var key = mgr.rebuild(assigment.getKey());
