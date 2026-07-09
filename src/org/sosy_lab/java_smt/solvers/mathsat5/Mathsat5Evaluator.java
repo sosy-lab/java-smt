@@ -10,7 +10,6 @@ package org.sosy_lab.java_smt.solvers.mathsat5;
 
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_get_model_value;
 
-import com.google.common.base.Preconditions;
 import org.sosy_lab.java_smt.basicimpl.AbstractEvaluator;
 import org.sosy_lab.java_smt.basicimpl.AbstractProver;
 
@@ -27,7 +26,6 @@ class Mathsat5Evaluator extends AbstractEvaluator<Long, Long, Long> {
 
   @Override
   protected Long evalImpl(Long formula) {
-    Preconditions.checkState(!isClosed());
     return msat_get_model_value(proverEnvironment, formula);
   }
 }

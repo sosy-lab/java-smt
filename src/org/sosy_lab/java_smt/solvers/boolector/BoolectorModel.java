@@ -80,7 +80,6 @@ class BoolectorModel extends AbstractModel<Long, Long, Long> {
           "set-option");
 
   private final long btor;
-  private final BoolectorTheoremProver prover;
   private final BoolectorFormulaCreator bfCreator;
   private final ImmutableList<ValueAssignment> model;
 
@@ -92,7 +91,6 @@ class BoolectorModel extends AbstractModel<Long, Long, Long> {
     super(pProver, creator);
     this.bfCreator = creator;
     this.btor = btor;
-    this.prover = pProver;
 
     // We need to generate and save this at construction time as Boolector has no functionality to
     // give a persistent reference to the model. If the SMT engine is used somewhere else, the
@@ -132,7 +130,7 @@ class BoolectorModel extends AbstractModel<Long, Long, Long> {
   */
   private ImmutableList<ValueAssignment> generateModel(Collection<Long> assertedTerms) {
     Preconditions.checkState(!isClosed());
-    Preconditions.checkState(!prover.isClosed(), "cannot use model after prover is closed");
+    Preconditions.checkState(!isProverClosed(), "cannot use model after prover is closed");
     // Use String instead of the node (long) as we need the name again later!
     ImmutableSet.Builder<String> variablesBuilder = ImmutableSet.builder();
 
@@ -189,7 +187,7 @@ class BoolectorModel extends AbstractModel<Long, Long, Long> {
 
   private ImmutableList<ValueAssignment> toList1(Set<String> variables) {
     Preconditions.checkState(!isClosed());
-    Preconditions.checkState(!prover.isClosed(), "cannot use model after prover is closed");
+    Preconditions.checkState(!isProverClosed(), "cannot use model after prover is closed");
     ImmutableList.Builder<ValueAssignment> assignmentBuilder = ImmutableList.builder();
     for (String name : variables) {
       // We get the formula here as we need the name.
@@ -281,7 +279,6 @@ class BoolectorModel extends AbstractModel<Long, Long, Long> {
 
   @Override
   protected Long evalImpl(Long pFormula) {
-    Preconditions.checkState(!isClosed());
     return pFormula;
   }
 
