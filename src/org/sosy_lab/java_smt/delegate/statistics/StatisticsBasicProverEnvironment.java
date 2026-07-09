@@ -125,7 +125,7 @@ class StatisticsBasicProverEnvironment<T> implements BasicProverEnvironment<T> {
 
   @Override
   public ImmutableMap<String, String> getStatistics() {
-    return ImmutableMap.of();
+    return delegate.getStatistics();
   }
 
   @Override
