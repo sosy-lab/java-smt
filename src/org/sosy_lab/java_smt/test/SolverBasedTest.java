@@ -2,32 +2,26 @@
 // an API wrapper for a collection of SMT solvers:
 // https://github.com/sosy-lab/java-smt
 //
-// SPDX-FileCopyrightText: 2020 Dirk Beyer <https://www.sosy-lab.org>
+// SPDX-FileCopyrightText: 2026 Dirk Beyer <https://www.sosy-lab.org>
 //
 // SPDX-License-Identifier: Apache-2.0
 
 package org.sosy_lab.java_smt.test;
 
-import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.truth.TruthJUnit.assume;
 import static org.sosy_lab.java_smt.api.FormulaType.getSinglePrecisionFloatingPointType;
 import static org.sosy_lab.java_smt.test.BooleanFormulaSubject.assertUsing;
 import static org.sosy_lab.java_smt.test.ProverEnvironmentSubject.assertThat;
 
-import com.google.common.collect.ImmutableMap;
 import com.google.common.truth.Truth;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Collection;
-import java.util.Map;
 import org.checkerframework.checker.nullness.qual.Nullable;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.rules.TestName;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameter;
-import org.junit.runners.Parameterized.Parameters;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.TestInfo;
+import org.junit.jupiter.params.Parameter;
+import org.junit.jupiter.params.ParameterizedClass;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.sosy_lab.common.ShutdownManager;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.configuration.Configuration;
@@ -66,39 +60,37 @@ import org.sosy_lab.java_smt.api.UFManager;
 import org.sosy_lab.java_smt.solvers.opensmt.Logics;
 
 /**
- * Abstract base class with helpful utilities for writing tests that use an SMT solver. It
- * instantiates and closes the SMT solver before and after each test, and provides fields with
- * direct access to the most relevant instances.
+ * Base class with helpful utilities for writing tests that use an SMT solver. It instantiates and
+ * closes the SMT solver before and after each test, and provides fields with direct access to the
+ * most relevant instances.
  *
- * <p>To run the tests using all available solvers, add the following code to your class:
+ * <p>To run the tests using all available solvers, use {@link ParameterizedSolverBasedTest}, or
+ * parametrize the class yourself:
  *
  * <pre>
- * <code>
- *  {@literal @}Parameters(name="{0}")
- *  public static List{@literal <Object[]>} getAllSolvers() {
- *    return allSolversAsParameters();
- *  }
+ * {@literal @}ParameterizedClass
+ * {@literal @}MethodSource("getAllSolvers")
+ *  public static class Test extends SolverBasedTest {
+ *    static Solvers[] getAllSolvers() {
+ *      return Solvers.values();
+ *    }
  *
- *  {@literal @}Parameter(0)
- *  public Solvers solver;
+ *   {@literal @}Parameter public Solvers solver;
  *
- *  {@literal @}Override
- *  protected Solvers solverToUse() {
- *    return solver;
+ *   {@literal @}Override
+ *    protected Solvers solverToUse() {
+ *      return solver;
+ *    }
  *  }
- * </code>
  * </pre>
- *
- * {@link #assertThatFormula(BooleanFormula)} can be used to easily write assertions about formulas
- * using Truth.
+ * In your tests {@link #assertThatFormula(BooleanFormula)} can be used to easily write assertions
+ * about formulas using Truth.
  *
  * <p>Test that rely on a theory that not all solvers support should call one of the {@code require}
  * methods at the beginning.
  */
-@SuppressFBWarnings("URF_UNREAD_PUBLIC_OR_PROTECTED_FIELD")
-public abstract class SolverBasedTest0 {
-
-  @Rule public TestName testName = new TestName();
+public class SolverBasedTest {
+  private TestInfo testInfo;
 
   protected Configuration config;
   protected final LogManager logger = LogManager.createTestLogManager();
@@ -144,7 +136,7 @@ public abstract class SolverBasedTest0 {
       String tracefile =
           "traces/%s/trace_%s_%s.java"
               .formatted(
-                  this.getClass().getSimpleName(), testName.getMethodName(), System.nanoTime());
+                  this.getClass().getSimpleName(), testInfo.getDisplayName(), System.nanoTime());
       newConfig.setOption("solver.trace", "true").setOption("solver.tracefile", tracefile);
       FileTypeConverter fileTypeConverter =
           FileTypeConverter.create(Configuration.defaultConfiguration());
@@ -183,74 +175,11 @@ public abstract class SolverBasedTest0 {
     return false;
   }
 
-  @Before
-  public final void initSolver() throws InvalidConfigurationException {
-    Configuration configuration = createTestConfigBuilder().build();
+  @BeforeEach
+  public final void initSolver(TestInfo info) throws InvalidConfigurationException {
+    testInfo = info;
+    config = createTestConfigBuilder().build();
 
-    initSolverWith(configuration);
-  }
-
-  /**
-   * Adds the given option to the config (all other options are retained) and re-initializes the
-   * current solver with this configuration. No solver object created before calling this is valid
-   * after executing this, as the old context is closed!
-   */
-  protected void setAdditionalConfigOptionForSolver(String optionName, String optionValue)
-      throws InvalidConfigurationException {
-    setAdditionalConfigOptionForSolver(ImmutableMap.of(optionName, optionValue));
-  }
-
-  /**
-   * Adds the given option to the config (all other options are retained) and re-initializes the
-   * current solver with this configuration. No solver object created before calling this is valid
-   * after executing this, as the old context is closed!
-   */
-  protected void setAdditionalConfigOptionForSolver(
-      String optionName1, String optionValue1, String optionName2, String optionValue2)
-      throws InvalidConfigurationException {
-    checkArgument(!optionName1.equalsIgnoreCase(optionValue2));
-    setAdditionalConfigOptionForSolver(
-        ImmutableMap.of(optionName1, optionValue1, optionName2, optionValue2));
-  }
-
-  /**
-   * Adds the given option to the config (all other options are retained) and re-initializes the
-   * current solver with this configuration. No solver object created before calling this is valid
-   * after executing this, as the old context is closed!
-   */
-  protected void setAdditionalConfigOptionForSolver(
-      String optionName1,
-      String optionValue1,
-      String optionName2,
-      String optionValue2,
-      String optionName3,
-      String optionValue3)
-      throws InvalidConfigurationException {
-    checkArgument(!optionName1.equalsIgnoreCase(optionValue2));
-    checkArgument(!optionName1.equalsIgnoreCase(optionValue3));
-    checkArgument(!optionName2.equalsIgnoreCase(optionValue3));
-    setAdditionalConfigOptionForSolver(
-        ImmutableMap.of(
-            optionName1, optionValue1, optionName2, optionValue2, optionName3, optionValue3));
-  }
-
-  /**
-   * Adds the given option to the config (all other options are retained) and re-initializes the
-   * current solver with this configuration. No solver object created before calling this is valid
-   * after executing this, as the old context is closed!
-   */
-  protected void setAdditionalConfigOptionForSolver(Map<String, String> optionsMap)
-      throws InvalidConfigurationException {
-    context.close();
-    initSolverWith(Configuration.builder().copyFrom(config).setOptions(optionsMap).build());
-  }
-
-  /**
-   * Initializes the currently set solver with the config given. All relevant fields are
-   * automatically (re)assigned.
-   */
-  private void initSolverWith(Configuration pConfiguration) throws InvalidConfigurationException {
-    config = pConfiguration;
     factory = new SolverContextFactory(config, logger, shutdownNotifierToUse());
     try {
       context = factory.generateContext();
@@ -314,7 +243,7 @@ public abstract class SolverBasedTest0 {
     }
   }
 
-  @After
+  @AfterEach
   public final void closeSolver() {
     if (context != null) {
       context.close();
@@ -649,16 +578,14 @@ public abstract class SolverBasedTest0 {
     throw new IllegalArgumentException();
   }
 
-  @RunWith(Parameterized.class)
-  public abstract static class ParameterizedSolverBasedTest0 extends SolverBasedTest0 {
-
-    @Parameters(name = "{0}")
-    public static Solvers[] getAllSolvers() {
+  @ParameterizedClass
+  @EnumSource(Solvers.class)
+  public static class ParameterizedSolverBasedTest extends SolverBasedTest {
+    static Solvers[] getAllSolvers() {
       return Solvers.values();
     }
 
-    @Parameter(0)
-    public Solvers solver;
+    @Parameter public Solvers solver;
 
     @Override
     protected Solvers solverToUse() {

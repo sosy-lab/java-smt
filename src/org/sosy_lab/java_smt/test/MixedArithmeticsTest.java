@@ -18,8 +18,8 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.function.BiFunction;
 import java.util.function.Function;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.NumeralFormula;
@@ -27,10 +27,10 @@ import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
 import org.sosy_lab.java_smt.api.SolverException;
 
-public class MixedArithmeticsTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
+public class MixedArithmeticsTest extends SolverBasedTest.ParameterizedSolverBasedTest {
 
   /** Require that the solver supports mixed integer-real arithmetics. */
-  @Before
+  @BeforeEach
   public void requireMixedArithmetics() {
     requireIntegers();
     requireRationals();

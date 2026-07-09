@@ -14,8 +14,8 @@ import static com.google.common.truth.TruthJUnit.assume;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import java.util.List;
-import org.junit.AssumptionViolatedException;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.opentest4j.TestAbortedException;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.SolverException;
@@ -24,7 +24,7 @@ import org.sosy_lab.java_smt.api.SolverException;
  * Uses bitvector theory if there is no integer theory available. Notice: Boolector does not support
  * bitvectors length 1.
  */
-public class BooleanFormulaManagerTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
+public class BooleanFormulaManagerTest extends SolverBasedTest.ParameterizedSolverBasedTest {
 
   @Test
   public void testConstBoolean() {
@@ -50,7 +50,7 @@ public class BooleanFormulaManagerTest extends SolverBasedTest0.ParameterizedSol
     try {
       var = bmgr.makeVariable("true");
     } catch (RuntimeException e) {
-      throw new AssumptionViolatedException("unsupported variable name", e);
+      throw new TestAbortedException("unsupported variable name", e);
     }
     BooleanFormula f = bmgr.equivalence(var, bmgr.makeFalse());
     assertThatFormula(f).isSatisfiable();
@@ -62,7 +62,7 @@ public class BooleanFormulaManagerTest extends SolverBasedTest0.ParameterizedSol
     try {
       var = bmgr.makeVariable("false");
     } catch (RuntimeException e) {
-      throw new AssumptionViolatedException("unsupported variable name", e);
+      throw new TestAbortedException("unsupported variable name", e);
     }
     BooleanFormula f = bmgr.equivalence(var, bmgr.makeTrue());
     assertThatFormula(f).isSatisfiable();

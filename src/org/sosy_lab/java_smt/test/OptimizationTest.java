@@ -10,14 +10,16 @@ package org.sosy_lab.java_smt.test;
 
 import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.TruthJUnit.assume;
-import static org.junit.Assert.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Range;
 import com.google.common.truth.TruthJUnit;
 import java.math.BigInteger;
-import org.junit.Before;
-import org.junit.Test;
+import java.util.concurrent.TimeUnit;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Timeout;
 import org.sosy_lab.common.configuration.ConfigurationBuilder;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.common.rationals.Rational;
@@ -30,14 +32,14 @@ import org.sosy_lab.java_smt.api.OptimizationProverEnvironment.OptStatus;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 
-public class OptimizationTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
+public class OptimizationTest extends SolverBasedTest.ParameterizedSolverBasedTest {
 
   @Override
   protected ConfigurationBuilder createTestConfigBuilder() throws InvalidConfigurationException {
     return super.createTestConfigBuilder().setOption("solver.mathsat5.loadOptimathsat5", "true");
   }
 
-  @Before
+  @BeforeEach
   public void skipUnsupportedSolvers() {
     requireOptimization();
   }
@@ -272,7 +274,8 @@ public class OptimizationTest extends SolverBasedTest0.ParameterizedSolverBasedT
     }
   }
 
-  @Test(timeout = 20_000)
+  @Test
+  @Timeout(value = 20, unit = TimeUnit.SECONDS)
   public void testSwitchingObjectives() throws SolverException, InterruptedException {
     requireRationals();
 

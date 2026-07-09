@@ -12,15 +12,15 @@ package org.sosy_lab.java_smt.test;
 
 import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.TruthJUnit.assume;
-import static org.junit.Assert.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.google.common.collect.ImmutableSet;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 
-public class UnsatCoreTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
+public class UnsatCoreTest extends SolverBasedTest.ParameterizedSolverBasedTest {
 
   // Tests that unsat cores can not be requested after changes to the stack have been made after
   // UNSAT has been established.

@@ -12,13 +12,13 @@ package org.sosy_lab.java_smt.test.example;
 
 import static com.google.common.truth.Truth.assertThat;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.sosy_lab.java_smt.test.SolverBasedTest0.ParameterizedSolverBasedTest0;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.sosy_lab.java_smt.test.SolverBasedTest;
 import org.sosy_lab.java_smt.utils.PrettyPrinter;
 import org.sosy_lab.java_smt.utils.PrettyPrinter.PrinterOption;
 
-public class PrettyPrinterTest extends ParameterizedSolverBasedTest0 {
+public class PrettyPrinterTest extends SolverBasedTest.ParameterizedSolverBasedTest {
 
   private PrettyPrinter pp;
 
@@ -34,7 +34,7 @@ public class PrettyPrinterTest extends ParameterizedSolverBasedTest0 {
 
   private static final String QUERY_1 = "(assert (and (= (select arr x) (foo 3)) (< x xx)))";
 
-  @Before
+  @BeforeEach
   public void init() {
     pp = new PrettyPrinter(context.getFormulaManager());
   }
