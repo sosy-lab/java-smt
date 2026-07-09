@@ -42,7 +42,7 @@ class StatisticsBasicProverEnvironment<T> implements BasicProverEnvironment<T> {
   @Override
   public @Nullable T push(BooleanFormula f) throws InterruptedException {
     stats.push.getAndIncrement();
-    stats.pop.getAndIncrement();
+    stats.constraint.getAndIncrement();
     return delegate.push(f);
   }
 
