@@ -194,8 +194,8 @@ SPDX-License-Identifier: Apache-2.0
 
     <target name="download-jdk21-windows" depends="build-initialize" unless="jdk.downloaded">
         <!-- Download a more recent Jdk to avoid compile errors -->
-        <get src="https://download.oracle.com/java/21/latest/jdk-21_windows-x64_bin.zip" dest="/dependencies" verbose="true"/>
-        <unzip src="/dependencies/jdk-21_windows-x64_bin.zip" dest="/dependencies"/>
+        <get src="https://download.oracle.com/java/21/archive/jdk-21.0.10_windows-x64_bin.zip" dest="/dependencies" verbose="true"/>
+        <unzip src="/dependencies/jdk-21.0.10_windows-x64_bin.zip" dest="/dependencies"/>
         <delete file="/dependencies/jdk-21_windows-x64_bin.zip" failonerror="true"/>
         <move file="/dependencies/jdk-21.0.10" tofile="/dependencies/jdk21-windows-x64" failonerror="true"/>
     </target>
@@ -203,7 +203,7 @@ SPDX-License-Identifier: Apache-2.0
     <target name="download-yices2-java" depends="build-initialize" unless="yices-java.downloaded">
         <exec executable="git" dir="${yices2.buildDir}" failonerror="true">
             <arg value="clone"/>
-            <arg value="https://github.com/daniel-raffler/yices2_java_bindings.git"/>
+            <arg value="https://github.com/SRI-CSL/yices2_java_bindings.git"/>
         </exec>
     </target>
     <target name="build-yices2-java" depends="build-yices2, download-jdk21-windows, download-yices2-java" unless="yices-java.installed">
