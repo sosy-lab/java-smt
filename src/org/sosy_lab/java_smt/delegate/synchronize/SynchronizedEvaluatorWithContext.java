@@ -32,9 +32,9 @@ class SynchronizedEvaluatorWithContext implements Evaluator {
   static final String UNSUPPORTED_OPERATION = "translating non-boolean formulae is not supported";
 
   private final Evaluator delegate;
-  final SolverContext sync;
-  final FormulaManager manager;
-  final FormulaManager otherManager;
+  private final SolverContext sync;
+  private final FormulaManager manager;
+  private final FormulaManager otherManager;
 
   SynchronizedEvaluatorWithContext(
       Evaluator pDelegate,

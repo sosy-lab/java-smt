@@ -29,7 +29,7 @@ import org.sosy_lab.java_smt.api.StringFormula;
 class SynchronizedEvaluator implements Evaluator {
 
   private final Evaluator delegate;
-  final SolverContext sync;
+  private final SolverContext sync;
 
   SynchronizedEvaluator(Evaluator pDelegate, SolverContext pSync) {
     delegate = checkNotNull(pDelegate);

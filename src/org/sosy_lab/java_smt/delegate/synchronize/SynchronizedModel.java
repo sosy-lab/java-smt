@@ -17,10 +17,12 @@ import org.sosy_lab.java_smt.api.SolverContext;
 class SynchronizedModel extends SynchronizedEvaluator implements Model {
 
   private final Model delegate;
+  private final SolverContext sync;
 
   SynchronizedModel(Model pDelegate, SolverContext pSync) {
     super(pDelegate, pSync);
     delegate = checkNotNull(pDelegate);
+    sync = checkNotNull(pSync);
   }
 
   @Override
