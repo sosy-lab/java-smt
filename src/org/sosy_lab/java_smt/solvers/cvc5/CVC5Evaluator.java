@@ -8,7 +8,6 @@
 
 package org.sosy_lab.java_smt.solvers.cvc5;
 
-import com.google.common.base.Preconditions;
 import io.github.cvc5.Solver;
 import io.github.cvc5.Sort;
 import io.github.cvc5.Term;
@@ -26,7 +25,6 @@ class CVC5Evaluator extends AbstractEvaluator<Term, Sort, TermManager> {
 
   @Override
   public Term evalImpl(Term f) {
-    Preconditions.checkState(!isClosed());
     return solver.getValue(f);
   }
 }

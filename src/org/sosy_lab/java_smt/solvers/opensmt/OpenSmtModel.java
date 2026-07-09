@@ -10,7 +10,6 @@ package org.sosy_lab.java_smt.solvers.opensmt;
 
 import static org.sosy_lab.common.collect.Collections3.elementAndList;
 
-import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import java.util.ArrayList;
@@ -104,7 +103,6 @@ class OpenSmtModel extends AbstractModel<PTRef, SRef, Logic> {
 
   @Override
   public PTRef evalImpl(PTRef f) {
-    Preconditions.checkState(!isClosed());
     Map<String, PTRef> userDeclarations = creator.extractVariablesAndUFs(f, true);
 
     // FIXME: rewrite to use checkCompatibility from AbstractProver

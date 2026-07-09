@@ -10,7 +10,6 @@ package org.sosy_lab.java_smt.solvers.smtinterpol;
 
 import static org.sosy_lab.common.collect.Collections3.transformedImmutableSetCopy;
 
-import com.google.common.base.Preconditions;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableMap;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
@@ -70,10 +69,6 @@ abstract class SmtInterpolAbstractProver<T> extends AbstractProver<T> {
     annotatedTerms.add(PathCopyingPersistentTreeMap.of());
   }
 
-  protected boolean isClosed() {
-    return closed;
-  }
-
   @Override
   protected boolean hasPersistentModel() {
     return true;
@@ -93,7 +88,7 @@ abstract class SmtInterpolAbstractProver<T> extends AbstractProver<T> {
 
   @CanIgnoreReturnValue
   protected String addConstraint0(BooleanFormula constraint) {
-    Preconditions.checkState(!closed);
+    checkNotClosed();
 
     // create a term-name, used for unsat-core or interpolation, otherwise there is no overhead.
     String termName = generateTermName();
@@ -140,7 +135,7 @@ abstract class SmtInterpolAbstractProver<T> extends AbstractProver<T> {
 
   @SuppressWarnings("resource")
   @Override
-  public org.sosy_lab.java_smt.api.Model getModelImpl() {
+  protected org.sosy_lab.java_smt.api.Model getModelImpl() {
     final Model model;
     try {
       model = env.getModel();
@@ -165,8 +160,7 @@ abstract class SmtInterpolAbstractProver<T> extends AbstractProver<T> {
   }
 
   @Override
-  public List<BooleanFormula> getUnsatCore() {
-    checkGenerateUnsatCores();
+  protected List<BooleanFormula> getUnsatCoreImpl() {
     return getUnsatCore0(annotatedTerms.peek());
   }
 
@@ -187,9 +181,8 @@ abstract class SmtInterpolAbstractProver<T> extends AbstractProver<T> {
   }
 
   @Override
-  public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(
+  protected Optional<List<BooleanFormula>> unsatCoreOverAssumptionsImpl(
       Collection<BooleanFormula> assumptions) throws InterruptedException, SolverException {
-    checkGenerateUnsatCoresOverAssumptions();
     Map<String, BooleanFormula> annotatedConstraints = new LinkedHashMap<>();
     push();
     for (BooleanFormula assumption : assumptions) {
@@ -199,11 +192,13 @@ abstract class SmtInterpolAbstractProver<T> extends AbstractProver<T> {
     Optional<List<BooleanFormula>> result =
         isUnsat() ? Optional.of(getUnsatCore0(annotatedConstraints)) : Optional.empty();
     pop();
+    // Note: You can not trust the solver anymore due to the pop. The pop() also changes
+    // changedSinceLastSatQuery to true!
     return result;
   }
 
   @Override
-  public ImmutableMap<String, String> getStatistics() {
+  protected ImmutableMap<String, String> getStatisticsImpl() {
     ImmutableMap.Builder<String, String> builder = ImmutableMap.builder();
     SmtInterpolSolverContext.flatten(builder, "", env.getInfo(":all-statistics"));
     return builder.buildOrThrow();
@@ -211,7 +206,7 @@ abstract class SmtInterpolAbstractProver<T> extends AbstractProver<T> {
 
   @Override
   public void close() {
-    if (!closed) {
+    if (!isClosed()) {
       annotatedTerms.clear();
       env.resetAssertions();
       env.exit();
@@ -220,16 +215,17 @@ abstract class SmtInterpolAbstractProver<T> extends AbstractProver<T> {
   }
 
   @Override
-  public boolean isUnsatWithAssumptions(Collection<BooleanFormula> pAssumptions)
+  protected boolean isUnsatWithAssumptionsImpl(Collection<BooleanFormula> pAssumptions)
       throws SolverException, InterruptedException {
+    // While SMTInterpol provides checkSatAssuming(), it requires the assumptions to be
+    // non-annotated, which we don't want due to this conflicting with unsat-core/interpolation
+    // support.
     throw new UnsupportedOperationException(ASSUMPTION_SOLVING_NOT_SUPPORTED);
   }
 
   @Override
-  public <R> R allSat(AllSatCallback<R> callback, List<BooleanFormula> important)
+  protected <R> R allSatImpl(AllSatCallback<R> callback, List<BooleanFormula> important)
       throws InterruptedException, SolverException {
-    checkGenerateAllSat();
-
     Term[] importantTerms = new Term[important.size()];
     int i = 0;
     for (BooleanFormula impF : important) {

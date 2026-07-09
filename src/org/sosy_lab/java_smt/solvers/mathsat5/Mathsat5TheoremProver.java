@@ -11,7 +11,6 @@ package org.sosy_lab.java_smt.solvers.mathsat5;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5FormulaManager.getMsatTerm;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_assert_formula;
 
-import com.google.common.base.Preconditions;
 import java.util.Map;
 import java.util.Set;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -38,7 +37,7 @@ class Mathsat5TheoremProver extends Mathsat5AbstractProver<Void> implements Prov
   @Override
   @Nullable
   protected Void addConstraintImpl(BooleanFormula constraint) throws InterruptedException {
-    Preconditions.checkState(!closed);
+    checkNotClosed();
     closeAllEvaluators();
     msat_assert_formula(curEnv, getMsatTerm(constraint));
     return null;

@@ -8,7 +8,6 @@
 
 package org.sosy_lab.java_smt.solvers.opensmt;
 
-import com.google.common.base.Preconditions;
 import org.sosy_lab.java_smt.basicimpl.AbstractEvaluator;
 import org.sosy_lab.java_smt.solvers.opensmt.api.Logic;
 import org.sosy_lab.java_smt.solvers.opensmt.api.Model;
@@ -26,7 +25,6 @@ class OpenSmtEvaluator extends AbstractEvaluator<PTRef, SRef, Logic> {
 
   @Override
   public PTRef evalImpl(PTRef f) {
-    Preconditions.checkState(!isClosed());
     return osmtModel.evaluate(f);
   }
 }

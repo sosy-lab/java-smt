@@ -37,6 +37,10 @@ public abstract class AbstractEvaluator<TFormulaInfo, TType, TEnv> implements Ev
     this.creator = Preconditions.checkNotNull(creator);
   }
 
+  protected final boolean isProverClosed() {
+    return prover.isClosed();
+  }
+
   @SuppressWarnings("unchecked")
   @Nullable
   @Override
@@ -128,7 +132,12 @@ public abstract class AbstractEvaluator<TFormulaInfo, TType, TEnv> implements Ev
     return evaluatedF == null ? null : creator.convertValue(f, evaluatedF);
   }
 
-  protected boolean isClosed() {
+  /**
+   * Returns the closed status of the evaluator (and only the evaluator!).
+   *
+   * @return {@code true} if it is closed, {@code false} else.
+   */
+  protected final boolean isClosed() {
     return closed;
   }
 
