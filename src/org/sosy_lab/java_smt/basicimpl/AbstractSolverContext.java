@@ -9,6 +9,7 @@
 package org.sosy_lab.java_smt.basicimpl;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableSet;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
@@ -38,7 +39,7 @@ public abstract class AbstractSolverContext implements SolverContext {
   @SuppressWarnings("resource")
   @Override
   public final ProverEnvironment newProverEnvironment(ProverOptions... options) {
-    ProverEnvironment out = newProverEnvironment0(toSet(options));
+    ProverEnvironment out = newProverEnvironment0(addModelBecauseOfAllSat(toSet(options)));
     if (!supportsAssumptionSolving()) {
       // In the case we do not already have a prover environment with assumptions,
       // we add a wrapper to it
@@ -49,13 +50,31 @@ public abstract class AbstractSolverContext implements SolverContext {
 
   protected abstract ProverEnvironment newProverEnvironment0(Set<ProverOptions> options);
 
+  public static Set<ProverOptions> addModelBecauseOfAllSat(Set<ProverOptions> options) {
+    if (options.contains(ProverOptions.GENERATE_MODELS)) {
+      return options;
+    } else if (options.contains(ProverOptions.GENERATE_ALL_SAT)
+        || options.contains(ProverOptions.GENERATE_ALL_SAT_NATIVE)
+        || options.contains(ProverOptions.GENERATE_ALL_SAT_MODEL_BASED)
+        || options.contains(ProverOptions.GENERATE_ALL_SAT_MODEL_BASED_W_FALLBACK)
+        || options.contains(ProverOptions.GENERATE_ALL_SAT_PREDICATE_COMBINATIONS)
+        || options.contains(ProverOptions.GENERATE_ALL_SAT_PREDICATE_COMBINATIONS_W_FALLBACK)) {
+      return ImmutableSet.<ProverOptions>builder()
+          .addAll(options)
+          .add(ProverOptions.GENERATE_MODELS)
+          .build();
+    }
+    return options;
+  }
+
   @SuppressWarnings("resource")
   @Override
   public final InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation(
       ProverOptions... options) {
 
     InterpolatingProverEnvironment<?> out =
-        new InterpolatingProverDelegate<>(newProverEnvironmentWithInterpolation0(toSet(options)));
+        new InterpolatingProverDelegate<>(
+            newProverEnvironmentWithInterpolation0(addModelBecauseOfAllSat(toSet(options))));
 
     if (!supportsAssumptionSolving()) {
       // In the case we do not already have a prover environment with assumptions,
@@ -72,7 +91,8 @@ public abstract class AbstractSolverContext implements SolverContext {
   @Override
   public final OptimizationProverEnvironment newOptimizationProverEnvironment(
       ProverOptions... options) {
-    return new OptimizationProverDelegate(newOptimizationProverEnvironment0(toSet(options)));
+    return new OptimizationProverDelegate(
+        newOptimizationProverEnvironment0(addModelBecauseOfAllSat(toSet(options))));
   }
 
   protected abstract OptimizationProverEnvironment newOptimizationProverEnvironment0(
