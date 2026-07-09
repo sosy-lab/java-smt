@@ -10,6 +10,8 @@
 
 package org.sosy_lab.java_smt.delegate.trace;
 
+import static org.sosy_lab.common.collect.Collections3.transformedImmutableListCopy;
+
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -107,9 +109,7 @@ class TraceBasicProverEnvironment<T> implements BasicProverEnvironment<T> {
     ImmutableList<Model.ValueAssignment> result =
         logger.logDefDiscard(
             logger.toVariable(this), "getModelAssignments()", delegate::getModelAssignments);
-    return FluentIterable.from(result)
-        .transform(
-            (Model.ValueAssignment assigment) -> {
+    return transformedImmutableListCopy(result, (Model.ValueAssignment assigment) -> {
               var key = mgr.rebuild(assigment.getKey());
               var val = mgr.rebuild(assigment.getValueAsFormula());
               var map = mgr.rebuild(assigment.getAssignmentAsFormula());
@@ -120,8 +120,7 @@ class TraceBasicProverEnvironment<T> implements BasicProverEnvironment<T> {
                   assigment.getName(),
                   assigment.getValue(),
                   assigment.getArgumentsInterpretation());
-            })
-        .toList();
+            });
   }
 
   @Override
