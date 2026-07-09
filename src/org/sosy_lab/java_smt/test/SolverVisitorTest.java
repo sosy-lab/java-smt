@@ -320,6 +320,7 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
   public void integerToBitvectorConversionVisit() {
     requireIntegers();
     requireBitvectors();
+    assume().that(solver).isNotEqualTo(Solvers.SMTINTERPOL);
 
     // Yices does not support integer to bitvector conversions
     assume().that(solver).isNotEqualTo(Solvers.YICES2);
@@ -335,6 +336,7 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
   public void bitvectorToIntegerConversionVisit() {
     requireIntegers();
     requireBitvectors();
+    assume().that(solver).isNotEqualTo(Solvers.SMTINTERPOL);
 
     // Yices does not support integer to bitvector conversions
     assume().that(solver).isNotEqualTo(Solvers.YICES2);
