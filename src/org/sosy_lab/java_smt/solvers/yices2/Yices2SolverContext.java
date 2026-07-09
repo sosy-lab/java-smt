@@ -42,7 +42,7 @@ public final class Yices2SolverContext extends AbstractSolverContext {
 
   private final Yices2FormulaCreator creator;
   private final BooleanFormulaManager bfmgr;
-  private final ShutdownNotifier shutdownManager;
+  private final ShutdownNotifier contextShutdownManager;
   private final Yices2Parameters parameters;
 
   private static int numLoadedInstances = 0;
@@ -52,12 +52,12 @@ public final class Yices2SolverContext extends AbstractSolverContext {
       FormulaManager pFmgr,
       Yices2FormulaCreator creator,
       BooleanFormulaManager pBfmgr,
-      ShutdownNotifier pShutdownManager,
+      ShutdownNotifier pContextShutdownManager,
       Yices2Parameters pParameters) {
     super(pFmgr);
     this.creator = creator;
     bfmgr = pBfmgr;
-    shutdownManager = pShutdownManager;
+    contextShutdownManager = pContextShutdownManager;
     parameters = pParameters;
   }
 
@@ -132,14 +132,15 @@ public final class Yices2SolverContext extends AbstractSolverContext {
 
   @Override
   protected ProverEnvironment newProverEnvironment0(Set<ProverOptions> pOptions) {
-    return new Yices2Prover(creator, pOptions, bfmgr, shutdownManager, parameters.solverType);
+    return new Yices2Prover(
+        creator, pOptions, bfmgr, contextShutdownManager, parameters.solverType);
   }
 
   @Override
   protected InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation0(
       Set<ProverOptions> pOptions) {
     return new Yices2InterpolatingProver(
-        creator, pOptions, bfmgr, shutdownManager, parameters.solverType);
+        creator, pOptions, bfmgr, contextShutdownManager, parameters.solverType);
   }
 
   @Override

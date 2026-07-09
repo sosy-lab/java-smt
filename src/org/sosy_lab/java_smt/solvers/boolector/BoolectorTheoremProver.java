@@ -23,7 +23,6 @@ import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractProverWithAllSat;
-import org.sosy_lab.java_smt.solvers.boolector.BtorJNI.TerminationCallback;
 
 class BoolectorTheoremProver extends AbstractProverWithAllSat<Void> implements ProverEnvironment {
 
@@ -33,7 +32,6 @@ class BoolectorTheoremProver extends AbstractProverWithAllSat<Void> implements P
   private final long btor;
   private final BoolectorFormulaManager manager;
   private final BoolectorFormulaCreator creator;
-  private final TerminationCallback terminationCallback;
   private final long terminationCallbackHelper;
 
   // Used/Built by TheoremProver
@@ -41,14 +39,13 @@ class BoolectorTheoremProver extends AbstractProverWithAllSat<Void> implements P
       BoolectorFormulaManager manager,
       BoolectorFormulaCreator creator,
       long btor,
-      ShutdownNotifier pShutdownNotifier,
+      ShutdownNotifier pContextShutdownNotifier,
       Set<ProverOptions> pOptions,
       AtomicBoolean pIsAnyStackAlive) {
-    super(pOptions, manager.getBooleanFormulaManager(), pShutdownNotifier);
+    super(pOptions, manager.getBooleanFormulaManager(), pContextShutdownNotifier);
     this.manager = manager;
     this.creator = creator;
     this.btor = btor;
-    terminationCallback = shutdownNotifier::shouldShutdown;
     terminationCallbackHelper = addTerminationCallback();
 
     isAnyStackAlive = pIsAnyStackAlive;
@@ -143,13 +140,8 @@ class BoolectorTheoremProver extends AbstractProverWithAllSat<Void> implements P
   }
 
   @Override
-  public List<BooleanFormula> getUnsatCore() {
-    throw new UnsupportedOperationException(UNSAT_CORE_NOT_SUPPORTED);
-  }
-
-  @Override
-  public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(
-      Collection<BooleanFormula> pAssumptions) throws SolverException, InterruptedException {
+  protected Optional<List<BooleanFormula>> unsatCoreOverAssumptionsImpl(
+      Collection<BooleanFormula> pAssumptions) {
     throw new UnsupportedOperationException(UNSAT_CORE_WITH_ASSUMPTIONS_NOT_SUPPORTED);
   }
 
@@ -172,6 +164,6 @@ class BoolectorTheoremProver extends AbstractProverWithAllSat<Void> implements P
 
   private long addTerminationCallback() {
     Preconditions.checkState(!closed, "solver context is already closed");
-    return BtorJNI.boolector_set_termination(btor, terminationCallback);
+    return BtorJNI.boolector_set_termination(btor, this::shouldShutdown);
   }
 }

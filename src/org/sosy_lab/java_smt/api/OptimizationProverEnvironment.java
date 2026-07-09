@@ -21,7 +21,7 @@ public interface OptimizationProverEnvironment extends BasicProverEnvironment<Vo
    *
    * @return Objective handle, to be used for retrieving the value.
    */
-  int maximize(Formula objective);
+  int maximize(Formula objective) throws InterruptedException;
 
   /**
    * Add minimization <code>objective</code>.
@@ -30,7 +30,7 @@ public interface OptimizationProverEnvironment extends BasicProverEnvironment<Vo
    *
    * @return Objective handle, to be used for retrieving the value.
    */
-  int minimize(Formula objective);
+  int minimize(Formula objective) throws InterruptedException;
 
   /**
    * Optimize the objective function subject to the previously imposed constraints.
@@ -44,14 +44,14 @@ public interface OptimizationProverEnvironment extends BasicProverEnvironment<Vo
    * @return Upper approximation of the optimized value, or absent optional if the objective is
    *     unbounded.
    */
-  Optional<Rational> upper(int handle, Rational epsilon);
+  Optional<Rational> upper(int handle, Rational epsilon) throws InterruptedException;
 
   /**
    * @param epsilon Value to substitute for the {@code epsilon}.
    * @return Lower approximation of the optimized value, or absent optional if the objective is
    *     unbounded.
    */
-  Optional<Rational> lower(int handle, Rational epsilon);
+  Optional<Rational> lower(int handle, Rational epsilon) throws InterruptedException;
 
   /**
    * {@inheritDoc}
@@ -68,7 +68,7 @@ public interface OptimizationProverEnvironment extends BasicProverEnvironment<Vo
    * (epsilon is irrelevant here and can be zero). The model returns the optimal assignment x=9.
    */
   @Override
-  Model getModel() throws SolverException;
+  Model getModel() throws SolverException, InterruptedException;
 
   /** Status of the optimization problem. */
   enum OptStatus {

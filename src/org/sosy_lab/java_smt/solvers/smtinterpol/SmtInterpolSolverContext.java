@@ -97,25 +97,25 @@ public final class SmtInterpolSolverContext extends AbstractSolverContext {
 
   private SmtInterpolSolverContext(
       SmtInterpolFormulaManager pManager,
-      ShutdownNotifier pShutdownNotifier,
+      ShutdownNotifier pContextShutdownNotifier,
       SmtInterpolSettings pSettings) {
     super(pManager);
     settings = pSettings;
-    shutdownNotifier = checkNotNull(pShutdownNotifier);
+    shutdownNotifier = checkNotNull(pContextShutdownNotifier);
     manager = pManager;
   }
 
   public static SmtInterpolSolverContext create(
       Configuration config,
       LogManager logger,
-      ShutdownNotifier pShutdownNotifier,
+      ShutdownNotifier pContextShutdownNotifier,
       @Nullable PathCounterTemplate smtLogfile,
       long randomSeed,
       NonLinearArithmetic pNonLinearArithmetic)
       throws InvalidConfigurationException {
 
     SmtInterpolSettings settings = new SmtInterpolSettings(config, randomSeed, smtLogfile);
-    Script script = getSmtInterpolScript(pShutdownNotifier, smtLogfile, settings, logger);
+    Script script = getSmtInterpolScript(pContextShutdownNotifier, smtLogfile, settings, logger);
 
     SmtInterpolFormulaCreator creator = new SmtInterpolFormulaCreator(script);
     SmtInterpolUFManager functionTheory = new SmtInterpolUFManager(creator);
@@ -134,12 +134,12 @@ public final class SmtInterpolSolverContext extends AbstractSolverContext {
             rationalTheory,
             arrayTheory,
             logger);
-    return new SmtInterpolSolverContext(manager, pShutdownNotifier, settings);
+    return new SmtInterpolSolverContext(manager, pContextShutdownNotifier, settings);
   }
 
   /** instantiate the central SMTInterpol script from where all others are copied. */
   private static Script getSmtInterpolScript(
-      ShutdownNotifier pShutdownNotifier,
+      ShutdownNotifier pContextShutdownNotifier,
       @javax.annotation.Nullable PathCounterTemplate smtLogfile,
       SmtInterpolSettings settings,
       LogManager logger)
@@ -147,7 +147,7 @@ public final class SmtInterpolSolverContext extends AbstractSolverContext {
     LogProxyForwarder smtInterpolLogProxy =
         new LogProxyForwarder(logger.withComponentName("SMTInterpol"));
     final SMTInterpol smtInterpol =
-        new SMTInterpol(smtInterpolLogProxy, pShutdownNotifier::shouldShutdown);
+        new SMTInterpol(smtInterpolLogProxy, pContextShutdownNotifier::shouldShutdown);
 
     final Script script = wrapInLoggingScriptIfNeeded(smtInterpol, smtLogfile);
 

@@ -69,9 +69,9 @@ abstract class Yices2AbstractProver<T> extends AbstractProverWithAllSat<T>
       Yices2FormulaCreator pCreator,
       Set<ProverOptions> pOptions,
       BooleanFormulaManager pBmgr,
-      ShutdownNotifier pShutdownNotifier,
+      ShutdownNotifier pContextShutdownNotifier,
       String pSolverType) {
-    super(pOptions, pBmgr, pShutdownNotifier);
+    super(pOptions, pBmgr, pContextShutdownNotifier);
     creator = pCreator;
     curEnv = newContext(pSolverType);
     stack.push(PathCopyingPersistentTreeMap.of());
@@ -162,12 +162,12 @@ abstract class Yices2AbstractProver<T> extends AbstractProverWithAllSat<T>
           !satCheckWithShutdownNotifier(
               () -> curEnv.checkWithAssumptions(DEFAULT_PARAMS, getAllConstraints()),
               curEnv,
-              shutdownNotifier);
+              contextShutdownNotifier);
 
     } else {
       unsat =
           !satCheckWithShutdownNotifier(
-              () -> curEnv.check(DEFAULT_PARAMS), curEnv, shutdownNotifier);
+              () -> curEnv.check(DEFAULT_PARAMS), curEnv, contextShutdownNotifier);
 
       if (unsat && stackSizeToUnsat == Integer.MAX_VALUE) {
         stackSizeToUnsat = size();
@@ -198,7 +198,7 @@ abstract class Yices2AbstractProver<T> extends AbstractProverWithAllSat<T>
         !satCheckWithShutdownNotifier(
             () -> curEnv.checkWithAssumptions(DEFAULT_PARAMS, uncapsulate(pAssumptions)),
             curEnv,
-            shutdownNotifier);
+            contextShutdownNotifier);
     if (!isUnsat) {
       wasLastSatCheckSatisfiable = true;
     }
@@ -246,15 +246,13 @@ abstract class Yices2AbstractProver<T> extends AbstractProverWithAllSat<T>
   }
 
   @Override
-  public List<BooleanFormula> getUnsatCore() {
-    checkGenerateUnsatCores();
+  public List<BooleanFormula> getUnsatCoreImpl() {
     return encapsulate(curEnv.getUnsatCore());
   }
 
   @Override
-  public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(
+  protected Optional<List<BooleanFormula>> unsatCoreOverAssumptionsImpl(
       Collection<BooleanFormula> pAssumptions) throws SolverException, InterruptedException {
-    checkGenerateUnsatCoresOverAssumptions();
     boolean sat = !isUnsatWithAssumptions(pAssumptions);
     return sat ? Optional.empty() : Optional.of(encapsulate(curEnv.getUnsatCore()));
   }

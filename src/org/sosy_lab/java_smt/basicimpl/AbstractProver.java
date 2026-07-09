@@ -25,8 +25,10 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.Set;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.java_smt.api.BasicProverEnvironment;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Evaluator;
@@ -53,6 +55,8 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
 
   private final Set<Evaluator> evaluators = new LinkedHashSet<>();
 
+  protected final ShutdownNotifier contextShutdownNotifier;
+
   /**
    * This data-structure tracks all formulas that were asserted on different levels. We can assert a
    * formula multiple times on the same or also distinct levels and return a new ID for each
@@ -62,7 +66,7 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
 
   private static final String TEMPLATE = "Please set the prover option %s.";
 
-  protected AbstractProver(Set<ProverOptions> pOptions) {
+  protected AbstractProver(Set<ProverOptions> pOptions, ShutdownNotifier pContextShutdownNotifier) {
     generateModels = pOptions.contains(ProverOptions.GENERATE_MODELS);
     generateAllSat = pOptions.contains(ProverOptions.GENERATE_ALL_SAT);
     generateUnsatCores = pOptions.contains(ProverOptions.GENERATE_UNSAT_CORE);
@@ -71,33 +75,44 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
     enableSL = pOptions.contains(ProverOptions.ENABLE_SEPARATION_LOGIC);
 
     assertedFormulas.add(LinkedHashMultimap.create());
+    contextShutdownNotifier = pContextShutdownNotifier;
   }
 
-  protected final void checkGenerateModels() {
+  protected final void checkGenerateModels() throws InterruptedException {
     Preconditions.checkState(generateModels, TEMPLATE, ProverOptions.GENERATE_MODELS);
     Preconditions.checkState(!closed);
+    shutdownIfNecessary();
     Preconditions.checkState(!changedSinceLastSatQuery);
     Preconditions.checkState(wasLastSatCheckSatisfiable, NO_MODEL_HELP);
   }
 
-  protected final void checkGenerateAllSat() {
+  protected final void checkGenerateAllSat() throws InterruptedException {
+    // TODO: should this close all evaluators as well?
     Preconditions.checkState(!closed);
+    shutdownIfNecessary();
     Preconditions.checkState(generateAllSat, TEMPLATE, ProverOptions.GENERATE_ALL_SAT);
   }
 
-  protected final void checkGenerateUnsatCores() {
+  protected final void checkGenerateUnsatCores() throws InterruptedException {
+    // TODO: should this close all evaluators as well?
     Preconditions.checkState(generateUnsatCores, TEMPLATE, ProverOptions.GENERATE_UNSAT_CORE);
     Preconditions.checkState(!closed);
+    shutdownIfNecessary();
     Preconditions.checkState(!changedSinceLastSatQuery);
     Preconditions.checkState(!wasLastSatCheckSatisfiable);
   }
 
-  protected final void checkGenerateUnsatCoresOverAssumptions() {
+  protected final void checkGenerateUnsatCoresOverAssumptions(
+      Collection<BooleanFormula> assumptions) throws InterruptedException {
+    // TODO: should this close all evaluators as well?
     Preconditions.checkState(!closed);
+    shutdownIfNecessary();
+    Preconditions.checkNotNull(assumptions);
     Preconditions.checkState(
         generateUnsatCoresOverAssumptions,
         TEMPLATE,
         ProverOptions.GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS);
+    // TODO: why is there no check for changedSinceLastSatQuery or wasLastSatCheckSatisfiable?
   }
 
   /**
@@ -108,8 +123,18 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
     Preconditions.checkState(!closed);
   }
 
-  private void checkGenerateInterpolants() {
+  protected final void shutdownIfNecessary() throws InterruptedException {
+    contextShutdownNotifier.shutdownIfNecessary();
+  }
+
+  protected final boolean shouldShutdown() {
+    return contextShutdownNotifier.shouldShutdown();
+  }
+
+  private void checkGenerateInterpolants() throws InterruptedException {
+    // TODO: should this close all evaluators as well?
     Preconditions.checkState(!closed);
+    shutdownIfNecessary();
     Preconditions.checkState(
         !changedSinceLastSatQuery,
         "Interpolants can only be calculated right after a call to isUnsat()");
@@ -119,7 +144,8 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
             + "unsatisfiable.");
   }
 
-  protected final void checkGenerateInterpolants(Collection<T> formulasOfA) {
+  protected final void checkGenerateInterpolants(Collection<T> formulasOfA)
+      throws InterruptedException {
     checkGenerateInterpolants();
     checkArgument(
         getAssertedConstraintIds().containsAll(formulasOfA),
@@ -127,7 +153,7 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
   }
 
   protected final void checkGenerateSeqInterpolants(
-      List<? extends Collection<T>> partitionedFormulas) {
+      List<? extends Collection<T>> partitionedFormulas) throws InterruptedException {
     checkGenerateInterpolants();
     Preconditions.checkArgument(
         !partitionedFormulas.isEmpty(), "at least one partition should be available.");
@@ -138,7 +164,8 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
   }
 
   protected final void checkGenerateTreeInterpolants(
-      List<? extends Collection<T>> partitionedFormulas, int[] startOfSubTree) {
+      List<? extends Collection<T>> partitionedFormulas, int[] startOfSubTree)
+      throws InterruptedException {
     checkGenerateSeqInterpolants(partitionedFormulas);
     assert InterpolatingProverEnvironment.checkTreeStructure(
         partitionedFormulas.size(), startOfSubTree);
@@ -164,12 +191,14 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
   @Override
   public int size() {
     checkState(!closed);
+    // TODO: can the solver calls used in the implementations cause interrupts?
     return assertedFormulas.size() - 1;
   }
 
   @Override
   public final void push() throws InterruptedException {
     checkState(!closed);
+    shutdownIfNecessary();
     pushImpl();
     setChanged();
     assertedFormulas.add(LinkedHashMultimap.create());
@@ -178,8 +207,9 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
   protected abstract void pushImpl() throws InterruptedException;
 
   @Override
-  public final void pop() {
+  public final void pop() throws InterruptedException {
     checkState(!closed);
+    shutdownIfNecessary();
     checkState(assertedFormulas.size() > 1, "initial level must remain until close");
     assertedFormulas.remove(assertedFormulas.size() - 1); // remove last
     popImpl();
@@ -192,6 +222,7 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
   @CanIgnoreReturnValue
   public final @Nullable T addConstraint(BooleanFormula constraint) throws InterruptedException {
     checkState(!closed);
+    shutdownIfNecessary();
     T t = addConstraintImpl(constraint);
     setChanged();
     Iterables.getLast(assertedFormulas).put(constraint, t);
@@ -205,6 +236,7 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
   @Override
   public final boolean isUnsat() throws SolverException, InterruptedException {
     checkState(!closed);
+    shutdownIfNecessary();
     changedSinceLastSatQuery = false;
     wasLastSatCheckSatisfiable = false;
     final boolean isUnsat = isUnsatImpl();
@@ -232,6 +264,7 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
    */
   public final OptStatus check() throws InterruptedException, SolverException {
     checkState(!closed);
+    shutdownIfNecessary();
     wasLastSatCheckSatisfiable = false;
     changedSinceLastSatQuery = false;
     final OptStatus status = checkImpl();
@@ -289,7 +322,7 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
   }
 
   @Override
-  public final Model getModel() throws SolverException {
+  public final Model getModel() throws SolverException, InterruptedException {
     checkGenerateModels();
     return getModelImpl();
   }
@@ -297,12 +330,12 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
   protected abstract Model getModelImpl() throws SolverException;
 
   @Override
-  public final Evaluator getEvaluator() throws SolverException {
+  public final Evaluator getEvaluator() throws SolverException, InterruptedException {
     checkGenerateModels();
     return getEvaluatorImpl();
   }
 
-  protected Evaluator getEvaluatorImpl() throws SolverException {
+  protected Evaluator getEvaluatorImpl() throws SolverException, InterruptedException {
     return getModel();
   }
 
@@ -322,6 +355,64 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
   protected void closeAllEvaluators() {
     ImmutableList.copyOf(evaluators).forEach(Evaluator::close);
     evaluators.clear();
+  }
+
+  @Override
+  public final List<BooleanFormula> getUnsatCore() throws InterruptedException {
+    checkGenerateUnsatCores();
+    return getUnsatCoreImpl();
+  }
+
+  /**
+   * @implSpec override and implement if a solver supports UNSAT-CORE generation.
+   */
+  protected List<BooleanFormula> getUnsatCoreImpl() {
+    throw new UnsupportedOperationException(UNSAT_CORE_NOT_SUPPORTED);
+  }
+
+  @Override
+  public final Optional<List<BooleanFormula>> unsatCoreOverAssumptions(
+      Collection<BooleanFormula> assumptions) throws SolverException, InterruptedException {
+    checkGenerateUnsatCoresOverAssumptions(assumptions);
+    return unsatCoreOverAssumptionsImpl(assumptions);
+  }
+
+  /**
+   * TODO: once javac does not complain if we use a default impl here, add one.
+   *
+   * @implSpec override and implement if a solver supports the generation of UNSAT-COREs over
+   *     assumptions. Else, override and throw a {@link UnsupportedOperationException} with {@link
+   *     BasicProverEnvironment#UNSAT_CORE_WITH_ASSUMPTIONS_NOT_SUPPORTED}
+   */
+  protected abstract Optional<List<BooleanFormula>> unsatCoreOverAssumptionsImpl(
+      Collection<BooleanFormula> assumptions) throws SolverException, InterruptedException;
+
+  @Override
+  public final <R> R allSat(AllSatCallback<R> callback, List<BooleanFormula> important)
+      throws InterruptedException, SolverException {
+    checkGenerateAllSat();
+    return allSatImpl(callback, important);
+  }
+
+  /**
+   * @implSpec only override and implement if a solver offers its own AllSAT procedure, otherwise
+   *     inherit {@link AbstractProverWithAllSat} instead of this class.
+   */
+  protected abstract <R> R allSatImpl(AllSatCallback<R> callback, List<BooleanFormula> important)
+      throws InterruptedException, SolverException;
+
+  @Override
+  public final ImmutableMap<String, String> getStatistics() throws InterruptedException {
+    Preconditions.checkState(!closed);
+    shutdownIfNecessary();
+    return getStatisticsImpl();
+  }
+
+  /**
+   * @implSpec override and implement for solvers that provide statistics.
+   */
+  protected ImmutableMap<String, String> getStatisticsImpl() {
+    return ImmutableMap.of();
   }
 
   @Override

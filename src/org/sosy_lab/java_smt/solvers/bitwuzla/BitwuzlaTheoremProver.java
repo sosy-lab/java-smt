@@ -23,10 +23,10 @@ class BitwuzlaTheoremProver extends BitwuzlaAbstractProver<Void> implements Prov
   BitwuzlaTheoremProver(
       BitwuzlaFormulaManager pManager,
       BitwuzlaFormulaCreator pCreator,
-      ShutdownNotifier pShutdownNotifier,
+      ShutdownNotifier pContextShutdownNotifier,
       Set<ProverOptions> pOptions,
       Options pSolverOptions) {
-    super(pManager, pCreator, pShutdownNotifier, pOptions, pSolverOptions);
+    super(pManager, pCreator, pContextShutdownNotifier, pOptions, pSolverOptions);
   }
 
   @Override

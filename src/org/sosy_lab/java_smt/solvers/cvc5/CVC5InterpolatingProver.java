@@ -42,13 +42,14 @@ class CVC5InterpolatingProver extends CVC5AbstractProver<String>
 
   CVC5InterpolatingProver(
       CVC5FormulaCreator pFormulaCreator,
-      ShutdownNotifier pShutdownNotifier,
+      ShutdownNotifier pContextShutdownNotifier,
       int pRandomSeed,
       ImmutableSet<ProverOptions> pOptions,
       FormulaManager pMgr,
       ImmutableMap<String, String> pFurtherOptionsMap,
       boolean pValidateInterpolants) {
-    super(pFormulaCreator, pShutdownNotifier, pRandomSeed, pOptions, pMgr, pFurtherOptionsMap);
+    super(
+        pFormulaCreator, pContextShutdownNotifier, pRandomSeed, pOptions, pMgr, pFurtherOptionsMap);
     mgr = pMgr;
     bmgr = (CVC5BooleanFormulaManager) mgr.getBooleanFormulaManager();
     validateInterpolants = pValidateInterpolants;

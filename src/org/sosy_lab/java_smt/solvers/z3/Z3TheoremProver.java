@@ -46,8 +46,8 @@ class Z3TheoremProver extends Z3AbstractProver implements ProverEnvironment {
       Set<ProverOptions> pOptions,
       ImmutableMap<String, Object> pSolverOptions,
       @Nullable PathCounterTemplate pLogfile,
-      ShutdownNotifier pShutdownNotifier) {
-    super(creator, pMgr, pLogic, pEngine, pOptions, pLogfile, pShutdownNotifier);
+      ShutdownNotifier pContextShutdownNotifier) {
+    super(creator, pMgr, pLogic, pEngine, pOptions, pLogfile, pContextShutdownNotifier);
     if (!logic.orElse("ALL").equalsIgnoreCase("ALL")) {
       // mkSolverForLogic() allows setting logics,
       // which seem to be getting ignored if set via options
@@ -59,7 +59,7 @@ class Z3TheoremProver extends Z3AbstractProver implements ProverEnvironment {
     Native.solverIncRef(z3context, z3solver);
 
     interruptListener = reason -> Native.solverInterrupt(z3context, z3solver);
-    shutdownNotifier.register(interruptListener);
+    contextShutdownNotifier.register(interruptListener);
 
     long z3params = Native.mkParams(z3context);
     Native.paramsIncRef(z3context, z3params);
@@ -141,7 +141,7 @@ class Z3TheoremProver extends Z3AbstractProver implements ProverEnvironment {
   private void undefinedStatusToException(int solverStatus)
       throws SolverException, InterruptedException {
     if (solverStatus == Z3_lbool.Z3_L_UNDEF.toInt()) {
-      creator.shutdownNotifier.shutdownIfNecessary();
+      creator.contextShutdownNotifier.shutdownIfNecessary();
       final String reason = Native.solverGetReasonUnknown(z3context, z3solver);
       switch (reason) {
         // see Z3:
@@ -215,7 +215,7 @@ class Z3TheoremProver extends Z3AbstractProver implements ProverEnvironment {
         propagator.close();
         propagator = null;
       }
-      shutdownNotifier.unregister(interruptListener);
+      contextShutdownNotifier.unregister(interruptListener);
     }
     super.close();
   }

@@ -37,9 +37,9 @@ class Yices2InterpolatingProver extends Yices2AbstractProver<Integer>
       Yices2FormulaCreator creator,
       Set<ProverOptions> pOptions,
       BooleanFormulaManager pBmgr,
-      ShutdownNotifier pShutdownNotifier,
+      ShutdownNotifier pContextShutdownNotifier,
       String pSolverType) {
-    super(creator, pOptions, pBmgr, pShutdownNotifier, pSolverType);
+    super(creator, pOptions, pBmgr, pContextShutdownNotifier, pSolverType);
   }
 
   @Override
@@ -71,9 +71,9 @@ class Yices2InterpolatingProver extends Yices2AbstractProver<Integer>
 
       // TODO How to abort this?
       // For now, let's just check before and after the call:
-      shutdownNotifier.shutdownIfNecessary();
+      shutdownIfNecessary();
       var status = context.check(DEFAULT_PARAMS, false);
-      shutdownNotifier.shutdownIfNecessary();
+      shutdownIfNecessary();
       if (status == Status.UNSAT) {
         return context.getInterpolant();
       } else {

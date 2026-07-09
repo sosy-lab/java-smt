@@ -64,12 +64,12 @@ abstract class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
 
   CVC5AbstractProver(
       CVC5FormulaCreator pFormulaCreator,
-      ShutdownNotifier pShutdownNotifier,
+      ShutdownNotifier pContextShutdownNotifier,
       int pRandomSeed,
       ImmutableSet<ProverOptions> pOptions,
       FormulaManager pMgr,
       ImmutableMap<String, String> pFurtherOptionsMap) {
-    super(pOptions, pMgr.getBooleanFormulaManager(), pShutdownNotifier);
+    super(pOptions, pMgr.getBooleanFormulaManager(), pContextShutdownNotifier);
 
     creator = pFormulaCreator;
     furtherOptionsMap = pFurtherOptionsMap;
@@ -210,7 +210,7 @@ abstract class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
       throw new SolverException("CVC5 failed during satisfiability check", e);
     } finally {
       /* Shutdown currently not possible in CVC5. */
-      shutdownNotifier.shutdownIfNecessary();
+      shutdownIfNecessary();
     }
     return convertSatResult(result);
   }
@@ -294,8 +294,7 @@ abstract class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
   }
 
   @Override
-  public List<BooleanFormula> getUnsatCore() {
-    checkGenerateUnsatCores();
+  public List<BooleanFormula> getUnsatCoreImpl() {
     List<BooleanFormula> converted = new ArrayList<>();
     for (Term aCore : solver.getUnsatCore()) {
       converted.add(creator.encapsulateBoolean(aCore));
@@ -310,8 +309,8 @@ abstract class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
   }
 
   @Override
-  public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(
-      Collection<BooleanFormula> pAssumptions) throws SolverException, InterruptedException {
+  protected Optional<List<BooleanFormula>> unsatCoreOverAssumptionsImpl(
+      Collection<BooleanFormula> pAssumptions) {
     throw new UnsupportedOperationException(UNSAT_CORE_WITH_ASSUMPTIONS_NOT_SUPPORTED);
   }
 

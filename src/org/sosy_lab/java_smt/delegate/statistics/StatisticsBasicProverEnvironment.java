@@ -10,6 +10,7 @@ package org.sosy_lab.java_smt.delegate.statistics;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.google.common.collect.ImmutableMap;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -36,7 +37,7 @@ class StatisticsBasicProverEnvironment<T> implements BasicProverEnvironment<T> {
   }
 
   @Override
-  public void pop() {
+  public void pop() throws InterruptedException {
     stats.pop.getAndIncrement();
     delegate.pop();
   }
@@ -81,13 +82,13 @@ class StatisticsBasicProverEnvironment<T> implements BasicProverEnvironment<T> {
 
   @SuppressWarnings("resource")
   @Override
-  public Model getModel() throws SolverException {
+  public Model getModel() throws SolverException, InterruptedException {
     stats.model.getAndIncrement();
     return new StatisticsModel(delegate.getModel(), stats);
   }
 
   @Override
-  public List<BooleanFormula> getUnsatCore() {
+  public List<BooleanFormula> getUnsatCore() throws InterruptedException {
     stats.unsatCore.getAndIncrement();
     return delegate.getUnsatCore();
   }
@@ -97,6 +98,11 @@ class StatisticsBasicProverEnvironment<T> implements BasicProverEnvironment<T> {
       Collection<BooleanFormula> pAssumptions) throws SolverException, InterruptedException {
     stats.unsatCore.getAndIncrement();
     return delegate.unsatCoreOverAssumptions(pAssumptions);
+  }
+
+  @Override
+  public ImmutableMap<String, String> getStatistics() throws InterruptedException {
+    return delegate.getStatistics();
   }
 
   @Override

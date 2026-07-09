@@ -78,7 +78,7 @@ public final class CVC5SolverContext extends AbstractSolverContext {
   // creator is final, except after closing, then null.
   private CVC5FormulaCreator creator;
   private final Solver solver;
-  private final ShutdownNotifier shutdownNotifier;
+  private final ShutdownNotifier contextShutdownNotifier;
   private final int randomSeed;
   private final CVC5Settings settings;
   private boolean closed = false;
@@ -89,13 +89,13 @@ public final class CVC5SolverContext extends AbstractSolverContext {
   private CVC5SolverContext(
       CVC5FormulaCreator pCreator,
       CVC5FormulaManager pManager,
-      ShutdownNotifier pShutdownNotifier,
+      ShutdownNotifier pContextShutdownNotifier,
       Solver pSolver,
       int pRandomSeed,
       CVC5Settings pSettings) {
     super(pManager);
     creator = pCreator;
-    shutdownNotifier = pShutdownNotifier;
+    contextShutdownNotifier = pContextShutdownNotifier;
     randomSeed = pRandomSeed;
     solver = pSolver;
     settings = pSettings;
@@ -114,7 +114,7 @@ public final class CVC5SolverContext extends AbstractSolverContext {
   public static SolverContext create(
       LogManager pLogger,
       Configuration pConfig,
-      ShutdownNotifier pShutdownNotifier,
+      ShutdownNotifier pContextShutdownNotifier,
       int randomSeed,
       NonLinearArithmetic pNonLinearArithmetic,
       FloatingPointRoundingMode pFloatingPointRoundingMode,
@@ -180,7 +180,7 @@ public final class CVC5SolverContext extends AbstractSolverContext {
             enumTheory);
 
     return new CVC5SolverContext(
-        pCreator, manager, pShutdownNotifier, newSolver, randomSeed, settings);
+        pCreator, manager, pContextShutdownNotifier, newSolver, randomSeed, settings);
   }
 
   /**
@@ -239,7 +239,7 @@ public final class CVC5SolverContext extends AbstractSolverContext {
     Preconditions.checkState(!closed, "solver context is already closed");
     return new CVC5TheoremProver(
         creator,
-        shutdownNotifier,
+        contextShutdownNotifier,
         randomSeed,
         ImmutableSet.copyOf(pOptions),
         getFormulaManager(),
@@ -257,7 +257,7 @@ public final class CVC5SolverContext extends AbstractSolverContext {
     Preconditions.checkState(!closed, "solver context is already closed");
     return new CVC5InterpolatingProver(
         creator,
-        shutdownNotifier,
+        contextShutdownNotifier,
         randomSeed,
         ImmutableSet.copyOf(pOptions),
         getFormulaManager(),

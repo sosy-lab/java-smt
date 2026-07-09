@@ -36,13 +36,13 @@ public final class PrincessSolverContext extends AbstractSolverContext {
 
   public static SolverContext create(
       Configuration config,
-      ShutdownNotifier pShutdownNotifier,
+      ShutdownNotifier pContextShutdownNotifier,
       @Nullable PathCounterTemplate pLogfileTemplate,
       int pRandomSeed,
       NonLinearArithmetic pNonLinearArithmetic)
       throws InvalidConfigurationException {
     PrincessEnvironment env =
-        new PrincessEnvironment(config, pLogfileTemplate, pShutdownNotifier, pRandomSeed);
+        new PrincessEnvironment(config, pLogfileTemplate, pContextShutdownNotifier, pRandomSeed);
     PrincessFormulaCreator creator = new PrincessFormulaCreator(env);
 
     // Create managers

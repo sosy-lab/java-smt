@@ -29,23 +29,19 @@ import org.sosy_lab.java_smt.api.SolverException;
  */
 public abstract class AbstractProverWithAllSat<T> extends AbstractProver<T> {
 
-  protected final ShutdownNotifier shutdownNotifier;
   private final BooleanFormulaManager bmgr;
 
   protected AbstractProverWithAllSat(
       Set<ProverOptions> pOptions,
       BooleanFormulaManager pBmgr,
-      ShutdownNotifier pShutdownNotifier) {
-    super(pOptions);
+      ShutdownNotifier pContextShutdownNotifier) {
+    super(pOptions, pContextShutdownNotifier);
     bmgr = pBmgr;
-    shutdownNotifier = pShutdownNotifier;
   }
 
   @Override
-  public <R> R allSat(AllSatCallback<R> callback, List<BooleanFormula> importantPredicates)
+  protected <R> R allSatImpl(AllSatCallback<R> callback, List<BooleanFormula> importantPredicates)
       throws InterruptedException, SolverException {
-    checkGenerateAllSat();
-
     push();
     try {
       // try model-based computation of ALLSAT
@@ -69,7 +65,7 @@ public abstract class AbstractProverWithAllSat<T> extends AbstractProver<T> {
       throws SolverException, InterruptedException {
     final Set<ImmutableList<BooleanFormula>> modelEvaluations = new LinkedHashSet<>();
     while (!isUnsat()) {
-      shutdownNotifier.shutdownIfNecessary();
+      shutdownIfNecessary();
 
       ImmutableList.Builder<BooleanFormula> valuesOfModel = ImmutableList.builder();
       try (Evaluator evaluator = getEvaluatorWithoutChecks()) {
@@ -94,11 +90,11 @@ public abstract class AbstractProverWithAllSat<T> extends AbstractProver<T> {
           "The model evaluation %s was found before. ALLSAT computation did not make progress.",
           values);
       callback.apply(values);
-      shutdownNotifier.shutdownIfNecessary();
+      shutdownIfNecessary();
 
       BooleanFormula negatedModel = bmgr.not(bmgr.and(values));
       addConstraint(negatedModel);
-      shutdownNotifier.shutdownIfNecessary();
+      shutdownIfNecessary();
     }
   }
 
@@ -119,7 +115,7 @@ public abstract class AbstractProverWithAllSat<T> extends AbstractProver<T> {
       Deque<BooleanFormula> valuesOfModel)
       throws SolverException, InterruptedException {
 
-    shutdownNotifier.shutdownIfNecessary();
+    shutdownIfNecessary();
 
     if (isUnsat()) {
       return;
@@ -140,6 +136,7 @@ public abstract class AbstractProverWithAllSat<T> extends AbstractProver<T> {
       valuesOfModel.pop();
 
       // negated predicate
+      shutdownIfNecessary();
       final BooleanFormula notPredicate = bmgr.not(predicates.get(0));
       valuesOfModel.push(notPredicate);
       push(notPredicate);

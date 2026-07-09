@@ -23,9 +23,9 @@ class Yices2Prover extends Yices2AbstractProver<Void> implements ProverEnvironme
       Yices2FormulaCreator creator,
       Set<ProverOptions> pOptions,
       BooleanFormulaManager pBmgr,
-      ShutdownNotifier pShutdownNotifier,
+      ShutdownNotifier pContextShutdownNotifier,
       String pSolverType) {
-    super(creator, pOptions, pBmgr, pShutdownNotifier, pSolverType);
+    super(creator, pOptions, pBmgr, pContextShutdownNotifier, pSolverType);
   }
 
   @Override

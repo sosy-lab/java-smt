@@ -13,6 +13,7 @@ package org.sosy_lab.java_smt.basicimpl;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.google.common.collect.ImmutableMap;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -40,29 +41,33 @@ public class OptimizationProverDelegate implements OptimizationProverEnvironment
 
   @SuppressWarnings("resource")
   @Override
-  public int maximize(Formula objective) {
+  public int maximize(Formula objective) throws InterruptedException {
     getDelegateAsAbstractProver().checkClosed();
+    getDelegateAsAbstractProver().shutdownIfNecessary();
     return optimizationProver.maximize(objective);
   }
 
   @SuppressWarnings("resource")
   @Override
-  public int minimize(Formula objective) {
+  public int minimize(Formula objective) throws InterruptedException {
     getDelegateAsAbstractProver().checkClosed();
+    getDelegateAsAbstractProver().shutdownIfNecessary();
     return optimizationProver.minimize(objective);
   }
 
   @SuppressWarnings("resource")
   @Override
-  public Optional<Rational> upper(int handle, Rational epsilon) {
+  public Optional<Rational> upper(int handle, Rational epsilon) throws InterruptedException {
     getDelegateAsAbstractProver().checkGenerateModels();
+    getDelegateAsAbstractProver().shutdownIfNecessary();
     return optimizationProver.upper(handle, epsilon);
   }
 
   @SuppressWarnings("resource")
   @Override
-  public Optional<Rational> lower(int handle, Rational epsilon) {
+  public Optional<Rational> lower(int handle, Rational epsilon) throws InterruptedException {
     getDelegateAsAbstractProver().checkGenerateModels();
+    getDelegateAsAbstractProver().shutdownIfNecessary();
     return optimizationProver.lower(handle, epsilon);
   }
 
@@ -76,12 +81,13 @@ public class OptimizationProverDelegate implements OptimizationProverEnvironment
 
   @SuppressWarnings("resource")
   @Override
-  public Model getModel() throws SolverException {
+  public Model getModel() throws SolverException, InterruptedException {
+    // TODO: add checks here?
     return optimizationProver.getModel();
   }
 
   @Override
-  public void pop() {
+  public void pop() throws InterruptedException {
     optimizationProver.pop();
   }
 
@@ -112,7 +118,7 @@ public class OptimizationProverDelegate implements OptimizationProverEnvironment
   }
 
   @Override
-  public List<BooleanFormula> getUnsatCore() {
+  public List<BooleanFormula> getUnsatCore() throws InterruptedException {
     return optimizationProver.getUnsatCore();
   }
 
@@ -120,6 +126,11 @@ public class OptimizationProverDelegate implements OptimizationProverEnvironment
   public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(
       Collection<BooleanFormula> assumptions) throws SolverException, InterruptedException {
     return optimizationProver.unsatCoreOverAssumptions(assumptions);
+  }
+
+  @Override
+  public ImmutableMap<String, String> getStatistics() throws InterruptedException {
+    return optimizationProver.getStatistics();
   }
 
   @Override

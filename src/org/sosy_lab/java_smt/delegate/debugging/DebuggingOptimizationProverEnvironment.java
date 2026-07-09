@@ -27,14 +27,14 @@ class DebuggingOptimizationProverEnvironment extends DebuggingBasicProverEnviron
   }
 
   @Override
-  public int maximize(Formula objective) {
+  public int maximize(Formula objective) throws InterruptedException {
     debugging.assertThreadLocal();
     debugging.assertFormulaInContext(objective);
     return delegate.maximize(objective);
   }
 
   @Override
-  public int minimize(Formula objective) {
+  public int minimize(Formula objective) throws InterruptedException {
     debugging.assertThreadLocal();
     debugging.assertFormulaInContext(objective);
     return delegate.maximize(objective);
@@ -47,13 +47,13 @@ class DebuggingOptimizationProverEnvironment extends DebuggingBasicProverEnviron
   }
 
   @Override
-  public Optional<Rational> upper(int handle, Rational epsilon) {
+  public Optional<Rational> upper(int handle, Rational epsilon) throws InterruptedException {
     debugging.assertThreadLocal();
     return delegate.upper(handle, epsilon);
   }
 
   @Override
-  public Optional<Rational> lower(int handle, Rational epsilon) {
+  public Optional<Rational> lower(int handle, Rational epsilon) throws InterruptedException {
     debugging.assertThreadLocal();
     return delegate.lower(handle, epsilon);
   }

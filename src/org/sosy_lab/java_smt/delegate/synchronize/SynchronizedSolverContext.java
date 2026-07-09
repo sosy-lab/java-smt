@@ -40,12 +40,12 @@ public class SynchronizedSolverContext implements SolverContext {
   private final SolverContext sync;
   private final Configuration config;
   private final LogManager logger;
-  private final ShutdownNotifier shutdownNotifier;
+  private final ShutdownNotifier contextShutdownNotifier;
 
   public SynchronizedSolverContext(
       Configuration pConfig,
       LogManager pLogger,
-      ShutdownNotifier pShutdownNotifier,
+      ShutdownNotifier pContextShutdownNotifier,
       SolverContext pDelegate)
       throws InvalidConfigurationException {
     pConfig.inject(this, SynchronizedSolverContext.class);
@@ -53,7 +53,7 @@ public class SynchronizedSolverContext implements SolverContext {
     sync = delegate;
     config = pConfig;
     logger = pLogger;
-    shutdownNotifier = pShutdownNotifier;
+    contextShutdownNotifier = pContextShutdownNotifier;
   }
 
   @SuppressWarnings("resource")
@@ -62,7 +62,7 @@ public class SynchronizedSolverContext implements SolverContext {
     try {
       otherContext =
           SolverContextFactory.createSolverContext(
-              config, logger, shutdownNotifier, delegate.getSolverName());
+              config, logger, contextShutdownNotifier, delegate.getSolverName());
     } catch (InvalidConfigurationException e) {
       throw new AssertionError("should not happen, current context was already created before.");
     }

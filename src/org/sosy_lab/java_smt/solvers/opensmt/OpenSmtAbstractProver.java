@@ -47,10 +47,10 @@ abstract class OpenSmtAbstractProver<T> extends AbstractProverWithAllSat<T> {
   OpenSmtAbstractProver(
       OpenSmtFormulaCreator pFormulaCreator,
       FormulaManager pMgr,
-      ShutdownNotifier pShutdownNotifier,
+      ShutdownNotifier pContextShutdownNotifier,
       SMTConfig pConfig,
       Set<ProverOptions> pOptions) {
-    super(pOptions, pMgr.getBooleanFormulaManager(), pShutdownNotifier);
+    super(pOptions, pMgr.getBooleanFormulaManager(), pContextShutdownNotifier);
 
     creator = pFormulaCreator;
 
@@ -208,8 +208,9 @@ abstract class OpenSmtAbstractProver<T> extends AbstractProverWithAllSat<T> {
   protected boolean isUnsatImpl() throws InterruptedException, SolverException {
     closeAllEvaluators();
     sstat result;
-    try (ShutdownHook listener = new ShutdownHook(shutdownNotifier, osmtSolver::notifyStop)) {
-      shutdownNotifier.shutdownIfNecessary();
+    try (ShutdownHook listener =
+        new ShutdownHook(contextShutdownNotifier, osmtSolver::notifyStop)) {
+      shutdownIfNecessary();
       try {
         result = osmtSolver.check();
       } catch (Exception e) {
@@ -228,7 +229,7 @@ abstract class OpenSmtAbstractProver<T> extends AbstractProverWithAllSat<T> {
           throw new SolverException("OpenSMT crashed while checking satisfiability.", e);
         }
       }
-      shutdownNotifier.shutdownIfNecessary();
+      shutdownIfNecessary();
     }
 
     if (result.equals(sstat.Error())) {
@@ -241,8 +242,7 @@ abstract class OpenSmtAbstractProver<T> extends AbstractProverWithAllSat<T> {
   }
 
   @Override
-  public List<BooleanFormula> getUnsatCore() {
-    checkGenerateUnsatCores();
+  public List<BooleanFormula> getUnsatCoreImpl() {
     return Lists.transform(osmtSolver.getUnsatCore(), creator::encapsulateBoolean);
   }
 
@@ -253,8 +253,8 @@ abstract class OpenSmtAbstractProver<T> extends AbstractProverWithAllSat<T> {
   }
 
   @Override
-  public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(
-      Collection<BooleanFormula> pAssumptions) throws SolverException, InterruptedException {
+  protected Optional<List<BooleanFormula>> unsatCoreOverAssumptionsImpl(
+      Collection<BooleanFormula> pAssumptions) {
     throw new UnsupportedOperationException(UNSAT_CORE_WITH_ASSUMPTIONS_NOT_SUPPORTED);
   }
 

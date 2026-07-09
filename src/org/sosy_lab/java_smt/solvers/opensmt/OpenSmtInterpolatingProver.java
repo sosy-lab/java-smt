@@ -36,13 +36,13 @@ class OpenSmtInterpolatingProver extends OpenSmtAbstractProver<Integer>
   OpenSmtInterpolatingProver(
       OpenSmtFormulaCreator pFormulaCreator,
       FormulaManager pMgr,
-      ShutdownNotifier pShutdownNotifier,
+      ShutdownNotifier pContextShutdownNotifier,
       Set<ProverOptions> pOptions,
       OpenSMTOptions pSolverOptions) {
     super(
         pFormulaCreator,
         pMgr,
-        pShutdownNotifier,
+        pContextShutdownNotifier,
         getConfigInstance(pOptions, pSolverOptions, true),
         pOptions);
     trackedConstraints.push(0); // initialize first level

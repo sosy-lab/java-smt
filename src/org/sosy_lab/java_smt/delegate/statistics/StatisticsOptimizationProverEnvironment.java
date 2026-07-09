@@ -26,12 +26,12 @@ class StatisticsOptimizationProverEnvironment extends StatisticsBasicProverEnvir
   }
 
   @Override
-  public int maximize(Formula pObjective) {
+  public int maximize(Formula pObjective) throws InterruptedException {
     return delegate.maximize(pObjective);
   }
 
   @Override
-  public int minimize(Formula pObjective) {
+  public int minimize(Formula pObjective) throws InterruptedException {
     return delegate.minimize(pObjective);
   }
 
@@ -46,12 +46,12 @@ class StatisticsOptimizationProverEnvironment extends StatisticsBasicProverEnvir
   }
 
   @Override
-  public Optional<Rational> upper(int pHandle, Rational pEpsilon) {
+  public Optional<Rational> upper(int pHandle, Rational pEpsilon) throws InterruptedException {
     return delegate.upper(pHandle, pEpsilon);
   }
 
   @Override
-  public Optional<Rational> lower(int pHandle, Rational pEpsilon) {
+  public Optional<Rational> lower(int pHandle, Rational pEpsilon) throws InterruptedException {
     return delegate.lower(pHandle, pEpsilon);
   }
 }

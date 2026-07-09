@@ -33,8 +33,8 @@ class SmtInterpolInterpolatingProver extends SmtInterpolAbstractProver<String>
       SmtInterpolFormulaManager pMgr,
       Script pScript,
       Set<ProverOptions> options,
-      ShutdownNotifier pShutdownNotifier) {
-    super(pMgr, pScript, options, pShutdownNotifier);
+      ShutdownNotifier pContextShutdownNotifier) {
+    super(pMgr, pScript, options, pContextShutdownNotifier);
   }
 
   @Override
@@ -87,7 +87,7 @@ class SmtInterpolInterpolatingProver extends SmtInterpolAbstractProver<String>
       }
     } catch (SMTLIBException e) {
       if ("Timeout exceeded".equals(e.getMessage())) {
-        shutdownNotifier.shutdownIfNecessary();
+        contextShutdownNotifier.shutdownIfNecessary();
       }
       throw new AssertionError(e);
     }

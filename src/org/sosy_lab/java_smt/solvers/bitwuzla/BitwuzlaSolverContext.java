@@ -82,7 +82,7 @@ public final class BitwuzlaSolverContext extends AbstractSolverContext {
 
   private final BitwuzlaFormulaManager manager;
   private final BitwuzlaFormulaCreator creator;
-  private final ShutdownNotifier shutdownNotifier;
+  private final ShutdownNotifier contextShutdownNotifier;
 
   private final Options solverOptions;
 
@@ -94,19 +94,19 @@ public final class BitwuzlaSolverContext extends AbstractSolverContext {
   BitwuzlaSolverContext(
       BitwuzlaFormulaManager pManager,
       BitwuzlaFormulaCreator pCreator,
-      ShutdownNotifier pShutdownNotifier,
+      ShutdownNotifier pContextShutdownNotifier,
       Options pOptions) {
     super(pManager);
     manager = pManager;
     creator = pCreator;
-    shutdownNotifier = pShutdownNotifier;
+    contextShutdownNotifier = pContextShutdownNotifier;
     solverOptions = pOptions;
   }
 
   @SuppressWarnings("unused")
   public static BitwuzlaSolverContext create(
       Configuration config,
-      ShutdownNotifier pShutdownNotifier,
+      ShutdownNotifier pContextShutdownNotifier,
       @Nullable PathCounterTemplate solverLogfile,
       long randomSeed,
       FloatingPointRoundingMode pFloatingPointRoundingMode,
@@ -144,7 +144,7 @@ public final class BitwuzlaSolverContext extends AbstractSolverContext {
             arrayTheory,
             solverOptions);
 
-    return new BitwuzlaSolverContext(manager, creator, pShutdownNotifier, solverOptions);
+    return new BitwuzlaSolverContext(manager, creator, pContextShutdownNotifier, solverOptions);
   }
 
   @VisibleForTesting
@@ -271,14 +271,16 @@ public final class BitwuzlaSolverContext extends AbstractSolverContext {
   @Override
   protected ProverEnvironment newProverEnvironment0(Set<ProverOptions> options) {
     Preconditions.checkState(!closed, "solver context is already closed");
-    return new BitwuzlaTheoremProver(manager, creator, shutdownNotifier, options, solverOptions);
+    return new BitwuzlaTheoremProver(
+        manager, creator, contextShutdownNotifier, options, solverOptions);
   }
 
   @Override
   protected InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation0(
       Set<ProverOptions> pF) {
     Preconditions.checkState(!closed, "solver context is already closed");
-    return new BitwuzlaInterpolatingProver(manager, creator, shutdownNotifier, pF, solverOptions);
+    return new BitwuzlaInterpolatingProver(
+        manager, creator, contextShutdownNotifier, pF, solverOptions);
   }
 
   @Override
