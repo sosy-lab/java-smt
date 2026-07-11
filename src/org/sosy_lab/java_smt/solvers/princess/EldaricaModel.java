@@ -26,10 +26,10 @@ public class EldaricaModel extends AbstractModel<IExpression, Sort, PrincessEnvi
   private final Map<Predicate, IFormula> model;
 
   EldaricaModel(
-      Map<Predicate, IFormula> model, EldaricaHornProver prover,
+      Map<Predicate, IFormula> pModel, EldaricaHornProver prover,
       FormulaCreator<IExpression, Sort, PrincessEnvironment, ?> creator) {
     super(prover, creator);
-    this.model = model;
+    model = pModel;
   }
 
   private ImmutableList<ValueAssignment> getAssignments(Predicate predicate, IFormula formula) {
@@ -54,7 +54,7 @@ public class EldaricaModel extends AbstractModel<IExpression, Sort, PrincessEnvi
   public ImmutableList<ValueAssignment> asList() {
     ImmutableSet.Builder<ValueAssignment> assignments = ImmutableSet.builder();
 
-    for (var entry : this.model.entrySet()) {
+    for (var entry : model.entrySet()) {
       assignments.addAll(getAssignments(entry.getKey(), entry.getValue()));
     }
 
