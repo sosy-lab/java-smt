@@ -114,9 +114,10 @@ public class EldaricaHornProver extends PrincessAbstractProver<Void>
       var preprocessor = new DefaultPreprocessor();
       var preprocessed = preprocessor.process(clauses, EmptyVerificationHints$.MODULE$);
 
+      var wrapper = new CEGARHornWrapper(clauses, preprocessed._1(), preprocessed._2(),
+          preprocessed._3(), false, stream);
 
-      var result = new CEGARHornWrapper(clauses, preprocessed._1(), preprocessed._2(),
-          preprocessed._3(), false, stream).result();
+      var result = wrapper.result();
 
 
       this.result = result;

@@ -12,9 +12,11 @@ package org.sosy_lab.java_smt.test.horn;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 
+import java.math.BigInteger;
 import org.junit.Test;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.HornProverEnvironment;
@@ -230,7 +232,15 @@ public class HornExampleTest extends SolverBasedTest0.ParameterizedSolverBasedTe
     prover.isUnsat();
     var model = prover.getModel().asList();
 
-    assertEquals("fun", model.iterator().next().getName());
+    assertEquals(1, model.size());
+
+    var fun = model.iterator().next();
+
+    assertEquals("fun", fun.getName());
+    assertTrue(fun.getAssignmentAsFormula().toString().contains("-91 + _1"));
+    var value = (Object[]) fun.getValue();
+    assertNull(value[0]); // does not matter
+    assertEquals(BigInteger.valueOf(91), value[1]);
   }
 
   @SuppressWarnings("varargs")
