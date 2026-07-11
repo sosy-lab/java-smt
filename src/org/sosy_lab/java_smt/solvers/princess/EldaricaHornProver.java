@@ -139,7 +139,7 @@ public class EldaricaHornProver extends PrincessAbstractProver<Void>
 
   @Override
   public Model getModelImpl() throws SolverException {
-    var model = solve().left().get().apply();
+    Map<Predicate, IFormula> model = solve().left().get().apply();
 
     return new EldaricaModel(JavaConverters.asJava(model), this, creator);
   }
