@@ -96,6 +96,10 @@ public class EldaricaHornProver extends PrincessAbstractProver<Void>
     return null;
   }
 
+  /**
+   * Passes all clauses to Eldarica and solves it
+   * @return Either (left) a model if sat, otherwise (right) a counter example.
+   */
   private Either<Function0<Map<Predicate, IFormula>>, Function0<Dag<IAtom>>> solve() {
     if (this.result != null) {
       return this.result;
