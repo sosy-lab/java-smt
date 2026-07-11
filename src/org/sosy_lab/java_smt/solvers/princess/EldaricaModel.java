@@ -109,6 +109,9 @@ public class EldaricaModel extends AbstractModel<IExpression, Sort, PrincessEnvi
     if (expression instanceof IIntLit lit) {
       return lit.value().bigIntValue();
     }
+    if (expression instanceof IBoolLit lit) {
+      return lit.value();
+    }
 
 
     throw new IllegalArgumentException("Unhandled model value: " + expression);
@@ -116,6 +119,9 @@ public class EldaricaModel extends AbstractModel<IExpression, Sort, PrincessEnvi
 
   private Object[] evalAssignments(IFormula formula) {
     var converted = toPrincess(formula);
+    if (formula instanceof IBoolLit lit && lit.isFalse()) {
+      return new Object[]{false};
+    }
 
     api.addAssertion(converted);
     api.checkSat(true);
