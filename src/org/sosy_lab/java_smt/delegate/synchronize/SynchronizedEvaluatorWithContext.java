@@ -47,8 +47,19 @@ class SynchronizedEvaluatorWithContext implements Evaluator {
     otherManager = checkNotNull(pOtherManager);
   }
 
+  @SuppressWarnings("unchecked")
   @Override
   public <T extends Formula> @Nullable T eval(T pFormula) {
+    if (pFormula instanceof BooleanFormula booleanFormula) {
+      BooleanFormula translated;
+      synchronized (sync) {
+        translated = otherManager.translateFrom(booleanFormula, manager);
+      }
+      BooleanFormula evaluated = delegate.eval(translated);
+      synchronized (sync) {
+        return (evaluated == null) ? null : (T) manager.translateFrom(evaluated, otherManager);
+      }
+    }
     throw new UnsupportedOperationException(UNSUPPORTED_OPERATION);
   }
 
