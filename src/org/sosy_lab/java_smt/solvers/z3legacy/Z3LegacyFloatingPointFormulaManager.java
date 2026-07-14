@@ -29,8 +29,10 @@ class Z3LegacyFloatingPointFormulaManager
   private final long roundingMode;
 
   Z3LegacyFloatingPointFormulaManager(
-      Z3LegacyFormulaCreator creator, FloatingPointRoundingMode pFloatingPointRoundingMode) {
-    super(creator);
+      Z3LegacyFormulaCreator creator,
+      Z3LegacyBitvectorFormulaManager bvMgr,
+      FloatingPointRoundingMode pFloatingPointRoundingMode) {
+    super(creator, bvMgr);
     z3context = creator.getEnv();
     roundingMode = getRoundingModeImpl(pFloatingPointRoundingMode);
   }
