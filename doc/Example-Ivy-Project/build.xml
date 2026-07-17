@@ -92,21 +92,24 @@ SPDX-License-Identifier: Apache-2.0
     </target>
 
     <target name="test" depends="compile">
-        <mkdir dir="build/test-report"/>
-        <junitlauncher printsummary="true" failureproperty="junit.failed">
-            <classpath refid="classpath.build"/>
-            <testclasses outputdir="build/test-report">
-                <fileset dir="build">
-                    <include name="**/*Test.*"/>
-                </fileset>
-                <listener type="legacy-brief" sendSysOut="true"/>
-                <listener type="legacy-xml" sendSysErr="true" sendSysOut="true"/>
-            </testclasses>
-        </junitlauncher>
-        <junitreport todir="build/test-report">
-            <fileset dir="build/test-report" includes="TEST-*.xml"/>
-            <report format="noframes" todir="build/test-report/html"/>
-        </junitreport>
+        <sequential>
+            <mkdir dir="build/test-report"/>
+            <junitlauncher printsummary="true" failureproperty="junit.failed">
+                <classpath refid="classpath.build"/>
+                <testclasses outputdir="build/test-report">
+                    <fileset dir="build">
+                        <include name="**/*Test.*"/>
+                    </fileset>
+                    <listener type="legacy-brief" sendSysOut="true"/>
+                    <listener type="legacy-xml" sendSysErr="true" sendSysOut="true"/>
+                </testclasses>
+            </junitlauncher>
+            <junitreport todir="build/test-report">
+                <fileset dir="build/test-report" includes="TEST-*.xml"/>
+                <report format="noframes" todir="build/test-report/html"/>
+            </junitreport>
+            <fail if="junit.failed" message="JUnit tests failed, look at JUnit.html"/>
+        </sequential>
     </target>
 
     <target name="package" depends="compile" description="--> build a .jar">
