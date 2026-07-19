@@ -2,22 +2,20 @@
 // an API wrapper for a collection of SMT solvers:
 // https://github.com/sosy-lab/java-smt
 //
-// SPDX-FileCopyrightText: 2021 Dirk Beyer <https://www.sosy-lab.org>
+// SPDX-FileCopyrightText: 2026 Dirk Beyer <https://www.sosy-lab.org>
 //
 // SPDX-License-Identifier: Apache-2.0
 
 package org.sosy_lab.java_smt_example;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.sosy_lab.java_smt.example.Sudoku.SIZE;
-
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
-import java.util.List;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.Parameter;
+import org.junit.jupiter.params.ParameterizedClass;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.configuration.Configuration;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
@@ -27,9 +25,17 @@ import org.sosy_lab.java_smt.SolverContextFactory;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.SolverContext;
 import org.sosy_lab.java_smt.api.SolverException;
-import org.sosy_lab.java_smt.example.Sudoku.IntegerBasedSudokuSolver;
-import org.sosy_lab.java_smt.example.Sudoku.BooleanBasedSudokuSolver;
+import org.sosy_lab.java_smt.example.Sudoku;
 import org.sosy_lab.java_smt.example.Sudoku.SudokuSolver;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.logging.Level;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
+
 
 /**
  * This program parses a String-given Sudoku and solves it with an SMT solver.
@@ -69,7 +75,16 @@ import org.sosy_lab.java_smt.example.Sudoku.SudokuSolver;
  * 451839627
  * </pre>
  */
+@ParameterizedClass
+@MethodSource("getAllSolvers")
 public class SudokuTest {
+
+  public static List<Solvers> getAllSolvers() {
+    return Arrays.asList(Solvers.values());
+  }
+
+  @Parameter(0)
+  public Solvers solver;
 
   private Configuration config;
   private LogManager logger;
@@ -77,33 +92,33 @@ public class SudokuTest {
 
   private SolverContext context;
 
-  private static final String input =
-      "2..9.6..1\n"
-          + "..6.4...9\n"
-          + "...52.4..\n"
-          + "3.2..7.5.\n"
-          + "...2..1..\n"
-          + ".9.3..7..\n"
-          + ".87.5.31.\n"
-          + "6.3.1.8..\n"
-          + "4....9...";
+  private static final String input = """
+          2..9.6..1
+          ..6.4...9
+          ...52.4..
+          3.2..7.5.
+          ...2..1..
+          .9.3..7..
+          .87.5.31.
+          6.3.1.8..
+          4....9...
+          """;
 
-  private static final String sudokuSolution =
-      "248976531\n"
-          + "536148279\n"
-          + "179523468\n"
-          + "312487956\n"
-          + "764295183\n"
-          + "895361742\n"
-          + "987652314\n"
-          + "623714895\n"
-          + "451839627\n";
-  
-  public SudokuTest() {
-    
-  }
+  private static final String sudokuSolution = """
+          248976531
+          536148279
+          179523468
+          312487956
+          764295183
+          895361742
+          987652314
+          623714895
+          451839627
+          """;
 
-  private void init() throws InvalidConfigurationException {
+  @BeforeEach
+  public void init() throws InvalidConfigurationException {
+    assumeTrue(Platform.isSupported(solver));
     config = Configuration.defaultConfiguration();
     logger = BasicLogManager.create(config);
     notifier = ShutdownNotifier.createDummy();
@@ -112,83 +127,22 @@ public class SudokuTest {
   /*
    * We close our context after we are done with a solver to not waste memory.
    */
-  private final void closeSolver() {
+  @AfterEach
+  public final void closeSolver() {
     if (context != null) {
       context.close();
     }
   }
 
-  public void princessSudokuTest()
-      throws InvalidConfigurationException, InterruptedException, SolverException {
-    init();
-    checkSudoku(Solvers.PRINCESS);
-    closeSolver();
-  }
-  
-  public void smtInterpolSudokuTest()
-      throws InvalidConfigurationException, InterruptedException, SolverException {
-    init();
-    checkSudoku(Solvers.SMTINTERPOL);
-    closeSolver();
-  }
-  
-  public void cvc4SudokuTest()
-      throws InvalidConfigurationException, InterruptedException, SolverException {
-    init();
-    checkSudoku(Solvers.CVC4);
-    closeSolver();
-  }
-
-  public void z3SudokuTest()
-      throws InvalidConfigurationException, InterruptedException, SolverException {
-    init();
-    checkSudoku(Solvers.Z3);
-    closeSolver();
-  }
-
-  public void mathsatSudokuTest()
-      throws InvalidConfigurationException, InterruptedException, SolverException {
-    init();
-    checkSudoku(Solvers.MATHSAT5);
-    closeSolver();
-  }
-  
-  public void boolectorSudokuTest()
-      throws InvalidConfigurationException, InterruptedException, SolverException {
-    init();
-    // Boolector does not support Integers
-    checkSudokuWithBooleans(Solvers.BOOLECTOR);
-    closeSolver();
-  }
-  
-  public void yicesSudokuTest()
-      throws InvalidConfigurationException, InterruptedException, SolverException {
-    init();
-    checkSudoku(Solvers.YICES2);
-    closeSolver();
-  }
-
-  private void checkSudoku(Solvers solver)
-      throws InvalidConfigurationException, InterruptedException, SolverException {
+  @Test
+  public void checkSudoku()
+          throws InvalidConfigurationException, InterruptedException, SolverException {
+    logger.log(Level.INFO, "Executing " + solver + "...");
 
     context = SolverContextFactory.createSolverContext(config, logger, notifier, solver);
     Integer[][] grid = readGridFromString(input);
 
-    SudokuSolver<?> sudoku = new IntegerBasedSudokuSolver(context);
-    Integer[][] solution = sudoku.solve(grid);
-
-    assertNotNull(solution);
-    assertEquals(sudokuSolution, solutionToString(solution));
-  }
-
-  // Same as checkSudoku but with Booleans instead of Integers
-  private void checkSudokuWithBooleans(Solvers solver)
-      throws InvalidConfigurationException, InterruptedException, SolverException {
-
-    context = SolverContextFactory.createSolverContext(config, logger, notifier, solver);
-    Integer[][] grid = readGridFromString(input);
-
-    SudokuSolver<?> sudoku = new BooleanBasedSudokuSolver(context);
+    SudokuSolver<?> sudoku = new Sudoku.BooleanBasedSudokuSolver(context);
     Integer[][] solution = sudoku.solve(grid);
 
     assertNotNull(solution);
@@ -209,8 +163,8 @@ public class SudokuTest {
    * <p>Use digits 0-9 as values, other values will be set to 'unknown'.
    */
   private Integer[][] readGridFromString(String puzzle) {
-    Integer[][] grid = new Integer[SIZE][SIZE];
     List<String> lines = Splitter.on('\n').splitToList(puzzle);
+    Integer[][] grid = new Integer[lines.size()][lines.size()];
 
     for (int row = 0; row < lines.size(); row++) {
       for (int col = 0; col < lines.get(row).length(); col++) {
