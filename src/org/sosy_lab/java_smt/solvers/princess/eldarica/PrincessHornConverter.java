@@ -24,6 +24,7 @@ import ap.parser.IIntLit;
 import ap.parser.IIntRelation;
 import ap.parser.INot;
 import ap.parser.IPlus;
+import ap.parser.ISortedEpsilon;
 import ap.parser.ISortedQuantified;
 import ap.parser.ISortedVariable;
 import ap.parser.ITerm;
@@ -235,6 +236,11 @@ public class PrincessHornConverter {
       return toFormula(not.subformula()).notSimplify();
     }
 
+    private ISortedQuantified toFormula(final ISortedQuantified quantified) {
+      return new ISortedQuantified(quantified.quan(), quantified.sort(),
+          toFormula(quantified.subformula()));
+    }
+
     private IFormula toFormula(final IFormulaITE ite) {
       var condition = toFormula(ite.cond());
 
@@ -266,6 +272,9 @@ public class PrincessHornConverter {
       }
       if (formula instanceof IFormulaITE ite) {
         return toFormula(ite);
+      }
+      if (formula instanceof ISortedQuantified quantified) {
+        return toFormula(quantified);
       }
 
       throw new IllegalArgumentException("Unhandled formula: " + formula);
@@ -317,6 +326,9 @@ public class PrincessHornConverter {
         //  (mostly EqZero). This could be handled by pushing/popping a stack and adding every
         //  single possible case as constraint (or the fomular with OR)
         throw new IllegalArgumentException("Eldarica does not support ITE terms: " + ite);
+      }
+      if (term instanceof ISortedEpsilon epsilon) {
+        return new ISortedEpsilon(epsilon.sort(), toFormula(epsilon.cond()));
       }
 
       throw new IllegalArgumentException("Unhandled term: " + term);
