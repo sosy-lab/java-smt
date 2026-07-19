@@ -87,7 +87,7 @@ class AppTest {
 
     @BeforeEach
     fun init() {
-        assumeTrue(isSupportedOperatingSystemAndArchitecture(solver))
+        assumeTrue(Platform.isSupported(solver))
     }
 
     @Test
@@ -137,67 +137,6 @@ class AppTest {
     companion object {
         @JvmStatic
         fun getAllSolvers() = Solvers.entries.toTypedArray()
-
-        private val OS: String =
-            StandardSystemProperty.OS_NAME.value()!!.lowercase(Locale.getDefault()).replace(" ", "")
-        private val ARCH: String =
-            StandardSystemProperty.OS_ARCH.value()!!.lowercase(Locale.getDefault()).replace(" ", "")
-
-        protected val IS_WINDOWS: Boolean = OS.startsWith("windows")
-        private val IS_MAC: Boolean = OS.startsWith("macos")
-        private val IS_LINUX: Boolean = OS.startsWith("linux")
-
-        private val IS_ARCH_ARM64 = ARCH == "aarch64"
-
-        private fun isSufficientVersionOfLibcxx(library: String): Boolean {
-            try {
-                NativeLibraries.loadLibrary(library)
-            } catch (e: UnsatisfiedLinkError) {
-                for (dependency in getRequiredLibcxx(library)) {
-                    if (e.message!!.contains("version `" + dependency + "' not found")) {
-                        return false
-                    }
-                }
-            }
-            return true
-        }
-
-        private fun getRequiredLibcxx(library: String): List<String> {
-            return when (library) {
-                "z3" -> listOf("GLIBC_2.34", "GLIBCXX_3.4.26", "GLIBCXX_3.4.29")
-                "bitwuzlaj" -> listOf("GLIBC_2.33", "GLIBCXX_3.4.26", "GLIBCXX_3.4.29")
-                "opensmtj" -> listOf("GLIBC_2.33", "GLIBCXX_3.4.26", "GLIBCXX_3.4.29")
-                "mathsat5j" -> listOf("GLIBC_2.33", "GLIBC_2.38")
-                "cvc5jni" -> listOf("GLIBC_2.32")
-                "yices2java" -> listOf("GLIBC_2.34")
-                else -> listOf()
-            }
-        }
-
-        /** Disable some checks on certain combinations of operating systems and solvers, because of missing dependencies.  */
-        private fun isSupportedOperatingSystemAndArchitecture(solver: Solvers): Boolean {
-            return when (solver) {
-                Solvers.SMTINTERPOL, Solvers.PRINCESS -> true
-                Solvers.BOOLECTOR, Solvers.CVC4 -> IS_LINUX && !IS_ARCH_ARM64
-                Solvers.YICES2 -> (IS_LINUX && !IS_ARCH_ARM64 && isSufficientVersionOfLibcxx("yices2java"))
-                        || (IS_WINDOWS && !IS_ARCH_ARM64)
-
-                Solvers.CVC5 -> (IS_LINUX && isSufficientVersionOfLibcxx("cvc5jni"))
-                        || IS_WINDOWS
-                        || IS_MAC
-
-                Solvers.OPENSMT -> IS_LINUX && isSufficientVersionOfLibcxx("opensmtj")
-                Solvers.BITWUZLA -> (IS_LINUX && isSufficientVersionOfLibcxx("bitwuzlaj"))
-                        || (IS_WINDOWS && !IS_ARCH_ARM64)
-
-                Solvers.MATHSAT5 -> (IS_WINDOWS && !IS_ARCH_ARM64)
-                Solvers.Z3 -> (IS_LINUX && isSufficientVersionOfLibcxx("z3"))
-                        || IS_WINDOWS
-                        || IS_MAC
-
-                Solvers.Z3_WITH_INTERPOLATION -> IS_LINUX && !IS_ARCH_ARM64
-            }
-        }
 
         private val input = """
             |2..9.6..1

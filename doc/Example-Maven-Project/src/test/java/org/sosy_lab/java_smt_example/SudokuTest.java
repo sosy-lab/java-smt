@@ -10,14 +10,12 @@ package org.sosy_lab.java_smt_example;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
-import com.google.common.base.StandardSystemProperty;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.Parameter;
 import org.junit.jupiter.params.ParameterizedClass;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.sosy_lab.common.NativeLibraries;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.configuration.Configuration;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
@@ -32,7 +30,6 @@ import org.sosy_lab.java_smt.example.Sudoku.SudokuSolver;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Locale;
 import java.util.logging.Level;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -89,17 +86,6 @@ public class SudokuTest {
   @Parameter(0)
   public Solvers solver;
 
-  private static final String OS =
-      StandardSystemProperty.OS_NAME.value().toLowerCase(Locale.getDefault()).replace(" ", "");
-  private static final String ARCH =
-      StandardSystemProperty.OS_ARCH.value().toLowerCase(Locale.getDefault()).replace(" ", "");
-
-  protected static final boolean IS_WINDOWS = OS.startsWith("windows");
-  private static final boolean IS_MAC = OS.startsWith("macos");
-  private static final boolean IS_LINUX = OS.startsWith("linux");
-
-  private static final boolean IS_ARCH_ARM64 = ARCH.equals("aarch64");
-
   private Configuration config;
   private LogManager logger;
   private ShutdownNotifier notifier;
@@ -132,7 +118,7 @@ public class SudokuTest {
 
   @BeforeEach
   public void init() throws InvalidConfigurationException {
-    assumeTrue(isSupportedOperatingSystemAndArchitecture(solver));
+    assumeTrue(Platform.isSupported(solver));
 
     config = Configuration.defaultConfiguration();
     logger = BasicLogManager.create(config);
@@ -147,48 +133,6 @@ public class SudokuTest {
     if (context != null) {
       context.close();
     }
-  }
-
-  private boolean isSufficientVersionOfLibcxx(String library) {
-    try {
-      NativeLibraries.loadLibrary(library);
-    } catch (UnsatisfiedLinkError e) {
-      for (String dependency : getRequiredLibcxx(library)) {
-        if (e.getMessage().contains("version `" + dependency + "' not found")) {
-          return false;
-        }
-      }
-    }
-    return true;
-  }
-
-  private String[] getRequiredLibcxx(String library) {
-    return switch (library) {
-      case "z3" -> new String[]{"GLIBC_2.34", "GLIBCXX_3.4.26", "GLIBCXX_3.4.29"};
-      case "bitwuzlaj" -> new String[]{"GLIBC_2.33", "GLIBCXX_3.4.26", "GLIBCXX_3.4.29"};
-      case "opensmtj" -> new String[]{"GLIBC_2.33", "GLIBCXX_3.4.26", "GLIBCXX_3.4.29"};
-      case "mathsat5j" -> new String[]{"GLIBC_2.33", "GLIBC_2.38"};
-      case "cvc5jni" -> new String[]{"GLIBC_2.32"};
-      case "yices2java" -> new String[]{"GLIBC_2.34"};
-      default -> new String[]{};
-    };
-  }
-
-  private boolean isSupportedOperatingSystemAndArchitecture(Solvers solver) {
-    return switch (solver) {
-      case SMTINTERPOL, PRINCESS ->
-        // Any operating system and any architecture is allowed, Java is sufficient
-          true;
-      case BOOLECTOR, CVC4 -> IS_LINUX && !IS_ARCH_ARM64;
-      case YICES2 -> (IS_LINUX && !IS_ARCH_ARM64 && isSufficientVersionOfLibcxx("yices2java"))
-          || (IS_WINDOWS && !IS_ARCH_ARM64);
-      case CVC5 -> (IS_LINUX && isSufficientVersionOfLibcxx("cvc5jni")) || IS_WINDOWS || IS_MAC;
-      case OPENSMT -> IS_LINUX && isSufficientVersionOfLibcxx("opensmtj");
-      case BITWUZLA -> (IS_LINUX && isSufficientVersionOfLibcxx("bitwuzlaj")) || (IS_WINDOWS && !IS_ARCH_ARM64);
-      case MATHSAT5 -> (IS_LINUX && isSufficientVersionOfLibcxx("mathsat5j")) || (IS_WINDOWS && !IS_ARCH_ARM64);
-      case Z3 -> (IS_LINUX && isSufficientVersionOfLibcxx("z3")) || IS_WINDOWS || IS_MAC;
-      case Z3_WITH_INTERPOLATION -> IS_LINUX && !IS_ARCH_ARM64;
-    };
   }
 
   @Test
