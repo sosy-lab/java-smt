@@ -201,10 +201,13 @@ public class PrincessHornConverter {
 
       var condition = toFormula(ite.cond());
 
-      var a = condition.andSimplify(new IEquation(value, toTerm(ite.left())));
-      var b = condition.notSimplify().andSimplify(new IEquation(value, toTerm(ite.right())));
+      var left = toTerm(ite.left());
+      var right = toTerm(ite.right());
 
-      return a.orSimplify(b);
+      var a = condition.andSimplify(new IEquation(value, left));
+      var b = condition.notSimplify().andSimplify(new IEquation(value, right));
+
+      return a.andSimplify(b);
     }
 
     private IFormula toFormula(final IEquation equation) {
@@ -244,11 +247,14 @@ public class PrincessHornConverter {
     private IFormula toFormula(final IFormulaITE ite) {
       var condition = toFormula(ite.cond());
 
-      var a = condition.andSimplify(toFormula(ite.left()));
-      var b = condition.notSimplify().andSimplify(toFormula(ite.right()));
+      var left = toFormula(ite.left());
+      var right = toFormula(ite.right());
+
+      var a = condition.andSimplify(left);
+      var b = condition.notSimplify().andSimplify(right);
 
 
-      return a.orSimplify(b);
+      return a.andSimplify(b);
     }
 
     private IFormula toFormula(final IFormula formula) {
@@ -328,6 +334,7 @@ public class PrincessHornConverter {
         throw new IllegalArgumentException("Eldarica does not support ITE terms: " + ite);
       }
       if (term instanceof ISortedEpsilon epsilon) {
+
         return new ISortedEpsilon(epsilon.sort(), toFormula(epsilon.cond()));
       }
 
