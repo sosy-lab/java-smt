@@ -50,6 +50,7 @@ import scala.jdk.javaapi.CollectionConverters;
 @SuppressWarnings({"unchecked", "PatternMatchingInstanceof"})
 public class PrincessHornConverter {
   private final ArrayList<Predicate> predicates = new ArrayList<>();
+  private int temporary = 0;
 
   private Predicate toPredicate(final MonoSortedIFunction function) {
     // Predicate does not implement hashCode nor equals, this deduplicates the objects.
@@ -308,6 +309,30 @@ public class PrincessHornConverter {
       return constant;
     }
 
+    private IConstant createVariable(String prefix, int index) {
+      return new IConstant(new ConstantTerm(prefix + index));
+    }
+
+    private ITerm toTerm(final ISortedEpsilon epsilon) {
+      throw new IllegalArgumentException("Epsilon terms are not supported at the moment");
+    }
+
+    private ITerm toTerm(final ITermITE ite) {
+      var variable = createVariable("T", temporary++);
+      var condition = toFormula(ite.cond());
+
+      var left = toTerm(ite.left());
+      var right = toTerm(ite.right());
+
+      var a = condition.andSimplify(new IEquation(variable, left));
+      var b = condition.notSimplify().andSimplify(new IEquation(variable, right));
+
+      this.constraint = this.constraint.andSimplify(a.andSimplify(b));
+
+
+      return variable;
+    }
+
     private ITerm toTerm(final ITerm term) {
       if (term instanceof IIntLit lit) {
         return lit;
@@ -328,14 +353,10 @@ public class PrincessHornConverter {
         return new IFunApp(fun.fun(), toTerm(fun.args()));
       }
       if (term instanceof ITermITE ite) {
-        // TODO: Most times this is already covered, as ITEs should only occur in equations
-        //  This would need to do some clause splitting (emitting one clause for if/else)
-        //  Or creating a temporary variable (as Eldarica does), but it gets sometimes optimized
-        //  away and returns wrong results
-        throw new IllegalArgumentException("Eldarica does not support ITE terms: " + ite);
+        return toTerm(ite);
       }
       if (term instanceof ISortedEpsilon epsilon) {
-        return new ISortedEpsilon(epsilon.sort(), toFormula(epsilon.cond()));
+        return toTerm(epsilon);
       }
 
       throw new IllegalArgumentException("Unhandled term: " + term);
