@@ -1532,6 +1532,9 @@ def translate(prog: List[Definition]):
             arg1 = stmt.value[-1].args[0]
             log(toExpr('get-value', toExpr('', arg1)))
 
+        elif stmt.getCalls()[-1] == "getEvaluator":
+            pass
+
         elif stmt.getCalls()[-1] == "getModel":
             log(toConst('(get-model)'))
 
@@ -1578,6 +1581,9 @@ def translate(prog: List[Definition]):
 
         elif stmt.getCalls()[-1] == "push":
             log(toExpr('push', toConst('1')))
+            if len(stmt.value[-1].args) > 0:
+                arg1 = stmt.value[-1].args[0]
+                log(toExpr('assert', arg1))
 
         else:
             raise Exception(f'Unsupported call: {stmt.getCalls()}')

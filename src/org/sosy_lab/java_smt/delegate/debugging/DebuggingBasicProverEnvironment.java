@@ -10,14 +10,18 @@ package org.sosy_lab.java_smt.delegate.debugging;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.java_smt.api.BasicProverEnvironment;
 import org.sosy_lab.java_smt.api.BooleanFormula;
+import org.sosy_lab.java_smt.api.Evaluator;
 import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.SolverException;
+import org.sosy_lab.java_smt.api.UserPropagator;
 
 class DebuggingBasicProverEnvironment<T> implements BasicProverEnvironment<T> {
   private final BasicProverEnvironment<T> delegate;
@@ -27,6 +31,13 @@ class DebuggingBasicProverEnvironment<T> implements BasicProverEnvironment<T> {
       BasicProverEnvironment<T> pDelegate, DebuggingAssertions pDebugging) {
     delegate = checkNotNull(pDelegate);
     debugging = pDebugging;
+  }
+
+  @Override
+  public @Nullable T push(BooleanFormula f) throws InterruptedException {
+    debugging.assertThreadLocal();
+    debugging.assertFormulaInContext(f);
+    return delegate.push(f);
   }
 
   @Override
@@ -77,6 +88,27 @@ class DebuggingBasicProverEnvironment<T> implements BasicProverEnvironment<T> {
     return new DebuggingModel(delegate.getModel(), debugging);
   }
 
+  @SuppressWarnings("resource")
+  @Override
+  public Evaluator getEvaluator() throws SolverException {
+    debugging.assertThreadLocal();
+    return new DebuggingEvaluator(delegate.getEvaluator(), debugging);
+  }
+
+  @Override
+  public ImmutableList<Model.ValueAssignment> getModelAssignments() throws SolverException {
+    debugging.assertThreadLocal();
+    ImmutableList<Model.ValueAssignment> result = delegate.getModelAssignments();
+    for (Model.ValueAssignment v : result) {
+      // Both lines are needed as assignments like "a == false" may have been simplified to
+      // "not(a)" by the solver. This then leads to errors as the term "false" is not defined in
+      // the context.
+      debugging.addFormulaTerm(v.getValueAsFormula());
+      debugging.addFormulaTerm(v.getAssignmentAsFormula());
+    }
+    return result;
+  }
+
   @Override
   public List<BooleanFormula> getUnsatCore() {
     debugging.assertThreadLocal();
@@ -94,6 +126,12 @@ class DebuggingBasicProverEnvironment<T> implements BasicProverEnvironment<T> {
   }
 
   @Override
+  public ImmutableMap<String, String> getStatistics() {
+    debugging.assertThreadLocal();
+    return delegate.getStatistics();
+  }
+
+  @Override
   public void close() {
     debugging.assertThreadLocal();
     delegate.close();
@@ -107,5 +145,10 @@ class DebuggingBasicProverEnvironment<T> implements BasicProverEnvironment<T> {
       debugging.assertFormulaInContext(f);
     }
     return delegate.allSat(callback, important);
+  }
+
+  @Override
+  public boolean registerUserPropagator(UserPropagator propagator) {
+    throw new UnsupportedOperationException();
   }
 }
