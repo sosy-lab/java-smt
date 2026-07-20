@@ -35,6 +35,7 @@ import ap.terfor.conjunctions.Quantifier.ALL$;
 import ap.terfor.preds.Predicate;
 import ap.types.MonoSortedIFunction;
 import ap.types.MonoSortedPredicate;
+import ap.types.Sort;
 import ap.types.Sort.Integer$;
 import ap.types.SortedConstantTerm;
 import java.util.ArrayList;
@@ -50,7 +51,6 @@ import scala.jdk.javaapi.CollectionConverters;
 @SuppressWarnings({"unchecked", "PatternMatchingInstanceof"})
 public class PrincessHornConverter {
   private final ArrayList<Predicate> predicates = new ArrayList<>();
-  private int temporary = 0;
 
   private Predicate toPredicate(final MonoSortedIFunction function) {
     // Predicate does not implement hashCode nor equals, this deduplicates the objects.
@@ -72,8 +72,10 @@ public class PrincessHornConverter {
   }
 
   class ClauseContext {
-    private final ArrayList<IConstant> parameters = new ArrayList<>();
+    private final ArrayList<IConstant> variables = new ArrayList<>();
     private IFormula constraint = new IBoolLit(true);
+    private int temporary = 0;
+    private boolean epsilon = false;
 
 
     private List<IFormula> flatten(final IBinFormula input) {
@@ -287,10 +289,10 @@ public class PrincessHornConverter {
       throw new IllegalArgumentException("Unhandled formula: " + formula);
     }
 
-    private IConstant toVariable(final ISortedVariable variable) {
-      var name = "V" + variable.index();
+    private IConstant toVariable(int index, Sort sort) {
+      var name = "V" + index;
 
-      for (IConstant constant : parameters) {
+      for (IConstant constant : variables) {
         if (constant.c().name().equals(name)) {
           return constant;
         }
@@ -298,15 +300,20 @@ public class PrincessHornConverter {
 
       ConstantTerm term;
 
-      if (variable.sort() == Integer$.MODULE$) {
+      if (sort == Integer$.MODULE$) {
         term = new ConstantTerm(name);
       } else {
-        term = new SortedConstantTerm(name, variable.sort());
+        term = new SortedConstantTerm(name, sort);
       }
 
       var constant = new IConstant(term);
-      parameters.add(constant);
+      variables.add(constant);
       return constant;
+
+    }
+
+    private IConstant toVariable(final ISortedVariable variable) {
+      return toVariable(variable.index(), variable.sort());
     }
 
     private IConstant createVariable(String prefix, int index) {
@@ -314,7 +321,18 @@ public class PrincessHornConverter {
     }
 
     private ITerm toTerm(final ISortedEpsilon epsilon) {
-      throw new IllegalArgumentException("Epsilon terms are not supported at the moment");
+      if (this.epsilon) {
+        throw new IllegalStateException("Can not nest epsilon terms (yet)!");
+      }
+      this.epsilon = true;
+
+      var variable = toVariable(0, epsilon.sort());
+      var condition = toFormula(epsilon.cond());
+
+      this.constraint = this.constraint.andSimplify(condition);
+
+      this.epsilon = false;
+      return variable;
     }
 
     private ITerm toTerm(final ITermITE ite) {
