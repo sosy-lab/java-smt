@@ -28,12 +28,61 @@ import org.sosy_lab.java_smt.basicimpl.AbstractSolverContext;
 public final class Yices2SolverContext extends AbstractSolverContext {
 
   @Options(prefix = "solver.yices2")
-  private static class Yices2Parameters {
+  static class Yices2Parameters {
     @Option(
         secure = true,
-        description = "Backend to use for the solver",
-        values = {"dpllt", "mcsat"})
-    String solverType = "mcsat";
+        description = "Sets the SMTLIB logic for solver selection",
+        values = {
+          "ALL",
+          "NONE",
+          "QF_ABV",
+          "QF_ALIA",
+          "QF_ALIRA",
+          "QF_ALRA",
+          "QF_ANIA",
+          "QF_ANIRA",
+          "QF_ANRA",
+          "QF_AUF",
+          "QF_AUFBV",
+          "QF_AUFBVLIA",
+          "QF_AUFBVNIA",
+          "QF_AUFLIA",
+          "QF_AUFLIRA",
+          "QF_AUFLRA",
+          "QF_AUFNIA",
+          "QF_AUFNIRA",
+          "QF_AUFNRA",
+          "QF_AX",
+          "QF_BV",
+          "QF_BVLRA",
+          "QF_FFA",
+          "QF_IDL",
+          "QF_LIA",
+          "QF_LIRA",
+          "QF_LRA",
+          "QF_NIA",
+          "QF_NIRA",
+          "QF_NRA",
+          "QF_RDL",
+          "QF_UF",
+          "QF_UFBV",
+          "QF_UFBVLIA",
+          "QF_UFIDL",
+          "QF_UFLIA",
+          "QF_UFLIRA",
+          "QF_UFLRA",
+          "QF_UFNIA",
+          "QF_UFNIRA",
+          "QF_UFNRA",
+          "QF_UFRDL"
+        })
+    String logic = "ALL";
+
+    @Option(
+        secure = true,
+        description = "Configures the solver to allow/disable multiple SAT checks",
+        values = {"one-shot", "multi-checks", "push-pop", "interactive"})
+    String mode = "push-pop";
 
     Yices2Parameters(Configuration config) throws InvalidConfigurationException {
       config.inject(this);
@@ -132,14 +181,13 @@ public final class Yices2SolverContext extends AbstractSolverContext {
 
   @Override
   protected ProverEnvironment newProverEnvironment0(Set<ProverOptions> pOptions) {
-    return new Yices2Prover(creator, pOptions, bfmgr, shutdownManager, parameters.solverType);
+    return new Yices2Prover(creator, pOptions, bfmgr, shutdownManager, parameters);
   }
 
   @Override
   protected InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation0(
       Set<ProverOptions> pOptions) {
-    return new Yices2InterpolatingProver(
-        creator, pOptions, bfmgr, shutdownManager, parameters.solverType);
+    return new Yices2InterpolatingProver(creator, pOptions, bfmgr, shutdownManager, parameters);
   }
 
   @Override

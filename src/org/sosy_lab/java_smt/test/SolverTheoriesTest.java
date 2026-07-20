@@ -22,6 +22,8 @@ import java.util.Random;
 import org.junit.AssumptionViolatedException;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.sosy_lab.common.configuration.ConfigurationBuilder;
+import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.ArrayFormula;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
@@ -37,6 +39,14 @@ import org.sosy_lab.java_smt.api.SolverException;
 
 @SuppressWarnings("LocalVariableName")
 public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
+  @Override
+  protected ConfigurationBuilder createTestConfigBuilder() throws InvalidConfigurationException {
+    var newConfig = super.createTestConfigBuilder();
+    if (solver == Solvers.YICES2) {
+      newConfig.setOption("solver.yices2.logic", "QF_AUFNIRA");
+    }
+    return newConfig;
+  }
 
   @Test
   public void basicBoolTest() throws SolverException, InterruptedException {

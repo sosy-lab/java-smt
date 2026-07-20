@@ -16,6 +16,8 @@ import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 import com.google.common.primitives.Ints;
+import com.sri.yices.Config;
+import com.sri.yices.Context;
 import com.sri.yices.InterpolationContext;
 import com.sri.yices.Status;
 import com.sri.yices.Terms;
@@ -30,6 +32,7 @@ import org.sosy_lab.java_smt.api.BooleanFormulaManager;
 import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
+import org.sosy_lab.java_smt.solvers.yices2.Yices2SolverContext.Yices2Parameters;
 
 class Yices2InterpolatingProver extends Yices2AbstractProver<Integer>
     implements InterpolatingProverEnvironment<Integer> {
@@ -38,8 +41,8 @@ class Yices2InterpolatingProver extends Yices2AbstractProver<Integer>
       Set<ProverOptions> pOptions,
       BooleanFormulaManager pBmgr,
       ShutdownNotifier pShutdownNotifier,
-      String pSolverType) {
-    super(creator, pOptions, pBmgr, pShutdownNotifier, pSolverType);
+      Yices2Parameters pSolverParameters) {
+    super(creator, pOptions, pBmgr, pShutdownNotifier, pSolverParameters);
   }
 
   @Override
@@ -60,10 +63,18 @@ class Yices2InterpolatingProver extends Yices2AbstractProver<Integer>
             transformedImmutableSetCopy(setB, stack.peekLast()::get)));
   }
 
+  private Context newSolverStack() {
+    try (var cfg = new Config()) {
+      cfg.set("solver-type", "mcsat");
+      cfg.set("model-interpolation", "true");
+      return new Context(cfg);
+    }
+  }
+
   private int interpolate(Collection<Integer> setA, Collection<Integer> setB)
       throws InterruptedException {
-    try (var ctxA = newContext("mcsat");
-        var ctxB = newContext("mcsat")) {
+    try (var ctxA = newSolverStack();
+        var ctxB = newSolverStack()) {
 
       ctxA.assertFormulas(Ints.toArray(setA));
       ctxB.assertFormulas(Ints.toArray(setB));
