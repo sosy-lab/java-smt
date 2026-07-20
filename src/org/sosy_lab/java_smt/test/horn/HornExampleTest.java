@@ -10,6 +10,7 @@
 
 package org.sosy_lab.java_smt.test.horn;
 
+import static com.google.common.truth.TruthJUnit.assume;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
@@ -18,6 +19,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.math.BigInteger;
 import org.junit.Test;
+import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.HornProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext;
@@ -169,17 +171,21 @@ public class HornExampleTest extends SolverBasedTest0.ParameterizedSolverBasedTe
     assertFalse(prover.isUnsat());
   }
 
-  // @Test // TODO: enable when https://github.com/sosy-lab/java-smt/issues/682 is fixed
+  @Test
   public void smt_38_c_000() throws Exception {
+    // TODO: enable when https://github.com/sosy-lab/java-smt/issues/682 is fixed
+    assume().that(solver).isNotEqualTo(Solvers.ELDARICA);
     var prover = solveSmtLib2("38.c_000");
 
     assertFalse(prover.isUnsat());
   }
 
 
-  // @Test // TODO: enable when https://github.com/sosy-lab/java-smt/issues/682 is fixed
+  // test for rewriting equation ITE terms and epsilon terms
+  @Test
   public void smt_s_split_18_000() throws Exception {
-    // test for rewriting equation ITE terms and epsilon terms
+    // TODO: enable when https://github.com/sosy-lab/java-smt/issues/682 is fixed
+    assume().that(solver).isNotEqualTo(Solvers.ELDARICA);
     var prover = solveSmtLib2("s_split_18_000");
 
     assertFalse(prover.isUnsat());
