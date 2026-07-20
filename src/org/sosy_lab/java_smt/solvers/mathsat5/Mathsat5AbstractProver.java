@@ -8,11 +8,13 @@
 
 package org.sosy_lab.java_smt.solvers.mathsat5;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5FormulaManager.getMsatTerm;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_all_sat;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_check_sat;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_check_sat_with_assumptions;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_create_config;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_create_default_config;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_destroy_config;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_destroy_env;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_free_termination_callback;
@@ -62,17 +64,18 @@ abstract class Mathsat5AbstractProver<T2> extends AbstractProver<T2> {
   protected Mathsat5AbstractProver(
       Mathsat5SolverContext pContext,
       Set<ProverOptions> pOptions,
+      String pLogic,
       Mathsat5FormulaCreator pCreator,
       ShutdownNotifier pShutdownNotifier) {
     super(pOptions);
     context = pContext;
     creator = pCreator;
-    curConfig = buildConfig(pOptions);
+    curConfig = buildConfig(pOptions, checkNotNull(pLogic));
     curEnv = context.createEnvironment(curConfig);
     shutdownNotifier = pShutdownNotifier;
   }
 
-  private long buildConfig(Set<ProverOptions> opts) {
+  private long buildConfig(Set<ProverOptions> opts, String pLogic) {
     Map<String, String> config = new LinkedHashMap<>();
     boolean generateUnsatCore = opts.contains(ProverOptions.GENERATE_UNSAT_CORE);
     config.put("model_generation", opts.contains(ProverOptions.GENERATE_MODELS) ? "true" : "false");
@@ -82,7 +85,13 @@ abstract class Mathsat5AbstractProver<T2> extends AbstractProver<T2> {
     }
     createConfig(config); // ask subclasses for their options
 
-    long cfg = msat_create_config();
+    long cfg;
+    if (pLogic.isEmpty() || pLogic.equalsIgnoreCase("ALL")) {
+      cfg = msat_create_config();
+    } else {
+      // TODO: input validation for logics in MathSAT5
+      cfg = msat_create_default_config(pLogic);
+    }
     for (Map.Entry<String, String> entry : config.entrySet()) {
       msat_set_option_checked(cfg, entry.getKey(), entry.getValue());
     }
@@ -193,7 +202,7 @@ abstract class Mathsat5AbstractProver<T2> extends AbstractProver<T2> {
   @Override
   public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(
       Collection<BooleanFormula> assumptions) throws SolverException, InterruptedException {
-    Preconditions.checkNotNull(assumptions);
+    checkNotNull(assumptions);
     checkGenerateUnsatCoresOverAssumptions();
 
     closeAllEvaluators();
