@@ -176,6 +176,15 @@ public class HornExampleTest extends SolverBasedTest0.ParameterizedSolverBasedTe
     assertFalse(prover.isUnsat());
   }
 
+
+  // @Test // TODO: enable when https://github.com/sosy-lab/java-smt/issues/682 is fixed
+  public void smt_s_split_18_000() throws Exception {
+    // test for rewriting equation ITE terms and epsilon terms
+    var prover = solveSmtLib2("s_split_18_000");
+
+    assertFalse(prover.isUnsat());
+  }
+
   @Test
   public void smt_two_counters_e3_325_000() throws Exception {
     var prover = solveSmtLib2("two_counters_e3_325_000");
@@ -239,6 +248,7 @@ public class HornExampleTest extends SolverBasedTest0.ParameterizedSolverBasedTe
     assertEquals("fun", fun.getName());
     assertTrue(fun.getAssignmentAsFormula().toString().contains("-91 + _1"));
     var value = (Object[]) fun.getValue();
+    assertEquals(2, value.length);
     assertNull(value[0]); // does not matter
     assertEquals(BigInteger.valueOf(91), value[1]);
   }
