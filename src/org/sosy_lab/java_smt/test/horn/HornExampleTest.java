@@ -180,6 +180,15 @@ public class HornExampleTest extends SolverBasedTest0.ParameterizedSolverBasedTe
     assertFalse(prover.isUnsat());
   }
 
+  // test for ex quantifier inside formula
+  @Test
+  public void smt_s_split_09_000() throws Exception {
+    assume().that(solver).isNotEqualTo(Solvers.ELDARICA);
+    var prover = solveSmtLib2("s_split_09_000");
+
+    assertTrue(prover.isUnsat());
+  }
+
 
   // test for rewriting equation ITE terms and epsilon terms
   @Test

@@ -193,9 +193,6 @@ public class PrincessHornConverter {
           return toFormula(ite.cond().notSimplify());
         }
       }
-      if (i.t() instanceof ITermITE ite) {
-        throw new RuntimeException("ITE (TODO): " + ite);
-      }
       return new IIntFormula(i.rel(), toTerm(i.t()));
     }
 
@@ -243,8 +240,11 @@ public class PrincessHornConverter {
     }
 
     private ISortedQuantified toFormula(final ISortedQuantified quantified) {
-      return new ISortedQuantified(quantified.quan(), quantified.sort(),
-          toFormula(quantified.subformula()));
+      // TODO: Eldarica supports this, but the variables need to be rewritten
+      throw new IllegalArgumentException(
+          "Quantifiers inside formulas are not supported yet: " + quantified);
+      // return new ISortedQuantified(quantified.quan(), quantified.sort(),
+      //    toFormula(quantified.subformula()));
     }
 
     private IFormula toFormula(final IFormulaITE ite) {
