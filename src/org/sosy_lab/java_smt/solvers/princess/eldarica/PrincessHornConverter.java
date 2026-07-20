@@ -328,13 +328,13 @@ public class PrincessHornConverter {
         return new IFunApp(fun.fun(), toTerm(fun.args()));
       }
       if (term instanceof ITermITE ite) {
-        // TODO: Most times this is already covered, as ITEs can only occur in Equations
-        //  (mostly EqZero). This could be handled by pushing/popping a stack and adding every
-        //  single possible case as constraint (or the fomular with OR)
+        // TODO: Most times this is already covered, as ITEs should only occur in equations
+        //  This would need to do some clause splitting (emitting one clause for if/else)
+        //  Or creating a temporary variable (as Eldarica does), but it gets sometimes optimized
+        //  away and returns wrong results
         throw new IllegalArgumentException("Eldarica does not support ITE terms: " + ite);
       }
       if (term instanceof ISortedEpsilon epsilon) {
-
         return new ISortedEpsilon(epsilon.sort(), toFormula(epsilon.cond()));
       }
 

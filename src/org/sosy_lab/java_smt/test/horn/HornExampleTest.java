@@ -191,6 +191,16 @@ public class HornExampleTest extends SolverBasedTest0.ParameterizedSolverBasedTe
     assertFalse(prover.isUnsat());
   }
 
+  // test for rewriting deep nested ITE terms
+  @Test
+  public void smt_rewrite_ite() throws Exception {
+    // TODO: enable when complex ITE term rewriting is supported
+    assume().that(solver).isNotEqualTo(Solvers.ELDARICA);
+    var prover = solveSmtLib2("rewrite_ite");
+
+    assertFalse(prover.isUnsat());
+  }
+
   @Test
   public void smt_two_counters_e3_325_000() throws Exception {
     var prover = solveSmtLib2("two_counters_e3_325_000");
