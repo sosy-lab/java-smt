@@ -186,13 +186,20 @@ public class PrincessHornConverter {
       return new IAtom(atom.pred(), toTerm(atom.args()));
     }
 
+    private IFormula toFormulaITE(final ITerm term, final IFormula cond) {
+      return new IBinFormula(
+          IBinJunctor.Or(),
+          toFormula(cond),
+          new IIntFormula(IIntRelation.EqZero(), toTerm(term)));
+    }
+
     private IFormula toFormula(final IIntFormula i) {
       if (i.rel().equals(IIntRelation.EqZero()) && i.t() instanceof ITermITE ite) {
         if (ite.left() instanceof IIntLit lit && lit.value().isZero()) {
-          return toFormula(ite.cond());
+          return toFormulaITE(ite.right(), ite.cond());
         }
         if (ite.right() instanceof IIntLit lit && lit.value().isZero()) {
-          return toFormula(ite.cond().notSimplify());
+          return toFormulaITE(ite.left(), ite.cond().notSimplify());
         }
       }
       return new IIntFormula(i.rel(), toTerm(i.t()));
@@ -209,7 +216,7 @@ public class PrincessHornConverter {
       var a = condition.andSimplify(new IEquation(value, left));
       var b = condition.notSimplify().andSimplify(new IEquation(value, right));
 
-      return a.andSimplify(b);
+      return a.orSimplify(b);
     }
 
     private IFormula toFormula(final IEquation equation) {
@@ -259,7 +266,7 @@ public class PrincessHornConverter {
       var b = condition.notSimplify().andSimplify(right);
 
 
-      return a.andSimplify(b);
+      return a.orSimplify(b);
     }
 
     private IFormula toFormula(final IFormula formula) {
@@ -347,7 +354,7 @@ public class PrincessHornConverter {
       var a = condition.andSimplify(new IEquation(variable, left));
       var b = condition.notSimplify().andSimplify(new IEquation(variable, right));
 
-      this.constraint = this.constraint.andSimplify(a.andSimplify(b));
+      this.constraint = this.constraint.andSimplify(a.orSimplify(b));
 
 
       return variable;
@@ -404,7 +411,7 @@ public class PrincessHornConverter {
     }
 
     private Clause toClause(IAtom head) {
-      if(head == null) {
+      if (head == null) {
         head = FALSE;
       }
       return new Clause(head, List$.MODULE$.empty(), this.constraint);
