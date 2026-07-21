@@ -173,8 +173,7 @@ public class HornExampleTest extends SolverBasedTest0.ParameterizedSolverBasedTe
 
   @Test
   public void smt_38_c_000() throws Exception {
-    // TODO: enable when https://github.com/sosy-lab/java-smt/issues/682 is fixed
-    assume().that(solver).isNotEqualTo(Solvers.ELDARICA);
+    assume().that(solver).isNotEqualTo(Solvers.ELDARICA); // ex
     var prover = solveSmtLib2("38.c_000");
 
     assertFalse(prover.isUnsat());
@@ -193,8 +192,7 @@ public class HornExampleTest extends SolverBasedTest0.ParameterizedSolverBasedTe
   // test for rewriting equation ITE terms and epsilon terms
   @Test
   public void smt_s_split_18_000() throws Exception {
-    // TODO: enable when https://github.com/sosy-lab/java-smt/issues/682 is fixed
-    assume().that(solver).isNotEqualTo(Solvers.ELDARICA);
+    assume().that(solver).isNotEqualTo(Solvers.ELDARICA); // ex
     var prover = solveSmtLib2("s_split_18_000");
 
     assertFalse(prover.isUnsat());
@@ -218,6 +216,28 @@ public class HornExampleTest extends SolverBasedTest0.ParameterizedSolverBasedTe
   @Test
   public void smt_O0_fibo_10_false_unreach_call_000() throws Exception {
     var prover = solveSmtLib2("O0_fibo_10_false-unreach-call_000");
+
+    assertTrue(prover.isUnsat());
+  }
+
+
+  @Test
+  public void smt_O0_count_up_down_false_unreach_call_true_termination_000() throws Exception {
+    var prover = solveSmtLib2("O0_count_up_down_false-unreach-call_true-termination_000");
+
+    assertTrue(prover.isUnsat());
+  }
+
+  @Test
+  public void smt_shift_right_negative_lvalue_int16_sol_2_000() throws Exception {
+    var prover = solveSmtLib2("shift_right_negative_lvalue_int16.sol_2_000");
+
+    assertTrue(prover.isUnsat());
+  }
+
+  @Test
+  public void smt_s_split_37_000() throws Exception {
+    var prover = solveSmtLib2("s_split_37_000");
 
     assertTrue(prover.isUnsat());
   }
