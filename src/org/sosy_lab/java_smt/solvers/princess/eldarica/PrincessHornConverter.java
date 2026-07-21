@@ -50,6 +50,8 @@ import scala.jdk.javaapi.CollectionConverters;
 
 @SuppressWarnings({"unchecked", "PatternMatchingInstanceof"})
 public class PrincessHornConverter {
+  private static final IAtom FALSE = new IAtom(HornClauses.FALSE(),
+      (Seq<ITerm>) Seq$.MODULE$.empty());
   private final ArrayList<Predicate> predicates = new ArrayList<>();
 
   private Predicate toPredicate(final MonoSortedIFunction function) {
@@ -401,8 +403,10 @@ public class PrincessHornConverter {
       return null;
     }
 
-    private Clause toClause(final IAtom head) {
-      assert head != null;
+    private Clause toClause(IAtom head) {
+      if(head == null) {
+        head = FALSE;
+      }
       return new Clause(head, List$.MODULE$.empty(), this.constraint);
     }
 
@@ -458,7 +462,7 @@ public class PrincessHornConverter {
           throw new RuntimeException("No head found: " + input);
         }
       } else {
-        head = new IAtom(HornClauses.FALSE(), (Seq<ITerm>) Seq$.MODULE$.empty());
+        head = FALSE;
         this.constraint = this.constraint.andSimplify(simplify(toFormula(other).notSimplify()));
 
         return toClause(head, simplify(not.subformula()));
