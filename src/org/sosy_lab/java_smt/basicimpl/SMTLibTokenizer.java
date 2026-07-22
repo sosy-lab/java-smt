@@ -125,7 +125,7 @@ public final class SMTLibTokenizer implements Iterable<String> {
    * #toImmutableList()}.
    */
   public static boolean isDeclarationToken(String token) {
-    return matchesOneOf(token, "declare-const", "declare-fun");
+    return matchesOneOf(token, "declare-const", "declare-fun", "declare-datatypes");
   }
 
   /**

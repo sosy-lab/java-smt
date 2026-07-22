@@ -81,3 +81,8 @@ pom.xml
 
 
 hs_err_*.log
+
+CPALog.txt
+CPALog.txt.lck
+CPALog.txt.*
+CPALog.txt.*.lck

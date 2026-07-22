@@ -23,6 +23,7 @@ SPDX-License-Identifier: Apache-2.0
 	<classpathentry kind="lib" path="lib/java/build/error_prone_annotations.jar" sourcepath="lib/java-contrib/error_prone_annotations-sources.jar"/>
 	<classpathentry kind="lib" path="lib/java/core/common.jar" sourcepath="lib/java-contrib/common-sources.jar"/>
 	<classpathentry kind="lib" path="lib/java/runtime-smtinterpol/smtinterpol.jar" sourcepath="lib/java-contrib/smtinterpol-sources.jar"/>
+	<classpathentry kind="lib" path="lib/java/runtime-eldarica/eldarica_2.13.jar" sourcepath="lib/java-contrib/eldarica_2.13-sources.jar"/>
 	<classpathentry kind="lib" path="lib/java/runtime-princess/princess_2.13.jar" sourcepath="lib/java-contrib/princess_2.13-sources.jar"/>
 	<classpathentry kind="lib" path="lib/java/runtime-princess/scala-library.jar"/>
 	<classpathentry kind="lib" path="lib/java/runtime-princess/princess-smt-parser_2.13.jar"/>
