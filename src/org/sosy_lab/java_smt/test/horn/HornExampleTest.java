@@ -243,6 +243,13 @@ public class HornExampleTest extends SolverBasedTest0.ParameterizedSolverBasedTe
   }
 
   @Test
+  public void smt_s_split_23_000() throws Exception { // endless looking for interpolants
+    var prover = solveSmtLib2("s_split_23_000");
+
+    assertFalse(prover.isUnsat());
+  }
+
+  @Test
   public void smt_small_unsat() throws Exception {
     /*
     mc(A,B) :- ((A + -100) >= 1),(B = (A + -10)).

@@ -30,6 +30,7 @@ import ap.parser.ISortedVariable;
 import ap.parser.ITerm;
 import ap.parser.ITermITE;
 import ap.parser.ITimes;
+import ap.parser.VariableSubstVisitor;
 import ap.terfor.ConstantTerm;
 import ap.terfor.conjunctions.Quantifier.ALL$;
 import ap.terfor.preds.Predicate;
@@ -43,6 +44,8 @@ import java.util.List;
 import lazabs.horn.bottomup.HornClauses;
 import lazabs.horn.bottomup.HornClauses.Clause;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import scala.Tuple2;
+import scala.collection.JavaConverters;
 import scala.collection.Seq$;
 import scala.collection.immutable.List$;
 import scala.collection.immutable.Seq;
@@ -77,7 +80,7 @@ public class PrincessHornConverter {
     private final ArrayList<IConstant> variables = new ArrayList<>();
     private IFormula constraint = new IBoolLit(true);
     private int temporary = 0;
-    private boolean epsilon = false;
+    private int epsilon = 0;
 
 
     private List<IFormula> flatten(final IBinFormula input) {
@@ -307,15 +310,8 @@ public class PrincessHornConverter {
         }
       }
 
-      ConstantTerm term;
 
-      if (sort == Integer$.MODULE$) {
-        term = new ConstantTerm(name);
-      } else {
-        term = new SortedConstantTerm(name, sort);
-      }
-
-      var constant = new IConstant(term);
+      var constant = createVariable(name, sort);
       variables.add(constant);
       return constant;
 
@@ -325,27 +321,42 @@ public class PrincessHornConverter {
       return toVariable(variable.index(), variable.sort());
     }
 
-    private IConstant createVariable(String prefix, int index) {
-      return new IConstant(new ConstantTerm(prefix + index));
+    private IConstant createVariable(String name, Sort sort) {
+      ConstantTerm term;
+
+      if (sort == Integer$.MODULE$) {
+        term = new ConstantTerm(name);
+      } else {
+        term = new SortedConstantTerm(name, sort);
+      }
+
+      return new IConstant(term);
+    }
+
+    private IConstant createVariable(String prefix, int index, Sort sort) {
+      var name = prefix + index;
+      return createVariable(name, sort);
     }
 
     private ITerm toTerm(final ISortedEpsilon epsilon) {
-      if (this.epsilon) {
-        throw new IllegalStateException("Can not nest epsilon terms (yet)!");
-      }
-      this.epsilon = true;
+      var variable = createVariable("E", this.epsilon++, epsilon.sort());
 
-      var variable = toVariable(0, epsilon.sort());
-      var condition = toFormula(epsilon.cond());
+      var substitution = JavaConverters.asScala(List.of((ITerm) variable)).toList();
+
+      IFormula rewritten = VariableSubstVisitor.apply(
+          epsilon.cond(),
+          new Tuple2<>(substitution, -1)
+      );
+
+      var condition = toFormula(rewritten);
 
       this.constraint = this.constraint.andSimplify(condition);
 
-      this.epsilon = false;
       return variable;
     }
 
     private ITerm toTerm(final ITermITE ite) {
-      var variable = createVariable("T", temporary++);
+      var variable = createVariable("T", temporary++, Integer$.MODULE$);
       var condition = toFormula(ite.cond());
 
       var left = toTerm(ite.left());
