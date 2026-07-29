@@ -58,11 +58,8 @@ class DebuggingAssertions {
         .contains(pFunctionDeclaration.getKind())) {
       Preconditions.checkArgument(
           debugInfo.getDeclaredFunctions().contains(pFunctionDeclaration),
-          "Function was not declared "
-              + (debugInfo.isNoSharedDeclarations() ? "in this context." : "on this solver.")
-              + "\n%s"
-              + "\nnot in"
-              + "\n%s",
+          "Function was not declared %s\n%s\nnot in\n%s",
+          debugInfo.isNoSharedDeclarations() ? "in this context." : "on this solver.",
           pFunctionDeclaration,
           debugInfo.getDeclaredFunctions());
     }
@@ -86,11 +83,8 @@ class DebuggingAssertions {
   public void assertFormulaInContext(Formula pFormula) {
     Preconditions.checkArgument(
         debugInfo.getDefinedFormulas().contains(pFormula),
-        "Function was not declared "
-            + (debugInfo.isNoSharedFormulas() ? "in this context." : "on this solver.")
-            + "\n%s"
-            + "\nnot in"
-            + "\n%s",
+        "Function was not declared %s\n%s\nnot in\n%s",
+        debugInfo.isNoSharedFormulas() ? "in this context." : "on this solver.",
         pFormula,
         debugInfo.getDefinedFormulas());
   }

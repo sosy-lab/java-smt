@@ -27,7 +27,7 @@ import org.sosy_lab.java_smt.api.RegexFormula;
 import org.sosy_lab.java_smt.api.StringFormula;
 
 @Immutable
-abstract class Z3Formula implements Formula {
+abstract sealed class Z3Formula implements Formula {
 
   private final long z3expr;
   private final long z3context;
@@ -53,11 +53,9 @@ abstract class Z3Formula implements Formula {
     if (obj == this) {
       return true;
     }
-    if (!(obj instanceof Z3Formula)) {
-      return false;
-    }
-    Z3Formula other = (Z3Formula) obj;
-    return (z3context == other.z3context) && Native.isEqAst(z3context, z3expr, other.z3expr);
+    return obj instanceof Z3Formula other
+        && z3context == other.z3context
+        && Native.isEqAst(z3context, z3expr, other.z3expr);
   }
 
   @Override

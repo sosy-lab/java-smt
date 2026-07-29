@@ -181,9 +181,7 @@ abstract class CVC4NumeralFormulaManager<
     if (pParam.size() < 2) {
       return exprManager.mkConst(true);
     } else {
-      vectorExpr param = new vectorExpr();
-      pParam.forEach(param::add);
-      return exprManager.mkExpr(Kind.DISTINCT, param);
+      return exprManager.mkExpr(Kind.DISTINCT, new vectorExpr(exprManager, pParam));
     }
   }
 }

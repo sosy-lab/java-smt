@@ -26,7 +26,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.java_smt.api.ArrayFormula;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
@@ -323,7 +322,7 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> {
   public abstract <R> R visit(FormulaVisitor<R> visitor, Formula formula, TFormulaInfo f);
 
   protected List<TFormulaInfo> extractInfo(Collection<? extends Formula> input) {
-    return input.stream().map(this::extractInfo).collect(Collectors.toList());
+    return input.stream().map(this::extractInfo).toList();
   }
 
   /**
@@ -580,14 +579,5 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> {
   public Object convertValue(
       @SuppressWarnings("unused") TFormulaInfo pAdditionalF, TFormulaInfo pF) {
     return convertValue(pF);
-  }
-
-  /** Variable names (symbols) can be wrapped with "|". This function removes those chars. */
-  protected static String dequote(String s) {
-    int l = s.length();
-    if (s.charAt(0) == '|' && s.charAt(l - 1) == '|') {
-      return s.substring(1, l - 1);
-    }
-    return s;
   }
 }

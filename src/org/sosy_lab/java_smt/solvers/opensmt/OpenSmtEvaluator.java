@@ -15,7 +15,7 @@ import org.sosy_lab.java_smt.solvers.opensmt.api.Model;
 import org.sosy_lab.java_smt.solvers.opensmt.api.PTRef;
 import org.sosy_lab.java_smt.solvers.opensmt.api.SRef;
 
-public class OpenSmtEvaluator extends AbstractEvaluator<PTRef, SRef, Logic> {
+class OpenSmtEvaluator extends AbstractEvaluator<PTRef, SRef, Logic> {
 
   private final Model osmtModel;
 

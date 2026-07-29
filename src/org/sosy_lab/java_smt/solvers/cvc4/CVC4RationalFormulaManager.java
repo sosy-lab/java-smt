@@ -16,8 +16,7 @@ import org.sosy_lab.java_smt.api.NumeralFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
 import org.sosy_lab.java_smt.api.RationalFormulaManager;
 
-public class CVC4RationalFormulaManager
-    extends CVC4NumeralFormulaManager<NumeralFormula, RationalFormula>
+class CVC4RationalFormulaManager extends CVC4NumeralFormulaManager<NumeralFormula, RationalFormula>
     implements RationalFormulaManager {
 
   CVC4RationalFormulaManager(

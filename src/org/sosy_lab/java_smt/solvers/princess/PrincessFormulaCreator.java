@@ -54,7 +54,6 @@ import ap.theories.nia.GroebnerMultiplication$;
 import ap.theories.rationals.Rationals;
 import ap.types.Sort;
 import ap.types.Sort$;
-import ap.types.Sort.MultipleValueBool$;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.ImmutableList;
@@ -239,46 +238,45 @@ class PrincessFormulaCreator
 
   @Override
   public Object convertValue(IExpression value) {
-    if (value instanceof IBoolLit) {
-      return ((IBoolLit) value).value();
-    } else if (value instanceof IIntLit) {
-      return ((IIntLit) value).value().bigIntValue();
+    if (value instanceof IBoolLit iBoolLit) {
+      return iBoolLit.value();
+    } else if (value instanceof IIntLit iIntLit) {
+      return iIntLit.value().bigIntValue();
     }
-    if (value instanceof IFunApp) {
-      IFunApp app = (IFunApp) value;
+    if (value instanceof IFunApp app) {
       switch (app.fun().name()) {
-        case "true":
+        case "true" -> {
           Preconditions.checkArgument(app.fun().arity() == 0);
           return true;
-        case "false":
+        }
+        case "false" -> {
           Preconditions.checkArgument(app.fun().arity() == 0);
           return false;
-        case "mod_cast":
+        }
+        case "mod_cast" -> {
           // we found a bitvector BV(lower, upper, ctxt), lets extract the last parameter
           return ((IIntLit) app.apply(2)).value().bigIntValue();
-        case "Rat_fromRing":
+        }
+        case "Rat_fromRing" -> {
           Preconditions.checkArgument(app.fun().arity() == 1);
           ITerm term = app.apply(0);
-          if (term instanceof IIntLit) {
-            return ((IIntLit) term).value().bigIntValue();
+          if (term instanceof IIntLit iIntLit) {
+            return iIntLit.value().bigIntValue();
           }
-          break;
-        case "Rat_frac":
+        }
+        case "Rat_frac" -> {
           Preconditions.checkArgument(app.fun().arity() == 2);
           ITerm term1 = app.apply(0);
           ITerm term2 = app.apply(1);
-          if (term1 instanceof IIntLit && term2 instanceof IIntLit) {
+          if (term1 instanceof IIntLit iIntLit1 && term2 instanceof IIntLit iIntLit2) {
             Rational ratValue =
-                Rational.of(
-                    ((IIntLit) term1).value().bigIntValue(),
-                    ((IIntLit) term2).value().bigIntValue());
+                Rational.of(iIntLit1.value().bigIntValue(), iIntLit2.value().bigIntValue());
             return ratValue.isIntegral() ? ratValue.getNum() : ratValue;
           }
-          break;
-        case "str_empty":
-        case "str_cons":
+        }
+        case "str_empty", "str_cons" -> {
           return strToString(app);
-        default:
+        }
       }
     }
 
@@ -296,11 +294,11 @@ class PrincessFormulaCreator
       checkArgument(fun.fun().arity() == 2);
       ITerm arg = fun.apply(0);
       IIntLit chr;
-      if (arg instanceof IIntLit) {
-        chr = ((IIntLit) arg);
-      } else if (arg instanceof IFunApp
-          && ModuloArithmetic.mod_cast().equals(((IFunApp) arg).fun())) {
-        chr = ((IIntLit) ((IFunApp) arg).apply(2));
+      if (arg instanceof IIntLit iIntLit) {
+        chr = iIntLit;
+      } else if (arg instanceof IFunApp iFunApp
+          && ModuloArithmetic.mod_cast().equals(iFunApp.fun())) {
+        chr = ((IIntLit) iFunApp.apply(2));
       } else {
         throw new AssertionError("unexpected string value: " + fun);
       }
@@ -364,22 +362,22 @@ class PrincessFormulaCreator
   }
 
   private String getName(IExpression input) {
-    if (input instanceof IAtom) {
-      return ((IAtom) input).pred().name();
-    } else if (input instanceof IConstant) {
-      return ((IConstant) input).c().name();
-    } else if (input instanceof IBinFormula) {
-      return ((IBinFormula) input).j().toString();
+    if (input instanceof IAtom iAtom) {
+      return iAtom.pred().name();
+    } else if (input instanceof IConstant iConstant) {
+      return iConstant.c().name();
+    } else if (input instanceof IBinFormula iBinFormula) {
+      return iBinFormula.j().toString();
     } else if (input instanceof IFormulaITE || input instanceof ITermITE) {
       // in princess ite representation is the complete formula which we do not want here
       return "ite";
-    } else if (input instanceof IIntFormula) {
-      return ((IIntFormula) input).rel().toString();
+    } else if (input instanceof IIntFormula iIntFormula) {
+      return iIntFormula.rel().toString();
     } else if (input instanceof INot) {
       // in princess not representation is the complete formula which we do not want here
       return "not";
-    } else if (input instanceof IFunApp) {
-      return ((IFunApp) input).fun().name();
+    } else if (input instanceof IFunApp iFunApp) {
+      return iFunApp.fun().name();
     } else if (input instanceof IPlus) {
       // in princess plus representation is the complete formula which we do not want here
       return "+";
@@ -401,8 +399,7 @@ class PrincessFormulaCreator
     if (input instanceof IBoolLit || input instanceof IIntLit) {
       // Boolean or integer literal
       return true;
-    } else if (input instanceof IFunApp) {
-      IFunApp app = (IFunApp) input;
+    } else if (input instanceof IFunApp app) {
       IFunction fun = app.fun();
       if (fun.equals(Rationals.fromRing()) || fun.equals(Rationals.frac())) {
         // Rational number literal
@@ -483,8 +480,8 @@ class PrincessFormulaCreator
       IExpression t1, IExpression t2) {
     if (t1.equals(t2)) {
       return new Pair<>(Optional.of(ImmutableMap.of()), t1);
-    } else if (t1 instanceof IConstant) {
-      return new Pair<>(Optional.of(ImmutableMap.of(((IConstant) t1).c(), t2)), t2);
+    } else if (t1 instanceof IConstant constant1) {
+      return new Pair<>(Optional.of(ImmutableMap.of(constant1.c(), t2)), t2);
     } else if (t1.getClass().equals(t2.getClass()) && t1.length() == t2.length()) {
       // Recursively check the subterms
       Optional<Map<ConstantTerm, IExpression>> subst = Optional.of(ImmutableMap.of());
@@ -519,8 +516,7 @@ class PrincessFormulaCreator
     return Rewriter.rewrite(
         t,
         v -> {
-          if (v instanceof ITimes) {
-            var times = (ITimes) v;
+          if (v instanceof ITimes times) {
             return new IFunApp(
                 symbolMul, toSeq(ImmutableList.of(IExpression.i(times.coeff()), times.subterm())));
           } else {
@@ -538,8 +534,7 @@ class PrincessFormulaCreator
     return Rewriter.rewrite(
         t,
         v -> {
-          if (v instanceof IIntLit) {
-            var lit = ((IIntLit) v);
+          if (v instanceof IIntLit lit) {
             if (!lit.value().isUnit() && lit.value().signum() < 0) {
               return new ITimes(IdealInt.apply(-1), IExpression.abs(lit));
             }
@@ -585,15 +580,15 @@ class PrincessFormulaCreator
         if (c instanceof IConstant) {
           // If the argument is already a variable, just keep it
           builder.add(c);
-        } else if (c instanceof ITimes) {
+        } else if (c instanceof ITimes times) {
           // If it's a term (c * t), where c is an integer coefficient, and t is another integer
           // literal, we replace t in (c * t) with a new variable
           // Specifically, this can be used to generalize negative integer constants by first
           // shifting the minus sign outside, and then replacing the nested integer term
-          var times = (ITimes) c;
           if (times.apply(0) instanceof IIntLit) {
             var newVar =
-                (ITerm) makeVariable(INTEGER_SORT, "@" + Integer.toUnsignedString(c.hashCode()));
+                (ITerm)
+                    makeVariable(INTEGER_SORT, "@" + Integer.toUnsignedString(times.hashCode()));
             term = ExpressionReplacingVisitor.apply(term, times.apply(0), newVar);
             builder.add(new ITimes(times.coeff(), newVar));
           } else {
@@ -713,17 +708,14 @@ class PrincessFormulaCreator
               Rewriter.rewrite(
                   updated,
                   v -> {
-                    if (v instanceof IFunApp) {
-                      var app = (IFunApp) v;
-                      if (app.fun().name().equals("mul") && app.apply(0) instanceof IIntLit) {
-                        var factor = (IIntLit) app.apply(0);
+                    if (v instanceof IFunApp app) {
+                      if (app.fun().name().equals("mul")
+                          && app.apply(0) instanceof IIntLit factor) {
                         return new ITimes(factor.value(), app.apply(1));
                       }
                     }
-                    if (v instanceof ITimes) {
-                      var times = (ITimes) v;
-                      if (times.apply(0) instanceof IIntLit) {
-                        var lit = (IIntLit) times.apply(0);
+                    if (v instanceof ITimes times) {
+                      if (times.apply(0) instanceof IIntLit lit) {
                         return IExpression.i(times.coeff().$times(lit.value()));
                       }
                     }
@@ -745,10 +737,10 @@ class PrincessFormulaCreator
     if (isValue(input)) {
       return visitor.visitConstant(f, convertValue(input));
 
-    } else if (input instanceof IFunApp
-        && ((IFunApp) input).fun().equals(ModuloArithmetic$.MODULE$.int_cast())) {
+    } else if (input instanceof IFunApp app
+        && app.fun().equals(ModuloArithmetic$.MODULE$.int_cast())) {
       // Is it a cast from bv to integer?
-      var arg = (ITerm) input.apply(0);
+      var arg = app.apply(0);
       var sort = (ModSort) Sort.sortOf(arg);
       var kind =
           sort.lower().isZero()
@@ -769,13 +761,13 @@ class PrincessFormulaCreator
                   ? PrincessBitvectorToIntegerDeclaration.SIGNED
                   : PrincessBitvectorToIntegerDeclaration.UNSIGNED));
 
-    } else if (input instanceof IFunApp
-        && ((IFunApp) input).fun().equals(ModuloArithmetic$.MODULE$.zero_extend())) {
+    } else if (input instanceof IFunApp app
+        && app.fun().equals(ModuloArithmetic$.MODULE$.zero_extend())) {
       // Is it zero_extend?
       var kind = FunctionDeclarationKind.BV_ZERO_EXTENSION;
-      var p1 = (IIntLit) input.apply(0);
-      var p2 = (IIntLit) input.apply(1);
-      var arg = input.apply(2);
+      var p1 = (IIntLit) app.apply(0);
+      var p2 = (IIntLit) app.apply(1);
+      var arg = app.apply(2);
       var extend = p2.value().intValue();
       var declaration =
           new PrincessFunctionDeclaration.PrincessBitvectorExtendDeclaration(extend, false);
@@ -789,24 +781,21 @@ class PrincessFormulaCreator
               FormulaType.getBitvectorTypeWithSize(p1.value().$plus(p2.value()).intValue()),
               declaration));
 
-    } else if (input instanceof IFunApp
-        && ((IFunApp) input).fun().equals(ModuloArithmetic.mod_cast())
-        && input.apply(2) instanceof IFunApp
-        && ((IFunApp) input.apply(2)).fun().equals(ModuloArithmetic.mod_cast())) {
+    } else if (input instanceof IFunApp app1
+        && app1.fun().equals(ModuloArithmetic.mod_cast())
+        && app1.apply(2) instanceof IFunApp app2
+        && app2.fun().equals(ModuloArithmetic.mod_cast())) {
       // Is it sign_extend?
-      var app1 = (IFunApp) input;
       var lower1 = (IIntLit) app1.apply(0);
       var upper1 = (IIntLit) app1.apply(1);
-      var arg1 = app1.apply(2);
       if (!lower1.value().isZero()) {
         throw new AssertionError();
       }
       var size1 = upper1.value().getHighestSetBit() + 1;
 
-      var app2 = (IFunApp) arg1;
       var lower2 = (IIntLit) app2.apply(0);
       var upper2 = (IIntLit) app2.apply(1);
-      var arg2 = app2.apply(2);
+      var arg = app2.apply(2);
       if (lower2.value().isZero()) {
         throw new AssertionError();
       }
@@ -816,7 +805,7 @@ class PrincessFormulaCreator
           new PrincessFunctionDeclaration.PrincessBitvectorExtendDeclaration(size, true);
       return visitor.visitFunction(
           f,
-          ImmutableList.of(encapsulateWithTypeOf(arg2)),
+          ImmutableList.of(encapsulateWithTypeOf(arg)),
           FunctionDeclarationImpl.of(
               declaration.getKind().toString(),
               declaration.getKind(),
@@ -824,11 +813,9 @@ class PrincessFormulaCreator
               FormulaType.getBitvectorTypeWithSize(size1),
               declaration));
 
-    } else if (input instanceof IFunApp
-        && ((IFunApp) input).fun().equals(ModuloArithmetic.mod_cast())) {
+    } else if (input instanceof IFunApp app && app.fun().equals(ModuloArithmetic.mod_cast())) {
       // Is it int_to_bv?
       var kind = FunctionDeclarationKind.INT_TO_BV;
-      var app = (IFunApp) input;
       var lower = (IIntLit) app.apply(0);
       var upper = (IIntLit) app.apply(1);
       var arg = app.apply(2);
@@ -847,13 +834,12 @@ class PrincessFormulaCreator
               FormulaType.getBitvectorTypeWithSize(size),
               declaration));
 
-    } else if (input instanceof IFunApp
-        && ((IFunApp) input).fun().equals(ModuloArithmetic.bv_extract())) {
+    } else if (input instanceof IFunApp app && app.fun().equals(ModuloArithmetic.bv_extract())) {
       // Is it extract?
       var kind = FunctionDeclarationKind.BV_EXTRACT;
-      var upper = ((IIntLit) input.apply(0)).value().intValue();
-      var lower = ((IIntLit) input.apply(1)).value().intValue();
-      var arg = input.apply(2);
+      var upper = ((IIntLit) app.apply(0)).value().intValue();
+      var lower = ((IIntLit) app.apply(1)).value().intValue();
+      var arg = app.apply(2);
       var argType = (FormulaType.BitvectorType) PrincessEnvironment.getFormulaType(arg);
 
       return visitor.visitFunction(
@@ -866,14 +852,13 @@ class PrincessFormulaCreator
               FormulaType.getBitvectorTypeWithSize(upper - lower + 1),
               new PrincessFunctionDeclaration.PrincessBitvectorExtractDeclaration(upper, lower)));
 
-    } else if (input instanceof IFunApp
-        && ((IFunApp) input).fun().equals(ModuloArithmetic.bv_concat())) {
+    } else if (input instanceof IFunApp app && app.fun().equals(ModuloArithmetic.bv_concat())) {
       // Is it concat?
       var kind = FunctionDeclarationKind.BV_CONCAT;
-      var size1 = ((IIntLit) input.apply(0)).value().intValue();
-      var size2 = ((IIntLit) input.apply(1)).value().intValue();
-      var arg1 = input.apply(2);
-      var arg2 = input.apply(3);
+      var size1 = ((IIntLit) app.apply(0)).value().intValue();
+      var size2 = ((IIntLit) app.apply(1)).value().intValue();
+      var arg1 = app.apply(2);
+      var arg2 = app.apply(3);
       var arg1Type = (FormulaType.BitvectorType) PrincessEnvironment.getFormulaType(arg1);
       var arg2Type = (FormulaType.BitvectorType) PrincessEnvironment.getFormulaType(arg2);
 
@@ -887,21 +872,19 @@ class PrincessFormulaCreator
               FormulaType.getBitvectorTypeWithSize(size1 + size2),
               new PrincessFunctionDeclaration.PrincessBitvectorConcatDeclaration()));
 
-    } else if (input instanceof IQuantified) {
+    } else if (input instanceof IQuantified quantified) {
       // Is it a quantifier?
-      return visitQuantifier(visitor, (BooleanFormula) f, (IQuantified) input);
+      return visitQuantifier(visitor, (BooleanFormula) f, quantified);
 
-    } else if (((input instanceof IAtom) && asJavaCollection(((IAtom) input).args()).isEmpty())
+    } else if (((input instanceof IAtom iAtom) && asJavaCollection(iAtom.args()).isEmpty())
         || input instanceof IConstant) {
       // nullary atoms and constant are variables
       return visitor.visitFreeVariable(f, input.toString());
 
-    } else if (input instanceof ITimes) {
-      // Princess encodes nonlinear multiplication as (coefficient* t), where "coefficient" is
-      // an integer constant and "t" is the only subterm
+    } else if (input instanceof ITimes multiplication) {
+      // Princess encodes multiplication as "linear coefficient and factor" with arity 1.
       assert input.length() == 1;
 
-      ITimes multiplication = (ITimes) input;
       IIntLit coeff = new IIntLit(multiplication.coeff());
       FormulaType<IntegerFormula> coeffType = FormulaType.IntegerType;
       IExpression factor = multiplication.subterm();
@@ -951,10 +934,10 @@ class PrincessFormulaCreator
               PrincessEquationDeclaration.INSTANCE));
     }
 
-    if (kind == FunctionDeclarationKind.UF && input instanceof IIntFormula) {
-      assert ((IIntFormula) input).rel().equals(IIntRelation.EqZero());
+    if (kind == FunctionDeclarationKind.UF && input instanceof IIntFormula iIntFormula) {
+      assert iIntFormula.rel().equals(IIntRelation.EqZero());
       // this is really a Boolean formula, visit the lhs of the equation
-      return visit(visitor, f, ((IIntFormula) input).t());
+      return visit(visitor, f, iIntFormula.t());
     }
 
     if (kind == FunctionDeclarationKind.EQ_ZERO) {
@@ -983,17 +966,17 @@ class PrincessFormulaCreator
       // the first argument is the bitsize, and it is not relevant for the user.
       // we do not want type/sort information as arguments.
       arityStart = 1;
-      if (input instanceof IAtom) {
-        solverDeclaration = new PrincessBitvectorToBooleanDeclaration(((IAtom) input).pred());
-      } else if (input instanceof IFunApp) {
-        solverDeclaration = new PrincessBitvectorToBitvectorDeclaration(((IFunApp) input).fun());
+      if (input instanceof IAtom iAtom) {
+        solverDeclaration = new PrincessBitvectorToBooleanDeclaration(iAtom.pred());
+      } else if (input instanceof IFunApp iFunApp) {
+        solverDeclaration = new PrincessBitvectorToBitvectorDeclaration(iFunApp.fun());
       } else {
         throw new AssertionError(
-            String.format("unexpected bitvector operation '%s' for formula '%s'", kind, input));
+            "unexpected bitvector operation '%s' for formula '%s'".formatted(kind, input));
       }
-    } else if (input instanceof IFunApp) {
+    } else if (input instanceof IFunApp iFunApp) {
       if (kind == FunctionDeclarationKind.UF) {
-        solverDeclaration = new PrincessIFunctionDeclaration(((IFunApp) input).fun());
+        solverDeclaration = new PrincessIFunctionDeclaration(iFunApp);
       } else if (kind == FunctionDeclarationKind.MUL) {
         if (getFormulaType(input.apply(0)).isRationalType()) {
           solverDeclaration = PrincessRationalMultiplyDeclaration.INSTANCE;
@@ -1003,7 +986,7 @@ class PrincessFormulaCreator
           throw new IllegalArgumentException();
         }
       } else if (kind == FunctionDeclarationKind.CONST) {
-        solverDeclaration = new PrincessConstArrayDeclaration(environment, (IFunApp) input);
+        solverDeclaration = new PrincessConstArrayDeclaration(environment, iFunApp);
       } else {
         solverDeclaration = new PrincessByExampleDeclaration(input);
       }
@@ -1063,44 +1046,43 @@ class PrincessFormulaCreator
   }
 
   private boolean isBitvectorOperationWithAdditionalArgument(FunctionDeclarationKind kind) {
-    switch (kind) {
-      case BV_NOT:
-      case BV_NEG:
-      case BV_OR:
-      case BV_AND:
-      case BV_XOR:
-      case BV_SUB:
-      case BV_ADD:
-      case BV_SDIV:
-      case BV_UDIV:
-      case BV_SREM:
-      case BV_UREM:
-      case BV_SMOD:
-      case BV_MUL:
-      case BV_ULT:
-      case BV_SLT:
-      case BV_ULE:
-      case BV_SLE:
-      case BV_UGT:
-      case BV_SGT:
-      case BV_UGE:
-      case BV_SGE:
-      case BV_EQ:
-        return true;
-      default:
-        return false;
-    }
+    return switch (kind) {
+      case BV_NOT,
+          BV_NEG,
+          BV_OR,
+          BV_AND,
+          BV_XOR,
+          BV_SUB,
+          BV_ADD,
+          BV_SDIV,
+          BV_UDIV,
+          BV_SREM,
+          BV_UREM,
+          BV_SMOD,
+          BV_MUL,
+          BV_ULT,
+          BV_SLT,
+          BV_ULE,
+          BV_SLE,
+          BV_UGT,
+          BV_SGT,
+          BV_UGE,
+          BV_SGE,
+          BV_EQ ->
+          true;
+      default -> false;
+    };
   }
 
   private FunctionDeclarationKind getDeclarationKind(IExpression input) {
-    assert !(((input instanceof IAtom) && asJavaCollection(((IAtom) input).args()).isEmpty())
+    assert !(((input instanceof IAtom iAtom) && asJavaCollection(iAtom.args()).isEmpty())
             || input instanceof IConstant)
         : "Variables should be handled somewhere else";
 
     if (input instanceof IFormulaITE || input instanceof ITermITE) {
       return FunctionDeclarationKind.ITE;
-    } else if (input instanceof IFunApp) {
-      final IFunction fun = ((IFunApp) input).fun();
+    } else if (input instanceof IFunApp iFunApp) {
+      final IFunction fun = iFunApp.fun();
       final FunctionDeclarationKind theoryKind = theoryFunctionKind.get(fun);
       if (theoryKind != null) {
         return theoryKind;
@@ -1112,13 +1094,15 @@ class PrincessFormulaCreator
         return FunctionDeclarationKind.CONST;
       } else if (fun == ModuloArithmetic.mod_cast()) {
         return FunctionDeclarationKind.INT_TO_BV;
-      } else if (((IFunApp) input).fun().equals(Rationals.fromRing())) {
+      } else if (iFunApp.fun().equals(Rationals.fromRing())) {
         return FunctionDeclarationKind.TO_REAL;
+      } else if (fun == PrincessEnvironment.stringTheory.re_none()) {
+        return FunctionDeclarationKind.RE_NONE;
       } else {
         return FunctionDeclarationKind.UF;
       }
-    } else if (input instanceof IAtom) {
-      final Predicate pred = ((IAtom) input).pred();
+    } else if (input instanceof IAtom iAtom) {
+      final Predicate pred = iAtom.pred();
       return theoryPredKind.getOrDefault(pred, FunctionDeclarationKind.UF);
     } else if (isBinaryFunction(input, IBinJunctor.And())) {
       return FunctionDeclarationKind.AND;
@@ -1135,10 +1119,9 @@ class PrincessFormulaCreator
       return FunctionDeclarationKind.ADD;
     } else if (input instanceof IEquation) {
       return FunctionDeclarationKind.EQ;
-    } else if (input instanceof IIntFormula) {
-      IIntFormula f = (IIntFormula) input;
+    } else if (input instanceof IIntFormula f) {
       if (f.rel().equals(IIntRelation.EqZero())) {
-        final Sort sort = Sort$.MODULE$.sortOf(((IIntFormula) input).t());
+        final Sort sort = Sort$.MODULE$.sortOf(f.t());
         if (sort == Sort.MultipleValueBool$.MODULE$) {
           // Princess does not allow UFs to have return sort 'Bool'
           // Instead, the function returns 'MultiplyValueBool' which is really an integer. The
@@ -1162,15 +1145,21 @@ class PrincessFormulaCreator
   }
 
   private static boolean isBinaryFunction(IExpression t, Enumeration.Value val) {
-    return (t instanceof IBinFormula) && val.equals(((IBinFormula) t).j()); // j is the operator
+    return (t instanceof IBinFormula iBinFormula)
+        && val.equals(iBinFormula.j()); // j is the operator
   }
 
   @Override
   public PrincessFunctionDeclaration declareUFImpl(
       String pName, Sort pReturnType, List<Sort> args) {
-    return new PrincessIFunctionDeclaration(
-        environment.declareFun(
-            pName, pReturnType.equals(BOOL_SORT) ? MultipleValueBool$.MODULE$ : pReturnType, args));
+    if (args.isEmpty()) {
+      return new PrincessByExampleDeclaration(environment.makeVariable(pReturnType, pName));
+    } else {
+      return environment.declareFun(
+          pName,
+          pReturnType.equals(BOOL_SORT) ? Sort.MultipleValueBool$.MODULE$ : pReturnType,
+          args);
+    }
   }
 
   @Override

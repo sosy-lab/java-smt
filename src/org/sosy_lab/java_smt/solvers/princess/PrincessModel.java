@@ -77,11 +77,11 @@ class PrincessModel extends AbstractModel<IExpression, Sort, PrincessEnvironment
   }
 
   private boolean isAbbrev(Set<Predicate> abbrevs, IExpression var) {
-    return var instanceof IAtom && abbrevs.contains(((IAtom) var).pred());
+    return var instanceof IAtom iAtom && abbrevs.contains(iAtom.pred());
   }
 
   private IFormula makeEquality(ITerm key, ITerm value) {
-    if (value instanceof IIntLit && ((IIntLit) value).value().isZero()) {
+    if (value instanceof IIntLit literal && literal.value().isZero()) {
       return IExpression.eqZero(key);
     } else {
       return key.$eq$eq$eq(value);
@@ -93,8 +93,8 @@ class PrincessModel extends AbstractModel<IExpression, Sort, PrincessEnvironment
     // first check array-access.
     // those cases can return multiple assignments per model entry.
     if (creator.getEnv().hasArrayType(key)) {
-      if (key instanceof IConstant && value instanceof IFunApp) {
-        return buildArrayAssignments((IConstant) key, (IFunApp) value);
+      if (key instanceof IConstant iConstant && value instanceof IFunApp iFunApp) {
+        return buildArrayAssignments(iConstant, iFunApp);
       } else {
         return ImmutableList.of();
       }
@@ -107,19 +107,18 @@ class PrincessModel extends AbstractModel<IExpression, Sort, PrincessEnvironment
       IFormula fAssignment;
       List<Object> argumentInterpretations = ImmutableList.of();
 
-      if (key instanceof IAtom) {
-        if (isArrayAccess(((IAtom) key).pred())) { // arrays are handled separately, see above
+      if (key instanceof IAtom iAtom) {
+        if (isArrayAccess(iAtom.pred())) { // arrays are handled separately, see above
           return ImmutableList.of();
         }
         name = key.toString();
-        fAssignment = new IBinFormula(IBinJunctor.Eqv(), (IAtom) key, (IFormula) value);
+        fAssignment = new IBinFormula(IBinJunctor.Eqv(), iAtom, (IFormula) value);
 
-      } else if (key instanceof IConstant) {
+      } else if (key instanceof IConstant iConstant) {
         name = key.toString();
-        fAssignment = makeEquality((IConstant) key, (ITerm) value);
+        fAssignment = makeEquality(iConstant, (ITerm) value);
 
-      } else if (key instanceof IFunApp) {
-        IFunApp cKey = (IFunApp) key;
+      } else if (key instanceof IFunApp cKey) {
         if (isArrayAccess(cKey.fun())) { // arrays are handled separately, see above
           return ImmutableList.of();
         }
@@ -133,7 +132,7 @@ class PrincessModel extends AbstractModel<IExpression, Sort, PrincessEnvironment
 
       } else {
         throw new AssertionError(
-            String.format("unknown type of key: %s -> %s (%s)", key, value, key.getClass()));
+            "unknown type of key: %s -> %s (%s)".formatted(key, value, key.getClass()));
       }
 
       return ImmutableList.of(

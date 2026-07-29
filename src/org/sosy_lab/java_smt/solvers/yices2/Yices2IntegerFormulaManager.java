@@ -8,15 +8,13 @@
 
 package org.sosy_lab.java_smt.solvers.yices2;
 
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_idiv;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_imod;
-
+import com.sri.yices.Terms;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import org.sosy_lab.java_smt.api.IntegerFormulaManager;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 
-public class Yices2IntegerFormulaManager
+class Yices2IntegerFormulaManager
     extends Yices2NumeralFormulaManager<IntegerFormula, IntegerFormula>
     implements IntegerFormulaManager {
 
@@ -42,20 +40,12 @@ public class Yices2IntegerFormulaManager
 
   @Override
   public Integer divide(Integer pParam1, Integer pParam2) {
-    if (isNumeral(pParam2)) {
-      return yices_idiv(pParam1, pParam2);
-    } else {
-      return super.divide(pParam1, pParam2);
-    }
+    return Terms.idiv(pParam1, pParam2);
   }
 
   @Override
   public Integer modulo(Integer pParam1, Integer pParam2) {
-    if (isNumeral(pParam2)) {
-      return yices_imod(pParam1, pParam2);
-    } else {
-      return super.modulo(pParam1, pParam2);
-    }
+    return Terms.imod(pParam1, pParam2);
   }
 
   @Override

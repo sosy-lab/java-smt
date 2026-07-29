@@ -19,12 +19,11 @@ import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.basicimpl.AbstractArrayFormulaManager;
 
 @SuppressWarnings("MethodTypeParameterName")
-public class CVC4ArrayFormulaManager
-    extends AbstractArrayFormulaManager<Expr, Type, ExprManager, Expr> {
+class CVC4ArrayFormulaManager extends AbstractArrayFormulaManager<Expr, Type, ExprManager, Expr> {
 
   private final ExprManager exprManager;
 
-  public CVC4ArrayFormulaManager(CVC4FormulaCreator pFormulaCreator) {
+  CVC4ArrayFormulaManager(CVC4FormulaCreator pFormulaCreator) {
     super(pFormulaCreator);
     exprManager = pFormulaCreator.getEnv();
   }
@@ -51,7 +50,8 @@ public class CVC4ArrayFormulaManager
   protected <TI extends Formula, TE extends Formula> Expr internalMakeArray(
       FormulaType<TI> pIndexType, FormulaType<TE> pElementType, Expr defaultElement) {
     final Type cvc4ArrayType = toSolverType(FormulaType.getArrayType(pIndexType, pElementType));
-    return exprManager.mkConst(new ArrayStoreAll((ArrayType) cvc4ArrayType, defaultElement));
+    return exprManager.mkConst(
+        new ArrayStoreAll(exprManager, (ArrayType) cvc4ArrayType, defaultElement));
   }
 
   @Override

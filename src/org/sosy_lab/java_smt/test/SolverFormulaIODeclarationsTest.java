@@ -2,7 +2,7 @@
 // an API wrapper for a collection of SMT solvers:
 // https://github.com/sosy-lab/java-smt
 //
-// SPDX-FileCopyrightText: 2021 Dirk Beyer <https://www.sosy-lab.org>
+// SPDX-FileCopyrightText: 2025 Dirk Beyer <https://www.sosy-lab.org>
 //
 // SPDX-License-Identifier: Apache-2.0
 
@@ -13,6 +13,7 @@ import static org.junit.Assert.assertThrows;
 import static org.sosy_lab.java_smt.api.FormulaType.BooleanType;
 import static org.sosy_lab.java_smt.api.FormulaType.IntegerType;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.truth.Truth;
 import java.util.EnumSet;
 import org.junit.Before;
@@ -100,6 +101,23 @@ public class SolverFormulaIODeclarationsTest
   }
 
   @Test
+  public void parseInvalidQuery1() {
+    for (final String q :
+        ImmutableList.of("()", "(x)", "(exit)", "(and)", "(or)", "(not)", "(=)")) {
+      assertThrows(IllegalArgumentException.class, () -> mgr.parse(q));
+    }
+  }
+
+  @Test
+  public void parseInvalidQuery2() {
+    for (final String q :
+        ImmutableList.of(
+            "(pop)", "(push)", "(assert)", "(assert true", "(assert", "assert", "1", "true")) {
+      assertThrows(IllegalArgumentException.class, () -> mgr.parse(q));
+    }
+  }
+
+  @Test
   public void parseDeclareNeverTest1() {
     String query = "(assert var)";
     assertThrows(IllegalArgumentException.class, () -> mgr.parse(query));
@@ -167,7 +185,7 @@ public class SolverFormulaIODeclarationsTest
     BitvectorFormula var = bvmgr.makeVariable(8, "x");
     String query =
         "(declare-fun x () (_ BitVec 8))(declare-fun x () (_ BitVec 8))(assert (= x #b00000000))";
-    if (EnumSet.of(Solvers.MATHSAT5, Solvers.BITWUZLA).contains(solverToUse())) {
+    if (EnumSet.of(Solvers.MATHSAT5, Solvers.BITWUZLA, Solvers.CVC5).contains(solverToUse())) {
       BooleanFormula formula = mgr.parse(query);
       Truth.assertThat(mgr.extractVariables(formula).values()).containsExactly(var);
     } else {
@@ -226,7 +244,7 @@ public class SolverFormulaIODeclarationsTest
     String query = "(declare-fun x () Bool)(assert x)";
     BooleanFormula formula = mgr.parse(query);
     Truth.assertThat(mgr.extractVariables(formula).values()).hasSize(1);
-    if (!EnumSet.of(Solvers.PRINCESS, Solvers.Z3, Solvers.BITWUZLA).contains(solverToUse())) {
+    if (!EnumSet.of(Solvers.Z3, Solvers.BITWUZLA).contains(solverToUse())) {
       assertThrows(IllegalArgumentException.class, () -> imgr.makeVariable("x"));
     } else if (EnumSet.of(Solvers.BITWUZLA).contains(solverToUse())) {
       Truth.assertThat(mgr.extractVariables(formula).values())
@@ -292,30 +310,32 @@ public class SolverFormulaIODeclarationsTest
   public void parseAbbreviation() throws SolverException, InterruptedException {
     requireBitvectors();
     String query =
-        "(declare-fun bb () Bool)\n"
-            + "(declare-fun b () Bool)\n"
-            + "(declare-fun |f::v@2| () (_ BitVec 32))\n"
-            + "(declare-fun A_a@ () (_ BitVec 32))\n"
-            + "(declare-fun A_b@ () (_ BitVec 32))\n"
-            + "(declare-fun i1 () (Array (_ BitVec 32) (_ BitVec 32)))\n"
-            + "(declare-fun i2 () (Array (_ BitVec 32) (_ BitVec 32)))\n"
-            + "(declare-fun i3 () (Array (_ BitVec 32) (_ BitVec 32)))\n"
-            + "(declare-fun i4 () (Array (_ BitVec 32) (_ BitVec 32)))\n"
-            + "(define-fun abbrev_9 () Bool (and\n"
-            + " (not bb)\n"
-            + " (= (_ bv0 32) A_a@)\n"
-            + " (= (_ bv4 32) A_b@)\n"
-            + " (= (bvurem A_b@ (_ bv4 32)) (_ bv0 32))\n"
-            + " (bvslt (_ bv0 32) (bvadd A_b@ (_ bv4 32)))\n"
-            + " (= (select i1 A_a@) (_ bv0 32))\n"
-            + " (= (select i1 A_b@) (_ bv0 32))\n"
-            + " (= i2 (store i1 A_b@ (_ bv1 32)))\n"
-            + " (= i3 (store i2 A_a@ (_ bv5 32)))\n"
-            + " (= i4 (store i3 A_a@ (_ bv4 32)))\n"
-            + " (= |f::v@2| (bvsub (bvadd (_ bv4 32) (select i4 A_b@)) (_ bv4 32)))))\n"
-            + "(assert (and\n"
-            + " (not b) abbrev_9\n"
-            + " (not (= |f::v@2| (_ bv1 32)))))";
+        """
+        (declare-fun bb () Bool)
+        (declare-fun b () Bool)
+        (declare-fun |f::v@2| () (_ BitVec 32))
+        (declare-fun A_a@ () (_ BitVec 32))
+        (declare-fun A_b@ () (_ BitVec 32))
+        (declare-fun i1 () (Array (_ BitVec 32) (_ BitVec 32)))
+        (declare-fun i2 () (Array (_ BitVec 32) (_ BitVec 32)))
+        (declare-fun i3 () (Array (_ BitVec 32) (_ BitVec 32)))
+        (declare-fun i4 () (Array (_ BitVec 32) (_ BitVec 32)))
+        (define-fun abbrev_9 () Bool (and
+         (not bb)
+         (= (_ bv0 32) A_a@)
+         (= (_ bv4 32) A_b@)
+         (= (bvurem A_b@ (_ bv4 32)) (_ bv0 32))
+         (bvslt (_ bv0 32) (bvadd A_b@ (_ bv4 32)))
+         (= (select i1 A_a@) (_ bv0 32))
+         (= (select i1 A_b@) (_ bv0 32))
+         (= i2 (store i1 A_b@ (_ bv1 32)))
+         (= i3 (store i2 A_a@ (_ bv5 32)))
+         (= i4 (store i3 A_a@ (_ bv4 32)))
+         (= |f::v@2| (bvsub (bvadd (_ bv4 32) (select i4 A_b@)) (_ bv4 32)))))
+        (assert (and
+         (not b) abbrev_9
+         (not (= |f::v@2| (_ bv1 32)))))\
+        """;
     BooleanFormula parsedQuery = mgr.parse(query);
     assertThatFormula(parsedQuery).isUnsatisfiable();
     assert_().that(mgr.extractVariables(parsedQuery)).hasSize(9);

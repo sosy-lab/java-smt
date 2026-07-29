@@ -19,14 +19,14 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 import org.sosy_lab.java_smt.basicimpl.AbstractBooleanFormulaManager;
 
-public class CVC4BooleanFormulaManager
+class CVC4BooleanFormulaManager
     extends AbstractBooleanFormulaManager<Expr, Type, ExprManager, Expr> {
 
   private final Expr cvc4True;
   private final Expr cvc4False;
   private final ExprManager exprManager;
 
-  protected CVC4BooleanFormulaManager(CVC4FormulaCreator pCreator) {
+  CVC4BooleanFormulaManager(CVC4FormulaCreator pCreator) {
     super(pCreator);
     exprManager = pCreator.getEnv();
     cvc4True = exprManager.mkConst(true);
@@ -84,18 +84,11 @@ public class CVC4BooleanFormulaManager
         operands.add(operand);
       }
     }
-    switch (operands.size()) {
-      case 0:
-        return cvc4True;
-      case 1:
-        return Iterables.getOnlyElement(operands);
-      default:
-        vectorExpr vExpr = new vectorExpr();
-        for (Expr e : operands) {
-          vExpr.add(e);
-        }
-        return exprManager.mkExpr(Kind.AND, vExpr);
-    }
+    return switch (operands.size()) {
+      case 0 -> cvc4True;
+      case 1 -> Iterables.getOnlyElement(operands);
+      default -> exprManager.mkExpr(Kind.AND, new vectorExpr(exprManager, operands));
+    };
   }
 
   @Override
@@ -127,18 +120,11 @@ public class CVC4BooleanFormulaManager
         operands.add(operand);
       }
     }
-    switch (operands.size()) {
-      case 0:
-        return cvc4False;
-      case 1:
-        return Iterables.getOnlyElement(operands);
-      default:
-        vectorExpr vExpr = new vectorExpr();
-        for (Expr e : operands) {
-          vExpr.add(e);
-        }
-        return exprManager.mkExpr(Kind.OR, vExpr);
-    }
+    return switch (operands.size()) {
+      case 0 -> cvc4False;
+      case 1 -> Iterables.getOnlyElement(operands);
+      default -> exprManager.mkExpr(Kind.OR, new vectorExpr(exprManager, operands));
+    };
   }
 
   @Override

@@ -10,6 +10,9 @@ package org.sosy_lab.java_smt.test;
 
 import static com.google.common.truth.Truth.assertThat;
 import static org.junit.Assert.assertThrows;
+import static org.sosy_lab.java_smt.api.FunctionDeclarationKind.SEP_EMP;
+import static org.sosy_lab.java_smt.api.FunctionDeclarationKind.SEP_PTO;
+import static org.sosy_lab.java_smt.api.FunctionDeclarationKind.SEP_STAR;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
@@ -21,12 +24,17 @@ import org.junit.Before;
 import org.junit.Test;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BooleanFormula;
+import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
+import org.sosy_lab.java_smt.api.FunctionDeclaration;
+import org.sosy_lab.java_smt.api.FunctionDeclarationKind;
 import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
+import org.sosy_lab.java_smt.api.visitors.DefaultFormulaVisitor;
+import org.sosy_lab.java_smt.api.visitors.TraversalProcess;
 
 public class SLFormulaManagerTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
 
@@ -71,7 +79,7 @@ public class SLFormulaManagerTest extends SolverBasedTest0.ParameterizedSolverBa
       if (solverToUse() == Solvers.CVC5) {
         assertThatEnvironment(prover).isSatisfiable();
       } else {
-        assertThrows(Exception.class, () -> prover.isUnsat());
+        assertThrows(Exception.class, prover::isUnsat);
       }
       prover.pop();
     }
@@ -306,5 +314,42 @@ public class SLFormulaManagerTest extends SolverBasedTest0.ParameterizedSolverBa
     // list: (n1 -> n2 -> ... -> n10) * cycle: (n10 -> n1)
     BooleanFormula sepTree = slmgr.makeStar(makeStarAll(ptos), ptoLastNil);
     assertThatFormula(sepTree).isSatisfiable(ProverOptions.ENABLE_SEPARATION_LOGIC);
+  }
+
+  @Test
+  public void testVisitSL() {
+    IntegerFormula num0 = imgr.makeNumber(0);
+    IntegerFormula num42 = imgr.makeNumber(42);
+    IntegerFormula p = imgr.makeVariable("p");
+    BooleanFormula pointsTo = slmgr.makePointsTo(p, num42);
+    BooleanFormula emptyHeap =
+        slmgr.makeEmptyHeap(FormulaType.IntegerType, FormulaType.IntegerType);
+    BooleanFormula heap = slmgr.makeStar(pointsTo, emptyHeap);
+
+    List<Formula> visited = new ArrayList<>();
+    List<FunctionDeclarationKind> kinds = new ArrayList<>();
+    mgr.visitRecursively(
+        heap,
+        new DefaultFormulaVisitor<>() {
+          @Override
+          protected TraversalProcess visitDefault(Formula f) {
+            visited.add(f);
+            return TraversalProcess.CONTINUE;
+          }
+
+          @Override
+          public TraversalProcess visitFunction(
+              Formula f, List<Formula> args, FunctionDeclaration<?> functionDeclaration) {
+            kinds.add(functionDeclaration.getKind());
+            return super.visitFunction(f, args, functionDeclaration);
+          }
+        });
+    assertThat(kinds).containsExactly(SEP_STAR, SEP_EMP, SEP_PTO);
+    if (solverToUse() == Solvers.CVC4) {
+      // CVC4 uses a ground-term-based encoding for EMP, which introduces an additional term ZERO.
+      assertThat(visited).containsExactly(heap, pointsTo, emptyHeap, num0, num42, p);
+    } else {
+      assertThat(visited).containsExactly(heap, pointsTo, emptyHeap, num42, p);
+    }
   }
 }

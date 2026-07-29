@@ -8,7 +8,6 @@
 
 package org.sosy_lab.java_smt.solvers.princess;
 
-import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkState;
 import static scala.collection.JavaConverters.asJava;
 import static scala.collection.JavaConverters.asScala;
@@ -74,11 +73,6 @@ class PrincessInterpolatingProver extends PrincessAbstractProver<Integer>
 
   @Override
   public BooleanFormula getInterpolant(Collection<Integer> pTermNamesOfA) throws SolverException {
-    Preconditions.checkState(!closed);
-    checkArgument(
-        getAssertedConstraintIds().containsAll(pTermNamesOfA),
-        "interpolation can only be done over previously asserted formulas.");
-
     Set<Integer> indexesOfA = ImmutableSet.copyOf(pTermNamesOfA);
 
     // calc difference: termNamesOfB := assertedFormulas - termNamesOfA
@@ -94,14 +88,6 @@ class PrincessInterpolatingProver extends PrincessAbstractProver<Integer>
   @Override
   public List<BooleanFormula> getSeqInterpolants(
       final List<? extends Collection<Integer>> pPartitions) throws SolverException {
-    Preconditions.checkState(!closed);
-    Preconditions.checkArgument(
-        !pPartitions.isEmpty(), "at least one partition should be available.");
-    final ImmutableSet<Integer> assertedConstraintIds = getAssertedConstraintIds();
-    checkArgument(
-        pPartitions.stream().allMatch(assertedConstraintIds::containsAll),
-        "interpolation can only be done over previously asserted formulas.");
-
     // convert to needed data-structure
     final ArrayBuffer<scala.collection.immutable.Set<Object>> args = new ArrayBuffer<>();
     for (Collection<Integer> partition : pPartitions) {
@@ -142,9 +128,8 @@ class PrincessInterpolatingProver extends PrincessAbstractProver<Integer>
           Rewriter.rewrite(
               simplified,
               term -> {
-                if (term instanceof IFunApp) {
+                if (term instanceof IFunApp app) {
                   // Rewrite casts to signed bitvectors as casts to unsigned bitvectors
-                  var app = (IFunApp) term;
                   if (app.fun().name().equals("mod_cast")) {
                     var par1 = (IIntLit) app.apply(0);
                     var par2 = (IIntLit) app.apply(1);
@@ -164,15 +149,13 @@ class PrincessInterpolatingProver extends PrincessAbstractProver<Integer>
               unsigned,
               term -> {
                 // Rewrite quantifiers with missing variable sorts
-                if (term instanceof ISortedQuantified) {
-                  var quantified = (ISortedQuantified) term;
+                if (term instanceof ISortedQuantified quantified) {
                   if (quantified.sort().name().equals("any")) {
                     return new ISortedQuantified(
                         quantified.quan(), Integer$.MODULE$, quantified.subformula());
                   }
                 }
-                if (term instanceof ISortedVariable) {
-                  var variable = (ISortedVariable) term;
+                if (term instanceof ISortedVariable variable) {
                   if (variable.sort().name().equals("any")) {
                     return new ISortedVariable(variable.index(), Integer$.MODULE$);
                   }
@@ -184,14 +167,12 @@ class PrincessInterpolatingProver extends PrincessAbstractProver<Integer>
               quantifiedVariableFix,
               term -> {
                 // Add missing conversions for select(arr, idx) if the arrays maps to bitvectors
-                if (term instanceof ITimes) {
-                  var times = (ITimes) term;
+                if (term instanceof ITimes times) {
                   if (!PrincessEnvironment.getFormulaType(times.subterm()).isIntegerType()) {
                     return new ITimes(times.coeff(), ModuloArithmetic.cast2Int(times.subterm()));
                   }
                 }
-                if (term instanceof IPlus) {
-                  var plus = (IPlus) term;
+                if (term instanceof IPlus plus) {
                   var t1 = plus.t1();
                   if (!PrincessEnvironment.getFormulaType(t1).isIntegerType()) {
                     t1 = ModuloArithmetic.cast2Int(t1);
@@ -204,8 +185,7 @@ class PrincessInterpolatingProver extends PrincessAbstractProver<Integer>
                     return new IPlus(t1, t2);
                   }
                 }
-                if (term instanceof IEquation) {
-                  var eq = (IEquation) term;
+                if (term instanceof IEquation eq) {
                   var sort1 = Sort.sortOf(eq.left());
                   var sort2 = Sort.sortOf(eq.right());
                   if (sort1.equals(Integer$.MODULE$) && !sort2.equals(Integer$.MODULE$)) {
@@ -215,8 +195,7 @@ class PrincessInterpolatingProver extends PrincessAbstractProver<Integer>
                     return new IEquation(ModuloArithmetic.cast2Int(eq.left()), eq.right());
                   }
                 }
-                if (term instanceof IIntFormula) {
-                  var formula = (IIntFormula) term;
+                if (term instanceof IIntFormula formula) {
                   if (formula.rel().equals(IIntRelation.GeqZero())
                       || formula.rel().equals(IIntRelation.EqZero())) {
                     if (!Sort.sortOf(formula.t()).equals(Integer$.MODULE$)) {
@@ -231,8 +210,7 @@ class PrincessInterpolatingProver extends PrincessAbstractProver<Integer>
               selectBugFixed,
               term -> {
                 // Rewrite (= term 0) as (=0 term)
-                if (term instanceof IEquation) {
-                  var equation = (IEquation) term;
+                if (term instanceof IEquation equation) {
                   if (equation.right() instanceof IIntLit
                       && ((IIntLit) equation.right()).value().isZero()) {
                     return IExpression.eqZero(equation.left());
@@ -249,14 +227,6 @@ class PrincessInterpolatingProver extends PrincessAbstractProver<Integer>
   public List<BooleanFormula> getTreeInterpolants(
       List<? extends Collection<Integer>> partitionedFormulas, int[] startOfSubTree)
       throws SolverException {
-    Preconditions.checkState(!closed);
-    final ImmutableSet<Integer> assertedConstraintIds = getAssertedConstraintIds();
-    checkArgument(
-        partitionedFormulas.stream().allMatch(assertedConstraintIds::containsAll),
-        "interpolation can only be done over previously asserted formulas.");
-    assert InterpolatingProverEnvironment.checkTreeStructure(
-        partitionedFormulas.size(), startOfSubTree);
-
     // reconstruct the trees from the labels in post-order
     final Deque<Tree<scala.collection.immutable.Set<Object>>> stack = new ArrayDeque<>();
     final Deque<Integer> subtreeStarts = new ArrayDeque<>();

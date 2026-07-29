@@ -14,14 +14,12 @@ import static com.google.common.truth.TruthJUnit.assume;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.Test;
-import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.java_smt.api.BooleanFormula;
+import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
-import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.solvers.opensmt.Logics;
@@ -38,12 +36,10 @@ public class SolverFormulaWithAssumptionsTest
   /**
    * Generate a prover environment depending on the parameter above. Can be overridden to
    * parameterize the test.
-   *
-   * @throws InvalidConfigurationException overriding methods are allowed to throw this
    */
   @SuppressWarnings({"unchecked", "rawtypes", "CheckReturnValue"})
   protected <T> InterpolatingProverEnvironment<T> newEnvironmentForTest()
-      throws InvalidConfigurationException, SolverException, InterruptedException {
+      throws SolverException, InterruptedException {
 
     // check if we support assumption-solving
     try (InterpolatingProverEnvironment<?> env = context.newProverEnvironmentWithInterpolation()) {
@@ -60,12 +56,11 @@ public class SolverFormulaWithAssumptionsTest
 
   @Test
   @SuppressWarnings("CheckReturnValue")
-  public <T> void basicAssumptionsTest()
-      throws SolverException, InterruptedException, InvalidConfigurationException {
+  public <T> void basicAssumptionsTest() throws SolverException, InterruptedException {
     requireInterpolation();
 
-    IntegerFormula v1 = imgr.makeVariable("v1");
-    IntegerFormula v2 = imgr.makeVariable("v2");
+    Formula v1 = makeVariable("v1");
+    Formula v2 = makeVariable("v2");
 
     BooleanFormula suffix1 = bmgr.makeVariable("suffix1");
     BooleanFormula suffix2 = bmgr.makeVariable("suffix2");
@@ -73,11 +68,9 @@ public class SolverFormulaWithAssumptionsTest
 
     BooleanFormula term1 =
         bmgr.or(
-            bmgr.and(imgr.equal(v1, imgr.makeNumber(BigDecimal.ONE)), bmgr.not(imgr.equal(v1, v2))),
-            suffix1);
-    BooleanFormula term2 = bmgr.or(imgr.equal(v2, imgr.makeNumber(BigDecimal.ONE)), suffix2);
-    BooleanFormula term3 =
-        bmgr.or(bmgr.not(imgr.equal(v1, imgr.makeNumber(BigDecimal.ONE))), suffix3);
+            bmgr.and(mgr.makeEqual(v1, makeNumber(1)), bmgr.not(mgr.makeEqual(v1, v2))), suffix1);
+    BooleanFormula term2 = bmgr.or(mgr.makeEqual(v2, makeNumber(1)), suffix2);
+    BooleanFormula term3 = bmgr.or(bmgr.not(mgr.makeEqual(v1, makeNumber(1))), suffix3);
 
     try (InterpolatingProverEnvironment<T> env = newEnvironmentForTest()) {
 
@@ -102,18 +95,17 @@ public class SolverFormulaWithAssumptionsTest
 
   @Test
   @SuppressWarnings("CheckReturnValue")
-  public <T> void assumptionsTest()
-      throws SolverException, InterruptedException, InvalidConfigurationException {
+  public <T> void assumptionsTest() throws SolverException, InterruptedException {
     requireInterpolation();
 
     int n = 5;
 
-    IntegerFormula x = imgr.makeVariable("x");
+    Formula x = makeVariable("x");
     List<BooleanFormula> assignments = new ArrayList<>();
     List<BooleanFormula> suffices = new ArrayList<>();
     List<BooleanFormula> terms = new ArrayList<>();
     for (int i = 0; i < n; i++) {
-      BooleanFormula a = imgr.equal(x, imgr.makeNumber(i));
+      BooleanFormula a = mgr.makeEqual(x, makeNumber(i));
       BooleanFormula suffix = bmgr.makeVariable("suffix" + i);
       assignments.add(a);
       suffices.add(suffix);

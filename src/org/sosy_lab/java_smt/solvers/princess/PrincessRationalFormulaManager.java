@@ -17,7 +17,6 @@ import com.google.common.collect.ImmutableList;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.List;
-import java.util.stream.Collectors;
 import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.api.NumeralFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
@@ -26,7 +25,7 @@ import org.sosy_lab.java_smt.solvers.princess.PrincessFunctionDeclaration.Prince
 import org.sosy_lab.java_smt.solvers.princess.PrincessFunctionDeclaration.PrincessRationalFloorDeclaration;
 import org.sosy_lab.java_smt.solvers.princess.PrincessFunctionDeclaration.PrincessRationalMultiplyDeclaration;
 
-public class PrincessRationalFormulaManager
+class PrincessRationalFormulaManager
     extends PrincessNumeralFormulaManager<NumeralFormula, RationalFormula>
     implements RationalFormulaManager {
 
@@ -42,16 +41,18 @@ public class PrincessRationalFormulaManager
 
   @Override
   protected boolean isNumeral(IExpression value) {
-    if (value instanceof IFunApp) {
-      IFunApp app = (IFunApp) value;
-      switch (app.fun().name()) {
-        case "Rat_fromRing":
+    if (value instanceof IFunApp app) {
+      return switch (app.fun().name()) {
+        case "Rat_fromRing" -> {
           assert app.fun().arity() == 1;
-          return ifmgr.isNumeral(app.apply(0));
-        case "Rat_frac":
+          yield ifmgr.isNumeral(app.apply(0));
+        }
+        case "Rat_frac" -> {
           assert app.fun().arity() == 2;
-          return ifmgr.isNumeral(app.apply(0)) && ifmgr.isNumeral(app.apply(1));
-      }
+          yield ifmgr.isNumeral(app.apply(0)) && ifmgr.isNumeral(app.apply(1));
+        }
+        default -> false;
+      };
     }
     return false;
   }
@@ -151,7 +152,7 @@ public class PrincessRationalFormulaManager
 
   @Override
   protected IExpression distinctImpl(List<IExpression> operands) {
-    List<IExpression> castedOps = operands.stream().map(this::toType).collect(Collectors.toList());
+    List<IExpression> castedOps = operands.stream().map(op -> (IExpression) toType(op)).toList();
     return super.distinctImpl(castedOps);
   }
 

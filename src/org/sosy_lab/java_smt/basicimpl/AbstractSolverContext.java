@@ -54,7 +54,9 @@ public abstract class AbstractSolverContext implements SolverContext {
   public final InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation(
       ProverOptions... options) {
 
-    InterpolatingProverEnvironment<?> out = newProverEnvironmentWithInterpolation0(toSet(options));
+    InterpolatingProverEnvironment<?> out =
+        new InterpolatingProverDelegate<>(newProverEnvironmentWithInterpolation0(toSet(options)));
+
     if (!supportsAssumptionSolving()) {
       // In the case we do not already have a prover environment with assumptions,
       // we add a wrapper to it
@@ -70,7 +72,7 @@ public abstract class AbstractSolverContext implements SolverContext {
   @Override
   public final OptimizationProverEnvironment newOptimizationProverEnvironment(
       ProverOptions... options) {
-    return newOptimizationProverEnvironment0(toSet(options));
+    return new OptimizationProverDelegate(newOptimizationProverEnvironment0(toSet(options)));
   }
 
   protected abstract OptimizationProverEnvironment newOptimizationProverEnvironment0(

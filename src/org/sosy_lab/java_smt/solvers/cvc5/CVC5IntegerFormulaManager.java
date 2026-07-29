@@ -17,8 +17,7 @@ import java.math.BigInteger;
 import org.sosy_lab.java_smt.api.IntegerFormulaManager;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 
-public class CVC5IntegerFormulaManager
-    extends CVC5NumeralFormulaManager<IntegerFormula, IntegerFormula>
+class CVC5IntegerFormulaManager extends CVC5NumeralFormulaManager<IntegerFormula, IntegerFormula>
     implements IntegerFormulaManager {
 
   CVC5IntegerFormulaManager(CVC5FormulaCreator pCreator, NonLinearArithmetic pNonLinearArithmetic) {

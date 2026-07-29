@@ -21,7 +21,7 @@ namespace opensmt {
 %ignore LogicProperty;
 
 %ignore QFLogicToProperties;
-%ignore getLogicFromString(const std::string & name);
+%ignore getLogicFromString(std::string_view name);
 %ignore getStringFromLogic(const Logic_t logic);
 
 %ignore LogicFactory::LogicFactory();

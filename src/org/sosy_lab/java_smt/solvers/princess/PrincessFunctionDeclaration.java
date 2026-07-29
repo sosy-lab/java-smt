@@ -16,7 +16,6 @@ import ap.basetypes.IdealInt;
 import ap.parser.IAtom;
 import ap.parser.IBinFormula;
 import ap.parser.IBinJunctor;
-import ap.parser.IConstant;
 import ap.parser.IExpression;
 import ap.parser.IExpression.BooleanFunApplier;
 import ap.parser.IFormula;
@@ -25,21 +24,21 @@ import ap.parser.IFunction;
 import ap.parser.IIntLit;
 import ap.parser.ITerm;
 import ap.parser.ITermITE;
-import ap.terfor.ConstantTerm;
+import ap.parser.SMTParser2InputAbsy.SMTFunctionType;
 import ap.terfor.preds.Predicate;
 import ap.theories.arrays.ExtArray.ArraySort;
 import ap.theories.bitvectors.ModuloArithmetic$;
 import ap.theories.nia.GroebnerMultiplication;
 import ap.theories.rationals.Rationals;
-import ap.types.MonoSortedIFunction;
 import ap.types.Sort;
 import ap.types.Sort$;
 import ap.types.Sort.MultipleValueBool$;
-import ap.types.SortedConstantTerm;
 import ap.types.SortedIFunction$;
 import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableList;
 import java.util.ArrayList;
 import java.util.List;
+import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FunctionDeclarationKind;
 import scala.Option;
 import scala.collection.immutable.Seq;
@@ -51,7 +50,7 @@ import scala.collection.immutable.Seq;
  * function). The latter case does not have a valid {@code equals}, but it is not necessary, as it's
  * not used in {@link org.sosy_lab.java_smt.basicimpl.FunctionDeclarationImpl}.
  */
-abstract class PrincessFunctionDeclaration {
+abstract sealed class PrincessFunctionDeclaration {
   private PrincessFunctionDeclaration() {}
 
   public abstract IExpression makeApp(PrincessEnvironment environment, List<IExpression> args);
@@ -60,7 +59,7 @@ abstract class PrincessFunctionDeclaration {
 
   public abstract FunctionDeclarationKind getKind();
 
-  private abstract static class AbstractDeclaration<T> extends PrincessFunctionDeclaration {
+  private abstract static sealed class AbstractDeclaration<T> extends PrincessFunctionDeclaration {
 
     /* some object representing the function declaration. */
     final T declarationItem;
@@ -71,11 +70,8 @@ abstract class PrincessFunctionDeclaration {
 
     @Override
     public boolean equals(Object o) {
-      if (!(o instanceof AbstractDeclaration<?>)) {
-        return false;
-      }
-      AbstractDeclaration<?> other = (AbstractDeclaration<?>) o;
-      return declarationItem.equals(other.declarationItem);
+      return o instanceof AbstractDeclaration<?> other
+          && declarationItem.equals(other.declarationItem);
     }
 
     @Override
@@ -92,28 +88,75 @@ abstract class PrincessFunctionDeclaration {
     }
   }
 
-  static class PrincessIFunctionDeclaration extends AbstractDeclaration<IFunction> {
+  static final class PrincessIFunctionDeclaration extends AbstractDeclaration<IFunction> {
+    private final List<FormulaType<?>> argSorts;
+    private final FormulaType<?> returnSort;
 
-    PrincessIFunctionDeclaration(IFunction pApp) {
-      super(pApp);
+    private final IFunction function;
+
+    PrincessIFunctionDeclaration(
+        List<FormulaType<?>> pArgSorts, FormulaType<?> pReturnSort, IFunction pFunction) {
+      super(pFunction);
+
+      argSorts = pArgSorts;
+      returnSort = pReturnSort;
+      function = pFunction;
+    }
+
+    PrincessIFunctionDeclaration(IFunction pFunction, SMTFunctionType pType) {
+      super(pFunction);
+
+      ImmutableList.Builder<FormulaType<?>> builder = ImmutableList.builder();
+      for (int i = 0; i < pType.arguments().size(); i++) {
+        builder.add(
+            PrincessEnvironment.getFormulaTypeFromSort(pType.arguments().apply(i).toSort()));
+      }
+
+      argSorts = builder.build();
+      returnSort = PrincessEnvironment.getFormulaTypeFromSort(pType.result().toSort());
+      function = pFunction;
+    }
+
+    PrincessIFunctionDeclaration(IFunApp pApp) {
+      super(pApp.fun());
+
+      ImmutableList.Builder<FormulaType<?>> builder = ImmutableList.builder();
+      for (int i = 0; i < pApp.fun().arity(); i++) {
+        builder.add(PrincessEnvironment.getFormulaType(pApp.apply(i)));
+      }
+      argSorts = builder.build();
+      returnSort = PrincessEnvironment.getFormulaType(pApp);
+      function = pApp.fun();
+    }
+
+    public IFunction getFunction() {
+      return function;
+    }
+
+    public List<FormulaType<?>> getArgSorts() {
+      return argSorts;
+    }
+
+    public FormulaType<?> getReturnSort() {
+      return returnSort;
     }
 
     @Override
     public IExpression makeApp(PrincessEnvironment env, List<IExpression> args) {
-
-      // TODO: check argument types
-      checkArgument(
-          args.size() == declarationItem.arity(), "functiontype has different number of args.");
-
       final List<ITerm> argsList = new ArrayList<>();
       for (int i = 0; i < args.size(); i++) {
         final IExpression arg = args.get(i);
         final ITerm termArg;
-        if (arg instanceof IFormula) { // boolean term -> build ITE(t,0,1)
+
+        final FormulaType<?> actualType = PrincessEnvironment.getFormulaType(arg);
+        final FormulaType<?> expectedType = argSorts.get(i);
+
+        if (actualType.isBooleanType()) {
+          // boolean term -> build ITE(t,0,1)
           termArg =
               new ITermITE(
                   (IFormula) arg, new IIntLit(IdealInt.ZERO()), new IIntLit(IdealInt.ONE()));
-        } else if (!exprIsRational(arg) && functionTakesRational(i)) {
+        } else if (actualType.isIntegerType() && expectedType.isRationalType()) {
           // sort does not match, so we need  to cast the argument to rational theory.
           termArg = PrincessEnvironment.rationalTheory.int2ring((ITerm) arg);
         } else {
@@ -122,46 +165,16 @@ abstract class PrincessFunctionDeclaration {
         argsList.add(termArg);
       }
       final Seq<ITerm> argsBuf = toSeq(argsList);
-      IFunApp returnFormula = new IFunApp(declarationItem, argsBuf);
-      Sort returnType = SortedIFunction$.MODULE$.iResultSort(declarationItem, returnFormula.args());
+      IFunApp returnFormula = new IFunApp(function, argsBuf);
+      Sort returnType = SortedIFunction$.MODULE$.iResultSort(function, returnFormula.args());
 
       // boolean term, so we have to use the fun-applier instead of the function itself
       if (returnType == MultipleValueBool$.MODULE$) {
-        BooleanFunApplier ap = new BooleanFunApplier(declarationItem);
+        BooleanFunApplier ap = new BooleanFunApplier(function);
         return ap.apply(argsBuf);
       } else {
         return returnFormula;
       }
-    }
-
-    /* Check if the expression returns a "Rational". */
-    private boolean exprIsRational(IExpression arg) {
-      if (arg instanceof IFunApp) {
-        IFunction fun = ((IFunApp) arg).fun();
-        if (fun instanceof MonoSortedIFunction) {
-          Sort sort = ((MonoSortedIFunction) fun).resSort();
-          return PrincessEnvironment.FRACTION_SORT.equals(sort);
-        }
-      }
-      if (arg instanceof IConstant) {
-        ConstantTerm constant = ((IConstant) arg).c();
-        if (constant instanceof SortedConstantTerm) {
-          Sort sort = ((SortedConstantTerm) constant).sort();
-          return PrincessEnvironment.FRACTION_SORT.equals(sort);
-        }
-      }
-      // TODO: What about other terms?
-      return false;
-    }
-
-    /* Checks if the k-th argument of the function is a "Rational". */
-    private boolean functionTakesRational(Integer index) {
-      // we switch from "int" to "Integer" in the signature to avoid ambiguous types with Scala API.
-      if (declarationItem instanceof MonoSortedIFunction) {
-        Sort sort = ((MonoSortedIFunction) declarationItem).argSorts().apply(index);
-        return PrincessEnvironment.rationalTheory.FractionSort().equals(sort);
-      }
-      return false;
     }
 
     @Override
@@ -175,7 +188,7 @@ abstract class PrincessFunctionDeclaration {
     }
   }
 
-  static class PrincessByExampleDeclaration extends AbstractDeclaration<IExpression> {
+  static final class PrincessByExampleDeclaration extends AbstractDeclaration<IExpression> {
 
     PrincessByExampleDeclaration(IExpression pExample) {
       super(pExample);
@@ -197,7 +210,7 @@ abstract class PrincessFunctionDeclaration {
     }
   }
 
-  static class PrincessConstArrayDeclaration extends AbstractDeclaration<ArraySort> {
+  static final class PrincessConstArrayDeclaration extends AbstractDeclaration<ArraySort> {
 
     PrincessConstArrayDeclaration(PrincessEnvironment env, IFunApp pArray) {
       super((ArraySort) Sort$.MODULE$.sortOf(pArray));
@@ -221,7 +234,7 @@ abstract class PrincessFunctionDeclaration {
     }
   }
 
-  static class PrincessBitvectorToBooleanDeclaration extends AbstractDeclaration<Predicate> {
+  static final class PrincessBitvectorToBooleanDeclaration extends AbstractDeclaration<Predicate> {
 
     PrincessBitvectorToBooleanDeclaration(Predicate pPredicate) {
       super(pPredicate);
@@ -255,7 +268,8 @@ abstract class PrincessFunctionDeclaration {
     }
   }
 
-  static class PrincessBitvectorToBitvectorDeclaration extends AbstractDeclaration<IFunction> {
+  static final class PrincessBitvectorToBitvectorDeclaration
+      extends AbstractDeclaration<IFunction> {
 
     PrincessBitvectorToBitvectorDeclaration(IFunction pFunction) {
       super(pFunction);
@@ -289,9 +303,9 @@ abstract class PrincessFunctionDeclaration {
     }
   }
 
-  static class PrincessEquationDeclaration extends PrincessFunctionDeclaration {
+  static final class PrincessEquationDeclaration extends PrincessFunctionDeclaration {
 
-    static final PrincessEquationDeclaration INSTANCE = new PrincessEquationDeclaration() {};
+    static final PrincessEquationDeclaration INSTANCE = new PrincessEquationDeclaration();
 
     private PrincessEquationDeclaration() {}
 
@@ -300,7 +314,7 @@ abstract class PrincessFunctionDeclaration {
       checkArgument(args.size() == 2);
       var left = (ITerm) args.get(0);
       var right = (ITerm) args.get(1);
-      if (right instanceof IIntLit && ((IIntLit) right).value().isZero()) {
+      if (right instanceof IIntLit rightLit && rightLit.value().isZero()) {
         return IExpression.eqZero(left);
       } else {
         return left.$eq$eq$eq(right);
@@ -318,7 +332,7 @@ abstract class PrincessFunctionDeclaration {
     }
   }
 
-  static class PrincessBitvectorFromIntegerDeclaration extends PrincessFunctionDeclaration {
+  static final class PrincessBitvectorFromIntegerDeclaration extends PrincessFunctionDeclaration {
     private final int bitwidth;
 
     public PrincessBitvectorFromIntegerDeclaration(int pBitwidth) {
@@ -342,11 +356,11 @@ abstract class PrincessFunctionDeclaration {
     }
   }
 
-  static class PrincessBitvectorToIntegerDeclaration extends PrincessFunctionDeclaration {
+  static final class PrincessBitvectorToIntegerDeclaration extends PrincessFunctionDeclaration {
     static final PrincessBitvectorToIntegerDeclaration SIGNED =
-        new PrincessBitvectorToIntegerDeclaration(true) {};
+        new PrincessBitvectorToIntegerDeclaration(true);
     static final PrincessBitvectorToIntegerDeclaration UNSIGNED =
-        new PrincessBitvectorToIntegerDeclaration(false) {};
+        new PrincessBitvectorToIntegerDeclaration(false);
 
     private final boolean signed;
 
@@ -381,7 +395,7 @@ abstract class PrincessFunctionDeclaration {
     }
   }
 
-  static class PrincessBitvectorExtendDeclaration extends PrincessFunctionDeclaration {
+  static final class PrincessBitvectorExtendDeclaration extends PrincessFunctionDeclaration {
     private final int extensionBits;
     private final boolean signed;
 
@@ -413,9 +427,9 @@ abstract class PrincessFunctionDeclaration {
     }
   }
 
-  static class PrincessMultiplyDeclaration extends PrincessFunctionDeclaration {
+  static final class PrincessMultiplyDeclaration extends PrincessFunctionDeclaration {
 
-    static final PrincessMultiplyDeclaration INSTANCE = new PrincessMultiplyDeclaration() {};
+    static final PrincessMultiplyDeclaration INSTANCE = new PrincessMultiplyDeclaration();
 
     private PrincessMultiplyDeclaration() {}
 
@@ -436,10 +450,10 @@ abstract class PrincessFunctionDeclaration {
     }
   }
 
-  static class PrincessRationalMultiplyDeclaration extends PrincessFunctionDeclaration {
+  static final class PrincessRationalMultiplyDeclaration extends PrincessFunctionDeclaration {
 
     static final PrincessRationalMultiplyDeclaration INSTANCE =
-        new PrincessRationalMultiplyDeclaration() {};
+        new PrincessRationalMultiplyDeclaration();
 
     private PrincessRationalMultiplyDeclaration() {}
 
@@ -460,9 +474,9 @@ abstract class PrincessFunctionDeclaration {
     }
   }
 
-  static class PrincessRationalDivisionDeclaration extends PrincessFunctionDeclaration {
+  static final class PrincessRationalDivisionDeclaration extends PrincessFunctionDeclaration {
     static final PrincessRationalDivisionDeclaration INSTANCE =
-        new PrincessRationalDivisionDeclaration() {};
+        new PrincessRationalDivisionDeclaration();
 
     private PrincessRationalDivisionDeclaration() {}
 
@@ -486,9 +500,8 @@ abstract class PrincessFunctionDeclaration {
     }
   }
 
-  static class PrincessRationalFloorDeclaration extends PrincessFunctionDeclaration {
-    static final PrincessRationalFloorDeclaration INSTANCE =
-        new PrincessRationalFloorDeclaration() {};
+  static final class PrincessRationalFloorDeclaration extends PrincessFunctionDeclaration {
+    static final PrincessRationalFloorDeclaration INSTANCE = new PrincessRationalFloorDeclaration();
 
     private PrincessRationalFloorDeclaration() {}
 
@@ -509,9 +522,9 @@ abstract class PrincessFunctionDeclaration {
     }
   }
 
-  static class PrincessIntegerDivisionDeclaration extends PrincessFunctionDeclaration {
+  static final class PrincessIntegerDivisionDeclaration extends PrincessFunctionDeclaration {
     static final PrincessIntegerDivisionDeclaration INSTANCE =
-        new PrincessIntegerDivisionDeclaration() {};
+        new PrincessIntegerDivisionDeclaration();
 
     private PrincessIntegerDivisionDeclaration() {}
 
@@ -532,9 +545,8 @@ abstract class PrincessFunctionDeclaration {
     }
   }
 
-  static class PrincessIntegerModuloDeclaration extends PrincessFunctionDeclaration {
-    static final PrincessIntegerModuloDeclaration INSTANCE =
-        new PrincessIntegerModuloDeclaration() {};
+  static final class PrincessIntegerModuloDeclaration extends PrincessFunctionDeclaration {
+    static final PrincessIntegerModuloDeclaration INSTANCE = new PrincessIntegerModuloDeclaration();
 
     private PrincessIntegerModuloDeclaration() {}
 
@@ -555,9 +567,9 @@ abstract class PrincessFunctionDeclaration {
     }
   }
 
-  static class PrincessModularCongruenceDeclaration extends PrincessFunctionDeclaration {
+  static final class PrincessModularCongruenceDeclaration extends PrincessFunctionDeclaration {
     static final PrincessModularCongruenceDeclaration INSTANCE =
-        new PrincessModularCongruenceDeclaration() {};
+        new PrincessModularCongruenceDeclaration();
 
     private PrincessModularCongruenceDeclaration() {}
 
@@ -583,7 +595,7 @@ abstract class PrincessFunctionDeclaration {
     }
   }
 
-  static class PrincessBitvectorExtractDeclaration extends PrincessFunctionDeclaration {
+  static final class PrincessBitvectorExtractDeclaration extends PrincessFunctionDeclaration {
     private final int upper;
     private final int lower;
 
@@ -609,7 +621,7 @@ abstract class PrincessFunctionDeclaration {
     }
   }
 
-  static class PrincessBitvectorConcatDeclaration extends PrincessFunctionDeclaration {
+  static final class PrincessBitvectorConcatDeclaration extends PrincessFunctionDeclaration {
 
     PrincessBitvectorConcatDeclaration() {}
 
@@ -630,8 +642,8 @@ abstract class PrincessFunctionDeclaration {
     }
   }
 
-  static class PrincessStringRangeDeclaration extends PrincessFunctionDeclaration {
-    static final PrincessStringRangeDeclaration INSTANCE = new PrincessStringRangeDeclaration() {};
+  static final class PrincessStringRangeDeclaration extends PrincessFunctionDeclaration {
+    static final PrincessStringRangeDeclaration INSTANCE = new PrincessStringRangeDeclaration();
 
     private PrincessStringRangeDeclaration() {}
 

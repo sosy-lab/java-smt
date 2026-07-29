@@ -17,8 +17,7 @@ import org.sosy_lab.java_smt.api.FormulaType.BitvectorType;
 import org.sosy_lab.java_smt.basicimpl.AbstractArrayFormulaManager;
 
 @SuppressWarnings("MethodTypeParameterName")
-public class BoolectorArrayFormulaManager
-    extends AbstractArrayFormulaManager<Long, Long, Long, Long> {
+class BoolectorArrayFormulaManager extends AbstractArrayFormulaManager<Long, Long, Long, Long> {
 
   private final long btor;
   private final Table<String, Long, Long> nameFormulaCache;

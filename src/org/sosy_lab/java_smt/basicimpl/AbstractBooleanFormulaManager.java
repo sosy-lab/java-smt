@@ -103,17 +103,15 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv, T
 
   @Override
   public BooleanFormula and(Collection<BooleanFormula> pBits) {
-    switch (pBits.size()) {
-      case 0:
-        return makeTrue();
-      case 1:
-        return pBits.iterator().next();
-      case 2:
+    return switch (pBits.size()) {
+      case 0 -> makeTrue();
+      case 1 -> pBits.iterator().next();
+      case 2 -> {
         Iterator<BooleanFormula> it = pBits.iterator();
-        return and(it.next(), it.next());
-      default:
-        return wrap(andImpl(Collections2.transform(pBits, this::extractInfo)));
-    }
+        yield and(it.next(), it.next());
+      }
+      default -> wrap(andImpl(Collections2.transform(pBits, this::extractInfo)));
+    };
   }
 
   /**
@@ -160,17 +158,15 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv, T
 
   @Override
   public BooleanFormula or(Collection<BooleanFormula> pBits) {
-    switch (pBits.size()) {
-      case 0:
-        return makeFalse();
-      case 1:
-        return pBits.iterator().next();
-      case 2:
+    return switch (pBits.size()) {
+      case 0 -> makeFalse();
+      case 1 -> pBits.iterator().next();
+      case 2 -> {
         Iterator<BooleanFormula> it = pBits.iterator();
-        return or(it.next(), it.next());
-      default:
-        return wrap(orImpl(Collections2.transform(pBits, this::extractInfo)));
-    }
+        yield or(it.next(), it.next());
+      }
+      default -> wrap(orImpl(Collections2.transform(pBits, this::extractInfo)));
+    };
   }
 
   /**
@@ -324,34 +320,33 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv, T
     @Override
     public R visitFunction(
         Formula f, List<Formula> args, FunctionDeclaration<?> functionDeclaration) {
-      switch (functionDeclaration.getKind()) {
-        case AND:
-          return delegate.visitAnd(getBoolArgs(args));
-        case NOT:
+      return switch (functionDeclaration.getKind()) {
+        case AND -> delegate.visitAnd(getBoolArgs(args));
+        case NOT -> {
           checkState(args.size() == 1);
           Formula arg = args.get(0);
-
           checkArgument(arg instanceof BooleanFormula);
-          return delegate.visitNot((BooleanFormula) arg);
-        case OR:
-          return delegate.visitOr(getBoolArgs(args));
-        case IFF:
+          yield delegate.visitNot((BooleanFormula) arg);
+        }
+        case OR -> delegate.visitOr(getBoolArgs(args));
+        case IFF -> {
           checkState(args.size() == 2);
           Formula a = args.get(0);
           Formula b = args.get(1);
           checkState(a instanceof BooleanFormula && b instanceof BooleanFormula);
-          return delegate.visitEquivalence((BooleanFormula) a, (BooleanFormula) b);
-        case EQ:
+          yield delegate.visitEquivalence((BooleanFormula) a, (BooleanFormula) b);
+        }
+        case EQ -> {
           if (args.size() == 2
               && args.get(0) instanceof BooleanFormula
               && args.get(1) instanceof BooleanFormula) {
-            return delegate.visitEquivalence(
+            yield delegate.visitEquivalence(
                 (BooleanFormula) args.get(0), (BooleanFormula) args.get(1));
           } else {
-            return delegate.visitAtom(
-                (BooleanFormula) f, toBooleanDeclaration(functionDeclaration));
+            yield delegate.visitAtom((BooleanFormula) f, toBooleanDeclaration(functionDeclaration));
           }
-        case ITE:
+        }
+        case ITE -> {
           checkArgument(args.size() == 3);
           Formula ifC = args.get(0);
           Formula then = args.get(1);
@@ -360,23 +355,26 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv, T
               ifC instanceof BooleanFormula
                   && then instanceof BooleanFormula
                   && elseC instanceof BooleanFormula);
-          return delegate.visitIfThenElse(
+          yield delegate.visitIfThenElse(
               (BooleanFormula) ifC, (BooleanFormula) then, (BooleanFormula) elseC);
-        case XOR:
+        }
+        case XOR -> {
           checkArgument(args.size() == 2);
           Formula a1 = args.get(0);
           Formula a2 = args.get(1);
           checkState(a1 instanceof BooleanFormula && a2 instanceof BooleanFormula);
-          return delegate.visitXor((BooleanFormula) a1, (BooleanFormula) a2);
-        case IMPLIES:
+          yield delegate.visitXor((BooleanFormula) a1, (BooleanFormula) a2);
+        }
+        case IMPLIES -> {
           checkArgument(args.size() == 2);
           Formula b1 = args.get(0);
           Formula b2 = args.get(1);
           checkArgument(b1 instanceof BooleanFormula && b2 instanceof BooleanFormula);
-          return delegate.visitImplication((BooleanFormula) b1, (BooleanFormula) b2);
-        default:
-          return delegate.visitAtom((BooleanFormula) f, toBooleanDeclaration(functionDeclaration));
-      }
+          yield delegate.visitImplication((BooleanFormula) b1, (BooleanFormula) b2);
+        }
+        default ->
+            delegate.visitAtom((BooleanFormula) f, toBooleanDeclaration(functionDeclaration));
+      };
     }
 
     @Override

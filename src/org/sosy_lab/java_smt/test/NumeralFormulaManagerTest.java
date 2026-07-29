@@ -21,6 +21,7 @@ import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FunctionDeclaration;
+import org.sosy_lab.java_smt.api.FunctionDeclarationKind;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
 import org.sosy_lab.java_smt.api.SolverException;
@@ -31,7 +32,7 @@ public class NumeralFormulaManagerTest extends SolverBasedTest0.ParameterizedSol
   @Test
   public void divZeroTest() throws SolverException, InterruptedException {
     requireIntegers();
-    assume().that(solver).isNoneOf(Solvers.OPENSMT, Solvers.YICES2); // No division by zero
+    assume().that(solver).isNotEqualTo(Solvers.OPENSMT); // No division by zero
 
     IntegerFormula zero = imgr.makeNumber(0);
     IntegerFormula three = imgr.makeNumber(3);
@@ -67,7 +68,7 @@ public class NumeralFormulaManagerTest extends SolverBasedTest0.ParameterizedSol
   @Test
   public void modZeroTest() throws SolverException, InterruptedException {
     requireIntegers();
-    assume().that(solver).isNoneOf(Solvers.OPENSMT, Solvers.YICES2); // No division by zero
+    assume().that(solver).isNotEqualTo(Solvers.OPENSMT); // No division by zero
 
     IntegerFormula zero = imgr.makeNumber(0);
     IntegerFormula three = imgr.makeNumber(3);
@@ -222,5 +223,49 @@ public class NumeralFormulaManagerTest extends SolverBasedTest0.ParameterizedSol
             return null;
           }
         });
+  }
+
+  private Formula getOperand(BooleanFormula pFormula, int pIndex) {
+    return mgr.visit(
+        pFormula,
+        new DefaultFormulaVisitor<>() {
+          @Override
+          public Formula visitFunction(
+              Formula f, List<Formula> args, FunctionDeclaration<?> functionDeclaration) {
+            return args.get(pIndex);
+          }
+
+          @Override
+          protected Formula visitDefault(Formula f) {
+            throw new AssertionError();
+          }
+        });
+  }
+
+  private FunctionDeclarationKind getKind(Formula pFormula) {
+    return mgr.visit(
+        pFormula,
+        new DefaultFormulaVisitor<>() {
+          @Override
+          public FunctionDeclarationKind visitFunction(
+              Formula f, List<Formula> args, FunctionDeclaration<?> functionDeclaration) {
+            return functionDeclaration.getKind();
+          }
+
+          @Override
+          protected FunctionDeclarationKind visitDefault(Formula f) {
+            throw new AssertionError();
+          }
+        });
+  }
+
+  @Test
+  public void negateTest() {
+    requireIntegers();
+    requireParser();
+    assume().that(solver).isNoneOf(Solvers.OPENSMT, Solvers.MATHSAT5, Solvers.PRINCESS);
+
+    var f = mgr.parse("(declare-const a Int) (declare-const b Int) (assert (= (- a) b))");
+    assertThat(getKind(getOperand(f, 0))).isEqualTo(FunctionDeclarationKind.UMINUS);
   }
 }

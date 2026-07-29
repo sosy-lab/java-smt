@@ -16,7 +16,7 @@ import org.sosy_lab.java_smt.solvers.opensmt.api.SRef;
 import org.sosy_lab.java_smt.solvers.opensmt.api.SymRef;
 import org.sosy_lab.java_smt.solvers.opensmt.api.VectorPTRef;
 
-public class OpenSmtBooleanFormulaManager
+class OpenSmtBooleanFormulaManager
     extends AbstractBooleanFormulaManager<PTRef, SRef, Logic, SymRef> {
 
   private final Logic logic;

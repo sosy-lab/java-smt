@@ -60,9 +60,7 @@ abstract class Z3NumeralFormulaManager<
 
   @Override
   protected Long negate(Long pNumber) {
-    long sort = Native.getSort(z3context, pNumber);
-    long minusOne = Native.mkInt(z3context, -1, sort);
-    return Native.mkMul(z3context, 2, new long[] {minusOne, pNumber});
+    return Native.mkUnaryMinus(z3context, pNumber);
   }
 
   @Override
@@ -74,6 +72,8 @@ abstract class Z3NumeralFormulaManager<
   protected Long sumImpl(List<Long> operands) {
     if (operands.isEmpty()) {
       return makeNumberImpl(0);
+    } else if (operands.size() == 1) {
+      return operands.get(0);
     } else {
       return Native.mkAdd(z3context, operands.size(), Longs.toArray(operands));
     }

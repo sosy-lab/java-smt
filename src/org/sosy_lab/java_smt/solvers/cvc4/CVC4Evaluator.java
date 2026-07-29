@@ -15,7 +15,7 @@ import edu.stanford.CVC4.SmtEngine;
 import edu.stanford.CVC4.Type;
 import org.sosy_lab.java_smt.basicimpl.AbstractEvaluator;
 
-public class CVC4Evaluator extends AbstractEvaluator<Expr, Type, ExprManager> {
+class CVC4Evaluator extends AbstractEvaluator<Expr, Type, ExprManager> {
 
   private final SmtEngine smtEngine;
   private final CVC4TheoremProver prover;

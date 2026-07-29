@@ -93,6 +93,7 @@ SPDX-License-Identifier: Apache-2.0
             <include name="**/test/RationalFormulaManagerTest.*"/>
             <include name="**/test/SolverContextFactoryTest.*"/>
             <include name="**/test/SolverContextTest.*"/>
+            <include name="**/PackageSanityTest.*"/>
         </patternset>
         <run-junit-tests/>
     </target>

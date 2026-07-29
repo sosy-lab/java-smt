@@ -13,7 +13,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import com.google.common.collect.ImmutableMap;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import org.sosy_lab.common.Appender;
@@ -40,7 +39,7 @@ import org.sosy_lab.java_smt.api.visitors.FormulaTransformationVisitor;
 import org.sosy_lab.java_smt.api.visitors.FormulaVisitor;
 import org.sosy_lab.java_smt.api.visitors.TraversalProcess;
 
-public class DebuggingFormulaManager implements FormulaManager {
+class DebuggingFormulaManager implements FormulaManager {
   private final FormulaManager delegate;
   private final DebuggingAssertions debugging;
 
@@ -150,19 +149,19 @@ public class DebuggingFormulaManager implements FormulaManager {
   }
 
   @Override
-  public BooleanFormula equal(Collection<Formula> pArgs) {
+  public BooleanFormula makeEqual(Iterable<Formula> pArgs) {
     debugging.assertThreadLocal();
     pArgs.forEach(debugging::assertFormulaInContext);
-    BooleanFormula result = delegate.equal(pArgs);
+    BooleanFormula result = delegate.makeEqual(pArgs);
     debugging.addFormulaTerm(result);
     return result;
   }
 
   @Override
-  public BooleanFormula distinct(Collection<Formula> pArgs) {
+  public BooleanFormula makeDistinct(Iterable<Formula> pArgs) {
     debugging.assertThreadLocal();
     pArgs.forEach(debugging::assertFormulaInContext);
-    BooleanFormula result = delegate.distinct(pArgs);
+    BooleanFormula result = delegate.makeDistinct(pArgs);
     debugging.addFormulaTerm(result);
     return result;
   }
@@ -180,6 +179,14 @@ public class DebuggingFormulaManager implements FormulaManager {
     BooleanFormula result = delegate.parse(s);
     debugging.addFormulaTerm(result);
     return result;
+  }
+
+  @Override
+  public List<BooleanFormula> parseAll(String s) throws IllegalArgumentException {
+    debugging.assertThreadLocal();
+    List<BooleanFormula> results = delegate.parseAll(s);
+    results.forEach(debugging::addFormulaTerm);
+    return results;
   }
 
   @Override
@@ -268,8 +275,8 @@ public class DebuggingFormulaManager implements FormulaManager {
 
   @Override
   public BooleanFormula translateFrom(BooleanFormula formula, FormulaManager otherManager) {
-    if (otherManager instanceof DebuggingFormulaManager) {
-      ((DebuggingFormulaManager) otherManager).debugging.assertFormulaInContext(formula);
+    if (otherManager instanceof DebuggingFormulaManager debuggingFormulaManager) {
+      debuggingFormulaManager.debugging.assertFormulaInContext(formula);
     }
     BooleanFormula result = delegate.translateFrom(formula, otherManager);
     debugging.addFormulaTerm(result);

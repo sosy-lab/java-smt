@@ -15,7 +15,7 @@ import org.sosy_lab.java_smt.api.RationalFormulaManager;
 import org.sosy_lab.java_smt.solvers.opensmt.api.PTRef;
 import org.sosy_lab.java_smt.solvers.opensmt.api.SRef;
 
-public class OpenSmtRationalFormulaManager
+class OpenSmtRationalFormulaManager
     extends OpenSmtNumeralFormulaManager<NumeralFormula, RationalFormula>
     implements RationalFormulaManager {
 

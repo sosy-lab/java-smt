@@ -36,12 +36,16 @@ import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractProverWithAllSat;
 import org.sosy_lab.java_smt.basicimpl.CachingModel;
+import org.sosy_lab.java_smt.solvers.z3.Z3SolverContext.Engine;
 
 abstract class Z3AbstractProver extends AbstractProverWithAllSat<Void> {
 
   protected final Z3FormulaCreator creator;
   protected final long z3context;
   protected final Z3FormulaManager mgr;
+
+  protected final Engine engine;
+  protected final Optional<String> logic;
 
   private final UniqueIdGenerator trackId = new UniqueIdGenerator();
   @Nullable private final Deque<PersistentMap<String, BooleanFormula>> storedConstraints;
@@ -51,12 +55,16 @@ abstract class Z3AbstractProver extends AbstractProverWithAllSat<Void> {
   Z3AbstractProver(
       Z3FormulaCreator pCreator,
       Z3FormulaManager pMgr,
+      Optional<String> pLogic,
+      Engine pEngine,
       Set<ProverOptions> pOptions,
       @Nullable PathCounterTemplate pLogfile,
       ShutdownNotifier pShutdownNotifier) {
     super(pOptions, pMgr.getBooleanFormulaManager(), pShutdownNotifier);
     creator = pCreator;
     z3context = creator.getEnv();
+    logic = pLogic;
+    engine = pEngine;
 
     if (pOptions.contains(ProverOptions.GENERATE_UNSAT_CORE)) {
       storedConstraints = new ArrayDeque<>();
@@ -71,20 +79,19 @@ abstract class Z3AbstractProver extends AbstractProverWithAllSat<Void> {
 
   void addParameter(long z3params, String key, Object value) {
     long keySymbol = Native.mkStringSymbol(z3context, key);
-    if (value instanceof Boolean) {
-      Native.paramsSetBool(z3context, z3params, keySymbol, (Boolean) value);
-    } else if (value instanceof Integer) {
-      Native.paramsSetUint(z3context, z3params, keySymbol, (Integer) value);
-    } else if (value instanceof Double) {
-      Native.paramsSetDouble(z3context, z3params, keySymbol, (Double) value);
-    } else if (value instanceof String) {
-      long valueSymbol = Native.mkStringSymbol(z3context, (String) value);
+    if (value instanceof Boolean b) {
+      Native.paramsSetBool(z3context, z3params, keySymbol, b);
+    } else if (value instanceof Integer i) {
+      Native.paramsSetUint(z3context, z3params, keySymbol, i);
+    } else if (value instanceof Double d) {
+      Native.paramsSetDouble(z3context, z3params, keySymbol, d);
+    } else if (value instanceof String string) {
+      long valueSymbol = Native.mkStringSymbol(z3context, string);
       Native.paramsSetSymbol(z3context, z3params, keySymbol, valueSymbol);
     } else {
       throw new IllegalArgumentException(
-          String.format(
-              "unexpected type '%s' with value '%s' for parameter '%s'",
-              value.getClass(), value, key));
+          "unexpected type '%s' with value '%s' for parameter '%s'"
+              .formatted(value.getClass(), value, key));
     }
   }
 
@@ -109,8 +116,7 @@ abstract class Z3AbstractProver extends AbstractProverWithAllSat<Void> {
 
   @SuppressWarnings("resource")
   @Override
-  public Model getModel() throws SolverException {
-    checkGenerateModels();
+  protected Model getModelImpl() throws SolverException {
     return new CachingModel(getEvaluatorWithoutChecks());
   }
 
@@ -131,7 +137,7 @@ abstract class Z3AbstractProver extends AbstractProverWithAllSat<Void> {
     long e = creator.extractInfo(f);
     try {
       if (storedConstraints != null) { // Unsat core generation is on.
-        String varName = String.format("Z3_UNSAT_CORE_%d", trackId.getFreshId());
+        String varName = "Z3_UNSAT_CORE_%d".formatted(trackId.getFreshId());
         BooleanFormula t = mgr.getBooleanFormulaManager().makeVariable(varName);
         assertContraintAndTrack(e, creator.extractInfo(t));
         storedConstraints.push(storedConstraints.pop().putAndCopy(varName, f));
@@ -219,9 +225,8 @@ abstract class Z3AbstractProver extends AbstractProverWithAllSat<Void> {
         builder.put(key, Double.toString(Native.statsGetDoubleValue(z3context, stats, i)));
       } else {
         throw new IllegalStateException(
-            String.format(
-                "Unknown data entry value for key %s at position %d in statistics '%s'",
-                key, i, Native.statsToString(z3context, stats)));
+            "Unknown data entry value for key %s at position %d in statistics '%s'"
+                .formatted(key, i, Native.statsToString(z3context, stats)));
       }
     }
 

@@ -5,7 +5,7 @@ This file is part of JavaSMT,
 an API wrapper for a collection of SMT solvers:
 https://github.com/sosy-lab/java-smt
 
-SPDX-FileCopyrightText: 2024 Dirk Beyer <https://www.sosy-lab.org>
+SPDX-FileCopyrightText: 2026 Dirk Beyer <https://www.sosy-lab.org>
 
 SPDX-License-Identifier: Apache-2.0
 -->
@@ -18,16 +18,20 @@ SPDX-License-Identifier: Apache-2.0
     <property name="cvc5.downloads" value="./downloads/cvc5"/>
     <property name="cvc5.distDir" value="${ivy.solver.dist.dir}/cvc5"/>
 
-    <target name="download-cvc5">
+    <target name="init-cvc5" description="Clean up CVC5 binaries and Java bindings.">
         <fail unless="cvc5.version">
             Please specify a version with the flag -Dcvc5.version=XXX.
             The version must match one of the daily builds from https://github.com/cvc5/cvc5/releases
         </fail>
 
+        <delete dir="${cvc5.distDir}" quiet="true"/>
+
         <mkdir dir="${cvc5.downloads}"/>
         <mkdir dir="${cvc5.distDir}/x64"/>
         <mkdir dir="${cvc5.distDir}/arm64"/>
+    </target>
 
+    <target name="download-cvc5" depends="init-cvc5" description="Download CVC5 binaries and Java bindings.">
         <!-- Download binaries for Linux on x64 -->
         <get src="${cvc5.url}/cvc5-Linux-x86_64-static-${cvc5.version}.zip" dest="${cvc5.downloads}" verbose="true"/>
         <unzip src="${cvc5.downloads}/cvc5-Linux-x86_64-static-${cvc5.version}.zip" dest="${cvc5.distDir}/x64">
@@ -63,6 +67,7 @@ SPDX-License-Identifier: Apache-2.0
             <mapper type="merge" to="libcvc5jni-${cvc5.version}.dll"/>
         </unzip>
 
+        <!-- Download binaries for Windows on arm64 -->
         <get src="${cvc5.url}/cvc5-Win64-arm64-static-${cvc5.version}.zip" dest="${cvc5.downloads}" verbose="true"/>
         <unzip src="${cvc5.downloads}/cvc5-Win64-arm64-static-${cvc5.version}.zip" dest="${cvc5.distDir}/arm64">
             <patternset><include name="cvc5-Win64-arm64-static/bin/cvc5jni.dll"/></patternset>
@@ -70,10 +75,79 @@ SPDX-License-Identifier: Apache-2.0
         </unzip>
 
         <!-- Download the Java bindings -->
-        <get src="${cvc5.url}/cvc5-Linux-arm64-java-api-${cvc5.version}.jar" dest="${cvc5.distDir}/cvc5-${cvc5.version}.jar" verbose="true"/>
+        <get src="${cvc5.url}/cvc5-Linux-arm64-java-api-${cvc5.version}.jar" dest="${cvc5.downloads}/cvc5-${cvc5.version}.jar" verbose="true"/>
+        <!-- Remove bundled binary -->
+        <zip destfile="${cvc5.distDir}/cvc5-${cvc5.version}.jar">
+            <zipfileset src="${cvc5.downloads}/cvc5-${cvc5.version}.jar">
+                <exclude name="cvc5-libs/**/*"/>
+            </zipfileset>
+        </zip>
     </target>
 
-    <target name="publish-cvc5" depends="download-cvc5, load-ivy" description="Publish CVC5 binaries to Ivy repository.">
+    <target name="download-cvc5-sources" depends="init-cvc5" description="Download CVC5 source code.">
+        <!-- Download the source code and get the exact version matching the downloaded binaries -->
+        <delete dir="${cvc5.downloads}/cvc5-sources" quiet="true"/>
+        <exec executable="git" dir="${cvc5.downloads}" failonerror="true">
+            <arg value="clone"/>
+            <arg value="https://github.com/cvc5/cvc5.git"/>
+            <arg value="cvc5-sources"/>
+        </exec>
+        <!-- Get the git revision from CVC5 version -->
+        <loadresource property="cvc5.gitVersion">
+            <concat>${cvc5.version}</concat>
+            <filterchain>
+                <replaceregex pattern="\d{4}-\d{2}-\d{2}-(.*)" replace="\1"/>
+            </filterchain>
+        </loadresource>
+        <!-- Checkout the matching version -->
+        <exec executable="git" dir="${cvc5.downloads}/cvc5-sources" failonerror="true">
+            <arg value="checkout"/>
+            <arg value="${cvc5.gitVersion}"/>
+        </exec>
+    </target>
+
+    <target name="package-cvc5-sources" depends="download-cvc5-sources" description="Package CVC5 source code into a JAR file.">
+        <jar destfile="${cvc5.distDir}/cvc5-${cvc5.version}-sources.jar" whenmanifestonly="fail">
+            <zipfileset dir="${cvc5.downloads}/cvc5-sources/src/api/java" includes="**/*.java"/>
+            <zipfileset dir="${cvc5.downloads}/cvc5-sources" includes="COPYING" prefix="META-INF"/>
+            <manifest>
+                <attribute name="Implementation-Title" value="cvc5"/>
+                <attribute name="Implementation-Version" value="${cvc5.version}"/>
+            </manifest>
+        </jar>
+    </target>
+
+    <target name="package-cvc5-javadoc" depends="download-cvc5-sources" description="Generate Javadoc for CVC5 Java API and package it into a JAR file.">
+        <delete dir="${cvc5.downloads}/cvc5-javadoc" quiet="true"/>
+        <javadoc destdir="${cvc5.downloads}/cvc5-javadoc"
+                 classpathref="classpath"
+                 locale="en_US"
+                 encoding="utf-8"
+                 windowtitle="cvc5"
+                 failonerror="true"
+                 failonwarning="false">
+            <fileset dir="${cvc5.downloads}/cvc5-sources/src/api/java">
+                <include name="**/*.java"/>
+            </fileset>
+            <link href="https://docs.oracle.com/en/java/javase/17/docs/api/"/>
+            <doctitle><![CDATA[<h1>cvc5</h1>]]></doctitle>
+            <tag name="api.note" description="Note:"/>
+            <arg line="${javadoc.doclint}"/>
+            <arg line="--allow-script-in-comments"/>
+            <!-- JVM inherits system language. We need to force it to use en_US instead of local language. -->
+            <arg value="-J-Duser.language=en" />
+            <arg value="-J-Duser.country=US" />
+            <arg value="-locale" /><arg value="en_US" />
+            <arg value="-docencoding" /><arg value="UTF-8" />
+            <arg value="-charset" /><arg value="UTF-8" />
+        </javadoc>
+        <jar jarfile="${cvc5.distDir}/cvc5-${cvc5.version}-javadoc.jar" whenmanifestonly="fail">
+            <zipfileset dir="${cvc5.downloads}/cvc5-sources" includes="COPYING" prefix="META-INF"/>
+            <zipfileset dir="${cvc5.downloads}/cvc5-javadoc"/>
+        </jar>
+    </target>
+
+    <target name="publish-cvc5" depends="download-cvc5, package-cvc5-sources, package-cvc5-javadoc, load-ivy" description="Publish CVC5 binaries to Ivy repository.">
         <ivy:resolve conf="solver-cvc5" file="solvers_ivy_conf/ivy_cvc5.xml"/>
         <publishToRepository solverName="CVC5" solverVersion="${cvc5.version}" distDir="${cvc5.distDir}"/>
 

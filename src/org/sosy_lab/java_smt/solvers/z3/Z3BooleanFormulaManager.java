@@ -102,14 +102,11 @@ class Z3BooleanFormulaManager extends AbstractBooleanFormulaManager<Long, Long, 
         operands.add(operand);
       }
     }
-    switch (operands.size()) {
-      case 0:
-        return z3false;
-      case 1:
-        return Iterables.getOnlyElement(operands);
-      default:
-        return Native.mkOr(z3context, operands.size(), Longs.toArray(operands));
-    }
+    return switch (operands.size()) {
+      case 0 -> z3false;
+      case 1 -> Iterables.getOnlyElement(operands);
+      default -> Native.mkOr(z3context, operands.size(), Longs.toArray(operands));
+    };
   }
 
   @Override
@@ -125,14 +122,11 @@ class Z3BooleanFormulaManager extends AbstractBooleanFormulaManager<Long, Long, 
         operands.add(operand);
       }
     }
-    switch (operands.size()) {
-      case 0:
-        return z3true;
-      case 1:
-        return Iterables.getOnlyElement(operands);
-      default:
-        return Native.mkAnd(z3context, operands.size(), Longs.toArray(operands));
-    }
+    return switch (operands.size()) {
+      case 0 -> z3true;
+      case 1 -> Iterables.getOnlyElement(operands);
+      default -> Native.mkAnd(z3context, operands.size(), Longs.toArray(operands));
+    };
   }
 
   @Override

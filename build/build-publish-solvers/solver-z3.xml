@@ -164,7 +164,6 @@ SPDX-License-Identifier: Apache-2.0
             windowtitle="${z3.project.name}"
             failonerror="false"
             failonwarning="false"
-            overview="doc/javadoc_overview.html"
             >
             <fileset dir="${z3.path}/src/api/java">
                 <include name="**/*.java"/>

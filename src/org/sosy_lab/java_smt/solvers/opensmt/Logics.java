@@ -37,70 +37,38 @@ public enum Logics {
   QF_AUFLIRA; // includes all logics that OpenSMT supports for now.
 
   boolean doesLogicSupportArrays() {
-    switch (this) {
-      case QF_AX:
-      case QF_ALIA:
-      case QF_ALRA:
-      case QF_AUFLIA:
-      case QF_AUFLRA:
-      case QF_AUFLIRA:
-        return true;
-      default:
-        return false;
-    }
+    return switch (this) {
+      case QF_AX, QF_ALIA, QF_ALRA, QF_AUFLIA, QF_AUFLRA, QF_AUFLIRA -> true;
+      default -> false;
+    };
   }
 
   boolean doesLogicSupportUFs() {
-    switch (this) {
-      case QF_UF:
-      case QF_UFLIA:
-      case QF_UFLRA:
-      case QF_AUFLIA:
-      case QF_AUFLRA:
-      case QF_AUFLIRA:
-        return true;
-      default:
-        return false;
-    }
+    return switch (this) {
+      case QF_UF, QF_UFLIA, QF_UFLRA, QF_AUFLIA, QF_AUFLRA, QF_AUFLIRA -> true;
+      default -> false;
+    };
   }
 
   boolean doesLogicSupportIntegers() {
-    switch (this) {
-      case QF_IDL:
-      case QF_LIA:
-      case QF_ALIA:
-      case QF_UFLIA:
-      case QF_AUFLIA:
-      case QF_AUFLIRA:
-        return true;
-      default:
-        return false;
-    }
+    return switch (this) {
+      case QF_IDL, QF_LIA, QF_ALIA, QF_UFLIA, QF_AUFLIA, QF_AUFLIRA -> true;
+      default -> false;
+    };
   }
 
   boolean doesLogicSupportReals() {
-    switch (this) {
-      case QF_RDL:
-      case QF_LRA:
-      case QF_ALRA:
-      case QF_UFLRA:
-      case QF_AUFLRA:
-      case QF_AUFLIRA:
-        return true;
-      default:
-        return false;
-    }
+    return switch (this) {
+      case QF_RDL, QF_LRA, QF_ALRA, QF_UFLRA, QF_AUFLRA, QF_AUFLIRA -> true;
+      default -> false;
+    };
   }
 
   /** OpenSMT only supports interpolation for specific logics, and no logic combinations. */
   boolean doesLogicSupportInterpolation() {
-    switch (this) {
-      case QF_UF:
-      case QF_LIA:
-      case QF_LRA:
-        return true;
-      default:
-        return false;
-    }
+    return switch (this) {
+      case QF_UF, QF_LIA, QF_LRA -> true;
+      default -> false;
+    };
   }
 }

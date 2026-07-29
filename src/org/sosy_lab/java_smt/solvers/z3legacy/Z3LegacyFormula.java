@@ -29,7 +29,7 @@ import org.sosy_lab.java_smt.api.RegexFormula;
 import org.sosy_lab.java_smt.api.StringFormula;
 
 @Immutable
-abstract class Z3LegacyFormula implements Formula {
+abstract sealed class Z3LegacyFormula implements Formula {
 
   private final long z3expr;
   private final long z3context;
@@ -55,11 +55,9 @@ abstract class Z3LegacyFormula implements Formula {
     if (obj == this) {
       return true;
     }
-    if (!(obj instanceof Z3LegacyFormula)) {
-      return false;
-    }
-    Z3LegacyFormula other = (Z3LegacyFormula) obj;
-    return (z3context == other.z3context) && Native.isEqAst(z3context, z3expr, other.z3expr);
+    return obj instanceof Z3LegacyFormula other
+        && z3context == other.z3context
+        && Native.isEqAst(z3context, z3expr, other.z3expr);
   }
 
   @Override
