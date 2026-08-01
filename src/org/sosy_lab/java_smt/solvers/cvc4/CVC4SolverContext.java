@@ -31,23 +31,23 @@ public final class CVC4SolverContext extends AbstractSolverContext {
 
   // creator is final, except after closing, then null.
   private CVC4FormulaCreator creator;
-  private final ShutdownNotifier shutdownNotifier;
+  private final ShutdownNotifier contextShutdownNotifier;
   private final int randomSeed;
 
   private CVC4SolverContext(
       CVC4FormulaCreator creator,
       CVC4FormulaManager manager,
-      ShutdownNotifier pShutdownNotifier,
+      ShutdownNotifier pContextShutdownNotifier,
       int pRandomSeed) {
     super(manager);
     this.creator = creator;
-    shutdownNotifier = pShutdownNotifier;
+    contextShutdownNotifier = pContextShutdownNotifier;
     randomSeed = pRandomSeed;
   }
 
   public static SolverContext create(
       LogManager pLogger,
-      ShutdownNotifier pShutdownNotifier,
+      ShutdownNotifier pContextShutdownNotifier,
       int randomSeed,
       NonLinearArithmetic pNonLinearArithmetic,
       FloatingPointRoundingMode pFloatingPointRoundingMode,
@@ -106,7 +106,7 @@ public final class CVC4SolverContext extends AbstractSolverContext {
             slTheory,
             strTheory);
 
-    return new CVC4SolverContext(creator, manager, pShutdownNotifier, randomSeed);
+    return new CVC4SolverContext(creator, manager, pContextShutdownNotifier, randomSeed);
   }
 
   @Override
@@ -130,7 +130,7 @@ public final class CVC4SolverContext extends AbstractSolverContext {
   public ProverEnvironment newProverEnvironment0(Set<ProverOptions> pOptions) {
     return new CVC4TheoremProver(
         creator,
-        shutdownNotifier,
+        contextShutdownNotifier,
         randomSeed,
         pOptions,
         getFormulaManager().getBooleanFormulaManager());

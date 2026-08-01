@@ -37,7 +37,7 @@ public final class OpenSmtSolverContext extends AbstractSolverContext {
   @SuppressWarnings("unused")
   private final LogManager logger;
 
-  private final ShutdownNotifier shutdownNotifier;
+  private final ShutdownNotifier contextShutdownNotifier;
   private final OpenSMTOptions solverOptions;
 
   private boolean closed = false;
@@ -97,21 +97,21 @@ public final class OpenSmtSolverContext extends AbstractSolverContext {
       OpenSmtFormulaCreator pCreator,
       OpenSmtFormulaManager pManager,
       LogManager pLogger,
-      ShutdownNotifier pShutdownNotifier,
+      ShutdownNotifier pContextShutdownNotifier,
       OpenSMTOptions pSolverOptions) {
 
     super(pManager);
     creator = pCreator;
     manager = pManager;
     logger = pLogger;
-    shutdownNotifier = pShutdownNotifier;
+    contextShutdownNotifier = pContextShutdownNotifier;
     solverOptions = pSolverOptions;
   }
 
   public static SolverContext create(
       Configuration config,
       LogManager pLogger,
-      ShutdownNotifier pShutdownNotifier,
+      ShutdownNotifier pContextShutdownNotifier,
       long pRandom,
       NonLinearArithmetic pNonLinearArithmetic,
       Consumer<String> pLoader)
@@ -139,7 +139,8 @@ public final class OpenSmtSolverContext extends AbstractSolverContext {
         new OpenSmtFormulaManager(
             creator, functionTheory, booleanTheory, integerTheory, rationalTheory, arrayTheory);
 
-    return new OpenSmtSolverContext(creator, manager, pLogger, pShutdownNotifier, solverOptions);
+    return new OpenSmtSolverContext(
+        creator, manager, pLogger, pContextShutdownNotifier, solverOptions);
   }
 
   @Override
@@ -171,7 +172,7 @@ public final class OpenSmtSolverContext extends AbstractSolverContext {
       Set<SolverContext.ProverOptions> pProverOptions) {
     Preconditions.checkState(!closed, "solver context is already closed");
     return new OpenSmtTheoremProver(
-        creator, manager, shutdownNotifier, pProverOptions, solverOptions);
+        creator, manager, contextShutdownNotifier, pProverOptions, solverOptions);
   }
 
   @Override
@@ -179,7 +180,7 @@ public final class OpenSmtSolverContext extends AbstractSolverContext {
       Set<SolverContext.ProverOptions> pProverOptions) {
     Preconditions.checkState(!closed, "solver context is already closed");
     return new OpenSmtInterpolatingProver(
-        creator, manager, shutdownNotifier, pProverOptions, solverOptions);
+        creator, manager, contextShutdownNotifier, pProverOptions, solverOptions);
   }
 
   @Override

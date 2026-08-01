@@ -115,7 +115,7 @@ public final class Mathsat5SolverContext extends AbstractSolverContext {
   private final Mathsat5Settings settings;
   private final long randomSeed;
 
-  private final ShutdownNotifier shutdownNotifier;
+  private final ShutdownNotifier contextShutdownNotifier;
   private final TerminationCallback terminationTest;
   private final Mathsat5FormulaCreator creator;
   private boolean closed = false;
@@ -128,7 +128,7 @@ public final class Mathsat5SolverContext extends AbstractSolverContext {
       long mathsatConfig,
       Mathsat5Settings settings,
       long randomSeed,
-      final ShutdownNotifier shutdownNotifier,
+      final ShutdownNotifier contextShutdownNotifier,
       Mathsat5FormulaManager manager,
       Mathsat5FormulaCreator creator) {
     super(manager);
@@ -138,12 +138,12 @@ public final class Mathsat5SolverContext extends AbstractSolverContext {
     this.mathsatConfig = mathsatConfig;
     this.settings = settings;
     this.randomSeed = randomSeed;
-    this.shutdownNotifier = shutdownNotifier;
+    this.contextShutdownNotifier = contextShutdownNotifier;
     this.creator = creator;
 
     terminationTest =
         () -> {
-          shutdownNotifier.shutdownIfNecessary();
+          contextShutdownNotifier.shutdownIfNecessary();
           return false;
         };
   }
@@ -165,7 +165,7 @@ public final class Mathsat5SolverContext extends AbstractSolverContext {
   public static Mathsat5SolverContext create(
       LogManager logger,
       Configuration config,
-      ShutdownNotifier pShutdownNotifier,
+      ShutdownNotifier pContextShutdownNotifier,
       @Nullable PathCounterTemplate solverLogFile,
       long randomSeed,
       FloatingPointRoundingMode pFloatingPointRoundingMode,
@@ -233,7 +233,7 @@ public final class Mathsat5SolverContext extends AbstractSolverContext {
             settings.useExtendedSMTLIB2Output,
             settings.dumpSMTLIB2LetExpressions);
     return new Mathsat5SolverContext(
-        logger, msatConf, settings, randomSeed, pShutdownNotifier, manager, creator);
+        logger, msatConf, settings, randomSeed, pContextShutdownNotifier, manager, creator);
   }
 
   @VisibleForTesting
@@ -287,21 +287,21 @@ public final class Mathsat5SolverContext extends AbstractSolverContext {
   @Override
   protected ProverEnvironment newProverEnvironment0(Set<ProverOptions> options) {
     Preconditions.checkState(!closed, "solver context is already closed");
-    return new Mathsat5TheoremProver(this, shutdownNotifier, creator, options);
+    return new Mathsat5TheoremProver(this, contextShutdownNotifier, creator, options);
   }
 
   @Override
   protected InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation0(
       Set<ProverOptions> options) {
     Preconditions.checkState(!closed, "solver context is already closed");
-    return new Mathsat5InterpolatingProver(this, shutdownNotifier, creator, options);
+    return new Mathsat5InterpolatingProver(this, contextShutdownNotifier, creator, options);
   }
 
   @Override
   public OptimizationProverEnvironment newOptimizationProverEnvironment0(
       Set<ProverOptions> options) {
     Preconditions.checkState(!closed, "solver context is already closed");
-    return new Mathsat5OptimizationProver(this, shutdownNotifier, creator, options);
+    return new Mathsat5OptimizationProver(this, contextShutdownNotifier, creator, options);
   }
 
   @Override

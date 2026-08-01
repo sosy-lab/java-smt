@@ -60,8 +60,8 @@ abstract class Z3LegacyAbstractProver<T> extends AbstractProverWithAllSat<T> {
       Z3LegacyFormulaManager pMgr,
       Set<ProverOptions> pOptions,
       @Nullable PathCounterTemplate pLogfile,
-      ShutdownNotifier pShutdownNotifier) {
-    super(pOptions, pMgr.getBooleanFormulaManager(), pShutdownNotifier);
+      ShutdownNotifier pContextShutdownNotifier) {
+    super(pOptions, pMgr.getBooleanFormulaManager(), pContextShutdownNotifier);
     creator = pCreator;
     z3context = creator.getEnv();
     z3solver = Native.mkSolver(z3context);
@@ -69,7 +69,7 @@ abstract class Z3LegacyAbstractProver<T> extends AbstractProverWithAllSat<T> {
     Native.solverIncRef(z3context, z3solver);
 
     interruptListener = reason -> Native.interrupt(z3context);
-    shutdownNotifier.register(interruptListener);
+    contextShutdownNotifier.register(interruptListener);
 
     if (pOptions.contains(ProverOptions.GENERATE_UNSAT_CORE)) {
       storedConstraints = new ArrayDeque<>();
@@ -239,7 +239,7 @@ abstract class Z3LegacyAbstractProver<T> extends AbstractProverWithAllSat<T> {
   private void undefinedStatusToException(int solverStatus)
       throws SolverException, InterruptedException {
     if (solverStatus == Z3_lbool.Z3_L_UNDEF.toInt()) {
-      creator.shutdownNotifier.shutdownIfNecessary();
+      creator.contextShutdownNotifier.shutdownIfNecessary();
       final String reason = Native.solverGetReasonUnknown(z3context, z3solver);
       switch (reason) {
         // see Z3:
@@ -289,9 +289,7 @@ abstract class Z3LegacyAbstractProver<T> extends AbstractProverWithAllSat<T> {
   }
 
   @Override
-  public List<BooleanFormula> getUnsatCore() {
-    Preconditions.checkState(!closed);
-    checkGenerateUnsatCores();
+  public List<BooleanFormula> getUnsatCoreImpl() {
     if (storedConstraints == null) {
       throw new UnsupportedOperationException(
           "Option to generate the UNSAT core wasn't enabled when creating the prover environment.");
@@ -312,9 +310,8 @@ abstract class Z3LegacyAbstractProver<T> extends AbstractProverWithAllSat<T> {
   }
 
   @Override
-  public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(
+  protected Optional<List<BooleanFormula>> unsatCoreOverAssumptionsImpl(
       Collection<BooleanFormula> assumptions) throws SolverException, InterruptedException {
-    checkGenerateUnsatCoresOverAssumptions();
     if (!isUnsatWithAssumptions(assumptions)) {
       return Optional.empty();
     }
@@ -330,10 +327,7 @@ abstract class Z3LegacyAbstractProver<T> extends AbstractProverWithAllSat<T> {
   }
 
   @Override
-  public ImmutableMap<String, String> getStatistics() {
-    // Z3 sigsevs if you try to get statistics for closed environments
-    Preconditions.checkState(!closed);
-
+  public ImmutableMap<String, String> getStatisticsImpl() {
     ImmutableMap.Builder<String, String> builder = ImmutableMap.builder();
     Set<String> seenKeys = new HashSet<>();
 
@@ -380,7 +374,7 @@ abstract class Z3LegacyAbstractProver<T> extends AbstractProverWithAllSat<T> {
 
       Native.solverReset(z3context, z3solver); // remove all assertions from the solver
       Native.solverDecRef(z3context, z3solver);
-      shutdownNotifier.unregister(interruptListener);
+      contextShutdownNotifier.unregister(interruptListener);
       if (storedConstraints != null) {
         storedConstraints.clear();
       }
@@ -389,10 +383,10 @@ abstract class Z3LegacyAbstractProver<T> extends AbstractProverWithAllSat<T> {
   }
 
   @Override
-  public <R> R allSat(AllSatCallback<R> callback, List<BooleanFormula> important)
+  protected <R> R allSatImpl(AllSatCallback<R> callback, List<BooleanFormula> important)
       throws InterruptedException, SolverException {
     try {
-      return super.allSat(callback, important);
+      return super.allSatImpl(callback, important);
     } catch (Z3Exception e) {
       throw creator.handleZ3Exception(e);
     }

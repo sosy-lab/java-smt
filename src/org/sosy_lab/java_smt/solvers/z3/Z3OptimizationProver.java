@@ -46,8 +46,8 @@ class Z3OptimizationProver extends Z3AbstractProver implements OptimizationProve
       Set<ProverOptions> pOptions,
       ImmutableMap<String, Object> pSolverOptions,
       @Nullable PathCounterTemplate pLogfile,
-      ShutdownNotifier pShutdownNotifier) {
-    super(creator, pMgr, pLogic, pEngine, pOptions, pLogfile, pShutdownNotifier);
+      ShutdownNotifier pContextShutdownNotifier) {
+    super(creator, pMgr, pLogic, pEngine, pOptions, pLogfile, pContextShutdownNotifier);
     z3optSolver = Native.mkOptimize(z3context);
     Native.optimizeIncRef(z3context, z3optSolver);
     logger = pLogger;
@@ -89,7 +89,7 @@ class Z3OptimizationProver extends Z3AbstractProver implements OptimizationProve
     if (status == Z3_lbool.Z3_L_FALSE.toInt()) {
       return OptStatus.UNSAT;
     } else if (status == Z3_lbool.Z3_L_UNDEF.toInt()) {
-      creator.shutdownNotifier.shutdownIfNecessary();
+      creator.contextShutdownNotifier.shutdownIfNecessary();
       logger.log(
           Level.INFO,
           "Solver returned an unknown status, explanation: ",

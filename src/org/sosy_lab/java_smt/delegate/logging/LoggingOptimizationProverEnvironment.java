@@ -30,13 +30,13 @@ class LoggingOptimizationProverEnvironment extends LoggingBasicProverEnvironment
   }
 
   @Override
-  public int maximize(Formula objective) {
+  public int maximize(Formula objective) throws InterruptedException {
     logger.log(Level.FINE, "Maximizing:", objective);
     return wrapped.maximize(objective);
   }
 
   @Override
-  public int minimize(Formula objective) {
+  public int minimize(Formula objective) throws InterruptedException {
     logger.log(Level.FINE, "Minimizing:", objective);
     return wrapped.minimize(objective);
   }
@@ -49,12 +49,12 @@ class LoggingOptimizationProverEnvironment extends LoggingBasicProverEnvironment
   }
 
   @Override
-  public Optional<Rational> upper(int handle, Rational epsilon) {
+  public Optional<Rational> upper(int handle, Rational epsilon) throws InterruptedException {
     return wrapped.upper(handle, epsilon);
   }
 
   @Override
-  public Optional<Rational> lower(int handle, Rational epsilon) {
+  public Optional<Rational> lower(int handle, Rational epsilon) throws InterruptedException {
     return wrapped.lower(handle, epsilon);
   }
 }

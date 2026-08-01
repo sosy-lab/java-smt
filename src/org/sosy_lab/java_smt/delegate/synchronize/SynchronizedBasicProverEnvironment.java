@@ -32,7 +32,7 @@ class SynchronizedBasicProverEnvironment<T> implements BasicProverEnvironment<T>
   }
 
   @Override
-  public void pop() {
+  public void pop() throws InterruptedException {
     synchronized (sync) {
       delegate.pop();
     }
@@ -76,14 +76,14 @@ class SynchronizedBasicProverEnvironment<T> implements BasicProverEnvironment<T>
 
   @SuppressWarnings("resource")
   @Override
-  public Model getModel() throws SolverException {
+  public Model getModel() throws SolverException, InterruptedException {
     synchronized (sync) {
       return new SynchronizedModel(delegate.getModel(), sync);
     }
   }
 
   @Override
-  public List<BooleanFormula> getUnsatCore() {
+  public List<BooleanFormula> getUnsatCore() throws InterruptedException {
     synchronized (sync) {
       return delegate.getUnsatCore();
     }
@@ -98,7 +98,7 @@ class SynchronizedBasicProverEnvironment<T> implements BasicProverEnvironment<T>
   }
 
   @Override
-  public ImmutableMap<String, String> getStatistics() {
+  public ImmutableMap<String, String> getStatistics() throws InterruptedException {
     synchronized (sync) {
       return delegate.getStatistics();
     }

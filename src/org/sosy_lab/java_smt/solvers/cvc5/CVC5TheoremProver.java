@@ -23,12 +23,13 @@ class CVC5TheoremProver extends CVC5AbstractProver<Void>
 
   CVC5TheoremProver(
       CVC5FormulaCreator pFormulaCreator,
-      ShutdownNotifier pShutdownNotifier,
+      ShutdownNotifier pContextShutdownNotifier,
       int pRandomSeed,
       ImmutableSet<ProverOptions> pOptions,
       FormulaManager pMgr,
       ImmutableMap<String, String> pFurtherOptionsMap) {
-    super(pFormulaCreator, pShutdownNotifier, pRandomSeed, pOptions, pMgr, pFurtherOptionsMap);
+    super(
+        pFormulaCreator, pContextShutdownNotifier, pRandomSeed, pOptions, pMgr, pFurtherOptionsMap);
   }
 
   @Override

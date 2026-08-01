@@ -10,6 +10,7 @@
 
 package org.sosy_lab.java_smt.delegate.trace;
 
+import com.google.common.collect.ImmutableMap;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -35,7 +36,7 @@ class TraceBasicProverEnvironment<T> implements BasicProverEnvironment<T> {
   }
 
   @Override
-  public void pop() {
+  public void pop() throws InterruptedException {
     logger.logStmt(logger.toVariable(this), "pop()", delegate::pop);
   }
 
@@ -73,7 +74,7 @@ class TraceBasicProverEnvironment<T> implements BasicProverEnvironment<T> {
 
   @SuppressWarnings("resource")
   @Override
-  public Model getModel() throws SolverException {
+  public Model getModel() throws SolverException, InterruptedException {
     return logger.logDefKeep(
         logger.toVariable(this),
         "getModel()",
@@ -81,7 +82,7 @@ class TraceBasicProverEnvironment<T> implements BasicProverEnvironment<T> {
   }
 
   @Override
-  public List<BooleanFormula> getUnsatCore() {
+  public List<BooleanFormula> getUnsatCore() throws InterruptedException {
     return mgr.rebuildAll(
         logger.logDefDiscard(logger.toVariable(this), "getUnsatCore()", delegate::getUnsatCore));
   }
@@ -96,6 +97,12 @@ class TraceBasicProverEnvironment<T> implements BasicProverEnvironment<T> {
                 .formatted(logger.toVariables(assumptions)),
             () -> delegate.unsatCoreOverAssumptions(assumptions))
         .map(mgr::rebuildAll);
+  }
+
+  @Override
+  public ImmutableMap<String, String> getStatistics() throws InterruptedException {
+    return logger.logDefDiscard(
+        logger.toVariable(this), "getStatistics()", delegate::getStatistics);
   }
 
   @Override

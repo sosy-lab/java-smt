@@ -57,19 +57,17 @@ abstract class Mathsat5AbstractProver<T2> extends AbstractProver<T2> {
   protected final long curEnv;
   private final long curConfig;
   protected final Mathsat5FormulaCreator creator;
-  private final ShutdownNotifier shutdownNotifier;
 
   protected Mathsat5AbstractProver(
       Mathsat5SolverContext pContext,
       Set<ProverOptions> pOptions,
       Mathsat5FormulaCreator pCreator,
-      ShutdownNotifier pShutdownNotifier) {
-    super(pOptions);
+      ShutdownNotifier pContextShutdownNotifier) {
+    super(pOptions, pContextShutdownNotifier);
     context = pContext;
     creator = pCreator;
     curConfig = buildConfig(pOptions);
     curEnv = context.createEnvironment(curConfig);
-    shutdownNotifier = pShutdownNotifier;
   }
 
   private long buildConfig(Set<ProverOptions> opts) {
@@ -184,18 +182,14 @@ abstract class Mathsat5AbstractProver<T2> extends AbstractProver<T2> {
   }
 
   @Override
-  public List<BooleanFormula> getUnsatCore() {
-    checkGenerateUnsatCores();
+  public List<BooleanFormula> getUnsatCoreImpl() {
     long[] terms = msat_get_unsat_core(curEnv);
     return encapsulate(terms);
   }
 
   @Override
-  public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(
+  protected Optional<List<BooleanFormula>> unsatCoreOverAssumptionsImpl(
       Collection<BooleanFormula> assumptions) throws SolverException, InterruptedException {
-    Preconditions.checkNotNull(assumptions);
-    checkGenerateUnsatCoresOverAssumptions();
-
     closeAllEvaluators();
 
     if (!isUnsatWithAssumptions(assumptions)) {
@@ -215,9 +209,8 @@ abstract class Mathsat5AbstractProver<T2> extends AbstractProver<T2> {
   }
 
   @Override
-  public ImmutableMap<String, String> getStatistics() {
+  public ImmutableMap<String, String> getStatisticsImpl() {
     // Mathsat sigsevs if you try to get statistics for closed environments
-    Preconditions.checkState(!closed);
     final String stats = msat_get_search_stats(curEnv);
     return ImmutableMap.copyOf(
         Splitter.on("\n").trimResults().omitEmptyStrings().withKeyValueSeparator(" ").split(stats));
@@ -237,9 +230,8 @@ abstract class Mathsat5AbstractProver<T2> extends AbstractProver<T2> {
   }
 
   @Override
-  public <T> T allSat(AllSatCallback<T> callback, List<BooleanFormula> important)
+  protected <T> T allSatImpl(AllSatCallback<T> callback, List<BooleanFormula> important)
       throws InterruptedException, SolverException {
-    checkGenerateAllSat();
     closeAllEvaluators();
 
     long[] imp = new long[important.size()];
@@ -274,7 +266,7 @@ abstract class Mathsat5AbstractProver<T2> extends AbstractProver<T2> {
 
     @Override
     public void callback(long[] model) throws InterruptedException {
-      shutdownNotifier.shutdownIfNecessary();
+      contextShutdownNotifier.shutdownIfNecessary();
       clientCallback.apply(Longs.asList(model).stream().map(creator::encapsulateBoolean).toList());
     }
   }

@@ -131,7 +131,7 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
 
   // todo: getters for statistic.
   private final Timer cleanupTimer = new Timer();
-  protected final ShutdownNotifier shutdownNotifier;
+  protected final ShutdownNotifier contextShutdownNotifier;
 
   @SuppressWarnings("ParameterNumber")
   Z3FormulaCreator(
@@ -142,10 +142,10 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
       long pStringType,
       long pRegexType,
       Configuration config,
-      ShutdownNotifier pShutdownNotifier)
+      ShutdownNotifier pContextShutdownNotifier)
       throws InvalidConfigurationException {
     super(pEnv, pBoolType, pIntegerType, pRealType, pStringType, pRegexType);
-    shutdownNotifier = pShutdownNotifier;
+    contextShutdownNotifier = pContextShutdownNotifier;
     config.inject(this);
 
     if (usePhantomReferences) {
@@ -168,7 +168,7 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
   final SolverException handleZ3Exception(Z3Exception e)
       throws SolverException, InterruptedException {
     if (Z3_INTERRUPT_ERRORS.contains(e.getMessage())) {
-      shutdownNotifier.shutdownIfNecessary();
+      contextShutdownNotifier.shutdownIfNecessary();
     }
     throw new SolverException("Z3 has thrown an exception", e);
   }

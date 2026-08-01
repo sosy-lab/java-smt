@@ -51,8 +51,8 @@ class Z3LegacyInterpolatingProver extends Z3LegacyAbstractProver<Long>
       Z3LegacyFormulaManager pMgr,
       Set<ProverOptions> pOptions,
       @Nullable PathCounterTemplate pLogfile,
-      ShutdownNotifier pShutdownNotifier) {
-    super(pCreator, pMgr, pOptions, pLogfile, pShutdownNotifier);
+      ShutdownNotifier pContextShutdownNotifier) {
+    super(pCreator, pMgr, pOptions, pLogfile, pContextShutdownNotifier);
   }
 
   @CanIgnoreReturnValue

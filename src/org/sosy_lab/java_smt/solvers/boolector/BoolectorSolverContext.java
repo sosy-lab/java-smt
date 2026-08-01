@@ -62,23 +62,23 @@ public final class BoolectorSolverContext extends AbstractSolverContext {
 
   private final BoolectorFormulaManager manager;
   private final BoolectorFormulaCreator creator;
-  private final ShutdownNotifier shutdownNotifier;
+  private final ShutdownNotifier contextShutdownNotifier;
   private final AtomicBoolean closed = new AtomicBoolean(false);
   private final AtomicBoolean isAnyStackAlive = new AtomicBoolean(false);
 
   BoolectorSolverContext(
       BoolectorFormulaManager pManager,
       BoolectorFormulaCreator pCreator,
-      ShutdownNotifier pShutdownNotifier) {
+      ShutdownNotifier pContextShutdownNotifier) {
     super(pManager);
     manager = pManager;
     creator = pCreator;
-    shutdownNotifier = pShutdownNotifier;
+    contextShutdownNotifier = pContextShutdownNotifier;
   }
 
   public static BoolectorSolverContext create(
       Configuration config,
-      ShutdownNotifier pShutdownNotifier,
+      ShutdownNotifier pContextShutdownNotifier,
       @Nullable PathCounterTemplate solverLogfile,
       long randomSeed,
       Consumer<String> pLoader)
@@ -98,7 +98,7 @@ public final class BoolectorSolverContext extends AbstractSolverContext {
     BoolectorFormulaManager manager =
         new BoolectorFormulaManager(
             creator, functionTheory, booleanTheory, bitvectorTheory, arrayTheory);
-    return new BoolectorSolverContext(manager, creator, pShutdownNotifier);
+    return new BoolectorSolverContext(manager, creator, pContextShutdownNotifier);
   }
 
   @Override
@@ -198,7 +198,7 @@ public final class BoolectorSolverContext extends AbstractSolverContext {
   protected ProverEnvironment newProverEnvironment0(Set<ProverOptions> pOptions) {
     Preconditions.checkState(!closed.get(), "solver context is already closed");
     return new BoolectorTheoremProver(
-        manager, creator, creator.getEnv(), shutdownNotifier, pOptions, isAnyStackAlive);
+        manager, creator, creator.getEnv(), contextShutdownNotifier, pOptions, isAnyStackAlive);
   }
 
   @Override

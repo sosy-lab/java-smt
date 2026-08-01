@@ -59,8 +59,8 @@ abstract class Z3AbstractProver extends AbstractProverWithAllSat<Void> {
       Engine pEngine,
       Set<ProverOptions> pOptions,
       @Nullable PathCounterTemplate pLogfile,
-      ShutdownNotifier pShutdownNotifier) {
-    super(pOptions, pMgr.getBooleanFormulaManager(), pShutdownNotifier);
+      ShutdownNotifier pContextShutdownNotifier) {
+    super(pOptions, pMgr.getBooleanFormulaManager(), pContextShutdownNotifier);
     creator = pCreator;
     z3context = creator.getEnv();
     logic = pLogic;
@@ -167,8 +167,7 @@ abstract class Z3AbstractProver extends AbstractProverWithAllSat<Void> {
   protected abstract long getUnsatCore0();
 
   @Override
-  public List<BooleanFormula> getUnsatCore() {
-    checkGenerateUnsatCores();
+  public List<BooleanFormula> getUnsatCoreImpl() {
     if (storedConstraints == null) {
       throw new UnsupportedOperationException(
           "Option to generate the UNSAT core wasn't enabled when creating the prover environment.");
@@ -189,9 +188,8 @@ abstract class Z3AbstractProver extends AbstractProverWithAllSat<Void> {
   }
 
   @Override
-  public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(
+  protected Optional<List<BooleanFormula>> unsatCoreOverAssumptionsImpl(
       Collection<BooleanFormula> assumptions) throws SolverException, InterruptedException {
-    checkGenerateUnsatCoresOverAssumptions();
     if (!isUnsatWithAssumptions(assumptions)) {
       return Optional.empty();
     }
@@ -209,10 +207,7 @@ abstract class Z3AbstractProver extends AbstractProverWithAllSat<Void> {
   protected abstract long getStatistics0();
 
   @Override
-  public ImmutableMap<String, String> getStatistics() {
-    // Z3 sigsevs if you try to get statistics for closed environments
-    Preconditions.checkState(!closed);
-
+  public ImmutableMap<String, String> getStatisticsImpl() {
     ImmutableMap.Builder<String, String> builder = ImmutableMap.builder();
     Set<String> seenKeys = new HashSet<>();
 
@@ -261,10 +256,10 @@ abstract class Z3AbstractProver extends AbstractProverWithAllSat<Void> {
   }
 
   @Override
-  public <R> R allSat(AllSatCallback<R> callback, List<BooleanFormula> important)
+  protected <R> R allSatImpl(AllSatCallback<R> callback, List<BooleanFormula> important)
       throws InterruptedException, SolverException {
     try {
-      return super.allSat(callback, important);
+      return super.allSatImpl(callback, important);
     } catch (Z3Exception e) {
       throw creator.handleZ3Exception(e);
     }

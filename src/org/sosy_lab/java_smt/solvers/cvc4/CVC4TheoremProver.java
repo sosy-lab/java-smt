@@ -58,11 +58,11 @@ class CVC4TheoremProver extends AbstractProverWithAllSat<Void>
 
   CVC4TheoremProver(
       CVC4FormulaCreator pFormulaCreator,
-      ShutdownNotifier pShutdownNotifier,
+      ShutdownNotifier pContextShutdownNotifier,
       int pRandomSeed,
       Set<ProverOptions> pOptions,
       BooleanFormulaManager pBmgr) {
-    super(pOptions, pBmgr, pShutdownNotifier);
+    super(pOptions, pBmgr, pContextShutdownNotifier);
 
     creator = pFormulaCreator;
     randomSeed = pRandomSeed;
@@ -182,13 +182,13 @@ class CVC4TheoremProver extends AbstractProverWithAllSat<Void>
     }
 
     Result result;
-    try (ShutdownHook hook = new ShutdownHook(shutdownNotifier, smtEngine::interrupt)) {
-      shutdownNotifier.shutdownIfNecessary();
+    try (ShutdownHook hook = new ShutdownHook(contextShutdownNotifier, smtEngine::interrupt)) {
+      shutdownIfNecessary();
       result = smtEngine.checkSat();
     } catch (Exception e) {
       throw new SolverException("CVC4 failed during satisfiability check", e);
     } finally {
-      shutdownNotifier.shutdownIfNecessary();
+      shutdownIfNecessary();
     }
     return convertSatResult(result);
   }
@@ -211,8 +211,7 @@ class CVC4TheoremProver extends AbstractProverWithAllSat<Void>
   }
 
   @Override
-  public List<BooleanFormula> getUnsatCore() {
-    checkGenerateUnsatCores();
+  public List<BooleanFormula> getUnsatCoreImpl() {
     List<BooleanFormula> converted = new ArrayList<>();
     for (Expr aCore : smtEngine.getUnsatCore()) {
       converted.add(creator.encapsulateBoolean(exportExpr(aCore)));
@@ -227,8 +226,8 @@ class CVC4TheoremProver extends AbstractProverWithAllSat<Void>
   }
 
   @Override
-  public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(
-      Collection<BooleanFormula> pAssumptions) throws SolverException, InterruptedException {
+  protected Optional<List<BooleanFormula>> unsatCoreOverAssumptionsImpl(
+      Collection<BooleanFormula> pAssumptions) {
     throw new UnsupportedOperationException(UNSAT_CORE_WITH_ASSUMPTIONS_NOT_SUPPORTED);
   }
 

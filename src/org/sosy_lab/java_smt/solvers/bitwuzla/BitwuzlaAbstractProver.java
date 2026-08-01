@@ -8,7 +8,6 @@
 
 package org.sosy_lab.java_smt.solvers.bitwuzla;
 
-import com.google.common.base.Preconditions;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.Lists;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
@@ -41,7 +40,7 @@ abstract class BitwuzlaAbstractProver<T> extends AbstractProverWithAllSat<T> {
       new Terminator() {
         @Override
         public boolean terminate() {
-          return shutdownNotifier.shouldShutdown(); // shutdownNotifer is defined in the superclass
+          return shouldShutdown();
         }
       };
   private static final UniqueIdGenerator ID_GENERATOR = new UniqueIdGenerator();
@@ -54,10 +53,10 @@ abstract class BitwuzlaAbstractProver<T> extends AbstractProverWithAllSat<T> {
   BitwuzlaAbstractProver(
       BitwuzlaFormulaManager pManager,
       BitwuzlaFormulaCreator pCreator,
-      ShutdownNotifier pShutdownNotifier,
+      ShutdownNotifier pContextShutdownNotifier,
       Set<ProverOptions> pOptions,
       Options pSolverOptions) {
-    super(pOptions, pManager.getBooleanFormulaManager(), pShutdownNotifier);
+    super(pOptions, pManager.getBooleanFormulaManager(), pContextShutdownNotifier);
     creator = pCreator;
 
     // Bitwuzla guarantees that Terms and Sorts are shared
@@ -127,7 +126,7 @@ abstract class BitwuzlaAbstractProver<T> extends AbstractProverWithAllSat<T> {
       return false;
     } else if (resultValue == Result.UNSAT) {
       return true;
-    } else if (resultValue == Result.UNKNOWN && shutdownNotifier.shouldShutdown()) {
+    } else if (resultValue == Result.UNKNOWN && shouldShutdown()) {
       throw new InterruptedException();
     } else {
       throw new SolverException("Bitwuzla returned UNKNOWN.");
@@ -177,8 +176,7 @@ abstract class BitwuzlaAbstractProver<T> extends AbstractProverWithAllSat<T> {
    * returned <code>false</code>.
    */
   @Override
-  public List<BooleanFormula> getUnsatCore() {
-    checkGenerateUnsatCores();
+  public List<BooleanFormula> getUnsatCoreImpl() {
     return Lists.transform(env.get_unsat_core(), creator::encapsulateBoolean);
   }
 
@@ -191,11 +189,8 @@ abstract class BitwuzlaAbstractProver<T> extends AbstractProverWithAllSat<T> {
    *     assumptions which is unsatisfiable with the original constraints otherwise.
    */
   @Override
-  public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(
+  protected Optional<List<BooleanFormula>> unsatCoreOverAssumptionsImpl(
       Collection<BooleanFormula> assumptions) throws SolverException, InterruptedException {
-    Preconditions.checkNotNull(assumptions);
-    checkGenerateUnsatCoresOverAssumptions();
-
     changedSinceLastSatQuery = true;
 
     Collection<Term> newAssumptions = new LinkedHashSet<>();

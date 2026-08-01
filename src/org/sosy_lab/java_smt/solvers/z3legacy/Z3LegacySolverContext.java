@@ -44,7 +44,7 @@ import org.sosy_lab.java_smt.basicimpl.AbstractSolverContext;
 public final class Z3LegacySolverContext extends AbstractSolverContext {
 
   private final ShutdownRequestListener interruptListener;
-  private final ShutdownNotifier shutdownNotifier;
+  private final ShutdownNotifier contextShutdownNotifier;
   private final ExtraOptions extraOptions;
   private final Z3LegacyFormulaCreator creator;
   private final Z3LegacyFormulaManager manager;
@@ -81,15 +81,15 @@ public final class Z3LegacySolverContext extends AbstractSolverContext {
 
   private Z3LegacySolverContext(
       Z3LegacyFormulaCreator pFormulaCreator,
-      ShutdownNotifier pShutdownNotifier,
+      ShutdownNotifier pContextShutdownNotifier,
       Z3LegacyFormulaManager pManager,
       ExtraOptions pExtraOptions) {
     super(pManager);
 
     creator = pFormulaCreator;
     interruptListener = reason -> Native.interrupt(pFormulaCreator.getEnv());
-    shutdownNotifier = pShutdownNotifier;
-    pShutdownNotifier.register(interruptListener);
+    contextShutdownNotifier = pContextShutdownNotifier;
+    pContextShutdownNotifier.register(interruptListener);
     manager = pManager;
     extraOptions = pExtraOptions;
   }
@@ -98,7 +98,7 @@ public final class Z3LegacySolverContext extends AbstractSolverContext {
   public static synchronized Z3LegacySolverContext create(
       LogManager logger,
       Configuration config,
-      ShutdownNotifier pShutdownNotifier,
+      ShutdownNotifier pContextShutdownNotifier,
       @Nullable PathCounterTemplate solverLogfile,
       long randomSeed,
       FloatingPointRoundingMode pFloatingPointRoundingMode,
@@ -164,7 +164,7 @@ public final class Z3LegacySolverContext extends AbstractSolverContext {
             stringSort,
             regexSort,
             config,
-            pShutdownNotifier);
+            pContextShutdownNotifier);
 
     // Create managers
     Z3LegacyUFManager functionTheory = new Z3LegacyUFManager(creator);
@@ -201,7 +201,7 @@ public final class Z3LegacySolverContext extends AbstractSolverContext {
             arrayManager,
             stringTheory,
             enumTheory);
-    return new Z3LegacySolverContext(creator, pShutdownNotifier, manager, extraOptions);
+    return new Z3LegacySolverContext(creator, pContextShutdownNotifier, manager, extraOptions);
   }
 
   @Override
@@ -220,7 +220,7 @@ public final class Z3LegacySolverContext extends AbstractSolverContext {
                     || options.contains(ProverOptions.GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS))
             .buildOrThrow();
     return new Z3LegacyTheoremProver(
-        creator, manager, options, solverOptions, extraOptions.logfile, shutdownNotifier);
+        creator, manager, options, solverOptions, extraOptions.logfile, contextShutdownNotifier);
   }
 
   @Override
@@ -235,7 +235,7 @@ public final class Z3LegacySolverContext extends AbstractSolverContext {
     Native.paramsSetBool(
         z3context, z3params, Native.mkStringSymbol(z3context, ":unsat_core"), false);
     return new Z3LegacyInterpolatingProver(
-        creator, manager, options, extraOptions.logfile, shutdownNotifier);
+        creator, manager, options, extraOptions.logfile, contextShutdownNotifier);
   }
 
   @Override
@@ -264,7 +264,7 @@ public final class Z3LegacySolverContext extends AbstractSolverContext {
     if (!closed.getAndSet(true)) {
       long context = creator.getEnv();
       creator.forceClose();
-      shutdownNotifier.unregister(interruptListener);
+      contextShutdownNotifier.unregister(interruptListener);
       Native.closeLog();
       Native.delContext(context);
     }

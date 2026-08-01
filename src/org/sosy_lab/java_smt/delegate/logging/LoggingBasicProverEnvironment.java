@@ -46,7 +46,7 @@ class LoggingBasicProverEnvironment<T> implements BasicProverEnvironment<T> {
   }
 
   @Override
-  public void pop() {
+  public void pop() throws InterruptedException {
     logger.log(Level.FINER, "down to level " + level--);
     wrapped.pop();
   }
@@ -87,21 +87,22 @@ class LoggingBasicProverEnvironment<T> implements BasicProverEnvironment<T> {
   }
 
   @Override
-  public Model getModel() throws SolverException {
+  public Model getModel() throws SolverException, InterruptedException {
     Model m = wrapped.getModel();
     logger.log(Level.FINE, "model", m);
     return m;
   }
 
   @Override
-  public ImmutableList<ValueAssignment> getModelAssignments() throws SolverException {
+  public ImmutableList<ValueAssignment> getModelAssignments()
+      throws SolverException, InterruptedException {
     ImmutableList<ValueAssignment> m = wrapped.getModelAssignments();
     logger.log(Level.FINE, "model", m);
     return m;
   }
 
   @Override
-  public List<BooleanFormula> getUnsatCore() {
+  public List<BooleanFormula> getUnsatCore() throws InterruptedException {
     List<BooleanFormula> unsatCore = wrapped.getUnsatCore();
     logger.log(Level.FINE, "unsat-core", unsatCore);
     return unsatCore;
@@ -116,7 +117,7 @@ class LoggingBasicProverEnvironment<T> implements BasicProverEnvironment<T> {
   }
 
   @Override
-  public ImmutableMap<String, String> getStatistics() {
+  public ImmutableMap<String, String> getStatistics() throws InterruptedException {
     return wrapped.getStatistics();
   }
 

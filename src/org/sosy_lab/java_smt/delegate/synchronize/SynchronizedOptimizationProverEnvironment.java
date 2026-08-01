@@ -27,14 +27,14 @@ class SynchronizedOptimizationProverEnvironment extends SynchronizedBasicProverE
   }
 
   @Override
-  public int maximize(Formula pObjective) {
+  public int maximize(Formula pObjective) throws InterruptedException {
     synchronized (sync) {
       return delegate.maximize(pObjective);
     }
   }
 
   @Override
-  public int minimize(Formula pObjective) {
+  public int minimize(Formula pObjective) throws InterruptedException {
     synchronized (sync) {
       return delegate.minimize(pObjective);
     }
@@ -48,14 +48,14 @@ class SynchronizedOptimizationProverEnvironment extends SynchronizedBasicProverE
   }
 
   @Override
-  public Optional<Rational> upper(int pHandle, Rational pEpsilon) {
+  public Optional<Rational> upper(int pHandle, Rational pEpsilon) throws InterruptedException {
     synchronized (sync) {
       return delegate.upper(pHandle, pEpsilon);
     }
   }
 
   @Override
-  public Optional<Rational> lower(int pHandle, Rational pEpsilon) {
+  public Optional<Rational> lower(int pHandle, Rational pEpsilon) throws InterruptedException {
     synchronized (sync) {
       return delegate.lower(pHandle, pEpsilon);
     }
