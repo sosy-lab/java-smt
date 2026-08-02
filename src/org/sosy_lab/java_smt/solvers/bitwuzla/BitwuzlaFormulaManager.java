@@ -18,7 +18,7 @@ import java.util.List;
 import org.sosy_lab.common.collect.Collections3;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager;
-import org.sosy_lab.java_smt.basicimpl.Tokenizer;
+import org.sosy_lab.java_smt.basicimpl.SMTLibTokenizer;
 import org.sosy_lab.java_smt.solvers.bitwuzla.api.Bitwuzla;
 import org.sosy_lab.java_smt.solvers.bitwuzla.api.Kind;
 import org.sosy_lab.java_smt.solvers.bitwuzla.api.Map_TermTerm;
@@ -85,12 +85,15 @@ final class BitwuzlaFormulaManager
   @Override
   protected List<Term> parseAllImpl(String formulaStr) throws IllegalArgumentException {
     // Split the input string into a list of SMT-LIB2 commands
-    List<String> tokens = Tokenizer.tokenize(formulaStr);
+    // TODO: refactor this and use the iterator instead of looping through input multiple times
+    List<String> tokens = SMTLibTokenizer.of(formulaStr).toImmutableList();
 
     Table<String, Sort, Term> cache = creator.getCache();
 
     Collection<String> assertionCommands =
-        tokens.stream().filter(Tokenizer::isAssertToken).collect(ImmutableList.toImmutableList());
+        tokens.stream()
+            .filter(SMTLibTokenizer::isAssertToken)
+            .collect(ImmutableList.toImmutableList());
     if (assertionCommands.isEmpty()) {
       return ImmutableList.of();
     }
@@ -186,10 +189,10 @@ final class BitwuzlaFormulaManager
       List<String> tokens, Table<String, Sort, Term> cache) {
     ImmutableList.Builder<String> newDeclarations = ImmutableList.builder();
     for (String token : tokens) {
-      if (Tokenizer.isAssertToken(token)) {
+      if (SMTLibTokenizer.isAssertToken(token)) {
         // Skip assertions, they will be parsed at the end together with the declarations
         continue;
-      } else if (Tokenizer.isDeclarationToken(token)) {
+      } else if (SMTLibTokenizer.isDeclarationToken(token)) {
         // FIXME: Do we need to support function definitions here?
         Parser declParser = new Parser(creator.getEnv(), bitwuzlaOption);
         declParser.parse(token, true, false);
@@ -228,9 +231,6 @@ final class BitwuzlaFormulaManager
       return "(assert %s)".formatted(pTerm);
     }
     Bitwuzla bitwuzla = new Bitwuzla(creator.getEnv());
-    for (Term t : creator.getConstraintsForTerm(pTerm)) {
-      bitwuzla.assert_formula(t);
-    }
     bitwuzla.assert_formula(pTerm);
     return bitwuzla.print_formula();
   }

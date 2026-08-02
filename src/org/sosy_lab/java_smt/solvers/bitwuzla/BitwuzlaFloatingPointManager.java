@@ -10,7 +10,6 @@ package org.sosy_lab.java_smt.solvers.bitwuzla;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import org.sosy_lab.common.UniqueIdGenerator;
 import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.api.FloatingPointFormula;
 import org.sosy_lab.java_smt.api.FloatingPointNumber.Sign;
@@ -26,17 +25,13 @@ import org.sosy_lab.java_smt.solvers.bitwuzla.api.TermManager;
 
 class BitwuzlaFloatingPointManager
     extends AbstractFloatingPointFormulaManager<Term, Sort, TermManager, BitwuzlaDeclaration> {
-  private final BitwuzlaFormulaCreator bitwuzlaCreator;
+
   private final TermManager termManager;
   private final Term roundingMode;
-
-  // Keeps track of the temporary variables that are created for fp-to-bv casts
-  private static final UniqueIdGenerator counter = new UniqueIdGenerator();
 
   BitwuzlaFloatingPointManager(
       BitwuzlaFormulaCreator pCreator, FloatingPointRoundingMode pFloatingPointRoundingMode) {
     super(pCreator);
-    bitwuzlaCreator = pCreator;
     termManager = pCreator.getEnv();
     roundingMode = getRoundingModeImpl(pFloatingPointRoundingMode);
   }
@@ -192,44 +187,9 @@ class BitwuzlaFloatingPointManager
 
   @Override
   protected Term toIeeeBitvectorImpl(Term pNumber) {
-    int sizeExp = pNumber.sort().fp_exp_size();
-    int sizeSig = pNumber.sort().fp_sig_size();
-
-    Sort bvSort = termManager.mk_bv_sort(sizeExp + sizeSig);
-
-    // The following code creates a new variable that is returned as result.
-    // Additionally, we track constraints about the equality of the new variable and the FP number,
-    // which is added onto the prover stack whenever the new variable is used as assertion.
-
-    // TODO This internal implementation is a technical dept and should be removed.
-    //   The additional constraints are not transparent in all cases, e.g., when visiting a
-    //   formula, creating a model, or transferring the assertions onto another prover stack.
-    //   A better way would be a direct implementation of this in Bitwuzla, without interfering
-    //   with JavaSMT.
-
-    // Note that NaN is handled as a special case in this method. This is not strictly necessary,
-    // but if we just use "fpTerm = to_fp(bvVar)" the NaN will be given a random payload (and
-    // sign). Since NaN payloads are not preserved here anyway we might as well pick a canonical
-    // representation, e.g., which is "0 11111111 10000000000000000000000" for single precision.
-    String nanRepr = "0" + "1".repeat(sizeExp + 1) + "0".repeat(sizeSig - 2);
-    Term bvNaN = termManager.mk_bv_value(bvSort, nanRepr);
-
-    // TODO creating our own utility variables might eb unexpected from the user.
-    //   We might need to exclude such variables in models and formula traversal.
-    String newVariable = "__JAVASMT__CAST_FROM_BV_" + counter.getFreshId();
-    Term bvVar = termManager.mk_const(bvSort, newVariable);
-    Term equal =
-        termManager.mk_term(
-            Kind.ITE,
-            termManager.mk_term(Kind.FP_IS_NAN, pNumber),
-            termManager.mk_term(Kind.EQUAL, bvVar, bvNaN),
-            termManager.mk_term(
-                Kind.EQUAL,
-                termManager.mk_term(Kind.FP_TO_FP_FROM_BV, bvVar, sizeExp, sizeSig),
-                pNumber));
-
-    bitwuzlaCreator.addConstraintForVariable(newVariable, equal);
-    return bvVar;
+    throw new UnsupportedOperationException(
+        "Bitwuzla does not support transforming "
+            + "floating-point formulas to IEEE bitvectors natively");
   }
 
   @Override

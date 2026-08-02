@@ -24,7 +24,7 @@ import java.util.Set;
 import java.util.regex.Pattern;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
-import org.sosy_lab.java_smt.basicimpl.Tokenizer;
+import org.sosy_lab.java_smt.basicimpl.SMTLibTokenizer;
 
 /**
  * Type of a formula.
@@ -638,7 +638,7 @@ public abstract class FormulaType<T extends Formula> {
       checkArgument(m.find());
       return FormulaType.getBitvectorTypeWithSize(Integer.parseInt(m.group(1)));
     } else if (t.startsWith("(Array")) {
-      var tokens = Tokenizer.tokenize(t.substring(1, t.length() - 1));
+      var tokens = SMTLibTokenizer.of(t.substring(1, t.length() - 1)).toImmutableList();
       checkArgument(tokens.size() == 3);
       var domain = fromSMTLIBString(tokens.get(1));
       var range = fromSMTLIBString(tokens.get(2));
