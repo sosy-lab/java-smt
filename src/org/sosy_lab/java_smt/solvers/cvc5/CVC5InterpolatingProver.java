@@ -12,6 +12,7 @@ import static com.google.common.base.Preconditions.checkState;
 import static org.sosy_lab.common.collect.Collections3.transformedImmutableSetCopy;
 
 import com.google.common.collect.FluentIterable;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
@@ -20,7 +21,6 @@ import io.github.cvc5.Kind;
 import io.github.cvc5.Solver;
 import io.github.cvc5.Term;
 import io.github.cvc5.TermManager;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
@@ -86,24 +86,57 @@ class CVC5InterpolatingProver extends CVC5AbstractProver<String>
   @Override
   public List<BooleanFormula> getSeqInterpolants(List<? extends Collection<String>> partitions)
       throws SolverException, InterruptedException {
-    final int n = partitions.size();
-    final List<BooleanFormula> itps = new ArrayList<>();
-    Term previousItp = termManager.mkTrue();
-    for (int i = 1; i < n; i++) {
-      Collection<Term> formulasA =
-          FluentIterable.from(partitions.get(i - 1))
-              .transform(assertedTerms.peek()::get)
-              .append(new Term[] {previousItp}) // class Term is Iterable<Term>, be careful here
-              .toSet();
-      Collection<Term> formulasB =
-          FluentIterable.concat(partitions.subList(i, n))
-              .transform(assertedTerms.peek()::get)
-              .toSet();
-      Term itp = getCVC5Interpolation(formulasA, formulasB);
-      itps.add(creator.encapsulateBoolean(itp));
-      previousItp = itp;
+    List<Term> groups =
+        FluentIterable.from(partitions)
+            .transform(
+                partition ->
+                    bmgr.andImpl(
+                        FluentIterable.from(partition)
+                            .transform(assertedTerms.peek()::get)
+                            .toSet()))
+            .toList();
+
+    // Uses a separate Solver instance to leave the original solver-context unmodified
+    Solver itpSolver = getNewSolver();
+
+    // We build the interpolant sequence in reverse:
+    // A & B & C -> (D -> false)
+    // (C1) A & B -> (C -> K)
+    //     (B1) A -> (B -> J)
+    //         (A1) A -> I
+    //         (A2) I & B -> J
+    //     (B2) J & C -> K
+    // (C2) K & D -> false
+    //
+    // By collecting the formulas, we get the sequence:
+    // (A1) A -> I
+    // (A2) I & B -> J
+    // (B2) J & C -> K
+    // (C2) K & D -> false
+    //
+    // Building the interpolants in reverse works better with the CVC5 API as it allows us to keep
+    // the "A"s on the solver stack
+    try {
+      for (int i = 0; i < groups.size() - 1; i++) {
+        itpSolver.push();
+        itpSolver.assertFormula(groups.get(i));
+      }
+
+      ImmutableList.Builder<BooleanFormula> builder = ImmutableList.builder();
+
+      Term lastItp = termManager.mkFalse();
+      for (int i = groups.size() - 1; i > 0; i--) {
+        lastItp =
+            itpSolver.simplify(itpSolver.getInterpolant(bmgr.implication(groups.get(i), lastItp)));
+        builder.add(creator.encapsulateBoolean(lastItp));
+
+        itpSolver.pop();
+      }
+      return builder.build().reverse();
+
+    } finally {
+      itpSolver.deletePointer();
     }
-    return itps;
   }
 
   @Override
