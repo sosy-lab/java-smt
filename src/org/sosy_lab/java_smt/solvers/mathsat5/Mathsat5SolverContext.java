@@ -83,6 +83,13 @@ public final class Mathsat5SolverContext extends AbstractSolverContext {
     @Option(secure = true, description = "Load less stable optimizing version of mathsat5 solver.")
     boolean loadOptimathsat5 = false;
 
+    @Option(
+        secure = true,
+        description =
+            "SMT-LIB logic to configure the SMT solvers (i.e. all Provers created from a"
+                + " SolverContext with this option) with. Default: ALL")
+    private String logic = "ALL";
+
     private final @Nullable PathCounterTemplate logfile;
 
     private final ImmutableMap<String, String> furtherOptionsMap;
@@ -287,21 +294,22 @@ public final class Mathsat5SolverContext extends AbstractSolverContext {
   @Override
   protected ProverEnvironment newProverEnvironment0(Set<ProverOptions> options) {
     Preconditions.checkState(!closed, "solver context is already closed");
-    return new Mathsat5TheoremProver(this, shutdownNotifier, creator, options);
+    return new Mathsat5TheoremProver(this, shutdownNotifier, creator, options, settings.logic);
   }
 
   @Override
   protected InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation0(
       Set<ProverOptions> options) {
     Preconditions.checkState(!closed, "solver context is already closed");
-    return new Mathsat5InterpolatingProver(this, shutdownNotifier, creator, options);
+    return new Mathsat5InterpolatingProver(
+        this, shutdownNotifier, creator, options, settings.logic);
   }
 
   @Override
   public OptimizationProverEnvironment newOptimizationProverEnvironment0(
       Set<ProverOptions> options) {
     Preconditions.checkState(!closed, "solver context is already closed");
-    return new Mathsat5OptimizationProver(this, shutdownNotifier, creator, options);
+    return new Mathsat5OptimizationProver(this, shutdownNotifier, creator, options, settings.logic);
   }
 
   @Override

@@ -26,8 +26,9 @@ class Mathsat5TheoremProver extends Mathsat5AbstractProver<Void> implements Prov
       Mathsat5SolverContext pMgr,
       ShutdownNotifier pShutdownNotifier,
       Mathsat5FormulaCreator creator,
-      Set<ProverOptions> options) {
-    super(pMgr, options, creator, pShutdownNotifier);
+      Set<ProverOptions> options,
+      String pLogic) {
+    super(pMgr, options, pLogic, creator, pShutdownNotifier);
   }
 
   @Override
