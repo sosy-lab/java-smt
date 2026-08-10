@@ -90,9 +90,7 @@ class CVC5InterpolatingProver extends CVC5AbstractProver<String>
     List<Term> groups =
         transformedImmutableListCopy(partitions, partition ->
                     bmgr.andImpl(
-                        FluentIterable.from(partition)
-                            .transform(assertedTerms.peek()::get)
-                            .toSet()));
+                        transformedImmutableSetCopy(partition, assertedTerms.peek()::get)));
 
     // Uses a separate Solver instance to leave the original solver-context unmodified
     Solver itpSolver = getNewSolver();
