@@ -9,6 +9,7 @@
 package org.sosy_lab.java_smt.solvers.cvc5;
 
 import static com.google.common.base.Preconditions.checkState;
+import static org.sosy_lab.common.collect.Collections3.transformedImmutableListCopy;
 import static org.sosy_lab.common.collect.Collections3.transformedImmutableSetCopy;
 
 import com.google.common.collect.FluentIterable;
@@ -87,14 +88,11 @@ class CVC5InterpolatingProver extends CVC5AbstractProver<String>
   public List<BooleanFormula> getSeqInterpolants(List<? extends Collection<String>> partitions)
       throws SolverException, InterruptedException {
     List<Term> groups =
-        FluentIterable.from(partitions)
-            .transform(
-                partition ->
+        transformedImmutableListCopy(partitions, partition ->
                     bmgr.andImpl(
                         FluentIterable.from(partition)
                             .transform(assertedTerms.peek()::get)
-                            .toSet()))
-            .toList();
+                            .toSet()));
 
     // Uses a separate Solver instance to leave the original solver-context unmodified
     Solver itpSolver = getNewSolver();
