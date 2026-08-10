@@ -63,11 +63,16 @@ class Yices2InterpolatingProver extends Yices2AbstractProver<Integer>
     var setB = Sets.difference(getAssertedConstraintIds(), setA);
 
     try (var ctxA = newContext("mcsat");
-        var ctxB = newContext("mcsat")) {
+        var ctxB = newContext("dpllt")) {
 
       ctxA.assertFormulas(Ints.toArray(transformedImmutableSetCopy(setA, stack.peekLast()::get)));
-      ctxB.assertFormulas(Ints.toArray(transformedImmutableSetCopy(setB, stack.peekLast()::get)));
+      try {
+        ctxB.assertFormulas(Ints.toArray(transformedImmutableSetCopy(setB, stack.peekLast()::get)));
+        ctxB.push(); // Will trigger an exception if B is already unsat by itself
 
+      } catch (YicesException ye) {
+        return creator.encapsulateBoolean(Terms.mkTrue());
+      }
       return creator.encapsulateBoolean(interpolate(ctxA, ctxB));
     }
   }
@@ -116,26 +121,42 @@ class Yices2InterpolatingProver extends Yices2AbstractProver<Integer>
             .toList();
 
     try (var ctxA = newContext("mcsat");
-        var ctxB = newContext("mcsat")) {
+        var ctxB = newContext("dpllt")) {
 
+      ctxB.push();
+      int skipped = 0;
       for (int i = groups.size() - 1; i > 0; i--) {
-        ctxB.push();
-        ctxB.assertFormulas(groups.get(i));
+        try {
+          ctxB.assertFormulas(groups.get(i));
+          ctxB.push();
+        } catch (YicesException e) {
+          // Yices will throw this exception once the Bs have become unsat
+          skipped = i;
+          break;
+        }
       }
+      ctxB.pop();
 
       ImmutableList.Builder<BooleanFormula> builder = ImmutableList.builder();
 
       var lastItp = Terms.mkTrue();
       for (int i = 0; i < groups.size() - 1; i++) {
-        ctxA.push();
-        ctxA.assertFormula(lastItp);
-        ctxA.assertFormulas(groups.get(i));
+        if (i < skipped) {
+          // Interpolants are 'true' until B is no longer unsat by itself
+          builder.add(creator.encapsulateBoolean(lastItp));
 
-        lastItp = interpolate(ctxA, ctxB);
-        builder.add(creator.encapsulateBoolean(lastItp));
+        } else {
+          ctxA.push();
 
-        ctxA.pop();
-        ctxB.pop();
+          ctxA.assertFormula(lastItp);
+          ctxA.assertFormulas(groups.get(i));
+
+          lastItp = interpolate(ctxA, ctxB);
+          builder.add(creator.encapsulateBoolean(lastItp));
+
+          ctxA.pop();
+          ctxB.pop();
+        }
       }
 
       return builder.build();
