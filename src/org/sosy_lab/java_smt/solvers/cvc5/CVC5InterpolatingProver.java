@@ -12,7 +12,6 @@ import static com.google.common.base.Preconditions.checkState;
 import static org.sosy_lab.common.collect.Collections3.transformedImmutableListCopy;
 import static org.sosy_lab.common.collect.Collections3.transformedImmutableSetCopy;
 
-import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
@@ -88,9 +87,10 @@ class CVC5InterpolatingProver extends CVC5AbstractProver<String>
   public List<BooleanFormula> getSeqInterpolants(List<? extends Collection<String>> partitions)
       throws SolverException, InterruptedException {
     List<Term> groups =
-        transformedImmutableListCopy(partitions, partition ->
-                    bmgr.andImpl(
-                        transformedImmutableSetCopy(partition, assertedTerms.peek()::get)));
+        transformedImmutableListCopy(
+            partitions,
+            partition ->
+                bmgr.andImpl(transformedImmutableSetCopy(partition, assertedTerms.peek()::get)));
 
     // Uses a separate Solver instance to leave the original solver-context unmodified
     Solver itpSolver = getNewSolver();
