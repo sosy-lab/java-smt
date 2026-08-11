@@ -17,7 +17,9 @@ import org.sosy_lab.java_smt.api.visitors.BooleanFormulaTransformationVisitor;
 import org.sosy_lab.java_smt.api.visitors.BooleanFormulaVisitor;
 import org.sosy_lab.java_smt.api.visitors.TraversalProcess;
 
-/** Manager for dealing with boolean formulas. */
+/**
+ * Manager for dealing with boolean formulas.
+ */
 public interface BooleanFormulaManager {
 
   /**
@@ -30,10 +32,14 @@ public interface BooleanFormulaManager {
     return value ? makeTrue() : makeFalse();
   }
 
-  /** Shortcut for {@code makeBoolean(true)}. */
+  /**
+   * Shortcut for {@code makeBoolean(true)}.
+   */
   BooleanFormula makeTrue();
 
-  /** Shortcut for {@code makeBoolean(false)}. */
+  /**
+   * Shortcut for {@code makeBoolean(false)}.
+   */
   BooleanFormula makeFalse();
 
   /**
@@ -81,8 +87,8 @@ public interface BooleanFormulaManager {
    * Creates a formula representing {@code IF cond THEN f1 ELSE f2}.
    *
    * @param cond a Formula
-   * @param f1 a Formula
-   * @param f2 a Formula
+   * @param f1   a Formula
+   * @param f2   a Formula
    * @return (IF cond THEN f1 ELSE f2)
    */
   <T extends Formula> T ifThenElse(BooleanFormula cond, T f1, T f2);
@@ -116,7 +122,9 @@ public interface BooleanFormulaManager {
     return and(ImmutableList.copyOf(bits));
   }
 
-  /** Return a stream {@link Collector} that creates a conjunction of all elements in the stream. */
+  /**
+   * Return a stream {@link Collector} that creates a conjunction of all elements in the stream.
+   */
   Collector<BooleanFormula, ?, BooleanFormula> toConjunction();
 
   /**
@@ -140,13 +148,19 @@ public interface BooleanFormulaManager {
     return or(ImmutableList.copyOf(bits));
   }
 
-  /** Return a stream {@link Collector} that creates a disjunction of all elements in the stream. */
+  /**
+   * Return a stream {@link Collector} that creates a disjunction of all elements in the stream.
+   */
   Collector<BooleanFormula, ?, BooleanFormula> toDisjunction();
 
-  /** Creates a formula representing XOR of the two arguments. */
+  /**
+   * Creates a formula representing XOR of the two arguments.
+   */
   BooleanFormula xor(BooleanFormula bits1, BooleanFormula bits2);
 
-  /** Visit the formula with the given visitor. */
+  /**
+   * Visit the formula with the given visitor.
+   */
   @CanIgnoreReturnValue
   <R> R visit(BooleanFormula pFormula, BooleanFormulaVisitor<R> visitor);
 
@@ -203,4 +217,56 @@ public interface BooleanFormulaManager {
    * @param flatten If {@code true}, flatten recursively.
    */
   Set<BooleanFormula> toDisjunctionArgs(BooleanFormula f, boolean flatten);
+
+  /**
+   * Creates a constrained horn clause.
+   * {@code (constraint \/ body) => head}
+   *
+   * @param head       Head of horn clause
+   * @param body       Body of horn clause
+   * @param constraint Constraint of horn clause
+   * @return boolean formula representation of horn clause
+   */
+  BooleanFormula makeHornClause(
+      BooleanFormula head,
+      Collection<BooleanFormula> body, BooleanFormula constraint);
+
+  /**
+   * Creates a constrained horn clause.
+   * {@code body => head}
+   *
+   * @param head Head of horn clause
+   * @param body Body of horn clause
+   * @return boolean formula representation of horn clause
+   */
+  default BooleanFormula makeHornClause(
+      BooleanFormula head,
+      Collection<BooleanFormula> body) {
+    return makeHornClause(head, body, makeTrue());
+  }
+
+  /**
+   * Creates a horn clause.
+   * {@code body => true}
+   *
+   * @param body Body of horn clause
+   * @return boolean formula representation of horn clause
+   */
+  default BooleanFormula makeHornClause(Collection<BooleanFormula> body) {
+    return makeHornClause(makeTrue(), body);
+  }
+
+  /**
+   * Creates a constrained horn clause.
+   * {@code (constraint \/ body) => true}
+   *
+   * @param body       Body of horn clause
+   * @param constraint Constraint of horn clause
+   * @return boolean formula representation of horn clause
+   */
+  default BooleanFormula makeHornClause(
+      Collection<BooleanFormula> body,
+      BooleanFormula constraint) {
+    return makeHornClause(makeTrue(), body, constraint);
+  }
 }

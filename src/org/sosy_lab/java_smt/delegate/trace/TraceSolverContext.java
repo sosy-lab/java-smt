@@ -30,6 +30,7 @@ import org.sosy_lab.common.io.PathTemplate;
 import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.FormulaManager;
+import org.sosy_lab.java_smt.api.HornProverEnvironment;
 import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
 import org.sosy_lab.java_smt.api.OptimizationProverEnvironment;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
@@ -160,6 +161,16 @@ public class TraceSolverContext implements SolverContext {
         () ->
             new TraceOptimizationProverEnvironment(
                 delegate.newOptimizationProverEnvironment(options), mgr, logger));
+  }
+
+  @Override
+  public HornProverEnvironment newHornProverEnvironment(ProverOptions... options) {
+    return logger.logDefKeep(
+        "context",
+        "newHornProverEnvironment(%s)".formatted(getOptionsForLogging(options)),
+        () ->
+            new TraceHornProverEnvironment(
+                delegate.newHornProverEnvironment(options), mgr, logger));
   }
 
   private static String getOptionsForLogging(ProverOptions[] options) {

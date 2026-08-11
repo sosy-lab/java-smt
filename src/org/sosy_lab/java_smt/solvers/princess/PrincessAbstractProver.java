@@ -51,7 +51,7 @@ abstract class PrincessAbstractProver<E> extends AbstractProverWithAllSat<E> {
   protected final UniqueIdGenerator idGenerator = new UniqueIdGenerator();
   protected final Deque<PersistentMap<Integer, BooleanFormula>> partitions = new ArrayDeque<>();
 
-  private final PrincessFormulaCreator creator;
+  protected final PrincessFormulaCreator creator;
 
   PrincessAbstractProver(
       PrincessFormulaManager pMgr,

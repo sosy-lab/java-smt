@@ -12,6 +12,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
+import lazabs.horn.global.Horn;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.configuration.Configuration;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
@@ -21,6 +22,7 @@ import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.java_smt.SolverContextFactory;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.FormulaManager;
+import org.sosy_lab.java_smt.api.HornProverEnvironment;
 import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
 import org.sosy_lab.java_smt.api.OptimizationProverEnvironment;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
@@ -123,6 +125,26 @@ public class SynchronizedSolverContext implements SolverContext {
           delegate.newOptimizationProverEnvironment(pOptions), delegate);
     }
   }
+
+  @SuppressWarnings("resource")
+  @Override
+  public HornProverEnvironment newHornProverEnvironment(
+      ProverOptions... options) {
+    synchronized (sync) {
+      if (useSeperateProvers) {
+        SolverContext otherContext = createOtherContext();
+        return new SynchronizedHornProverEnvironmentWithContext(
+            otherContext.newHornProverEnvironment(options),
+            sync,
+            delegate.getFormulaManager(),
+            otherContext.getFormulaManager());
+      } else {
+        return new SynchronizedHornProverEnvironment(
+            delegate.newHornProverEnvironment(options), delegate);
+      }
+    }
+  }
+
 
   @Override
   public String getVersion() {

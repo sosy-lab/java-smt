@@ -154,4 +154,12 @@ class StatisticsBooleanFormulaManager implements BooleanFormulaManager {
   public Set<BooleanFormula> toDisjunctionArgs(BooleanFormula pF, boolean pFlatten) {
     return delegate.toDisjunctionArgs(pF, pFlatten);
   }
+
+  @Override
+  public BooleanFormula makeHornClause(
+      BooleanFormula head,
+      Collection<BooleanFormula> body,
+      BooleanFormula constraint) {
+      return delegate.makeHornClause(head, body, constraint);
+  }
 }

@@ -26,6 +26,7 @@ SPDX-License-Identifier: Apache-2.0
         runtime-boolector,
         runtime-cvc4,
         runtime-cvc5,
+        runtime-eldarica,
         runtime-mathsat,
         runtime-opensmt,
         runtime-optimathsat,
@@ -49,7 +50,7 @@ SPDX-License-Identifier: Apache-2.0
     <property name="errorprone.options" value="-Xep:Finally:OFF -Xep:MissingSummary:OFF -Xep:UnescapedEntity:OFF"/>
 
     <!-- Maven Central metadata -->
-    <property name="ivy.pom.description" value="Unified acccess layer to SMT solvers"/>
+    <property name="ivy.pom.description" value="Unified access layer to SMT solvers"/>
     <property name="ivy.pom.url" value="https://github.com/sosy-lab/java-smt"/>
     <property name="ivy.pom.name" value="java-smt"/>
     <property name="ivy.pom.groupId" value="org.sosy-lab"/>

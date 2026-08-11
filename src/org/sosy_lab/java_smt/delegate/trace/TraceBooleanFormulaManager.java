@@ -200,4 +200,17 @@ class TraceBooleanFormulaManager implements BooleanFormulaManager {
             "toDisjunctionArgs(%s, %s)".formatted(logger.toVariable(f), flatten),
             () -> delegate.toDisjunctionArgs(f, flatten)));
   }
+
+  @Override
+  public BooleanFormula makeHornClause(
+      BooleanFormula head,
+      Collection<BooleanFormula> body,
+      BooleanFormula constraint) {
+    return mgr.rebuild(
+        logger.logDefDiscard(
+            "mgr.getBooleanFormulaManager()",
+            "makeHornClause(%s, %s, %s)".formatted(logger.toVariable(head),
+                logger.toVariable(body), logger.toVariable(constraint)),
+            () -> delegate.makeHornClause(head, body, constraint)));
+  }
 }

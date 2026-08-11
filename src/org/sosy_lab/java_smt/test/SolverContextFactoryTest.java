@@ -111,7 +111,7 @@ public class SolverContextFactoryTest {
    */
   private boolean isSupportedOperatingSystemAndArchitecture() {
     return switch (solverToUse()) {
-      case SMTINTERPOL, PRINCESS ->
+      case SMTINTERPOL, PRINCESS, ELDARICA ->
           // Any operating system and any architecture is allowed, Java is sufficient
           true;
       case BOOLECTOR, CVC4 -> IS_LINUX && !IS_ARCH_ARM64;
