@@ -28,7 +28,7 @@ source .venv/bin/activate
 pip install -r requirements.txt
 
 echo -e "\nConverting JavaTraces to Smtlib"
-find ../traces -name *.java -exec ./traceToSmtlib.py --save {} ';' | tee solver.log
+find ../output/traces -name *.java -exec ./traceToSmtlib.py --save {} ';' | tee solver.log
 
 echo -e "\nRunning the solver on the generated Smtlib files"
 find ../traces -name *.smt2 -exec echo "path: {}" ';' -exec timeout 20s $* {} ';' 2>&1 | grep -E "error|path" | tee -a solver.log

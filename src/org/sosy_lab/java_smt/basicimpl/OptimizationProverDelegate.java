@@ -13,16 +13,20 @@ package org.sosy_lab.java_smt.basicimpl;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.api.BooleanFormula;
+import org.sosy_lab.java_smt.api.Evaluator;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.OptimizationProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverException;
+import org.sosy_lab.java_smt.api.UserPropagator;
 
 /**
  * This delegate enables common implementations for methods in {@link OptimizationProverEnvironment}
@@ -81,6 +85,21 @@ public class OptimizationProverDelegate implements OptimizationProverEnvironment
   }
 
   @Override
+  public Evaluator getEvaluator() throws SolverException {
+    return optimizationProver.getEvaluator();
+  }
+
+  @Override
+  public ImmutableList<Model.ValueAssignment> getModelAssignments() throws SolverException {
+    return optimizationProver.getModelAssignments();
+  }
+
+  @Override
+  public @Nullable Void push(BooleanFormula f) throws InterruptedException {
+    return optimizationProver.push(f);
+  }
+
+  @Override
   public void pop() {
     optimizationProver.pop();
   }
@@ -123,6 +142,11 @@ public class OptimizationProverDelegate implements OptimizationProverEnvironment
   }
 
   @Override
+  public ImmutableMap<String, String> getStatistics() {
+    return optimizationProver.getStatistics();
+  }
+
+  @Override
   public void close() {
     optimizationProver.close();
   }
@@ -131,6 +155,11 @@ public class OptimizationProverDelegate implements OptimizationProverEnvironment
   public <R> R allSat(AllSatCallback<R> callback, List<BooleanFormula> important)
       throws InterruptedException, SolverException {
     return optimizationProver.allSat(callback, important);
+  }
+
+  @Override
+  public boolean registerUserPropagator(UserPropagator propagator) {
+    return optimizationProver.registerUserPropagator(propagator);
   }
 
   /* ############################### Utility methods ############################### */
