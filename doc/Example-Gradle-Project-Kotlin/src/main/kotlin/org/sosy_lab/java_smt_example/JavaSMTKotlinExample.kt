@@ -20,10 +20,7 @@ import org.sosy_lab.java_smt.example.SolverOverviewTable.SolverInfo
 fun main() {
   val infos: MutableList<SolverInfo> = mutableListOf()
   for (s in Solvers.values()) {
-    val info: SolverInfo? = SolverOverviewTable().getSolverInformation(s)
-    if (info != null) {
-      infos.add(info)
-	  }
+    infos.add(SolverOverviewTable().getSolverInformation(s)!!)
   }
 
   infos.sortBy { it.getName() } // alphabetical ordering

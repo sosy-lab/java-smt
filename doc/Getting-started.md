@@ -28,6 +28,28 @@ After the repository URL is configured, you only need to add the following depen
 <dependency org="org.sosy-lab" name="java-smt" rev="5.0.0" conf="runtime->runtime"/>
 ```
 
+Solvers that are not needed can be excluded from the download:
+```xml
+<dependency org="org.sosy_lab" name="java-smt" rev="6.0.0" conf="runtime->runtime-without-gpl; contrib->sources">
+    <exclude org="org.sosy_lab" module="javasmt-solver-optimathsat"/>
+    <exclude org="org.sosy_lab" module="javasmt-solver-mathsat"/>
+</dependency>
+```
+
+By removing the dependency and then adding it back in, it is also possible to manually override the solver version:
+```xml
+<dependency org="org.sosy_lab" name="java-smt" rev="6.0.0" conf="runtime->runtime-without-gpl; contrib->sources">
+    <exclude org="org.sosy_lab" module="javasmt-solver-optimathsat"/>
+    <exclude org="org.sosy_lab" module="javasmt-solver-mathsat"/>
+</dependency>
+<!-- MathSAT5 beyond 5.6.11 requires system dependencies equivalent of Ubuntu 24.04/Debian 13 or greater.
+     We use version 5.6.11 as an intermediate step to give users and our systems some time to upgrade
+     before switching to newer MathSAT5 versions.
+-->
+<dependency org="org.sosy_lab" name="javasmt-solver-mathsat" rev="5.6.11" conf="runtime->solver-mathsat" />
+```
+However, note that this should be done with caution as it may often lead to compatibility issues
+
 #### Architecture specification and Operating System
 
 The support for operating systems depends on the solver,
@@ -126,6 +148,11 @@ Solvers, such as `MathSAT5`, `SMTInterpol` and `Z3`, can be added by using addit
 The XML snippets for other solvers available via Maven,
 such as `Boolector`, `CVC4`, `CVC5`, `OpenSMT`, `Princess`, and `Yices2`,
 can be found in the [`POM file`](Example-Maven-Project/pom.xml) of our [`Example-Maven-Project`](Example-Maven-Project).
+
+The latest supported solver versions can be found in the Maven example project under
+[`Example-Maven-Project/pom.xml`](Example-Maven-Project/pom.xml). It may sometimes be possible to use a newer version of a solver, or downgrade to
+an older release. However, this should be done with caution as JavaSMT releases are generally tied to specific solver
+version, and any change may lead to compatibility issues.
 
 If you are not using Linux, but Windows or macOS, or if you want to use a different architecture,
 such as `arm64`, you might need to set the dependencies accordingly, e.g.,
