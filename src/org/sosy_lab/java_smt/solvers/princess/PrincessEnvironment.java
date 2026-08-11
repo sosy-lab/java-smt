@@ -12,6 +12,7 @@ import static scala.collection.JavaConverters.asJava;
 import static scala.collection.JavaConverters.collectionAsScalaIterableConverter;
 
 import ap.api.SimpleAPI;
+import ap.basetypes.IdealInt;
 import ap.parameters.GlobalSettings;
 import ap.parser.BooleanCompactifier;
 import ap.parser.Environment.EnvironmentException;
@@ -22,6 +23,7 @@ import ap.parser.IFormula;
 import ap.parser.IFunApp;
 import ap.parser.IFunction;
 import ap.parser.IIntFormula;
+import ap.parser.IIntLit;
 import ap.parser.ITerm;
 import ap.parser.Parser2InputAbsy.ParseException;
 import ap.parser.Parser2InputAbsy.TranslationException;
@@ -32,7 +34,6 @@ import ap.parser.SMTTypes.SMTType;
 import ap.terfor.ConstantTerm;
 import ap.terfor.preds.Predicate;
 import ap.theories.ADT.ADTProxySort;
-import ap.theories.arrays.ExtArray;
 import ap.theories.arrays.ExtArray.ArraySort;
 import ap.theories.bitvectors.ModuloArithmetic;
 import ap.theories.rationals.Rationals$;
@@ -53,8 +54,6 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.nio.file.Path;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -175,6 +174,8 @@ class PrincessEnvironment {
   private final Map<String, ITerm> sortedVariablesCache = new HashMap<>();
 
   private final Map<String, PrincessIFunctionDeclaration> functionsCache = new HashMap<>();
+
+  private final Map<FormulaType<?>, Map<ITerm, ITerm>> constArrayCache = new HashMap<>();
 
   private final int randomSeed;
   private final @Nullable PathCounterTemplate basicLogfile;
@@ -564,6 +565,16 @@ class PrincessEnvironment {
   static FormulaType<?> getFormulaType(IExpression pFormula) {
     if (pFormula instanceof IFormula) {
       return FormulaType.BooleanType;
+    } else if (pFormula instanceof IFunApp app && app.fun().equals(ModuloArithmetic.bv_extract())) {
+      IIntLit upper = (IIntLit) pFormula.apply(0);
+      IIntLit lower = (IIntLit) pFormula.apply(1);
+      IdealInt bwResult = upper.value().$minus(lower.value()).$plus(IdealInt.ONE());
+      return FormulaType.getBitvectorTypeWithSize(bwResult.intValue());
+    } else if (pFormula instanceof IFunApp app && app.fun().equals(ModuloArithmetic.bv_concat())) {
+      IIntLit upper = (IIntLit) pFormula.apply(0);
+      IIntLit lower = (IIntLit) pFormula.apply(1);
+      IdealInt bwResult = upper.value().$plus(lower.value());
+      return FormulaType.getBitvectorTypeWithSize(bwResult.intValue());
     } else {
       final Sort sort = Sort.sortOf((ITerm) pFormula);
       try {
@@ -697,20 +708,32 @@ class PrincessEnvironment {
     return new IFunApp(arraySort.theory().store(), toSeq(args));
   }
 
+  void cacheConstArray(ArraySort arraySort, ITerm elseTerm, ITerm constArray) {
+    constArrayCache.compute(
+        getFormulaTypeFromSort(arraySort),
+        (sort, maps) -> {
+          if (maps == null) {
+            maps = new HashMap<>();
+          }
+          maps.putIfAbsent(elseTerm, constArray);
+          return maps;
+        });
+  }
+
   public ITerm makeConstArray(ArraySort arraySort, ITerm elseTerm) {
-    // return new IFunApp(arraySort.theory().const(), elseTerm); // I love Scala! So simple! ;-)
-
-    // Scala uses keywords that are illegal in Java. Thus, we use reflection to access the method.
-    // TODO we should contact the developers of Princess and ask for a renaming.
-    final IFunction constArrayOp;
-    try {
-      Method constMethod = ExtArray.class.getMethod("const");
-      constArrayOp = (IFunction) constMethod.invoke(arraySort.theory());
-    } catch (IllegalAccessException | NoSuchMethodException | InvocationTargetException exception) {
-      throw new RuntimeException(exception);
-    }
-
-    return new IFunApp(constArrayOp, toSeq(ImmutableList.of(elseTerm)));
+    constArrayCache.compute(
+        getFormulaTypeFromSort(arraySort),
+        (sort, maps) -> {
+          if (maps == null) {
+            maps = new HashMap<>();
+          }
+          maps.computeIfAbsent(
+              elseTerm,
+              term ->
+                  new IFunApp(arraySort.theory().constArray(), toSeq(ImmutableList.of(elseTerm))));
+          return maps;
+        });
+    return constArrayCache.get(getFormulaTypeFromSort(arraySort)).get(elseTerm);
   }
 
   public boolean hasArrayType(IExpression exp) {

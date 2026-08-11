@@ -13,11 +13,10 @@ import ap.parser.IExpression;
 import ap.parser.ITerm;
 import ap.theories.bitvectors.ModuloArithmetic$;
 import ap.types.Sort;
-import ap.types.Sort$;
-import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableList;
 import java.math.BigInteger;
 import org.sosy_lab.java_smt.basicimpl.AbstractBitvectorFormulaManager;
-import scala.Option;
+import org.sosy_lab.java_smt.solvers.princess.PrincessFunctionDeclaration.PrincessBitvectorToIntegerDeclaration;
 
 class PrincessBitvectorFormulaManager
     extends AbstractBitvectorFormulaManager<
@@ -132,34 +131,17 @@ class PrincessBitvectorFormulaManager
 
   @Override
   protected IExpression makeBitvectorImpl(int pLength, IExpression pIntegerFormula) {
-    return ModuloArithmetic$.MODULE$.cast2UnsignedBV(pLength, (ITerm) pIntegerFormula);
+    return new PrincessFunctionDeclaration.PrincessBitvectorFromIntegerDeclaration(pLength)
+        .makeApp(getFormulaCreator().getEnv(), ImmutableList.of(pIntegerFormula));
   }
 
   @Override
   protected IExpression toIntegerFormulaImpl(IExpression pBVFormula, boolean signed) {
-    final Sort sort = Sort$.MODULE$.sortOf((ITerm) pBVFormula);
-    final Option<Object> bitWidth = PrincessEnvironment.getBitWidth(sort);
-    Preconditions.checkArgument(bitWidth.isDefined());
-    final int size = (Integer) bitWidth.get();
-
-    // compute range for integer value,
-    // example: bitWidth=4 => signed_range=[-8;7] and unsigned_range=[0;15]
-    final BigInteger min;
-    final BigInteger max;
-    if (signed) {
-      min = BigInteger.ONE.shiftLeft(size - 1).negate();
-      max = BigInteger.ONE.shiftLeft(size - 1).subtract(BigInteger.ONE);
-    } else {
-      min = BigInteger.ZERO;
-      max = BigInteger.ONE.shiftLeft(size).subtract(BigInteger.ONE);
-    }
-
-    ITerm bvInRange =
-        ModuloArithmetic$.MODULE$.cast2Interval(
-            IdealInt.apply(min), IdealInt.apply(max), (ITerm) pBVFormula);
-
-    // Princess can not directly convert from BV to INT. However, adding zero helps. Ugly.
-    return IExpression.i(0).$plus(bvInRange);
+    var decl =
+        signed
+            ? PrincessBitvectorToIntegerDeclaration.SIGNED
+            : PrincessBitvectorToIntegerDeclaration.UNSIGNED;
+    return decl.makeApp(getFormulaCreator().getEnv(), ImmutableList.of(pBVFormula));
   }
 
   @Override
@@ -194,10 +176,8 @@ class PrincessBitvectorFormulaManager
 
   @Override
   protected IExpression extend(IExpression pNumber, int pExtensionBits, boolean pSigned) {
-    if (pSigned) {
-      return ModuloArithmetic$.MODULE$.sign_extend(pExtensionBits, (ITerm) pNumber);
-    } else {
-      return ModuloArithmetic$.MODULE$.zero_extend(pExtensionBits, (ITerm) pNumber);
-    }
+    return new PrincessFunctionDeclaration.PrincessBitvectorExtendDeclaration(
+            pExtensionBits, pSigned)
+        .makeApp(getFormulaCreator().getEnv(), ImmutableList.of(pNumber));
   }
 }
