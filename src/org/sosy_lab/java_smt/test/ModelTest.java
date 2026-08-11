@@ -1319,6 +1319,10 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
                 + "but reports only default 123")
         .that(solverToUse())
         .isNotEqualTo(Solvers.YICES2);
+    assume()
+        .withMessage("SmtInterpol uses default values for the array")
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.SMTINTERPOL);
 
     // (= (select (select (select arr 5) 3) 1) x)
     // (= x 123)"
@@ -2514,7 +2518,12 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
     assume()
         .withMessage("Solver is quite slow for this example")
         .that(solverToUse())
-        .isNoneOf(Solvers.CVC5, Solvers.MATHSAT5, Solvers.PRINCESS, Solvers.BITWUZLA);
+        .isNoneOf(
+            Solvers.CVC5,
+            Solvers.MATHSAT5,
+            Solvers.PRINCESS,
+            Solvers.BITWUZLA,
+            Solvers.SMTINTERPOL);
 
     checkModelIteration(formula, false);
   }
@@ -2657,6 +2666,14 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
 
     assume().that(solver).isNotEqualTo(Solvers.BOOLECTOR); // Doesn't support multiple indices
 
+    // SmtInterpol returns the following model:
+    // array[5,_]=20
+    // array[3,2]=5    <- Only index without wildcards
+    // array[3,_]=20
+    // array[_,7]=10
+    // array[_,_]=20
+    assume().that(solver).isNotEqualTo(Solvers.SMTINTERPOL);
+
     // Test for 2d bitvector arrays with formula like:
     //     array[1][7] = 10  and  array[3][2] = 5  and  array[5][4] = 20
     // We have no default value, so the solver can choose any value for other indices,
@@ -2705,6 +2722,10 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
         .withMessage("Yices does not support constant arrays when mcsat is used")
         .that(solver)
         .isNotEqualTo(Solvers.YICES2);
+    assume()
+        .withMessage("SmtInterpol does not support constant arrays over bitvectors")
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.SMTINTERPOL);
 
     var scalarType = FormulaType.getBitvectorTypeWithSize(8);
 
@@ -2750,6 +2771,10 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
         .withMessage("Yices does not support constant arrays when mcsat is used")
         .that(solver)
         .isNotEqualTo(Solvers.YICES2);
+    assume()
+        .withMessage("SmtInterpol does not support constant arrays over bitvectors")
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.SMTINTERPOL);
     // FIXME CVC4 array model is sometimes broken in JavaSMT. Unfixable in CVC4, fixed in CVC5.
     assume().that(solver).isNotEqualTo(Solvers.CVC4);
 

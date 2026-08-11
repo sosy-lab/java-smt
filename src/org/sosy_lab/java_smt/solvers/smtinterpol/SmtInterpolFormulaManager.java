@@ -40,13 +40,16 @@ class SmtInterpolFormulaManager extends AbstractFormulaManager<Term, Sort, Scrip
 
   private final LogManager logger;
 
+  @SuppressWarnings("checkstyle:parameternumber")
   SmtInterpolFormulaManager(
       SmtInterpolFormulaCreator pCreator,
       SmtInterpolUFManager pFunctionManager,
       SmtInterpolBooleanFormulaManager pBooleanManager,
       SmtInterpolIntegerFormulaManager pIntegerManager,
       SmtInterpolRationalFormulaManager pRationalManager,
+      SmtInterpolBitvectorFormulaManager pBitvectorManager,
       SmtInterpolArrayFormulaManager pArrayFormulaManager,
+      SmtInterpolQuantifiedFormulaManager pQuantifiedFormulaManager,
       LogManager pLogger) {
     super(
         pCreator,
@@ -54,9 +57,9 @@ class SmtInterpolFormulaManager extends AbstractFormulaManager<Term, Sort, Scrip
         pBooleanManager,
         pIntegerManager,
         pRationalManager,
+        pBitvectorManager,
         null,
-        null,
-        null,
+        pQuantifiedFormulaManager,
         pArrayFormulaManager,
         null,
         null,

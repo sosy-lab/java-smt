@@ -552,12 +552,14 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
   @Test
   public void testBVEquality2() throws SolverException, InterruptedException {
     requireBitvectors();
-    // Boolector quants need to be reworked
-    assume().that(solverToUse()).isNotEqualTo(Solvers.BOOLECTOR);
     assume()
         .withMessage("Yices2 quantifier support is very limited at the moment")
         .that(solverToUse())
         .isNotEqualTo(Solvers.YICES2);
+    assume()
+        .withMessage("Quantifier support in SmtInterpol is incomplete")
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.SMTINTERPOL);
 
     BitvectorFormula z = bvmgr.makeVariable(bvWidth, "z");
     BitvectorFormula y = bvmgr.makeVariable(bvWidth, "y");
@@ -570,12 +572,14 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
     // exists z . (forall y . z = y && z + 2 > z)
     // UNSAT because of bv behaviour
     requireBitvectors();
-    // Boolector quants need to be reworked
-    assume().that(solverToUse()).isNotEqualTo(Solvers.BOOLECTOR);
     assume()
         .withMessage("Yices2 quantifier support is very limited at the moment")
         .that(solverToUse())
         .isNotEqualTo(Solvers.YICES2);
+    assume()
+        .withMessage("Quantifier support in SmtInterpol is incomplete")
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.SMTINTERPOL);
 
     BitvectorFormula z = bvmgr.makeVariable(bvWidth, "z");
     BitvectorFormula zPlusTwo =

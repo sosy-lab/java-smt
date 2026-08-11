@@ -116,6 +116,10 @@ public class RationalFormulaManagerTest extends SolverBasedTest0.ParameterizedSo
         .withMessage("Princees does not support universal quantification over rationals")
         .that(solverToUse())
         .isNotEqualTo(Solvers.PRINCESS);
+    assume()
+        .withMessage("Quantifier support in SmtInterpol is incomplete")
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.SMTINTERPOL);
 
     RationalFormula v = rmgr.makeVariable("v");
     // counterexample: all integers

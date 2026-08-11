@@ -362,6 +362,10 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
   @Test
   public void intTestBV_DivMod() throws SolverException, InterruptedException {
     requireBitvectors();
+    assume()
+        .withMessage("SmtInterpol only has limited support for bitvectors")
+        .that(solver)
+        .isNotEqualTo(Solvers.SMTINTERPOL);
 
     final int bitsize = 8;
     BitvectorFormula a = bvmgr.makeVariable(bitsize, "int_a");
