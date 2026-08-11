@@ -377,23 +377,28 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
     ImmutableList.Builder<String> declarationTokens = ImmutableList.builder();
     ImmutableList.Builder<String> definitionTokens = ImmutableList.builder();
     ImmutableList.Builder<String> assertTokens = ImmutableList.builder();
-    for (String token : SMTLibTokenizer.of(formulaStr)) {
-      if (SMTLibTokenizer.isDeclarationToken(token)) {
-        declarationTokens.add(token);
+    try {
+      for (String token : SMTLibTokenizer.of(formulaStr)) {
+        if (SMTLibTokenizer.isDeclarationToken(token)) {
+          declarationTokens.add(token);
+        }
+        if (SMTLibTokenizer.isDefinitionToken(token)) {
+          definitionTokens.add(token);
+        }
+        if (SMTLibTokenizer.isAssertToken(token)) {
+          assertTokens.add(token);
+        }
       }
-      if (SMTLibTokenizer.isDefinitionToken(token)) {
-        definitionTokens.add(token);
-      }
-      if (SMTLibTokenizer.isAssertToken(token)) {
-        assertTokens.add(token);
-      }
-    }
-    String definitions =
-        Joiner.on("").join(declarationTokens.build())
-            + Joiner.on("").join(definitionTokens.build());
+      String definitions =
+          Joiner.on("").join(declarationTokens.build())
+              + Joiner.on("").join(definitionTokens.build());
 
-    return Collections3.transformedImmutableListCopy(
-        assertTokens.build(), assertion -> parseImpl(definitions + assertion));
+      return Collections3.transformedImmutableListCopy(
+          assertTokens.build(), assertion -> parseImpl(definitions + assertion));
+
+    } catch (IllegalArgumentException illegalArgumentException) {
+      throw throwIllegalArgumentExceptionWithBetterErrorMessage(illegalArgumentException);
+    }
   }
 
   /**
@@ -1045,5 +1050,30 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
                 + " 'reset' first");
       }
     }
+  }
+
+  /**
+   * Returns the given {@link IllegalArgumentException} with a potentially improved error message.
+   * For example: the 'as_ieee_bv' and 'to_ieee_bv' operations are not supported by all SMT solvers,
+   * as the standard does not define those. We add an explanation to error messages containing those
+   * operations that explain how to build SMTLIB2 conforming and well accepted SMTLIB2.
+   *
+   * @param illegalArgumentException original {@link IllegalArgumentException} wrapping a solvers or
+   *     our initial error message from parsing SMTLIB2.
+   * @return a {@link IllegalArgumentException} that should be thrown in all cases. Might be the
+   *     original exception.
+   */
+  private IllegalArgumentException throwIllegalArgumentExceptionWithBetterErrorMessage(
+      IllegalArgumentException illegalArgumentException) throws IllegalArgumentException {
+    final String msg = illegalArgumentException.getMessage();
+    if (msg != null && (msg.contains("to_ieee_bv") || msg.contains("as_ieee_bv"))) {
+      // Better error message for certain cases, explaining common problems
+      final String additionalMessage =
+          "; Note: operations 'to_ieee_bv' and 'as_ieee_bv' are not supported in most SMT"
+              + " solvers. You can try using the SMTLIB2 standards preferred way to encode this"
+              + " operation by utilizing the 'to_fp' operation.";
+      return new IllegalArgumentException(msg + additionalMessage, illegalArgumentException);
+    }
+    return illegalArgumentException;
   }
 }
