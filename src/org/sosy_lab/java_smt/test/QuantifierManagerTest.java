@@ -10,7 +10,7 @@ package org.sosy_lab.java_smt.test;
 
 import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.TruthJUnit.assume;
-import static org.junit.Assert.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.sosy_lab.java_smt.api.FormulaType.StringType;
 
 import com.google.common.collect.ImmutableList;
@@ -18,8 +18,8 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.sosy_lab.common.UniqueIdGenerator;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.ArrayFormula;
@@ -35,7 +35,7 @@ import org.sosy_lab.java_smt.api.Tactic;
 import org.sosy_lab.java_smt.api.visitors.DefaultFormulaVisitor;
 
 @SuppressFBWarnings(value = "DLS_DEAD_LOCAL_STORE", justification = "test code")
-public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
+public class QuantifierManagerTest extends SolverBasedTest.ParameterizedSolverBasedTest {
 
   private IntegerFormula x;
   private ArrayFormula<IntegerFormula, IntegerFormula> a;
@@ -64,7 +64,7 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
   @SuppressWarnings("checkstyle:membername")
   private BooleanFormula bv_forall_x_a_at_x_eq_0;
 
-  @Before
+  @BeforeEach
   public void setUp() {
     requireQuantifiers();
   }

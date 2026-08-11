@@ -8,7 +8,7 @@
 
 package org.sosy_lab.java_smt.test;
 
-import static org.junit.Assert.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.sosy_lab.java_smt.api.FormulaType.BooleanType;
 import static org.sosy_lab.java_smt.api.FormulaType.IntegerType;
 
@@ -17,8 +17,8 @@ import com.google.common.collect.HashBiMap;
 import com.google.common.collect.ImmutableList;
 import com.google.common.truth.Truth;
 import java.util.Map;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FunctionDeclaration;
@@ -28,11 +28,11 @@ import org.sosy_lab.java_smt.utils.SolverUtils;
 import org.sosy_lab.java_smt.utils.UfElimination;
 import org.sosy_lab.java_smt.utils.UfElimination.Result;
 
-public class UfEliminationTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
+public class UfEliminationTest extends SolverBasedTest.ParameterizedSolverBasedTest {
 
   private UfElimination ackermannization;
 
-  @Before
+  @BeforeEach
   public void setUp() {
     ackermannization = SolverUtils.ufElimination(mgr);
   }

@@ -15,12 +15,11 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import java.util.List;
 import java.util.function.Supplier;
-import org.junit.AssumptionViolatedException;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameter;
-import org.junit.runners.Parameterized.Parameters;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.Parameter;
+import org.junit.jupiter.params.ParameterizedClass;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.opentest4j.TestAbortedException;
 import org.sosy_lab.common.configuration.ConfigurationBuilder;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
@@ -29,13 +28,13 @@ import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractNumeralFormulaManager.NonLinearArithmetic;
 
-@RunWith(Parameterized.class)
-public class NonLinearArithmeticWithModuloTest extends SolverBasedTest0 {
+@ParameterizedClass
+@MethodSource("getAllSolversAndTheories")
+public class NonLinearArithmeticWithModuloTest extends SolverBasedTest {
 
-  @Parameters(name = "{0} {1}")
   public static Iterable<Object[]> getAllSolversAndTheories() {
     return Lists.cartesianProduct(
-            ImmutableList.copyOf(ParameterizedSolverBasedTest0.getAllSolvers()),
+            ImmutableList.copyOf(ParameterizedSolverBasedTest.getAllSolvers()),
             ImmutableList.copyOf(NonLinearArithmetic.values()))
         .stream()
         .map(List::toArray)
@@ -65,7 +64,7 @@ public class NonLinearArithmeticWithModuloTest extends SolverBasedTest0 {
     } catch (UnsupportedOperationException e) {
       if (nonLinearArithmetic == NonLinearArithmetic.USE
           && NonLinearArithmeticTest.SOLVER_WITHOUT_NONLINEAR_ARITHMETIC.contains(solver)) {
-        throw new AssumptionViolatedException(
+        throw new TestAbortedException(
             "Expected UnsupportedOperationException was thrown correctly");
       }
       throw e;

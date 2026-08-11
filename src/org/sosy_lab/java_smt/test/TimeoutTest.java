@@ -9,18 +9,19 @@
 package org.sosy_lab.java_smt.test;
 
 import static com.google.common.truth.TruthJUnit.assume;
-import static org.junit.Assert.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameter;
-import org.junit.runners.Parameterized.Parameters;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Timeout;
+import org.junit.jupiter.params.Parameter;
+import org.junit.jupiter.params.ParameterizedClass;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BasicProverEnvironment;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -28,17 +29,17 @@ import org.sosy_lab.java_smt.api.Tactic;
 import org.sosy_lab.java_smt.solvers.opensmt.Logics;
 
 /** Check that timeout is handled gracefully. */
-@RunWith(Parameterized.class)
-public class TimeoutTest extends SolverBasedTest0 {
+@ParameterizedClass
+@MethodSource("getAllSolversAndDelays")
+public class TimeoutTest extends SolverBasedTest {
 
   private static final int TIMEOUT_MILLISECONDS = 20000;
 
   private static final int[] DELAY_IN_MILLISECONDS = {5, 10, 20, 50, 100};
 
-  @Parameters(name = "{0} with delay {1}")
   public static List<Object[]> getAllSolversAndDelays() {
     List<Object[]> lst = new ArrayList<>();
-    for (Solvers solver : ParameterizedSolverBasedTest0.getAllSolvers()) {
+    for (Solvers solver : ParameterizedSolverBasedTest.getAllSolvers()) {
       for (int delay : DELAY_IN_MILLISECONDS) {
         lst.add(new Object[] {solver, delay});
       }
@@ -63,7 +64,7 @@ public class TimeoutTest extends SolverBasedTest0 {
     return Logics.QF_LIA;
   }
 
-  @Before
+  @BeforeEach
   public void setUp() {
     // FIXME CVC5 does not support interruption and will segfault once the timeout is reached
     //   The issue here seems to be that CVC5SolverContext.close() will free the C++ objects while
@@ -84,29 +85,33 @@ public class TimeoutTest extends SolverBasedTest0 {
     String msg = "ShutdownRequest";
     BooleanFormula test = fuzzer.fuzz(20, 3);
     shutdownManager.requestShutdown(msg);
-    assertThrows(msg, InterruptedException.class, () -> mgr.applyTactic(test, Tactic.NNF));
+    assertThrows(InterruptedException.class, () -> mgr.applyTactic(test, Tactic.NNF), msg);
   }
 
-  @Test(timeout = TIMEOUT_MILLISECONDS)
+  @Test
+  @Timeout(value = TIMEOUT_MILLISECONDS, unit = TimeUnit.MILLISECONDS)
   public void testProverTimeoutInt() throws InterruptedException {
     requireIntegers();
     testBasicProverTimeoutInt(() -> context.newProverEnvironment());
   }
 
-  @Test(timeout = TIMEOUT_MILLISECONDS)
+  @Test
+  @Timeout(value = TIMEOUT_MILLISECONDS, unit = TimeUnit.MILLISECONDS)
   public void testProverTimeoutBv() throws InterruptedException {
     requireBitvectors();
     testBasicProverTimeoutBv(() -> context.newProverEnvironment());
   }
 
-  @Test(timeout = TIMEOUT_MILLISECONDS)
+  @Test
+  @Timeout(value = TIMEOUT_MILLISECONDS, unit = TimeUnit.MILLISECONDS)
   public void testInterpolationProverTimeout() throws InterruptedException {
     requireInterpolation();
     requireIntegers();
     testBasicProverTimeoutInt(() -> context.newProverEnvironmentWithInterpolation());
   }
 
-  @Test(timeout = TIMEOUT_MILLISECONDS)
+  @Test
+  @Timeout(value = TIMEOUT_MILLISECONDS, unit = TimeUnit.MILLISECONDS)
   public void testOptimizationProverTimeout() throws InterruptedException {
     requireOptimization();
     requireIntegers();

@@ -14,13 +14,12 @@ import static org.sosy_lab.java_smt.test.BooleanFormulaSubject.assertUsing;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import java.util.List;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameter;
-import org.junit.runners.Parameterized.Parameters;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.Parameter;
+import org.junit.jupiter.params.ParameterizedClass;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.sosy_lab.common.ShutdownManager;
 import org.sosy_lab.common.configuration.Configuration;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
@@ -36,7 +35,8 @@ import org.sosy_lab.java_smt.api.SolverContext;
 import org.sosy_lab.java_smt.api.SolverException;
 
 /** Testing formula serialization. */
-@RunWith(Parameterized.class)
+@ParameterizedClass
+@MethodSource("getSolverCombinations")
 public class TranslateFormulaTest {
 
   private final LogManager logger = LogManager.createTestLogManager();
@@ -52,13 +52,13 @@ public class TranslateFormulaTest {
   @Parameter(1)
   public Solvers translateTo;
 
-  @Parameters(name = "{index}: {0} --> {1}")
   public static List<Object[]> getSolverCombinations() {
-    List<Solvers> solvers = ImmutableList.copyOf(Solvers.values());
+    List<Solvers> solvers =
+        ImmutableList.copyOf(SolverBasedTest.ParameterizedSolverBasedTest.getAllSolvers());
     return Lists.transform(Lists.cartesianProduct(solvers, solvers), List::toArray);
   }
 
-  @Before
+  @BeforeEach
   public void initSolvers() throws InvalidConfigurationException {
     Configuration empty = Configuration.builder().build();
     SolverContextFactory factory =
@@ -79,7 +79,7 @@ public class TranslateFormulaTest {
     managerTo = to.getFormulaManager();
   }
 
-  @After
+  @AfterEach
   public void close() {
     if (from != null) {
       from.close();

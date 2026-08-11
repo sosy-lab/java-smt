@@ -16,13 +16,12 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import java.util.List;
 import java.util.function.Supplier;
-import org.junit.AssumptionViolatedException;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameter;
-import org.junit.runners.Parameterized.Parameters;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.Parameter;
+import org.junit.jupiter.params.ParameterizedClass;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.opentest4j.TestAbortedException;
 import org.sosy_lab.common.configuration.ConfigurationBuilder;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
@@ -33,8 +32,9 @@ import org.sosy_lab.java_smt.api.NumeralFormulaManager;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractNumeralFormulaManager.NonLinearArithmetic;
 
-@RunWith(Parameterized.class)
-public class NonLinearArithmeticTest<T extends NumeralFormula> extends SolverBasedTest0 {
+@ParameterizedClass
+@MethodSource("getAllSolversAndTheories")
+public class NonLinearArithmeticTest<T extends NumeralFormula> extends SolverBasedTest {
 
   // Boolector, CVC4, SMTInterpol, MathSAT5 and OpenSMT do not fully support non-linear arithmetic
   // (though SMTInterpol and MathSAT5 support some parts)
@@ -44,10 +44,9 @@ public class NonLinearArithmeticTest<T extends NumeralFormula> extends SolverBas
       ImmutableSet.of(
           Solvers.SMTINTERPOL, Solvers.MATHSAT5, Solvers.BOOLECTOR, Solvers.CVC4, Solvers.OPENSMT);
 
-  @Parameters(name = "{0} {1} {2}")
   public static Iterable<Object[]> getAllSolversAndTheories() {
     return Lists.cartesianProduct(
-            ImmutableList.copyOf(ParameterizedSolverBasedTest0.getAllSolvers()),
+            ImmutableList.copyOf(ParameterizedSolverBasedTest.getAllSolvers()),
             ImmutableList.of(FormulaType.IntegerType, FormulaType.RationalType),
             ImmutableList.copyOf(NonLinearArithmetic.values()))
         .stream()
@@ -69,7 +68,7 @@ public class NonLinearArithmeticTest<T extends NumeralFormula> extends SolverBas
   private NumeralFormulaManager<T, T> nmgr;
 
   @SuppressWarnings("unchecked")
-  @Before
+  @BeforeEach
   public void chooseNumeralFormulaManager() {
     if (formulaType.isIntegerType()) {
       requireIntegers();
@@ -97,7 +96,7 @@ public class NonLinearArithmeticTest<T extends NumeralFormula> extends SolverBas
     } catch (UnsupportedOperationException e) {
       if (nonLinearArithmetic == NonLinearArithmetic.USE
           && SOLVER_WITHOUT_NONLINEAR_ARITHMETIC.contains(solver)) {
-        throw new AssumptionViolatedException(
+        throw new TestAbortedException(
             "Expected UnsupportedOperationException was thrown correctly");
       }
       throw e;

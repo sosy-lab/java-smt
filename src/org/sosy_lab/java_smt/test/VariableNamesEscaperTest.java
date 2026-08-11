@@ -12,7 +12,7 @@ import static com.google.common.truth.Truth.assertThat;
 
 import com.google.common.collect.Lists;
 import java.util.List;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /** inherits many tests from {@link VariableNamesTest}. */
 public class VariableNamesEscaperTest extends VariableNamesTest {

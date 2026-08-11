@@ -15,8 +15,8 @@ import static org.sosy_lab.java_smt.api.FormulaType.StringType;
 import static org.sosy_lab.java_smt.api.FormulaType.getBitvectorTypeWithSize;
 import static org.sosy_lab.java_smt.api.FormulaType.getSinglePrecisionFloatingPointType;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.ArrayFormula;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
@@ -31,9 +31,9 @@ import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.api.StringFormula;
 
 /** Tests Arrays for all solvers that support it. */
-public class ArrayFormulaManagerTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
+public class ArrayFormulaManagerTest extends SolverBasedTest.ParameterizedSolverBasedTest {
 
-  @Before
+  @BeforeEach
   public void init() {
     requireArrays();
   }

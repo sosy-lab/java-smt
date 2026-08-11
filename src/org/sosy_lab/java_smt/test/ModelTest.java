@@ -12,7 +12,7 @@ import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.Truth.assertWithMessage;
 import static com.google.common.truth.Truth.assert_;
 import static com.google.common.truth.TruthJUnit.assume;
-import static org.junit.Assert.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.sosy_lab.java_smt.api.FormulaType.IntegerType;
 import static org.sosy_lab.java_smt.api.FormulaType.getBitvectorTypeWithSize;
 import static org.sosy_lab.java_smt.test.ProverEnvironmentSubject.assertThat;
@@ -31,10 +31,12 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import org.checkerframework.checker.nullness.qual.Nullable;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Timeout;
 import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.ArrayFormula;
@@ -59,7 +61,7 @@ import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.api.visitors.DefaultFormulaVisitor;
 
 /** Test that values from models are appropriately parsed. */
-public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
+public class ModelTest extends SolverBasedTest.ParameterizedSolverBasedTest {
 
   // A list of variables to test that model variable names are correctly applied
   private static final ImmutableList<String> VARIABLE_NAMES =
@@ -103,7 +105,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   /** Model value for irrelevant variable. */
   private BigInteger defaultValue;
 
-  @Before
+  @BeforeEach
   public void setup() {
     requireModel();
 
@@ -3261,8 +3263,8 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
         false);
   }
 
-  @Test // (timeout = 10_000)
-  // TODO CVC5 crashes on making the first boolean symbol when using timeout ???.
+  @Test
+  @Timeout(value = 10, unit = TimeUnit.SECONDS)
   public void testDeeplyNestedFormulaLIA() throws SolverException, InterruptedException {
     requireIntegers();
 
@@ -3272,8 +3274,8 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
         var -> imgr.equal(var, imgr.makeNumber(1)));
   }
 
-  @Test // (timeout = 10_000)
-  // TODO CVC5 crashes on making the first boolean symbol when using timeout ???.
+  @Test
+  @Timeout(value = 10, unit = TimeUnit.SECONDS)
   public void testDeeplyNestedFormulaBV() throws SolverException, InterruptedException {
     requireBitvectors();
 

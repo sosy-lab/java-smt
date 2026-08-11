@@ -9,7 +9,7 @@
 package org.sosy_lab.java_smt.solvers.cvc4;
 
 import static com.google.common.truth.Truth.assertThat;
-import static org.junit.Assert.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import edu.stanford.CVC4.ArrayType;
 import edu.stanford.CVC4.BitVector;
@@ -29,11 +29,11 @@ import edu.stanford.CVC4.SortType;
 import edu.stanford.CVC4.Type;
 import edu.stanford.CVC4.UnsatCore;
 import edu.stanford.CVC4.vectorExpr;
-import org.junit.After;
-import org.junit.AssumptionViolatedException;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.opentest4j.TestAbortedException;
 import org.sosy_lab.common.NativeLibraries;
 
 /*
@@ -58,19 +58,19 @@ public class CVC4NativeAPITest {
   private Expr aAtxEq0;
   private Expr aAtxEq1;
 
-  @BeforeClass
+  @BeforeAll
   public static void loadCVC4() {
     try {
       NativeLibraries.loadLibrary("cvc4jni");
     } catch (UnsatisfiedLinkError e) {
-      throw new AssumptionViolatedException("CVC4 is not available", e);
+      throw new TestAbortedException("CVC4 is not available", e);
     }
   }
 
   private ExprManager exprMgr;
   private SmtEngine smtEngine;
 
-  @Before
+  @BeforeEach
   public void createEnvironment() {
     exprMgr = new ExprManager();
     smtEngine = new SmtEngine(exprMgr);
@@ -84,7 +84,7 @@ public class CVC4NativeAPITest {
     smtEngine.setOption("output-language", new SExpr("smt2"));
   }
 
-  @After
+  @AfterEach
   public void freeEnvironment() {
     smtEngine.delete();
     exprMgr.delete();

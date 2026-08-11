@@ -12,7 +12,7 @@ import static com.google.common.collect.Iterables.getLast;
 import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.Truth.assertWithMessage;
 import static com.google.common.truth.TruthJUnit.assume;
-import static org.junit.Assert.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.sosy_lab.java_smt.test.ProverEnvironmentSubject.assertThat;
 
 import com.google.common.collect.ImmutableList;
@@ -21,7 +21,7 @@ import com.google.common.collect.Lists;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.sosy_lab.common.UniqueIdGenerator;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
@@ -33,7 +33,7 @@ import org.sosy_lab.java_smt.solvers.opensmt.Logics;
 
 /** This class contains some simple Junit-tests to check the interpolation-API of our solvers. */
 @SuppressWarnings({"resource", "LocalVariableName"})
-public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
+public class InterpolatingProverTest extends SolverBasedTest.ParameterizedSolverBasedTest {
 
   // INFO: OpenSmt only support interpolation for QF_LIA, QF_LRA and QF_UF
   @Override

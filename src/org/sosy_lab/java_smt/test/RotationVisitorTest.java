@@ -12,18 +12,18 @@ package org.sosy_lab.java_smt.test;
 
 import static com.google.common.truth.Truth.assertThat;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.FunctionDeclarationKind;
 import org.sosy_lab.java_smt.test.SolverVisitorTest.FunctionDeclarationVisitorNoOther;
 
-public class RotationVisitorTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
+public class RotationVisitorTest extends SolverBasedTest.ParameterizedSolverBasedTest {
 
   private BitvectorFormula a;
   private BitvectorFormula y;
 
-  @Before
+  @BeforeEach
   public void init() {
     requireBitvectors();
     requireVisitor();

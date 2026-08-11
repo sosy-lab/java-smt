@@ -15,7 +15,7 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 import org.checkerframework.checker.nullness.qual.NonNull;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.sosy_lab.common.configuration.ConfigurationBuilder;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.common.rationals.Rational;
@@ -29,7 +29,7 @@ import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractStringFormulaManager;
 
 /** Test that we can request evaluations from models. */
-public class ModelEvaluationTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
+public class ModelEvaluationTest extends SolverBasedTest.ParameterizedSolverBasedTest {
 
   /**
    * This is the default boolean value for unknown model evaluations. For unknown model evaluation

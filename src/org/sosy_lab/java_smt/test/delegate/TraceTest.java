@@ -17,11 +17,10 @@ import com.google.common.collect.ImmutableList;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 import org.sosy_lab.common.configuration.Configuration;
 import org.sosy_lab.common.configuration.FileOption;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
@@ -41,16 +40,16 @@ import org.sosy_lab.java_smt.api.visitors.DefaultFormulaVisitor;
 
 public class TraceTest {
 
-  @Rule public TemporaryFolder tempDir = new TemporaryFolder();
+  @TempDir Path tempDir;
 
   private SolverContext context;
   private FormulaManager mgr;
   private BooleanFormulaManager bmgr;
   private Path traceFile;
 
-  @Before
-  public void setUp() throws InvalidConfigurationException, IOException {
-    traceFile = tempDir.newFile("trace.java").toPath();
+  @BeforeEach
+  public void setUp() throws InvalidConfigurationException {
+    traceFile = tempDir.resolve("trace.java");
     FileTypeConverter fileTypeConverter =
         FileTypeConverter.create(Configuration.defaultConfiguration());
     Configuration.getDefaultConverters().put(FileOption.class, fileTypeConverter);
@@ -71,7 +70,7 @@ public class TraceTest {
     bmgr = mgr.getBooleanFormulaManager();
   }
 
-  @After
+  @AfterEach
   public void tearDown() {
     context.close();
   }

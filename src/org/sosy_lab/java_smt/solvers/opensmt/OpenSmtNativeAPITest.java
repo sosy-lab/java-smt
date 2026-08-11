@@ -10,9 +10,9 @@ package org.sosy_lab.java_smt.solvers.opensmt;
 
 import static com.google.common.truth.Truth.assertThat;
 
-import org.junit.AssumptionViolatedException;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.opentest4j.TestAbortedException;
 import org.sosy_lab.common.NativeLibraries;
 import org.sosy_lab.java_smt.solvers.opensmt.api.ArithLogic;
 import org.sosy_lab.java_smt.solvers.opensmt.api.InterpolationContext;
@@ -34,12 +34,12 @@ import org.sosy_lab.java_smt.solvers.opensmt.api.sstat;
 
 public class OpenSmtNativeAPITest {
 
-  @BeforeClass
+  @BeforeAll
   public static void load() {
     try {
       NativeLibraries.loadLibrary("opensmtj");
     } catch (UnsatisfiedLinkError e) {
-      throw new AssumptionViolatedException("OpenSMT is not available", e);
+      throw new TestAbortedException("OpenSMT is not available", e);
     }
   }
 
