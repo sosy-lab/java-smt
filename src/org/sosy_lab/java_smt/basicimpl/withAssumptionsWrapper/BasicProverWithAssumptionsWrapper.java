@@ -19,6 +19,11 @@ import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.SolverException;
 
+/**
+ * This wrapper and its children provide solver-independent support for assumption solving. The
+ * implementations in this class only call other methods provided by {@link BasicProverEnvironment}.
+ * Preconditions for using the API are therefore fully checked.
+ */
 class BasicProverWithAssumptionsWrapper<T, P extends BasicProverEnvironment<T>>
     implements BasicProverEnvironment<T> {
 
@@ -66,7 +71,7 @@ class BasicProverWithAssumptionsWrapper<T, P extends BasicProverEnvironment<T>>
   }
 
   @Override
-  public boolean isUnsatWithAssumptions(Collection<BooleanFormula> assumptions)
+  public final boolean isUnsatWithAssumptions(Collection<BooleanFormula> assumptions)
       throws SolverException, InterruptedException {
     clearAssumptions();
     solverAssumptionsAsFormula.addAll(assumptions);

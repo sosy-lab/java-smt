@@ -68,7 +68,7 @@ class BoolectorTheoremProver extends AbstractProverWithAllSat<Void> implements P
 
   @Override
   public void close() {
-    if (!closed) {
+    if (!isClosed()) {
       // Free resources of callback
       BtorJNI.boolector_free_termination(terminationCallbackHelper);
       // remove the whole stack, including the initial level from the constructor call.
@@ -115,9 +115,9 @@ class BoolectorTheoremProver extends AbstractProverWithAllSat<Void> implements P
   }
 
   @Override
-  public boolean isUnsatWithAssumptions(Collection<BooleanFormula> pAssumptions)
+  protected boolean isUnsatWithAssumptionsImpl(Collection<BooleanFormula> pAssumptions)
       throws SolverException, InterruptedException {
-    Preconditions.checkState(!closed);
+    checkNotClosed();
 
     for (BooleanFormula assumption : pAssumptions) {
       BtorJNI.boolector_assume(btor, BoolectorFormulaManager.getBtorTerm(assumption));
@@ -143,13 +143,8 @@ class BoolectorTheoremProver extends AbstractProverWithAllSat<Void> implements P
   }
 
   @Override
-  public List<BooleanFormula> getUnsatCore() {
-    throw new UnsupportedOperationException(UNSAT_CORE_NOT_SUPPORTED);
-  }
-
-  @Override
-  public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(
-      Collection<BooleanFormula> pAssumptions) throws SolverException, InterruptedException {
+  protected Optional<List<BooleanFormula>> unsatCoreOverAssumptionsImpl(
+      Collection<BooleanFormula> pAssumptions) {
     throw new UnsupportedOperationException(UNSAT_CORE_WITH_ASSUMPTIONS_NOT_SUPPORTED);
   }
 
@@ -161,17 +156,8 @@ class BoolectorTheoremProver extends AbstractProverWithAllSat<Void> implements P
     return null;
   }
 
-  /**
-   * Simply returns true if the prover is closed. False otherwise.
-   *
-   * @return bool return value.
-   */
-  protected boolean isClosed() {
-    return closed;
-  }
-
   private long addTerminationCallback() {
-    Preconditions.checkState(!closed, "solver context is already closed");
+    checkNotClosed();
     return BtorJNI.boolector_set_termination(btor, terminationCallback);
   }
 }

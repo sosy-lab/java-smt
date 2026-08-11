@@ -101,7 +101,7 @@ class SmtInterpolInterpolatingProver extends SmtInterpolAbstractProver<String>
   }
 
   private Term buildConjunctionOfNamedTerms(Collection<String> termNames) {
-    Preconditions.checkState(!closed);
+    checkNotClosed();
     Preconditions.checkArgument(!termNames.isEmpty());
 
     if (termNames.size() == 1) {

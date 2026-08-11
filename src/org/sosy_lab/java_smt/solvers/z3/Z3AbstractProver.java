@@ -8,7 +8,6 @@
 
 package org.sosy_lab.java_smt.solvers.z3;
 
-import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.io.MoreFiles;
 import com.microsoft.z3.Native;
@@ -133,7 +132,7 @@ abstract class Z3AbstractProver extends AbstractProverWithAllSat<Void> {
 
   @Override
   protected Void addConstraintImpl(BooleanFormula f) throws InterruptedException {
-    Preconditions.checkState(!closed);
+    checkNotClosed();
     long e = creator.extractInfo(f);
     try {
       if (storedConstraints != null) { // Unsat core generation is on.
@@ -151,14 +150,14 @@ abstract class Z3AbstractProver extends AbstractProverWithAllSat<Void> {
   }
 
   protected void push0() {
-    Preconditions.checkState(!closed);
+    checkNotClosed();
     if (storedConstraints != null) {
       storedConstraints.push(storedConstraints.peek());
     }
   }
 
   protected void pop0() {
-    Preconditions.checkState(!closed);
+    checkNotClosed();
     if (storedConstraints != null) {
       storedConstraints.pop();
     }
@@ -167,8 +166,7 @@ abstract class Z3AbstractProver extends AbstractProverWithAllSat<Void> {
   protected abstract long getUnsatCore0();
 
   @Override
-  public List<BooleanFormula> getUnsatCore() {
-    checkGenerateUnsatCores();
+  protected List<BooleanFormula> getUnsatCoreImpl() {
     if (storedConstraints == null) {
       throw new UnsupportedOperationException(
           "Option to generate the UNSAT core wasn't enabled when creating the prover environment.");
@@ -189,9 +187,8 @@ abstract class Z3AbstractProver extends AbstractProverWithAllSat<Void> {
   }
 
   @Override
-  public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(
+  protected Optional<List<BooleanFormula>> unsatCoreOverAssumptionsImpl(
       Collection<BooleanFormula> assumptions) throws SolverException, InterruptedException {
-    checkGenerateUnsatCoresOverAssumptions();
     if (!isUnsatWithAssumptions(assumptions)) {
       return Optional.empty();
     }
@@ -209,10 +206,7 @@ abstract class Z3AbstractProver extends AbstractProverWithAllSat<Void> {
   protected abstract long getStatistics0();
 
   @Override
-  public ImmutableMap<String, String> getStatistics() {
-    // Z3 sigsevs if you try to get statistics for closed environments
-    Preconditions.checkState(!closed);
-
+  protected ImmutableMap<String, String> getStatisticsImpl() {
     ImmutableMap.Builder<String, String> builder = ImmutableMap.builder();
     Set<String> seenKeys = new HashSet<>();
 
@@ -252,7 +246,7 @@ abstract class Z3AbstractProver extends AbstractProverWithAllSat<Void> {
 
   @Override
   public void close() {
-    if (!closed) {
+    if (!isClosed()) {
       if (storedConstraints != null) {
         storedConstraints.clear();
       }
@@ -261,10 +255,10 @@ abstract class Z3AbstractProver extends AbstractProverWithAllSat<Void> {
   }
 
   @Override
-  public <R> R allSat(AllSatCallback<R> callback, List<BooleanFormula> important)
+  protected <R> R allSatImpl(AllSatCallback<R> callback, List<BooleanFormula> important)
       throws InterruptedException, SolverException {
     try {
-      return super.allSat(callback, important);
+      return super.allSatImpl(callback, important);
     } catch (Z3Exception e) {
       throw creator.handleZ3Exception(e);
     }

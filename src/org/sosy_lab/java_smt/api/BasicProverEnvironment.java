@@ -145,7 +145,7 @@ public interface BasicProverEnvironment<T> extends AutoCloseable {
    * combined.
    *
    * @param assumptions Selected assumptions.
-   * @return Empty optional if the constraints with assumptions are satisfiable, subset of
+   * @return {@link Optional#empty()} if the constraints with assumptions are satisfiable, subset of
    *     assumptions which is unsatisfiable with the original constraints otherwise.
    */
   Optional<List<BooleanFormula>> unsatCoreOverAssumptions(Collection<BooleanFormula> assumptions)

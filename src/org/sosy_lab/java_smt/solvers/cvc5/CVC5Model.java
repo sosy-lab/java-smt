@@ -49,7 +49,6 @@ class CVC5Model extends AbstractModel<Term, Sort, TermManager> {
 
   @Override
   public Term evalImpl(Term f) {
-    checkState(!isClosed());
     return solver.getValue(f);
   }
 

@@ -8,7 +8,6 @@
 
 package org.sosy_lab.java_smt.solvers.cvc4;
 
-import com.google.common.base.Preconditions;
 import com.google.common.collect.Collections2;
 import edu.stanford.CVC4.Exception;
 import edu.stanford.CVC4.Expr;
@@ -125,7 +124,7 @@ class CVC4TheoremProver extends AbstractProverWithAllSat<Void>
 
   @Override
   protected @Nullable Void addConstraintImpl(BooleanFormula pF) throws InterruptedException {
-    Preconditions.checkState(!closed);
+    checkNotClosed();
     if (incremental) {
       assertFormula(pF);
     }
@@ -211,8 +210,7 @@ class CVC4TheoremProver extends AbstractProverWithAllSat<Void>
   }
 
   @Override
-  public List<BooleanFormula> getUnsatCore() {
-    checkGenerateUnsatCores();
+  protected List<BooleanFormula> getUnsatCoreImpl() {
     List<BooleanFormula> converted = new ArrayList<>();
     for (Expr aCore : smtEngine.getUnsatCore()) {
       converted.add(creator.encapsulateBoolean(exportExpr(aCore)));
@@ -221,22 +219,20 @@ class CVC4TheoremProver extends AbstractProverWithAllSat<Void>
   }
 
   @Override
-  public boolean isUnsatWithAssumptions(Collection<BooleanFormula> pAssumptions)
+  protected boolean isUnsatWithAssumptionsImpl(Collection<BooleanFormula> pAssumptions)
       throws SolverException, InterruptedException {
     throw new UnsupportedOperationException(ASSUMPTION_SOLVING_NOT_SUPPORTED);
   }
 
   @Override
-  public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(
-      Collection<BooleanFormula> pAssumptions) throws SolverException, InterruptedException {
+  protected Optional<List<BooleanFormula>> unsatCoreOverAssumptionsImpl(
+      Collection<BooleanFormula> pAssumptions) {
     throw new UnsupportedOperationException(UNSAT_CORE_WITH_ASSUMPTIONS_NOT_SUPPORTED);
   }
 
   @Override
   public void close() {
-    if (!closed) {
-      // Never close the context
-    }
+    // Don't close the context!
     super.close();
   }
 }

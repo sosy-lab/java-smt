@@ -25,8 +25,10 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.Set;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.api.BasicProverEnvironment;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Evaluator;
@@ -39,6 +41,93 @@ import org.sosy_lab.java_smt.api.SolverException;
 
 public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
 
+  // TODO: we could use this in a proper state machine to control the prover
+  enum ProverState {
+    CLOSED {
+      @Override
+      public boolean isClosed() {
+        return true;
+      }
+    },
+
+    CHANGED_SINCE_LAST_SAT_QUERY,
+
+    /** Initial state of a prover. We assume that it is SAT, but also that the state is changed. */
+    CHANGED_SINCE_LAST_SAT_QUERY_SAT,
+
+    /** The last query was SAT and the prover is unchanged since this was established. */
+    UNCHANGED_SAT {
+      @Override
+      public final boolean lastQueryWasSAT() {
+        return true;
+      }
+
+      @Override
+      public final boolean isUnchangedSinceLastQuery() {
+        return true;
+      }
+    },
+
+    UNCHANGED_UNSAT {
+      @Override
+      public final boolean lastQueryWasUNSAT() {
+        return true;
+      }
+
+      @Override
+      public final boolean isUnchangedSinceLastQuery() {
+        return true;
+      }
+    };
+
+    /**
+     * It is disallowed to call any prover method that requires an unchanged prover state after
+     * establishing SAT or UNSAT (for example {@link BasicProverEnvironment#getModel()}, {@link
+     * InterpolatingProverEnvironment#getInterpolant(Collection)}, {@link
+     * BasicProverEnvironment#getUnsatCore()} etc.) if this method returns {@code false}.
+     *
+     * @return {@code false} if the prover state changed since the last call to isUnsat() (or other
+     *     satisfiability establishing methods) with a valid (SAT/UNSAT) result. {@code true} if the
+     *     prover state has not been changed since the last valid result; either SAT or UNSAT.
+     */
+    public boolean isUnchangedSinceLastQuery() {
+      return false;
+    }
+
+    /**
+     * Can be used to check whether calls to methods that require a SAT result in the last
+     * satisfiability check are allowed. All model/evaluator methods require this. For example:
+     * {@link BasicProverEnvironment#getModel()} etc.
+     *
+     * @return {@code true} only if the last satisfiability check returned SAT. {@code false} in all
+     *     other cases.
+     */
+    public boolean lastQueryWasSAT() {
+      return false;
+    }
+
+    /**
+     * Can be used to check whether calls to methods that require a UNSAT result in the last
+     * satisfiability check are allowed. Examples for methods that require this: {@link
+     * InterpolatingProverEnvironment#getInterpolant(Collection)}, {@link
+     * BasicProverEnvironment#getUnsatCore()} etc.
+     *
+     * @return {@code true} only if the last satisfiability check returned UNSAT. {@code false} in
+     *     all other cases.
+     */
+    public boolean lastQueryWasUNSAT() {
+      return false;
+    }
+
+    /**
+     * @return {@code true} only if the solver is closed. No methods besides {@link #close()} are
+     *     allowed to be called anymore if it is closed. A solver can never be "unclosed"!
+     */
+    public boolean isClosed() {
+      return false;
+    }
+  }
+
   // flags for option
   protected final boolean generateModels;
   protected final boolean generateAllSat;
@@ -46,10 +135,8 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
   protected final boolean generateUnsatCoresOverAssumptions;
   protected final boolean enableSL;
 
-  // flags for status
-  protected boolean closed = false;
-  protected boolean wasLastSatCheckSatisfiable = true; // assume SAT for an empty prover
-  protected boolean changedSinceLastSatQuery = true; // assume changed for an empty prover
+  // We assume changed for an empty prover, but it is also SAT (which might not be used!)
+  private ProverState proverState = ProverState.CHANGED_SINCE_LAST_SAT_QUERY_SAT;
 
   private final Set<Evaluator> evaluators = new LinkedHashSet<>();
 
@@ -73,50 +160,97 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
     assertedFormulas.add(LinkedHashMultimap.create());
   }
 
+  /** Checks whether the prover has been closed and throws if it is closed. */
+  protected void checkNotClosed() {
+    checkState(
+        !proverState.isClosed(),
+        "The prover is already closed. No further operations are permitted.");
+  }
+
+  /**
+   * @return {@code true} if the prover has been closed and may not be used anymore, {@code false}
+   *     else.
+   */
+  public final boolean isClosed() {
+    return proverState.isClosed();
+  }
+
+  /**
+   * Checks whether operations that require an unchanged prover state since the last satisfiability
+   * check (e.g. {@link #isUnsat()}) that returned UNSAT are allowed to be used (e.g.{@link
+   * #getUnsatCore()}, {@link InterpolatingProverEnvironment#getInterpolant(Collection)} etc.).
+   * Throws if the prover state has been modified (e.g. via {@link #push()}, {@link #pop()} etc.) or
+   * the last result was not UNSAT.
+   */
+  protected void checkUnchangedSinceLastQueryUnsatisfiable() {
+    checkState(
+        proverState.isUnchangedSinceLastQuery(),
+        "The prover state changed since the last satisfiability check. The called method may only"
+            + " be used directly after a satisfiability check returned UNSAT.");
+    checkState(
+        proverState.lastQueryWasUNSAT(),
+        "The last query was not satisfiable. The called method may only be used directly after a"
+            + " satisfiability check returned UNSAT.");
+  }
+
+  /**
+   * Checks whether operations that require an unchanged prover state since the last satisfiability
+   * check (e.g. {@link #isUnsat()}) that returned SAT are allowed to be used (e.g.{@link
+   * #getModel()}, {@link #getEvaluator()}, {@link OptimizationProverEnvironment#upper(int,
+   * Rational)} etc.). Throws if the prover state has been modified (e.g. via {@link #push()},
+   * {@link #pop()} etc.) or the last result was not SAT.
+   */
+  protected void checkUnchangedSinceLastQuerySatisfiable() {
+    checkState(
+        proverState.isUnchangedSinceLastQuery(),
+        "The prover state changed since the last satisfiability check. The called method may only"
+            + " be used directly after a satisfiability check returned SAT.");
+    checkState(
+        proverState.lastQueryWasSAT(),
+        "The last query was not satisfiable. The called method may only be used directly after a"
+            + " satisfiability check returned SAT.");
+  }
+
   protected final void checkGenerateModels() {
     Preconditions.checkState(generateModels, TEMPLATE, ProverOptions.GENERATE_MODELS);
-    Preconditions.checkState(!closed);
-    Preconditions.checkState(!changedSinceLastSatQuery);
-    Preconditions.checkState(wasLastSatCheckSatisfiable, NO_MODEL_HELP);
+    checkNotClosed();
+    checkUnchangedSinceLastQuerySatisfiable();
   }
 
   protected final void checkGenerateAllSat() {
-    Preconditions.checkState(!closed);
+    // TODO: should this close all evaluators as well?
+    checkNotClosed();
     Preconditions.checkState(generateAllSat, TEMPLATE, ProverOptions.GENERATE_ALL_SAT);
   }
 
   protected final void checkGenerateUnsatCores() {
+    // TODO: should this close all evaluators as well?
     Preconditions.checkState(generateUnsatCores, TEMPLATE, ProverOptions.GENERATE_UNSAT_CORE);
-    Preconditions.checkState(!closed);
-    Preconditions.checkState(!changedSinceLastSatQuery);
-    Preconditions.checkState(!wasLastSatCheckSatisfiable);
+    checkNotClosed();
+    checkUnchangedSinceLastQueryUnsatisfiable();
   }
 
-  protected final void checkGenerateUnsatCoresOverAssumptions() {
-    Preconditions.checkState(!closed);
+  protected final void checkIsUnsatOverAssumptions(Collection<BooleanFormula> assumptions) {
+    checkNotClosed();
+    Preconditions.checkNotNull(assumptions);
+  }
+
+  protected final void checkGenerateUnsatCoresOverAssumptions(
+      Collection<BooleanFormula> assumptions) {
+    // TODO: should this close all evaluators as well?
+    // No need to no check for changedSinceLastSatQuery or wasLastSatCheckSatisfiable, as we
+    // guarantee a call to isUnsatOverAssumptions()
+    checkIsUnsatOverAssumptions(assumptions);
     Preconditions.checkState(
         generateUnsatCoresOverAssumptions,
         TEMPLATE,
         ProverOptions.GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS);
   }
 
-  /**
-   * Checks whether the prover has been closed already. Only to be used if this is the only check
-   * performed in a call.
-   */
-  protected void checkClosed() {
-    Preconditions.checkState(!closed);
-  }
-
   private void checkGenerateInterpolants() {
-    Preconditions.checkState(!closed);
-    Preconditions.checkState(
-        !changedSinceLastSatQuery,
-        "Interpolants can only be calculated right after a call to isUnsat()");
-    Preconditions.checkState(
-        !wasLastSatCheckSatisfiable,
-        "Interpolants can only be calculated if the assertions on the solver stack are "
-            + "unsatisfiable.");
+    // TODO: should this close all evaluators as well?
+    checkNotClosed();
+    checkUnchangedSinceLastQueryUnsatisfiable();
   }
 
   protected final void checkGenerateInterpolants(Collection<T> formulasOfA) {
@@ -145,33 +279,76 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
   }
 
   protected final void checkEnableSeparationLogic() {
-    Preconditions.checkState(!closed);
+    checkNotClosed();
     Preconditions.checkState(enableSL, TEMPLATE, ProverOptions.ENABLE_SEPARATION_LOGIC);
   }
 
   protected abstract boolean hasPersistentModel();
 
-  private void setChanged() {
-    wasLastSatCheckSatisfiable = false;
-    if (!changedSinceLastSatQuery) {
-      changedSinceLastSatQuery = true;
+  /**
+   * Sets the flags such that the prover state was changed since the last SAT check and closes all
+   * evaluators.
+   */
+  private void setProverStateToChangedSinceLastQuery() {
+    if (proverState != ProverState.CHANGED_SINCE_LAST_SAT_QUERY) {
+      proverState = ProverState.CHANGED_SINCE_LAST_SAT_QUERY;
       if (!hasPersistentModel()) {
         closeAllEvaluators();
       }
     }
   }
 
+  /**
+   * Modifies the current solver state to unchanged since last satisfiability check and remembers
+   * its result. Example usage:
+   *
+   * <p>{@code boolean isUnsat = setProverStateByIsUnsat(isUnsatImpl())}
+   *
+   * @param isUnsat the result of {@link #isUnsat()} (and similar methods) that guarantee returning
+   *     {@code true} for UNSAT and {@code false} for SAT.
+   * @return the unchanged parameter 'isUnsat'.
+   */
+  @CanIgnoreReturnValue
+  protected boolean setProverStateByIsUnsat(final boolean isUnsat) {
+    if (isUnsat) {
+      proverState = ProverState.UNCHANGED_UNSAT;
+    } else {
+      proverState = ProverState.UNCHANGED_SAT;
+    }
+    return isUnsat;
+  }
+
+  /**
+   * Modifies the current solver state to unchanged since last satisfiability check and remembers
+   * its result. The prover state is set to {@link ProverState#UNCHANGED_SAT} only for {@link
+   * OptStatus#OPT}, and to {@link ProverState#UNCHANGED_UNSAT} in all other cases. Example usage:
+   *
+   * <p>{@code OptStatus optStatus = setProverStateByOptStatus(checkImpl(query))}
+   *
+   * @param optimizationStatus the result of {@link #check()} (and similar methods) that return
+   *     {@link OptStatus}.
+   * @return the unchanged parameter 'optimizationStatus'.
+   */
+  private OptStatus setProverStateByOptStatus(final OptStatus optimizationStatus) {
+    if (optimizationStatus == OptStatus.OPT) {
+      proverState = ProverState.UNCHANGED_SAT;
+    } else {
+      proverState = ProverState.UNCHANGED_UNSAT;
+    }
+    return optimizationStatus;
+  }
+
   @Override
   public int size() {
-    checkState(!closed);
+    checkNotClosed();
     return assertedFormulas.size() - 1;
   }
 
   @Override
   public final void push() throws InterruptedException {
-    checkState(!closed);
+    checkNotClosed();
     pushImpl();
-    setChanged();
+    setProverStateToChangedSinceLastQuery();
     assertedFormulas.add(LinkedHashMultimap.create());
   }
 
@@ -179,11 +356,11 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
 
   @Override
   public final void pop() {
-    checkState(!closed);
+    checkNotClosed();
     checkState(assertedFormulas.size() > 1, "initial level must remain until close");
     assertedFormulas.remove(assertedFormulas.size() - 1); // remove last
     popImpl();
-    setChanged();
+    setProverStateToChangedSinceLastQuery();
   }
 
   protected abstract void popImpl();
@@ -191,9 +368,9 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
   @Override
   @CanIgnoreReturnValue
   public final @Nullable T addConstraint(BooleanFormula constraint) throws InterruptedException {
-    checkState(!closed);
+    checkNotClosed();
     T t = addConstraintImpl(constraint);
-    setChanged();
+    setProverStateToChangedSinceLastQuery();
     Iterables.getLast(assertedFormulas).put(constraint, t);
     return t;
   }
@@ -204,14 +381,9 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
   /** Check whether the conjunction of all formulas on the stack is unsatisfiable. */
   @Override
   public final boolean isUnsat() throws SolverException, InterruptedException {
-    checkState(!closed);
-    changedSinceLastSatQuery = false;
-    wasLastSatCheckSatisfiable = false;
-    final boolean isUnsat = isUnsatImpl();
-    if (!isUnsat) {
-      wasLastSatCheckSatisfiable = true;
-    }
-    return isUnsat;
+    checkNotClosed();
+    setProverStateToChangedSinceLastQuery();
+    return setProverStateByIsUnsat(isUnsatImpl());
   }
 
   protected abstract boolean isUnsatImpl() throws SolverException, InterruptedException;
@@ -231,14 +403,9 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
    * @return the optimization status; {@link OptStatus#OPT} indicates a satisfiable/optimal result
    */
   public final OptStatus check() throws InterruptedException, SolverException {
-    checkState(!closed);
-    wasLastSatCheckSatisfiable = false;
-    changedSinceLastSatQuery = false;
-    final OptStatus status = checkImpl();
-    if (status == OptStatus.OPT) {
-      wasLastSatCheckSatisfiable = true;
-    }
-    return status;
+    checkNotClosed();
+    setProverStateToChangedSinceLastQuery();
+    return setProverStateByOptStatus(checkImpl());
   }
 
   /**
@@ -324,10 +491,97 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
     evaluators.clear();
   }
 
+  // Note: this is also overridden and implemented in our assumptions wrapper (i.e.
+  // BasicProverWithAssumptionsWrapper and its children), without checks/flags. But the
+  // implementation in the assumptions wrapper is guaranteed to use other methods that are
+  // checked and set the flags correctly (push() and isUnsat()), so we can safely ignore it.
+  @Override
+  public final boolean isUnsatWithAssumptions(Collection<BooleanFormula> assumptions)
+      throws SolverException, InterruptedException {
+    checkIsUnsatOverAssumptions(assumptions);
+    setProverStateToChangedSinceLastQuery();
+    return setProverStateByIsUnsat(isUnsatWithAssumptionsImpl(assumptions));
+  }
+
+  /**
+   * @implNote implementing this assumes that {@link
+   *     AbstractSolverContext#supportsAssumptionSolving()} is also overridden returning {@code
+   *     true} in the {@link org.sosy_lab.java_smt.api.SolverContext} implementation of this solver,
+   *     as otherwise this method is ignored.
+   */
+  protected abstract boolean isUnsatWithAssumptionsImpl(Collection<BooleanFormula> assumptions)
+      throws SolverException, InterruptedException;
+
+  @Override
+  public final List<BooleanFormula> getUnsatCore() {
+    checkGenerateUnsatCores();
+    return getUnsatCoreImpl();
+  }
+
+  /**
+   * @implSpec override and implement if a solver supports UNSAT-CORE generation.
+   */
+  protected List<BooleanFormula> getUnsatCoreImpl() {
+    throw new UnsupportedOperationException(UNSAT_CORE_NOT_SUPPORTED);
+  }
+
+  @Override
+  public final Optional<List<BooleanFormula>> unsatCoreOverAssumptions(
+      Collection<BooleanFormula> assumptions) throws SolverException, InterruptedException {
+    checkGenerateUnsatCoresOverAssumptions(assumptions);
+    setProverStateToChangedSinceLastQuery();
+    // Since some unsatCoreOverAssumptionsImpl() implementations don't use isUnsatWithAssumptions(),
+    // we can not give any guarantees (set flags) after calling unsatCoreOverAssumptionsImpl().
+    // Flags need to be set by the implementation correctly.
+    return unsatCoreOverAssumptionsImpl(assumptions);
+  }
+
+  /**
+   * @implSpec override and implement if a solver supports the generation of UNSAT-COREs over
+   *     assumptions. This implementation must guarantee that {@link
+   *     BasicProverEnvironment#isUnsatWithAssumptions(Collection)}, or equivalent code that
+   *     establishes satisfiability is called before generating the unsat-core. The prover state
+   *     needs to be set correctly after the satisfiability check (e.g. {@link
+   *     #setProverStateByIsUnsat(boolean)} if you can guarantee that the result is usable after
+   *     returning from this method). You can expect that the prover state is set the {@link
+   *     ProverState#CHANGED_SINCE_LAST_SAT_QUERY} before this method is called. Else, override and
+   *     throw a {@link UnsupportedOperationException} with {@link
+   *     BasicProverEnvironment#UNSAT_CORE_WITH_ASSUMPTIONS_NOT_SUPPORTED}.
+   */
+  protected abstract Optional<List<BooleanFormula>> unsatCoreOverAssumptionsImpl(
+      Collection<BooleanFormula> assumptions) throws SolverException, InterruptedException;
+
+  @Override
+  public final <R> R allSat(AllSatCallback<R> callback, List<BooleanFormula> important)
+      throws InterruptedException, SolverException {
+    checkGenerateAllSat();
+    return allSatImpl(callback, important);
+  }
+
+  /**
+   * @implSpec only override and implement if a solver offers its own AllSAT procedure, otherwise
+   *     inherit {@link AbstractProverWithAllSat} instead of this class.
+   */
+  protected abstract <R> R allSatImpl(AllSatCallback<R> callback, List<BooleanFormula> important)
+      throws InterruptedException, SolverException;
+
+  @Override
+  public final ImmutableMap<String, String> getStatistics() {
+    checkNotClosed();
+    return getStatisticsImpl();
+  }
+
+  /**
+   * @implSpec override and implement for solvers that provide statistics.
+   */
+  protected ImmutableMap<String, String> getStatisticsImpl() {
+    return ImmutableMap.of();
+  }
+
   @Override
   public void close() {
     assertedFormulas.clear();
     closeAllEvaluators();
-    closed = true;
+    proverState = ProverState.CLOSED;
   }
 }
