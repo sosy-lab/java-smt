@@ -12,15 +12,15 @@ package org.sosy_lab.java_smt.solvers.yices2;
 
 import static org.sosy_lab.common.collect.Collections3.transformedImmutableSetCopy;
 
-import com.google.common.collect.FluentIterable;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 import com.google.common.primitives.Ints;
+import com.sri.yices.Context;
 import com.sri.yices.InterpolationContext;
 import com.sri.yices.Status;
 import com.sri.yices.Terms;
 import com.sri.yices.YicesException;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
@@ -31,6 +31,7 @@ import org.sosy_lab.java_smt.api.BooleanFormulaManager;
 import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
+import org.sosy_lab.java_smt.basicimpl.ShutdownHook;
 
 class Yices2InterpolatingProver extends Yices2AbstractProver<Integer>
     implements InterpolatingProverEnvironment<Integer> {
@@ -61,25 +62,34 @@ class Yices2InterpolatingProver extends Yices2AbstractProver<Integer>
     var setA = ImmutableSet.copyOf(formulasOfA);
     var setB = Sets.difference(getAssertedConstraintIds(), setA);
 
-    return creator.encapsulateBoolean(
-        interpolate(
-            transformedImmutableSetCopy(setA, stack.peekLast()::get),
-            transformedImmutableSetCopy(setB, stack.peekLast()::get)));
+    try (var ctxA = newContext("mcsat");
+        var ctxB = newContext("dpllt")) {
+
+      ctxA.assertFormulas(Ints.toArray(transformedImmutableSetCopy(setA, stack.peekLast()::get)));
+      try {
+        ctxB.assertFormulas(Ints.toArray(transformedImmutableSetCopy(setB, stack.peekLast()::get)));
+        ctxB.push(); // Will trigger an exception if B is already unsat by itself
+
+      } catch (YicesException e) {
+        return creator.encapsulateBoolean(Terms.mkTrue());
+      }
+      return creator.encapsulateBoolean(interpolate(ctxA, ctxB));
+    }
   }
 
-  private int interpolate(Collection<Integer> setA, Collection<Integer> setB)
-      throws InterruptedException, SolverException {
-    try (var ctxA = newContext("mcsat");
-        var ctxB = newContext("mcsat")) {
+  @SuppressWarnings("try")
+  private int interpolate(Context ctxA, Context ctxB) throws InterruptedException, SolverException {
+    var context = new InterpolationContext(ctxA, ctxB);
 
-      ctxA.assertFormulas(Ints.toArray(setA));
-      ctxB.assertFormulas(Ints.toArray(setB));
-      var context = new InterpolationContext(ctxA, ctxB);
-
-      // TODO How to abort this?
-      // For now, let's just check before and after the call:
+    Status status;
+    try (ShutdownHook hook =
+        new ShutdownHook(
+            shutdownNotifier,
+            () -> {
+              ctxA.stopSearch();
+              ctxB.stopSearch();
+            })) {
       shutdownNotifier.shutdownIfNecessary();
-      Status status;
       try {
         status = context.check(DEFAULT_PARAMS, false);
       } catch (YicesException e) {
@@ -89,34 +99,68 @@ class Yices2InterpolatingProver extends Yices2AbstractProver<Integer>
           throw e;
         }
       }
-      shutdownNotifier.shutdownIfNecessary();
-      if (status == Status.UNSAT) {
+    }
+
+    switch (status) {
+      case INTERRUPTED -> throw new InterruptedException();
+      case UNSAT -> {
         return context.getInterpolant();
-      } else {
-        throw new IllegalStateException("Solver state must be unsat");
       }
+      case UNKNOWN -> throw new SolverException("Could not interpolate");
+      default -> throw new RuntimeException("Inconsistent SAT result during interpolation");
     }
   }
 
   @Override
   public List<BooleanFormula> getSeqInterpolants(List<? extends Collection<Integer>> partitions)
       throws SolverException, InterruptedException {
-    final int n = partitions.size();
-    final List<BooleanFormula> itps = new ArrayList<>();
-    var previousItp = Terms.mkTrue();
-    for (int i = 1; i < n; i++) {
-      Collection<Integer> formulasA =
-          FluentIterable.from(partitions.get(i - 1))
-              .transform(stack.peekLast()::get)
-              .append(new Integer[] {previousItp})
-              .toSet();
-      Collection<Integer> formulasB =
-          FluentIterable.concat(partitions.subList(i, n)).transform(stack.peekLast()::get).toSet();
-      var itp = interpolate(formulasA, formulasB);
-      itps.add(creator.encapsulateBoolean(itp));
-      previousItp = itp;
+
+    var groups =
+        partitions.stream()
+            .map(partition -> partition.stream().map(stack.peekLast()::get).toList())
+            .toList();
+
+    try (var ctxA = newContext("mcsat");
+        var ctxB = newContext("dpllt")) {
+
+      ctxB.push();
+      int skipped = 0;
+      for (int i = groups.size() - 1; i > 0; i--) {
+        try {
+          ctxB.assertFormulas(groups.get(i));
+          ctxB.push();
+        } catch (YicesException e) {
+          // Yices will throw this exception once the Bs have become unsat
+          skipped = i;
+          break;
+        }
+      }
+      ctxB.pop();
+
+      ImmutableList.Builder<BooleanFormula> builder = ImmutableList.builder();
+
+      var lastItp = Terms.mkTrue();
+      for (int i = 0; i < groups.size() - 1; i++) {
+        if (i < skipped) {
+          // Interpolants are 'true' until B is no longer unsat by itself
+          builder.add(creator.encapsulateBoolean(lastItp));
+
+        } else {
+          ctxA.push();
+
+          ctxA.assertFormula(lastItp);
+          ctxA.assertFormulas(groups.get(i));
+
+          lastItp = interpolate(ctxA, ctxB);
+          builder.add(creator.encapsulateBoolean(lastItp));
+
+          ctxA.pop();
+          ctxB.pop();
+        }
+      }
+
+      return builder.build();
     }
-    return itps;
   }
 
   @Override
