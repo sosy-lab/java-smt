@@ -117,7 +117,7 @@ abstract class OpenSmtAbstractProver<T> extends AbstractProverWithAllSat<T> {
 
   @SuppressWarnings("resource")
   @Override
-  protected Model getModelImpl() {
+  protected Model getModelImpl() throws SolverException {
     return registerEvaluator(
         new OpenSmtModel(
             this, creator, Collections2.transform(getAssertedFormulas(), creator::extractInfo)));

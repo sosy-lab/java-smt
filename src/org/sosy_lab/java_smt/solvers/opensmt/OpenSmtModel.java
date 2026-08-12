@@ -18,6 +18,7 @@ import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractModel;
 import org.sosy_lab.java_smt.solvers.opensmt.api.Logic;
 import org.sosy_lab.java_smt.solvers.opensmt.api.Model;
@@ -38,7 +39,8 @@ class OpenSmtModel extends AbstractModel<PTRef, SRef, Logic> {
   OpenSmtModel(
       OpenSmtAbstractProver<?> pProver,
       OpenSmtFormulaCreator pCreator,
-      Collection<PTRef> pAssertedTerms) {
+      Collection<PTRef> pAssertedTerms)
+      throws SolverException {
     super(pProver, pCreator);
 
     osmtLogic = pCreator.getEnv();
@@ -51,7 +53,7 @@ class OpenSmtModel extends AbstractModel<PTRef, SRef, Logic> {
   }
 
   private ImmutableList<ValueAssignment> generateModel(
-      OpenSmtFormulaCreator pCreator, Collection<PTRef> pAssertedTerms) {
+      OpenSmtFormulaCreator pCreator, Collection<PTRef> pAssertedTerms) throws SolverException {
     Map<String, PTRef> userDeclarations = new LinkedHashMap<>();
     for (PTRef asserted : pAssertedTerms) {
       userDeclarations.putAll(creator.extractVariablesAndUFs(asserted, true));
@@ -69,8 +71,9 @@ class OpenSmtModel extends AbstractModel<PTRef, SRef, Logic> {
       if (osmtLogic.isArraySort(sort)) {
         // INFO: Disable model generation if arrays are used
         // https://github.com/usi-verification-and-security/opensmt/issues/630
-        throw new UnsupportedOperationException(
-            "OpenSMT does not support model generation when arrays are used");
+        throw new SolverException(
+            "OpenSMT2 can not return satisfiable assignments for arrays. To avoid wrong"
+                + "interpretation, we disallow model export for queries including arrays.");
       }
 
       if (numArgs == 0) {
