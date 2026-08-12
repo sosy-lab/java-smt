@@ -497,7 +497,7 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
 
     List<BooleanFormula> itps1 = stack.getSeqInterpolants0(ImmutableList.of(TA, TB, TC, TD));
     List<BooleanFormula> itps2 = stack.getSeqInterpolants0(ImmutableList.of(TD, TC, TB, TA));
-    List<BooleanFormula> itps3 = List.of();
+    List<BooleanFormula> itps3 = ImmutableList.of();
     if (solver != Solvers.YICES2) {
       // FIXME Yices fails to terminate for this example
       itps3 = stack.getSeqInterpolants0(ImmutableList.of(TA, TC, TB, TD));

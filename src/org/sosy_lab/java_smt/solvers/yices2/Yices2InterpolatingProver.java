@@ -70,7 +70,7 @@ class Yices2InterpolatingProver extends Yices2AbstractProver<Integer>
         ctxB.assertFormulas(Ints.toArray(transformedImmutableSetCopy(setB, stack.peekLast()::get)));
         ctxB.push(); // Will trigger an exception if B is already unsat by itself
 
-      } catch (YicesException ye) {
+      } catch (YicesException e) {
         return creator.encapsulateBoolean(Terms.mkTrue());
       }
       return creator.encapsulateBoolean(interpolate(ctxA, ctxB));
