@@ -637,6 +637,94 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
     }
   }
 
+  private void checkIndexedSymbol(
+      FunctionDeclarationKind pExpectedKind, List<Integer> pExpectedIndex, Formula pTerm) {
+    mgr.visit(
+        pTerm,
+        new DefaultFormulaVisitor<Void>() {
+          @Override
+          public Void visitFunction(
+              Formula f, List<Formula> args, FunctionDeclaration<?> functionDeclaration) {
+            assertThat(functionDeclaration.getKind()).isEqualTo(pExpectedKind);
+            assertThat(functionDeclaration.getIndices()).isEqualTo(pExpectedIndex);
+            return null;
+          }
+
+          @Override
+          protected Void visitDefault(Formula f) {
+            throw new AssertionError();
+          }
+        });
+  }
+
+  private List<Formula> getArgs(Formula pFormula) {
+    return mgr.visit(
+        pFormula,
+        new DefaultFormulaVisitor<>() {
+          @Override
+          public List<Formula> visitFunction(
+              Formula f, List<Formula> args, FunctionDeclaration<?> functionDeclaration) {
+            return args;
+          }
+
+          @Override
+          protected List<Formula> visitDefault(Formula f) {
+            throw new AssertionError();
+          }
+        });
+  }
+
+  @Test
+  public void bvExtractVisit() {
+    requireBitvectors();
+    assume()
+        .withMessage("Visiting indexed functions not fully supported on %")
+        .that(solver)
+        .isNotEqualTo(Solvers.CVC4);
+
+    var x = bvmgr.makeVariable(8, "x");
+    var f = bvmgr.extract(x, 3, 0);
+
+    if (solver == Solvers.YICES2) {
+      // Yices2 will rewrite to (bv-array (bit x 3) (bit x 2) (bit x 1) (bit x 0))
+      var args = getArgs(f);
+      assertThat(args).hasSize(4);
+      for (var p = 0; p < args.size(); p++) {
+        checkIndexedSymbol(
+            FunctionDeclarationKind.BV_EXTRACT, ImmutableList.of(3 - p, 3 - p), args.get(p));
+      }
+    } else {
+      checkIndexedSymbol(FunctionDeclarationKind.BV_EXTRACT, ImmutableList.of(3, 0), f);
+    }
+  }
+
+  @Test
+  public void bvExtendVisit() {
+    requireBitvectors();
+    assume()
+        .withMessage("Visiting indexed functions not fully supported on %")
+        .that(solver)
+        .isNoneOf(Solvers.CVC4, Solvers.PRINCESS);
+
+    var x = bvmgr.makeVariable(8, "x");
+    var f = bvmgr.extend(x, 8, false);
+
+    if (solver == Solvers.YICES2) {
+      // Yices2 will rewrite to (bv-array #b0 ... #b0 (bit x 7) ... (bit x 0)
+      var terms = getArgs(f);
+      assertThat(terms).hasSize(16);
+      for (var p = 0; p < terms.size(); p++) {
+        if (p < 8) {
+          assertThat(terms.get(p)).isEqualTo(bvmgr.makeBitvector(1, 0));
+        } else {
+          assertThat(terms.get(p)).isEqualTo(bvmgr.extract(f, 15 - p, 15 - p));
+        }
+      }
+    } else {
+      checkIndexedSymbol(FunctionDeclarationKind.BV_ZERO_EXTENSION, ImmutableList.of(8), f);
+    }
+  }
+
   @Test
   public void bvVisit() throws SolverException, InterruptedException {
     requireBitvectors();
