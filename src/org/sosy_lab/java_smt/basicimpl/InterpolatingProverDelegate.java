@@ -83,6 +83,7 @@ class InterpolatingProverDelegate<T> implements InterpolatingProverEnvironment<I
 
   /* ########################## Delegate methods of ProverEnvironment ########################## */
 
+  @SuppressWarnings("resource")
   @Override
   public void pop() {
     itpProver.pop();
