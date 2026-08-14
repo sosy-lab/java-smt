@@ -14,7 +14,9 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -27,9 +29,12 @@ import org.sosy_lab.java_smt.api.SolverException;
  * InterpolatingProverEnvironment} based on the implementations in the abstract/theorem prover that
  * can not be done using abstract implementations.
  */
-class InterpolatingProverDelegate<T> implements InterpolatingProverEnvironment<T> {
+class InterpolatingProverDelegate<T> implements InterpolatingProverEnvironment<Integer> {
 
   private final InterpolatingProverEnvironment<T> itpProver;
+
+  private final Map<Integer, T> assertionIds = new HashMap<>();
+  private int lastId = 0;
 
   InterpolatingProverDelegate(InterpolatingProverEnvironment<T> pBaseProver) {
     checkArgument(pBaseProver instanceof AbstractProver<?>);
@@ -38,32 +43,42 @@ class InterpolatingProverDelegate<T> implements InterpolatingProverEnvironment<T
 
   @SuppressWarnings("resource")
   @Override
-  public BooleanFormula getInterpolant(Collection<T> formulasOfA)
+  public BooleanFormula getInterpolant(Collection<Integer> formulasOfA)
       throws SolverException, InterruptedException {
-    getDelegateAsAbstractProver().checkGenerateInterpolants(formulasOfA);
+    Collection<T> formulaIds = formulasOfA.stream().map(assertionIds::get).toList();
+    getDelegateAsAbstractProver().checkGenerateInterpolants(formulaIds);
     // TODO: do we want a common method to calculate partition B out of the asserted formulas
     //  efficiently? We currently have several distinct solutions.
-    return itpProver.getInterpolant(formulasOfA);
+    return itpProver.getInterpolant(formulaIds);
   }
 
   @SuppressWarnings("resource")
   @Override
-  public List<BooleanFormula> getSeqInterpolants(List<? extends Collection<T>> partitionedFormulas)
+  public List<BooleanFormula> getSeqInterpolants(
+      List<? extends Collection<Integer>> partitionedFormulas)
       throws SolverException, InterruptedException {
-    getDelegateAsAbstractProver().checkGenerateSeqInterpolants(partitionedFormulas);
+    List<? extends Collection<T>> partitionedFormulaIds =
+        partitionedFormulas.stream()
+            .map(partition -> partition.stream().map(assertionIds::get).toList())
+            .toList();
+    getDelegateAsAbstractProver().checkGenerateSeqInterpolants(partitionedFormulaIds);
     // TODO: problem/inefficiency; unsupported solvers still check validity of input before failing?
-    return itpProver.getSeqInterpolants(partitionedFormulas);
+    return itpProver.getSeqInterpolants(partitionedFormulaIds);
   }
 
   @SuppressWarnings("resource")
   @Override
   public List<BooleanFormula> getTreeInterpolants(
-      List<? extends Collection<T>> partitionedFormulas, int[] startOfSubTree)
+      List<? extends Collection<Integer>> partitionedFormulas, int[] startOfSubTree)
       throws SolverException, InterruptedException {
+    List<? extends Collection<T>> partitionedFormulaIds =
+        partitionedFormulas.stream()
+            .map(partition -> partition.stream().map(assertionIds::get).toList())
+            .toList();
     getDelegateAsAbstractProver()
-        .checkGenerateTreeInterpolants(partitionedFormulas, startOfSubTree);
+        .checkGenerateTreeInterpolants(partitionedFormulaIds, startOfSubTree);
     // TODO: problem/inefficiency; unsupported solvers still check validity of input before failing?
-    return itpProver.getTreeInterpolants(partitionedFormulas, startOfSubTree);
+    return itpProver.getTreeInterpolants(partitionedFormulaIds, startOfSubTree);
   }
 
   /* ########################## Delegate methods of ProverEnvironment ########################## */
@@ -71,11 +86,14 @@ class InterpolatingProverDelegate<T> implements InterpolatingProverEnvironment<T
   @Override
   public void pop() {
     itpProver.pop();
+    lastId = getDelegateAsAbstractProver().getAssertedConstraintIds().size();
   }
 
   @Override
-  public @Nullable T addConstraint(BooleanFormula constraint) throws InterruptedException {
-    return itpProver.addConstraint(constraint);
+  public @Nullable Integer addConstraint(BooleanFormula constraint) throws InterruptedException {
+    var newId = ++lastId;
+    assertionIds.put(newId, itpProver.addConstraint(constraint));
+    return newId;
   }
 
   @Override
