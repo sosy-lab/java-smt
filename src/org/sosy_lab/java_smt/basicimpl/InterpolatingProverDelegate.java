@@ -13,6 +13,7 @@ package org.sosy_lab.java_smt.basicimpl;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.google.common.collect.Maps;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -33,7 +34,7 @@ class InterpolatingProverDelegate<T> implements InterpolatingProverEnvironment<I
 
   private final InterpolatingProverEnvironment<T> itpProver;
 
-  private final Map<Integer, T> assertionIds = new HashMap<>();
+  private Map<Integer, T> assertionIds = new HashMap<>();
   private int lastId = 0;
 
   InterpolatingProverDelegate(InterpolatingProverEnvironment<T> pBaseProver) {
@@ -88,6 +89,7 @@ class InterpolatingProverDelegate<T> implements InterpolatingProverEnvironment<I
   public void pop() {
     itpProver.pop();
     lastId = getDelegateAsAbstractProver().getAssertedConstraintIds().size();
+    assertionIds = new HashMap<>(Maps.filterKeys(assertionIds, k -> k <= lastId));
   }
 
   @Override
