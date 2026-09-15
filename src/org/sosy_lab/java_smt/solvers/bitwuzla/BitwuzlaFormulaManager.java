@@ -18,7 +18,7 @@ import java.util.List;
 import org.sosy_lab.common.collect.Collections3;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager;
-import org.sosy_lab.java_smt.basicimpl.Tokenizer;
+import org.sosy_lab.java_smt.basicimpl.SMTLibTokenizer;
 import org.sosy_lab.java_smt.solvers.bitwuzla.api.Bitwuzla;
 import org.sosy_lab.java_smt.solvers.bitwuzla.api.Kind;
 import org.sosy_lab.java_smt.solvers.bitwuzla.api.Map_TermTerm;
@@ -30,7 +30,7 @@ import org.sosy_lab.java_smt.solvers.bitwuzla.api.TermManager;
 import org.sosy_lab.java_smt.solvers.bitwuzla.api.Vector_Int;
 import org.sosy_lab.java_smt.solvers.bitwuzla.api.Vector_Term;
 
-public final class BitwuzlaFormulaManager
+final class BitwuzlaFormulaManager
     extends AbstractFormulaManager<Term, Sort, TermManager, BitwuzlaDeclaration> {
   private final BitwuzlaFormulaCreator creator;
   private final Options bitwuzlaOption;
@@ -85,12 +85,15 @@ public final class BitwuzlaFormulaManager
   @Override
   protected List<Term> parseAllImpl(String formulaStr) throws IllegalArgumentException {
     // Split the input string into a list of SMT-LIB2 commands
-    List<String> tokens = Tokenizer.tokenize(formulaStr);
+    // TODO: refactor this and use the iterator instead of looping through input multiple times
+    List<String> tokens = SMTLibTokenizer.of(formulaStr).toImmutableList();
 
     Table<String, Sort, Term> cache = creator.getCache();
 
     Collection<String> assertionCommands =
-        tokens.stream().filter(Tokenizer::isAssertToken).collect(ImmutableList.toImmutableList());
+        tokens.stream()
+            .filter(SMTLibTokenizer::isAssertToken)
+            .collect(ImmutableList.toImmutableList());
     if (assertionCommands.isEmpty()) {
       return ImmutableList.of();
     }
@@ -111,9 +114,8 @@ public final class BitwuzlaFormulaManager
       parser.parse(declsFromCache + declsFromTokens + assertionsFromTokens, true, false);
     } catch (IllegalArgumentException e) {
       throw new IllegalArgumentException(
-          String.format(
-              "Failed to parse input string \"%s\" with declarations \"%s\" and \"%s\"",
-              assertionsFromTokens, declsFromCache, declsFromTokens),
+          "Failed to parse input string \"%s\" with declarations \"%s\" and \"%s\""
+              .formatted(assertionsFromTokens, declsFromCache, declsFromTokens),
           e);
     }
 
@@ -171,7 +173,7 @@ public final class BitwuzlaFormulaManager
         sort = sort.fun_codomain();
       }
       String argsStr = Joiner.on(" ").join(args);
-      builder.add(String.format("(declare-fun %s (%s) %s)", symbol, argsStr, sort));
+      builder.add("(declare-fun %s (%s) %s)".formatted(symbol, argsStr, sort));
     }
     return builder.build();
   }
@@ -187,10 +189,10 @@ public final class BitwuzlaFormulaManager
       List<String> tokens, Table<String, Sort, Term> cache) {
     ImmutableList.Builder<String> newDeclarations = ImmutableList.builder();
     for (String token : tokens) {
-      if (Tokenizer.isAssertToken(token)) {
+      if (SMTLibTokenizer.isAssertToken(token)) {
         // Skip assertions, they will be parsed at the end together with the declarations
         continue;
-      } else if (Tokenizer.isDeclarationToken(token)) {
+      } else if (SMTLibTokenizer.isDeclarationToken(token)) {
         // FIXME: Do we need to support function definitions here?
         Parser declParser = new Parser(creator.getEnv(), bitwuzlaOption);
         declParser.parse(token, true, false);
@@ -205,9 +207,8 @@ public final class BitwuzlaFormulaManager
             // Sort of the definition that we parsed does not match the sort from the variable
             // cache.
             throw new IllegalArgumentException(
-                String.format(
-                    "Symbol %s is already defined with a different sort %s in the variable cache",
-                    symbol, cache.row(symbol)));
+                "Symbol %s is already defined with a different sort %s in the variable cache"
+                    .formatted(symbol, cache.row(symbol)));
           }
           // Skip if it's just a redefinition
           continue;
@@ -227,12 +228,9 @@ public final class BitwuzlaFormulaManager
     // Only bitwuzla_print_formula() gives us the proper SMT2 format, with (check-sat) etc.
     // Note: bitwuzla_print_formula() is wrapped in dump_assertions_smt2()
     if (pTerm.is_value()) {
-      return "(assert " + pTerm + ")";
+      return "(assert %s)".formatted(pTerm);
     }
     Bitwuzla bitwuzla = new Bitwuzla(creator.getEnv());
-    for (Term t : creator.getConstraintsForTerm(pTerm)) {
-      bitwuzla.assert_formula(t);
-    }
     bitwuzla.assert_formula(pTerm);
     return bitwuzla.print_formula();
   }

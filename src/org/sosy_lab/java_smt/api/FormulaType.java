@@ -21,8 +21,10 @@ import com.google.common.collect.ImmutableSet;
 import com.google.errorprone.annotations.Immutable;
 import java.util.List;
 import java.util.Set;
+import java.util.regex.Pattern;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
+import org.sosy_lab.java_smt.basicimpl.SMTLibTokenizer;
 
 /**
  * Type of a formula.
@@ -188,11 +190,7 @@ public abstract class FormulaType<T extends Formula> {
       if (pObj == this) {
         return true;
       }
-      if (!(pObj instanceof BitvectorType)) {
-        return false;
-      }
-      BitvectorType other = (BitvectorType) pObj;
-      return size == other.size;
+      return (pObj instanceof BitvectorType other) && size == other.size;
     }
 
     @Override
@@ -386,11 +384,8 @@ public abstract class FormulaType<T extends Formula> {
       if (this == obj) {
         return true;
       }
-      if (!(obj instanceof FloatingPointType)) {
-        return false;
-      }
-      FloatingPointType other = (FloatingPointType) obj;
-      return this.exponentSize == other.exponentSize
+      return (obj instanceof FloatingPointType other)
+          && this.exponentSize == other.exponentSize
           && this.mantissaSizeWithoutHiddenBit == other.mantissaSizeWithoutHiddenBit;
     }
 
@@ -425,8 +420,7 @@ public abstract class FormulaType<T extends Formula> {
 
     @Override
     public String toSMTLIBString() {
-      throw new UnsupportedOperationException(
-          "rounding mode is not expected in symbol declarations");
+      return "RoundingMode";
     }
   }
 
@@ -463,7 +457,7 @@ public abstract class FormulaType<T extends Formula> {
 
     @Override
     public String toString() {
-      return String.format("Array<%s,%s>", indexType, elementType);
+      return "Array<%s,%s>".formatted(indexType, elementType);
     }
 
     @Override
@@ -476,11 +470,9 @@ public abstract class FormulaType<T extends Formula> {
       if (this == obj) {
         return true;
       }
-      if (!(obj instanceof ArrayFormulaType)) {
-        return false;
-      }
-      ArrayFormulaType<?, ?> other = (ArrayFormulaType<?, ?>) obj;
-      return elementType.equals(other.elementType) && indexType.equals(other.indexType);
+      return (obj instanceof ArrayFormulaType<?, ?> other)
+          && elementType.equals(other.elementType)
+          && indexType.equals(other.indexType);
     }
 
     @Override
@@ -522,7 +514,7 @@ public abstract class FormulaType<T extends Formula> {
 
     @Override
     public String toString() {
-      return String.format("%s (%s)", name, Joiner.on(", ").join(elements));
+      return "%s (%s)".formatted(name, Joiner.on(", ").join(elements));
     }
 
     @Override
@@ -535,11 +527,9 @@ public abstract class FormulaType<T extends Formula> {
       if (this == obj) {
         return true;
       }
-      if (!(obj instanceof EnumerationFormulaType)) {
-        return false;
-      }
-      EnumerationFormulaType other = (EnumerationFormulaType) obj;
-      return name.equals(other.name) && elements.equals(other.elements);
+      return (obj instanceof EnumerationFormulaType other)
+          && name.equals(other.name)
+          && elements.equals(other.elements);
     }
 
     @Override
@@ -620,6 +610,39 @@ public abstract class FormulaType<T extends Formula> {
       String elementsStr = t.substring(t.indexOf("(") + 1, t.length() - 1);
       Set<String> elements = ImmutableSet.copyOf(Splitter.on(", ").split(elementsStr));
       return new EnumerationFormulaType(name, elements);
+    } else {
+      throw new AssertionError("unknown type:" + t);
+    }
+  }
+
+  public static FormulaType<?> fromSMTLIBString(String t) {
+    if (t.equals("Bool")) {
+      return BooleanType;
+    } else if (t.equals("Int")) {
+      return IntegerType;
+    } else if (t.equals("Real")) {
+      return RationalType;
+    } else if (t.equals("String")) {
+      return StringType;
+    } else if (t.equals("RegLan")) {
+      return RegexType;
+    } else if (t.equals("RoundingMode")) {
+      return FloatingPointRoundingModeType;
+    } else if (t.startsWith("(_ FloatingPoint")) {
+      var m = Pattern.compile("\\(\\s*_\\s+FloatingPoint\\s+(\\d+)\\s+(\\d+)\\s*\\)").matcher(t);
+      checkArgument(m.find());
+      return FormulaType.getFloatingPointTypeFromSizesWithHiddenBit(
+          Integer.parseInt(m.group(1)), Integer.parseInt(m.group(2)));
+    } else if (t.startsWith("(_ BitVec")) {
+      var m = Pattern.compile("\\(\\s*_\\s+BitVec\\s+(\\d+)\\s*\\)").matcher(t);
+      checkArgument(m.find());
+      return FormulaType.getBitvectorTypeWithSize(Integer.parseInt(m.group(1)));
+    } else if (t.startsWith("(Array")) {
+      var tokens = SMTLibTokenizer.of(t.substring(1, t.length() - 1)).toImmutableList();
+      checkArgument(tokens.size() == 3);
+      var domain = fromSMTLIBString(tokens.get(1));
+      var range = fromSMTLIBString(tokens.get(2));
+      return FormulaType.getArrayType(domain, range);
     } else {
       throw new AssertionError("unknown type:" + t);
     }

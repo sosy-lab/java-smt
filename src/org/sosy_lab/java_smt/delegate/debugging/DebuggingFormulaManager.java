@@ -39,7 +39,7 @@ import org.sosy_lab.java_smt.api.visitors.FormulaTransformationVisitor;
 import org.sosy_lab.java_smt.api.visitors.FormulaVisitor;
 import org.sosy_lab.java_smt.api.visitors.TraversalProcess;
 
-public class DebuggingFormulaManager implements FormulaManager {
+class DebuggingFormulaManager implements FormulaManager {
   private final FormulaManager delegate;
   private final DebuggingAssertions debugging;
 
@@ -275,8 +275,8 @@ public class DebuggingFormulaManager implements FormulaManager {
 
   @Override
   public BooleanFormula translateFrom(BooleanFormula formula, FormulaManager otherManager) {
-    if (otherManager instanceof DebuggingFormulaManager) {
-      ((DebuggingFormulaManager) otherManager).debugging.assertFormulaInContext(formula);
+    if (otherManager instanceof DebuggingFormulaManager debuggingFormulaManager) {
+      debuggingFormulaManager.debugging.assertFormulaInContext(formula);
     }
     BooleanFormula result = delegate.translateFrom(formula, otherManager);
     debugging.addFormulaTerm(result);

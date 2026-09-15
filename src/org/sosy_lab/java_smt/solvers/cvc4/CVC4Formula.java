@@ -23,7 +23,7 @@ import org.sosy_lab.java_smt.api.RegexFormula;
 import org.sosy_lab.java_smt.api.StringFormula;
 
 @Immutable
-public class CVC4Formula implements Formula {
+sealed class CVC4Formula implements Formula {
 
   @SuppressWarnings("Immutable")
   private final Expr cvc4term;
@@ -42,10 +42,7 @@ public class CVC4Formula implements Formula {
     if (o == this) {
       return true;
     }
-    if (!(o instanceof CVC4Formula)) {
-      return false;
-    }
-    return cvc4term.equals(((CVC4Formula) o).cvc4term);
+    return (o instanceof CVC4Formula other) && cvc4term.equals(other.cvc4term);
   }
 
   @Override

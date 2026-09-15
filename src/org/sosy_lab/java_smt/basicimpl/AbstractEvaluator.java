@@ -57,9 +57,9 @@ public abstract class AbstractEvaluator<TFormulaInfo, TType, TEnv> implements Ev
   @Override
   public Rational evaluate(RationalFormula f) {
     Object value = evaluateImpl(creator.extractInfo(f));
-    if (value instanceof BigInteger) {
+    if (value instanceof BigInteger bigIntegerValue) {
       // We simplified the value internally. Here, we need to convert it back to Rational.
-      return Rational.ofBigInteger((BigInteger) value);
+      return Rational.ofBigInteger(bigIntegerValue);
     } else {
       return (Rational) value;
     }

@@ -54,16 +54,12 @@ class Fuzzer {
       formulaSize -= 1;
 
       int pivot = formulaSize / 2;
-      switch (r.nextInt(3)) {
-        case 0:
-          return bfmgr.or(recFuzz(pivot), recFuzz(formulaSize - pivot));
-        case 1:
-          return bfmgr.and(recFuzz(pivot), recFuzz(formulaSize - pivot));
-        case 2:
-          return bfmgr.not(recFuzz(formulaSize));
-        default:
-          throw new UnsupportedOperationException("Unexpected state");
-      }
+      return switch (r.nextInt(3)) {
+        case 0 -> bfmgr.or(recFuzz(pivot), recFuzz(formulaSize - pivot));
+        case 1 -> bfmgr.and(recFuzz(pivot), recFuzz(formulaSize - pivot));
+        case 2 -> bfmgr.not(recFuzz(formulaSize));
+        default -> throw new UnsupportedOperationException("Unexpected state");
+      };
     }
   }
 

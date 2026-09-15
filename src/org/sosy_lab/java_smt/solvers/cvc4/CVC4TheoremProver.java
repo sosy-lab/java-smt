@@ -56,7 +56,7 @@ class CVC4TheoremProver extends AbstractProverWithAllSat<Void>
   // CVC4 does not support separation logic in incremental mode.
   private final boolean incremental;
 
-  protected CVC4TheoremProver(
+  CVC4TheoremProver(
       CVC4FormulaCreator pFormulaCreator,
       ShutdownNotifier pShutdownNotifier,
       int pRandomSeed,
@@ -137,14 +137,13 @@ class CVC4TheoremProver extends AbstractProverWithAllSat<Void>
       smtEngine.assertFormula(importExpr(creator.extractInfo(pF)));
     } catch (Exception cvc4Exception) {
       throw new AssertionError(
-          String.format("CVC4 crashed while adding the constraint '%s'", pF), cvc4Exception);
+          "CVC4 crashed while adding the constraint '%s'".formatted(pF), cvc4Exception);
     }
   }
 
   @SuppressWarnings("resource")
   @Override
-  public CVC4Model getModel() throws SolverException {
-    checkGenerateModels();
+  public CVC4Model getModelImpl() throws SolverException {
     // special case for CVC4: Models are not permanent and need to be closed
     // before any change is applied to the prover stack. So, we register the Model as Evaluator.
     return registerEvaluator(
@@ -156,8 +155,7 @@ class CVC4TheoremProver extends AbstractProverWithAllSat<Void>
   }
 
   @Override
-  public Evaluator getEvaluator() {
-    checkGenerateModels();
+  protected Evaluator getEvaluatorImpl() {
     return getEvaluatorWithoutChecks();
   }
 
@@ -237,9 +235,7 @@ class CVC4TheoremProver extends AbstractProverWithAllSat<Void>
   @Override
   public void close() {
     if (!closed) {
-      exportMapping.delete();
-      // smtEngine.delete();
-      exprManager.delete();
+      // Never close the context
     }
     super.close();
   }

@@ -27,7 +27,7 @@ import java.util.List;
 import org.sosy_lab.java_smt.api.RegexFormula;
 import org.sosy_lab.java_smt.basicimpl.AbstractStringFormulaManager;
 
-public class PrincessStringFormulaManager
+class PrincessStringFormulaManager
     extends AbstractStringFormulaManager<
         IExpression, Sort, PrincessEnvironment, PrincessFunctionDeclaration> {
 

@@ -43,6 +43,7 @@ import ap.types.Sort.MultipleValueBool$;
 import ap.util.Debug;
 import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
+import com.google.common.base.Verify;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
@@ -67,7 +68,6 @@ import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
 import java.util.TreeMap;
-import java.util.stream.Collectors;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.Appender;
 import org.sosy_lab.common.Appenders;
@@ -305,8 +305,7 @@ class PrincessEnvironment {
     Preconditions.checkState(registeredProvers.isEmpty());
   }
 
-  public List<? extends IExpression> parseStringToTerms(String s, PrincessFormulaCreator creator) {
-
+  public List<? extends IExpression> parseStringToTerms(String s) {
     Tuple4<
             Seq<IFormula>,
             scala.collection.immutable.Map<IFunction, SMTFunctionType>,
@@ -320,27 +319,24 @@ class PrincessEnvironment {
       throw new IllegalArgumentException(nested);
     }
 
-    final List<IFormula> formulas = asJava(parserResult._1());
+    List<IFormula> asserts = asJava(parserResult._1());
+    Map<IFunction, SMTFunctionType> ufs = asJava(parserResult._2());
+    Map<ConstantTerm, SMTType> constants = asJava(parserResult._3());
+    Map<Predicate, SMTFunctionType> nullaryPredicates = asJava(parserResult._4());
 
-    ImmutableSet.Builder<IExpression> declaredFunctions = ImmutableSet.builder();
-    for (IExpression f : formulas) {
-      declaredFunctions.addAll(creator.extractVariablesAndUFs(f, true).values());
+    for (Entry<IFunction, SMTFunctionType> entry : ufs.entrySet()) {
+      functionsCache.put(
+          entry.getKey().name(),
+          new PrincessIFunctionDeclaration(entry.getKey(), entry.getValue()));
     }
-    for (IExpression var : declaredFunctions.build()) {
-      if (var instanceof IConstant) {
-        sortedVariablesCache.put(((IConstant) var).c().name(), (ITerm) var);
-        addSymbol((IConstant) var);
-      } else if (var instanceof IAtom) {
-        boolVariablesCache.put(((IAtom) var).pred().name(), (IFormula) var);
-        addSymbol((IAtom) var);
-      } else if (var instanceof IFunApp) {
-        IFunApp app = (IFunApp) var;
-        IFunction fun = app.fun();
-        functionsCache.put(fun.name(), new PrincessIFunctionDeclaration(app));
-        addFunction(fun);
-      }
+    for (ConstantTerm constant : constants.keySet()) {
+      sortedVariablesCache.put(constant.name(), new IConstant(constant));
     }
-    return formulas;
+    for (Predicate predicate : nullaryPredicates.keySet()) {
+      Verify.verify(predicate.arity() == 0);
+      boolVariablesCache.put(predicate.name(), new IAtom(predicate, toSeq(ImmutableList.of())));
+    }
+    return asserts;
   }
 
   /**
@@ -430,10 +426,10 @@ class PrincessEnvironment {
         // declare normal symbols
         for (Entry<String, IExpression> symbol : symbols.entrySet()) {
           out.append(
-              String.format(
-                  "(declare-fun %s () %s)%n",
-                  SMTLineariser.quoteIdentifier(symbol.getKey()),
-                  getFormulaType(symbol.getValue()).toSMTLIBString()));
+              "(declare-fun %s () %s)%n"
+                  .formatted(
+                      SMTLineariser.quoteIdentifier(symbol.getKey()),
+                      getFormulaType(symbol.getValue()).toSMTLIBString()));
         }
 
         // declare UFs
@@ -442,11 +438,11 @@ class PrincessEnvironment {
               Lists.transform(
                   asJava(function.getValue().args()), a -> getFormulaType(a).toSMTLIBString());
           out.append(
-              String.format(
-                  "(declare-fun %s (%s) %s)%n",
-                  SMTLineariser.quoteIdentifier(function.getKey()),
-                  Joiner.on(" ").join(argSorts),
-                  getFormulaType(function.getValue()).toSMTLIBString()));
+              "(declare-fun %s (%s) %s)%n"
+                  .formatted(
+                      SMTLineariser.quoteIdentifier(function.getKey()),
+                      Joiner.on(" ").join(argSorts),
+                      getFormulaType(function.getValue()).toSMTLIBString()));
         }
 
         // now every symbol from the formula or from abbreviations are declared,
@@ -455,11 +451,11 @@ class PrincessEnvironment {
           IExpression abbrevFormula = usedAbbrevs.get(abbrev);
           IExpression fullFormula = abbrevMap.get(abbrevFormula);
           out.append(
-              String.format(
-                  "(define-fun %s () %s %s)%n",
-                  SMTLineariser.quoteIdentifier(abbrev),
-                  getFormulaType(fullFormula).toSMTLIBString(),
-                  SMTLineariser.asString(fullFormula)));
+              "(define-fun %s () %s %s)%n"
+                  .formatted(
+                      SMTLineariser.quoteIdentifier(abbrev),
+                      getFormulaType(fullFormula).toSMTLIBString(),
+                      SMTLineariser.asString(fullFormula)));
         }
 
         // now add the final assert
@@ -498,9 +494,9 @@ class PrincessEnvironment {
             Set<IExpression> varsFromAbbrev = getVariablesFromAbbreviation(var);
             Sets.difference(varsFromAbbrev, allVars).forEach(waitlistSymbols::push);
             allVars.addAll(varsFromAbbrev);
-          } else if (var instanceof IFunApp) {
+          } else if (var instanceof IFunApp iFunApp) {
             Preconditions.checkState(!ufs.containsKey(name));
-            ufs.put(name, (IFunApp) var);
+            ufs.put(name, iFunApp);
           } else {
             Preconditions.checkState(!symbols.containsKey(name));
             symbols.put(name, var);
@@ -551,15 +547,15 @@ class PrincessEnvironment {
   }
 
   private static String getName(IExpression var) {
-    if (var instanceof IAtom) {
-      return ((IAtom) var).pred().name();
+    if (var instanceof IAtom iAtom) {
+      return iAtom.pred().name();
     } else if (var instanceof IConstant) {
       return var.toString();
-    } else if (var instanceof IFunApp) {
-      String fullStr = ((IFunApp) var).fun().toString();
+    } else if (var instanceof IFunApp iFunApp) {
+      String fullStr = iFunApp.fun().toString();
       return fullStr.substring(0, fullStr.indexOf('/'));
-    } else if (var instanceof IIntFormula) {
-      return getName(((IIntFormula) var).t());
+    } else if (var instanceof IIntFormula iIntFormula) {
+      return getName(iIntFormula.t());
     }
 
     throw new IllegalArgumentException("The given parameter is no variable or function");
@@ -575,15 +571,14 @@ class PrincessEnvironment {
       } catch (IllegalArgumentException e) {
         // add more info about the formula, then rethrow
         throw new IllegalArgumentException(
-            String.format(
-                "Unknown formula type '%s' of sort '%s' for formula '%s'.",
-                pFormula.getClass(), sort.toString(), pFormula),
+            "Unknown formula type '%s' of sort '%s' for formula '%s'."
+                .formatted(pFormula.getClass(), sort.toString(), pFormula),
             e);
       }
     }
   }
 
-  private static FormulaType<?> getFormulaTypeFromSort(final Sort sort) {
+  static FormulaType<?> getFormulaTypeFromSort(final Sort sort) {
     if (sort == PrincessEnvironment.BOOL_SORT) {
       return FormulaType.BooleanType;
     } else if (sort == PrincessEnvironment.INTEGER_SORT || sort == PrincessEnvironment.NAT_SORT) {
@@ -596,9 +591,9 @@ class PrincessEnvironment {
       return FormulaType.StringType;
     } else if (sort == PrincessEnvironment.REGEX_SORT) {
       return FormulaType.RegexType;
-    } else if (sort instanceof ArraySort) {
-      Seq<Sort> indexSorts = ((ArraySort) sort).theory().indexSorts();
-      Sort elementSort = ((ArraySort) sort).theory().objSort();
+    } else if (sort instanceof ArraySort arraySort) {
+      Seq<Sort> indexSorts = arraySort.theory().indexSorts();
+      Sort elementSort = arraySort.theory().objSort();
       assert indexSorts.iterator().size() == 1 : "unexpected index type in Array type:" + sort;
       // assert indexSorts.size() == 1; // TODO Eclipse does not like simpler code.
       return FormulaType.getArrayType(
@@ -614,7 +609,7 @@ class PrincessEnvironment {
       } else {
         // Otherwise, fail
         throw new IllegalArgumentException(
-            String.format("Unknown formula type '%s' for sort '%s'.", sort.getClass(), sort));
+            "Unknown formula type '%s' for sort '%s'.".formatted(sort.getClass(), sort));
       }
     }
   }
@@ -719,8 +714,7 @@ class PrincessEnvironment {
   }
 
   public boolean hasArrayType(IExpression exp) {
-    if (exp instanceof ITerm) {
-      final ITerm t = (ITerm) exp;
+    if (exp instanceof ITerm t) {
       return Sort$.MODULE$.sortOf(t) instanceof ArraySort;
     } else {
       return false;
@@ -754,8 +748,7 @@ class PrincessEnvironment {
   }
 
   static Seq<ITerm> toITermSeq(List<IExpression> exprs) {
-    return PrincessEnvironment.toSeq(
-        exprs.stream().map(e -> (ITerm) e).collect(Collectors.toList()));
+    return PrincessEnvironment.toSeq(exprs.stream().map(e -> (ITerm) e).toList());
   }
 
   static Seq<ITerm> toITermSeq(IExpression... exprs) {

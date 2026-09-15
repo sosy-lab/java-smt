@@ -8,6 +8,20 @@
 
 package org.sosy_lab.java_smt.example;
 
+import static org.sosy_lab.java_smt.api.FunctionDeclarationKind.BV_MUL;
+import static org.sosy_lab.java_smt.api.FunctionDeclarationKind.BV_SDIV;
+import static org.sosy_lab.java_smt.api.FunctionDeclarationKind.BV_SREM;
+import static org.sosy_lab.java_smt.api.FunctionDeclarationKind.BV_UDIV;
+import static org.sosy_lab.java_smt.api.FunctionDeclarationKind.BV_UREM;
+import static org.sosy_lab.java_smt.api.FunctionDeclarationKind.DIV;
+import static org.sosy_lab.java_smt.api.FunctionDeclarationKind.GT;
+import static org.sosy_lab.java_smt.api.FunctionDeclarationKind.GTE;
+import static org.sosy_lab.java_smt.api.FunctionDeclarationKind.LT;
+import static org.sosy_lab.java_smt.api.FunctionDeclarationKind.LTE;
+import static org.sosy_lab.java_smt.api.FunctionDeclarationKind.MODULO;
+import static org.sosy_lab.java_smt.api.FunctionDeclarationKind.MUL;
+import static org.sosy_lab.java_smt.api.FunctionDeclarationKind.UF;
+
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
@@ -32,7 +46,6 @@ import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FunctionDeclaration;
-import org.sosy_lab.java_smt.api.FunctionDeclarationKind;
 import org.sosy_lab.java_smt.api.QuantifiedFormulaManager.Quantifier;
 import org.sosy_lab.java_smt.api.SolverContext;
 import org.sosy_lab.java_smt.api.SolverException;
@@ -260,7 +273,7 @@ public class FormulaClassifier {
     @Override
     public Integer visitFunction(
         Formula pF, List<Formula> args, FunctionDeclaration<?> pFunctionDeclaration) {
-      if (pFunctionDeclaration.getKind() == FunctionDeclarationKind.UF) {
+      if (pFunctionDeclaration.getKind() == UF) {
         hasUFs = true;
       }
       checkType(pF);
@@ -273,43 +286,30 @@ public class FormulaClassifier {
         }
         allArgLevel = Math.max(allArgLevel, argLevel);
       }
-      switch (pFunctionDeclaration.getKind()) {
-        case MUL:
-        case BV_MUL:
-        case DIV:
-        case BV_UDIV:
-        case BV_SDIV:
-        case MODULO:
-        case BV_UREM:
-        case BV_SREM:
-          if (numNonConstantArgs >= 2) {
-            nonLinearArithmetic = true;
-            return allArgLevel + 1;
-          }
-        // $FALL-THROUGH$
-        default:
-          if (pFunctionDeclaration.getType().isBooleanType()) {
-            if (EnumSet.of(
-                    FunctionDeclarationKind.LT,
-                    FunctionDeclarationKind.LTE,
-                    FunctionDeclarationKind.GT,
-                    FunctionDeclarationKind.GTE)
-                .contains(pFunctionDeclaration.getKind())) {
-              for (Formula arg : args) {
-                FormulaType<Formula> type = mgr.getFormulaType(arg);
-                if (type.isIntegerType() || type.isRationalType()) {
-                  linearArithmetic = true;
-                }
-              }
-            }
-            return 0;
-          } else {
-            if (pFunctionDeclaration.getKind() != FunctionDeclarationKind.UF) {
+
+      if (numNonConstantArgs >= 2
+          && EnumSet.of(MUL, BV_MUL, DIV, BV_UDIV, BV_SDIV, MODULO, BV_UREM, BV_SREM)
+              .contains(pFunctionDeclaration.getKind())) {
+        nonLinearArithmetic = true;
+        return allArgLevel + 1;
+      }
+
+      if (pFunctionDeclaration.getType().isBooleanType()) {
+        if (EnumSet.of(LT, LTE, GT, GTE).contains(pFunctionDeclaration.getKind())) {
+          for (Formula arg : args) {
+            FormulaType<Formula> type = mgr.getFormulaType(arg);
+            if (type.isIntegerType() || type.isRationalType()) {
               linearArithmetic = true;
             }
-            return allArgLevel;
           }
+        }
+        return 0;
       }
+
+      if (pFunctionDeclaration.getKind() != UF) {
+        linearArithmetic = true;
+      }
+      return allArgLevel;
     }
 
     @Override

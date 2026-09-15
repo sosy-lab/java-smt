@@ -14,11 +14,11 @@ import io.github.cvc5.Term;
 import io.github.cvc5.TermManager;
 import org.sosy_lab.java_smt.basicimpl.AbstractSLFormulaManager;
 
-public class CVC5SLFormulaManager extends AbstractSLFormulaManager<Term, Sort, TermManager, Term> {
+class CVC5SLFormulaManager extends AbstractSLFormulaManager<Term, Sort, TermManager, Term> {
 
   private final TermManager termManager;
 
-  protected CVC5SLFormulaManager(CVC5FormulaCreator pCreator) {
+  CVC5SLFormulaManager(CVC5FormulaCreator pCreator) {
     super(pCreator);
     termManager = pCreator.getEnv();
   }

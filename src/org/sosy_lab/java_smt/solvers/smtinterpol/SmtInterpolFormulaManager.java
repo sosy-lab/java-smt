@@ -36,8 +36,7 @@ import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager;
 
-public class SmtInterpolFormulaManager
-    extends AbstractFormulaManager<Term, Sort, Script, FunctionSymbol> {
+class SmtInterpolFormulaManager extends AbstractFormulaManager<Term, Sort, Script, FunctionSymbol> {
 
   private final LogManager logger;
 
@@ -133,11 +132,10 @@ public class SmtInterpolFormulaManager
       while (t instanceof AnnotatedTerm) {
         t = ((AnnotatedTerm) t).getSubterm();
       }
-      if (!(t instanceof ApplicationTerm) || !seen.add(t)) {
+      if (!(t instanceof ApplicationTerm term) || !seen.add(t)) {
         continue;
       }
 
-      ApplicationTerm term = (ApplicationTerm) t;
       Collections.addAll(todo, term.getParameters());
 
       FunctionSymbol func = term.getFunction();

@@ -208,6 +208,15 @@ namespace opensmt {
 %ignore SMTConfig::printSuccess () const;
 %ignore SMTConfig::setSimplifyInterpolant (int val);
 %ignore SMTConfig::getSimplifyInterpolant () const;
+%ignore SMTConfig::setProduceAssignments();
+%ignore SMTConfig::setProduceProofs();
+%ignore SMTConfig::produce_assignments() const;
+%ignore SMTConfig::getting_models() const;
+%ignore SMTConfig::produce_unsat_cores() const;
+%ignore SMTConfig::getting_unsat_cores() const;
+%ignore SMTConfig::minimal_unsat_cores() const;
+%ignore SMTConfig::print_cores_full() const;
+%ignore SMTConfig::produce_proof() const;
 %ignore SMTConfig::status;
 %ignore SMTConfig::print_stats;
 %ignore SMTConfig::print_proofs_smtlib2;
@@ -260,6 +269,12 @@ namespace opensmt {
 %ignore SMTConfig::lra_trade_off;
 %ignore SMTConfig::lra_integer_solver;
 %ignore SMTConfig::lra_check_on_assert;
+%ignore SMTConfig::o_produce_assignments;
+%ignore SMTConfig::o_get_models;
+%ignore SMTConfig::o_produce_unsat_cores;
+%ignore SMTConfig::o_get_unsat_cores;
+%ignore SMTConfig::o_minimal_unsat_cores;
+%ignore SMTConfig::o_print_cores_full;
 %ignore SMTConfig::o_incremental;
 %ignore SMTConfig::o_verbosity;
 %ignore SMTConfig::o_produce_stats;

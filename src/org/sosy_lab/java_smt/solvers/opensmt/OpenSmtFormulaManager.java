@@ -88,9 +88,9 @@ class OpenSmtFormulaManager extends AbstractFormulaManager<PTRef, SRef, Logic, S
       out.append("(declare-fun ")
           .append(osmtLogic.protectName(ref))
           .append(" (")
-          .append(Joiner.on(' ').join(Lists.transform(sym.getArgTypes(), osmtLogic::printSort)))
+          .append(Joiner.on(' ').join(Lists.transform(sym.getArgTypes(), osmtLogic::sortToString)))
           .append(") ")
-          .append(osmtLogic.printSort(sym.rsort()))
+          .append(osmtLogic.sortToString(sym.rsort()))
           .append(")\n");
     }
     out.append("(assert ").append(osmtLogic.dumpWithLets(f)).append(')');

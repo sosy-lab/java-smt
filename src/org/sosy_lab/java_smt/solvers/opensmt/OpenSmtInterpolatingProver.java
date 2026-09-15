@@ -8,9 +8,6 @@
 
 package org.sosy_lab.java_smt.solvers.opensmt;
 
-import static com.google.common.base.Preconditions.checkArgument;
-
-import com.google.common.collect.ImmutableSet;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -22,6 +19,7 @@ import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
+import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.solvers.opensmt.OpenSmtSolverContext.OpenSMTOptions;
 import org.sosy_lab.java_smt.solvers.opensmt.api.PTRef;
 import org.sosy_lab.java_smt.solvers.opensmt.api.VectorInt;
@@ -71,27 +69,29 @@ class OpenSmtInterpolatingProver extends OpenSmtAbstractProver<Integer>
     super.popImpl();
   }
 
-  @Override
-  public BooleanFormula getInterpolant(Collection<Integer> formulasOfA) {
-    checkGenerateInterpolants();
-    checkArgument(
-        getAssertedConstraintIds().containsAll(formulasOfA),
-        "interpolation can only be done over previously asserted formulas.");
+  /**
+   * Check if OpenSMT supports interpolation for the current logic, and throw an {@link
+   * SolverException} otherwise.
+   */
+  private void checkLogicSupportInterpolation() throws SolverException {
+    if (!creator.getLogic().doesLogicSupportInterpolation()) {
+      throw new SolverException(
+          "OpenSMT does not support interpolation for the specified logic %s."
+              .formatted(creator.getLogic()));
+    }
+  }
 
+  @Override
+  public BooleanFormula getInterpolant(Collection<Integer> formulasOfA) throws SolverException {
+    checkLogicSupportInterpolation();
     return creator.encapsulateBoolean(
         osmtSolver.getInterpolationContext().getSingleInterpolant(new VectorInt(formulasOfA)));
   }
 
   @Override
   public List<BooleanFormula> getSeqInterpolants(
-      List<? extends Collection<Integer>> partitionedFormulas) {
-    checkGenerateInterpolants();
-    checkArgument(!partitionedFormulas.isEmpty(), "Interpolation sequence must not be empty");
-    final ImmutableSet<Integer> assertedConstraintIds = getAssertedConstraintIds();
-    checkArgument(
-        partitionedFormulas.stream().allMatch(assertedConstraintIds::containsAll),
-        "interpolation can only be done over previously asserted formulas.");
-
+      List<? extends Collection<Integer>> partitionedFormulas) throws SolverException {
+    checkLogicSupportInterpolation();
     VectorVectorInt partitions = new VectorVectorInt();
     for (int i = 1; i < partitionedFormulas.size(); i++) {
       VectorInt prefix = new VectorInt();
@@ -120,8 +120,8 @@ class OpenSmtInterpolatingProver extends OpenSmtAbstractProver<Integer>
   protected String getReasonFromSolverFeatures(
       boolean usesUFs, boolean usesIntegers, boolean usesReals, boolean usesArrays) {
     if (!creator.getLogic().doesLogicSupportInterpolation()) {
-      return String.format(
-          "OpenSMT does not support interpolation for the specified logic %s.", creator.getLogic());
+      return "OpenSMT does not support interpolation for the specified logic %s."
+          .formatted(creator.getLogic());
     }
     return super.getReasonFromSolverFeatures(usesUFs, usesIntegers, usesReals, usesArrays);
   }

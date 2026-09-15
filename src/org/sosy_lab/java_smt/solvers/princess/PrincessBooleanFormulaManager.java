@@ -49,12 +49,12 @@ class PrincessBooleanFormulaManager
 
   @Override
   public boolean isTrue(IExpression t) {
-    return t instanceof IBoolLit && ((IBoolLit) t).value();
+    return t instanceof IBoolLit iBoolLit && iBoolLit.value();
   }
 
   @Override
   public boolean isFalse(IExpression t) {
-    return t instanceof IBoolLit && !((IBoolLit) t).value();
+    return t instanceof IBoolLit iBoolLit && !iBoolLit.value();
   }
 
   @Override
@@ -70,8 +70,8 @@ class PrincessBooleanFormulaManager
     } else if (isFalse(t1) && isTrue(t2)) {
       return not(condition);
     }
-    if (t1 instanceof IFormula) {
-      return new IFormulaITE((IFormula) condition, (IFormula) t1, (IFormula) t2);
+    if (t1 instanceof IFormula iFormula) {
+      return new IFormulaITE((IFormula) condition, iFormula, (IFormula) t2);
     } else {
       return new ITermITE((IFormula) condition, (ITerm) t1, (ITerm) t2);
     }
@@ -83,8 +83,8 @@ class PrincessBooleanFormulaManager
       return pFalse;
     } else if (isFalse(pBits)) {
       return pTrue;
-    } else if (pBits instanceof INot) {
-      return ((INot) pBits).subformula(); // "not not a" == "a"
+    } else if (pBits instanceof INot iNot) {
+      return iNot.subformula(); // "not not a" == "a"
     } else {
       return new INot((IFormula) pBits);
     }
@@ -138,20 +138,19 @@ class PrincessBooleanFormulaManager
    * it simple.
    */
   private IFormula simplify(IFormula f) {
-    if (f instanceof IBinFormula) {
-      final IBinFormula bin = (IBinFormula) f;
+    if (f instanceof IBinFormula bin) {
       Enumeration.Value operator = bin.j();
       if (isDistributiveBooleanOperator(operator)
-          && bin.f1() instanceof IBinFormula
-          && bin.f2() instanceof IBinFormula
-          && ((IBinFormula) bin.f1()).j().equals(((IBinFormula) bin.f2()).j())) {
-        Enumeration.Value innerOperator = ((IBinFormula) bin.f1()).j();
+          && bin.f1() instanceof IBinFormula f1
+          && bin.f2() instanceof IBinFormula f2
+          && f1.j().equals(f2.j())) {
+        Enumeration.Value innerOperator = f1.j();
         if (isDistributiveBooleanOperator(innerOperator)) {
 
-          IFormula s11 = ((IBinFormula) bin.f1()).f1();
-          IFormula s12 = ((IBinFormula) bin.f1()).f2();
-          IFormula s21 = ((IBinFormula) bin.f2()).f1();
-          IFormula s22 = ((IBinFormula) bin.f2()).f2();
+          IFormula s11 = f1.f1();
+          IFormula s12 = f1.f2();
+          IFormula s21 = f2.f1();
+          IFormula s22 = f2.f2();
 
           // only check for object equality, for performance
           if (s11 == s21) { // (ab)(ac) -> a(bc)

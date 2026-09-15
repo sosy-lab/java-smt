@@ -18,10 +18,9 @@ import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.solvers.bitwuzla.api.Options;
 
-public class BitwuzlaTheoremProver extends BitwuzlaAbstractProver<Void>
-    implements ProverEnvironment {
+class BitwuzlaTheoremProver extends BitwuzlaAbstractProver<Void> implements ProverEnvironment {
 
-  protected BitwuzlaTheoremProver(
+  BitwuzlaTheoremProver(
       BitwuzlaFormulaManager pManager,
       BitwuzlaFormulaCreator pCreator,
       ShutdownNotifier pShutdownNotifier,

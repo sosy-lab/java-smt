@@ -19,7 +19,7 @@ import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.SolverException;
 
-public class BasicProverWithAssumptionsWrapper<T, P extends BasicProverEnvironment<T>>
+class BasicProverWithAssumptionsWrapper<T, P extends BasicProverEnvironment<T>>
     implements BasicProverEnvironment<T> {
 
   protected final P delegate;

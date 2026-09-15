@@ -20,14 +20,14 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 import org.sosy_lab.java_smt.basicimpl.AbstractBooleanFormulaManager;
 
-public class CVC5BooleanFormulaManager
+class CVC5BooleanFormulaManager
     extends AbstractBooleanFormulaManager<Term, Sort, TermManager, Term> {
 
   private final TermManager termManager;
   private final Term pTrue;
   private final Term pFalse;
 
-  protected CVC5BooleanFormulaManager(CVC5FormulaCreator pCreator) {
+  CVC5BooleanFormulaManager(CVC5FormulaCreator pCreator) {
     super(pCreator);
     termManager = pCreator.getEnv();
     pTrue = termManager.mkBoolean(true);
@@ -90,14 +90,11 @@ public class CVC5BooleanFormulaManager
         operands.add(operand);
       }
     }
-    switch (operands.size()) {
-      case 0:
-        return pTrue;
-      case 1:
-        return Iterables.getOnlyElement(operands);
-      default:
-        return termManager.mkTerm(Kind.AND, operands.toArray(new Term[0]));
-    }
+    return switch (operands.size()) {
+      case 0 -> pTrue;
+      case 1 -> Iterables.getOnlyElement(operands);
+      default -> termManager.mkTerm(Kind.AND, operands.toArray(new Term[0]));
+    };
   }
 
   @Override
@@ -129,14 +126,11 @@ public class CVC5BooleanFormulaManager
         operands.add(operand);
       }
     }
-    switch (operands.size()) {
-      case 0:
-        return pFalse;
-      case 1:
-        return Iterables.getOnlyElement(operands);
-      default:
-        return termManager.mkTerm(Kind.OR, operands.toArray(new Term[0]));
-    }
+    return switch (operands.size()) {
+      case 0 -> pFalse;
+      case 1 -> Iterables.getOnlyElement(operands);
+      default -> termManager.mkTerm(Kind.OR, operands.toArray(new Term[0]));
+    };
   }
 
   @Override

@@ -42,53 +42,47 @@ public class RotationVisitorTest extends SolverBasedTest0.ParameterizedSolverBas
 
     var functions = mgr.visit(f, new FunctionDeclarationVisitorNoOther(mgr));
     switch (solverToUse()) {
-      case CVC4:
-        assertThat(functions)
-            .containsExactly(
-                FunctionDeclarationKind.BV_OR,
-                FunctionDeclarationKind.BV_SHL,
-                FunctionDeclarationKind.ITE,
-                FunctionDeclarationKind.ITE,
-                FunctionDeclarationKind.EQ,
-                FunctionDeclarationKind.EQ,
-                FunctionDeclarationKind.BV_UREM,
-                FunctionDeclarationKind.BV_UREM,
-                FunctionDeclarationKind.BV_LSHR,
-                FunctionDeclarationKind.BV_SUB);
-        break;
-      case CVC5:
-      case PRINCESS:
-        assertThat(functions)
-            .containsExactly(
-                FunctionDeclarationKind.BV_OR,
-                FunctionDeclarationKind.BV_SHL,
-                FunctionDeclarationKind.BV_UREM,
-                FunctionDeclarationKind.BV_UREM,
-                FunctionDeclarationKind.BV_LSHR,
-                FunctionDeclarationKind.BV_SUB);
-        break;
-      case MATHSAT5:
-        assertThat(functions)
-            .containsExactly(
-                FunctionDeclarationKind.BV_OR,
-                FunctionDeclarationKind.BV_LSHR,
-                FunctionDeclarationKind.BV_SHL);
-        break;
-      case YICES2:
-        assertThat(functions)
-            .containsExactly(
-                FunctionDeclarationKind.BV_CONCAT,
-                FunctionDeclarationKind.BV_EXTRACT,
-                FunctionDeclarationKind.BV_EXTRACT,
-                FunctionDeclarationKind.BV_EXTRACT,
-                FunctionDeclarationKind.BV_EXTRACT,
-                FunctionDeclarationKind.BV_EXTRACT,
-                FunctionDeclarationKind.BV_EXTRACT,
-                FunctionDeclarationKind.BV_EXTRACT,
-                FunctionDeclarationKind.BV_EXTRACT);
-        break;
-      default:
-        assertThat(functions).containsExactly(FunctionDeclarationKind.BV_ROTATE_LEFT);
+      case CVC4 ->
+          assertThat(functions)
+              .containsExactly(
+                  FunctionDeclarationKind.BV_OR,
+                  FunctionDeclarationKind.BV_SHL,
+                  FunctionDeclarationKind.ITE,
+                  FunctionDeclarationKind.ITE,
+                  FunctionDeclarationKind.EQ,
+                  FunctionDeclarationKind.EQ,
+                  FunctionDeclarationKind.BV_UREM,
+                  FunctionDeclarationKind.BV_UREM,
+                  FunctionDeclarationKind.BV_LSHR,
+                  FunctionDeclarationKind.BV_SUB);
+      case CVC5, PRINCESS ->
+          assertThat(functions)
+              .containsExactly(
+                  FunctionDeclarationKind.BV_OR,
+                  FunctionDeclarationKind.BV_SHL,
+                  FunctionDeclarationKind.BV_UREM,
+                  FunctionDeclarationKind.BV_UREM,
+                  FunctionDeclarationKind.BV_LSHR,
+                  FunctionDeclarationKind.BV_SUB);
+      case MATHSAT5 ->
+          assertThat(functions)
+              .containsExactly(
+                  FunctionDeclarationKind.BV_OR,
+                  FunctionDeclarationKind.BV_LSHR,
+                  FunctionDeclarationKind.BV_SHL);
+      case YICES2 ->
+          assertThat(functions)
+              .containsExactly(
+                  FunctionDeclarationKind.BV_CONCAT,
+                  FunctionDeclarationKind.BV_EXTRACT,
+                  FunctionDeclarationKind.BV_EXTRACT,
+                  FunctionDeclarationKind.BV_EXTRACT,
+                  FunctionDeclarationKind.BV_EXTRACT,
+                  FunctionDeclarationKind.BV_EXTRACT,
+                  FunctionDeclarationKind.BV_EXTRACT,
+                  FunctionDeclarationKind.BV_EXTRACT,
+                  FunctionDeclarationKind.BV_EXTRACT);
+      default -> assertThat(functions).containsExactly(FunctionDeclarationKind.BV_ROTATE_LEFT);
     }
 
     // TODO dumpFormula crashes with Princess
@@ -105,53 +99,47 @@ public class RotationVisitorTest extends SolverBasedTest0.ParameterizedSolverBas
 
     var functions = mgr.visit(f, new FunctionDeclarationVisitorNoOther(mgr));
     switch (solverToUse()) {
-      case CVC4:
-        assertThat(functions)
-            .containsExactly(
-                FunctionDeclarationKind.BV_OR,
-                FunctionDeclarationKind.BV_LSHR,
-                FunctionDeclarationKind.ITE,
-                FunctionDeclarationKind.ITE,
-                FunctionDeclarationKind.EQ,
-                FunctionDeclarationKind.EQ,
-                FunctionDeclarationKind.BV_UREM,
-                FunctionDeclarationKind.BV_UREM,
-                FunctionDeclarationKind.BV_SHL,
-                FunctionDeclarationKind.BV_SUB);
-        break;
-      case CVC5:
-      case PRINCESS:
-        assertThat(functions)
-            .containsExactly(
-                FunctionDeclarationKind.BV_OR,
-                FunctionDeclarationKind.BV_SHL,
-                FunctionDeclarationKind.BV_UREM,
-                FunctionDeclarationKind.BV_UREM,
-                FunctionDeclarationKind.BV_LSHR,
-                FunctionDeclarationKind.BV_SUB);
-        break;
-      case MATHSAT5:
-        assertThat(functions)
-            .containsExactly(
-                FunctionDeclarationKind.BV_OR,
-                FunctionDeclarationKind.BV_LSHR,
-                FunctionDeclarationKind.BV_SHL);
-        break;
-      case YICES2:
-        assertThat(functions)
-            .containsExactly(
-                FunctionDeclarationKind.BV_CONCAT,
-                FunctionDeclarationKind.BV_EXTRACT,
-                FunctionDeclarationKind.BV_EXTRACT,
-                FunctionDeclarationKind.BV_EXTRACT,
-                FunctionDeclarationKind.BV_EXTRACT,
-                FunctionDeclarationKind.BV_EXTRACT,
-                FunctionDeclarationKind.BV_EXTRACT,
-                FunctionDeclarationKind.BV_EXTRACT,
-                FunctionDeclarationKind.BV_EXTRACT);
-        break;
-      default:
-        assertThat(functions).containsExactly(FunctionDeclarationKind.BV_ROTATE_RIGHT);
+      case CVC4 ->
+          assertThat(functions)
+              .containsExactly(
+                  FunctionDeclarationKind.BV_OR,
+                  FunctionDeclarationKind.BV_LSHR,
+                  FunctionDeclarationKind.ITE,
+                  FunctionDeclarationKind.ITE,
+                  FunctionDeclarationKind.EQ,
+                  FunctionDeclarationKind.EQ,
+                  FunctionDeclarationKind.BV_UREM,
+                  FunctionDeclarationKind.BV_UREM,
+                  FunctionDeclarationKind.BV_SHL,
+                  FunctionDeclarationKind.BV_SUB);
+      case CVC5, PRINCESS ->
+          assertThat(functions)
+              .containsExactly(
+                  FunctionDeclarationKind.BV_OR,
+                  FunctionDeclarationKind.BV_SHL,
+                  FunctionDeclarationKind.BV_UREM,
+                  FunctionDeclarationKind.BV_UREM,
+                  FunctionDeclarationKind.BV_LSHR,
+                  FunctionDeclarationKind.BV_SUB);
+      case MATHSAT5 ->
+          assertThat(functions)
+              .containsExactly(
+                  FunctionDeclarationKind.BV_OR,
+                  FunctionDeclarationKind.BV_LSHR,
+                  FunctionDeclarationKind.BV_SHL);
+      case YICES2 ->
+          assertThat(functions)
+              .containsExactly(
+                  FunctionDeclarationKind.BV_CONCAT,
+                  FunctionDeclarationKind.BV_EXTRACT,
+                  FunctionDeclarationKind.BV_EXTRACT,
+                  FunctionDeclarationKind.BV_EXTRACT,
+                  FunctionDeclarationKind.BV_EXTRACT,
+                  FunctionDeclarationKind.BV_EXTRACT,
+                  FunctionDeclarationKind.BV_EXTRACT,
+                  FunctionDeclarationKind.BV_EXTRACT,
+                  FunctionDeclarationKind.BV_EXTRACT);
+      default -> assertThat(functions).containsExactly(FunctionDeclarationKind.BV_ROTATE_RIGHT);
     }
   }
 
@@ -165,25 +153,24 @@ public class RotationVisitorTest extends SolverBasedTest0.ParameterizedSolverBas
 
     var functions = mgr.visit(f, new FunctionDeclarationVisitorNoOther(mgr));
     switch (solverToUse()) {
-      case PRINCESS:
-        assertThat(functions)
-            .containsExactly(FunctionDeclarationKind.BV_EXTRACT, FunctionDeclarationKind.BV_CONCAT);
-        break;
-      case YICES2:
-        assertThat(functions)
-            .containsExactly(
-                FunctionDeclarationKind.BV_CONCAT,
-                FunctionDeclarationKind.BV_EXTRACT,
-                FunctionDeclarationKind.BV_EXTRACT,
-                FunctionDeclarationKind.BV_EXTRACT,
-                FunctionDeclarationKind.BV_EXTRACT,
-                FunctionDeclarationKind.BV_EXTRACT,
-                FunctionDeclarationKind.BV_EXTRACT,
-                FunctionDeclarationKind.BV_EXTRACT,
-                FunctionDeclarationKind.BV_EXTRACT);
-        break;
-      default:
-        assertThat(functions).containsExactly(FunctionDeclarationKind.BV_ROTATE_LEFT_BY_INT);
+      case PRINCESS ->
+          assertThat(functions)
+              .containsExactly(
+                  FunctionDeclarationKind.BV_EXTRACT, FunctionDeclarationKind.BV_CONCAT);
+      case YICES2 ->
+          assertThat(functions)
+              .containsExactly(
+                  FunctionDeclarationKind.BV_CONCAT,
+                  FunctionDeclarationKind.BV_EXTRACT,
+                  FunctionDeclarationKind.BV_EXTRACT,
+                  FunctionDeclarationKind.BV_EXTRACT,
+                  FunctionDeclarationKind.BV_EXTRACT,
+                  FunctionDeclarationKind.BV_EXTRACT,
+                  FunctionDeclarationKind.BV_EXTRACT,
+                  FunctionDeclarationKind.BV_EXTRACT,
+                  FunctionDeclarationKind.BV_EXTRACT);
+      default ->
+          assertThat(functions).containsExactly(FunctionDeclarationKind.BV_ROTATE_LEFT_BY_INT);
     }
   }
 
@@ -197,25 +184,24 @@ public class RotationVisitorTest extends SolverBasedTest0.ParameterizedSolverBas
 
     var functions = mgr.visit(f, new FunctionDeclarationVisitorNoOther(mgr));
     switch (solverToUse()) {
-      case PRINCESS:
-        assertThat(functions)
-            .containsExactly(FunctionDeclarationKind.BV_EXTRACT, FunctionDeclarationKind.BV_CONCAT);
-        break;
-      case YICES2:
-        assertThat(functions)
-            .containsExactly(
-                FunctionDeclarationKind.BV_CONCAT,
-                FunctionDeclarationKind.BV_EXTRACT,
-                FunctionDeclarationKind.BV_EXTRACT,
-                FunctionDeclarationKind.BV_EXTRACT,
-                FunctionDeclarationKind.BV_EXTRACT,
-                FunctionDeclarationKind.BV_EXTRACT,
-                FunctionDeclarationKind.BV_EXTRACT,
-                FunctionDeclarationKind.BV_EXTRACT,
-                FunctionDeclarationKind.BV_EXTRACT);
-        break;
-      default:
-        assertThat(functions).containsExactly(FunctionDeclarationKind.BV_ROTATE_RIGHT_BY_INT);
+      case PRINCESS ->
+          assertThat(functions)
+              .containsExactly(
+                  FunctionDeclarationKind.BV_EXTRACT, FunctionDeclarationKind.BV_CONCAT);
+      case YICES2 ->
+          assertThat(functions)
+              .containsExactly(
+                  FunctionDeclarationKind.BV_CONCAT,
+                  FunctionDeclarationKind.BV_EXTRACT,
+                  FunctionDeclarationKind.BV_EXTRACT,
+                  FunctionDeclarationKind.BV_EXTRACT,
+                  FunctionDeclarationKind.BV_EXTRACT,
+                  FunctionDeclarationKind.BV_EXTRACT,
+                  FunctionDeclarationKind.BV_EXTRACT,
+                  FunctionDeclarationKind.BV_EXTRACT,
+                  FunctionDeclarationKind.BV_EXTRACT);
+      default ->
+          assertThat(functions).containsExactly(FunctionDeclarationKind.BV_ROTATE_RIGHT_BY_INT);
     }
   }
 }

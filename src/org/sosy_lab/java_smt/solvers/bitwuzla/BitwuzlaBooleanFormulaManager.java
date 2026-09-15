@@ -14,14 +14,14 @@ import org.sosy_lab.java_smt.solvers.bitwuzla.api.Sort;
 import org.sosy_lab.java_smt.solvers.bitwuzla.api.Term;
 import org.sosy_lab.java_smt.solvers.bitwuzla.api.TermManager;
 
-public class BitwuzlaBooleanFormulaManager
+class BitwuzlaBooleanFormulaManager
     extends AbstractBooleanFormulaManager<Term, Sort, TermManager, BitwuzlaDeclaration> {
   private final TermManager termManager;
 
   private final Term pTrue;
   private final Term pFalse;
 
-  protected BitwuzlaBooleanFormulaManager(BitwuzlaFormulaCreator pCreator) {
+  BitwuzlaBooleanFormulaManager(BitwuzlaFormulaCreator pCreator) {
     super(pCreator);
     termManager = pCreator.getEnv();
     pTrue = termManager.mk_true();

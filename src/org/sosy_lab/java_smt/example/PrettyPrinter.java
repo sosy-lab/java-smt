@@ -119,17 +119,12 @@ public final class PrettyPrinter {
 
   private static String formulaToString(
       BooleanFormula formula, org.sosy_lab.java_smt.utils.PrettyPrinter pp, Type type) {
-    switch (type) {
-      case DETAILED_TEXT:
-        return pp.formulaToString(formula);
-      case DOT:
-        return pp.formulaToDot(formula, PrinterOption.SPLIT_ONLY_BOOLEAN_OPERATIONS);
-      case DETAILED_DOT:
-        return pp.formulaToDot(formula);
-      case TEXT:
-      default:
-        return pp.formulaToString(formula, PrinterOption.SPLIT_ONLY_BOOLEAN_OPERATIONS);
-    }
+    return switch (type) {
+      case DETAILED_TEXT -> pp.formulaToString(formula);
+      case DOT -> pp.formulaToDot(formula, PrinterOption.SPLIT_ONLY_BOOLEAN_OPERATIONS);
+      case DETAILED_DOT -> pp.formulaToDot(formula);
+      default -> pp.formulaToString(formula, PrinterOption.SPLIT_ONLY_BOOLEAN_OPERATIONS);
+    };
   }
 
   private static void help() {

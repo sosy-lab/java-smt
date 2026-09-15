@@ -9,26 +9,19 @@
 package org.sosy_lab.java_smt.solvers.bitwuzla;
 
 import static com.google.common.base.Preconditions.checkArgument;
-import static org.sosy_lab.common.collect.Collections3.transformedImmutableSetCopy;
 import static org.sosy_lab.java_smt.api.FormulaType.getFloatingPointTypeFromSizesWithHiddenBit;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Table;
 import java.math.BigInteger;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Deque;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Optional;
-import java.util.Set;
+import java.util.function.BiConsumer;
 import org.sosy_lab.java_smt.api.ArrayFormula;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -59,28 +52,11 @@ import org.sosy_lab.java_smt.solvers.bitwuzla.api.Vector_Int;
 import org.sosy_lab.java_smt.solvers.bitwuzla.api.Vector_Sort;
 import org.sosy_lab.java_smt.solvers.bitwuzla.api.Vector_Term;
 
-public class BitwuzlaFormulaCreator
-    extends FormulaCreator<Term, Sort, TermManager, BitwuzlaDeclaration> {
+class BitwuzlaFormulaCreator extends FormulaCreator<Term, Sort, TermManager, BitwuzlaDeclaration> {
 
   private final Table<String, Sort, Term> formulaCache = HashBasedTable.create();
 
-  /**
-   * This mapping stores symbols and their constraints, such as from fp-to-bv casts with their
-   * defining equation.
-   *
-   * <p>Bitwuzla does not support casts from floating-point to bitvector natively. The reason given
-   * is that the value is undefined for NaN and that the SMT-LIB standard also does not include such
-   * an operation. We try to work around this limitation by introducing a fresh variable <code>
-   * __CAST_FROM_BV_XXX</code>for the result and then adding the constraint <code>
-   * fp.to_fp(__CAST_FROM_BV_XXX) = &lt;float-term&gt;</code> as a side-condition. This is also what
-   * is recommended by the SMT-LIB2 standard. The map <code>variableCasts</code> is used to store
-   * these side-conditions so that they can later be added as assertions. The keys of the map are
-   * the newly introduced variable symbols and the values are the defining equations as mentioned
-   * above.
-   */
-  private final Map<String, Term> constraintsForVariables = new HashMap<>();
-
-  protected BitwuzlaFormulaCreator(TermManager pTermManager) {
+  BitwuzlaFormulaCreator(TermManager pTermManager) {
     super(pTermManager, pTermManager.mk_bool_sort(), null, null, null, null);
   }
 
@@ -125,15 +101,15 @@ public class BitwuzlaFormulaCreator
   @Override
   protected FloatingPointFormula encapsulateFloatingPoint(Term pTerm) {
     assert getFormulaType(pTerm).isFloatingPointType()
-        : String.format("%s is no FP, but %s (%s)", pTerm, pTerm.sort(), getFormulaType(pTerm));
+        : "%s is no FP, but %s (%s)".formatted(pTerm, pTerm.sort(), getFormulaType(pTerm));
     return new BitwuzlaFloatingPointFormula(pTerm);
   }
 
   @Override
   protected FloatingPointRoundingModeFormula encapsulateRoundingMode(Term pTerm) {
     assert getFormulaType(pTerm).isFloatingPointRoundingModeType()
-        : String.format(
-            "%s is no FP rounding mode, but %s (%s)", pTerm, pTerm.sort(), getFormulaType(pTerm));
+        : "%s is no FP rounding mode, but %s (%s)"
+            .formatted(pTerm, pTerm.sort(), getFormulaType(pTerm));
     return new BitwuzlaFloatingPointRoundingModeFormula(pTerm);
   }
 
@@ -351,8 +327,7 @@ public class BitwuzlaFormulaCreator
   @Override
   public <T extends Formula> T encapsulate(FormulaType<T> pType, Term pTerm) {
     assert pType.equals(getFormulaType(pTerm))
-        : String.format(
-            "Trying to encapsulate formula of type %s as %s", getFormulaType(pTerm), pType);
+        : "Trying to encapsulate formula of type %s as %s".formatted(getFormulaType(pTerm), pType);
     if (pType.isBooleanType()) {
       return (T) new BitwuzlaBooleanFormula(pTerm);
     } else if (pType.isArrayType()) {
@@ -499,34 +474,32 @@ public class BitwuzlaFormulaCreator
   public Term callFunctionImpl(BitwuzlaDeclaration declaration, List<Term> args) {
     // For UFs the declaration needs to be a const wrapping of the function sort
     // For all other functions it needs to be the kind
-    // BUT, we can never use a bitwuzla_term_is... function on a KIND
-    if (!declaration.isKind() && declaration.getTerm().num_indices() > 0) {
-      // The term might be indexed, then we need index creation
-      Term term = declaration.getTerm();
-      Kind properKind = term.kind();
-      return environment.mk_term(properKind, new Vector_Term(args), term.indices());
-    }
-
-    if (!declaration.isKind() && declaration.getTerm().sort().is_fun()) {
+    if (declaration.isTerm() && declaration.getTerm().sort().is_fun()) {
+      // UF symbol
       Vector_Term functionAndArgs = new Vector_Term();
       functionAndArgs.add(declaration.getTerm());
       functionAndArgs.addAll(args);
       return environment.mk_term(Kind.APPLY, functionAndArgs, new Vector_Int());
+    } else if (declaration.isTerm() && declaration.getTerm().num_indices() == 0) {
+      // Constant UF symbol
+      return declaration.getTerm();
+    } else if (declaration.isTerm() && declaration.getTerm().num_indices() > 0) {
+      // Indexed operator
+      Term term = declaration.getTerm();
+      Kind properKind = term.kind();
+      return environment.mk_term(properKind, new Vector_Term(args), term.indices());
+    } else {
+      // Operator
+      return environment.mk_term(declaration.getKind(), new Vector_Term(args), new Vector_Int());
     }
-
-    assert declaration.isKind();
-
-    return environment.mk_term(declaration.getKind(), new Vector_Term(args), new Vector_Int());
   }
 
   @Override
   public BitwuzlaDeclaration declareUFImpl(String name, Sort pReturnType, List<Sort> pArgTypes) {
-    if (pArgTypes.isEmpty()) {
-      // Bitwuzla does not support UFs with no args, so we make a variable
-      // TODO: implement
-      throw new UnsupportedOperationException("Bitwuzla does not support 0 arity UFs.");
-    }
-    Sort functionSort = environment.mk_fun_sort(new Vector_Sort(pArgTypes), pReturnType);
+    Sort functionSort =
+        pArgTypes.isEmpty()
+            ? pReturnType
+            : environment.mk_fun_sort(new Vector_Sort(pArgTypes), pReturnType);
 
     Term maybeFormula = formulaCache.get(name, functionSort);
     if (maybeFormula != null) {
@@ -567,22 +540,6 @@ public class BitwuzlaFormulaCreator
     return formulaCache;
   }
 
-  // True if the entered String has an existing variable in the cache.
-  protected boolean formulaCacheContains(String variable) {
-    // There is always only 1 type permitted per variable
-    return formulaCache.containsRow(variable);
-  }
-
-  // Optional that contains the variable to the entered String if there is one.
-  protected Optional<Term> getFormulaFromCache(String variable) {
-    Iterator<Entry<Sort, Term>> entrySetIter = formulaCache.row(variable).entrySet().iterator();
-    if (entrySetIter.hasNext()) {
-      // If there is a non-empty row for an entry, there is only one entry
-      return Optional.of(entrySetIter.next().getValue());
-    }
-    return Optional.empty();
-  }
-
   @Override
   public Object convertValue(Term term) {
     Preconditions.checkArgument(term.is_value(), "Term \"%s\" is not a value.", term);
@@ -599,6 +556,7 @@ public class BitwuzlaFormulaCreator
     if (sort.is_fp()) {
       int exponentSize = sort.fp_exp_size();
       int mantissaSizeWithHiddenBit = sort.fp_sig_size();
+      // We can also return REAL representations with fp_value_to_real_str()
       return FloatingPointNumber.of(
           term.to_bv(),
           getFloatingPointTypeFromSizesWithHiddenBit(exponentSize, mantissaSizeWithHiddenBit));
@@ -606,35 +564,39 @@ public class BitwuzlaFormulaCreator
     throw new AssertionError("Unknown value type.");
   }
 
-  /** Add a constraint that is pushed onto the prover stack whenever the variable is used. */
-  public void addConstraintForVariable(String variable, Term constraint) {
-    constraintsForVariables.put(variable, constraint);
-  }
-
-  /**
-   * Returns a set of additional constraints (side-conditions) that are needed to use some variables
-   * from the given term, such as utility variables from casts.
-   *
-   * <p>Bitwuzla does not support fp-to-bv conversion natively. We have to use side-conditions as a
-   * workaround. When a term containing fp-to-bv casts is added to the assertion stack these
-   * side-conditions need to be collected by calling this method and then also adding them to the
-   * assertion stack.
-   */
-  public Collection<Term> getConstraintsForTerm(Term pTerm) {
-    final Set<String> usedConstraintVariables = new LinkedHashSet<>();
-    final Deque<String> waitlist = new ArrayDeque<>(extractVariablesAndUFs(pTerm, false).keySet());
-    while (!waitlist.isEmpty()) {
-      String current = waitlist.pop();
-      if (constraintsForVariables.containsKey(current)) { // ignore variables without constraints
-        if (usedConstraintVariables.add(current)) {
-          // if we found a new variable with constraint, get transitive variables from constraint
-          Term constraint = constraintsForVariables.get(current);
-          waitlist.addAll(extractVariablesAndUFs(constraint, false).keySet());
+  @Override
+  public void extractVariablesAndUFs(
+      final Formula pFormula,
+      final boolean extractUF,
+      final BiConsumer<String, Formula> pConsumer) {
+    ImmutableSet.Builder<Term> builder = ImmutableSet.builder();
+    var cache = new HashSet<Term>();
+    var work = new ArrayDeque<>(ImmutableList.of(extractInfo(pFormula)));
+    while (!work.isEmpty()) {
+      var term = work.pop();
+      if (cache.add(term)) {
+        var kind = term.kind();
+        if (kind == Kind.CONSTANT) {
+          builder.add(term);
+        } else if (kind == Kind.APPLY) {
+          if (extractUF) {
+            builder.add(term);
+          }
+          for (int c = 1; c < term.num_children(); c++) {
+            work.push(term.get(c));
+          }
+        } else {
+          for (int c = 0; c < term.num_children(); c++) {
+            work.push(term.get(c));
+          }
         }
       }
     }
-
-    return transformedImmutableSetCopy(usedConstraintVariables, constraintsForVariables::get);
+    for (var term : builder.build()) {
+      pConsumer.accept(
+          term.kind() == Kind.APPLY ? term.get(0).symbol() : term.symbol(),
+          encapsulateWithTypeOf(term));
+    }
   }
 
   @Override
@@ -651,8 +613,7 @@ public class BitwuzlaFormulaCreator
     } else if (term.is_rm_value_rtz()) {
       return FloatingPointRoundingMode.TOWARD_ZERO;
     } else {
-      throw new IllegalArgumentException(
-          String.format("Unknown rounding mode in Term '%s'.", term));
+      throw new IllegalArgumentException("Unknown rounding mode in Term '%s'.".formatted(term));
     }
   }
 }

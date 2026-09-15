@@ -16,7 +16,7 @@ import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FunctionDeclaration;
 import org.sosy_lab.java_smt.api.UFManager;
 
-public class DebuggingUFManager implements UFManager {
+class DebuggingUFManager implements UFManager {
   private final UFManager delegate;
   private final DebuggingAssertions debugging;
 

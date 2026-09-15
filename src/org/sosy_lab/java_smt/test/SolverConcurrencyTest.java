@@ -30,7 +30,6 @@ import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReferenceArray;
-import java.util.stream.Collectors;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -147,14 +146,14 @@ public class SolverConcurrencyTest {
     assume()
         .withMessage("Solver does not support integers")
         .that(solver)
-        .isNoneOf(Solvers.BOOLECTOR, Solvers.YICES2, Solvers.BITWUZLA);
+        .isNoneOf(Solvers.BOOLECTOR, Solvers.BITWUZLA);
   }
 
   private void requireBitvectors() {
     assume()
         .withMessage("Solver does not support bitvectors")
         .that(solver)
-        .isNoneOf(Solvers.SMTINTERPOL, Solvers.YICES2, Solvers.OPENSMT);
+        .isNoneOf(Solvers.SMTINTERPOL, Solvers.OPENSMT);
   }
 
   private void requireOptimization() {
@@ -294,11 +293,11 @@ public class SolverConcurrencyTest {
   public void testFormulaTranslationWithConcurrentContexts()
       throws InvalidConfigurationException, InterruptedException, SolverException {
     requireIntegers();
-    // CVC4 does not support parsing and therefore no translation.
+    // CVC4 and Yices2 do not support parsing and therefore no translation.
     assume()
         .withMessage("Solver does not support translation of formulas")
         .that(solver)
-        .isNotEqualTo(Solvers.CVC4);
+        .isNoneOf(Solvers.CVC4, Solvers.YICES2);
 
     ConcurrentLinkedQueue<ContextAndFormula> contextAndFormulaList = new ConcurrentLinkedQueue<>();
 
@@ -529,11 +528,11 @@ public class SolverConcurrencyTest {
   @Test
   public void continuousRunningThreadFormulaTransferTranslateTest() {
     requireIntegers();
-    // CVC4 does not support parsing and therefore no translation.
+    // CVC4 and Yices2 do not support parsing and therefore no translation.
     assume()
         .withMessage("Solver does not support translation of formulas")
         .that(solver)
-        .isNotEqualTo(Solvers.CVC4);
+        .isNoneOf(Solvers.CVC4, Solvers.YICES2);
     assume()
         .withMessage("Princess will run out of memory")
         .that(solver)
@@ -578,9 +577,8 @@ public class SolverConcurrencyTest {
 
               assertWithMessage(
                       "Test continuousRunningThreadFormulaTransferTranslateTest() "
-                          + "failed isUnsat() in thread with id: "
-                          + id
-                          + ".")
+                          + "failed isUnsat() in thread with id: %s.",
+                      id)
                   .that(stack.isUnsat())
                   .isTrue();
 
@@ -713,11 +711,11 @@ public class SolverConcurrencyTest {
               });
     }
     try {
-      assertWithMessage("Timeout initializing the Threads for " + testName)
+      assertWithMessage("Timeout initializing the Threads for %s", testName)
           .that(allExecutorThreadsReady.await(NUMBER_OF_THREADS * 20, TimeUnit.MILLISECONDS))
           .isTrue();
       afterInitBlocker.countDown();
-      assertWithMessage("Timeout in " + testName)
+      assertWithMessage("Timeout in %s", testName)
           .that(allDone.await(TIMEOUT_SECONDS, TimeUnit.SECONDS))
           .isTrue();
     } catch (Throwable e) {
@@ -735,7 +733,7 @@ public class SolverConcurrencyTest {
                   ex.printStackTrace(pw);
                   return sw.toString();
                 })
-            .collect(Collectors.toList());
+            .toList();
     assertWithMessage(
             "Test %s failed with exception(s): %s",
             testName, Joiner.on("\n").join(exceptionDetails))

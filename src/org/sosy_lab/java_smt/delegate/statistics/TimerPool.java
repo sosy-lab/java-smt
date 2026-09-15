@@ -18,7 +18,7 @@ import java.util.function.Function;
 import org.sosy_lab.common.time.TimeSpan;
 import org.sosy_lab.common.time.Timer;
 
-public class TimerPool {
+class TimerPool {
 
   /** We assume one common unit for all sub-timers. */
   private static final TimeUnit UNIT = new Timer().getMaxTime().getUnit();
@@ -49,9 +49,9 @@ public class TimerPool {
    */
   private int numberOfIntervals = 0;
 
-  public TimerPool() {}
+  TimerPool() {}
 
-  public TimerWrapper getNewTimer() {
+  TimerWrapper getNewTimer() {
     cleanupReferences();
     Timer timer = new Timer();
     TimerWrapper wrapper = new TimerWrapper(timer);
@@ -136,7 +136,7 @@ public class TimerPool {
   }
 
   /** A minimal wrapper to keep a reference on the timer and provide a limited view. */
-  public static class TimerWrapper {
+  static class TimerWrapper {
     private final Timer timer;
 
     TimerWrapper(Timer pTimer) {

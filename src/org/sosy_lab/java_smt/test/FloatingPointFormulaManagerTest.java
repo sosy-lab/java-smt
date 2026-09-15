@@ -148,7 +148,7 @@ public class FloatingPointFormulaManagerTest
                         List<Formula> boundVariables,
                         BooleanFormula body) {
                       throw new IllegalArgumentException(
-                          String.format("Unexpected quantifier %s", quantifier));
+                          "Unexpected quantifier %s".formatted(quantifier));
                     }
                   });
 

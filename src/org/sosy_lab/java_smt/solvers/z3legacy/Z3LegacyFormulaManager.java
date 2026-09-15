@@ -248,8 +248,8 @@ final class Z3LegacyFormulaManager extends AbstractFormulaManager<Long, Long, Lo
 
   @Override
   public BooleanFormula translateFrom(BooleanFormula other, FormulaManager otherManager) {
-    if (otherManager instanceof Z3LegacyFormulaManager) {
-      long otherZ3Context = ((Z3LegacyFormulaManager) otherManager).getEnvironment();
+    if (otherManager instanceof Z3LegacyFormulaManager z3LegacyFormulaManager) {
+      long otherZ3Context = z3LegacyFormulaManager.getEnvironment();
       if (otherZ3Context == getEnvironment()) {
 
         // Same context.
