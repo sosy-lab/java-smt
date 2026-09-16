@@ -72,7 +72,7 @@ public final class JavaSMTMain {
 
       String logic = cmdLineOptions.get("solver.opensmt.logic");
       String solver = cmdLineOptions.get("solver.solver");
-      if (logic != null && (solver == null || !solver.equals("OPENSMT"))) {
+      if (logic != null && (solver == null || !solver.equalsIgnoreCase("OPENSMT"))) {
         logManager.log(
             Level.WARNING,
             "Option --logic is only effective with OpenSMT solver, but solver is set to "
@@ -149,16 +149,20 @@ public final class JavaSMTMain {
     ShutdownNotifier notifier = shutdownManager.getNotifier();
 
     try (SolverContext context =
-            SolverContextFactory.createSolverContext(config, logManager, notifier, options.solver);
-        ProverEnvironment prover = context.newProverEnvironment()) {
+        SolverContextFactory.createSolverContext(config, logManager, notifier, options.solver)) {
 
+      // Parse before creating the prover: Princess does not know symbols that are declared after
+      // the prover environment was created.
       FormulaManager formulaManager = context.getFormulaManager();
       List<BooleanFormula> formulas = formulaManager.parseAll(input);
-      for (BooleanFormula formula : formulas) {
-        prover.addConstraint(formula);
-      }
 
-      boolean isUnsat = prover.isUnsat();
+      boolean isUnsat;
+      try (ProverEnvironment prover = context.newProverEnvironment()) {
+        for (BooleanFormula formula : formulas) {
+          prover.addConstraint(formula);
+        }
+        isUnsat = prover.isUnsat();
+      }
       System.out.println(isUnsat ? "unsat" : "sat");
       System.exit(0);
 
