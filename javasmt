@@ -1,0 +1,126 @@
+#!/usr/bin/env bash
+
+# This file is part of JavaSMT,
+# an API wrapper for a collection of SMT solvers:
+# https://github.com/sosy-lab/java-smt
+#
+# SPDX-FileCopyrightText: 2026 Dirk Beyer <https://www.sosy-lab.org>
+#
+# SPDX-License-Identifier: Apache-2.0
+
+# Launcher for the command-line interface of JavaSMT. Benchmarking frameworks such
+# as BenchExec need a single executable inside the project directory, so that the
+# tool can be located and transferred via that path. The classpath is assembled the
+# same way as in runExamples.sh.
+#
+# This script sets no JVM option that influences what is measured, so that every
+# solver runs under the same conditions. The heap size comes from the memory limit
+# of the run and is passed by the tool-info module.
+
+# the location of the java command
+[ -z "$JAVA" ] && JAVA=java
+
+java_version="`"$JAVA" -XX:-UsePerfData -Xmx5m -version 2>&1`"
+result=$?
+if [ $result -eq 127 ]; then
+  echo "Java not found, please install Java 17 or newer." 1>&2
+  echo "For Ubuntu: sudo apt-get install openjdk-17-jre" 1>&2
+  echo "If you have installed Java 17, but it is not in your PATH," 1>&2
+  echo "let the environment variable JAVA point to the \"java\" binary." 1>&2
+  exit 1
+fi
+if [ $result -ne 0 ]; then
+  echo "Failed to execute Java VM, return code was $result and output was"
+  echo "$java_version"
+  echo "Please make sure you are able to execute Java processes by running \"$JAVA\"."
+  exit 1
+fi
+java_version="`echo "$java_version" | grep -e "^\(java\|openjdk\) version" | cut -f2 -d\\\" | cut -f1 -d. | cut -f1 -d-`"
+if [ -z "$java_version" ] || [ "$java_version" -lt 17 ] ; then
+  echo "Your Java version is too old, please install Java 17 or newer." 1>&2
+  echo "For Ubuntu: sudo apt-get install openjdk-17-jre" 1>&2
+  echo "If you have installed Java 17, but it is not in your PATH," 1>&2
+  echo "let the environment variable JAVA point to the \"java\" binary." 1>&2
+  exit 1
+fi
+
+platform="`uname -s`"
+SEP=":"
+
+# where the project directory is, relative to the location of this script
+case "$platform" in
+  Linux|CYGWIN*)
+    SCRIPT="$(readlink -f "$0")"
+    [ -n "$PATH_TO_JAVASMT" ] || PATH_TO_JAVASMT="$(readlink -f "$(dirname "$SCRIPT")")"
+    ;;
+  MINGW64*)
+	PATH_TO_JAVASMT="." # assume working directory is the current directory
+	SEP=";"
+    ;;
+  # other platforms like Mac don't support readlink -f
+  *)
+    [ -n "$PATH_TO_JAVASMT" ] || PATH_TO_JAVASMT="$(dirname "$0")"
+    ;;
+esac
+
+# JavaSMT can be present either as compiled classes below bin/ or as a JAR. The JARs with the
+# sources and the documentation carry no
+# classes to run, so they are skipped.
+JAVASMT_JAR=""
+for jar in "$PATH_TO_JAVASMT"/java-smt-*.jar; do
+  case "$jar" in
+    *-sources.jar | *-javadoc.jar) continue ;;
+  esac
+  [ -e "$jar" ] && JAVASMT_JAR="$jar"
+done
+
+if [ ! -e "$PATH_TO_JAVASMT/bin/org/sosy_lab/java_smt/cmdline/JavaSMTMain.class" ] \
+   && [ -z "$JAVASMT_JAR" ] ; then
+  echo "Could not find JavaSMT binary, please check path to project directory" 1>&2
+  exit 1
+fi
+
+# the classpath contains the compiled classes, the JAR if there is one,
+# the core JARs, and every solver present
+CLASSPATH="$PATH_TO_JAVASMT/bin"
+[ -n "$JAVASMT_JAR" ] && CLASSPATH="$CLASSPATH$SEP$JAVASMT_JAR"
+CLASSPATH="$CLASSPATH$SEP$PATH_TO_JAVASMT/lib/java/core/*"
+for solver_dir in "$PATH_TO_JAVASMT"/lib/java/runtime-*; do
+  [ -d "$solver_dir" ] && CLASSPATH="$CLASSPATH$SEP$solver_dir/*"
+done
+
+# loop over all input parameters and parse them
+declare -a OPTIONS
+declare -a JAVA_VM_ARGUMENTS
+while [ $# -gt 0 ]; do
+
+  case $1 in
+   -X*) # params starting with "-X" are used for JVM, this includes -Xmx
+       JAVA_VM_ARGUMENTS+=("$1")
+       ;;
+   *) # other params are only for JavaSMT
+       OPTIONS+=("$1")
+       ;;
+  esac
+
+  shift
+done
+
+# Determine temp dir to use for JVM
+if [ -n "$TMPDIR" ]; then
+  JAVA_VM_ARGUMENTS+=("-Djava.io.tmpdir=$TMPDIR")
+elif [ -n "$TEMP" ]; then
+  JAVA_VM_ARGUMENTS+=("-Djava.io.tmpdir=$TEMP")
+elif [ -n "$TMP" ]; then
+  JAVA_VM_ARGUMENTS+=("-Djava.io.tmpdir=$TMP")
+fi
+
+# Run JavaSMT. Everything given here comes before the arguments from the command
+# line, so that a benchmark definition can override any of it.
+exec "$JAVA" \
+    -XX:+PerfDisableSharedMem \
+    -Djava.awt.headless=true \
+    "${JAVA_VM_ARGUMENTS[@]}" \
+    -cp "$CLASSPATH" \
+    org.sosy_lab.java_smt.cmdline.JavaSMTMain \
+    "${OPTIONS[@]}"
