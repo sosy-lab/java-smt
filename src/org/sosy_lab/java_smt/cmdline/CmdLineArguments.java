@@ -89,9 +89,10 @@ public final class CmdLineArguments {
 
   private static void printVersion(PrintStream out) {
     out.println();
+    // The version is only available from the manifest of the JAR, not when running from bin/.
     Package pkg = CmdLineArguments.class.getPackage();
-    String version = pkg != null ? pkg.getImplementationVersion() : "unknown";
-    out.println("JavaSMT " + version);
+    String version = pkg != null ? pkg.getImplementationVersion() : null;
+    out.println("JavaSMT " + (version != null ? version : "unknown"));
   }
 
   /**
