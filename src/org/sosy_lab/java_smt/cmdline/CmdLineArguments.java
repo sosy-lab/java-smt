@@ -26,16 +26,23 @@ public final class CmdLineArguments {
 
   private CmdLineArguments() {}
 
+  /** Keys in the map returned by {@link #processArguments(String[])}. */
+  static final String SOLVER_OPTION = "solver.solver";
+
+  static final String LOGIC_OPTION = "solver.opensmt.logic";
+  static final String FILE_OPTION = "smt2.file";
+  static final String HELP_OPTION = "help";
+
   private static final ImmutableSortedSet<CmdLineArgument> CMD_LINE_ARGS =
       ImmutableSortedSet.of(
           new CmdLineArgument1("--solver", "-solver")
-              .settingOption("solver.solver")
+              .settingOption(SOLVER_OPTION)
               .withDescription("Set SMT solver to use"),
           new CmdLineArgument1("--logic", "-logic")
-              .settingOption("solver.opensmt.logic")
+              .settingOption(LOGIC_OPTION)
               .withDescription("Set SMT logic (only for OpenSMT)"),
           new PropertyAddingCmdLineArgument("--help", "-h", "-help")
-              .settingProperty("help", "true")
+              .settingProperty(HELP_OPTION, "true")
               .withDescription("Print this help message"));
 
   /**
@@ -67,15 +74,15 @@ public final class CmdLineArguments {
         if (arg.startsWith("-")) {
           throw new InvalidCmdlineArgumentException("Unknown command-line argument: " + arg);
         } else {
-          if (properties.containsKey("smt2.file")) {
+          if (properties.containsKey(FILE_OPTION)) {
             throw new InvalidCmdlineArgumentException(
                 "Multiple input files are not supported: "
-                    + properties.get("smt2.file")
+                    + properties.get(FILE_OPTION)
                     + " and "
                     + arg);
           }
           Path file = Path.of(arg);
-          properties.put("smt2.file", file.toString());
+          properties.put(FILE_OPTION, file.toString());
         }
       }
     }

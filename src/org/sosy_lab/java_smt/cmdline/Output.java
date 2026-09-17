@@ -13,8 +13,6 @@ package org.sosy_lab.java_smt.cmdline;
 import com.google.errorprone.annotations.FormatMethod;
 import com.google.errorprone.annotations.FormatString;
 import java.io.PrintStream;
-import org.checkerframework.dataflow.qual.TerminatesExecution;
-import org.sosy_lab.common.annotations.SuppressForbidden;
 import org.sosy_lab.common.io.IO;
 
 /**
@@ -22,39 +20,36 @@ import org.sosy_lab.common.io.IO;
  *
  * <p>Provides methods for printing error messages with optional color support.
  */
-@SuppressForbidden("System.out in this class is ok")
 final class Output {
 
   private Output() {}
-
-  private static final PrintStream ERROR_OUTPUT = System.err;
 
   private static final boolean USE_COLORS = IO.mayUseColorForOutput();
   private static final String ERROR_COLOR = "\033[31;1m"; // bold red
   private static final String REGULAR_COLOR = "\033[m";
 
-  @TerminatesExecution
+  /**
+   * Prints an error message to the given stream. This method does not terminate the program, the
+   * caller is responsible for returning the appropriate exit code.
+   *
+   * @param err the stream for error messages, usually {@link System#err}
+   * @param msg the message as format string for {@link PrintStream#printf}
+   * @param args the arguments for the format string
+   */
   @FormatMethod
-  static RuntimeException fatalError(String msg, Object... args) {
-    coloredOutput(ERROR_COLOR, msg, args);
-    System.exit(JavaSMTMain.ERROR_EXIT_CODE);
-    return new RuntimeException("never reached");
-  }
-
-  @FormatMethod
-  private static void coloredOutput(String color, @FormatString String msg, Object... args) {
-    ERROR_OUTPUT.println();
+  static void error(PrintStream err, @FormatString String msg, Object... args) {
+    err.println();
 
     if (USE_COLORS) {
-      ERROR_OUTPUT.print(color);
+      err.print(ERROR_COLOR);
     }
 
-    ERROR_OUTPUT.printf(msg, args);
+    err.printf(msg, args);
 
     if (USE_COLORS) {
-      ERROR_OUTPUT.print(REGULAR_COLOR);
+      err.print(REGULAR_COLOR);
     }
 
-    ERROR_OUTPUT.println();
+    err.println();
   }
 }
