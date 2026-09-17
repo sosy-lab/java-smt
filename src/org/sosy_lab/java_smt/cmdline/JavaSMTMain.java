@@ -11,15 +11,15 @@
 package org.sosy_lab.java_smt.cmdline;
 
 import java.io.IOException;
-import java.io.PrintStream;
+import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
-import java.util.logging.StreamHandler;
 import java.util.regex.Pattern;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.ShutdownManager;
@@ -68,6 +68,8 @@ public final class JavaSMTMain {
     Runtime.getRuntime().addShutdownHook(shutdownHook);
 
     int exitCode = run(args, System.out, System.err, shutdownManager.getNotifier());
+    System.out.flush();
+    System.err.flush();
 
     // The result is reported, the hook must not delay the exit anymore.
     shutdownHook.disableAndStop();
@@ -80,13 +82,13 @@ public final class JavaSMTMain {
    * terminating the JVM, such that it can be used from tests.
    *
    * @param args Command-line arguments: [--solver SOLVER] [--logic LOGIC] file.smt2
-   * @param out stream for the result, i.e., sat, unsat, unknown, or the help message
-   * @param err stream for diagnostics and logging
+   * @param out output for the result, i.e., sat, unsat, unknown, or the help message
+   * @param err output for diagnostics and logging
    * @param shutdownNotifier a shutdown request aborts the solver, and unknown is reported
    * @return exit code, 0 for sat and unsat, {@link #ERROR_EXIT_CODE} otherwise
    */
   public static int run(
-      String[] args, PrintStream out, PrintStream err, ShutdownNotifier shutdownNotifier) {
+      String[] args, Appendable out, Appendable err, ShutdownNotifier shutdownNotifier) {
     if (args.length == 0) {
       // be nice to user
       args = new String[] {"--help"};
@@ -163,8 +165,8 @@ public final class JavaSMTMain {
       ShutdownNotifier shutdownNotifier,
       Solvers solver,
       String input,
-      PrintStream out,
-      PrintStream err) {
+      Appendable out,
+      Appendable err) {
 
     try (SolverContext context =
         SolverContextFactory.createSolverContext(config, logManager, shutdownNotifier, solver)) {
@@ -181,7 +183,10 @@ public final class JavaSMTMain {
         return ERROR_EXIT_CODE;
       } catch (UnsupportedOperationException e) {
         // Solvers without a parser for SMT-LIB2, e.g., Yices2.
-        Output.error(err, "Solver %s does not support parsing SMT-LIB2 input.%s", solver,
+        Output.error(
+            err,
+            "Solver %s does not support parsing SMT-LIB2 input.%s",
+            solver,
             e.getMessage() == null ? "" : " " + e.getMessage());
         return ERROR_EXIT_CODE;
       }
@@ -195,7 +200,7 @@ public final class JavaSMTMain {
         }
         isUnsat = prover.isUnsat();
       }
-      out.println(isUnsat ? "unsat" : "sat");
+      Output.println(out, isUnsat ? "unsat" : "sat");
       return 0;
 
     } catch (InvalidConfigurationException e) {
@@ -205,11 +210,11 @@ public final class JavaSMTMain {
       // Thrown by the solver after a shutdown request, see ShutdownHook.
       String reason = shutdownNotifier.shouldShutdown() ? shutdownNotifier.getReason() : "";
       logManager.log(Level.WARNING, "SMT execution was interrupted.", reason);
-      out.println("unknown");
+      Output.println(out, "unknown");
       return ERROR_EXIT_CODE;
     } catch (SolverException e) {
       logManager.logUserException(Level.SEVERE, e, "Error executing SMT2 solver");
-      out.println("unknown");
+      Output.println(out, "unknown");
       return ERROR_EXIT_CODE;
     }
   }
@@ -231,21 +236,28 @@ public final class JavaSMTMain {
     return false;
   }
 
-  /** Creates a logger that writes messages of level INFO and above to the given stream. */
-  private static LogManager createLogManager(PrintStream err) {
-    StreamHandler handler =
-        new StreamHandler(err, ConsoleLogFormatter.withColorsIfPossible()) {
+  /** Creates a logger that writes messages of level INFO and above to the given output. */
+  private static LogManager createLogManager(Appendable err) {
+    Handler handler =
+        new Handler() {
           @Override
-          public synchronized void publish(LogRecord record) {
-            super.publish(record);
-            flush(); // like ConsoleHandler, do not buffer messages
+          public void publish(LogRecord record) {
+            if (isLoggable(record)) {
+              try {
+                err.append(getFormatter().format(record));
+              } catch (IOException e) {
+                throw new UncheckedIOException(e);
+              }
+            }
           }
 
           @Override
-          public synchronized void close() {
-            flush(); // do not close the stream, it may be System.err
-          }
+          public void flush() {}
+
+          @Override
+          public void close() {}
         };
+    handler.setFormatter(ConsoleLogFormatter.withColorsIfPossible());
     handler.setLevel(Level.INFO);
     return BasicLogManager.createWithHandler(handler);
   }
@@ -257,10 +269,16 @@ public final class JavaSMTMain {
       config.inject(this);
     }
 
-    @Option(secure = true, name = CmdLineArguments.FILE_OPTION, description = "The SMT2 file to execute")
+    @Option(
+        secure = true,
+        name = CmdLineArguments.FILE_OPTION,
+        description = "The SMT2 file to execute")
     private @Nullable String smt2File = null;
 
-    @Option(secure = true, name = CmdLineArguments.SOLVER_OPTION, description = "The SMT solver to use")
+    @Option(
+        secure = true,
+        name = CmdLineArguments.SOLVER_OPTION,
+        description = "The SMT solver to use")
     private Solvers solver = Solvers.SMTINTERPOL;
   }
 

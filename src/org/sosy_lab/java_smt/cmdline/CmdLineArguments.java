@@ -12,7 +12,6 @@ package org.sosy_lab.java_smt.cmdline;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableSortedSet;
-import java.io.PrintStream;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -94,32 +93,32 @@ public final class CmdLineArguments {
     return arg.length() > 2 && arg.startsWith("-") && !arg.startsWith("--");
   }
 
-  private static void printVersion(PrintStream out) {
-    out.println();
+  private static void printVersion(Appendable out) {
+    Output.println(out, "");
     // The version is only available from the manifest of the JAR, not when running from bin/.
     Package pkg = CmdLineArguments.class.getPackage();
     String version = pkg != null ? pkg.getImplementationVersion() : null;
-    out.println("JavaSMT " + (version != null ? version : "unknown"));
+    Output.println(out, "JavaSMT " + (version != null ? version : "unknown"));
   }
 
   /**
    * Prints the help message to the given output stream.
    *
-   * @param out The output stream to print to
+   * @param out The output to print to
    */
-  public static void printHelp(PrintStream out) {
+  public static void printHelp(Appendable out) {
     printVersion(out);
-    out.println();
-    out.println("Usage: javasmt [options] <file.smt2>");
-    out.println("Options:");
+    Output.println(out, "");
+    Output.println(out, "Usage: javasmt [options] <file.smt2>");
+    Output.println(out, "Options:");
     for (CmdLineArgument cmdLineArg : CMD_LINE_ARGS) {
       if (!isOldStyleArgument(cmdLineArg.getMainName())) {
-        out.println(" " + cmdLineArg);
+        Output.println(out, " " + cmdLineArg);
       }
     }
-    out.println();
-    out.println("JavaSMT executes SMT2 files using the selected solver.");
-    out.println("javasmt --solver <SOLVER> <file.smt2>");
+    Output.println(out, "");
+    Output.println(out, "JavaSMT executes SMT2 files using the selected solver.");
+    Output.println(out, "javasmt --solver <SOLVER> <file.smt2>");
   }
 
   static void putIfNotExistent(Map<String, String> properties, String key, String value)

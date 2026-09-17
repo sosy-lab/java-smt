@@ -15,10 +15,10 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import org.sosy_lab.common.ShutdownManager;
 
 /**
- * Shutdown hook for the JVM that requests a shutdown from the solver if the JVM is terminated
- * while the solver is running, e.g., because Ctrl+C was pressed or SIGTERM was sent. The hook then
- * keeps the JVM alive for a grace period, such that the main thread can report <code>unknown</code>
- * and close the solver.
+ * Shutdown hook for the JVM that requests a shutdown from the solver if the JVM is terminated while
+ * the solver is running, e.g., because Ctrl+C was pressed or SIGTERM was sent. The hook then keeps
+ * the JVM alive for a grace period, such that the main thread can report <code>unknown</code> and
+ * close the solver.
  */
 final class ShutdownHook extends Thread {
 
