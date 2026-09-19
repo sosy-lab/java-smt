@@ -205,46 +205,45 @@ class PrincessFormulaCreator
 
   @Override
   public Object convertValue(IExpression value) {
-    if (value instanceof IBoolLit) {
-      return ((IBoolLit) value).value();
-    } else if (value instanceof IIntLit) {
-      return ((IIntLit) value).value().bigIntValue();
+    if (value instanceof IBoolLit iBoolLit) {
+      return iBoolLit.value();
+    } else if (value instanceof IIntLit iIntLit) {
+      return iIntLit.value().bigIntValue();
     }
-    if (value instanceof IFunApp) {
-      IFunApp app = (IFunApp) value;
+    if (value instanceof IFunApp app) {
       switch (app.fun().name()) {
-        case "true":
+        case "true" -> {
           Preconditions.checkArgument(app.fun().arity() == 0);
           return true;
-        case "false":
+        }
+        case "false" -> {
           Preconditions.checkArgument(app.fun().arity() == 0);
           return false;
-        case "mod_cast":
+        }
+        case "mod_cast" -> {
           // we found a bitvector BV(lower, upper, ctxt), lets extract the last parameter
           return ((IIntLit) app.apply(2)).value().bigIntValue();
-        case "Rat_fromRing":
+        }
+        case "Rat_fromRing" -> {
           Preconditions.checkArgument(app.fun().arity() == 1);
           ITerm term = app.apply(0);
-          if (term instanceof IIntLit) {
-            return ((IIntLit) term).value().bigIntValue();
+          if (term instanceof IIntLit iIntLit) {
+            return iIntLit.value().bigIntValue();
           }
-          break;
-        case "Rat_frac":
+        }
+        case "Rat_frac" -> {
           Preconditions.checkArgument(app.fun().arity() == 2);
           ITerm term1 = app.apply(0);
           ITerm term2 = app.apply(1);
-          if (term1 instanceof IIntLit && term2 instanceof IIntLit) {
+          if (term1 instanceof IIntLit iIntLit1 && term2 instanceof IIntLit iIntLit2) {
             Rational ratValue =
-                Rational.of(
-                    ((IIntLit) term1).value().bigIntValue(),
-                    ((IIntLit) term2).value().bigIntValue());
+                Rational.of(iIntLit1.value().bigIntValue(), iIntLit2.value().bigIntValue());
             return ratValue.isIntegral() ? ratValue.getNum() : ratValue;
           }
-          break;
-        case "str_empty":
-        case "str_cons":
+        }
+        case "str_empty", "str_cons" -> {
           return strToString(app);
-        default:
+        }
       }
     }
 
@@ -262,11 +261,11 @@ class PrincessFormulaCreator
       checkArgument(fun.fun().arity() == 2);
       ITerm arg = fun.apply(0);
       IIntLit chr;
-      if (arg instanceof IIntLit) {
-        chr = ((IIntLit) arg);
-      } else if (arg instanceof IFunApp
-          && ModuloArithmetic.mod_cast().equals(((IFunApp) arg).fun())) {
-        chr = ((IIntLit) ((IFunApp) arg).apply(2));
+      if (arg instanceof IIntLit iIntLit) {
+        chr = iIntLit;
+      } else if (arg instanceof IFunApp iFunApp
+          && ModuloArithmetic.mod_cast().equals(iFunApp.fun())) {
+        chr = ((IIntLit) iFunApp.apply(2));
       } else {
         throw new AssertionError("unexpected string value: " + fun);
       }
@@ -330,22 +329,22 @@ class PrincessFormulaCreator
   }
 
   private String getName(IExpression input) {
-    if (input instanceof IAtom) {
-      return ((IAtom) input).pred().name();
-    } else if (input instanceof IConstant) {
-      return ((IConstant) input).c().name();
-    } else if (input instanceof IBinFormula) {
-      return ((IBinFormula) input).j().toString();
+    if (input instanceof IAtom iAtom) {
+      return iAtom.pred().name();
+    } else if (input instanceof IConstant iConstant) {
+      return iConstant.c().name();
+    } else if (input instanceof IBinFormula iBinFormula) {
+      return iBinFormula.j().toString();
     } else if (input instanceof IFormulaITE || input instanceof ITermITE) {
       // in princess ite representation is the complete formula which we do not want here
       return "ite";
-    } else if (input instanceof IIntFormula) {
-      return ((IIntFormula) input).rel().toString();
+    } else if (input instanceof IIntFormula iIntFormula) {
+      return iIntFormula.rel().toString();
     } else if (input instanceof INot) {
       // in princess not representation is the complete formula which we do not want here
       return "not";
-    } else if (input instanceof IFunApp) {
-      return ((IFunApp) input).fun().name();
+    } else if (input instanceof IFunApp iFunApp) {
+      return iFunApp.fun().name();
     } else if (input instanceof IPlus) {
       // in princess plus representation is the complete formula which we do not want here
       return "+";
@@ -367,8 +366,7 @@ class PrincessFormulaCreator
     if (input instanceof IBoolLit || input instanceof IIntLit) {
       // Boolean or integer literal
       return true;
-    } else if (input instanceof IFunApp) {
-      IFunApp app = (IFunApp) input;
+    } else if (input instanceof IFunApp app) {
       IFunction fun = app.fun();
       if (fun.equals(Rationals.fromRing()) || fun.equals(Rationals.frac())) {
         // Rational number literal
@@ -397,23 +395,22 @@ class PrincessFormulaCreator
     if (isValue(input)) {
       return visitor.visitConstant(f, convertValue(input));
 
-    } else if (input instanceof IQuantified) {
-      return visitQuantifier(visitor, (BooleanFormula) f, (IQuantified) input);
+    } else if (input instanceof IQuantified iQuantified) {
+      return visitQuantifier(visitor, (BooleanFormula) f, iQuantified);
 
-    } else if (input instanceof IVariable) {
+    } else if (input instanceof IVariable iVariable) {
       // variable bound by a quantifier
-      return visitor.visitBoundVariable(f, ((IVariable) input).index());
+      return visitor.visitBoundVariable(f, iVariable.index());
 
-    } else if (((input instanceof IAtom) && asJavaCollection(((IAtom) input).args()).isEmpty())
+    } else if (((input instanceof IAtom iAtom) && asJavaCollection(iAtom.args()).isEmpty())
         || input instanceof IConstant) {
       // nullary atoms and constant are variables
       return visitor.visitFreeVariable(f, input.toString());
 
-    } else if (input instanceof ITimes) {
+    } else if (input instanceof ITimes multiplication) {
       // Princess encodes multiplication as "linear coefficient and factor" with arity 1.
       assert input.length() == 1;
 
-      ITimes multiplication = (ITimes) input;
       IIntLit coeff = new IIntLit(multiplication.coeff());
       FormulaType<IntegerFormula> coeffType = FormulaType.IntegerType;
       IExpression factor = multiplication.subterm();
@@ -463,10 +460,10 @@ class PrincessFormulaCreator
               PrincessEquationDeclaration.INSTANCE));
     }
 
-    if (kind == FunctionDeclarationKind.UF && input instanceof IIntFormula) {
-      assert ((IIntFormula) input).rel().equals(IIntRelation.EqZero());
+    if (kind == FunctionDeclarationKind.UF && input instanceof IIntFormula iIntFormula) {
+      assert iIntFormula.rel().equals(IIntRelation.EqZero());
       // this is really a Boolean formula, visit the lhs of the equation
-      return visit(visitor, f, ((IIntFormula) input).t());
+      return visit(visitor, f, iIntFormula.t());
     }
 
     ImmutableList.Builder<Formula> args = ImmutableList.builder();
@@ -479,17 +476,17 @@ class PrincessFormulaCreator
       // the first argument is the bitsize, and it is not relevant for the user.
       // we do not want type/sort information as arguments.
       arityStart = 1;
-      if (input instanceof IAtom) {
-        solverDeclaration = new PrincessBitvectorToBooleanDeclaration(((IAtom) input).pred());
-      } else if (input instanceof IFunApp) {
-        solverDeclaration = new PrincessBitvectorToBitvectorDeclaration(((IFunApp) input).fun());
+      if (input instanceof IAtom iAtom) {
+        solverDeclaration = new PrincessBitvectorToBooleanDeclaration(iAtom.pred());
+      } else if (input instanceof IFunApp iFunApp) {
+        solverDeclaration = new PrincessBitvectorToBitvectorDeclaration(iFunApp.fun());
       } else {
         throw new AssertionError(
-            String.format("unexpected bitvector operation '%s' for formula '%s'", kind, input));
+            "unexpected bitvector operation '%s' for formula '%s'".formatted(kind, input));
       }
-    } else if (input instanceof IFunApp) {
+    } else if (input instanceof IFunApp iFunApp) {
       if (kind == FunctionDeclarationKind.UF) {
-        solverDeclaration = new PrincessIFunctionDeclaration((IFunApp) input);
+        solverDeclaration = new PrincessIFunctionDeclaration(iFunApp);
       } else if (kind == FunctionDeclarationKind.MUL) {
         solverDeclaration = PrincessMultiplyDeclaration.INSTANCE;
       } else {
@@ -551,44 +548,43 @@ class PrincessFormulaCreator
   }
 
   private boolean isBitvectorOperationWithAdditionalArgument(FunctionDeclarationKind kind) {
-    switch (kind) {
-      case BV_NOT:
-      case BV_NEG:
-      case BV_OR:
-      case BV_AND:
-      case BV_XOR:
-      case BV_SUB:
-      case BV_ADD:
-      case BV_SDIV:
-      case BV_UDIV:
-      case BV_SREM:
-      case BV_UREM:
-      case BV_SMOD:
-      case BV_MUL:
-      case BV_ULT:
-      case BV_SLT:
-      case BV_ULE:
-      case BV_SLE:
-      case BV_UGT:
-      case BV_SGT:
-      case BV_UGE:
-      case BV_SGE:
-      case BV_EQ:
-        return true;
-      default:
-        return false;
-    }
+    return switch (kind) {
+      case BV_NOT,
+          BV_NEG,
+          BV_OR,
+          BV_AND,
+          BV_XOR,
+          BV_SUB,
+          BV_ADD,
+          BV_SDIV,
+          BV_UDIV,
+          BV_SREM,
+          BV_UREM,
+          BV_SMOD,
+          BV_MUL,
+          BV_ULT,
+          BV_SLT,
+          BV_ULE,
+          BV_SLE,
+          BV_UGT,
+          BV_SGT,
+          BV_UGE,
+          BV_SGE,
+          BV_EQ ->
+          true;
+      default -> false;
+    };
   }
 
   private FunctionDeclarationKind getDeclarationKind(IExpression input) {
-    assert !(((input instanceof IAtom) && asJavaCollection(((IAtom) input).args()).isEmpty())
+    assert !(((input instanceof IAtom iAtom) && asJavaCollection(iAtom.args()).isEmpty())
             || input instanceof IConstant)
         : "Variables should be handled somewhere else";
 
     if (input instanceof IFormulaITE || input instanceof ITermITE) {
       return FunctionDeclarationKind.ITE;
-    } else if (input instanceof IFunApp) {
-      final IFunction fun = ((IFunApp) input).fun();
+    } else if (input instanceof IFunApp iFunApp) {
+      final IFunction fun = iFunApp.fun();
       final FunctionDeclarationKind theoryKind = theoryFunctionKind.get(fun);
       if (theoryKind != null) {
         return theoryKind;
@@ -602,11 +598,13 @@ class PrincessFormulaCreator
         return FunctionDeclarationKind.OTHER;
       } else if (fun == ModuloArithmetic.int_cast()) {
         return FunctionDeclarationKind.OTHER;
+      } else if (fun == PrincessEnvironment.stringTheory.re_none()) {
+        return FunctionDeclarationKind.RE_NONE;
       } else {
         return FunctionDeclarationKind.UF;
       }
-    } else if (input instanceof IAtom) {
-      final Predicate pred = ((IAtom) input).pred();
+    } else if (input instanceof IAtom iAtom) {
+      final Predicate pred = iAtom.pred();
       final FunctionDeclarationKind theoryKind = theoryPredKind.get(pred);
       if (theoryKind != null) {
         return theoryKind;
@@ -628,10 +626,9 @@ class PrincessFormulaCreator
       return FunctionDeclarationKind.ADD;
     } else if (input instanceof IEquation) {
       return FunctionDeclarationKind.EQ;
-    } else if (input instanceof IIntFormula) {
-      IIntFormula f = (IIntFormula) input;
+    } else if (input instanceof IIntFormula f) {
       if (f.rel().equals(IIntRelation.EqZero())) {
-        final Sort sort = Sort$.MODULE$.sortOf(((IIntFormula) input).t());
+        final Sort sort = Sort$.MODULE$.sortOf(f.t());
         if (sort == PrincessEnvironment.BOOL_SORT) {
           // this is really a Boolean formula, it has to be UF
           return FunctionDeclarationKind.UF;
@@ -654,7 +651,8 @@ class PrincessFormulaCreator
   }
 
   private static boolean isBinaryFunction(IExpression t, Enumeration.Value val) {
-    return (t instanceof IBinFormula) && val.equals(((IBinFormula) t).j()); // j is the operator
+    return (t instanceof IBinFormula iBinFormula)
+        && val.equals(iBinFormula.j()); // j is the operator
   }
 
   @Override

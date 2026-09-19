@@ -117,16 +117,14 @@ abstract class OpenSmtAbstractProver<T> extends AbstractProverWithAllSat<T> {
 
   @SuppressWarnings("resource")
   @Override
-  public Model getModel() {
-    checkGenerateModels();
+  protected Model getModelImpl() throws SolverException {
     return registerEvaluator(
         new OpenSmtModel(
             this, creator, Collections2.transform(getAssertedFormulas(), creator::extractInfo)));
   }
 
   @Override
-  public Evaluator getEvaluator() {
-    checkGenerateModels();
+  protected Evaluator getEvaluatorImpl() {
     return getEvaluatorWithoutChecks();
   }
 
@@ -200,9 +198,8 @@ abstract class OpenSmtAbstractProver<T> extends AbstractProverWithAllSat<T> {
     if (errors.isEmpty()) {
       return "Unknown reason.";
     } else {
-      return String.format(
-          "Assertions use features %s that are not supported by the specified logic %s.",
-          errors, creator.getLogic());
+      return "Assertions use features %s that are not supported by the specified logic %s."
+          .formatted(errors, creator.getLogic());
     }
   }
 
@@ -223,10 +220,10 @@ abstract class OpenSmtAbstractProver<T> extends AbstractProverWithAllSat<T> {
           // such that the solver can simplify and try to reason about a query as far as possible.
           // In several cases, the complex logics are not required for reasoning
           // and OpenSMT succeeds with solving a query.
-          String reason = String.format(" Most likely reason: %s", getReasonFromSolverFeatures());
+          String reason = " Most likely reason: %s".formatted(getReasonFromSolverFeatures());
           throw new SolverException(
-              String.format(
-                  "OpenSMT crashed while checking satisfiability. Most likely reason: %s", reason));
+              "OpenSMT crashed while checking satisfiability. Most likely reason: %s"
+                  .formatted(reason));
         } else {
           throw new SolverException("OpenSMT crashed while checking satisfiability.", e);
         }

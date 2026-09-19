@@ -30,7 +30,6 @@ import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReferenceArray;
-import java.util.stream.Collectors;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -578,9 +577,8 @@ public class SolverConcurrencyTest {
 
               assertWithMessage(
                       "Test continuousRunningThreadFormulaTransferTranslateTest() "
-                          + "failed isUnsat() in thread with id: "
-                          + id
-                          + ".")
+                          + "failed isUnsat() in thread with id: %s.",
+                      id)
                   .that(stack.isUnsat())
                   .isTrue();
 
@@ -713,11 +711,11 @@ public class SolverConcurrencyTest {
               });
     }
     try {
-      assertWithMessage("Timeout initializing the Threads for " + testName)
+      assertWithMessage("Timeout initializing the Threads for %s", testName)
           .that(allExecutorThreadsReady.await(NUMBER_OF_THREADS * 20, TimeUnit.MILLISECONDS))
           .isTrue();
       afterInitBlocker.countDown();
-      assertWithMessage("Timeout in " + testName)
+      assertWithMessage("Timeout in %s", testName)
           .that(allDone.await(TIMEOUT_SECONDS, TimeUnit.SECONDS))
           .isTrue();
     } catch (Throwable e) {
@@ -735,7 +733,7 @@ public class SolverConcurrencyTest {
                   ex.printStackTrace(pw);
                   return sw.toString();
                 })
-            .collect(Collectors.toList());
+            .toList();
     assertWithMessage(
             "Test %s failed with exception(s): %s",
             testName, Joiner.on("\n").join(exceptionDetails))

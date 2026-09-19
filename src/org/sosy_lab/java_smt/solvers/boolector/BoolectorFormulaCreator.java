@@ -115,8 +115,7 @@ class BoolectorFormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
   @Override
   public <T extends Formula> T encapsulate(FormulaType<T> pType, Long pTerm) {
     assert pType.equals(getFormulaType(pTerm))
-        : String.format(
-            "Trying to encapsulate formula of type %s as %s", getFormulaType(pTerm), pType);
+        : "Trying to encapsulate formula of type %s as %s".formatted(getFormulaType(pTerm), pType);
     if (pType.isBooleanType()) {
       return (T) new BoolectorBooleanFormula(pTerm, getEnv());
     } else if (pType.isArrayType()) {

@@ -8,6 +8,7 @@
 
 package org.sosy_lab.java_smt.basicimpl;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkState;
 
 import com.google.common.base.Preconditions;
@@ -19,6 +20,7 @@ import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Multimap;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -28,6 +30,8 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.java_smt.api.BasicProverEnvironment;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Evaluator;
+import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
+import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.OptimizationProverEnvironment;
 import org.sosy_lab.java_smt.api.OptimizationProverEnvironment.OptStatus;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
@@ -96,7 +100,15 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
         ProverOptions.GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS);
   }
 
-  protected final void checkGenerateInterpolants() {
+  /**
+   * Checks whether the prover has been closed already. Only to be used if this is the only check
+   * performed in a call.
+   */
+  protected void checkClosed() {
+    Preconditions.checkState(!closed);
+  }
+
+  private void checkGenerateInterpolants() {
     Preconditions.checkState(!closed);
     Preconditions.checkState(
         !changedSinceLastSatQuery,
@@ -105,6 +117,31 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
         !wasLastSatCheckSatisfiable,
         "Interpolants can only be calculated if the assertions on the solver stack are "
             + "unsatisfiable.");
+  }
+
+  protected final void checkGenerateInterpolants(Collection<T> formulasOfA) {
+    checkGenerateInterpolants();
+    checkArgument(
+        getAssertedConstraintIds().containsAll(formulasOfA),
+        "interpolation can only be done over previously asserted formulas.");
+  }
+
+  protected final void checkGenerateSeqInterpolants(
+      List<? extends Collection<T>> partitionedFormulas) {
+    checkGenerateInterpolants();
+    Preconditions.checkArgument(
+        !partitionedFormulas.isEmpty(), "at least one partition should be available.");
+    final ImmutableSet<T> assertedConstraintIds = getAssertedConstraintIds();
+    checkArgument(
+        partitionedFormulas.stream().allMatch(assertedConstraintIds::containsAll),
+        "interpolation can only be done over previously asserted formulas.");
+  }
+
+  protected final void checkGenerateTreeInterpolants(
+      List<? extends Collection<T>> partitionedFormulas, int[] startOfSubTree) {
+    checkGenerateSeqInterpolants(partitionedFormulas);
+    assert InterpolatingProverEnvironment.checkTreeStructure(
+        partitionedFormulas.size(), startOfSubTree);
   }
 
   protected final void checkEnableSeparationLogic() {
@@ -249,6 +286,24 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
       }
     }
     return builder.buildOrThrow();
+  }
+
+  @Override
+  public final Model getModel() throws SolverException {
+    checkGenerateModels();
+    return getModelImpl();
+  }
+
+  protected abstract Model getModelImpl() throws SolverException;
+
+  @Override
+  public final Evaluator getEvaluator() throws SolverException {
+    checkGenerateModels();
+    return getEvaluatorImpl();
+  }
+
+  protected Evaluator getEvaluatorImpl() throws SolverException {
+    return getModel();
   }
 
   /**

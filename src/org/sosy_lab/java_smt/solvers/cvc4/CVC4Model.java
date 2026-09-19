@@ -15,7 +15,6 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
-import edu.stanford.CVC4.ArrayType;
 import edu.stanford.CVC4.Expr;
 import edu.stanford.CVC4.ExprManager;
 import edu.stanford.CVC4.Kind;
@@ -70,8 +69,7 @@ class CVC4Model extends AbstractModel<Expr, Type, ExprManager> {
     // collecting duplicate terms
     // (This problem has been fixed on CVC5/Bitwula)
     var cache = new HashSet<CVC4Formula>();
-    var work = new ArrayDeque<CVC4Formula>();
-    work.addAll(Collections2.transform(asserted, CVC4Formula::new));
+    var work = new ArrayDeque<>(Collections2.transform(asserted, CVC4Formula::new));
     while (!work.isEmpty()) {
       var next = work.pop();
       if (cache.add(next)) {
@@ -163,7 +161,7 @@ class CVC4Model extends AbstractModel<Expr, Type, ExprManager> {
       Expr select = creator.getEnv().mkExpr(Kind.SELECT, expr, index);
 
       // CASE 1: nested array dimension, let's recurse deeper
-      if (new ArrayType(expr.getType()).getConstituentType().isArray()) {
+      if (element.getType().isArray()) {
         result.addAll(buildArrayAssignments(select, element));
 
       } else {

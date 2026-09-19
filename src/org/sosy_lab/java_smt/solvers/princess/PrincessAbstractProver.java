@@ -130,8 +130,7 @@ abstract class PrincessAbstractProver<E> extends AbstractProverWithAllSat<E> {
 
   @SuppressWarnings("resource")
   @Override
-  public Model getModel() throws SolverException {
-    checkGenerateModels();
+  protected Model getModelImpl() throws SolverException {
     return new CachingModel(getEvaluatorWithoutChecks());
   }
 
@@ -235,7 +234,7 @@ abstract class PrincessAbstractProver<E> extends AbstractProverWithAllSat<E> {
 
     @Override
     public String toString() {
-      return String.format("{%s, %s, %s}", booleanSymbols, theorySymbols, functionSymbols);
+      return "{%s, %s, %s}".formatted(booleanSymbols, theorySymbols, functionSymbols);
     }
   }
 }

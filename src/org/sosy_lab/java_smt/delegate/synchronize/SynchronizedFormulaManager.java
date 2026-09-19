@@ -44,7 +44,7 @@ class SynchronizedFormulaManager implements FormulaManager {
   private final FormulaManager delegate;
   private final SolverContext sync;
 
-  protected SynchronizedFormulaManager(FormulaManager pDelegate, SolverContext pSync) {
+  SynchronizedFormulaManager(FormulaManager pDelegate, SolverContext pSync) {
     delegate = checkNotNull(pDelegate);
     sync = checkNotNull(pSync);
   }

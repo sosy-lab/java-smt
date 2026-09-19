@@ -10,10 +10,8 @@
 
 package org.sosy_lab.java_smt.solvers.bitwuzla;
 
-import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkState;
 
-import com.google.common.base.Preconditions;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
@@ -28,11 +26,17 @@ import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.solvers.bitwuzla.api.Option;
 import org.sosy_lab.java_smt.solvers.bitwuzla.api.Options;
+import org.sosy_lab.java_smt.solvers.bitwuzla.api.Term;
 import org.sosy_lab.java_smt.solvers.bitwuzla.api.Vector_Term;
 import org.sosy_lab.java_smt.solvers.bitwuzla.api.Vector_Vector_Term;
 
 class BitwuzlaInterpolatingProver extends BitwuzlaAbstractProver<Integer>
     implements InterpolatingProverEnvironment<Integer> {
+
+  private static final ImmutableSet<String> ACCEPTED_INTERPOLATION_ERROR_MESSAGES =
+      ImmutableSet.of(
+          "interpolation queries with lemmas that use fresh variables not supported",
+          "interpolation queries with mixed lemmas not supported");
 
   BitwuzlaInterpolatingProver(
       BitwuzlaFormulaManager pManager,
@@ -58,40 +62,47 @@ class BitwuzlaInterpolatingProver extends BitwuzlaAbstractProver<Integer>
   @Override
   public BooleanFormula getInterpolant(Collection<Integer> formulasOfA)
       throws SolverException, InterruptedException {
-    checkGenerateInterpolants();
-    checkArgument(
-        getAssertedConstraintIds().containsAll(formulasOfA),
-        "interpolation can only be done over previously asserted formulas.");
-    checkArgument(stack.peek().keySet().containsAll(formulasOfA));
+    Term interpolant;
+    if (formulasOfA.isEmpty()) {
+      interpolant = creator.getEnv().mk_true();
+    } else {
+      Vector_Term itpVector =
+          new Vector_Term(FluentIterable.from(formulasOfA).transform(stack.peek()::get));
+      try {
+        interpolant = env.get_interpolant(itpVector);
 
-    return creator.encapsulateBoolean(
-        formulasOfA.isEmpty()
-            ? creator.getEnv().mk_true()
-            : env.get_interpolant(
-                new Vector_Term(FluentIterable.from(formulasOfA).transform(stack.peek()::get))));
+      } catch (IllegalArgumentException e) {
+        // TODO Starting with Bitwuzla 0.9.2 we could catch the Unsupported exception in C++
+        if (ACCEPTED_INTERPOLATION_ERROR_MESSAGES.contains(e.getMessage())) {
+          throw new SolverException(e.getMessage());
+        } else {
+          throw e;
+        }
+      }
+    }
+    return creator.encapsulateBoolean(interpolant);
   }
 
   @Override
   public List<BooleanFormula> getSeqInterpolants(
       List<? extends Collection<Integer>> partitionedFormulas)
       throws SolverException, InterruptedException {
-    checkGenerateInterpolants();
-    Preconditions.checkArgument(
-        !partitionedFormulas.isEmpty(), "at least one partition should be available.");
-    final ImmutableSet<Integer> assertedConstraintIds = getAssertedConstraintIds();
-    checkArgument(
-        partitionedFormulas.stream().allMatch(assertedConstraintIds::containsAll),
-        "interpolation can only be done over previously asserted formulas.");
-    for (var partition : partitionedFormulas) {
-      checkArgument(stack.peek().keySet().containsAll(partition));
-    }
 
     Vector_Vector_Term partitions =
         new Vector_Vector_Term(
             FluentIterable.from(partitionedFormulas)
                 .transform(
                     p -> new Vector_Term(FluentIterable.from(p).transform(stack.peek()::get))));
-    Vector_Term itps = env.get_interpolants(partitions);
+    Vector_Term itps;
+    try {
+      itps = env.get_interpolants(partitions);
+    } catch (IllegalArgumentException e) {
+      if (ACCEPTED_INTERPOLATION_ERROR_MESSAGES.contains(e.getMessage())) {
+        throw new SolverException(e.getMessage());
+      } else {
+        throw e;
+      }
+    }
     checkState(
         creator.getEnv().mk_false().equals(Iterables.getLast(itps)),
         "the last interpolant should be false");

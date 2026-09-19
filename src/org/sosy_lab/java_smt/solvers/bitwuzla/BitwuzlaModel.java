@@ -55,8 +55,7 @@ class BitwuzlaModel extends AbstractModel<Term, Sort, TermManager> {
   private Set<Term> collectModelTerms(Collection<Term> asserted) {
     ImmutableSet.Builder<Term> builder = ImmutableSet.builder();
     var cache = new HashSet<Term>();
-    var work = new ArrayDeque<Term>();
-    work.addAll(asserted);
+    var work = new ArrayDeque<>(asserted);
     while (!work.isEmpty()) {
       var term = work.pop();
       if (cache.add(term)) {

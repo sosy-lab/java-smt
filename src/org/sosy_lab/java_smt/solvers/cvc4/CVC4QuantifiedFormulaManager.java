@@ -78,7 +78,7 @@ class CVC4QuantifiedFormulaManager
         !pVars.isEmpty(), "Missing variables for quantifier '%s' and body '%s'.", pQ, pBody);
 
     // CVC4 uses its own lists for quantifier that may only have bound vars
-    vectorExpr vec = new vectorExpr();
+    vectorExpr vec = new vectorExpr(exprManager);
     Expr substBody = pBody;
     // every free needs a bound copy. As the internal Id is different for every variable, even
     // with the same name, this is fine.

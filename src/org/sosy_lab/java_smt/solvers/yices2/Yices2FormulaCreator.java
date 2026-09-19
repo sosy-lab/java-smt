@@ -119,9 +119,8 @@ class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long, Intege
             || (FormulaType.RationalType.equals(pType)
                 && FormulaType.IntegerType.equals(getFormulaType(pTerm)))
             || pType.equals(getFormulaType(pTerm))
-        : String.format(
-            "Trying to encapsulate formula %s of type %s as %s",
-            Terms.toString(pTerm), getFormulaType(pTerm), pType);
+        : "Trying to encapsulate formula %s of type %s as %s"
+            .formatted(Terms.toString(pTerm), getFormulaType(pTerm), pType);
     if (pType.isBooleanType()) {
       return (T) new Yices2BooleanFormula(pTerm);
     } else if (pType.isIntegerType()) {
@@ -194,7 +193,7 @@ class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long, Intege
       return FormulaType.getArrayType(convertType(domain), convertType(range));
     } else {
       throw new IllegalArgumentException(
-          String.format("Unknown formula type '%s'", Types.toString(pType)));
+          "Unknown formula type '%s'".formatted(Types.toString(pType)));
     }
   }
 
@@ -274,31 +273,25 @@ class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long, Intege
   @Override
   public <R> R visit(FormulaVisitor<R> pVisitor, Formula pFormula, Integer pF) {
     Constructor constructor = Terms.constructor(pF);
-    switch (constructor) {
-      case BOOL_CONSTANT:
-        return pVisitor.visitConstant(pFormula, Terms.boolConstValue(pF));
-      case ARITH_CONSTANT:
-        return pVisitor.visitConstant(pFormula, convertValue(pF, pF));
-      case BV_CONSTANT:
-        return pVisitor.visitConstant(pFormula, convertValue(pF, pF));
-      case LAMBDA_TERM:
-        // We use lambda terms as array constants
-        return pVisitor.visitFunction(
-            pFormula,
-            ImmutableList.of(encapsulateWithTypeOf(Terms.child(pF, 1))),
-            FunctionDeclarationImpl.of(
-                "const",
-                FunctionDeclarationKind.CONST,
-                ImmutableList.of(getFormulaType(Terms.child(pF, 1))),
-                getFormulaType(pF),
-                0));
-      case FORALL_TERM:
-        return visitQuantifier(pVisitor, pFormula, pF, Quantifier.FORALL);
-      case UNINTERPRETED_TERM:
-        return pVisitor.visitFreeVariable(pFormula, lookupName(pF));
-      default:
-        return visitFunctionApplication(pVisitor, pFormula, pF, constructor);
-    }
+    return switch (constructor) {
+      case BOOL_CONSTANT -> pVisitor.visitConstant(pFormula, Terms.boolConstValue(pF));
+      case ARITH_CONSTANT -> pVisitor.visitConstant(pFormula, convertValue(pF, pF));
+      case BV_CONSTANT -> pVisitor.visitConstant(pFormula, convertValue(pF, pF));
+      case LAMBDA_TERM ->
+          // We use lambda terms as array constants
+          pVisitor.visitFunction(
+              pFormula,
+              ImmutableList.of(encapsulateWithTypeOf(Terms.child(pF, 1))),
+              FunctionDeclarationImpl.of(
+                  "const",
+                  FunctionDeclarationKind.CONST,
+                  ImmutableList.of(getFormulaType(Terms.child(pF, 1))),
+                  getFormulaType(pF),
+                  0));
+      case FORALL_TERM -> visitQuantifier(pVisitor, pFormula, pF, Quantifier.FORALL);
+      case UNINTERPRETED_TERM -> pVisitor.visitFreeVariable(pFormula, lookupName(pF));
+      default -> visitFunctionApplication(pVisitor, pFormula, pF, constructor);
+    };
   }
 
   private <R> R visitQuantifier(
@@ -341,10 +334,8 @@ class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long, Intege
     FunctionDeclarationKind functionKind;
 
     switch (constructor) {
-      case ITE_TERM:
-        functionKind = FunctionDeclarationKind.ITE;
-        break;
-      case APP_TERM:
+      case ITE_TERM -> functionKind = FunctionDeclarationKind.ITE;
+      case APP_TERM -> {
         var fun = Terms.child(pF, 0);
         if (ufSymbols.contains(fun)) {
           functionKind = FunctionDeclarationKind.UF;
@@ -362,22 +353,18 @@ class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long, Intege
           var x = Terms.newVariable(Terms.typeOf(functionArgs.get(1)));
           functionDeclaration = Terms.lambda(new int[] {f, x}, Terms.funApplication(f, x));
         }
-        break;
-      case UPDATE_TERM:
+      }
+      case UPDATE_TERM -> {
         functionKind = FunctionDeclarationKind.STORE;
         functionArgs = getArgs(pF);
         var f = Terms.newVariable(Terms.typeOf(functionArgs.get(0)));
         var x = Terms.newVariable(Terms.typeOf(functionArgs.get(1)));
         var y = Terms.newVariable(Terms.typeOf(functionArgs.get(2)));
         functionDeclaration = Terms.lambda(new int[] {f, x, y}, Terms.functionUpdate1(f, x, y));
-        break;
-      case EQ_TERM:
-        functionKind = FunctionDeclarationKind.EQ;
-        break;
-      case DISTINCT_TERM:
-        functionKind = FunctionDeclarationKind.DISTINCT;
-        break;
-      case NOT_TERM:
+      }
+      case EQ_TERM -> functionKind = FunctionDeclarationKind.EQ;
+      case DISTINCT_TERM -> functionKind = FunctionDeclarationKind.DISTINCT;
+      case NOT_TERM -> {
         if (isNestedExists(pF)) {
           int existsTerm = Iterables.getOnlyElement(getArgs(pF));
           return visitQuantifier(pVisitor, pFormula, existsTerm, Quantifier.EXISTS);
@@ -387,62 +374,26 @@ class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long, Intege
         } else {
           functionKind = FunctionDeclarationKind.NOT;
         }
-        break;
-      case OR_TERM:
-        functionKind = FunctionDeclarationKind.OR;
-        break;
-      case XOR_TERM:
-        functionKind = FunctionDeclarationKind.XOR;
-        break;
-      case BV_DIV:
-        functionKind = FunctionDeclarationKind.BV_UDIV;
-        break;
-      case BV_REM:
-        functionKind = FunctionDeclarationKind.BV_UREM;
-        break;
-      case BV_SDIV:
-        functionKind = FunctionDeclarationKind.BV_SDIV;
-        break;
-      case BV_SREM:
-        functionKind = FunctionDeclarationKind.BV_SREM;
-        break;
-      case BV_SMOD:
-        functionKind = FunctionDeclarationKind.BV_SMOD;
-        break;
-      case BV_SHL:
-        functionKind = FunctionDeclarationKind.BV_SHL;
-        break;
-      case BV_LSHR:
-        functionKind = FunctionDeclarationKind.BV_LSHR;
-        break;
-      case BV_ASHR:
-        functionKind = FunctionDeclarationKind.BV_ASHR;
-        break;
-      case BV_GE_ATOM:
-        functionKind = FunctionDeclarationKind.BV_UGE;
-        break;
-      case BV_SGE_ATOM:
-        functionKind = FunctionDeclarationKind.BV_SGE;
-        break;
-      case ARITH_GE_ATOM:
-        functionKind = FunctionDeclarationKind.GTE;
-        break;
-      case FLOOR:
-        functionKind = FunctionDeclarationKind.FLOOR;
-        break;
-      case RDIV:
-        functionKind = FunctionDeclarationKind.DIV;
-        break;
-      case IDIV:
-        functionKind = FunctionDeclarationKind.DIV;
-        break;
-      case IMOD:
-        functionKind = FunctionDeclarationKind.MODULO;
-        break;
-      case SELECT_TERM:
-        functionKind = FunctionDeclarationKind.SELECT;
-        break;
-      case BV_SUM:
+      }
+      case OR_TERM -> functionKind = FunctionDeclarationKind.OR;
+      case XOR_TERM -> functionKind = FunctionDeclarationKind.XOR;
+      case BV_DIV -> functionKind = FunctionDeclarationKind.BV_UDIV;
+      case BV_REM -> functionKind = FunctionDeclarationKind.BV_UREM;
+      case BV_SDIV -> functionKind = FunctionDeclarationKind.BV_SDIV;
+      case BV_SREM -> functionKind = FunctionDeclarationKind.BV_SREM;
+      case BV_SMOD -> functionKind = FunctionDeclarationKind.BV_SMOD;
+      case BV_SHL -> functionKind = FunctionDeclarationKind.BV_SHL;
+      case BV_LSHR -> functionKind = FunctionDeclarationKind.BV_LSHR;
+      case BV_ASHR -> functionKind = FunctionDeclarationKind.BV_ASHR;
+      case BV_GE_ATOM -> functionKind = FunctionDeclarationKind.BV_UGE;
+      case BV_SGE_ATOM -> functionKind = FunctionDeclarationKind.BV_SGE;
+      case ARITH_GE_ATOM -> functionKind = FunctionDeclarationKind.GTE;
+      case FLOOR -> functionKind = FunctionDeclarationKind.FLOOR;
+      case RDIV -> functionKind = FunctionDeclarationKind.DIV;
+      case IDIV -> functionKind = FunctionDeclarationKind.DIV;
+      case IMOD -> functionKind = FunctionDeclarationKind.MODULO;
+      case SELECT_TERM -> functionKind = FunctionDeclarationKind.SELECT;
+      case BV_SUM -> {
         if (Terms.numChildren(pF) == 1) {
           functionKind = FunctionDeclarationKind.BV_MUL;
           functionArgs = getOnlySumTerm(pF);
@@ -455,8 +406,8 @@ class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long, Intege
                   : terms.get(1);
           functionArgs = ImmutableList.of(terms.get(0), right);
         }
-        break;
-      case ARITH_SUM:
+      }
+      case ARITH_SUM -> {
         if (Terms.numChildren(pF) == 1) {
           functionKind = FunctionDeclarationKind.MUL;
           functionArgs = getOnlySumTerm(pF);
@@ -464,8 +415,8 @@ class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long, Intege
           functionKind = FunctionDeclarationKind.ADD;
           functionArgs = getSumTerms(pF);
         }
-        break;
-      case POWER_PRODUCT:
+      }
+      case POWER_PRODUCT -> {
         if (Terms.isBitvector(pF)) {
           functionKind = FunctionDeclarationKind.BV_MUL;
           var factors = getProductFactors(pF);
@@ -478,8 +429,8 @@ class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long, Intege
           functionKind = FunctionDeclarationKind.MUL;
           functionArgs = getProductFactors(pF);
         }
-        break;
-      case BIT_TERM:
+      }
+      case BIT_TERM -> {
         // Yices rewrites most "bitwise" operations on bitvectors, f.ex bvand(a,b) becomes
         // (bool-to-bv (and (bit a k) (bit b k)) (and (bit a k-1) (bit b k-1)) ...)
         // Here (bit a k) returns the k-th bit of the bitvector as a boolean, and bool-to-bv is
@@ -495,8 +446,8 @@ class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long, Intege
             ImmutableList.of(
                 Terms.bvExtract(Terms.projArg(pF), Terms.projIndex(pF), Terms.projIndex(pF)),
                 Terms.bvConst(1, 1));
-        break;
-      case BV_ARRAY:
+      }
+      case BV_ARRAY -> {
         if (Terms.numChildren(pF) == 1) {
           if (Terms.constructor(Terms.child(pF, 0)) == Constructor.BIT_TERM) {
             // Rewrite (bool-to-bv (bit x n)) to (extract x n n)
@@ -520,9 +471,8 @@ class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long, Intege
                       p -> Terms.ifThenElse(p, Terms.bvConst(1, 1), Terms.bvConst(1, 0)))
                   .reverse();
         }
-        break;
-      default:
-        throw new UnsupportedOperationException(constructor.toString());
+      }
+      default -> throw new UnsupportedOperationException(constructor.toString());
     }
 
     if (functionName == null) {
@@ -566,237 +516,205 @@ class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long, Intege
       builder.add(Terms.newVariable("var" + c++, Terms.typeOf(arg)));
     }
     var args = builder.build();
-    int f;
-    switch (pKind) {
-      case AND:
-        f = Terms.and(args);
-        break;
-      case NOT:
-        checkArgument(args.size() == 1);
-        f = Terms.not(args.get(0));
-        break;
-      case OR:
-        f = Terms.or(args);
-        break;
-      case IFF:
-        checkArgument(args.size() == 2);
-        f = Terms.iff(args.get(0), args.get(1));
-        break;
-      case ITE:
-        checkArgument(args.size() == 3);
-        f = Terms.ifThenElse(args.get(0), args.get(1), args.get(2));
-        break;
-      case XOR:
-        f = Terms.xor(args);
-        break;
-      case IMPLIES:
-        checkArgument(args.size() == 2);
-        f = Terms.implies(args.get(0), args.get(1));
-        break;
-      case DISTINCT:
-        f = Terms.distinct(args);
-        break;
-      case STORE:
-        checkArgument(args.size() == 3);
-        f = Terms.functionUpdate1(args.get(0), args.get(1), args.get(2));
-        break;
-      case SELECT:
-        checkArgument(args.size() == 2);
-        f = Terms.funApplication(args.get(0), args.get(1));
-        break;
-      case CONST:
-        checkArgument(args.size() == 1);
-        f = Terms.lambda(new int[] {}, args.get(0));
-        break;
-      case UMINUS:
-        checkArgument(args.size() == 1);
-        f = Terms.neg(args.get(0));
-        break;
-      case SUB:
-        checkArgument(args.size() == 2);
-        f = Terms.sub(args.get(0), args.get(1));
-        break;
-      case ADD:
-        f = Terms.add(args);
-        break;
-      case DIV:
-        checkArgument(args.size() == 2);
-        f = Terms.div(args.get(0), args.get(1));
-        break;
-      case MUL:
-        f = Terms.mul(args);
-        break;
-      case MODULO:
-        checkArgument(args.size() == 2);
-        f = Terms.imod(args.get(0), args.get(1));
-        break;
-      case UF:
-      case VAR:
-        throw new IllegalArgumentException("Expecting builtin kind");
-      case LT:
-        checkArgument(args.size() == 2);
-        f = Terms.arithLt(args.get(0), args.get(1));
-        break;
-      case LTE:
-        checkArgument(args.size() == 2);
-        f = Terms.arithLeq(args.get(0), args.get(1));
-        break;
-      case GT:
-        checkArgument(args.size() == 2);
-        f = Terms.arithGt(args.get(0), args.get(1));
-        break;
-      case GTE:
-        checkArgument(args.size() == 2);
-        f = Terms.arithGeq(args.get(0), args.get(1));
-        break;
-      case EQ:
-        checkArgument(args.size() == 2);
-        f = Terms.eq(args.get(0), args.get(1));
-        break;
-      case EQ_ZERO:
-        throw new UnsupportedOperationException("EQ_ZERO not supported");
-      case GTE_ZERO:
-        throw new UnsupportedOperationException("GTE_ZERO not supported");
-      case FLOOR:
-        checkArgument(args.size() == 1);
-        f = Terms.floor(args.get(0));
-        break;
-      case TO_REAL:
-        throw new UnsupportedOperationException("TO_REAL not supported");
-      case INT_TO_BV:
-        throw new UnsupportedOperationException("INT_TO_BV not supported");
-      case BV_EXTRACT:
-        checkArgument(args.size() == 1 && pIndex.size() == 2);
-        f = Terms.bvExtract(args.get(0), pIndex.get(0), pIndex.get(1));
-        break;
-      case BV_CONCAT:
-        f = Terms.bvConcat(args);
-        break;
-      case BV_SIGN_EXTENSION:
-        checkArgument(args.size() == 1);
-        f = Terms.bvSignExtend(args.get(0), pIndex.get(0));
-        break;
-      case BV_ZERO_EXTENSION:
-        checkArgument(args.size() == 1);
-        f = Terms.bvZeroExtend(args.get(0), pIndex.get(0));
-        break;
-      case BV_NOT:
-        checkArgument(args.size() == 1);
-        f = Terms.bvNot(args.get(0));
-        break;
-      case BV_NEG:
-        checkArgument(args.size() == 1);
-        f = Terms.bvNeg(args.get(0));
-        break;
-      case BV_OR:
-        f = Terms.bvOr(args);
-        break;
-      case BV_AND:
-        f = Terms.bvAnd(args);
-        break;
-      case BV_XOR:
-        f = Terms.bvXor(args);
-        break;
-      case BV_SUB:
-        checkArgument(args.size() == 2);
-        f = Terms.bvSub(args.get(0), args.get(1));
-        break;
-      case BV_ADD:
-        f = Terms.bvAdd(args);
-        break;
-      case BV_SDIV:
-        checkArgument(args.size() == 2);
-        f = Terms.bvSDiv(args.get(0), args.get(1));
-        break;
-      case BV_UDIV:
-        checkArgument(args.size() == 2);
-        f = Terms.bvDiv(args.get(0), args.get(1));
-        break;
-      case BV_SREM:
-        checkArgument(args.size() == 2);
-        f = Terms.bvSRem(args.get(0), args.get(1));
-        break;
-      case BV_UREM:
-        checkArgument(args.size() == 2);
-        f = Terms.bvRem(args.get(0), args.get(1));
-        break;
-      case BV_SMOD:
-        checkArgument(args.size() == 2);
-        f = Terms.bvSMod(args.get(0), args.get(1));
-        break;
-      case BV_MUL:
-        checkArgument(args.size() == 2);
-        f = Terms.bvMul(args.get(0), args.get(1));
-        break;
-      case BV_ULT:
-        checkArgument(args.size() == 2);
-        f = Terms.bvLt(args.get(0), args.get(1));
-        break;
-      case BV_SLT:
-        checkArgument(args.size() == 2);
-        f = Terms.bvSLt(args.get(0), args.get(1));
-        break;
-      case BV_ULE:
-        checkArgument(args.size() == 2);
-        f = Terms.bvLe(args.get(0), args.get(1));
-        break;
-      case BV_SLE:
-        checkArgument(args.size() == 2);
-        f = Terms.bvSLe(args.get(0), args.get(1));
-        break;
-      case BV_UGT:
-        checkArgument(args.size() == 2);
-        f = Terms.bvGt(args.get(0), args.get(1));
-        break;
-      case BV_SGT:
-        checkArgument(args.size() == 2);
-        f = Terms.bvSGt(args.get(0), args.get(1));
-        break;
-      case BV_UGE:
-        checkArgument(args.size() == 2);
-        f = Terms.bvGe(args.get(0), args.get(1));
-        break;
-      case BV_SGE:
-        checkArgument(args.size() == 2);
-        f = Terms.bvSGe(args.get(0), args.get(1));
-        break;
-      case BV_EQ:
-        checkArgument(args.size() == 2);
-        f = Terms.bvEq(args.get(0), args.get(1));
-        break;
-      case BV_SHL:
-        checkArgument(args.size() == 2);
-        f = Terms.bvShl(args.get(0), args.get(1));
-        break;
-      case BV_LSHR:
-        checkArgument(args.size() == 2);
-        f = Terms.bvLshr(args.get(0), args.get(1));
-        break;
-      case BV_ASHR:
-        checkArgument(args.size() == 2);
-        f = Terms.bvAshr(args.get(0), args.get(1));
-        break;
-      case BV_ROTATE_LEFT:
-        throw new UnsupportedOperationException("BV_ROTATE_LEFT not supported");
-      case BV_ROTATE_RIGHT:
-        throw new UnsupportedOperationException("BV_ROTATE_RIGHT not supported");
-      case BV_ROTATE_LEFT_BY_INT:
-        checkArgument(args.size() == 1);
-        f = Terms.bvRotateLeft(args.get(0), pIndex.get(0));
-        break;
-      case BV_ROTATE_RIGHT_BY_INT:
-        checkArgument(args.size() == 1);
-        f = Terms.bvRotateRight(args.get(0), pIndex.get(0));
-        break;
-      case UBV_TO_INT:
-        throw new UnsupportedOperationException("UBV_TO_INT not supported");
-      case SBV_TO_INT:
-        throw new UnsupportedOperationException("SBV_TO_INT not supported");
-      case OTHER:
-        throw new UnsupportedOperationException("OTHER not supported");
-      default:
-        throw new UnsupportedOperationException();
-    }
+    int f =
+        switch (pKind) {
+          case AND -> Terms.and(args);
+          case NOT -> {
+            checkArgument(args.size() == 1);
+            yield Terms.not(args.get(0));
+          }
+          case OR -> Terms.or(args);
+          case IFF -> {
+            checkArgument(args.size() == 2);
+            yield Terms.iff(args.get(0), args.get(1));
+          }
+          case ITE -> {
+            checkArgument(args.size() == 3);
+            yield Terms.ifThenElse(args.get(0), args.get(1), args.get(2));
+          }
+          case XOR -> Terms.xor(args);
+          case IMPLIES -> {
+            checkArgument(args.size() == 2);
+            yield Terms.implies(args.get(0), args.get(1));
+          }
+          case DISTINCT -> Terms.distinct(args);
+          case STORE -> {
+            checkArgument(args.size() == 3);
+            yield Terms.functionUpdate1(args.get(0), args.get(1), args.get(2));
+          }
+          case SELECT -> {
+            checkArgument(args.size() == 2);
+            yield Terms.funApplication(args.get(0), args.get(1));
+          }
+          case CONST -> {
+            checkArgument(args.size() == 1);
+            yield Terms.lambda(new int[] {}, args.get(0));
+          }
+          case UMINUS -> {
+            checkArgument(args.size() == 1);
+            yield Terms.neg(args.get(0));
+          }
+          case SUB -> {
+            checkArgument(args.size() == 2);
+            yield Terms.sub(args.get(0), args.get(1));
+          }
+          case ADD -> Terms.add(args);
+          case DIV -> {
+            checkArgument(args.size() == 2);
+            yield Terms.div(args.get(0), args.get(1));
+          }
+          case MUL -> Terms.mul(args);
+          case MODULO -> {
+            checkArgument(args.size() == 2);
+            yield Terms.imod(args.get(0), args.get(1));
+          }
+          case UF, VAR -> throw new IllegalArgumentException("Expecting builtin kind");
+          case LT -> {
+            checkArgument(args.size() == 2);
+            yield Terms.arithLt(args.get(0), args.get(1));
+          }
+          case LTE -> {
+            checkArgument(args.size() == 2);
+            yield Terms.arithLeq(args.get(0), args.get(1));
+          }
+          case GT -> {
+            checkArgument(args.size() == 2);
+            yield Terms.arithGt(args.get(0), args.get(1));
+          }
+          case GTE -> {
+            checkArgument(args.size() == 2);
+            yield Terms.arithGeq(args.get(0), args.get(1));
+          }
+          case EQ -> {
+            checkArgument(args.size() == 2);
+            yield Terms.eq(args.get(0), args.get(1));
+          }
+          case EQ_ZERO -> throw new UnsupportedOperationException("EQ_ZERO not supported");
+          case GTE_ZERO -> throw new UnsupportedOperationException("GTE_ZERO not supported");
+          case FLOOR -> {
+            checkArgument(args.size() == 1);
+            yield Terms.floor(args.get(0));
+          }
+          case TO_REAL -> throw new UnsupportedOperationException("TO_REAL not supported");
+          case INT_TO_BV -> throw new UnsupportedOperationException("INT_TO_BV not supported");
+          case BV_EXTRACT -> {
+            checkArgument(args.size() == 1 && pIndex.size() == 2);
+            yield Terms.bvExtract(args.get(0), pIndex.get(0), pIndex.get(1));
+          }
+          case BV_CONCAT -> Terms.bvConcat(args);
+          case BV_SIGN_EXTENSION -> {
+            checkArgument(args.size() == 1);
+            yield Terms.bvSignExtend(args.get(0), pIndex.get(0));
+          }
+          case BV_ZERO_EXTENSION -> {
+            checkArgument(args.size() == 1);
+            yield Terms.bvZeroExtend(args.get(0), pIndex.get(0));
+          }
+          case BV_NOT -> {
+            checkArgument(args.size() == 1);
+            yield Terms.bvNot(args.get(0));
+          }
+          case BV_NEG -> {
+            checkArgument(args.size() == 1);
+            yield Terms.bvNeg(args.get(0));
+          }
+          case BV_OR -> Terms.bvOr(args);
+          case BV_AND -> Terms.bvAnd(args);
+          case BV_XOR -> Terms.bvXor(args);
+          case BV_SUB -> {
+            checkArgument(args.size() == 2);
+            yield Terms.bvSub(args.get(0), args.get(1));
+          }
+          case BV_ADD -> Terms.bvAdd(args);
+          case BV_SDIV -> {
+            checkArgument(args.size() == 2);
+            yield Terms.bvSDiv(args.get(0), args.get(1));
+          }
+          case BV_UDIV -> {
+            checkArgument(args.size() == 2);
+            yield Terms.bvDiv(args.get(0), args.get(1));
+          }
+          case BV_SREM -> {
+            checkArgument(args.size() == 2);
+            yield Terms.bvSRem(args.get(0), args.get(1));
+          }
+          case BV_UREM -> {
+            checkArgument(args.size() == 2);
+            yield Terms.bvRem(args.get(0), args.get(1));
+          }
+          case BV_SMOD -> {
+            checkArgument(args.size() == 2);
+            yield Terms.bvSMod(args.get(0), args.get(1));
+          }
+          case BV_MUL -> {
+            checkArgument(args.size() == 2);
+            yield Terms.bvMul(args.get(0), args.get(1));
+          }
+          case BV_ULT -> {
+            checkArgument(args.size() == 2);
+            yield Terms.bvLt(args.get(0), args.get(1));
+          }
+          case BV_SLT -> {
+            checkArgument(args.size() == 2);
+            yield Terms.bvSLt(args.get(0), args.get(1));
+          }
+          case BV_ULE -> {
+            checkArgument(args.size() == 2);
+            yield Terms.bvLe(args.get(0), args.get(1));
+          }
+          case BV_SLE -> {
+            checkArgument(args.size() == 2);
+            yield Terms.bvSLe(args.get(0), args.get(1));
+          }
+          case BV_UGT -> {
+            checkArgument(args.size() == 2);
+            yield Terms.bvGt(args.get(0), args.get(1));
+          }
+          case BV_SGT -> {
+            checkArgument(args.size() == 2);
+            yield Terms.bvSGt(args.get(0), args.get(1));
+          }
+          case BV_UGE -> {
+            checkArgument(args.size() == 2);
+            yield Terms.bvGe(args.get(0), args.get(1));
+          }
+          case BV_SGE -> {
+            checkArgument(args.size() == 2);
+            yield Terms.bvSGe(args.get(0), args.get(1));
+          }
+          case BV_EQ -> {
+            checkArgument(args.size() == 2);
+            yield Terms.bvEq(args.get(0), args.get(1));
+          }
+          case BV_SHL -> {
+            checkArgument(args.size() == 2);
+            yield Terms.bvShl(args.get(0), args.get(1));
+          }
+          case BV_LSHR -> {
+            checkArgument(args.size() == 2);
+            yield Terms.bvLshr(args.get(0), args.get(1));
+          }
+          case BV_ASHR -> {
+            checkArgument(args.size() == 2);
+            yield Terms.bvAshr(args.get(0), args.get(1));
+          }
+          case BV_ROTATE_LEFT ->
+              throw new UnsupportedOperationException("BV_ROTATE_LEFT not supported");
+          case BV_ROTATE_RIGHT ->
+              throw new UnsupportedOperationException("BV_ROTATE_RIGHT not supported");
+          case BV_ROTATE_LEFT_BY_INT -> {
+            checkArgument(args.size() == 1);
+            yield Terms.bvRotateLeft(args.get(0), pIndex.get(0));
+          }
+          case BV_ROTATE_RIGHT_BY_INT -> {
+            checkArgument(args.size() == 1);
+            yield Terms.bvRotateRight(args.get(0), pIndex.get(0));
+          }
+          case UBV_TO_INT -> throw new UnsupportedOperationException("UBV_TO_INT not supported");
+          case SBV_TO_INT -> throw new UnsupportedOperationException("SBV_TO_INT not supported");
+          case OTHER -> throw new UnsupportedOperationException("OTHER not supported");
+          default -> throw new UnsupportedOperationException();
+        };
     return Terms.lambda(args, f);
   }
 
@@ -854,15 +772,13 @@ class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long, Intege
 
   /** Convert value to constant term. */
   private static int toConstant(Object value) {
-    if (value instanceof BigRational) {
-      var rational = (BigRational) value;
+    if (value instanceof BigRational rational) {
       if (rational.isInteger()) {
         return Terms.intConst(rational.getNumerator());
       } else {
         return Terms.rationalConst(rational);
       }
-    } else if (value instanceof boolean[]) {
-      var array = (boolean[]) value;
+    } else if (value instanceof boolean[] array) {
       ImmutableList.Builder<Integer> builder = ImmutableList.builder();
       for (var bit : array) {
         builder.add(bit ? 1 : 0);

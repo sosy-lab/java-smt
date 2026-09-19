@@ -137,8 +137,8 @@ final class Mathsat5FormulaManager extends AbstractFormulaManager<Long, Long, Lo
 
   @Override
   public BooleanFormula translateFrom(BooleanFormula formula, FormulaManager otherManager) {
-    if (otherManager instanceof Mathsat5FormulaManager) {
-      long otherMsatContext = ((Mathsat5FormulaManager) otherManager).getEnvironment();
+    if (otherManager instanceof Mathsat5FormulaManager mathsat5FormulaManager) {
+      long otherMsatContext = mathsat5FormulaManager.getEnvironment();
       if (otherMsatContext == getEnvironment()) {
 
         // Same context.

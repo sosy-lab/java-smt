@@ -6,28 +6,24 @@ This file is part of JavaSMT,
 an API wrapper for a collection of SMT solvers:
 https://github.com/sosy-lab/java-smt
 
-SPDX-FileCopyrightText: 2021 Dirk Beyer <https://www.sosy-lab.org>
+SPDX-FileCopyrightText: 2026 Dirk Beyer <https://www.sosy-lab.org>
 
 SPDX-License-Identifier: Apache-2.0
 -->
 
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.sosy-lab</groupId>
-  <artifactId>javasmt-yices2</artifactId>
+  <artifactId>javasmt-solver-z3-legacy</artifactId>
   <packaging>pom</packaging>
-  <name>javasmt-yices2</name>
+  <name>javasmt-solver-z3</name>
   <version>${stage.revision}</version>
-  <description>JavaSMT bindings for the SMT solver Yices</description>
+  <description>SMT solver Z3 (legacy version with interpolation) for use in JavaSMT</description>
   <url>https://github.com/sosy-lab/java-smt</url>
 
   <licenses>
       <license>
-          <name>Apache License, Version 2.0</name>
-          <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-      </license>
-      <license>
-          <name>GPL v3</name>
-          <url>http://www.gnu.org/licenses/gpl-3.0.de.html</url>
+          <name>MIT License</name>
+          <url>https://opensource.org/licenses/MIT</url>
       </license>
   </licenses>
 

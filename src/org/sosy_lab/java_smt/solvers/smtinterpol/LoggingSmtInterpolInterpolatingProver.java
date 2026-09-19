@@ -53,7 +53,7 @@ class LoggingSmtInterpolInterpolatingProver extends SmtInterpolInterpolatingProv
     @SuppressWarnings("IllegalInstantiation")
     PrintWriter writer = new PrintWriter(IO.openOutputFile(logfile, Charset.defaultCharset()));
     for (Map.Entry<String, Object> entry : globalOptions.entrySet()) {
-      writer.println(String.format("(set-option %s %s)", entry.getKey(), entry.getValue()));
+      writer.println("(set-option %s %s)".formatted(entry.getKey(), entry.getValue()));
     }
     writer.println("(set-logic " + env.getTheory().getLogic().name() + ")");
     return writer;

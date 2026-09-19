@@ -42,26 +42,14 @@ class Z3FloatingPointFormulaManager
 
   @Override
   protected Long getRoundingModeImpl(FloatingPointRoundingMode pFloatingPointRoundingMode) {
-    long out;
-    switch (pFloatingPointRoundingMode) {
-      case NEAREST_TIES_TO_EVEN:
-        out = Native.mkFpaRoundNearestTiesToEven(z3context);
-        break;
-      case NEAREST_TIES_AWAY:
-        out = Native.mkFpaRoundNearestTiesToAway(z3context);
-        break;
-      case TOWARD_POSITIVE:
-        out = Native.mkFpaRoundTowardPositive(z3context);
-        break;
-      case TOWARD_NEGATIVE:
-        out = Native.mkFpaRoundTowardNegative(z3context);
-        break;
-      case TOWARD_ZERO:
-        out = Native.mkFpaRoundTowardZero(z3context);
-        break;
-      default:
-        throw new AssertionError("Unexpected value");
-    }
+    long out =
+        switch (pFloatingPointRoundingMode) {
+          case NEAREST_TIES_TO_EVEN -> Native.mkFpaRoundNearestTiesToEven(z3context);
+          case NEAREST_TIES_AWAY -> Native.mkFpaRoundNearestTiesToAway(z3context);
+          case TOWARD_POSITIVE -> Native.mkFpaRoundTowardPositive(z3context);
+          case TOWARD_NEGATIVE -> Native.mkFpaRoundTowardNegative(z3context);
+          case TOWARD_ZERO -> Native.mkFpaRoundTowardZero(z3context);
+        };
     Native.incRef(z3context, out);
     return out;
   }
