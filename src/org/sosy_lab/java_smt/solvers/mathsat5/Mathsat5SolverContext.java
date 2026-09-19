@@ -221,6 +221,8 @@ public final class Mathsat5SolverContext extends AbstractSolverContext {
     }
     Mathsat5FormulaManager manager =
         new Mathsat5FormulaManager(
+            logger,
+            config,
             creator,
             functionTheory,
             booleanTheory,

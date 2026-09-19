@@ -24,6 +24,7 @@ import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.common.configuration.Option;
 import org.sosy_lab.common.configuration.Options;
 import org.sosy_lab.common.io.PathCounterTemplate;
+import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
 import org.sosy_lab.java_smt.api.OptimizationProverEnvironment;
@@ -77,6 +78,7 @@ public final class BoolectorSolverContext extends AbstractSolverContext {
   }
 
   public static BoolectorSolverContext create(
+      LogManager pLogger,
       Configuration config,
       ShutdownNotifier pShutdownNotifier,
       @Nullable PathCounterTemplate solverLogfile,
@@ -97,7 +99,7 @@ public final class BoolectorSolverContext extends AbstractSolverContext {
     BoolectorArrayFormulaManager arrayTheory = new BoolectorArrayFormulaManager(creator);
     BoolectorFormulaManager manager =
         new BoolectorFormulaManager(
-            creator, functionTheory, booleanTheory, bitvectorTheory, arrayTheory);
+            pLogger, config, creator, functionTheory, booleanTheory, bitvectorTheory, arrayTheory);
     return new BoolectorSolverContext(manager, creator, pShutdownNotifier);
   }
 

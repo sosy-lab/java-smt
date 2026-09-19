@@ -16,6 +16,7 @@ import org.sosy_lab.common.configuration.Configuration;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.common.configuration.Option;
 import org.sosy_lab.common.configuration.Options;
+import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BooleanFormulaManager;
 import org.sosy_lab.java_smt.api.FormulaManager;
@@ -62,6 +63,7 @@ public final class Yices2SolverContext extends AbstractSolverContext {
   }
 
   public static Yices2SolverContext create(
+      LogManager pLogger,
       Configuration pConfig,
       NonLinearArithmetic pNonLinearArithmetic,
       ShutdownNotifier pShutdownManager,
@@ -96,6 +98,8 @@ public final class Yices2SolverContext extends AbstractSolverContext {
     Yices2ArrayFormulaManager arrayTheory = new Yices2ArrayFormulaManager(creator);
     Yices2FormulaManager manager =
         new Yices2FormulaManager(
+            pLogger,
+            pConfig,
             creator,
             functionTheory,
             booleanTheory,

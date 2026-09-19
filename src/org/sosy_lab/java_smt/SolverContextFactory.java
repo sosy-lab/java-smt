@@ -257,6 +257,7 @@ public class SolverContextFactory {
       case CVC4 ->
           CVC4SolverContext.create(
               logger,
+              config,
               shutdownNotifier,
               (int) randomSeed,
               nonLinearArithmetic,
@@ -312,17 +313,24 @@ public class SolverContextFactory {
 
       case PRINCESS ->
           PrincessSolverContext.create(
-              config, shutdownNotifier, logfile, (int) randomSeed, nonLinearArithmetic);
+              logger, config, shutdownNotifier, logfile, (int) randomSeed, nonLinearArithmetic);
 
       case YICES2 ->
-          Yices2SolverContext.create(config, nonLinearArithmetic, shutdownNotifier, loader);
+          Yices2SolverContext.create(logger, config, nonLinearArithmetic, shutdownNotifier, loader);
 
       case BOOLECTOR ->
-          BoolectorSolverContext.create(config, shutdownNotifier, logfile, randomSeed, loader);
+          BoolectorSolverContext.create(
+              logger, config, shutdownNotifier, logfile, randomSeed, loader);
 
       case BITWUZLA ->
           BitwuzlaSolverContext.create(
-              config, shutdownNotifier, logfile, randomSeed, floatingPointRoundingMode, loader);
+              logger,
+              config,
+              shutdownNotifier,
+              logfile,
+              randomSeed,
+              floatingPointRoundingMode,
+              loader);
     };
   }
 

@@ -10,6 +10,7 @@
 
 package org.sosy_lab.java_smt.basicimpl;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
@@ -17,6 +18,7 @@ import com.google.common.collect.ImmutableList;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.regex.Pattern;
 
 /**
  * Helper class for splitting up an SMT-LIB2 file into a string of commands.
@@ -90,6 +92,13 @@ public final class SMTLibTokenizer implements Iterable<String> {
 
   private static boolean matchesOneOf(String token, String... regexp) {
     return token.matches("\\(\\s*(" + String.join("|", regexp) + ")[\\S\\s]*");
+  }
+
+  /** Return the name of a command from a token. */
+  public static String getCommand(String token) {
+    var m = Pattern.compile("\\(\\s*([a-z-]*)[\\s()][\\S\\s]*").matcher(token);
+    checkArgument(m.find());
+    return m.group(1);
   }
 
   /**
@@ -224,8 +233,21 @@ public final class SMTLibTokenizer implements Iterable<String> {
    *   <li>reset
    * </ul>
    *
-   * <p>Forbidden tokens manipulate the stack and are not supported while parsing SMT-lIB2 string.
-   * When a forbidden token is found parsing should be aborted by throwing an {@link
+   * <p>These tokens manipulate the stack and are not supported while parsing SMT-lIB2 string.
+   *
+   * <p>The list of forbidden tokens also contains operations that are not supported by JavaSMT:
+   *
+   * <ul>
+   *   <li>declare-datatype
+   *   <li>declare-datatypes
+   *   <li>declare-sort
+   *   <li>define-sort
+   *   <li>declare-sort-parameter
+   *   <li>define-fun-rec
+   *   <li>define-funs-rec
+   * </ul>
+   *
+   * <p>When a forbidden token is found parsing should be aborted by throwing an {@link
    * IllegalArgumentException} exception.
    *
    * <p>Use {@link SMTLibTokenizer} as an {@link Iterable}, or the {@link Iterator} with {@link
@@ -237,7 +259,66 @@ public final class SMTLibTokenizer implements Iterable<String> {
     return isPushToken(token)
         || isPopToken(token)
         || isResetAssertionsToken(token)
-        || isResetToken(token);
+        || isResetToken(token)
+        || matchesOneOf(
+            token,
+            "declare-datatype",
+            "declare-datatypes",
+            "declare-sort",
+            "define-sort",
+            "declare-sort-parameter",
+            "define-fun-rec",
+            "define-funs-rec");
+  }
+
+  /**
+   * Check if this token can be ignored.
+   *
+   * <p>The list of ignored tokens contains:
+   *
+   * <ul>
+   *   <li>echo
+   *   <li>set-info
+   *   <li>set-option
+   *   <li>get-assertions
+   *   <li>get-assignment
+   *   <li>get-info
+   *   <li>get-option
+   *   <li>get-model
+   *   <li>get-proof
+   *   <li>get-unsat-assumptions
+   *   <li>get-unsat-core
+   *   <li>get-value
+   *   <li>check-sat
+   *   <li>check-sat-assuming
+   * </ul>
+   *
+   * <p>Tokens on this list print their results to the screen and are meant to be used
+   * interactively. They don't change the assertion stack or add new symbols, and can therefore be
+   * ignored while parsing.
+   *
+   * <p>Use {@link SMTLibTokenizer} as an {@link Iterable}, or the {@link Iterator} with {@link
+   * #iterator()} to turn an SMT-LIB2 script into a string of input tokens efficiently.
+   * Alternatively, a {@link ImmutableList} of all tokens can be created with {@link
+   * #toImmutableList()}.
+   */
+  public static boolean isIgnoredToken(String token) {
+    return matchesOneOf(
+        token,
+        "echo",
+        "set-info",
+        "set-option",
+        "get-assertions",
+        "get-assignment",
+        "get-info",
+        "get-option",
+        "get-model",
+        "get-proof",
+        "get-unsat-assumptions",
+        "get-unsat-core",
+        "get-value",
+        "check-sat",
+        "check-sat-assuming");
   }
 
   public static final class TokenizerIterator implements Iterator<String> {
