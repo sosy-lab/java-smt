@@ -62,7 +62,7 @@ abstract class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
   //  our own stack for asserted terms, and use a different solver instance for each sat check.
   protected final boolean incremental;
 
-  protected CVC5AbstractProver(
+  CVC5AbstractProver(
       CVC5FormulaCreator pFormulaCreator,
       ShutdownNotifier pShutdownNotifier,
       int pRandomSeed,
@@ -165,8 +165,7 @@ abstract class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
 
   @SuppressWarnings("resource")
   @Override
-  public CVC5Model getModel() throws SolverException {
-    checkGenerateModels();
+  public CVC5Model getModelImpl() throws SolverException {
     // special case for CVC5: Models are not permanent and need to be closed
     // before any change is applied to the prover stack. So, we register the Model as Evaluator.
     return registerEvaluator(
@@ -175,8 +174,7 @@ abstract class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
   }
 
   @Override
-  public Evaluator getEvaluator() {
-    checkGenerateModels();
+  protected Evaluator getEvaluatorImpl() {
     return getEvaluatorWithoutChecks();
   }
 
@@ -314,7 +312,7 @@ abstract class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
   @Override
   public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(
       Collection<BooleanFormula> pAssumptions) throws SolverException, InterruptedException {
-    throw new UnsupportedOperationException(ASSUMPTION_SOLVING_NOT_SUPPORTED);
+    throw new UnsupportedOperationException(UNSAT_CORE_WITH_ASSUMPTIONS_NOT_SUPPORTED);
   }
 
   @Override

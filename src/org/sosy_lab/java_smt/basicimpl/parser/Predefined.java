@@ -167,7 +167,7 @@ public class Predefined {
                       mgr.getRationalFormulaManager().equal((NumeralFormula) a, (NumeralFormula) b),
                   p);
             } else {
-              return mgr.equal(p);
+              return mgr.makeEqual(p);
             }
           };
         });
@@ -177,7 +177,7 @@ public class Predefined {
           Preconditions.checkArgument(idx.isEmpty());
           return p -> {
             Preconditions.checkArgument(p.size() >= 2);
-            return mgr.distinct(p);
+            return mgr.makeDistinct(p);
           };
         });
     predefined.put(
@@ -197,7 +197,7 @@ public class Predefined {
         idx -> {
           Preconditions.checkArgument(idx.isEmpty());
           return p -> {
-            Preconditions.checkArgument(p.size() >= 1);
+            Preconditions.checkArgument(!p.isEmpty());
             if (p.size() == 1) {
               if (p.get(0) instanceof NumeralFormula.IntegerFormula) {
                 return mgr.getIntegerFormulaManager()
@@ -436,7 +436,7 @@ public class Predefined {
           return p -> {
             Preconditions.checkArgument(p.size() == 1);
             Preconditions.checkArgument(p.get(0) instanceof NumeralFormula.RationalFormula);
-            return mgr.equal(
+            return mgr.makeEqual(
                 mgr.getRationalFormulaManager()
                     .sum(
                         ImmutableList.of(
@@ -861,7 +861,7 @@ public class Predefined {
           return p -> {
             Preconditions.checkArgument(p.isEmpty());
             return mgr.getFloatingPointFormulaManager()
-                .makePlusInfinity(FormulaType.getFloatingPointType(idx.get(0), idx.get(1) - 1));
+                .makePlusInfinity(FormulaType.getFloatingPointTypeFromSizesWithHiddenBit(idx.get(0), idx.get(1)));
           };
         });
     predefined.put(
@@ -871,7 +871,7 @@ public class Predefined {
           return p -> {
             Preconditions.checkArgument(p.isEmpty());
             return mgr.getFloatingPointFormulaManager()
-                .makeMinusInfinity(FormulaType.getFloatingPointType(idx.get(0), idx.get(1) - 1));
+                .makeMinusInfinity(FormulaType.getFloatingPointTypeFromSizesWithHiddenBit(idx.get(0), idx.get(1)));
           };
         });
     predefined.put(
@@ -881,7 +881,7 @@ public class Predefined {
           return p -> {
             Preconditions.checkArgument(p.isEmpty());
             return mgr.getFloatingPointFormulaManager()
-                .makeNumber(0.0, FormulaType.getFloatingPointType(idx.get(0), idx.get(1) - 1));
+                .makeNumber(0.0, FormulaType.getFloatingPointTypeFromSizesWithHiddenBit(idx.get(0), idx.get(1)));
           };
         });
     predefined.put(
@@ -891,7 +891,7 @@ public class Predefined {
           return p -> {
             Preconditions.checkArgument(p.isEmpty());
             return mgr.getFloatingPointFormulaManager()
-                .makeNumber(-0.0, FormulaType.getFloatingPointType(idx.get(0), idx.get(1) - 1));
+                .makeNumber(-0.0, FormulaType.getFloatingPointTypeFromSizesWithHiddenBit(idx.get(0), idx.get(1)));
           };
         });
     predefined.put(
@@ -901,7 +901,7 @@ public class Predefined {
           return p -> {
             Preconditions.checkArgument(p.isEmpty());
             return mgr.getFloatingPointFormulaManager()
-                .makeNaN(FormulaType.getFloatingPointType(idx.get(0), idx.get(1) - 1));
+                .makeNaN(FormulaType.getFloatingPointTypeFromSizesWithHiddenBit(idx.get(0), idx.get(1)));
           };
         });
     predefined.put(
@@ -1184,7 +1184,7 @@ public class Predefined {
               return mgr.getFloatingPointFormulaManager()
                   .fromIeeeBitvector(
                       (BitvectorFormula) p.get(0),
-                      FormulaType.getFloatingPointType(idx.get(0), idx.get(1) - 1));
+                      FormulaType.getFloatingPointTypeFromSizesWithHiddenBit(idx.get(0), idx.get(1)));
             } else {
               var rm = (FloatingPointRoundingModeFormula) p.get(0);
               var from = p.get(1);
@@ -1192,7 +1192,7 @@ public class Predefined {
                   .castFrom(
                       from,
                       true,
-                      FormulaType.getFloatingPointType(idx.get(0), idx.get(1) - 1),
+                      FormulaType.getFloatingPointTypeFromSizesWithHiddenBit(idx.get(0), idx.get(1)),
                       mgr.getFloatingPointFormulaManager().fromRoundingModeFormula(rm));
             }
           };
@@ -1209,7 +1209,7 @@ public class Predefined {
                 .castFrom(
                     from,
                     false,
-                    FormulaType.getFloatingPointType(idx.get(0), idx.get(1) - 1),
+                    FormulaType.getFloatingPointTypeFromSizesWithHiddenBit(idx.get(0), idx.get(1)),
                     mgr.getFloatingPointFormulaManager().fromRoundingModeFormula(rm));
           };
         });
@@ -1224,7 +1224,7 @@ public class Predefined {
             var fromType = (FormulaType.FloatingPointType) mgr.getFormulaType(from);
             var toType =
                 FormulaType.getBitvectorTypeWithSize(
-                    1 + fromType.getExponentSize() + fromType.getMantissaSize());
+                    1 + fromType.getExponentSize() + fromType.getMantissaSizeWithoutHiddenBit());
             return mgr.getFloatingPointFormulaManager()
                 .castTo(
                     from,
@@ -1244,7 +1244,7 @@ public class Predefined {
             var fromType = (FormulaType.FloatingPointType) mgr.getFormulaType(from);
             var toType =
                 FormulaType.getBitvectorTypeWithSize(
-                    1 + fromType.getExponentSize() + fromType.getMantissaSize());
+                    1 + fromType.getExponentSize() + fromType.getMantissaSizeWithoutHiddenBit());
             return mgr.getFloatingPointFormulaManager()
                 .castTo(
                     from,

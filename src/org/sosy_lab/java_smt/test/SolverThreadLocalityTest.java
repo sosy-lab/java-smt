@@ -9,12 +9,10 @@
 package org.sosy_lab.java_smt.test;
 
 import static com.google.common.truth.TruthJUnit.assume;
-import static org.junit.Assert.assertThrows;
 import static org.sosy_lab.java_smt.test.ProverEnvironmentSubject.assertThat;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.truth.Truth;
-import java.util.Collection;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -40,9 +38,6 @@ public class SolverThreadLocalityTest extends SolverBasedTest0.ParameterizedSolv
 
   private HardIntegerFormulaGenerator hardProblem;
   private static final int DEFAULT_PROBLEM_SIZE = 8;
-
-  private static final Collection<Solvers> SOLVERS_NOT_SUPPORTING_FORMULA_THREAD_SHARING =
-      ImmutableList.of(Solvers.CVC5);
 
   @Before
   public void makeThreads() {
@@ -78,7 +73,6 @@ public class SolverThreadLocalityTest extends SolverBasedTest0.ParameterizedSolv
   public void nonLocalContextTest()
       throws ExecutionException, InterruptedException, SolverException {
     requireIntegers();
-    assume().that(solverToUse()).isNotEqualTo(Solvers.CVC5);
 
     // generate a new context in another thread, i.e., non-locally
     Future<SolverContext> result = executor.submit(() -> factory.generateContext());
@@ -92,14 +86,6 @@ public class SolverThreadLocalityTest extends SolverBasedTest0.ParameterizedSolv
       HardIntegerFormulaGenerator newHardProblem =
           new HardIntegerFormulaGenerator(newImgr, newBmgr);
 
-      // FIXME: Exception for CVC5 (related to bug #310?)
-      // io.github.cvc5.CVC5ApiException:
-      // Invalid call to 'cvc5::SortKind cvc5::Sort::getKind() const', expected non-null object
-      //   at io.github.cvc5.Sort.getKind
-      //       (Native Method)
-      //   at io.github.cvc5.Sort.getKind
-      //       (Sort.java:93)
-      //   at ..
       BooleanFormula formula = newHardProblem.generate(DEFAULT_PROBLEM_SIZE);
 
       try (BasicProverEnvironment<?> prover = newContext.newProverEnvironment()) {
@@ -113,23 +99,10 @@ public class SolverThreadLocalityTest extends SolverBasedTest0.ParameterizedSolv
   public void nonLocalFormulaTest()
       throws InterruptedException, SolverException, ExecutionException {
     requireIntegers();
-    assume().that(solverToUse()).isNotEqualTo(Solvers.CVC5);
 
     // generate a new formula in another thread, i.e., non-locally
     Future<BooleanFormula> result =
-        executor.submit(
-            () -> {
-              // FIXME: Exception for CVC5 (related to bug #310?)
-              // io.github.cvc5.CVC5ApiException:
-              // Invalid call to 'cvc5::SortKind cvc5::Sort::getKind() const', expected non-null
-              // object
-              //   at io.github.cvc5.Sort.getKind
-              //       (Native Method)
-              //   at io.github.cvc5.Sort.getKind
-              //       (Sort.java:93)
-              //   at ..
-              return hardProblem.generate(DEFAULT_PROBLEM_SIZE);
-            });
+        executor.submit(() -> hardProblem.generate(DEFAULT_PROBLEM_SIZE));
 
     BooleanFormula formula = result.get();
 
@@ -142,7 +115,6 @@ public class SolverThreadLocalityTest extends SolverBasedTest0.ParameterizedSolv
   @Test
   public void nonLocalProverTest() throws InterruptedException, ExecutionException {
     requireIntegers();
-    assume().that(solverToUse()).isNotEqualTo(Solvers.CVC5);
 
     BooleanFormula formula = hardProblem.generate(DEFAULT_PROBLEM_SIZE);
 
@@ -151,18 +123,6 @@ public class SolverThreadLocalityTest extends SolverBasedTest0.ParameterizedSolv
         executor.submit(
             () -> {
               try (BasicProverEnvironment<?> prover = context.newProverEnvironment()) {
-                // FIXME: Exception for CVC5
-                // io.github.cvc5.CVC5ApiException:
-                // Given term is not associated with the node manager of this solver
-                //   at io.github.cvc5.Solver.assertFormula
-                //       (Native Method)
-                //   at io.github.cvc5.Solver.assertFormula
-                //       (Solver.java:1455)
-                //   at org.sosy_lab.java_smt.solvers.cvc5.CVC5AbstractProver.addConstraintImpl
-                //       (CVC5AbstractProver.java:114)
-                //   at org.sosy_lab.java_smt.basicimpl.AbstractProver.addConstraint
-                //       (AbstractProver.java:108)
-                //   at ..
                 prover.push(formula);
                 assertThat(prover).isUnsatisfiable();
               } catch (SolverException | InterruptedException exception) {
@@ -175,49 +135,26 @@ public class SolverThreadLocalityTest extends SolverBasedTest0.ParameterizedSolv
 
   @Test
   public void nonLocalFormulaTranslationTest() throws Throwable {
-    // Test that even when using translation, the thread local problem persists for CVC5
+    // Test that even when using translation, the thread local problem persists
     requireIntegers();
-    assume().that(solverToUse()).isNotEqualTo(Solvers.CVC5);
 
     BooleanFormula formula = hardProblem.generate(DEFAULT_PROBLEM_SIZE);
 
     // generate a new prover in another thread, i.e., non-locally
-    Future<?> task;
-    if (SOLVERS_NOT_SUPPORTING_FORMULA_THREAD_SHARING.contains(solverToUse())) {
-      task =
-          executor.submit(
-              () ->
-                  assertThrows(
-                      io.github.cvc5.CVC5ApiException.class,
-                      () -> {
-                        try (BasicProverEnvironment<?> prover = context.newProverEnvironment()) {
-                          prover.push(
-                              context
-                                  .getFormulaManager()
-                                  .translateFrom(formula, context.getFormulaManager()));
-                          assertThat(prover).isUnsatisfiable();
-                        } catch (SolverException | InterruptedException exception) {
-                          throw new RuntimeException(exception);
-                        }
-                      }));
-      Truth.assertThat(task.get()).isInstanceOf(io.github.cvc5.CVC5ApiException.class);
-
-    } else {
-      task =
-          executor.submit(
-              () -> {
-                try (BasicProverEnvironment<?> prover = context.newProverEnvironment()) {
-                  prover.push(
-                      context
-                          .getFormulaManager()
-                          .translateFrom(formula, context.getFormulaManager()));
-                  assertThat(prover).isUnsatisfiable();
-                } catch (SolverException | InterruptedException exception) {
-                  throw new RuntimeException(exception);
-                }
-              });
-      Truth.assertThat(task.get()).isNull();
-    }
+    Future<?> task =
+        executor.submit(
+            () -> {
+              try (BasicProverEnvironment<?> prover = context.newProverEnvironment()) {
+                prover.push(
+                    context
+                        .getFormulaManager()
+                        .translateFrom(formula, context.getFormulaManager()));
+                assertThat(prover).isUnsatisfiable();
+              } catch (SolverException | InterruptedException exception) {
+                throw new RuntimeException(exception);
+              }
+            });
+    Truth.assertThat(task.get()).isNull();
   }
 
   @Override
@@ -264,7 +201,6 @@ public class SolverThreadLocalityTest extends SolverBasedTest0.ParameterizedSolv
   public <T> void nonLocalInterpolationTest() throws InterruptedException, ExecutionException {
     requireIntegers();
     requireInterpolation();
-    assume().that(solverToUse()).isNotEqualTo(Solvers.CVC5);
 
     BooleanFormula f1 = imgr.lessThan(imgr.makeVariable("A"), imgr.makeVariable("B"));
     BooleanFormula f2 = imgr.lessThan(imgr.makeVariable("B"), imgr.makeVariable("A"));
@@ -278,14 +214,6 @@ public class SolverThreadLocalityTest extends SolverBasedTest0.ParameterizedSolv
           executor.submit(
               () -> {
                 try {
-                  // FIXME: Exception for CVC5
-                  // java.lang.IllegalStateException:
-                  // You tried to use push() on an CVC5 assertion stack illegally.
-                  //   at org.sosy_lab.java_smt.solvers.cvc5.CVC5AbstractProver.pushImpl
-                  //       (CVC5AbstractProver.java:89)
-                  //   at org.sosy_lab.java_smt.basicimpl.AbstractProver.push
-                  //       (AbstractProver.java:88)
-                  //   at ..
                   prover.push(f2);
                   assertThat(prover).isUnsatisfiable();
 

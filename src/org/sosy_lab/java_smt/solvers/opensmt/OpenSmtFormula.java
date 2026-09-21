@@ -20,7 +20,7 @@ import org.sosy_lab.java_smt.solvers.opensmt.api.Logic;
 import org.sosy_lab.java_smt.solvers.opensmt.api.PTRef;
 
 @Immutable
-public class OpenSmtFormula implements Formula {
+abstract sealed class OpenSmtFormula implements Formula {
 
   @SuppressWarnings("Immutable")
   private final Logic osmtLogic;
@@ -43,11 +43,9 @@ public class OpenSmtFormula implements Formula {
     if (o == this) {
       return true;
     }
-    if (!(o instanceof OpenSmtFormula)) {
-      return false;
-    }
-    OpenSmtFormula that = (OpenSmtFormula) o;
-    return this.osmtLogic.equals(that.osmtLogic) && this.osmtTerm.equals(that.osmtTerm);
+    return (o instanceof OpenSmtFormula that)
+        && this.osmtLogic.equals(that.osmtLogic)
+        && this.osmtTerm.equals(that.osmtTerm);
   }
 
   @Override

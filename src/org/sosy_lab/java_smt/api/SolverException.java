@@ -8,12 +8,13 @@
 
 package org.sosy_lab.java_smt.api;
 
+import java.io.Serial;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 /** Exception thrown if there is an error during SMT solving. */
 public class SolverException extends Exception {
 
-  private static final long serialVersionUID = -1557936144555925180L;
+  @Serial private static final long serialVersionUID = -1557936144555925180L;
 
   public SolverException(@Nullable String msg) {
     super(msg);

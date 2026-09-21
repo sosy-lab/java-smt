@@ -9,6 +9,7 @@
 package org.sosy_lab.java_smt.api;
 
 import com.google.common.collect.ImmutableMap;
+import java.util.Collection;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 
 /**
@@ -43,12 +44,16 @@ public interface SolverContext extends AutoCloseable {
      * generated over all formulas asserted with {@link
      * ProverEnvironment#addConstraint(BooleanFormula)} or {@link
      * ProverEnvironment#push(BooleanFormula)}.
+     *
+     * <p>This option is needed for {@link ProverEnvironment#getUnsatCore()}
      */
     GENERATE_UNSAT_CORE,
 
     /**
      * Whether the solver should generate an unsat core for unsatisfiable formulas <b>only</b> over
      * the assumptions explicitly passed to the solver.
+     *
+     * <p>This option is needed for {@link ProverEnvironment#unsatCoreOverAssumptions(Collection)}
      */
     GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS,
 

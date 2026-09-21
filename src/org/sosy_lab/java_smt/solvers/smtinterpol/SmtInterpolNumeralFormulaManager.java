@@ -16,6 +16,7 @@ import de.uni_freiburg.informatik.ultimate.logic.Rational;
 import de.uni_freiburg.informatik.ultimate.logic.Script;
 import de.uni_freiburg.informatik.ultimate.logic.Sort;
 import de.uni_freiburg.informatik.ultimate.logic.Term;
+import java.math.BigInteger;
 import java.util.ArrayDeque;
 import java.util.Arrays;
 import java.util.Deque;
@@ -48,14 +49,13 @@ abstract class SmtInterpolNumeralFormulaManager<
   protected final boolean isNumeral(Term t) {
     boolean is = false;
     // ConstantTerm with Number --> "123"
-    if (t instanceof ConstantTerm) {
-      Object value = ((ConstantTerm) t).getValue();
+    if (t instanceof ConstantTerm constantTerm) {
+      Object value = constantTerm.getValue();
       if (value instanceof Number || value instanceof Rational) {
         is = true;
       }
 
-    } else if (t instanceof ApplicationTerm) {
-      ApplicationTerm at = (ApplicationTerm) t;
+    } else if (t instanceof ApplicationTerm at) {
 
       // ApplicationTerm with negative Number --> "(- 123)"
       if ("-".equals(at.getFunction().getName())
@@ -94,8 +94,7 @@ abstract class SmtInterpolNumeralFormulaManager<
       }
       if (isNumeral(t)) {
         // true, skip and check others
-      } else if (t instanceof ApplicationTerm) {
-        final ApplicationTerm app = (ApplicationTerm) t;
+      } else if (t instanceof ApplicationTerm app) {
         final FunctionSymbol func = app.getFunction();
         final Term[] params = app.getParameters();
 
@@ -173,5 +172,14 @@ abstract class SmtInterpolNumeralFormulaManager<
   @Override
   public Term lessOrEquals(Term pNumber1, Term pNumber2) {
     return env.term("<=", pNumber1, pNumber2);
+  }
+
+  @Override
+  protected Term sumImpl(List<Term> operands) {
+    return switch (operands.size()) {
+      case 0 -> env.numeral(BigInteger.ZERO);
+      case 1 -> operands.get(0);
+      default -> env.term("+", operands.toArray(new Term[0]));
+    };
   }
 }

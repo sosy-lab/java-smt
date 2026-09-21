@@ -15,7 +15,7 @@ import io.github.cvc5.Term;
 import io.github.cvc5.TermManager;
 import org.sosy_lab.java_smt.basicimpl.AbstractEvaluator;
 
-public class CVC5Evaluator extends AbstractEvaluator<Term, Sort, TermManager> {
+class CVC5Evaluator extends AbstractEvaluator<Term, Sort, TermManager> {
 
   private final Solver solver;
 

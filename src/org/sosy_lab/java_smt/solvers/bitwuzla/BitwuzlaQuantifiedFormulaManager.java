@@ -21,13 +21,13 @@ import org.sosy_lab.java_smt.solvers.bitwuzla.api.TermManager;
 import org.sosy_lab.java_smt.solvers.bitwuzla.api.Vector_Int;
 import org.sosy_lab.java_smt.solvers.bitwuzla.api.Vector_Term;
 
-public class BitwuzlaQuantifiedFormulaManager
-    extends AbstractQuantifiedFormulaManager<Term, Sort, Void, BitwuzlaDeclaration> {
+class BitwuzlaQuantifiedFormulaManager
+    extends AbstractQuantifiedFormulaManager<Term, Sort, TermManager, BitwuzlaDeclaration> {
   private final TermManager termManager;
 
-  protected BitwuzlaQuantifiedFormulaManager(BitwuzlaFormulaCreator pCreator) {
+  BitwuzlaQuantifiedFormulaManager(BitwuzlaFormulaCreator pCreator) {
     super(pCreator);
-    termManager = pCreator.getTermManager();
+    termManager = pCreator.getEnv();
   }
 
   @Override

@@ -215,10 +215,10 @@ public final class SmtInterpolSolverContext extends AbstractSolverContext {
   /** extract the central SMTInterpol instance. */
   private SMTInterpol getSmtInterpol() {
     final Script script = manager.getEnvironment();
-    if (script instanceof SMTInterpol) {
-      return (SMTInterpol) script;
-    } else if (script instanceof WrapperScript) {
-      return checkNotNull((WrapperScript) script).findBacking(SMTInterpol.class);
+    if (script instanceof SMTInterpol smtInterpolScript) {
+      return smtInterpolScript;
+    } else if (script instanceof WrapperScript wrapperScript) {
+      return wrapperScript.findBacking(SMTInterpol.class);
     } else {
       throw new AssertionError("unexpected class for SMTInterpol: " + script.getClass());
     }
@@ -290,11 +290,11 @@ public final class SmtInterpolSolverContext extends AbstractSolverContext {
    * <li>output: {ab:1, ac:2, d:3, ef:4}
    */
   static void flatten(ImmutableMap.Builder<String, String> builder, String prefix, Object obj) {
-    if (obj instanceof Object[]) { // very type-safe structure! :-(
+    if (obj instanceof Object[] objects) { // very type-safe structure! :-(
       if (!prefix.isEmpty()) {
         prefix += ">"; // separator for next nesting level
       }
-      for (Object entry : (Object[]) obj) {
+      for (Object entry : objects) {
         checkArgument(
             entry instanceof Object[],
             "expected key-value-pair, but found an unexpected structure: %s",

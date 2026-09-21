@@ -11,7 +11,6 @@
 package org.sosy_lab.java_smt.delegate.parsing;
 
 import com.google.common.collect.ImmutableMap;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import org.antlr.v4.runtime.CharStreams;
@@ -124,13 +123,13 @@ public class ParsingFormulaManager implements FormulaManager {
   }
 
   @Override
-  public BooleanFormula equal(Collection<Formula> pArgs) {
-    return delegate.equal(pArgs);
+  public BooleanFormula makeEqual(Iterable<Formula> pArgs) {
+    return delegate.makeEqual(pArgs);
   }
 
   @Override
-  public BooleanFormula distinct(Collection<Formula> pArgs) {
-    return delegate.distinct(pArgs);
+  public BooleanFormula makeDistinct(Iterable<Formula> pArgs) {
+    return delegate.makeDistinct(pArgs);
   }
 
   @Override
@@ -139,7 +138,7 @@ public class ParsingFormulaManager implements FormulaManager {
   }
 
   @Override
-  public BooleanFormula parse(String s) throws IllegalArgumentException {
+  public List<BooleanFormula> parseAll(String s) throws IllegalArgumentException {
     var input = CharStreams.fromString(s);
     var lexer = new SmtlibLexer(input);
     lexer.removeErrorListener(ConsoleErrorListener.INSTANCE);
@@ -149,7 +148,7 @@ public class ParsingFormulaManager implements FormulaManager {
     parser.removeErrorListener(ConsoleErrorListener.INSTANCE);
     parser.addErrorListener(new FaultingErrorListener("Parsing error"));
     var ast = parser.smtlib();
-    return SmtlibEvaluator.link(this).apply(ast).getAssertions().get(0);
+    return SmtlibEvaluator.link(this).apply(ast).getAssertions();
   }
 
   @Override

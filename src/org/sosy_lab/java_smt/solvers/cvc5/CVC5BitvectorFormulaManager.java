@@ -18,13 +18,12 @@ import java.math.BigInteger;
 import java.util.List;
 import org.sosy_lab.java_smt.basicimpl.AbstractBitvectorFormulaManager;
 
-public class CVC5BitvectorFormulaManager
+class CVC5BitvectorFormulaManager
     extends AbstractBitvectorFormulaManager<Term, Sort, TermManager, Term> {
 
   private final TermManager termManager;
 
-  protected CVC5BitvectorFormulaManager(
-      CVC5FormulaCreator pCreator, CVC5BooleanFormulaManager pBmgr) {
+  CVC5BitvectorFormulaManager(CVC5FormulaCreator pCreator, CVC5BooleanFormulaManager pBmgr) {
     super(pCreator, pBmgr);
     termManager = pCreator.getEnv();
   }
@@ -132,7 +131,7 @@ public class CVC5BitvectorFormulaManager
       return termManager.mkTerm(op, pNumber);
     } catch (CVC5ApiException e) {
       throw new IllegalArgumentException(
-          String.format("You tried rotation a bitvector %s with shift %d", pNumber, pToRotate), e);
+          "You tried rotation a bitvector %s with shift %d".formatted(pNumber, pToRotate), e);
     }
   }
 
@@ -143,7 +142,7 @@ public class CVC5BitvectorFormulaManager
       return termManager.mkTerm(op, pNumber);
     } catch (CVC5ApiException e) {
       throw new IllegalArgumentException(
-          String.format("You tried rotation a bitvector %s with shift %d", pNumber, pToRotate), e);
+          "You tried rotation a bitvector %s with shift %d".formatted(pNumber, pToRotate), e);
     }
   }
 

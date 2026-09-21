@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+This file is part of JavaSMT,
+an API wrapper for a collection of SMT solvers:
+https://github.com/sosy-lab/java-smt
+
+SPDX-FileCopyrightText: 2026 Dirk Beyer <https://www.sosy-lab.org>
+
+SPDX-License-Identifier: Apache-2.0
+-->
+
+<project name="documentation-yices2" basedir=".">
+    <!-- Targets for building documentation for the Yices2 bindings. -->
+    <property name="yices.javadoc" value="downloads/javadoc/javasmt-yices"/>
+
+    <target name="javadoc-yices2" depends="build-project">
+        <delete dir="yices.javadoc"/>
+        <javadoc destdir="${yices.javadoc}"
+                 classpathref="classpath"
+                 locale="en_US"
+                 encoding="utf-8"
+                 windowtitle="${ant.project.name}"
+                 failonerror="true"
+                 failonwarning="true">
+            <fileset dir="${source.dir}/org/sosy_lab/java_smt/solvers/yices2">
+                <include name="**/*.java"/>
+                <exclude name="**/*Test.java"/>
+            </fileset>
+            <link href="https://docs.oracle.com/en/java/javase/17/docs/api/"/>
+            <link href="https://guava.dev/releases/snapshot/api/docs/"/>
+            <link href="https://sosy-lab.github.io/java-common-lib/api/"/>
+            <link href="https://sosy-lab.github.io/java-smt/api/"/>
+            <arg line="${javadoc.doclint}"/>
+        </javadoc>
+    </target>
+
+    <target name="javadoc-jar-yices2" depends="javadoc-yices2,determine-version,build" description="Pack Javadoc into a JAR">
+        <property name="javadoc-jar.file" value="javasmt-yices2-${version}-javadoc.jar"/>
+        <jar jarfile="${javadoc-jar.file}">
+            <metainf dir="." includes="LICENSE"/>
+            <fileset dir="${yices.javadoc}"/>
+        </jar>
+    </target>
+</project>

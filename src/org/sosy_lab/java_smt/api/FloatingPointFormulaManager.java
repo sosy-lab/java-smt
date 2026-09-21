@@ -2,14 +2,14 @@
 // an API wrapper for a collection of SMT solvers:
 // https://github.com/sosy-lab/java-smt
 //
-// SPDX-FileCopyrightText: 2025 Dirk Beyer <https://www.sosy-lab.org>
+// SPDX-FileCopyrightText: 2026 Dirk Beyer <https://www.sosy-lab.org>
 //
 // SPDX-License-Identifier: Apache-2.0
 
 package org.sosy_lab.java_smt.api;
 
 import static org.sosy_lab.java_smt.api.FormulaManager.API_METHOD_NOT_IMPLEMENTED;
-import static org.sosy_lab.java_smt.api.FormulaType.getFloatingPointType;
+import static org.sosy_lab.java_smt.api.FormulaType.getFloatingPointTypeFromSizesWithoutHiddenBit;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -113,7 +113,8 @@ public interface FloatingPointFormulaManager {
         number.getExponent(),
         number.getMantissa(),
         number.getMathSign(),
-        getFloatingPointType(number.getExponentSize(), number.getMantissaSize()));
+        getFloatingPointTypeFromSizesWithoutHiddenBit(
+            number.getExponentSize(), number.getMantissaSizeWithoutHiddenBit()));
   }
 
   /**
@@ -288,8 +289,8 @@ public interface FloatingPointFormulaManager {
 
   /**
    * Create a formula that interprets the given bitvector as a floating-point value in the IEEE
-   * format, according to the given type. The sum of the sizes of exponent and mantissa of the
-   * target type plus 1 (for the sign bit) needs to be equal to the size of the bitvector.
+   * format, according to the given type. The sum of the sizes of exponent and mantissa (including
+   * the hidden bit) of the target type needs to be equal to the size of the bitvector.
    *
    * <p>Note: This method will return a value that is (numerically) far away from the original
    * value. This method is completely different from {@link #castFrom}, which will produce a
@@ -299,8 +300,8 @@ public interface FloatingPointFormulaManager {
 
   /**
    * Create a formula that produces a representation of the given floating-point value as a
-   * bitvector conforming to the IEEE format. The size of the resulting bitvector is the sum of the
-   * sizes of the exponent and mantissa of the input formula plus 1 (for the sign bit).
+   * bitvector conforming to the IEEE 754-2008 FP format. The bit size of the resulting bitvector is
+   * equal to the total size of the {@link FloatingPointNumber}s precision.
    */
   BitvectorFormula toIeeeBitvector(FloatingPointFormula number);
 

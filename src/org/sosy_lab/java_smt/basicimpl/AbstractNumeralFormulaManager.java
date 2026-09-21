@@ -17,7 +17,6 @@ import com.google.common.collect.Lists;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.List;
-import java.util.stream.Collectors;
 import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
@@ -198,20 +197,19 @@ public abstract class AbstractNumeralFormulaManager<
 
   @Override
   public ResultFormulaType sum(List<ParamFormulaType> operands) {
-    return wrap(
-        sumImpl(
-            operands.stream()
-                .map(this::extractInfo)
-                .map(this::toType)
-                .collect(Collectors.toList())));
+    return wrap(sumImpl(operands.stream().map(this::extractInfo).map(this::toType).toList()));
   }
 
   protected TFormulaInfo sumImpl(List<TFormulaInfo> operands) {
-    TFormulaInfo result = makeNumberImpl(0);
-    for (TFormulaInfo operand : operands) {
-      result = add(result, operand);
+    if (operands.isEmpty()) {
+      return makeNumberImpl(0);
+    } else {
+      TFormulaInfo result = operands.get(0);
+      for (TFormulaInfo operand : operands.subList(1, operands.size())) {
+        result = add(result, operand);
+      }
+      return result;
     }
-    return result;
   }
 
   @Override

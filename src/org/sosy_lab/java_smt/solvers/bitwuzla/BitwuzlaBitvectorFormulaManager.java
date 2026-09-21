@@ -16,16 +16,16 @@ import org.sosy_lab.java_smt.solvers.bitwuzla.api.Sort;
 import org.sosy_lab.java_smt.solvers.bitwuzla.api.Term;
 import org.sosy_lab.java_smt.solvers.bitwuzla.api.TermManager;
 
-public class BitwuzlaBitvectorFormulaManager
-    extends AbstractBitvectorFormulaManager<Term, Sort, Void, BitwuzlaDeclaration> {
+class BitwuzlaBitvectorFormulaManager
+    extends AbstractBitvectorFormulaManager<Term, Sort, TermManager, BitwuzlaDeclaration> {
 
   private final TermManager termManager;
 
-  protected BitwuzlaBitvectorFormulaManager(
+  BitwuzlaBitvectorFormulaManager(
       BitwuzlaFormulaCreator pCreator,
-      AbstractBooleanFormulaManager<Term, Sort, Void, BitwuzlaDeclaration> pBmgr) {
+      AbstractBooleanFormulaManager<Term, Sort, TermManager, BitwuzlaDeclaration> pBmgr) {
     super(pCreator, pBmgr);
-    termManager = pCreator.getTermManager();
+    termManager = pCreator.getEnv();
   }
 
   @Override

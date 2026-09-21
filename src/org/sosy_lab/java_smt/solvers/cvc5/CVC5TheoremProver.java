@@ -21,7 +21,7 @@ import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 class CVC5TheoremProver extends CVC5AbstractProver<Void>
     implements ProverEnvironment, BasicProverEnvironment<Void> {
 
-  protected CVC5TheoremProver(
+  CVC5TheoremProver(
       CVC5FormulaCreator pFormulaCreator,
       ShutdownNotifier pShutdownNotifier,
       int pRandomSeed,

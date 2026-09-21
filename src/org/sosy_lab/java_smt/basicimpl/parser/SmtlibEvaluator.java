@@ -99,21 +99,17 @@ public class SmtlibEvaluator {
     @Override
     public FormulaType<?> visitSortFloat(SmtlibParser.SortFloatContext ctx) {
       if (ctx.integer().isEmpty()) {
-        switch (ctx.getText()) {
-          case "Float16":
-            return FormulaType.getFloatingPointType(5, 10);
-          case "Float32":
-            return FormulaType.getFloatingPointType(8, 23);
-          case "Float64":
-            return FormulaType.getFloatingPointType(11, 52);
-          case "Float128":
-            return FormulaType.getFloatingPointType(15, 112);
-          default:
-            throw new IllegalArgumentException(
-                String.format("Unknown floating-point type: %s", ctx.getText()));
-        }
+        return switch (ctx.getText()) {
+          case "Float16" -> FormulaType.getFloatingPointTypeFromSizesWithHiddenBit(5, 11);
+          case "Float32" -> FormulaType.getFloatingPointTypeFromSizesWithHiddenBit(8, 24);
+          case "Float64" -> FormulaType.getFloatingPointTypeFromSizesWithHiddenBit(11, 53);
+          case "Float128" -> FormulaType.getFloatingPointTypeFromSizesWithHiddenBit(15, 113);
+          default ->
+              throw new IllegalArgumentException(
+                  String.format("Unknown floating-point type: %s", ctx.getText()));
+        };
       } else {
-        return FormulaType.getFloatingPointType(
+        return FormulaType.getFloatingPointTypeFromSizesWithHiddenBit(
             getIntegerValue(ctx.integer(0)).intValueExact(),
             getIntegerValue(ctx.integer(1)).intValueExact());
       }
@@ -151,7 +147,11 @@ public class SmtlibEvaluator {
       var b2 = ctx.bitvec(2).getText().substring(2);
       Preconditions.checkArgument(b0.length() == 1);
       return mgr.getFloatingPointFormulaManager()
-          .makeNumber(FloatingPointNumber.of(b0 + b1 + b2, b1.length(), b2.length()));
+          .makeNumber(
+              FloatingPointNumber.of(
+                  b0 + b1 + b2,
+                  FormulaType.getFloatingPointTypeFromSizesWithHiddenBit(
+                      b1.length(), b2.length())));
     }
 
     @Override

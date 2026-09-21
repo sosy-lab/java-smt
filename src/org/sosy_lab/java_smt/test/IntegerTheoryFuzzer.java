@@ -61,18 +61,15 @@ class IntegerTheoryFuzzer {
 
       // Pivot \in [1, formulaSize - 1]
       int pivot = 1 + r.nextInt(pFormulaSize - 1);
-      switch (r.nextInt(3)) {
-        case 0:
-          return ifmgr.add(recFuzz(pivot), recFuzz(pFormulaSize - pivot));
-        case 1:
-          return ifmgr.subtract(recFuzz(pivot), recFuzz(pFormulaSize - pivot));
-        case 2:
+      return switch (r.nextInt(3)) {
+        case 0 -> ifmgr.add(recFuzz(pivot), recFuzz(pFormulaSize - pivot));
+        case 1 -> ifmgr.subtract(recFuzz(pivot), recFuzz(pFormulaSize - pivot));
+        case 2 ->
 
-          // Multiplication by a constant.
-          return ifmgr.multiply(getConstant(), recFuzz(pFormulaSize - 1));
-        default:
-          throw new UnsupportedOperationException("Unexpected state");
-      }
+            // Multiplication by a constant.
+            ifmgr.multiply(getConstant(), recFuzz(pFormulaSize - 1));
+        default -> throw new UnsupportedOperationException("Unexpected state");
+      };
     }
   }
 

@@ -60,7 +60,7 @@ SPDX-License-Identifier: Apache-2.0
                 <exclude name="**/*Test.java"/>
                 <exclude name="${documentation.javadoc.exclude}"/>
             </fileset>
-            <link href="https://docs.oracle.com/en/java/javase/11/docs/api/"/>
+            <link href="https://docs.oracle.com/en/java/javase/17/docs/api/"/>
             <link href="https://guava.dev/releases/snapshot/api/docs/"/>
             <link href="https://truth.dev/api/latest/"/>
             <link href="https://sosy-lab.github.io/java-common-lib/api/"/>

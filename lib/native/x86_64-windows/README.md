@@ -3,7 +3,7 @@ This file is part of JavaSMT,
 an API wrapper for a collection of SMT solvers:
 https://github.com/sosy-lab/java-smt
 
-SPDX-FileCopyrightText: 2025 Dirk Beyer <https://www.sosy-lab.org>
+SPDX-FileCopyrightText: 2026 Dirk Beyer <https://www.sosy-lab.org>
 
 SPDX-License-Identifier: Apache-2.0
 -->
@@ -40,8 +40,10 @@ For Bitwuzla:
 - `mklink libbitwuzlaj.dll ..\..\java\runtime-bitwuzla\x64\libbitwuzlaj.dll`
 
 For CVC5:
-
 - `mlink libcvc5jni.dll ..\..\java\runtime-cvc5\x64\libcvcjni.so`
+
+For Yices2:
+- `mlink yices2java.dll ..\..\java\runtime-yices2\x64\yices2java.so`
 
 ### With a direct copy of the library:
 
@@ -62,8 +64,10 @@ For Bitwuzla:
 - `copy ..\..\java\runtime-bitwuzla\x64\libbitwuzlaj.dll libbitwuzlaj.dll`
 
 For CVC5:
-
 - `copy ..\..\java\runtime-cvc5\x64\libcvc5jni.dll libcvc5jni.dll`
+
+For Yices2:
+- `copy ..\..\java\runtime-yices2\x64\yices2java.dll yices2java.dll`
 
 Or simply use a wildcard:
 - `copy ..\..\java\runtime-*\*dll .\`

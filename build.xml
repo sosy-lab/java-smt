@@ -66,11 +66,11 @@ SPDX-License-Identifier: Apache-2.0
     <import file="build/build-spotbugs.xml"/>
     <import file="build/build-publish.xml"/>
     <import file="build/build-publish-solvers.xml"/>
-    <import file="build/build-maven-publish.xml"/>
+    <import file="build/build-maven-central.xml"/>
 
     <path id="classpath">
         <pathelement location="${class.dir}"/>
-        <fileset dir="${ivy.lib.dir}" includes="runtime-*/*.jar test/*.jar build/annotations.jar build/auto-value-annotations.jar build/error_prone_annotations.jar"/>
+        <fileset dir="${ivy.lib.dir}" includes="runtime-*/*.jar test/*.jar build/error_prone_annotations.jar"/>
     </path>
 
     <!-- Needs to include all annotation processors and error-prone -->
@@ -89,7 +89,7 @@ SPDX-License-Identifier: Apache-2.0
         <delete includeEmptyDirs="true">
             <fileset dir="." includes="${libraryFiles} ${jarFiles} ${docFiles} ${junitFiles}"/>
             <fileset dir="lib/native/source/libmathsat5j" includes="*.so *.dll *.o"/>
-            <fileset dir="lib/native/source/libbitwuzla" includes="install-linux/ install-linux-x64/ install-linux-arm64/ install-windows/ install-windows-x64/ build/ doc/ *.so *.dll bitwuzla_wrap.o"/>
+            <fileset dir="lib/native/source/libbitwuzla" includes="install-linux/ install-linux-x64/ install-linux-arm64/ install-windows/ install-windows-x64/ build/ doc/ *.so *.dll bitwuzla_wrap.o libbitwuzla.nopatch/"/>
             <fileset dir="lib/native/source/opensmt" includes="build/ doc/ install-linux-x64/ install-linux-arm64/ *.o *.so version.h"/>
         </delete>
     </target>

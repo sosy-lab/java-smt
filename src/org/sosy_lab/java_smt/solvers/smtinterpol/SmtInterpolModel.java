@@ -49,8 +49,8 @@ class SmtInterpolModel extends AbstractModel<Term, Sort, Script> {
     Set<FunctionSymbol> usedSymbols = new LinkedHashSet<>();
     for (Term assertedTerm : assertedTerms) {
       for (Term symbol : creator.extractVariablesAndUFs(assertedTerm, true).values()) {
-        if (symbol instanceof ApplicationTerm) {
-          usedSymbols.add(((ApplicationTerm) symbol).getFunction());
+        if (symbol instanceof ApplicationTerm applicationTerm) {
+          usedSymbols.add(applicationTerm.getFunction());
         }
       }
     }
@@ -101,8 +101,7 @@ class SmtInterpolModel extends AbstractModel<Term, Sort, Script> {
     Term evaluation = model.evaluate(array);
 
     // get all assignments for the current array
-    while (evaluation instanceof ApplicationTerm) {
-      ApplicationTerm arrayEval = (ApplicationTerm) evaluation;
+    while (evaluation instanceof ApplicationTerm arrayEval) {
       FunctionSymbol funcDecl = arrayEval.getFunction();
       Term[] params = arrayEval.getParameters();
       if (funcDecl.isIntern() && "store".equals(funcDecl.getName())) {
