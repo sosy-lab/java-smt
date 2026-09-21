@@ -223,6 +223,42 @@ public class JavaSMTMainTest {
   }
 
   @Test
+  public void testRunPopIsAnError() throws IOException {
+    String input = "(declare-fun x () Int)\n(assert (> x 0))\n(pop 1)\n(check-sat)\n";
+    Run r = run("--solver", "SMTINTERPOL", smt2File(input));
+    assertThat(r.out).isEmpty();
+    assertThat(r.err).contains("Command (pop 1) is not supported");
+    assertThat(r.exitCode).isEqualTo(JavaSMTMain.ERROR_EXIT_CODE);
+  }
+
+  @Test
+  public void testRunResetIsAnError() throws IOException {
+    String input = "(declare-fun x () Int)\n(assert (> x 0))\n(reset)\n(check-sat)\n";
+    Run r = run("--solver", "SMTINTERPOL", smt2File(input));
+    assertThat(r.out).isEmpty();
+    assertThat(r.err).contains("Command (reset) is not supported");
+    assertThat(r.exitCode).isEqualTo(JavaSMTMain.ERROR_EXIT_CODE);
+  }
+
+  @Test
+  public void testRunResetAssertionsIsAnError() throws IOException {
+    String input = "(declare-fun x () Int)\n(assert (> x 0))\n(reset-assertions)\n(check-sat)\n";
+    Run r = run("--solver", "SMTINTERPOL", smt2File(input));
+    assertThat(r.out).isEmpty();
+    assertThat(r.err).contains("Command (reset-assertions) is not supported");
+    assertThat(r.exitCode).isEqualTo(JavaSMTMain.ERROR_EXIT_CODE);
+  }
+
+  @Test
+  public void testRunExitBeforeLastCommandIsAnError() throws IOException {
+    String input = "(declare-fun x () Int)\n(assert (> x 0))\n(exit)\n(check-sat)\n";
+    Run r = run("--solver", "SMTINTERPOL", smt2File(input));
+    assertThat(r.out).isEmpty();
+    assertThat(r.err).contains("Command (exit) is only allowed as the last command");
+    assertThat(r.exitCode).isEqualTo(JavaSMTMain.ERROR_EXIT_CODE);
+  }
+
+  @Test
   public void testRunUnsupportedCommandIsAnError() throws IOException {
     String input = "(declare-fun x () Int)\n(push 1)\n(assert (> x 0))\n(check-sat)\n";
     Run r = run("--solver", "SMTINTERPOL", smt2File(input));

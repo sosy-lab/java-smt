@@ -17,6 +17,7 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
@@ -140,19 +141,16 @@ public final class JavaSMTMain {
       return ERROR_EXIT_CODE;
     }
 
-    // The parser silently ignores everything that is not a declaration, definition, or assertion,
-    // so an empty or unparsable file would be reported as sat. Every benchmark that asks a question
-    // contains (check-sat), so we require it.
-    final boolean hasCheckSat;
+    final Optional<String> scriptError;
     try {
-      hasCheckSat = containsCheckSat(input);
+      scriptError = checkScript(input);
     } catch (IllegalArgumentException e) {
       // The tokenizer rejects syntactically broken input, e.g., unbalanced parentheses.
       Output.error(err, "Could not parse SMT2 file: %s", describe(e));
       return ERROR_EXIT_CODE;
     }
-    if (!hasCheckSat) {
-      Output.error(err, "SMT2 file contains no (check-sat) command: %s", options.smt2File);
+    if (scriptError.isPresent()) {
+      Output.error(err, "%s: %s", scriptError.orElseThrow(), options.smt2File);
       return ERROR_EXIT_CODE;
     }
 
@@ -227,13 +225,47 @@ public final class JavaSMTMain {
   /** Matches the commands <code>(check-sat)</code> and <code>(check-sat-assuming ..)</code>. */
   private static final Pattern CHECK_SAT_COMMAND = Pattern.compile("\\(\\s*check-sat[\\S\\s]*");
 
-  private static boolean containsCheckSat(String input) {
+  /**
+   * Checks the commands of the script for those that cannot be handled.
+   *
+   * <p>The parser silently ignores everything that is not a declaration, definition, or assertion,
+   * so an empty or unparsable file would be reported as sat. Every benchmark that asks a question
+   * contains (check-sat), so we require it.
+   *
+   * @return an error message if the script cannot be handled
+   * @throws IllegalArgumentException if the tokenizer rejects the script, e.g., for unbalanced
+   *     parentheses
+   */
+  private static Optional<String> checkScript(String input) {
+    // TODO: parseAll does not track the assertion stack, i.e., (push ...) and (pop ...) are not
+    // applied, and (reset) and (reset-assertions) are ignored. The assertions of a script using
+    // these commands can therefore not be reconstructed, and such scripts are rejected here for
+    // now.
+    // The same holds for (exit) that is not the last command. To be supported once parseAll
+    // handles the assertion stack and resets.
+    boolean hasCheckSat = false;
+    boolean afterExit = false;
     for (String token : SMTLibTokenizer.of(input)) {
-      if (CHECK_SAT_COMMAND.matcher(token).matches()) {
-        return true;
+      if (afterExit) {
+        return Optional.of("Command (exit) is only allowed as the last command in the SMT2 file");
+      }
+      if (SMTLibTokenizer.isPopToken(token)
+          || SMTLibTokenizer.isResetToken(token)
+          || SMTLibTokenizer.isResetAssertionsToken(token)) {
+        return Optional.of(
+            "Command "
+                + token
+                + " is not supported, the assertion stack is not tracked when parsing SMT2 files");
+      } else if (SMTLibTokenizer.isExitToken(token)) {
+        afterExit = true;
+      } else if (CHECK_SAT_COMMAND.matcher(token).matches()) {
+        hasCheckSat = true;
       }
     }
-    return false;
+    if (!hasCheckSat) {
+      return Optional.of("SMT2 file contains no (check-sat) command");
+    }
+    return Optional.empty();
   }
 
   /** Creates a logger that writes messages of level INFO and above to the given output. */
