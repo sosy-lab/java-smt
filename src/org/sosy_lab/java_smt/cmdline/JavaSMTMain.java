@@ -13,6 +13,7 @@ package org.sosy_lab.java_smt.cmdline;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.Files;
+import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Locale;
@@ -45,14 +46,28 @@ import org.sosy_lab.java_smt.basicimpl.SMTLibTokenizer;
  * and reports the result (sat/unsat/unknown).
  *
  * <p>Contract for callers such as benchmarking frameworks: exactly one of <code>sat</code>, <code>
- * unsat</code>, or <code>unknown</code> is printed to stdout, all diagnostics and logging go to
- * stderr. The exit code is 0 for <code>sat</code> and <code>unsat</code>, and {@link
- * #ERROR_EXIT_CODE} for <code>unknown</code> and for all errors.
+ * unsat</code>, or <code>unknown</code> is printed to stdout, or nothing in case of an error. All
+ * diagnostics and logging go to stderr. The exit code is 0 for <code>sat</code> and <code>unsat
+ * </code>, and {@link #ERROR_EXIT_CODE} for <code>unknown</code> and for all errors. If the JVM is
+ * terminated by a signal, the exit code is the one of the JVM, e.g., 143 for SIGTERM.
  */
 public final class JavaSMTMain {
 
   /** Exit code for unknown results and for all errors. */
   public static final int ERROR_EXIT_CODE = 1;
+
+  /** The solver that is used if none is given on the command line. */
+  static final Solvers DEFAULT_SOLVER = Solvers.SMTINTERPOL;
+
+  private static final String COULD_NOT_PARSE_FILE = "Could not parse SMT2 file";
+  private static final String INVALID_CONFIGURATION = "Invalid configuration: %s";
+
+  /** Matches exactly the command <code>(check-sat)</code>. */
+  private static final Pattern CHECK_SAT_COMMAND = Pattern.compile("\\(\\s*check-sat\\s*\\)");
+
+  /** Matches every command starting with <code>check-sat</code>, e.g., check-sat-assuming. */
+  private static final Pattern CHECK_SAT_LIKE_COMMAND =
+      Pattern.compile("\\(\\s*check-sat[\\S\\s]*");
 
   /**
    * Main method for running JavaSMT from command line.
@@ -71,6 +86,11 @@ public final class JavaSMTMain {
     int exitCode = run(args, System.out, System.err, shutdownManager.getNotifier());
     System.out.flush();
     System.err.flush();
+    // System.out and System.err do not throw on I/O errors but only record them internally,
+    // so the result might not have been delivered even though nothing was reported.
+    if (System.out.checkError() || System.err.checkError()) {
+      exitCode = ERROR_EXIT_CODE;
+    }
 
     // The result is reported, the hook must not delay the exit anymore.
     shutdownHook.disableAndStop();
@@ -82,29 +102,32 @@ public final class JavaSMTMain {
    * {@link #main(String[])}, but writes to the given streams and returns the exit code instead of
    * terminating the JVM, such that it can be used from tests.
    *
-   * @param args Command-line arguments: [--solver SOLVER] [--logic LOGIC] file.smt2
-   * @param out output for the result, i.e., sat, unsat, unknown, or the help message
-   * @param err output for diagnostics and logging
-   * @param shutdownNotifier a shutdown request aborts the solver, and unknown is reported
+   * @param pArgs Command-line arguments: [--solver SOLVER] [--logic LOGIC] file.smt2
+   * @param pOut output for the result, i.e., sat, unsat, unknown, or the help message
+   * @param pErr output for diagnostics and logging
+   * @param pShutdownNotifier a shutdown request aborts the solver, and unknown is reported
    * @return exit code, 0 for sat and unsat, {@link #ERROR_EXIT_CODE} otherwise
    */
   public static int run(
-      String[] args, Appendable out, Appendable err, ShutdownNotifier shutdownNotifier) {
-    if (args.length == 0) {
+      String[] pArgs, Appendable pOut, Appendable pErr, ShutdownNotifier pShutdownNotifier) {
+    final String[] args;
+    if (pArgs.length == 0) {
       // be nice to user
-      args = new String[] {"--help"};
+      args = new String[] {CmdLineArguments.HELP_ARGUMENT};
+    } else {
+      args = pArgs;
     }
 
     final Map<String, String> cmdLineOptions;
     try {
       cmdLineOptions = CmdLineArguments.processArguments(args);
     } catch (InvalidCmdlineArgumentException e) {
-      Output.error(err, "Could not process command line arguments: %s", e.getMessage());
+      Output.error(pErr, "Could not process command line arguments: %s", e.getMessage());
       return ERROR_EXIT_CODE;
     }
 
     if (cmdLineOptions.remove(CmdLineArguments.HELP_OPTION) != null) {
-      CmdLineArguments.printHelp(out);
+      CmdLineArguments.printHelp(pOut);
       return 0;
     }
 
@@ -114,30 +137,31 @@ public final class JavaSMTMain {
       config = Configuration.builder().setOptions(cmdLineOptions).build();
       options = new MainOptions(config);
     } catch (InvalidConfigurationException e) {
-      Output.error(err, "Invalid configuration: %s", e.getMessage());
+      Output.error(pErr, INVALID_CONFIGURATION, describe(e));
       return ERROR_EXIT_CODE;
     }
 
     if (options.smt2File == null) {
-      Output.error(err, "No SMT2 file given, see --help for usage.");
+      Output.error(pErr, "No SMT2 file given, see --help for usage.");
       return ERROR_EXIT_CODE;
     }
 
-    LogManager logManager = createLogManager(err);
+    LogManager logManager = createLogManager(pErr);
 
     if (cmdLineOptions.containsKey(CmdLineArguments.LOGIC_OPTION)
         && options.solver != Solvers.OPENSMT) {
-      logManager.log(
+      logManager.logf(
           Level.WARNING,
-          "Option --logic is only effective with OpenSMT solver, but solver is set to",
-          options.solver + ". The logic setting will be ignored.");
+          "Option --logic is only effective with OpenSMT solver, but solver is set to %s."
+              + " The logic setting will be ignored.",
+          options.solver);
     }
 
     final String input;
     try {
       input = Files.readString(Path.of(options.smt2File));
-    } catch (IOException e) {
-      Output.error(err, "Could not read SMT2 file: %s", e.getMessage());
+    } catch (IOException | InvalidPathException e) {
+      Output.error(pErr, "Could not read SMT2 file: %s", describe(e));
       return ERROR_EXIT_CODE;
     }
 
@@ -146,84 +170,98 @@ public final class JavaSMTMain {
       scriptError = checkScript(input);
     } catch (IllegalArgumentException e) {
       // The tokenizer rejects syntactically broken input, e.g., unbalanced parentheses.
-      Output.error(err, "Could not parse SMT2 file: %s", describe(e));
+      Output.error(pErr, COULD_NOT_PARSE_FILE + ": %s", describe(e));
       return ERROR_EXIT_CODE;
     }
     if (scriptError.isPresent()) {
-      Output.error(err, "%s: %s", scriptError.orElseThrow(), options.smt2File);
+      Output.error(pErr, "%s: %s", scriptError.orElseThrow(), options.smt2File);
       return ERROR_EXIT_CODE;
     }
 
-    return solve(config, logManager, shutdownNotifier, options.solver, input, out, err);
+    return solve(config, logManager, pShutdownNotifier, options.solver, input, pOut, pErr);
   }
 
+  /**
+   * Parses the assertions of the script with the given solver and checks their satisfiability.
+   *
+   * @return exit code, 0 for sat and unsat, {@link #ERROR_EXIT_CODE} otherwise
+   */
   private static int solve(
-      Configuration config,
-      LogManager logManager,
-      ShutdownNotifier shutdownNotifier,
-      Solvers solver,
-      String input,
-      Appendable out,
-      Appendable err) {
+      Configuration pConfig,
+      LogManager pLogManager,
+      ShutdownNotifier pShutdownNotifier,
+      Solvers pSolver,
+      String pInput,
+      Appendable pOut,
+      Appendable pErr) {
 
     try (SolverContext context =
-        SolverContextFactory.createSolverContext(config, logManager, shutdownNotifier, solver)) {
+        SolverContextFactory.createSolverContext(
+            pConfig, pLogManager, pShutdownNotifier, pSolver)) {
 
       // Parse before creating the prover: Princess does not know symbols that are declared after
       // the prover environment was created.
       final List<BooleanFormula> formulas;
       try {
-        formulas = context.getFormulaManager().parseAll(input);
+        formulas = context.getFormulaManager().parseAll(pInput);
       } catch (IllegalArgumentException e) {
         // All parsers report input they cannot handle like this: syntax errors, undeclared
         // symbols, type errors, unsupported sorts or commands.
-        Output.error(err, "Could not parse SMT2 file with %s: %s", solver, describe(e));
+        Output.error(pErr, COULD_NOT_PARSE_FILE + " with %s: %s", pSolver, describe(e));
         return ERROR_EXIT_CODE;
       } catch (UnsupportedOperationException e) {
         // Solvers without a parser for SMT-LIB2, e.g., Yices2.
+        final String details;
+        if (e.getMessage() == null) {
+          details = "";
+        } else {
+          details = " " + e.getMessage();
+        }
         Output.error(
-            err,
-            "Solver %s does not support parsing SMT-LIB2 input.%s",
-            solver,
-            e.getMessage() == null ? "" : " " + e.getMessage());
+            pErr, "Solver %s does not support parsing SMT-LIB2 input.%s", pSolver, details);
         return ERROR_EXIT_CODE;
       }
       // Any other exception is unexpected, e.g., a bug in a solver binding, and is intentionally
       // not caught, such that it terminates the program with a stack trace on stderr.
 
-      boolean isUnsat;
+      final SolverResult result;
       try (ProverEnvironment prover = context.newProverEnvironment()) {
         for (BooleanFormula formula : formulas) {
           prover.addConstraint(formula);
         }
-        isUnsat = prover.isUnsat();
+        if (prover.isUnsat()) {
+          result = SolverResult.UNSAT;
+        } else {
+          result = SolverResult.SAT;
+        }
       }
-      Output.println(out, isUnsat ? "unsat" : "sat");
+      Output.println(pOut, result.toString());
       return 0;
 
     } catch (InvalidConfigurationException e) {
-      Output.error(err, "Invalid configuration: %s", describe(e));
+      Output.error(pErr, INVALID_CONFIGURATION, describe(e));
       return ERROR_EXIT_CODE;
     } catch (InterruptedException e) {
-      // Thrown by the solver after a shutdown request, see ShutdownHook.
-      String reason = shutdownNotifier.shouldShutdown() ? shutdownNotifier.getReason() : "";
-      logManager.log(Level.WARNING, "SMT execution was interrupted.", reason);
-      Output.println(out, "unknown");
+      // Thrown by the solver after a shutdown request, see ShutdownHook. The exception carries
+      // the reason of the shutdown request.
+      pLogManager.logUserException(Level.WARNING, e, "SMT execution was interrupted");
+      Output.println(pOut, SolverResult.UNKNOWN.toString());
       return ERROR_EXIT_CODE;
     } catch (SolverException e) {
-      logManager.logUserException(Level.SEVERE, e, "Error executing SMT2 solver");
-      Output.println(out, "unknown");
+      pLogManager.logUserException(Level.SEVERE, e, "Error executing SMT2 solver");
+      Output.println(pOut, SolverResult.UNKNOWN.toString());
       return ERROR_EXIT_CODE;
     }
   }
 
   /** The message of an exception, or its class if it has no message. */
-  private static String describe(Throwable e) {
-    return e.getMessage() != null ? e.getMessage() : e.getClass().getSimpleName();
+  private static String describe(Throwable pException) {
+    if (pException.getMessage() != null) {
+      return pException.getMessage();
+    } else {
+      return pException.getClass().getSimpleName();
+    }
   }
-
-  /** Matches the commands <code>(check-sat)</code> and <code>(check-sat-assuming ..)</code>. */
-  private static final Pattern CHECK_SAT_COMMAND = Pattern.compile("\\(\\s*check-sat[\\S\\s]*");
 
   /**
    * Checks the commands of the script for those that cannot be handled.
@@ -236,47 +274,67 @@ public final class JavaSMTMain {
    * @throws IllegalArgumentException if the tokenizer rejects the script, e.g., for unbalanced
    *     parentheses
    */
-  private static Optional<String> checkScript(String input) {
+  private static Optional<String> checkScript(String pInput) {
     // TODO: parseAll does not track the assertion stack, i.e., (push ...) and (pop ...) are not
     // applied, and (reset) and (reset-assertions) are ignored. The assertions of a script using
     // these commands can therefore not be reconstructed, and such scripts are rejected here for
-    // now.
-    // The same holds for (exit) that is not the last command. To be supported once parseAll
-    // handles the assertion stack and resets.
-    boolean hasCheckSat = false;
+    // now. The same holds for (exit) that is not the last command.
+    // Furthermore, each (check-sat) is a separate query over the assertions on the stack at that
+    // point, but we perform a single check over all assertions of the script, so only one
+    // (check-sat) is allowed, no assertion may follow it, and (check-sat-assuming ...) is not
+    // supported.
+    // To be supported once parseAll handles the assertion stack, resets, and check-sat commands.
+    int checkSatCount = 0;
     boolean afterExit = false;
-    for (String token : SMTLibTokenizer.of(input)) {
+    for (String token : SMTLibTokenizer.of(pInput)) {
       if (afterExit) {
         return Optional.of("Command (exit) is only allowed as the last command in the SMT2 file");
       }
-      if (SMTLibTokenizer.isPopToken(token)
-          || SMTLibTokenizer.isResetToken(token)
-          || SMTLibTokenizer.isResetAssertionsToken(token)) {
+      if (!token.startsWith("(")) {
+        // The parser silently ignores everything that is not a command.
+        return Optional.of(String.format("Unexpected input '%s' in the SMT2 file", token));
+      }
+      if (SMTLibTokenizer.isForbiddenToken(token)) {
+        // push, pop, reset-assertions, reset
         return Optional.of(
-            "Command "
-                + token
-                + " is not supported, the assertion stack is not tracked when parsing SMT2 files");
+            String.format(
+                "Command %s is not supported, the assertion stack is not tracked when parsing"
+                    + " SMT2 files",
+                token));
       } else if (SMTLibTokenizer.isExitToken(token)) {
         afterExit = true;
       } else if (CHECK_SAT_COMMAND.matcher(token).matches()) {
-        hasCheckSat = true;
+        checkSatCount++;
+      } else if (CHECK_SAT_LIKE_COMMAND.matcher(token).matches()) {
+        return Optional.of(
+            String.format("Command %s is not supported, only (check-sat) is supported", token));
+      } else if (SMTLibTokenizer.isAssertToken(token) && checkSatCount > 0) {
+        return Optional.of(
+            "Command (assert ...) after (check-sat) is not supported, all assertions have to"
+                + " precede (check-sat)");
       }
     }
-    if (!hasCheckSat) {
+    if (checkSatCount == 0) {
       return Optional.of("SMT2 file contains no (check-sat) command");
+    }
+    if (checkSatCount > 1) {
+      return Optional.of(
+          String.format(
+              "Only one (check-sat) command is supported, but the SMT2 file contains %d",
+              checkSatCount));
     }
     return Optional.empty();
   }
 
   /** Creates a logger that writes messages of level INFO and above to the given output. */
-  private static LogManager createLogManager(Appendable err) {
+  private static LogManager createLogManager(Appendable pErr) {
     Handler handler =
         new Handler() {
           @Override
-          public void publish(LogRecord record) {
-            if (isLoggable(record)) {
+          public void publish(LogRecord pRecord) {
+            if (isLoggable(pRecord)) {
               try {
-                err.append(getFormatter().format(record));
+                pErr.append(getFormatter().format(pRecord));
               } catch (IOException e) {
                 throw new UncheckedIOException(e);
               }
@@ -297,8 +355,8 @@ public final class JavaSMTMain {
   @Options
   private static final class MainOptions {
 
-    private MainOptions(Configuration config) throws InvalidConfigurationException {
-      config.inject(this);
+    private MainOptions(Configuration pConfig) throws InvalidConfigurationException {
+      pConfig.inject(this);
     }
 
     @Option(
@@ -311,7 +369,7 @@ public final class JavaSMTMain {
         secure = true,
         name = CmdLineArguments.SOLVER_OPTION,
         description = "The SMT solver to use")
-    private Solvers solver = Solvers.SMTINTERPOL;
+    private Solvers solver = DEFAULT_SOLVER;
   }
 
   private JavaSMTMain() {}

@@ -14,13 +14,20 @@ import static com.google.common.base.Preconditions.checkState;
 import static org.sosy_lab.java_smt.cmdline.CmdLineArguments.putIfNotExistent;
 
 import com.google.common.base.Joiner;
+import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableSet;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
-import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
+/**
+ * A command-line argument with one or more names, e.g., <code>--solver</code> and <code>-solver
+ * </code>. The first name is the main name that is shown in the help message. Sorting and equality
+ * are both based on the sequence of names.
+ */
 abstract class CmdLineArgument implements Comparable<CmdLineArgument> {
 
   private final ImmutableSet<String> names;
@@ -36,33 +43,35 @@ abstract class CmdLineArgument implements Comparable<CmdLineArgument> {
     return this;
   }
 
+  /** The first name given in the constructor. */
   String getMainName() {
     return names.iterator().next();
   }
 
   @Override
-  public int compareTo(CmdLineArgument other) {
-    return names.toString().compareTo(other.names.toString());
+  public int compareTo(CmdLineArgument pOther) {
+    // Consistent with equals(): the string of an ImmutableSet lists the names in insertion order.
+    return names.toString().compareTo(pOther.names.toString());
   }
 
   @Override
-  public boolean equals(Object o) {
-    if (this == o) {
+  public boolean equals(@Nullable Object pOther) {
+    if (this == pOther) {
       return true;
     }
-    return o instanceof CmdLineArgument other && names.equals(other.names);
+    return pOther instanceof CmdLineArgument other && names.asList().equals(other.names.asList());
   }
 
   @Override
   public int hashCode() {
-    return names.hashCode();
+    return names.asList().hashCode();
   }
 
   @Override
   public String toString() {
     String s =
-        com.google.common.collect.FluentIterable.from(names)
-            .filter(arg -> !CmdLineArguments.isOldStyleArgument(arg))
+        FluentIterable.from(names)
+            .filter(pName -> !CmdLineArguments.isOldStyleArgument(pName))
             .join(Joiner.on("/"));
     if (description.isEmpty()) {
       return s;
@@ -71,51 +80,62 @@ abstract class CmdLineArgument implements Comparable<CmdLineArgument> {
     }
   }
 
-  boolean apply(Map<String, String> properties, String currentArg, Iterator<String> argsIt)
+  /**
+   * Applies this argument if it matches the current argument.
+   *
+   * @return whether the current argument matched one of the names of this argument
+   */
+  boolean apply(Map<String, String> pProperties, String pCurrentArg, Iterator<String> pArgsIt)
       throws InvalidCmdlineArgumentException {
-    if (names.contains(currentArg)) {
-      apply0(properties, currentArg, argsIt);
+    if (names.contains(pCurrentArg)) {
+      apply0(pProperties, pCurrentArg, pArgsIt);
       return true;
     }
     return false;
   }
 
-  abstract void apply0(Map<String, String> properties, String currentArg, Iterator<String> argsIt)
+  abstract void apply0(
+      Map<String, String> pProperties, String pCurrentArg, Iterator<String> pArgsIt)
       throws InvalidCmdlineArgumentException;
 
+  /** A command-line argument with one value that is given as the next argument. */
   static class CmdLineArgument1 extends CmdLineArgument {
 
-    private String option;
+    private @Nullable String option;
 
     CmdLineArgument1(String... pNames) {
       super(pNames);
     }
 
+    /** Sets the name of the option that receives the value of this argument. */
+    @CanIgnoreReturnValue
     CmdLineArgument1 settingOption(String pOption) {
       option = pOption;
       return this;
     }
 
     @Override
-    final void apply0(Map<String, String> properties, String currentArg, Iterator<String> args)
+    final void apply0(Map<String, String> pProperties, String pCurrentArg, Iterator<String> pArgsIt)
         throws InvalidCmdlineArgumentException {
-      if (args.hasNext()) {
-        handleArg(properties, args.next());
+      if (pArgsIt.hasNext()) {
+        handleArg(pProperties, pArgsIt.next());
       } else {
-        throw new InvalidCmdlineArgumentException(currentArg + " argument missing.");
+        throw new InvalidCmdlineArgumentException(pCurrentArg + " argument missing.");
       }
     }
 
     void handleArg(Map<String, String> pProperties, String pArgValue)
         throws InvalidCmdlineArgumentException {
-      checkState(option != null);
+      checkState(option != null, "settingOption() has to be called first");
       putIfNotExistent(pProperties, option, pArgValue);
     }
   }
 
+  /** A command-line argument that sets some properties to fixed values. */
   static class PropertyAddingCmdLineArgument extends CmdLineArgument {
 
-    private final Map<String, String> additionalIfNotExistentArgs = new HashMap<>();
+    // Insertion order determines which conflict is reported first.
+    private final Map<String, String> additionalIfNotExistentArgs = new LinkedHashMap<>();
 
     PropertyAddingCmdLineArgument(String... pNames) {
       super(pNames);
@@ -128,10 +148,10 @@ abstract class CmdLineArgument implements Comparable<CmdLineArgument> {
     }
 
     @Override
-    void apply0(Map<String, String> properties, String currentArg, Iterator<String> args)
+    void apply0(Map<String, String> pProperties, String pCurrentArg, Iterator<String> pArgsIt)
         throws InvalidCmdlineArgumentException {
       for (Entry<String, String> e : additionalIfNotExistentArgs.entrySet()) {
-        putIfNotExistent(properties, e.getKey(), e.getValue());
+        putIfNotExistent(pProperties, e.getKey(), e.getValue());
       }
     }
   }

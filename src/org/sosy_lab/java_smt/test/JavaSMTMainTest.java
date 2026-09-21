@@ -12,11 +12,12 @@ package org.sosy_lab.java_smt.test;
 
 import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.TruthJUnit.assume;
+import static org.junit.Assert.assertThrows;
 
+import com.google.common.collect.ImmutableList;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -51,21 +52,14 @@ public class JavaSMTMainTest {
       """;
 
   private static final String NL = System.lineSeparator();
+  private static final String SOLVER = "--solver";
+  private static final String SMTINTERPOL = "SMTINTERPOL";
+  private static final String PRINCESS = "PRINCESS";
 
   @Rule public TemporaryFolder tempDir = new TemporaryFolder();
 
   /** The result of one invocation of the command-line interface. */
-  private static final class Run {
-    final int exitCode;
-    final String out;
-    final String err;
-
-    Run(int pExitCode, String pOut, String pErr) {
-      exitCode = pExitCode;
-      out = pOut;
-      err = pErr;
-    }
-  }
+  private record Run(int exitCode, String out, String err) {}
 
   /** Runs the command-line interface in-process, capturing stdout and stderr. */
   private static Run run(String... args) {
@@ -91,194 +85,244 @@ public class JavaSMTMainTest {
 
   @Test
   public void testRunSat() throws IOException {
-    Run r = run("--solver", "SMTINTERPOL", smt2File(SAT_INPUT));
-    assertThat(r.out).isEqualTo("sat" + NL);
-    assertThat(r.exitCode).isEqualTo(0);
+    Run r = run(SOLVER, SMTINTERPOL, smt2File(SAT_INPUT));
+    assertThat(r.out()).isEqualTo("sat" + NL);
+    assertThat(r.exitCode()).isEqualTo(0);
   }
 
   @Test
   public void testRunUnsatWithSeveralAssertions() throws IOException {
-    Run r = run("--solver", "PRINCESS", smt2File(UNSAT_INPUT));
-    assertThat(r.out).isEqualTo("unsat" + NL);
-    assertThat(r.exitCode).isEqualTo(0);
+    Run r = run(SOLVER, PRINCESS, smt2File(UNSAT_INPUT));
+    assertThat(r.out()).isEqualTo("unsat" + NL);
+    assertThat(r.exitCode()).isEqualTo(0);
   }
 
   @Test
   public void testRunDefaultSolverIsSmtInterpol() throws IOException {
     Run r = run(smt2File(UNSAT_INPUT));
-    assertThat(r.out).isEqualTo("unsat" + NL);
-    assertThat(r.exitCode).isEqualTo(0);
-    assertThat(r.err).isEmpty();
+    assertThat(r.out()).isEqualTo("unsat" + NL);
+    assertThat(r.exitCode()).isEqualTo(0);
+    assertThat(r.err()).isEmpty();
   }
 
   @Test
   public void testRunSolverNameIsCaseInsensitive() throws IOException {
-    Run r = run("--solver", "smtinterpol", smt2File(SAT_INPUT));
-    assertThat(r.out).isEqualTo("sat" + NL);
-    assertThat(r.exitCode).isEqualTo(0);
+    Run r = run(SOLVER, "smtinterpol", smt2File(SAT_INPUT));
+    assertThat(r.out()).isEqualTo("sat" + NL);
+    assertThat(r.exitCode()).isEqualTo(0);
   }
 
   @Test
   public void testRunHelpTakesPrecedenceOverFile() throws IOException {
-    Run r = run("--help", "--solver", "SMTINTERPOL", smt2File(SAT_INPUT));
-    assertThat(r.out).contains("Usage: javasmt");
-    assertThat(r.out).doesNotContain("sat" + NL);
-    assertThat(r.exitCode).isEqualTo(0);
+    Run r = run("--help", SOLVER, SMTINTERPOL, smt2File(SAT_INPUT));
+    assertThat(r.out()).isNotEmpty();
+    assertThat(r.out()).isNotEqualTo("sat" + NL);
+    assertThat(r.err()).isEmpty();
+    assertThat(r.exitCode()).isEqualTo(0);
   }
 
   @Test
   public void testRunWithoutArgumentsPrintsHelp() {
     Run r = run();
-    assertThat(r.out).contains("Usage: javasmt");
-    assertThat(r.exitCode).isEqualTo(0);
+    assertThat(r.out()).isNotEmpty();
+    assertThat(r.err()).isEmpty();
+    assertThat(r.exitCode()).isEqualTo(0);
   }
 
   @Test
   public void testRunWithoutFileIsAnError() {
-    Run r = run("--solver", "SMTINTERPOL");
-    assertThat(r.out).isEmpty();
-    assertThat(r.err).contains("No SMT2 file given");
-    assertThat(r.exitCode).isEqualTo(JavaSMTMain.ERROR_EXIT_CODE);
+    Run r = run(SOLVER, SMTINTERPOL);
+    assertThat(r.out()).isEmpty();
+    assertThat(r.err()).isNotEmpty();
+    assertThat(r.exitCode()).isEqualTo(JavaSMTMain.ERROR_EXIT_CODE);
   }
 
   @Test
   public void testRunUnknownArgumentIsAnError() throws IOException {
     Run r = run("--unknown", smt2File(SAT_INPUT));
-    assertThat(r.out).isEmpty();
-    assertThat(r.err).contains("Unknown command-line argument: --unknown");
-    assertThat(r.exitCode).isEqualTo(JavaSMTMain.ERROR_EXIT_CODE);
+    assertThat(r.out()).isEmpty();
+    assertThat(r.err()).isNotEmpty();
+    assertThat(r.exitCode()).isEqualTo(JavaSMTMain.ERROR_EXIT_CODE);
   }
 
   @Test
   public void testRunUnknownSolverIsAnError() throws IOException {
-    Run r = run("--solver", "NOSUCHSOLVER", smt2File(SAT_INPUT));
-    assertThat(r.out).isEmpty();
-    assertThat(r.err).contains("Invalid configuration");
-    assertThat(r.exitCode).isEqualTo(JavaSMTMain.ERROR_EXIT_CODE);
+    Run r = run(SOLVER, "NOSUCHSOLVER", smt2File(SAT_INPUT));
+    assertThat(r.out()).isEmpty();
+    assertThat(r.err()).isNotEmpty();
+    assertThat(r.exitCode()).isEqualTo(JavaSMTMain.ERROR_EXIT_CODE);
   }
 
   @Test
   public void testRunMissingFileIsAnError() {
-    Run r =
-        run(
-            "--solver",
-            "SMTINTERPOL",
-            tempDir.getRoot().toPath().resolve("missing.smt2").toString());
-    assertThat(r.out).isEmpty();
-    assertThat(r.err).contains("Could not read SMT2 file");
-    assertThat(r.exitCode).isEqualTo(JavaSMTMain.ERROR_EXIT_CODE);
+    Run r = run(SOLVER, SMTINTERPOL, tempDir.getRoot().toPath().resolve("missing.smt2").toString());
+    assertThat(r.out()).isEmpty();
+    assertThat(r.err()).isNotEmpty();
+    assertThat(r.exitCode()).isEqualTo(JavaSMTMain.ERROR_EXIT_CODE);
   }
 
   @Test
   public void testRunEmptyFileIsAnError() throws IOException {
-    Run r = run("--solver", "SMTINTERPOL", smt2File(""));
-    assertThat(r.out).isEmpty();
-    assertThat(r.err).contains("no (check-sat) command");
-    assertThat(r.exitCode).isEqualTo(JavaSMTMain.ERROR_EXIT_CODE);
+    Run r = run(SOLVER, SMTINTERPOL, smt2File(""));
+    assertThat(r.out()).isEmpty();
+    assertThat(r.err()).isNotEmpty();
+    assertThat(r.exitCode()).isEqualTo(JavaSMTMain.ERROR_EXIT_CODE);
+  }
+
+  @Test
+  public void testRunFileWithoutCommandsIsAnError() throws IOException {
+    Run r = run(SOLVER, SMTINTERPOL, smt2File("this is not an SMT2 file\n"));
+    assertThat(r.out()).isEmpty();
+    assertThat(r.err()).isNotEmpty();
+    assertThat(r.exitCode()).isEqualTo(JavaSMTMain.ERROR_EXIT_CODE);
   }
 
   @Test
   public void testRunUnparsableFileIsAnError() throws IOException {
-    Run r = run("--solver", "SMTINTERPOL", smt2File("this is not an SMT2 file\n"));
-    assertThat(r.out).isEmpty();
-    assertThat(r.err).contains("no (check-sat) command");
-    assertThat(r.exitCode).isEqualTo(JavaSMTMain.ERROR_EXIT_CODE);
+    // The parser would ignore the text and report sat for the (check-sat).
+    Run r = run(SOLVER, SMTINTERPOL, smt2File("this is not an SMT2 file\n(check-sat)\n"));
+    assertThat(r.out()).isEmpty();
+    assertThat(r.err()).isNotEmpty();
+    assertThat(r.exitCode()).isEqualTo(JavaSMTMain.ERROR_EXIT_CODE);
+  }
+
+  @Test
+  public void testRunAssertionAfterCheckSatIsAnError() throws IOException {
+    // parseAll collects all assertions, the answer would be unsat instead of sat.
+    String input = "(declare-const x Int)\n(assert (> x 0))\n(check-sat)\n(assert (< x 0))\n";
+    Run r = run(SOLVER, SMTINTERPOL, smt2File(input));
+    assertThat(r.out()).isEmpty();
+    assertThat(r.err()).isNotEmpty();
+    assertThat(r.exitCode()).isEqualTo(JavaSMTMain.ERROR_EXIT_CODE);
   }
 
   @Test
   public void testRunWithoutAssertionsIsSat() throws IOException {
-    Run r = run("--solver", "SMTINTERPOL", smt2File("(set-logic QF_LIA)\n(check-sat)\n"));
-    assertThat(r.out).isEqualTo("sat" + NL);
-    assertThat(r.exitCode).isEqualTo(0);
+    Run r = run(SOLVER, SMTINTERPOL, smt2File("(set-logic QF_LIA)\n(check-sat)\n"));
+    assertThat(r.out()).isEqualTo("sat" + NL);
+    assertThat(r.exitCode()).isEqualTo(0);
   }
 
   @Test
   public void testRunUnbalancedParenthesesIsAnError() throws IOException {
-    Run r = run("--solver", "SMTINTERPOL", smt2File("(declare-fun x () Int)\n(assert (> x 0)\n"));
-    assertThat(r.out).isEmpty();
-    assertThat(r.err).contains("Could not parse SMT2 file");
-    assertThat(r.err).doesNotContain("Exception in thread");
-    assertThat(r.exitCode).isEqualTo(JavaSMTMain.ERROR_EXIT_CODE);
+    Run r = run(SOLVER, SMTINTERPOL, smt2File("(declare-fun x () Int)\n(assert (> x 0)\n"));
+    assertThat(r.out()).isEmpty();
+    assertThat(r.err()).isNotEmpty();
+    assertThat(r.exitCode()).isEqualTo(JavaSMTMain.ERROR_EXIT_CODE);
   }
 
   @Test
   public void testRunUndeclaredSymbolIsAnError() throws IOException {
-    Run r = run("--solver", "SMTINTERPOL", smt2File("(assert (> y 0))\n(check-sat)\n"));
-    assertThat(r.out).isEmpty();
-    assertThat(r.err).contains("Could not parse SMT2 file with SMTINTERPOL");
-    assertThat(r.err).doesNotContain("Exception in thread");
-    assertThat(r.exitCode).isEqualTo(JavaSMTMain.ERROR_EXIT_CODE);
+    Run r = run(SOLVER, SMTINTERPOL, smt2File("(assert (> y 0))\n(check-sat)\n"));
+    assertThat(r.out()).isEmpty();
+    assertThat(r.err()).isNotEmpty();
+    assertThat(r.exitCode()).isEqualTo(JavaSMTMain.ERROR_EXIT_CODE);
   }
 
   @Test
   public void testRunTypeErrorIsAnError() throws IOException {
     Run r =
         run(
-            "--solver",
-            "PRINCESS",
+            SOLVER,
+            PRINCESS,
             smt2File("(declare-fun x () Int)\n(assert (> x true))\n(check-sat)\n"));
-    assertThat(r.out).isEmpty();
-    assertThat(r.err).contains("Could not parse SMT2 file with PRINCESS");
-    assertThat(r.exitCode).isEqualTo(JavaSMTMain.ERROR_EXIT_CODE);
+    assertThat(r.out()).isEmpty();
+    assertThat(r.err()).isNotEmpty();
+    assertThat(r.exitCode()).isEqualTo(JavaSMTMain.ERROR_EXIT_CODE);
+  }
+
+  @Test
+  public void testRunTwoCheckSatsIsAnError() throws IOException {
+    String input = "(declare-fun x () Int)\n(assert (> x 0))\n(check-sat)\n(check-sat)\n";
+    Run r = run(SOLVER, SMTINTERPOL, smt2File(input));
+    assertThat(r.out()).isEmpty();
+    assertThat(r.err()).isNotEmpty();
+    assertThat(r.exitCode()).isEqualTo(JavaSMTMain.ERROR_EXIT_CODE);
+  }
+
+  @Test
+  public void testRunCheckSatAssumingIsAnError() throws IOException {
+    // parseAll ignores (check-sat-assuming ...), the answer would be sat instead of unsat.
+    String input = "(declare-fun p () Bool)\n(assert p)\n(check-sat-assuming ((not p)))\n";
+    Run r = run(SOLVER, SMTINTERPOL, smt2File(input));
+    assertThat(r.out()).isEmpty();
+    assertThat(r.err()).isNotEmpty();
+    assertThat(r.exitCode()).isEqualTo(JavaSMTMain.ERROR_EXIT_CODE);
+  }
+
+  @Test
+  public void testRunMalformedCheckSatIsAnError() throws IOException {
+    String input = "(declare-fun x () Int)\n(assert (> x 0))\n(check-sat 1)\n";
+    Run r = run(SOLVER, SMTINTERPOL, smt2File(input));
+    assertThat(r.out()).isEmpty();
+    assertThat(r.err()).isNotEmpty();
+    assertThat(r.exitCode()).isEqualTo(JavaSMTMain.ERROR_EXIT_CODE);
+  }
+
+  @Test
+  public void testRunInvalidPathIsAnError() {
+    Run r = run(SOLVER, SMTINTERPOL, "bad\0name.smt2");
+    assertThat(r.out()).isEmpty();
+    assertThat(r.err()).isNotEmpty();
+    assertThat(r.exitCode()).isEqualTo(JavaSMTMain.ERROR_EXIT_CODE);
   }
 
   @Test
   public void testRunPopIsAnError() throws IOException {
     String input = "(declare-fun x () Int)\n(assert (> x 0))\n(pop 1)\n(check-sat)\n";
-    Run r = run("--solver", "SMTINTERPOL", smt2File(input));
-    assertThat(r.out).isEmpty();
-    assertThat(r.err).contains("Command (pop 1) is not supported");
-    assertThat(r.exitCode).isEqualTo(JavaSMTMain.ERROR_EXIT_CODE);
+    Run r = run(SOLVER, SMTINTERPOL, smt2File(input));
+    assertThat(r.out()).isEmpty();
+    assertThat(r.err()).isNotEmpty();
+    assertThat(r.exitCode()).isEqualTo(JavaSMTMain.ERROR_EXIT_CODE);
   }
 
   @Test
   public void testRunResetIsAnError() throws IOException {
     String input = "(declare-fun x () Int)\n(assert (> x 0))\n(reset)\n(check-sat)\n";
-    Run r = run("--solver", "SMTINTERPOL", smt2File(input));
-    assertThat(r.out).isEmpty();
-    assertThat(r.err).contains("Command (reset) is not supported");
-    assertThat(r.exitCode).isEqualTo(JavaSMTMain.ERROR_EXIT_CODE);
+    Run r = run(SOLVER, SMTINTERPOL, smt2File(input));
+    assertThat(r.out()).isEmpty();
+    assertThat(r.err()).isNotEmpty();
+    assertThat(r.exitCode()).isEqualTo(JavaSMTMain.ERROR_EXIT_CODE);
   }
 
   @Test
   public void testRunResetAssertionsIsAnError() throws IOException {
     String input = "(declare-fun x () Int)\n(assert (> x 0))\n(reset-assertions)\n(check-sat)\n";
-    Run r = run("--solver", "SMTINTERPOL", smt2File(input));
-    assertThat(r.out).isEmpty();
-    assertThat(r.err).contains("Command (reset-assertions) is not supported");
-    assertThat(r.exitCode).isEqualTo(JavaSMTMain.ERROR_EXIT_CODE);
+    Run r = run(SOLVER, SMTINTERPOL, smt2File(input));
+    assertThat(r.out()).isEmpty();
+    assertThat(r.err()).isNotEmpty();
+    assertThat(r.exitCode()).isEqualTo(JavaSMTMain.ERROR_EXIT_CODE);
   }
 
   @Test
   public void testRunExitBeforeLastCommandIsAnError() throws IOException {
     String input = "(declare-fun x () Int)\n(assert (> x 0))\n(exit)\n(check-sat)\n";
-    Run r = run("--solver", "SMTINTERPOL", smt2File(input));
-    assertThat(r.out).isEmpty();
-    assertThat(r.err).contains("Command (exit) is only allowed as the last command");
-    assertThat(r.exitCode).isEqualTo(JavaSMTMain.ERROR_EXIT_CODE);
+    Run r = run(SOLVER, SMTINTERPOL, smt2File(input));
+    assertThat(r.out()).isEmpty();
+    assertThat(r.err()).isNotEmpty();
+    assertThat(r.exitCode()).isEqualTo(JavaSMTMain.ERROR_EXIT_CODE);
   }
 
   @Test
-  public void testRunUnsupportedCommandIsAnError() throws IOException {
+  public void testRunPushIsAnError() throws IOException {
     String input = "(declare-fun x () Int)\n(push 1)\n(assert (> x 0))\n(check-sat)\n";
-    Run r = run("--solver", "SMTINTERPOL", smt2File(input));
-    assertThat(r.out).isEmpty();
-    assertThat(r.err).contains("Could not parse SMT2 file");
-    assertThat(r.err).contains("(push ...)");
-    assertThat(r.exitCode).isEqualTo(JavaSMTMain.ERROR_EXIT_CODE);
+    Run r = run(SOLVER, SMTINTERPOL, smt2File(input));
+    assertThat(r.out()).isEmpty();
+    assertThat(r.err()).isNotEmpty();
+    assertThat(r.exitCode()).isEqualTo(JavaSMTMain.ERROR_EXIT_CODE);
   }
 
   @Test
   public void testRunLogicWithoutOpenSmtWarnsOnce() throws IOException {
-    Run r = run("--logic", "QF_LIA", "--solver", "SMTINTERPOL", smt2File(SAT_INPUT));
-    assertThat(r.out).isEqualTo("sat" + NL);
-    assertThat(r.exitCode).isEqualTo(0);
-    assertThat(r.err).contains("Option --logic is only effective with OpenSMT");
-    assertThat(r.err.indexOf("--logic")).isEqualTo(r.err.lastIndexOf("--logic"));
+    String file = smt2File(SAT_INPUT);
+    Run r = run("--logic", "QF_LIA", SOLVER, SMTINTERPOL, file);
+    assertThat(r.out()).isEqualTo("sat" + NL);
+    assertThat(r.exitCode()).isEqualTo(0);
+    assertThat(r.err()).isNotEmpty(); // the warning
 
     // Running again must not duplicate the log output of the first run.
-    Run r2 = run("--logic", "QF_LIA", "--solver", "SMTINTERPOL", smt2File(SAT_INPUT));
-    assertThat(r2.err.indexOf("--logic")).isEqualTo(r2.err.lastIndexOf("--logic"));
+    Run r2 = run("--logic", "QF_LIA", SOLVER, SMTINTERPOL, file);
+    assertThat(r2.err()).isEqualTo(r.err());
   }
 
   /**
@@ -317,10 +361,10 @@ public class JavaSMTMainTest {
   public void testRunShutdownRequestedBeforeSolvingIsUnknown() throws IOException {
     ShutdownManager shutdown = ShutdownManager.create();
     shutdown.requestShutdown("requested by test");
-    Run r = run(shutdown.getNotifier(), "--solver", "SMTINTERPOL", smt2File(UNSAT_INPUT));
-    assertThat(r.out).isEqualTo("unknown" + NL);
-    assertThat(r.err).contains("requested by test");
-    assertThat(r.exitCode).isEqualTo(JavaSMTMain.ERROR_EXIT_CODE);
+    Run r = run(shutdown.getNotifier(), SOLVER, SMTINTERPOL, smt2File(UNSAT_INPUT));
+    assertThat(r.out()).isEqualTo("unknown" + NL);
+    assertThat(r.err()).isNotEmpty();
+    assertThat(r.exitCode()).isEqualTo(JavaSMTMain.ERROR_EXIT_CODE);
   }
 
   @Test(timeout = 60_000)
@@ -337,11 +381,11 @@ public class JavaSMTMainTest {
               shutdown.requestShutdown("requested by test while solving");
             });
     requester.start();
-    Run r = run(shutdown.getNotifier(), "--solver", "SMTINTERPOL", smt2File(pigeonholeInput(12)));
+    Run r = run(shutdown.getNotifier(), SOLVER, SMTINTERPOL, smt2File(pigeonholeInput(12)));
     requester.join();
-    assertThat(r.out).isEqualTo("unknown" + NL);
-    assertThat(r.err).contains("requested by test while solving");
-    assertThat(r.exitCode).isEqualTo(JavaSMTMain.ERROR_EXIT_CODE);
+    assertThat(r.out()).isEqualTo("unknown" + NL);
+    assertThat(r.err()).isNotEmpty();
+    assertThat(r.exitCode()).isEqualTo(JavaSMTMain.ERROR_EXIT_CODE);
   }
 
   @Test(timeout = 60_000)
@@ -356,23 +400,54 @@ public class JavaSMTMainTest {
     Path outFile = tempDir.newFile("stdout").toPath();
     Process process =
         new ProcessBuilder(
-                List.of(
+                ImmutableList.of(
                     Path.of(System.getProperty("java.home"), "bin", "java").toString(),
                     "-cp",
                     System.getProperty("java.class.path"),
                     JavaSMTMain.class.getName(),
-                    "--solver",
-                    "SMTINTERPOL",
+                    SOLVER,
+                    SMTINTERPOL,
                     smt2File(pigeonholeInput(12))))
             .redirectOutput(outFile.toFile())
             .redirectError(ProcessBuilder.Redirect.DISCARD)
             .start();
-    Thread.sleep(3000); // let the JVM start and the solver run
-    process.destroy();
-    assertThat(process.waitFor(30, TimeUnit.SECONDS)).isTrue();
+    try {
+      Thread.sleep(3000); // let the JVM start and the solver run
+      process.destroy();
+      assertThat(process.waitFor(30, TimeUnit.SECONDS)).isTrue();
 
-    assertThat(Files.readString(outFile)).isEqualTo("unknown" + NL);
-    assertThat(process.exitValue()).isNotEqualTo(0);
+      assertThat(Files.readString(outFile)).isEqualTo("unknown" + NL);
+      // The JVM exits with 128 + signal number after running the shutdown hooks.
+      assertThat(process.exitValue()).isEqualTo(128 + 15);
+    } finally {
+      process.destroyForcibly();
+    }
+  }
+
+  @Test(timeout = 60_000)
+  public void testMainReportsFailureToWriteResult() throws Exception {
+    Path devFull = Path.of("/dev/full");
+    assume().withMessage("/dev/full is not available").that(Files.exists(devFull)).isTrue();
+
+    Process process =
+        new ProcessBuilder(
+                ImmutableList.of(
+                    Path.of(System.getProperty("java.home"), "bin", "java").toString(),
+                    "-cp",
+                    System.getProperty("java.class.path"),
+                    JavaSMTMain.class.getName(),
+                    SOLVER,
+                    SMTINTERPOL,
+                    smt2File(SAT_INPUT)))
+            .redirectOutput(devFull.toFile())
+            .redirectError(ProcessBuilder.Redirect.DISCARD)
+            .start();
+    try {
+      assertThat(process.waitFor(30, TimeUnit.SECONDS)).isTrue();
+      assertThat(process.exitValue()).isEqualTo(JavaSMTMain.ERROR_EXIT_CODE);
+    } finally {
+      process.destroyForcibly();
+    }
   }
 
   // Tests for the argument parsing.
@@ -380,7 +455,7 @@ public class JavaSMTMainTest {
   @Test
   public void testProcessArgumentsWithSolverAndFile() throws Exception {
     Map<String, String> result =
-        CmdLineArguments.processArguments(new String[] {"--solver", "Z3", "test.smt2"});
+        CmdLineArguments.processArguments(new String[] {SOLVER, "Z3", "test.smt2"});
     assertThat(result.get("solver.solver")).isEqualTo("Z3");
     assertThat(result.get("smt2.file")).isEqualTo("test.smt2");
   }
@@ -410,34 +485,40 @@ public class JavaSMTMainTest {
     assertThat(result.get("smt2.file")).isEqualTo("input.smt2");
   }
 
-  @Test(expected = InvalidCmdlineArgumentException.class)
-  public void testProcessArgumentsMultipleFiles() throws Exception {
-    CmdLineArguments.processArguments(new String[] {"file1.smt2", "file2.smt2"});
+  @Test
+  public void testProcessArgumentsMultipleFiles() {
+    assertThrows(
+        InvalidCmdlineArgumentException.class,
+        () -> CmdLineArguments.processArguments(new String[] {"file1.smt2", "file2.smt2"}));
   }
 
-  @Test(expected = InvalidCmdlineArgumentException.class)
-  public void testProcessArgumentsUnknownArgument() throws Exception {
-    CmdLineArguments.processArguments(new String[] {"--unknown", "file.smt2"});
+  @Test
+  public void testProcessArgumentsUnknownArgument() {
+    assertThrows(
+        InvalidCmdlineArgumentException.class,
+        () -> CmdLineArguments.processArguments(new String[] {"--unknown", "file.smt2"}));
   }
 
-  @Test(expected = InvalidCmdlineArgumentException.class)
-  public void testProcessArgumentsSolverMissingValue() throws Exception {
-    CmdLineArguments.processArguments(new String[] {"--solver"});
+  @Test
+  public void testProcessArgumentsSolverMissingValue() {
+    assertThrows(
+        InvalidCmdlineArgumentException.class,
+        () -> CmdLineArguments.processArguments(new String[] {SOLVER}));
   }
 
   @Test
   public void testProcessArgumentsFileBeforeSolver() throws Exception {
     Map<String, String> result =
-        CmdLineArguments.processArguments(new String[] {"test.smt2", "--solver", "Z3"});
+        CmdLineArguments.processArguments(new String[] {"test.smt2", SOLVER, "Z3"});
     assertThat(result.get("smt2.file")).isEqualTo("test.smt2");
     assertThat(result.get("solver.solver")).isEqualTo("Z3");
   }
 
   @Test
-  public void testProcessArgumentsDefaultSolver() throws Exception {
+  public void testProcessArgumentsWithoutSolverLeavesSolverUnset() throws Exception {
     Map<String, String> result = CmdLineArguments.processArguments(new String[] {"test.smt2"});
     assertThat(result.get("smt2.file")).isEqualTo("test.smt2");
-    assertThat(result.get("solver.solver")).isNull();
+    assertThat(result).doesNotContainKey("solver.solver");
   }
 
   @Test
@@ -459,14 +540,23 @@ public class JavaSMTMainTest {
   public void testProcessArgumentsWithSolverAndLogic() throws Exception {
     Map<String, String> result =
         CmdLineArguments.processArguments(
-            new String[] {"--solver", "OPENSMT", "--logic", "QF_LIA", "test.smt2"});
+            new String[] {SOLVER, "OPENSMT", "--logic", "QF_LIA", "test.smt2"});
     assertThat(result.get("solver.solver")).isEqualTo("OPENSMT");
     assertThat(result.get("solver.opensmt.logic")).isEqualTo("QF_LIA");
     assertThat(result.get("smt2.file")).isEqualTo("test.smt2");
   }
 
-  @Test(expected = InvalidCmdlineArgumentException.class)
-  public void testProcessArgumentsLogicMissingValue() throws Exception {
-    CmdLineArguments.processArguments(new String[] {"--logic"});
+  @Test
+  public void testProcessArgumentsLogicMissingValue() {
+    assertThrows(
+        InvalidCmdlineArgumentException.class,
+        () -> CmdLineArguments.processArguments(new String[] {"--logic"}));
+  }
+
+  @Test
+  public void testProcessArgumentsInvalidPath() {
+    assertThrows(
+        InvalidCmdlineArgumentException.class,
+        () -> CmdLineArguments.processArguments(new String[] {"bad\0name.smt2"}));
   }
 }

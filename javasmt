@@ -30,9 +30,9 @@ if [ $result -eq 127 ]; then
   exit 1
 fi
 if [ $result -ne 0 ]; then
-  echo "Failed to execute Java VM, return code was $result and output was"
-  echo "$java_version"
-  echo "Please make sure you are able to execute Java processes by running \"$JAVA\"."
+  echo "Failed to execute Java VM, return code was $result and output was" 1>&2
+  echo "$java_version" 1>&2
+  echo "Please make sure you are able to execute Java processes by running \"$JAVA\"." 1>&2
   exit 1
 fi
 java_version="`echo "$java_version" | grep -e "^\(java\|openjdk\) version" | cut -f2 -d\\\" | cut -f1 -d. | cut -f1 -d-`"
@@ -63,28 +63,34 @@ case "$platform" in
     ;;
 esac
 
-# JavaSMT can be present either as compiled classes below bin/ or as a JAR. The JARs with the
-# sources and the documentation carry no
-# classes to run, so they are skipped.
-JAVASMT_JAR=""
-for jar in "$PATH_TO_JAVASMT"/java-smt-*.jar; do
-  case "$jar" in
-    *-sources.jar | *-javadoc.jar) continue ;;
-  esac
-  [ -e "$jar" ] && JAVASMT_JAR="$jar"
-done
-
-if [ ! -e "$PATH_TO_JAVASMT/bin/org/sosy_lab/java_smt/cmdline/JavaSMTMain.class" ] \
-   && [ -z "$JAVASMT_JAR" ] ; then
-  echo "Could not find JavaSMT binary, please check path to project directory" 1>&2
-  exit 1
+# JavaSMT can be present either as compiled classes below bin/, which take precedence, or as
+# the JAR that "ant jar" produces. The JARs with the sources and the documentation carry no
+# classes to run, so they are skipped. Several JARs would make it ambiguous which version runs,
+# so this is refused.
+if [ -e "$PATH_TO_JAVASMT/bin/org/sosy_lab/java_smt/cmdline/JavaSMTMain.class" ]; then
+  JAVASMT_CLASSES="$PATH_TO_JAVASMT/bin"
+else
+  JAVASMT_CLASSES=""
+  for jar in "$PATH_TO_JAVASMT"/java-smt-*.jar; do
+    case "$jar" in
+      *-sources.jar | *-javadoc.jar) continue ;;
+    esac
+    if [ -e "$jar" ]; then
+      if [ -n "$JAVASMT_CLASSES" ]; then
+        echo "Found several JavaSMT JARs, please remove all but one: $JAVASMT_CLASSES $jar" 1>&2
+        exit 1
+      fi
+      JAVASMT_CLASSES="$jar"
+    fi
+  done
+  if [ -z "$JAVASMT_CLASSES" ]; then
+    echo "Could not find JavaSMT binary, please check path to project directory" 1>&2
+    exit 1
+  fi
 fi
 
-# the classpath contains the compiled classes, the JAR if there is one,
-# the core JARs, and every solver present
-CLASSPATH="$PATH_TO_JAVASMT/bin"
-[ -n "$JAVASMT_JAR" ] && CLASSPATH="$CLASSPATH$SEP$JAVASMT_JAR"
-CLASSPATH="$CLASSPATH$SEP$PATH_TO_JAVASMT/lib/java/core/*"
+# the classpath contains the classes of JavaSMT, the core JARs, and every solver present
+CLASSPATH="$JAVASMT_CLASSES$SEP$PATH_TO_JAVASMT/lib/java/core/*"
 for solver_dir in "$PATH_TO_JAVASMT"/lib/java/runtime-*; do
   [ -d "$solver_dir" ] && CLASSPATH="$CLASSPATH$SEP$solver_dir/*"
 done

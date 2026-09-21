@@ -10,16 +10,18 @@
 
 package org.sosy_lab.java_smt.cmdline;
 
+import java.io.Serial;
+
 /** Exception thrown when an invalid command-line argument is provided. */
 public class InvalidCmdlineArgumentException extends Exception {
 
-  private static final long serialVersionUID = -6526968677815416436L;
+  @Serial private static final long serialVersionUID = -6526968677815416436L;
 
-  public InvalidCmdlineArgumentException(final String msg) {
-    super(msg);
+  public InvalidCmdlineArgumentException(String pMsg) {
+    super(pMsg);
   }
 
-  public InvalidCmdlineArgumentException(final String msg, final Throwable cause) {
-    super(msg, cause);
+  public InvalidCmdlineArgumentException(String pMsg, Throwable pCause) {
+    super(pMsg, pCause);
   }
 }

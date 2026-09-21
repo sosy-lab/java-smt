@@ -10,37 +10,48 @@
 
 package org.sosy_lab.java_smt.cmdline;
 
+import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSortedSet;
+import com.google.common.collect.Iterators;
+import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.cmdline.CmdLineArgument.CmdLineArgument1;
 import org.sosy_lab.java_smt.cmdline.CmdLineArgument.PropertyAddingCmdLineArgument;
+import org.sosy_lab.java_smt.solvers.opensmt.Logics;
 
 /** Processes command-line arguments for JavaSMT. */
 public final class CmdLineArguments {
 
   private CmdLineArguments() {}
 
-  /** Keys in the map returned by {@link #processArguments(String[])}. */
+  // Keys in the map returned by processArguments()
   static final String SOLVER_OPTION = "solver.solver";
-
   static final String LOGIC_OPTION = "solver.opensmt.logic";
   static final String FILE_OPTION = "smt2.file";
   static final String HELP_OPTION = "help";
+
+  /** The command-line argument that requests the help message. */
+  static final String HELP_ARGUMENT = "--help";
+
+  /** Solvers that cannot parse SMT-LIB2 input, see {@link #printHelp}. */
+  private static final ImmutableSet<Solvers> SOLVERS_WITHOUT_PARSER =
+      ImmutableSet.of(Solvers.BOOLECTOR, Solvers.CVC4, Solvers.YICES2);
 
   private static final ImmutableSortedSet<CmdLineArgument> CMD_LINE_ARGS =
       ImmutableSortedSet.of(
           new CmdLineArgument1("--solver", "-solver")
               .settingOption(SOLVER_OPTION)
-              .withDescription("Set SMT solver to use"),
+              .withDescription("Set the SMT solver, default: " + JavaSMTMain.DEFAULT_SOLVER),
           new CmdLineArgument1("--logic", "-logic")
               .settingOption(LOGIC_OPTION)
-              .withDescription("Set SMT logic (only for OpenSMT)"),
-          new PropertyAddingCmdLineArgument("--help", "-h", "-help")
+              .withDescription("Set the logic of OpenSMT, ignored for other solvers"),
+          new PropertyAddingCmdLineArgument(HELP_ARGUMENT, "-h", "-help")
               .settingProperty(HELP_OPTION, "true")
               .withDescription("Print this help message"));
 
@@ -56,7 +67,7 @@ public final class CmdLineArguments {
     Preconditions.checkNotNull(pArgs);
 
     Map<String, String> properties = new HashMap<>();
-    Iterator<String> argsIt = Arrays.asList(pArgs).iterator();
+    Iterator<String> argsIt = Iterators.forArray(pArgs);
 
     while (argsIt.hasNext()) {
       String arg = argsIt.next();
@@ -80,7 +91,12 @@ public final class CmdLineArguments {
                     + " and "
                     + arg);
           }
-          Path file = Path.of(arg);
+          final Path file;
+          try {
+            file = Path.of(arg);
+          } catch (InvalidPathException e) {
+            throw new InvalidCmdlineArgumentException("Invalid path of SMT2 file: " + arg, e);
+          }
           properties.put(FILE_OPTION, file.toString());
         }
       }
@@ -89,46 +105,79 @@ public final class CmdLineArguments {
     return properties;
   }
 
-  static boolean isOldStyleArgument(String arg) {
-    return arg.length() > 2 && arg.startsWith("-") && !arg.startsWith("--");
+  /** Whether the argument has the old single-dash style, e.g., <code>-solver</code>. */
+  static boolean isOldStyleArgument(String pArg) {
+    return pArg.length() > 2 && pArg.startsWith("-") && !pArg.startsWith("--");
   }
 
-  private static void printVersion(Appendable out) {
-    Output.println(out, "");
+  private static void printVersion(Appendable pOut) {
+    Output.println(pOut, "");
     // The version is only available from the manifest of the JAR, not when running from bin/.
+    final String version;
     Package pkg = CmdLineArguments.class.getPackage();
-    String version = pkg != null ? pkg.getImplementationVersion() : null;
-    Output.println(out, "JavaSMT " + (version != null ? version : "unknown"));
+    if (pkg != null && pkg.getImplementationVersion() != null) {
+      version = pkg.getImplementationVersion();
+    } else {
+      version = "unknown";
+    }
+    Output.println(pOut, "JavaSMT " + version);
   }
 
   /**
-   * Prints the help message to the given output stream.
+   * Prints the help message, including the allowed arguments and the restrictions on the input, to
+   * the given output.
    *
-   * @param out The output to print to
+   * @param pOut The output to print to
    */
-  public static void printHelp(Appendable out) {
-    printVersion(out);
-    Output.println(out, "");
-    Output.println(out, "Usage: javasmt [options] <file.smt2>");
-    Output.println(out, "Options:");
+  public static void printHelp(Appendable pOut) {
+    printVersion(pOut);
+    Output.println(pOut, "");
+    Output.println(pOut, "Usage: javasmt [--solver SOLVER] [--logic LOGIC] <file.smt2>");
+    Output.println(pOut, "Options:");
     for (CmdLineArgument cmdLineArg : CMD_LINE_ARGS) {
       if (!isOldStyleArgument(cmdLineArg.getMainName())) {
-        Output.println(out, " " + cmdLineArg);
+        Output.println(pOut, " " + cmdLineArg);
       }
     }
-    Output.println(out, "");
-    Output.println(out, "JavaSMT executes SMT2 files using the selected solver.");
-    Output.println(out, "javasmt --solver <SOLVER> <file.smt2>");
+    Output.println(pOut, "");
+    Output.println(
+        pOut,
+        "JavaSMT checks the satisfiability of the assertions in the given SMT-LIB2 file with the");
+    Output.println(
+        pOut, "selected solver and prints exactly one of sat, unsat, or unknown on stdout, or");
+    Output.println(
+        pOut, "nothing in case of an error. All other output goes to stderr. The exit code is 0");
+    Output.println(pOut, "for sat and unsat, and 1 for unknown and for all errors.");
+    Output.println(pOut, "");
+    Output.println(pOut, "Solvers: " + Joiner.on(", ").join(Solvers.values()));
+    Output.println(
+        pOut,
+        "Solvers without a parser for SMT-LIB2 input cannot be used: "
+            + Joiner.on(", ").join(SOLVERS_WITHOUT_PARSER));
+    Output.println(pOut, "Logics for OpenSMT: " + Joiner.on(", ").join(Logics.values()));
+    Output.println(
+        pOut, "Arguments starting with -X, e.g., -Xmx4g, are passed to the JVM by the launcher.");
+    Output.println(pOut, "");
+    Output.println(pOut, "Restrictions on the SMT-LIB2 file:");
+    Output.println(pOut, " - It has to contain exactly one (check-sat) command.");
+    Output.println(pOut, " - All assertions have to precede the (check-sat) command.");
+    Output.println(pOut, " - (check-sat-assuming ...) is not supported.");
+    Output.println(
+        pOut, " - (push ...), (pop ...), (reset), and (reset-assertions) are not supported.");
+    Output.println(pOut, " - (exit) is only allowed as the last command.");
+    Output.println(
+        pOut, " - Only declarations, definitions, and assertions are evaluated, other commands");
+    Output.println(pOut, "   such as (set-option ...) or (get-model) are ignored.");
   }
 
-  static void putIfNotExistent(Map<String, String> properties, String key, String value)
+  static void putIfNotExistent(Map<String, String> pProperties, String pKey, String pValue)
       throws InvalidCmdlineArgumentException {
-    if (properties.containsKey(key) && !properties.get(key).equals(value)) {
+    if (pProperties.containsKey(pKey) && !pProperties.get(pKey).equals(pValue)) {
       throw new InvalidCmdlineArgumentException(
           String.format(
               "Option %s specified twice on command-line with values '%s' and '%s'.",
-              key, properties.get(key), value));
+              pKey, pProperties.get(pKey), pValue));
     }
-    properties.put(key, value);
+    pProperties.put(pKey, pValue);
   }
 }

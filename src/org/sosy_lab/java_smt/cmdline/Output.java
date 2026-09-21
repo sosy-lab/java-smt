@@ -29,9 +29,9 @@ final class Output {
   private static final String REGULAR_COLOR = "\033[m";
 
   /** Appends the line and a line separator to the given output. */
-  static void println(Appendable out, String line) {
+  static void println(Appendable pOut, String pLine) {
     try {
-      out.append(line).append(System.lineSeparator());
+      pOut.append(pLine).append(System.lineSeparator());
     } catch (IOException e) {
       throw new UncheckedIOException(e);
     }
@@ -41,14 +41,19 @@ final class Output {
    * Prints an error message to the given output, in color if the console supports it. This method
    * does not terminate the program, the caller is responsible for returning the exit code.
    *
-   * @param err the output for error messages, usually {@link System#err}
-   * @param msg the message as format string for {@link String#format}
-   * @param args the arguments for the format string
+   * @param pErr the output for error messages, usually {@link System#err}
+   * @param pMsg the message as format string for {@link String#format}
+   * @param pArgs the arguments for the format string
    */
   @FormatMethod
-  static void error(Appendable err, @FormatString String msg, Object... args) {
-    String message = String.format(msg, args);
-    println(err, "");
-    println(err, USE_COLORS ? ERROR_COLOR + message + REGULAR_COLOR : message);
+  static void error(Appendable pErr, @FormatString String pMsg, Object... pArgs) {
+    final String message;
+    if (USE_COLORS) {
+      message = ERROR_COLOR + String.format(pMsg, pArgs) + REGULAR_COLOR;
+    } else {
+      message = String.format(pMsg, pArgs);
+    }
+    println(pErr, "");
+    println(pErr, message);
   }
 }

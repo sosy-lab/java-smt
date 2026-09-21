@@ -9,4 +9,8 @@
  */
 
 /** The frontend of JavaSMT for using it as a standalone application on the command line. */
+@com.google.errorprone.annotations.CheckReturnValue
+@javax.annotation.ParametersAreNonnullByDefault
+@org.sosy_lab.common.annotations.FieldsAreNonnullByDefault
+@org.sosy_lab.common.annotations.ReturnValuesAreNonnullByDefault
 package org.sosy_lab.java_smt.cmdline;
