@@ -32,7 +32,8 @@ public final class CmdLineArguments {
 
   // Keys in the map returned by processArguments()
   static final String SOLVER_OPTION = "solver.solver";
-  static final String LOGIC_OPTION = "solver.opensmt.logic";
+  static final String OPENSMT_LOGIC_OPTION = "solver.opensmt.logic";
+  static final String Z3_LOGIC_OPTION = "solver.z3.logic";
   static final String FILE_OPTION = "smt2.file";
   static final String HELP_OPTION = "help";
 
@@ -43,14 +44,18 @@ public final class CmdLineArguments {
   private static final ImmutableSet<Solvers> SOLVERS_WITHOUT_PARSER =
       ImmutableSet.of(Solvers.BOOLECTOR, Solvers.CVC4, Solvers.YICES2);
 
+  /** Solvers that have an option for the logic, i.e., for which --logic is effective. */
+  static final ImmutableSet<Solvers> SOLVERS_WITH_LOGIC_OPTION =
+      ImmutableSet.of(Solvers.OPENSMT, Solvers.Z3);
+
   private static final ImmutableSortedSet<CmdLineArgument> CMD_LINE_ARGS =
       ImmutableSortedSet.of(
           new CmdLineArgument1("--solver", "-solver")
               .settingOption(SOLVER_OPTION)
               .withDescription("Set the SMT solver, default: " + JavaSMTMain.DEFAULT_SOLVER),
           new CmdLineArgument1("--logic", "-logic")
-              .settingOption(LOGIC_OPTION)
-              .withDescription("Set the logic of OpenSMT, ignored for other solvers"),
+              .settingOption(OPENSMT_LOGIC_OPTION)
+              .withDescription("Set the logic for OpenSMT and Z3, ignored for other solvers"),
           new PropertyAddingCmdLineArgument(HELP_ARGUMENT, "-h", "-help")
               .settingProperty(HELP_OPTION, "true")
               .withDescription("Print this help message"));
@@ -100,6 +105,13 @@ public final class CmdLineArguments {
           properties.put(FILE_OPTION, file.toString());
         }
       }
+    }
+
+    // OpenSMT and Z3 read the logic from different options, and --logic sets both of them.
+    // Only the solver that is used reads its option, the other one is never looked at.
+    String logic = properties.get(OPENSMT_LOGIC_OPTION);
+    if (logic != null) {
+      properties.put(Z3_LOGIC_OPTION, logic);
     }
 
     return properties;
@@ -155,6 +167,7 @@ public final class CmdLineArguments {
         "Solvers without a parser for SMT-LIB2 input cannot be used: "
             + Joiner.on(", ").join(SOLVERS_WITHOUT_PARSER));
     Output.println(pOut, "Logics for OpenSMT: " + Joiner.on(", ").join(Logics.values()));
+    Output.println(pOut, "Logics for Z3: the SMT-LIB2 logics, e.g., QF_LIA, or ALL, the default.");
     Output.println(
         pOut, "Arguments starting with -X, e.g., -Xmx4g, are passed to the JVM by the launcher.");
     Output.println(pOut, "");
@@ -168,6 +181,7 @@ public final class CmdLineArguments {
     Output.println(
         pOut, " - Only declarations, definitions, and assertions are evaluated, other commands");
     Output.println(pOut, "   such as (set-option ...) or (get-model) are ignored.");
+    Output.println(pOut, " - (set-logic ...) is ignored as well, use --logic to select the logic.");
   }
 
   static void putIfNotExistent(Map<String, String> pProperties, String pKey, String pValue)

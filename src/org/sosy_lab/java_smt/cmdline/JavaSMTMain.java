@@ -148,12 +148,14 @@ public final class JavaSMTMain {
 
     LogManager logManager = createLogManager(pErr);
 
-    if (cmdLineOptions.containsKey(CmdLineArguments.LOGIC_OPTION)
-        && options.solver != Solvers.OPENSMT) {
+    // --logic sets the logic option of every solver that has one,
+    // so either of them shows that it was given.
+    if (cmdLineOptions.containsKey(CmdLineArguments.OPENSMT_LOGIC_OPTION)
+        && !CmdLineArguments.SOLVERS_WITH_LOGIC_OPTION.contains(options.solver)) {
       logManager.logf(
           Level.WARNING,
-          "Option --logic is only effective with OpenSMT solver, but solver is set to %s."
-              + " The logic setting will be ignored.",
+          "Option --logic is only effective with the solvers OpenSMT and Z3, but solver is set"
+              + " to %s. The logic setting will be ignored.",
           options.solver);
     }
 

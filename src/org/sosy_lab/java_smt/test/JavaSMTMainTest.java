@@ -526,6 +526,7 @@ public class JavaSMTMainTest {
     Map<String, String> result =
         CmdLineArguments.processArguments(new String[] {"--logic", "QF_LIA", "test.smt2"});
     assertThat(result.get("solver.opensmt.logic")).isEqualTo("QF_LIA");
+    assertThat(result.get("solver.z3.logic")).isEqualTo("QF_LIA");
     assertThat(result.get("smt2.file")).isEqualTo("test.smt2");
   }
 
@@ -534,6 +535,7 @@ public class JavaSMTMainTest {
     Map<String, String> result =
         CmdLineArguments.processArguments(new String[] {"-logic", "QF_UF", "test.smt2"});
     assertThat(result.get("solver.opensmt.logic")).isEqualTo("QF_UF");
+    assertThat(result.get("solver.z3.logic")).isEqualTo("QF_UF");
   }
 
   @Test
@@ -543,6 +545,7 @@ public class JavaSMTMainTest {
             new String[] {SOLVER, "OPENSMT", "--logic", "QF_LIA", "test.smt2"});
     assertThat(result.get("solver.solver")).isEqualTo("OPENSMT");
     assertThat(result.get("solver.opensmt.logic")).isEqualTo("QF_LIA");
+    assertThat(result.get("solver.z3.logic")).isEqualTo("QF_LIA");
     assertThat(result.get("smt2.file")).isEqualTo("test.smt2");
   }
 
