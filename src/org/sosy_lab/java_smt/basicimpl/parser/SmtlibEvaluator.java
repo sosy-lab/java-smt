@@ -100,7 +100,11 @@ public class SmtlibEvaluator {
   }
 
   public SmtlibEvaluator apply(ParseTree pSmtlib) {
-    return commandVisitor.visit(pSmtlib);
+    try {
+      return commandVisitor.visit(pSmtlib);
+    } finally {
+      prover.close();
+    }
   }
 
   public List<BooleanFormula> getAssertions() {
@@ -724,7 +728,7 @@ public class SmtlibEvaluator {
     public SmtlibEvaluator visitSmtlib(SmtlibParser.SmtlibContext ctx) {
       var eval = SmtlibEvaluator.this;
       for (var cmd : ctx.command()) {
-        eval = eval.apply(cmd);
+        eval = eval.commandVisitor.visit(cmd);
       }
       return eval;
     }
