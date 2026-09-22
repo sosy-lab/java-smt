@@ -642,10 +642,9 @@ public class SmtlibEvaluator {
     public SmtlibEvaluator visitGetUnsatAssumptions(SmtlibParser.GetUnsatAssumptionsContext ctx) {
       checkArgument(
           mode != ParsingMode.TERM, "Command 'get-unsat-assumptions' is not allowed in term mode");
-      ImmutableList.Builder<Formula> evaluated = ImmutableList.builder();
       Optional<List<BooleanFormula>> core;
       try {
-        core = prover.unsatCoreOverAssumptions(lastAssumptions.get());
+        core = prover.unsatCoreOverAssumptions(lastAssumptions.orElseThrow());
       } catch (SolverException | InterruptedException e) {
         throw new RuntimeException(e);
       }
@@ -656,7 +655,7 @@ public class SmtlibEvaluator {
           globalDefs,
           asserted,
           lastAssumptions,
-          responses.add(new FormulaManager.SolverResponse.UnsatCoreResponse(core.get())));
+          responses.add(new FormulaManager.SolverResponse.UnsatCoreResponse(core.orElseThrow())));
     }
 
     @Override
