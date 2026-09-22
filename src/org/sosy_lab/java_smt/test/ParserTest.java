@@ -15,11 +15,14 @@ import static org.sosy_lab.java_smt.api.FormulaType.BooleanType;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
+import java.math.BigInteger;
 import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BooleanFormula;
+import org.sosy_lab.java_smt.api.FormulaManager.SolverResponse;
+import org.sosy_lab.java_smt.api.FormulaManager.SolverResponse.CheckSatResponse.Status;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.SolverException;
@@ -294,5 +297,148 @@ public class ParserTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
     BooleanFormula f = mgr.parse("(assert (> (/ 1.0 2.0) 0.0))");
 
     assertThatFormula(f).isTautological();
+  }
+
+  @Test
+  public void parseScriptStackTest() {
+    requireIntegers();
+
+    String push =
+        """
+        (declare-const v Int)
+        (get-assertions)
+        (assert (= v 0))
+        (push 1)
+        (declare-const w Int)
+        (assert (= w v))
+        (get-assertions)
+        (pop 1)
+        (get-assertions)
+        (exit)
+        """;
+    var pushResponse = mgr.parseScript(push);
+
+    assertThat(((SolverResponse.AssertedResponse) pushResponse.get(0)).asserted()).hasSize(0);
+    assertThat(((SolverResponse.AssertedResponse) pushResponse.get(1)).asserted()).hasSize(2);
+    assertThat(((SolverResponse.AssertedResponse) pushResponse.get(2)).asserted()).hasSize(1);
+
+    String reset =
+        """
+        (declare-const v Int)
+        (assert (= v 0))
+        (get-assertions)
+        (reset)
+        (get-assertions)
+        (exit)
+        """;
+    var resetResponse = mgr.parseScript(reset);
+
+    assertThat(((SolverResponse.AssertedResponse) resetResponse.get(0)).asserted()).hasSize(1);
+    assertThat(((SolverResponse.AssertedResponse) resetResponse.get(1)).asserted()).hasSize(0);
+  }
+
+  @Test
+  public void parseScriptCheckSatTest() {
+    requireIntegers();
+
+    String check =
+        """
+        (declare-const v Int)
+        (assert (= v 0))
+        (check-sat)
+        (exit)
+        """;
+    var checkResponse = mgr.parseScript(check);
+
+    assertThat(((SolverResponse.CheckSatResponse) checkResponse.get(0)).status())
+        .isEqualTo(Status.SAT);
+
+    String checkAssuming =
+        """
+        (declare-const v Int)
+        (assert (= v 0))
+        (check-sat-assuming ((= v 1)))
+        (exit)
+        """;
+    var assumingResponse = mgr.parseScript(checkAssuming);
+
+    assertThat(((SolverResponse.CheckSatResponse) assumingResponse.get(0)).status())
+        .isEqualTo(Status.UNSAT);
+  }
+
+  @Test
+  public void parseScriptModelTest() {
+    requireIntegers();
+
+    String modelSmtlib =
+        """
+        (declare-const v Int)
+        (assert (= v 0))
+        (check-sat)
+        (get-model)
+        (exit)
+        """;
+    var modelResponse = mgr.parseScript(modelSmtlib);
+    var model = ((SolverResponse.ModelResponse) modelResponse.get(1)).model();
+
+    assertThat(model).hasSize(1);
+    assertThat(model.get(0).getName()).isEqualTo("v");
+    assertThat(model.get(0).getValue()).isEqualTo(new BigInteger("0"));
+
+    String evalSmtlib =
+        """
+        (declare-const v Int)
+        (assert (= v 0))
+        (check-sat)
+        (get-value (v))
+        (exit)
+        """;
+    var evalResponse = mgr.parseScript(evalSmtlib);
+
+    assertThat(((SolverResponse.EvaluationResponse) evalResponse.get(1)).value().get(0))
+        .isEqualTo(imgr.makeNumber(0));
+  }
+
+  @Test
+  public void parseScriptUnsatCoreTest() {
+    requireIntegers();
+
+    String unsatCoreSmtlib =
+        """
+        (declare-const v Int)
+        (declare-const w Int)
+        (assert (and (= v 0) (> v 0)))
+        (assert (= w 0))
+        (check-sat)
+        (get-unsat-core)
+        (exit)
+        """;
+    var unsatCoreResponse = mgr.parseScript(unsatCoreSmtlib);
+    var unsatCore = ((SolverResponse.UnsatCoreResponse) unsatCoreResponse.get(1)).core();
+
+    assertThat(unsatCore).hasSize(1);
+    assertThat(mgr.extractVariables(unsatCore.get(0)).keySet()).containsExactly("v");
+  }
+
+  @Test
+  public void parseScriptUnsatAssumptionsTest() {
+    requireIntegers();
+
+    String unsatAssumptionsSmtlib =
+        """
+        (declare-const A Bool)
+        (declare-const B Bool)
+        (assert (xor A B))
+        (assert A)
+        (check-sat-assuming (A B))
+        (get-unsat-assumptions)
+        (exit)
+        """;
+    var unsatAssumptionsResponse = mgr.parseScript(unsatAssumptionsSmtlib);
+    var unsatAssumptionsCore =
+        ((SolverResponse.UnsatCoreResponse) unsatAssumptionsResponse.get(1)).core();
+
+    assertThat(unsatAssumptionsCore).hasSize(1);
+    assertThat(mgr.extractVariables(unsatAssumptionsCore.get(0)).keySet()).containsExactly("B");
   }
 }

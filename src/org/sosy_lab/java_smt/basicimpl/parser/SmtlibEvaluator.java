@@ -10,11 +10,10 @@
 
 package org.sosy_lab.java_smt.basicimpl.parser;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static org.sosy_lab.common.collect.Collections3.transformedImmutableListCopy;
 
 import com.google.common.base.Joiner;
-import com.google.common.base.Preconditions;
-import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
@@ -23,35 +22,72 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Function;
+import java.util.stream.Stream;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.FloatingPointNumber;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaManager;
+import org.sosy_lab.java_smt.api.FormulaManager.SolverResponse.CheckSatResponse.Status;
 import org.sosy_lab.java_smt.api.FormulaType;
+import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.QuantifiedFormulaManager;
+import org.sosy_lab.java_smt.api.SolverContext;
+import org.sosy_lab.java_smt.api.SolverException;
 
 public class SmtlibEvaluator {
+  private final SolverContext solver;
   private final FormulaManager mgr;
+  private final ProverEnvironment prover;
 
   private final Map<String, Function<List<Integer>, Function<List<Formula>, Formula>>> globalDefs;
-  private final List<BooleanFormula> asserted;
+  private final List<List<BooleanFormula>> asserted;
+  private final Optional<List<BooleanFormula>> lastAssumptions;
+  private final ImmutableList.Builder<FormulaManager.SolverResponse> responses;
 
   private static int counter = 0;
 
   protected SmtlibEvaluator(
-      FormulaManager pManager,
+      SolverContext pSolver,
+      ProverEnvironment pProver,
       Map<String, Function<List<Integer>, Function<List<Formula>, Formula>>> pGlobalDefs,
-      List<BooleanFormula> pAsserted) {
-    mgr = pManager;
+      List<List<BooleanFormula>> pAsserted,
+      Optional<List<BooleanFormula>> pLastAssumptions,
+      ImmutableList.Builder<FormulaManager.SolverResponse> pResponses) {
+    solver = pSolver;
+    mgr = pSolver.getFormulaManager();
+    prover = pProver;
     globalDefs = pGlobalDefs;
     asserted = pAsserted;
+    lastAssumptions = pLastAssumptions;
+    responses = pResponses;
   }
 
-  public static SmtlibEvaluator link(FormulaManager pManager) {
+  private static ProverEnvironment newProver(SolverContext pSolver) {
+    var newProver =
+        pSolver.newProverEnvironment(
+            SolverContext.ProverOptions.GENERATE_MODELS,
+            SolverContext.ProverOptions.GENERATE_UNSAT_CORE,
+            SolverContext.ProverOptions.GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS);
+    try {
+      // Start with one level, so that we can pop all formulas that will be added
+      newProver.push();
+    } catch (InterruptedException e) {
+      throw new RuntimeException(e);
+    }
+    return newProver;
+  }
+
+  public static SmtlibEvaluator link(SolverContext pSolver) {
     return new SmtlibEvaluator(
-        pManager, new Predefined(pManager).addTheorySymbols(), ImmutableList.of());
+        pSolver,
+        newProver(pSolver),
+        new Predefined(pSolver.getFormulaManager()).addTheorySymbols(),
+        ImmutableList.of(ImmutableList.of()),
+        Optional.empty(),
+        ImmutableList.builder());
   }
 
   public SmtlibEvaluator apply(ParseTree pSmtlib) {
@@ -59,7 +95,15 @@ public class SmtlibEvaluator {
   }
 
   public List<BooleanFormula> getAssertions() {
-    return asserted;
+    ImmutableList.Builder<BooleanFormula> builder = ImmutableList.builder();
+    for (var level : asserted) {
+      builder.addAll(level);
+    }
+    return builder.build();
+  }
+
+  public List<FormulaManager.SolverResponse> getResponses() {
+    return responses.build();
   }
 
   public static String genSymbol() {
@@ -145,7 +189,7 @@ public class SmtlibEvaluator {
       var b0 = ctx.bitvec(0).getText().substring(2);
       var b1 = ctx.bitvec(1).getText().substring(2);
       var b2 = ctx.bitvec(2).getText().substring(2);
-      Preconditions.checkArgument(b0.length() == 1);
+      checkArgument(b0.length() == 1);
       return mgr.getFloatingPointFormulaManager()
           .makeNumber(
               FloatingPointNumber.of(
@@ -182,9 +226,9 @@ public class SmtlibEvaluator {
         if (symbol.matches("bv\\d+")) {
           // Special case: BV defines symbols (_ bvX m) to create bitvector literals. Here we
           // have to get the value of the bitvector straight from the symbol name
-          Preconditions.checkArgument(ctx.integer().size() == 1);
+          checkArgument(ctx.integer().size() == 1);
           return p -> {
-            Preconditions.checkArgument(p.isEmpty());
+            checkArgument(p.isEmpty());
             return mgr.getBitvectorFormulaManager()
                 .makeBitvector(
                     getIntegerValue(ctx.integer(0)).intValueExact(),
@@ -201,9 +245,9 @@ public class SmtlibEvaluator {
       @SuppressWarnings("unchecked")
       @Override
       public Function<List<Formula>, Formula> visitAs(SmtlibParser.AsContext ctx) {
-        Preconditions.checkArgument(getSymbolValue(ctx.symbol()).equals("const"));
+        checkArgument(getSymbolValue(ctx.symbol()).equals("const"));
         var sort = sortEvaluator.visit(ctx.sort());
-        Preconditions.checkArgument(sort.isArrayType());
+        checkArgument(sort.isArrayType());
         @SuppressWarnings("rawtypes")
         var arraySort = (FormulaType.ArrayFormulaType) sort;
         return value -> mgr.getArrayFormulaManager().makeArray(arraySort, value.get(0));
@@ -217,7 +261,7 @@ public class SmtlibEvaluator {
     }
 
     private Function<List<Integer>, Function<List<Formula>, Formula>> lookup(String symbol) {
-      Preconditions.checkArgument(
+      checkArgument(
           context.containsKey(symbol),
           "Symbol `%s` is not defined. Context has %s",
           symbol,
@@ -251,7 +295,7 @@ public class SmtlibEvaluator {
           ImmutableMap.of();
       for (var binding : ctx.binding()) {
         var sym = getSymbolValue(binding.symbol());
-        Preconditions.checkArgument(
+        checkArgument(
             !local.containsKey(sym), "Let block contains more than one definition for %s", sym);
         var term = visit(binding.expr());
         local = addConstant(local, sym, term);
@@ -274,7 +318,7 @@ public class SmtlibEvaluator {
         variables.add(term);
       }
       var evaluated = new ExprEvaluator(updated).visit(ctx.expr());
-      Preconditions.checkArgument(evaluated instanceof BooleanFormula);
+      checkArgument(evaluated instanceof BooleanFormula);
       var acc = (BooleanFormula) evaluated;
       for (var bound : Lists.reverse(variables)) {
         acc =
@@ -311,7 +355,7 @@ public class SmtlibEvaluator {
         .put(
             name,
             idx -> {
-              Preconditions.checkArgument(idx.isEmpty());
+              checkArgument(idx.isEmpty());
               return function;
             })
         .buildKeepingLast();
@@ -325,7 +369,7 @@ public class SmtlibEvaluator {
         context,
         name,
         p -> {
-          Preconditions.checkArgument(p.isEmpty());
+          checkArgument(p.isEmpty());
           return value;
         });
   }
@@ -345,7 +389,7 @@ public class SmtlibEvaluator {
     @Override
     public SmtlibEvaluator visitSetLogic(SmtlibParser.SetLogicContext ctx) {
       var logic = ctx.symbol().getText();
-      Preconditions.checkArgument(logic.equals("ALL"), "Logic must be set to ALL");
+      checkArgument(logic.equals("ALL"), "Logic must be set to ALL");
       return SmtlibEvaluator.this;
     }
 
@@ -357,11 +401,22 @@ public class SmtlibEvaluator {
       var right = sorts.get(sorts.size() - 1);
       if (sorts.size() == 1) {
         var term = mgr.makeVariable(right, name);
-        return new SmtlibEvaluator(mgr, addConstant(globalDefs, name, term), asserted);
+        return new SmtlibEvaluator(
+            solver,
+            prover,
+            addConstant(globalDefs, name, term),
+            asserted,
+            lastAssumptions,
+            responses);
       } else {
         var uf = mgr.getUFManager().declareUF(name, right, left.toArray(new FormulaType<?>[0]));
         return new SmtlibEvaluator(
-            mgr, addFunction(globalDefs, name, p -> mgr.makeApplication(uf, p)), asserted);
+            solver,
+            prover,
+            addFunction(globalDefs, name, p -> mgr.makeApplication(uf, p)),
+            asserted,
+            lastAssumptions,
+            responses);
       }
     }
 
@@ -370,40 +425,258 @@ public class SmtlibEvaluator {
       var name = getSymbolValue(ctx.symbol());
       var sort = sortEvaluator.visit(ctx.sort());
       var parameters = ctx.sortedVar();
-      if (parameters == null || parameters.isEmpty()) {
+      if (parameters.isEmpty()) {
         var term = new ExprEvaluator(globalDefs).visit(ctx.expr());
-        Preconditions.checkArgument(mgr.getFormulaType(term).equals(sort));
-        return new SmtlibEvaluator(mgr, addConstant(globalDefs, name, term), asserted);
+        checkArgument(mgr.getFormulaType(term).equals(sort));
+        return new SmtlibEvaluator(
+            solver,
+            prover,
+            addConstant(globalDefs, name, term),
+            asserted,
+            lastAssumptions,
+            responses);
       } else {
         var capture = globalDefs;
         // TODO Evaluate once during creation to catch any errors right away
         return new SmtlibEvaluator(
-            mgr,
+            solver,
+            prover,
             addFunction(
                 globalDefs,
                 name,
                 p -> {
-                  Preconditions.checkArgument(p.size() == parameters.size());
+                  checkArgument(p.size() == parameters.size());
                   var updated = capture;
                   for (int i = 0; i < p.size(); i++) {
                     var nameArg = getSymbolValue(parameters.get(i).symbol());
                     var sortArg = sortEvaluator.visit(parameters.get(i).sort());
                     var value = p.get(i);
                     // FIXME Probably too strong for bv/fp sorts?
-                    Preconditions.checkArgument(mgr.getFormulaType(value).equals(sortArg));
+                    checkArgument(mgr.getFormulaType(value).equals(sortArg));
                     updated = addConstant(updated, nameArg, value);
                   }
                   return new ExprEvaluator(updated).visit(ctx.expr());
                 }),
-            asserted);
+            asserted,
+            lastAssumptions,
+            responses);
       }
+    }
+
+    @Override
+    public SmtlibEvaluator visitPush(SmtlibParser.PushContext ctx) {
+      var levels = Integer.parseInt(ctx.Numeral().getText());
+      ImmutableList.Builder<List<BooleanFormula>> newAsserted = ImmutableList.builder();
+      newAsserted.addAll(asserted);
+      for (var i = 0; i < levels; i++) {
+        try {
+          prover.push();
+          newAsserted.add(ImmutableList.of());
+
+        } catch (InterruptedException e) {
+          throw new RuntimeException(e);
+        }
+      }
+      return new SmtlibEvaluator(
+          solver, prover, globalDefs, newAsserted.build(), Optional.empty(), responses);
+    }
+
+    @Override
+    public SmtlibEvaluator visitPop(SmtlibParser.PopContext ctx) {
+      var levels = Integer.parseInt(ctx.Numeral().getText());
+      checkArgument(levels < asserted.size());
+      for (var i = 0; i < levels; i++) {
+        prover.pop();
+      }
+      return new SmtlibEvaluator(
+          solver,
+          prover,
+          globalDefs,
+          asserted.subList(0, asserted.size() - levels),
+          Optional.empty(),
+          responses);
     }
 
     @Override
     public SmtlibEvaluator visitAssert(SmtlibParser.AssertContext ctx) {
       var term = (BooleanFormula) new ExprEvaluator(globalDefs).visit(ctx.expr());
+      var last = asserted.get(asserted.size() - 1);
+      var init = asserted.subList(0, asserted.size() - 1);
+      var added = Stream.concat(last.stream(), Stream.of(term)).toList();
+      try {
+        prover.addConstraint(term);
+      } catch (InterruptedException e) {
+        throw new RuntimeException(e);
+      }
       return new SmtlibEvaluator(
-          mgr, globalDefs, FluentIterable.concat(asserted, ImmutableList.of(term)).toList());
+          solver,
+          prover,
+          globalDefs,
+          Stream.concat(init.stream(), Stream.of(added)).toList(),
+          lastAssumptions,
+          responses);
+    }
+
+    @Override
+    public SmtlibEvaluator visitGetAssertions(SmtlibParser.GetAssertionsContext ctx) {
+      return new SmtlibEvaluator(
+          solver,
+          prover,
+          globalDefs,
+          asserted,
+          lastAssumptions,
+          responses.add(new FormulaManager.SolverResponse.AssertedResponse(getAssertions())));
+    }
+
+    @Override
+    public SmtlibEvaluator visitCheckSat(SmtlibParser.CheckSatContext ctx) {
+      var status = Status.UNKNOWN;
+      try {
+        status = prover.isUnsat() ? Status.UNSAT : Status.SAT;
+      } catch (SolverException e) {
+        // Return 'unknown' when there is a solver exception
+      } catch (InterruptedException e) {
+        throw new RuntimeException(e);
+      }
+      return new SmtlibEvaluator(
+          solver,
+          prover,
+          globalDefs,
+          asserted,
+          Optional.empty(),
+          responses.add(new FormulaManager.SolverResponse.CheckSatResponse(status)));
+    }
+
+    @Override
+    public SmtlibEvaluator visitCheckSatAssuming(SmtlibParser.CheckSatAssumingContext ctx) {
+      var assumed =
+          ctx.expr().stream()
+              .map(expr -> (BooleanFormula) new ExprEvaluator(globalDefs).visit(expr))
+              .toList();
+
+      var status = Status.UNKNOWN;
+      try {
+        status = prover.isUnsatWithAssumptions(assumed) ? Status.UNSAT : Status.SAT;
+      } catch (SolverException e) {
+        // Return 'unknown' when there is a solver exception
+      } catch (InterruptedException e) {
+        throw new RuntimeException(e);
+      }
+      return new SmtlibEvaluator(
+          solver,
+          prover,
+          globalDefs,
+          asserted,
+          Optional.of(assumed),
+          responses.add(new FormulaManager.SolverResponse.CheckSatResponse(status)));
+    }
+
+    @Override
+    public SmtlibEvaluator visitGetModel(SmtlibParser.GetModelContext ctx) {
+      try (var model = prover.getModel()) {
+        return new SmtlibEvaluator(
+            solver,
+            prover,
+            globalDefs,
+            asserted,
+            lastAssumptions,
+            responses.add(new FormulaManager.SolverResponse.ModelResponse(model.asList())));
+
+      } catch (SolverException e) {
+        throw new RuntimeException(e);
+      }
+    }
+
+    @Override
+    public SmtlibEvaluator visitGetUnsatCore(SmtlibParser.GetUnsatCoreContext ctx) {
+      List<BooleanFormula> core = prover.getUnsatCore();
+      return new SmtlibEvaluator(
+          solver,
+          prover,
+          globalDefs,
+          asserted,
+          lastAssumptions,
+          responses.add(new FormulaManager.SolverResponse.UnsatCoreResponse(core)));
+    }
+
+    @Override
+    public SmtlibEvaluator visitGetUnsatAssumptions(SmtlibParser.GetUnsatAssumptionsContext ctx) {
+      ImmutableList.Builder<Formula> evaluated = ImmutableList.builder();
+      Optional<List<BooleanFormula>> core;
+      try {
+        core = prover.unsatCoreOverAssumptions(lastAssumptions.get());
+      } catch (SolverException | InterruptedException e) {
+        throw new RuntimeException(e);
+      }
+      return new SmtlibEvaluator(
+          solver,
+          prover,
+          globalDefs,
+          asserted,
+          lastAssumptions,
+          responses.add(new FormulaManager.SolverResponse.UnsatCoreResponse(core.get())));
+    }
+
+    @Override
+    public SmtlibEvaluator visitGetValue(SmtlibParser.GetValueContext ctx) {
+      var terms =
+          ctx.expr().stream().map(expr -> new ExprEvaluator(globalDefs).visit(expr)).toList();
+
+      ImmutableList.Builder<Formula> evaluatedTerms = ImmutableList.builder();
+      for (var term : terms) {
+        try {
+          var evaluated = prover.getEvaluator().eval(term);
+          evaluatedTerms.add(evaluated == null ? term : evaluated);
+        } catch (SolverException e) {
+          throw new RuntimeException(e);
+        }
+      }
+      return new SmtlibEvaluator(
+          solver,
+          prover,
+          globalDefs,
+          asserted,
+          lastAssumptions,
+          responses.add(
+              new FormulaManager.SolverResponse.EvaluationResponse(evaluatedTerms.build())));
+    }
+
+    @Override
+    public SmtlibEvaluator visitResetSolver(SmtlibParser.ResetSolverContext ctx) {
+      return new SmtlibEvaluator(
+          solver,
+          newProver(solver),
+          globalDefs,
+          ImmutableList.of(ImmutableList.of()),
+          Optional.empty(),
+          responses);
+    }
+
+    @Override
+    public SmtlibEvaluator visitResetAssertions(SmtlibParser.ResetAssertionsContext ctx) {
+      for (var i = 0; i < asserted.size(); i++) {
+        prover.pop();
+      }
+      try {
+        // Restore empty base level
+        prover.push();
+      } catch (InterruptedException e) {
+        throw new RuntimeException(e);
+      }
+      return new SmtlibEvaluator(
+          solver,
+          prover,
+          globalDefs,
+          ImmutableList.of(ImmutableList.of()),
+          Optional.empty(),
+          responses);
+    }
+
+    @Override
+    public SmtlibEvaluator visitExit(SmtlibParser.ExitContext ctx) {
+      prover.close();
+      return new SmtlibEvaluator(
+          solver, prover, globalDefs, ImmutableList.of(), Optional.empty(), responses);
     }
 
     @Override

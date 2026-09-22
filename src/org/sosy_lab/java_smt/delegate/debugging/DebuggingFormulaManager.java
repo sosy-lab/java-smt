@@ -190,6 +190,11 @@ class DebuggingFormulaManager implements FormulaManager {
   }
 
   @Override
+  public List<SolverResponse> parseScript(String smtlib) {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
   public Appender dumpFormula(BooleanFormula pT) {
     debugging.assertThreadLocal();
     debugging.assertFormulaInContext(pT);

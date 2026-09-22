@@ -1105,6 +1105,11 @@ class TraceFormulaManager implements FormulaManager {
   }
 
   @Override
+  public List<SolverResponse> parseScript(String smtlib) {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
   public Appender dumpFormula(BooleanFormula pT) {
     return logger.logDefDiscard(
         "mgr", "dumpFormula(%s)".formatted(logger.toVariable(pT)), () -> delegate.dumpFormula(pT));

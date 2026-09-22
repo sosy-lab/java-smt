@@ -222,6 +222,37 @@ public interface FormulaManager {
    */
   List<BooleanFormula> parseAll(String s) throws IllegalArgumentException;
 
+  sealed interface SolverResponse {
+    /** Responst to <code>get-assertions</code>. */
+    record AssertedResponse(List<? extends Formula> asserted) implements SolverResponse {}
+
+    /** Response to <code>check-sat</code> or <code>check-sat-assuming</code>. */
+    record CheckSatResponse(Status status) implements SolverResponse {
+      public enum Status {
+        SAT,
+        UNSAT,
+        UNKNOWN
+      }
+    }
+
+    /** Response to <code>get-model</code>. */
+    record ModelResponse(List<Model.ValueAssignment> model) implements SolverResponse {}
+
+    /** Response to <code>get-unsat-core</code> or <code>get-unsat-assumptions</code>. */
+    record UnsatCoreResponse(List<BooleanFormula> core) implements SolverResponse {}
+
+    /** Response to <code>get-value</code>. */
+    record EvaluationResponse(List<Formula> value) implements SolverResponse {}
+  }
+
+  /**
+   * Read and evaluate a SMTLIB script in a new {@link ProverEnvironment}.
+   *
+   * <p>Solver responses to commands like <code>check-sat</code> or <code>get-model</code> are
+   * stored in a list and then returned by this function.
+   */
+  List<SolverResponse> parseScript(String smtlib);
+
   /**
    * Serialize an input formula to an SMT-LIB format. Very useful when passing formulas between
    * different solvers.

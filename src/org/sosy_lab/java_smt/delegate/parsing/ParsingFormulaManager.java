@@ -16,6 +16,7 @@ import java.util.Map;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.ConsoleErrorListener;
+import org.antlr.v4.runtime.TokenStream;
 import org.sosy_lab.common.Appender;
 import org.sosy_lab.java_smt.api.ArrayFormulaManager;
 import org.sosy_lab.java_smt.api.BitvectorFormulaManager;
@@ -31,6 +32,7 @@ import org.sosy_lab.java_smt.api.IntegerFormulaManager;
 import org.sosy_lab.java_smt.api.QuantifiedFormulaManager;
 import org.sosy_lab.java_smt.api.RationalFormulaManager;
 import org.sosy_lab.java_smt.api.SLFormulaManager;
+import org.sosy_lab.java_smt.api.SolverContext;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.api.StringFormulaManager;
 import org.sosy_lab.java_smt.api.Tactic;
@@ -45,9 +47,11 @@ import org.sosy_lab.java_smt.basicimpl.parser.SmtlibParser;
 
 public class ParsingFormulaManager implements FormulaManager {
   private final FormulaManager delegate;
+  private final SolverContext solver;
 
-  public ParsingFormulaManager(FormulaManager pDelegate) {
+  public ParsingFormulaManager(FormulaManager pDelegate, SolverContext pSolver) {
     delegate = pDelegate;
+    solver = pSolver;
   }
 
   @Override
@@ -137,18 +141,28 @@ public class ParsingFormulaManager implements FormulaManager {
     return delegate.getFormulaType(formula);
   }
 
-  @Override
-  public List<BooleanFormula> parseAll(String s) throws IllegalArgumentException {
-    var input = CharStreams.fromString(s);
-    var lexer = new SmtlibLexer(input);
+  private TokenStream lex(String smtlib) {
+    var lexer = new SmtlibLexer(CharStreams.fromString(smtlib));
     lexer.removeErrorListener(ConsoleErrorListener.INSTANCE);
     lexer.addErrorListener(new FaultingErrorListener("Lexing error"));
-    var tokens = new CommonTokenStream(lexer);
+    return new CommonTokenStream(lexer);
+  }
+
+  private SmtlibParser.SmtlibContext parse(TokenStream tokens) {
     var parser = new SmtlibParser(tokens);
     parser.removeErrorListener(ConsoleErrorListener.INSTANCE);
     parser.addErrorListener(new FaultingErrorListener("Parsing error"));
-    var ast = parser.smtlib();
-    return SmtlibEvaluator.link(this).apply(ast).getAssertions();
+    return parser.smtlib();
+  }
+
+  @Override
+  public List<BooleanFormula> parseAll(String smtlib) throws IllegalArgumentException {
+    return SmtlibEvaluator.link(solver).apply(parse(lex(smtlib))).getAssertions();
+  }
+
+  @Override
+  public List<SolverResponse> parseScript(String smtlib) {
+    return SmtlibEvaluator.link(solver).apply(parse(lex(smtlib))).getResponses();
   }
 
   @Override

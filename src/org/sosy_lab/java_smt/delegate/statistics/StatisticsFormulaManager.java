@@ -151,6 +151,11 @@ class StatisticsFormulaManager implements FormulaManager {
   }
 
   @Override
+  public List<SolverResponse> parseScript(String smtlib) {
+    return delegate.parseScript(smtlib);
+  }
+
+  @Override
   public Appender dumpFormula(BooleanFormula pT) {
     return new Appenders.AbstractAppender() {
       @Override

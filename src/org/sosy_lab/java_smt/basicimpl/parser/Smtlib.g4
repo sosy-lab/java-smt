@@ -196,8 +196,47 @@ define
     | '(' 'define-fun' symbol '(' sortedVar* ')' sort expr ')'
     ;
 
+push
+    : '(' 'push' Numeral ')'
+    ;
+
+pop
+    : '(' 'pop' Numeral ')'
+    ;
+
 assert
     : '(' 'assert' expr ')'
+    ;
+
+getAssertions
+    : '(' 'get-assertions' ')'
+    ;
+
+check
+    : '(' 'check-sat' ')'                        # CheckSat
+    | '(' 'check-sat-assuming' '(' expr* ')' ')' # CheckSatAssuming
+    ;
+
+getModel
+    : '(' 'get-model' ')'
+    ;
+
+getCore
+    : '(' 'get-unsat-core' ')'        # GetUnsatCore
+    | '(' 'get-unsat-assumptions' ')' # GetUnsatAssumptions
+    ;
+
+getValue
+    : '(' 'get-value' '(' expr+ ')' ')'
+    ;
+
+reset
+    : '(' 'reset' ')'            # ResetSolver
+    | '(' 'reset-assertions' ')' # ResetAssertions
+    ;
+
+exit
+    : '(' 'exit' ')'
     ;
 
 command
@@ -206,7 +245,16 @@ command
     | setLogic
     | declare
     | define
+    | push
+    | pop
     | assert
+    | getAssertions
+    | check
+    | getModel
+    | getCore
+    | getValue
+    | reset
+    | exit
     ;
 
 smtlib

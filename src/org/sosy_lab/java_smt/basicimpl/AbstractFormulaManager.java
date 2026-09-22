@@ -482,6 +482,11 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
         .toList();
   }
 
+  @Override
+  public List<SolverResponse> parseScript(String smtlib) {
+    throw new UnsupportedOperationException();
+  }
+
   protected abstract String dumpFormulaImpl(TFormulaInfo t) throws IOException;
 
   @Override

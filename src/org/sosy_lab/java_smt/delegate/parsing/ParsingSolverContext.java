@@ -26,7 +26,7 @@ public class ParsingSolverContext implements SolverContext {
 
   @Override
   public FormulaManager getFormulaManager() {
-    return new ParsingFormulaManager(delegate.getFormulaManager());
+    return new ParsingFormulaManager(delegate.getFormulaManager(), this);
   }
 
   @Override

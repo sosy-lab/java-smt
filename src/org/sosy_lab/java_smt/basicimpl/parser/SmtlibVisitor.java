@@ -283,12 +283,114 @@ public interface SmtlibVisitor<T> extends ParseTreeVisitor<T> {
   T visitDefine(SmtlibParser.DefineContext ctx);
 
   /**
+   * Visit a parse tree produced by {@link SmtlibParser#push}.
+   *
+   * @param ctx the parse tree
+   * @return the visitor result
+   */
+  T visitPush(SmtlibParser.PushContext ctx);
+
+  /**
+   * Visit a parse tree produced by {@link SmtlibParser#pop}.
+   *
+   * @param ctx the parse tree
+   * @return the visitor result
+   */
+  T visitPop(SmtlibParser.PopContext ctx);
+
+  /**
    * Visit a parse tree produced by {@link SmtlibParser#assert_}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
   T visitAssert(SmtlibParser.AssertContext ctx);
+
+  /**
+   * Visit a parse tree produced by {@link SmtlibParser#getAssertions}.
+   *
+   * @param ctx the parse tree
+   * @return the visitor result
+   */
+  T visitGetAssertions(SmtlibParser.GetAssertionsContext ctx);
+
+  /**
+   * Visit a parse tree produced by the {@code CheckSat} labeled alternative in {@link
+   * SmtlibParser#check}.
+   *
+   * @param ctx the parse tree
+   * @return the visitor result
+   */
+  T visitCheckSat(SmtlibParser.CheckSatContext ctx);
+
+  /**
+   * Visit a parse tree produced by the {@code CheckSatAssuming} labeled alternative in {@link
+   * SmtlibParser#check}.
+   *
+   * @param ctx the parse tree
+   * @return the visitor result
+   */
+  T visitCheckSatAssuming(SmtlibParser.CheckSatAssumingContext ctx);
+
+  /**
+   * Visit a parse tree produced by {@link SmtlibParser#getModel}.
+   *
+   * @param ctx the parse tree
+   * @return the visitor result
+   */
+  T visitGetModel(SmtlibParser.GetModelContext ctx);
+
+  /**
+   * Visit a parse tree produced by the {@code GetUnsatCore} labeled alternative in {@link
+   * SmtlibParser#getCore}.
+   *
+   * @param ctx the parse tree
+   * @return the visitor result
+   */
+  T visitGetUnsatCore(SmtlibParser.GetUnsatCoreContext ctx);
+
+  /**
+   * Visit a parse tree produced by the {@code GetUnsatAssumptions} labeled alternative in {@link
+   * SmtlibParser#getCore}.
+   *
+   * @param ctx the parse tree
+   * @return the visitor result
+   */
+  T visitGetUnsatAssumptions(SmtlibParser.GetUnsatAssumptionsContext ctx);
+
+  /**
+   * Visit a parse tree produced by {@link SmtlibParser#getValue}.
+   *
+   * @param ctx the parse tree
+   * @return the visitor result
+   */
+  T visitGetValue(SmtlibParser.GetValueContext ctx);
+
+  /**
+   * Visit a parse tree produced by the {@code ResetSolver} labeled alternative in {@link
+   * SmtlibParser#reset}.
+   *
+   * @param ctx the parse tree
+   * @return the visitor result
+   */
+  T visitResetSolver(SmtlibParser.ResetSolverContext ctx);
+
+  /**
+   * Visit a parse tree produced by the {@code ResetAssertions} labeled alternative in {@link
+   * SmtlibParser#reset}.
+   *
+   * @param ctx the parse tree
+   * @return the visitor result
+   */
+  T visitResetAssertions(SmtlibParser.ResetAssertionsContext ctx);
+
+  /**
+   * Visit a parse tree produced by {@link SmtlibParser#exit}.
+   *
+   * @param ctx the parse tree
+   * @return the visitor result
+   */
+  T visitExit(SmtlibParser.ExitContext ctx);
 
   /**
    * Visit a parse tree produced by {@link SmtlibParser#command}.
