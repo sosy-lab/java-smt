@@ -157,12 +157,16 @@ public class ParsingFormulaManager implements FormulaManager {
 
   @Override
   public List<BooleanFormula> parseAll(String smtlib) throws IllegalArgumentException {
-    return SmtlibEvaluator.link(solver).apply(parse(lex(smtlib))).getAssertions();
+    return SmtlibEvaluator.link(solver, SmtlibEvaluator.ParsingMode.TERM)
+        .apply(parse(lex(smtlib)))
+        .getAssertions();
   }
 
   @Override
   public List<SolverResponse> parseScript(String smtlib) {
-    return SmtlibEvaluator.link(solver).apply(parse(lex(smtlib))).getResponses();
+    return SmtlibEvaluator.link(solver, SmtlibEvaluator.ParsingMode.SCRIPT)
+        .apply(parse(lex(smtlib)))
+        .getResponses();
   }
 
   @Override
