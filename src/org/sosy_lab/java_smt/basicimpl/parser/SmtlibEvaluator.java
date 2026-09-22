@@ -482,7 +482,7 @@ public class SmtlibEvaluator {
 
     @Override
     public SmtlibEvaluator visitPush(SmtlibParser.PushContext ctx) {
-      checkArgument(mode == ParsingMode.TERM, "Command 'push' is not allowed in term mode");
+      checkArgument(mode != ParsingMode.TERM, "Command 'push' is not allowed in term mode");
       var levels = Integer.parseInt(ctx.Numeral().getText());
       ImmutableList.Builder<List<BooleanFormula>> newAsserted = ImmutableList.builder();
       newAsserted.addAll(asserted);
@@ -501,7 +501,7 @@ public class SmtlibEvaluator {
 
     @Override
     public SmtlibEvaluator visitPop(SmtlibParser.PopContext ctx) {
-      checkArgument(mode == ParsingMode.TERM, "Command 'pop' is not allowed in term mode");
+      checkArgument(mode != ParsingMode.TERM, "Command 'pop' is not allowed in term mode");
       var levels = Integer.parseInt(ctx.Numeral().getText());
       checkArgument(levels < asserted.size());
       for (var i = 0; i < levels; i++) {
