@@ -19,8 +19,12 @@ import java.util.EnumSet;
 import org.junit.Before;
 import org.junit.Test;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
+import org.sosy_lab.java_smt.api.ArrayFormula;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
+import org.sosy_lab.java_smt.api.FloatingPointFormula;
+import org.sosy_lab.java_smt.api.FormulaType;
+import org.sosy_lab.java_smt.api.NumeralFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.SolverException;
 
@@ -125,7 +129,7 @@ public class SolverFormulaIODeclarationsTest
 
   @Test
   public void parseDeclareNeverTest2() {
-    String query = "(assert (= 0 x))";
+    String query = "(assert (= x 0))";
     assertThrows(IllegalArgumentException.class, () -> mgr.parse(query));
   }
 
@@ -146,6 +150,49 @@ public class SolverFormulaIODeclarationsTest
     String query = "(assert var)";
     BooleanFormula var = bmgr.makeVariable("var");
     BooleanFormula formula = mgr.parse(query);
+    Truth.assertThat(mgr.extractVariables(formula).values()).containsExactly(var);
+  }
+
+  @Test
+  public void parseDeclareIntegerBeforeTest() {
+    requireIntegers();
+    IntegerFormula var = imgr.makeVariable("var");
+    BooleanFormula formula = mgr.parse("(assert (= var 0))");
+    Truth.assertThat(mgr.extractVariables(formula).values()).containsExactly(var);
+  }
+
+  @Test
+  public void parseDeclareRationalBeforeTest() {
+    requireRationals();
+    NumeralFormula.RationalFormula var = rmgr.makeVariable("var");
+    BooleanFormula formula = mgr.parse("(assert (= var 0.0))");
+    Truth.assertThat(mgr.extractVariables(formula).values()).containsExactly(var);
+  }
+
+  @Test
+  public void parseDeclareBitVectorBeforeTest() {
+    requireBitvectors();
+    BitvectorFormula var = bvmgr.makeVariable(8, "var");
+    BooleanFormula formula = mgr.parse("(assert (= var (_ bv0 8)))");
+    Truth.assertThat(mgr.extractVariables(formula).values()).containsExactly(var);
+  }
+
+  @Test
+  public void parseDeclareFloatBeforeTest() {
+    requireFloats();
+    FloatingPointFormula var =
+        fpmgr.makeVariable("var", FormulaType.getSinglePrecisionFloatingPointType());
+    BooleanFormula formula = mgr.parse("(assert (= var (_ +zero 8 24)))");
+    Truth.assertThat(mgr.extractVariables(formula).values()).containsExactly(var);
+  }
+
+  @Test
+  public void parseDeclareArrayBeforeTest() {
+    requireIntegers();
+    requireArrays();
+    ArrayFormula<IntegerFormula, IntegerFormula> var =
+        amgr.makeArray("var", IntegerType, IntegerType);
+    BooleanFormula formula = mgr.parse("(assert (= (select var 0) 0))");
     Truth.assertThat(mgr.extractVariables(formula).values()).containsExactly(var);
   }
 

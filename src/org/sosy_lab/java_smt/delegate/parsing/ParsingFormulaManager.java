@@ -11,6 +11,7 @@
 package org.sosy_lab.java_smt.delegate.parsing;
 
 import com.google.common.collect.ImmutableMap;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.antlr.v4.runtime.CharStreams;
@@ -49,6 +50,20 @@ public class ParsingFormulaManager implements FormulaManager {
   private final FormulaManager delegate;
   private final SolverContext solver;
 
+  public record Declarations(
+      Map<String, Formula> constants, Map<String, FunctionDeclaration<?>> functions) {
+
+    void addConstant(String name, Formula term) {
+      constants.put(name, term);
+    }
+
+    void addFunction(String name, FunctionDeclaration<?> declaration) {
+      functions.put(name, declaration);
+    }
+  }
+
+  private final Declarations declarations = new Declarations(new HashMap<>(), new HashMap<>());
+
   public ParsingFormulaManager(FormulaManager pDelegate, SolverContext pSolver) {
     delegate = pDelegate;
     solver = pSolver;
@@ -56,37 +71,38 @@ public class ParsingFormulaManager implements FormulaManager {
 
   @Override
   public IntegerFormulaManager getIntegerFormulaManager() {
-    return delegate.getIntegerFormulaManager();
+    return new ParsingIntegerFormulaManager(delegate.getIntegerFormulaManager(), declarations);
   }
 
   @Override
   public RationalFormulaManager getRationalFormulaManager() {
-    return delegate.getRationalFormulaManager();
+    return new ParsingRationalFormulaManager(delegate.getRationalFormulaManager(), declarations);
   }
 
   @Override
   public BooleanFormulaManager getBooleanFormulaManager() {
-    return delegate.getBooleanFormulaManager();
+    return new ParsingBooleanFormulaManager(delegate.getBooleanFormulaManager(), declarations);
   }
 
   @Override
   public ArrayFormulaManager getArrayFormulaManager() {
-    return delegate.getArrayFormulaManager();
+    return new ParsingArrayFormulaManager(delegate.getArrayFormulaManager(), declarations);
   }
 
   @Override
   public BitvectorFormulaManager getBitvectorFormulaManager() {
-    return delegate.getBitvectorFormulaManager();
+    return new ParsingBitvectorFormulaManager(delegate.getBitvectorFormulaManager(), declarations);
   }
 
   @Override
   public FloatingPointFormulaManager getFloatingPointFormulaManager() {
-    return delegate.getFloatingPointFormulaManager();
+    return new ParsingFloatingPointFormulaManager(
+        delegate.getFloatingPointFormulaManager(), declarations);
   }
 
   @Override
   public UFManager getUFManager() {
-    return delegate.getUFManager();
+    return new ParsingUFManager(delegate.getUFManager(), this, declarations);
   }
 
   @Override
@@ -111,7 +127,9 @@ public class ParsingFormulaManager implements FormulaManager {
 
   @Override
   public <T extends Formula> T makeVariable(FormulaType<T> formulaType, String name) {
-    return delegate.makeVariable(formulaType, name);
+    var term = delegate.makeVariable(formulaType, name);
+    declarations.addConstant(name, term);
+    return term;
   }
 
   @Override
@@ -157,14 +175,14 @@ public class ParsingFormulaManager implements FormulaManager {
 
   @Override
   public List<BooleanFormula> parseAll(String smtlib) throws IllegalArgumentException {
-    return SmtlibEvaluator.link(solver, SmtlibEvaluator.ParsingMode.TERM)
+    return SmtlibEvaluator.link(solver, this, SmtlibEvaluator.ParsingMode.TERM)
         .apply(parse(lex(smtlib)))
         .getAssertions();
   }
 
   @Override
   public List<SolverResponse> parseScript(String smtlib) {
-    return SmtlibEvaluator.link(solver, SmtlibEvaluator.ParsingMode.SCRIPT)
+    return SmtlibEvaluator.link(solver, this, SmtlibEvaluator.ParsingMode.SCRIPT)
         .apply(parse(lex(smtlib)))
         .getResponses();
   }
@@ -239,5 +257,10 @@ public class ParsingFormulaManager implements FormulaManager {
   @Override
   public String unescape(String variableName) {
     return delegate.unescape(variableName);
+  }
+
+  public Declarations getDefinedSymbols() {
+    return new Declarations(
+        ImmutableMap.copyOf(declarations.constants), ImmutableMap.copyOf(declarations.functions));
   }
 }

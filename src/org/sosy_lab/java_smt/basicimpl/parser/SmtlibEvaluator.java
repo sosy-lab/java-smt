@@ -36,6 +36,7 @@ import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.QuantifiedFormulaManager;
 import org.sosy_lab.java_smt.api.SolverContext;
 import org.sosy_lab.java_smt.api.SolverException;
+import org.sosy_lab.java_smt.delegate.parsing.ParsingFormulaManager;
 
 public class SmtlibEvaluator {
   public enum ParsingMode {
@@ -88,12 +89,16 @@ public class SmtlibEvaluator {
     return newProver;
   }
 
-  public static SmtlibEvaluator link(SolverContext pSolver, ParsingMode pMode) {
+  public static SmtlibEvaluator link(
+      SolverContext pSolver, ParsingFormulaManager pManager, ParsingMode pMode) {
     return new SmtlibEvaluator(
         pSolver,
         newProver(pSolver),
         pMode,
-        new Predefined(pSolver.getFormulaManager()).addTheorySymbols(),
+        new Predefined(pManager)
+            .addTheorySymbols()
+            .addUserSymbols(pManager.getDefinedSymbols())
+            .build(),
         ImmutableList.of(ImmutableList.of()),
         Optional.empty(),
         ImmutableList.builder());

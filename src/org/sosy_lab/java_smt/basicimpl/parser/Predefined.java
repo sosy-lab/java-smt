@@ -28,10 +28,15 @@ import org.sosy_lab.java_smt.api.FloatingPointRoundingModeFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.FormulaType;
+import org.sosy_lab.java_smt.api.FunctionDeclaration;
 import org.sosy_lab.java_smt.api.NumeralFormula;
+import org.sosy_lab.java_smt.delegate.parsing.ParsingFormulaManager;
 
 public class Predefined {
   private final FormulaManager mgr;
+
+  ImmutableMap.Builder<String, Function<List<Integer>, Function<List<Formula>, Formula>>>
+      predefined = ImmutableMap.builder();
 
   public Predefined(FormulaManager pManager) {
     mgr = pManager;
@@ -72,10 +77,7 @@ public class Predefined {
   }
 
   @SuppressWarnings({"unchecked", "rawtypes"})
-  public Map<String, Function<List<Integer>, Function<List<Formula>, Formula>>> addTheorySymbols() {
-    ImmutableMap.Builder<String, Function<List<Integer>, Function<List<Formula>, Formula>>>
-        predefined = ImmutableMap.builder();
-
+  public Predefined addTheorySymbols() {
     // Core
     predefined.put(
         "true",
@@ -1294,6 +1296,34 @@ public class Predefined {
           };
         });
 
+    return this;
+  }
+
+  public Predefined addUserSymbols(ParsingFormulaManager.Declarations pDeclarations) {
+    for (Map.Entry<String, Formula> constant : pDeclarations.constants().entrySet()) {
+      predefined.put(
+          constant.getKey(),
+          idx -> {
+            Preconditions.checkArgument(idx.isEmpty());
+            return p -> {
+              Preconditions.checkArgument(p.isEmpty());
+              return constant.getValue();
+            };
+          });
+    }
+    for (Map.Entry<String, FunctionDeclaration<?>> function :
+        pDeclarations.functions().entrySet()) {
+      predefined.put(
+          function.getKey(),
+          idx -> {
+            Preconditions.checkArgument(idx.isEmpty());
+            return p -> mgr.makeApplication(function.getValue(), p);
+          });
+    }
+    return this;
+  }
+
+  public Map<String, Function<List<Integer>, Function<List<Formula>, Formula>>> build() {
     return predefined.buildOrThrow();
   }
 }

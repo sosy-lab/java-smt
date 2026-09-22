@@ -19,14 +19,16 @@ import org.sosy_lab.java_smt.api.SolverContext;
 
 public class ParsingSolverContext implements SolverContext {
   private final SolverContext delegate;
+  private final FormulaManager manager;
 
   public ParsingSolverContext(SolverContext pDelegate) {
     delegate = pDelegate;
+    manager = new ParsingFormulaManager(delegate.getFormulaManager(), this);
   }
 
   @Override
   public FormulaManager getFormulaManager() {
-    return new ParsingFormulaManager(delegate.getFormulaManager(), this);
+    return manager;
   }
 
   @Override
