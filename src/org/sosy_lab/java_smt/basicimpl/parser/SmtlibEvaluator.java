@@ -664,11 +664,11 @@ public class SmtlibEvaluator {
       var terms =
           ctx.expr().stream().map(expr -> new ExprEvaluator(globalDefs).visit(expr)).toList();
 
-      ImmutableList.Builder<Formula> evaluatedTerms = ImmutableList.builder();
+      ImmutableList.Builder<Formula> evaluated = ImmutableList.builder();
       for (var term : terms) {
-        try {
-          var evaluated = prover.getEvaluator().eval(term);
-          evaluatedTerms.add(evaluated == null ? term : evaluated);
+        try (var evaluator = prover.getEvaluator()) {
+          var newTerm = evaluator.eval(term);
+          evaluated.add(newTerm == null ? term : newTerm);
         } catch (SolverException e) {
           throw new RuntimeException(e);
         }
@@ -680,8 +680,7 @@ public class SmtlibEvaluator {
           globalDefs,
           asserted,
           lastAssumptions,
-          responses.add(
-              new FormulaManager.SolverResponse.EvaluationResponse(evaluatedTerms.build())));
+          responses.add(new FormulaManager.SolverResponse.EvaluationResponse(evaluated.build())));
     }
 
     @Override
