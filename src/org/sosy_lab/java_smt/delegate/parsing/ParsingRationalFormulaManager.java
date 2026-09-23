@@ -16,11 +16,8 @@ import org.sosy_lab.java_smt.api.RationalFormulaManager;
 public class ParsingRationalFormulaManager
     extends ParsingNumeralFormulaManager<NumeralFormula, NumeralFormula.RationalFormula>
     implements RationalFormulaManager {
-  private final RationalFormulaManager delegate;
-
   ParsingRationalFormulaManager(
       RationalFormulaManager pDelegate, ParsingFormulaManager.Declarations pDeclarations) {
     super(pDelegate, pDeclarations);
-    delegate = pDelegate;
   }
 }
