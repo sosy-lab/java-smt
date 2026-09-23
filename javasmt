@@ -63,27 +63,27 @@ case "$platform" in
     ;;
 esac
 
-# JavaSMT can be present either as compiled classes below bin/, which take precedence, or as
-# the JAR that "ant jar" produces. The JARs with the sources and the documentation carry no
-# classes to run, so they are skipped. Several JARs would make it ambiguous which version runs,
-# so this is refused.
-if [ -e "$PATH_TO_JAVASMT/bin/org/sosy_lab/java_smt/cmdline/JavaSMTMain.class" ]; then
-  JAVASMT_CLASSES="$PATH_TO_JAVASMT/bin"
-else
-  JAVASMT_CLASSES=""
-  for jar in "$PATH_TO_JAVASMT"/java-smt-*.jar; do
-    case "$jar" in
-      *-sources.jar | *-javadoc.jar) continue ;;
-    esac
-    if [ -e "$jar" ]; then
-      if [ -n "$JAVASMT_CLASSES" ]; then
-        echo "Found several JavaSMT JARs, please remove all but one: $JAVASMT_CLASSES $jar" 1>&2
-        exit 1
-      fi
-      JAVASMT_CLASSES="$jar"
+# JavaSMT can be present either as the JAR that "ant jar" produces, which takes precedence, or as
+# compiled classes below bin/. The JARs with the sources and the documentation carry no classes
+# to run, so they are skipped. Several JARs would make it ambiguous which version runs, so this
+# is refused.
+JAVASMT_CLASSES=""
+for jar in "$PATH_TO_JAVASMT"/java-smt-*.jar; do
+  case "$jar" in
+    *-sources.jar | *-javadoc.jar) continue ;;
+  esac
+  if [ -e "$jar" ]; then
+    if [ -n "$JAVASMT_CLASSES" ]; then
+      echo "Found several JavaSMT JARs, please remove all but one: $JAVASMT_CLASSES $jar" 1>&2
+      exit 1
     fi
-  done
-  if [ -z "$JAVASMT_CLASSES" ]; then
+    JAVASMT_CLASSES="$jar"
+  fi
+done
+if [ -z "$JAVASMT_CLASSES" ]; then
+  if [ -e "$PATH_TO_JAVASMT/bin/org/sosy_lab/java_smt/cmdline/JavaSMTMain.class" ]; then
+    JAVASMT_CLASSES="$PATH_TO_JAVASMT/bin"
+  else
     echo "Could not find JavaSMT binary, please check path to project directory" 1>&2
     exit 1
   fi
