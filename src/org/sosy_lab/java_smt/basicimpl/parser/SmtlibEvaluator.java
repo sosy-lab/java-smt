@@ -714,12 +714,20 @@ public class SmtlibEvaluator {
     public SmtlibEvaluator visitResetSolver(SmtlibParser.ResetSolverContext ctx) {
       checkArgument(mode != ParsingMode.TERM, "Command 'reset' is not allowed in term mode");
       prover.close();
+      // Remove all symbols that were defined in this smtlib file from the context
+      ImmutableMap.Builder<String, Function<List<Integer>, Function<List<Formula>, Formula>>>
+          nonlocal = ImmutableMap.builder();
+      for (var symbol : globalDefs.keySet()) {
+        if (!localDefs.contains(symbol)) {
+          nonlocal.put(symbol, globalDefs.get(symbol));
+        }
+      }
       return new SmtlibEvaluator(
           solver,
           newProver(solver),
           mode,
-          globalDefs,
-          localDefs,
+          nonlocal.build(),
+          ImmutableSet.of(),
           ImmutableList.of(ImmutableList.of()),
           Optional.empty(),
           responses);

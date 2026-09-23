@@ -441,4 +441,42 @@ public class ParserTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
     assertThat(unsatAssumptionsCore).hasSize(1);
     assertThat(mgr.extractVariables(unsatAssumptionsCore.get(0)).keySet()).containsExactly("B");
   }
+
+  @SuppressWarnings("unused")
+  @Test
+  public void parseScriptResetTest() {
+    requireIntegers();
+
+    String resetSmtlib =
+        """
+            (declare-const v Int)
+            (reset)
+            (assert (= v 0))
+            (check-sat)
+            (exit)
+            """;
+    assertThrows(IllegalArgumentException.class, () -> mgr.parseScript(resetSmtlib));
+
+    String redeclareSmtlib =
+        """
+            (declare-const v Int)
+            (reset)
+            (declare-const v Int)
+            (assert (= v 0))
+            (check-sat)
+            (exit)
+            """;
+    var redeclareResponse = mgr.parseScript(redeclareSmtlib);
+
+    String redefineSmtlib =
+        """
+            (declare-const v Int)
+            (reset)
+            (declare-const v Bool)
+            (assert v)
+            (check-sat)
+            (exit)
+            """;
+    var redefineResponse = mgr.parseScript(redefineSmtlib);
+  }
 }
