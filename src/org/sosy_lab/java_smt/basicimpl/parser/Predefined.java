@@ -1227,15 +1227,12 @@ public class Predefined {
     predefined.put(
         "fp.to_ubv",
         idx -> {
-          Preconditions.checkArgument(idx.isEmpty());
+          Preconditions.checkArgument(idx.size() == 1);
           return p -> {
             Preconditions.checkArgument(p.size() == 2);
             var rm = (FloatingPointRoundingModeFormula) p.get(0);
             var from = (FloatingPointFormula) p.get(1);
-            var fromType = (FormulaType.FloatingPointType) mgr.getFormulaType(from);
-            var toType =
-                FormulaType.getBitvectorTypeWithSize(
-                    1 + fromType.getExponentSize() + fromType.getMantissaSizeWithoutHiddenBit());
+            var toType = FormulaType.getBitvectorTypeWithSize(idx.get(0));
             return mgr.getFloatingPointFormulaManager()
                 .castTo(
                     from,
@@ -1247,15 +1244,12 @@ public class Predefined {
     predefined.put(
         "fp.to_sbv",
         idx -> {
-          Preconditions.checkArgument(idx.isEmpty());
+          Preconditions.checkArgument(idx.size() == 1);
           return p -> {
             Preconditions.checkArgument(p.size() == 2);
             var rm = (FloatingPointRoundingModeFormula) p.get(0);
             var from = (FloatingPointFormula) p.get(1);
-            var fromType = (FormulaType.FloatingPointType) mgr.getFormulaType(from);
-            var toType =
-                FormulaType.getBitvectorTypeWithSize(
-                    1 + fromType.getExponentSize() + fromType.getMantissaSizeWithoutHiddenBit());
+            var toType = FormulaType.getBitvectorTypeWithSize(idx.get(0));
             return mgr.getFloatingPointFormulaManager()
                 .castTo(
                     from,
