@@ -433,8 +433,7 @@ public final class SmtlibEvaluator {
 
     @Override
     public SmtlibEvaluator visitSetLogic(SmtlibParser.SetLogicContext ctx) {
-      var logic = ctx.symbol().getText();
-      checkArgument(logic.equals("ALL"), "Logic must be set to ALL");
+      // Ignore for now
       return SmtlibEvaluator.this;
     }
 
