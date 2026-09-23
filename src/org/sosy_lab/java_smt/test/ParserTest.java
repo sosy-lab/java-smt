@@ -402,6 +402,7 @@ public class ParserTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   @Test
   public void parseScriptUnsatCoreTest() throws SolverException, InterruptedException {
     requireIntegers();
+    requireUnsatCore();
 
     String unsatCoreSmtlib =
         """
@@ -423,6 +424,7 @@ public class ParserTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   @Test
   public void parseScriptUnsatAssumptionsTest() throws SolverException, InterruptedException {
     requireIntegers();
+    requireUnsatCoreOverAssumptions();
 
     String unsatAssumptionsSmtlib =
         """
