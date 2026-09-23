@@ -370,8 +370,8 @@ public final class SmtlibEvaluator {
             mgr.getQuantifiedFormulaManager()
                 .mkQuantifier(
                     ctx.quantifier().getRuleIndex() == 0
-                        ? QuantifiedFormulaManager.Quantifier.FORALL
-                        : QuantifiedFormulaManager.Quantifier.EXISTS,
+                        ? QuantifiedFormulaManager.Quantifier.EXISTS
+                        : QuantifiedFormulaManager.Quantifier.FORALL,
                     ImmutableList.of(bound),
                     acc);
       }
