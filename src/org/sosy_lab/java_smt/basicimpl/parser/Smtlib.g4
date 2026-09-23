@@ -71,12 +71,28 @@ real
     : Decimal
     ;
 
+fragment StringChar
+    : '\u0020' .. '\u0021' // Skip '"'
+    | '\u0023' .. '\u007E' // Skip <Delete>
+    | '\u0080' .. '\uffff'
+    | '""'                 // Add escaped '"' back in
+    ;
+
+String
+    : '"' StringChar* '"'
+    ;
+
+string
+    : String
+    ;
+
 literal
     : boolean
     | integer
     | real
     | bitvec
     | float
+    | string
     ;
 
 fragment Sym

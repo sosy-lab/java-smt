@@ -84,6 +84,17 @@ public class SmtlibBaseVisitor<T> extends AbstractParseTreeVisitor<T> implements
    * ctx}.
    */
   @Override
+  public T visitString(SmtlibParser.StringContext ctx) {
+    return visitChildren(ctx);
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * <p>The default implementation returns the result of calling {@link #visitChildren} on {@code
+   * ctx}.
+   */
+  @Override
   public T visitLiteral(SmtlibParser.LiteralContext ctx) {
     return visitChildren(ctx);
   }

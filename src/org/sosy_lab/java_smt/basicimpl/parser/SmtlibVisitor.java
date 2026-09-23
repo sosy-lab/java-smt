@@ -62,6 +62,14 @@ public interface SmtlibVisitor<T> extends ParseTreeVisitor<T> {
   T visitReal(SmtlibParser.RealContext ctx);
 
   /**
+   * Visit a parse tree produced by {@link SmtlibParser#string}.
+   *
+   * @param ctx the parse tree
+   * @return the visitor result
+   */
+  T visitString(SmtlibParser.StringContext ctx);
+
+  /**
    * Visit a parse tree produced by {@link SmtlibParser#literal}.
    *
    * @param ctx the parse tree
