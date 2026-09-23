@@ -130,6 +130,15 @@ public interface SmtlibVisitor<T> extends ParseTreeVisitor<T> {
   T visitSortBitvec(SmtlibParser.SortBitvecContext ctx);
 
   /**
+   * Visit a parse tree produced by the {@code SortRoundingMode} labeled alternative in {@link
+   * SmtlibParser#sort}.
+   *
+   * @param ctx the parse tree
+   * @return the visitor result
+   */
+  T visitSortRoundingMode(SmtlibParser.SortRoundingModeContext ctx);
+
+  /**
    * Visit a parse tree produced by the {@code SortFloat} labeled alternative in {@link
    * SmtlibParser#sort}.
    *

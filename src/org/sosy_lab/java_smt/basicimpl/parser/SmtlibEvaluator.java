@@ -173,6 +173,11 @@ public final class SmtlibEvaluator {
     }
 
     @Override
+    public FormulaType<?> visitSortRoundingMode(SmtlibParser.SortRoundingModeContext ctx) {
+      return FormulaType.FloatingPointRoundingModeType;
+    }
+
+    @Override
     public FormulaType<?> visitSortFloat(SmtlibParser.SortFloatContext ctx) {
       if (ctx.integer().isEmpty()) {
         return switch (ctx.getText()) {

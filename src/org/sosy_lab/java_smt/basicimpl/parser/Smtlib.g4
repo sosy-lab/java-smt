@@ -153,6 +153,7 @@ sort
     | 'Int'                                        # SortInt
     | 'Real'                                       # SortReal
     | '(' '_' 'BitVec' integer ')'                 # SortBitvec
+    | 'RoundingMode'                               # SortRoundingMode
     | ('Float16'
       |'Float32'
       |'Float64'

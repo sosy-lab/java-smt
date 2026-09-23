@@ -172,6 +172,17 @@ public class SmtlibBaseVisitor<T> extends AbstractParseTreeVisitor<T> implements
    * ctx}.
    */
   @Override
+  public T visitSortRoundingMode(SmtlibParser.SortRoundingModeContext ctx) {
+    return visitChildren(ctx);
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * <p>The default implementation returns the result of calling {@link #visitChildren} on {@code
+   * ctx}.
+   */
+  @Override
   public T visitSortFloat(SmtlibParser.SortFloatContext ctx) {
     return visitChildren(ctx);
   }
