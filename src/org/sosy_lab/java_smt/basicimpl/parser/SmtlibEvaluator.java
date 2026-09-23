@@ -205,22 +205,30 @@ public final class SmtlibEvaluator {
       return mgr.getBooleanFormulaManager().makeBoolean(Boolean.parseBoolean(ctx.getText()));
     }
 
-    @Override
-    public Formula visitBitvec(SmtlibParser.BitvecContext ctx) {
-      var str = ctx.getText().substring(2);
-      if (ctx.getText().startsWith("#b")) {
-        return mgr.getBitvectorFormulaManager().makeBitvector(str.length(), new BigInteger(str, 2));
+    private String toBinary(String bitvec) {
+      var prefix = bitvec.substring(0, 2);
+      var number = bitvec.substring(2);
+
+      if (prefix.equals("#b")) {
+        return number;
       } else {
-        return mgr.getBitvectorFormulaManager()
-            .makeBitvector(str.length() * 4, new BigInteger(str, 16));
+        var binary = new BigInteger(number, 16).toString(2);
+        return "0".repeat(4 * number.length() - binary.length()) + binary;
       }
     }
 
     @Override
+    public Formula visitBitvec(SmtlibParser.BitvecContext ctx) {
+      var binary = toBinary(ctx.getText());
+      return mgr.getBitvectorFormulaManager()
+          .makeBitvector(binary.length(), new BigInteger(binary, 2));
+    }
+
+    @Override
     public Formula visitFloat(SmtlibParser.FloatContext ctx) {
-      var b0 = ctx.bitvec(0).getText().substring(2);
-      var b1 = ctx.bitvec(1).getText().substring(2);
-      var b2 = ctx.bitvec(2).getText().substring(2);
+      var b0 = toBinary(ctx.bitvec(0).getText());
+      var b1 = toBinary(ctx.bitvec(1).getText());
+      var b2 = toBinary(ctx.bitvec(2).getText());
       checkArgument(b0.length() == 1);
       return mgr.getFloatingPointFormulaManager()
           .makeNumber(
