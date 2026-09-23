@@ -743,9 +743,10 @@ public final class SmtlibEvaluator {
       // Remove all symbols that were defined in this smtlib file from the context
       ImmutableMap.Builder<String, Function<List<Integer>, Function<List<Formula>, Formula>>>
           nonlocal = ImmutableMap.builder();
-      for (var symbol : globalDefs.keySet()) {
+      for (var entry : globalDefs.entrySet()) {
+        var symbol = entry.getKey();
         if (!localDefs.contains(symbol)) {
-          nonlocal.put(symbol, globalDefs.get(symbol));
+          nonlocal.put(symbol, entry.getValue());
         }
       }
       return new SmtlibEvaluator(
@@ -753,7 +754,7 @@ public final class SmtlibEvaluator {
           solver,
           newProver(solver),
           closed,
-          nonlocal.build(),
+          nonlocal.buildOrThrow(),
           ImmutableSet.of(),
           ImmutableList.of(ImmutableList.of()),
           Optional.empty(),
