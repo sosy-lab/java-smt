@@ -234,7 +234,7 @@ public final class SmtlibEvaluator {
           .makeNumber(
               FloatingPointNumber.of(
                   b0 + b1 + b2,
-                  FormulaType.getFloatingPointTypeFromSizesWithHiddenBit(
+                  FormulaType.getFloatingPointTypeFromSizesWithoutHiddenBit(
                       b1.length(), b2.length())));
     }
 
