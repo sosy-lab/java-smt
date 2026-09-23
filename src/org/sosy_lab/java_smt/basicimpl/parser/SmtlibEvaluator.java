@@ -47,10 +47,11 @@ public class SmtlibEvaluator {
     SCRIPT
   }
 
+  private final ParsingMode mode;
   private final SolverContext solver;
   private final FormulaManager mgr;
   private final ProverEnvironment prover;
-  private final ParsingMode mode;
+  private final boolean closed;
 
   private final Map<String, Function<List<Integer>, Function<List<Formula>, Formula>>> globalDefs;
   private final Set<String> localDefs;
@@ -60,19 +61,21 @@ public class SmtlibEvaluator {
 
   private static int counter = 0;
 
-  protected SmtlibEvaluator(
+  private SmtlibEvaluator(
+      ParsingMode pMode,
       SolverContext pSolver,
       ProverEnvironment pProver,
-      ParsingMode pMode,
+      boolean pClosed,
       Map<String, Function<List<Integer>, Function<List<Formula>, Formula>>> pGlobalDefs,
       Set<String> pLocalDefs,
       List<List<BooleanFormula>> pAsserted,
       Optional<List<BooleanFormula>> pLastAssumptions,
       ImmutableList.Builder<FormulaManager.SolverResponse> pResponses) {
+    mode = pMode;
     solver = pSolver;
     mgr = pSolver.getFormulaManager();
     prover = pProver;
-    mode = pMode;
+    closed = pClosed;
     globalDefs = pGlobalDefs;
     localDefs = pLocalDefs;
     asserted = pAsserted;
@@ -99,9 +102,10 @@ public class SmtlibEvaluator {
   public static SmtlibEvaluator link(
       SolverContext pSolver, ParsingFormulaManager pManager, ParsingMode pMode) {
     return new SmtlibEvaluator(
+        pMode,
         pSolver,
         newProver(pSolver),
-        pMode,
+        false,
         new Predefined(pManager)
             .addTheorySymbols()
             .addUserSymbols(pManager.getDefinedSymbols())
@@ -425,9 +429,10 @@ public class SmtlibEvaluator {
       if (sorts.size() == 1) {
         var term = mgr.makeVariable(right, name);
         return new SmtlibEvaluator(
+            mode,
             solver,
             prover,
-            mode,
+            closed,
             addConstant(globalDefs, name, term),
             FluentIterable.concat(localDefs, ImmutableSet.of(name)).toSet(),
             asserted,
@@ -436,9 +441,10 @@ public class SmtlibEvaluator {
       } else {
         var uf = mgr.getUFManager().declareUF(name, right, left.toArray(new FormulaType<?>[0]));
         return new SmtlibEvaluator(
+            mode,
             solver,
             prover,
-            mode,
+            closed,
             addFunction(globalDefs, name, p -> mgr.makeApplication(uf, p)),
             FluentIterable.concat(localDefs, ImmutableSet.of(name)).toSet(),
             asserted,
@@ -457,9 +463,10 @@ public class SmtlibEvaluator {
         var term = new ExprEvaluator(globalDefs).visit(ctx.expr());
         checkArgument(mgr.getFormulaType(term).equals(sort));
         return new SmtlibEvaluator(
+            mode,
             solver,
             prover,
-            mode,
+            closed,
             addConstant(globalDefs, name, term),
             FluentIterable.concat(localDefs, ImmutableSet.of(name)).toSet(),
             asserted,
@@ -469,9 +476,10 @@ public class SmtlibEvaluator {
         var capture = globalDefs;
         // TODO Evaluate once during creation to catch any errors right away
         return new SmtlibEvaluator(
+            mode,
             solver,
             prover,
-            mode,
+            closed,
             addFunction(
                 globalDefs,
                 name,
@@ -511,9 +519,10 @@ public class SmtlibEvaluator {
         }
       }
       return new SmtlibEvaluator(
+          mode,
           solver,
           prover,
-          mode,
+          closed,
           globalDefs,
           localDefs,
           newAsserted.build(),
@@ -530,9 +539,10 @@ public class SmtlibEvaluator {
         prover.pop();
       }
       return new SmtlibEvaluator(
+          mode,
           solver,
           prover,
-          mode,
+          closed,
           globalDefs,
           localDefs,
           asserted.subList(0, asserted.size() - levels),
@@ -552,9 +562,10 @@ public class SmtlibEvaluator {
         throw new RuntimeException(e);
       }
       return new SmtlibEvaluator(
+          mode,
           solver,
           prover,
-          mode,
+          closed,
           globalDefs,
           localDefs,
           Stream.concat(init.stream(), Stream.of(added)).toList(),
@@ -567,9 +578,10 @@ public class SmtlibEvaluator {
       checkArgument(
           mode != ParsingMode.TERM, "Command 'get-assertions' is not allowed in term mode");
       return new SmtlibEvaluator(
+          mode,
           solver,
           prover,
-          mode,
+          closed,
           globalDefs,
           localDefs,
           asserted,
@@ -589,9 +601,10 @@ public class SmtlibEvaluator {
         throw new RuntimeException(e);
       }
       return new SmtlibEvaluator(
+          mode,
           solver,
           prover,
-          mode,
+          closed,
           globalDefs,
           localDefs,
           asserted,
@@ -617,9 +630,10 @@ public class SmtlibEvaluator {
         throw new RuntimeException(e);
       }
       return new SmtlibEvaluator(
+          mode,
           solver,
           prover,
-          mode,
+          closed,
           globalDefs,
           localDefs,
           asserted,
@@ -632,9 +646,10 @@ public class SmtlibEvaluator {
       checkArgument(mode != ParsingMode.TERM, "Command 'get-model' is not allowed in term mode");
       try (var model = prover.getModel()) {
         return new SmtlibEvaluator(
+            mode,
             solver,
             prover,
-            mode,
+            closed,
             globalDefs,
             localDefs,
             asserted,
@@ -652,9 +667,10 @@ public class SmtlibEvaluator {
           mode != ParsingMode.TERM, "Command 'get-unsat-core' is not allowed in term mode");
       List<BooleanFormula> core = prover.getUnsatCore();
       return new SmtlibEvaluator(
+          mode,
           solver,
           prover,
-          mode,
+          closed,
           globalDefs,
           localDefs,
           asserted,
@@ -673,9 +689,10 @@ public class SmtlibEvaluator {
         throw new RuntimeException(e);
       }
       return new SmtlibEvaluator(
+          mode,
           solver,
           prover,
-          mode,
+          closed,
           globalDefs,
           localDefs,
           asserted,
@@ -699,9 +716,10 @@ public class SmtlibEvaluator {
         }
       }
       return new SmtlibEvaluator(
+          mode,
           solver,
           prover,
-          mode,
+          closed,
           globalDefs,
           localDefs,
           asserted,
@@ -723,9 +741,10 @@ public class SmtlibEvaluator {
         }
       }
       return new SmtlibEvaluator(
+          mode,
           solver,
           newProver(solver),
-          mode,
+          closed,
           nonlocal.build(),
           ImmutableSet.of(),
           ImmutableList.of(ImmutableList.of()),
@@ -747,9 +766,10 @@ public class SmtlibEvaluator {
         throw new RuntimeException(e);
       }
       return new SmtlibEvaluator(
+          mode,
           solver,
           prover,
-          mode,
+          closed,
           globalDefs,
           localDefs,
           ImmutableList.of(ImmutableList.of()),
@@ -761,9 +781,10 @@ public class SmtlibEvaluator {
     public SmtlibEvaluator visitExit(SmtlibParser.ExitContext ctx) {
       checkArgument(mode != ParsingMode.TERM, "Command 'exit' is not allowed in term mode");
       return new SmtlibEvaluator(
+          mode,
           solver,
           prover,
-          mode,
+          true,
           globalDefs,
           localDefs,
           ImmutableList.of(),
@@ -776,6 +797,7 @@ public class SmtlibEvaluator {
       var eval = SmtlibEvaluator.this;
       try {
         for (var cmd : ctx.command()) {
+          checkArgument(!eval.closed, "Can't run any more commands. Solver was closed");
           eval = eval.commandVisitor.visit(cmd);
         }
       } finally {

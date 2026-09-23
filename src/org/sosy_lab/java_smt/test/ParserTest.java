@@ -449,34 +449,57 @@ public class ParserTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
 
     String resetSmtlib =
         """
-            (declare-const v Int)
-            (reset)
-            (assert (= v 0))
-            (check-sat)
-            (exit)
-            """;
+        (declare-const v Int)
+        (reset)
+        (assert (= v 0))
+        (check-sat)
+        (exit)
+        """;
     assertThrows(IllegalArgumentException.class, () -> mgr.parseScript(resetSmtlib));
 
     String redeclareSmtlib =
         """
-            (declare-const v Int)
-            (reset)
-            (declare-const v Int)
-            (assert (= v 0))
-            (check-sat)
-            (exit)
-            """;
+        (declare-const v Int)
+        (reset)
+        (declare-const v Int)
+        (assert (= v 0))
+        (check-sat)
+        (exit)
+        """;
     var redeclareResponse = mgr.parseScript(redeclareSmtlib);
 
     String redefineSmtlib =
         """
-            (declare-const v Int)
-            (reset)
-            (declare-const v Bool)
-            (assert v)
-            (check-sat)
-            (exit)
-            """;
+        (declare-const v Int)
+        (reset)
+        (declare-const v Bool)
+        (assert v)
+        (check-sat)
+        (exit)
+        """;
     var redefineResponse = mgr.parseScript(redefineSmtlib);
+  }
+
+  @SuppressWarnings("unused")
+  @Test
+  public void parseScriptExitTest() {
+    requireIntegers();
+
+    String noExitSmtlib =
+        """
+        (declare-const v Int)
+        (assert (= v 0))
+        (check-sat)
+        """;
+    var noExit = mgr.parseScript(noExitSmtlib);
+
+    String earlyExitSmtlib =
+        """
+        (declare-const v Int)
+        (assert (= v 0))
+        (exit)
+        (check-sat)
+        """;
+    assertThrows(IllegalArgumentException.class, () -> mgr.parseScript(earlyExitSmtlib));
   }
 }
