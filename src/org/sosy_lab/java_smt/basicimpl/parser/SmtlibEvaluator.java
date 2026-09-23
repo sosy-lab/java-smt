@@ -105,11 +105,7 @@ public class SmtlibEvaluator {
   }
 
   public SmtlibEvaluator apply(ParseTree pSmtlib) {
-    try {
-      return commandVisitor.visit(pSmtlib);
-    } finally {
-      prover.close();
-    }
+    return commandVisitor.visit(pSmtlib);
   }
 
   public List<BooleanFormula> getAssertions() {
@@ -686,6 +682,7 @@ public class SmtlibEvaluator {
     @Override
     public SmtlibEvaluator visitResetSolver(SmtlibParser.ResetSolverContext ctx) {
       checkArgument(mode != ParsingMode.TERM, "Command 'reset' is not allowed in term mode");
+      prover.close();
       return new SmtlibEvaluator(
           solver,
           newProver(solver),
@@ -722,7 +719,6 @@ public class SmtlibEvaluator {
     @Override
     public SmtlibEvaluator visitExit(SmtlibParser.ExitContext ctx) {
       checkArgument(mode != ParsingMode.TERM, "Command 'exit' is not allowed in term mode");
-      prover.close();
       return new SmtlibEvaluator(
           solver, prover, mode, globalDefs, ImmutableList.of(), Optional.empty(), responses);
     }
@@ -730,8 +726,12 @@ public class SmtlibEvaluator {
     @Override
     public SmtlibEvaluator visitSmtlib(SmtlibParser.SmtlibContext ctx) {
       var eval = SmtlibEvaluator.this;
-      for (var cmd : ctx.command()) {
-        eval = eval.commandVisitor.visit(cmd);
+      try {
+        for (var cmd : ctx.command()) {
+          eval = eval.commandVisitor.visit(cmd);
+        }
+      } finally {
+        prover.close();
       }
       return eval;
     }
