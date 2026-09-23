@@ -779,7 +779,6 @@ public class SmtlibEvaluator {
 
     @Override
     public SmtlibEvaluator visitExit(SmtlibParser.ExitContext ctx) {
-      checkArgument(mode != ParsingMode.TERM, "Command 'exit' is not allowed in term mode");
       return new SmtlibEvaluator(
           mode,
           solver,
@@ -787,8 +786,8 @@ public class SmtlibEvaluator {
           true,
           globalDefs,
           localDefs,
-          ImmutableList.of(),
-          Optional.empty(),
+          asserted,
+          lastAssumptions,
           responses);
     }
 
