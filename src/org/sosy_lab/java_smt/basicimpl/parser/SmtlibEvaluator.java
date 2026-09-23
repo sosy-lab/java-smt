@@ -14,8 +14,10 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static org.sosy_lab.common.collect.Collections3.transformedImmutableListCopy;
 
 import com.google.common.base.Joiner;
+import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -23,6 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Stream;
 import org.antlr.v4.runtime.tree.ParseTree;
@@ -50,6 +53,7 @@ public class SmtlibEvaluator {
   private final ParsingMode mode;
 
   private final Map<String, Function<List<Integer>, Function<List<Formula>, Formula>>> globalDefs;
+  private final Set<String> localDefs;
   private final List<List<BooleanFormula>> asserted;
   private final Optional<List<BooleanFormula>> lastAssumptions;
   private final ImmutableList.Builder<FormulaManager.SolverResponse> responses;
@@ -61,6 +65,7 @@ public class SmtlibEvaluator {
       ProverEnvironment pProver,
       ParsingMode pMode,
       Map<String, Function<List<Integer>, Function<List<Formula>, Formula>>> pGlobalDefs,
+      Set<String> pLocalDefs,
       List<List<BooleanFormula>> pAsserted,
       Optional<List<BooleanFormula>> pLastAssumptions,
       ImmutableList.Builder<FormulaManager.SolverResponse> pResponses) {
@@ -69,6 +74,7 @@ public class SmtlibEvaluator {
     prover = pProver;
     mode = pMode;
     globalDefs = pGlobalDefs;
+    localDefs = pLocalDefs;
     asserted = pAsserted;
     lastAssumptions = pLastAssumptions;
     responses = pResponses;
@@ -100,6 +106,7 @@ public class SmtlibEvaluator {
             .addTheorySymbols()
             .addUserSymbols(pManager.getDefinedSymbols())
             .build(),
+        ImmutableSet.of(),
         ImmutableList.of(ImmutableList.of()),
         Optional.empty(),
         ImmutableList.builder());
@@ -411,6 +418,7 @@ public class SmtlibEvaluator {
     @Override
     public SmtlibEvaluator visitDeclare(SmtlibParser.DeclareContext ctx) {
       var name = getSymbolValue(ctx.symbol());
+      checkArgument(!localDefs.contains(name), "Symbol %s already exists", name);
       var sorts = transformedImmutableListCopy(ctx.sort(), p -> sortEvaluator.visit(p));
       var left = sorts.subList(0, sorts.size() - 1);
       var right = sorts.get(sorts.size() - 1);
@@ -421,6 +429,7 @@ public class SmtlibEvaluator {
             prover,
             mode,
             addConstant(globalDefs, name, term),
+            FluentIterable.concat(localDefs, ImmutableSet.of(name)).toSet(),
             asserted,
             lastAssumptions,
             responses);
@@ -431,6 +440,7 @@ public class SmtlibEvaluator {
             prover,
             mode,
             addFunction(globalDefs, name, p -> mgr.makeApplication(uf, p)),
+            FluentIterable.concat(localDefs, ImmutableSet.of(name)).toSet(),
             asserted,
             lastAssumptions,
             responses);
@@ -440,6 +450,7 @@ public class SmtlibEvaluator {
     @Override
     public SmtlibEvaluator visitDefine(SmtlibParser.DefineContext ctx) {
       var name = getSymbolValue(ctx.symbol());
+      checkArgument(!localDefs.contains(name), "Symbol %s already exists", name);
       var sort = sortEvaluator.visit(ctx.sort());
       var parameters = ctx.sortedVar();
       if (parameters.isEmpty()) {
@@ -450,6 +461,7 @@ public class SmtlibEvaluator {
             prover,
             mode,
             addConstant(globalDefs, name, term),
+            FluentIterable.concat(localDefs, ImmutableSet.of(name)).toSet(),
             asserted,
             lastAssumptions,
             responses);
@@ -476,6 +488,7 @@ public class SmtlibEvaluator {
                   }
                   return new ExprEvaluator(updated).visit(ctx.expr());
                 }),
+            FluentIterable.concat(localDefs, ImmutableSet.of(name)).toSet(),
             asserted,
             lastAssumptions,
             responses);
@@ -498,7 +511,14 @@ public class SmtlibEvaluator {
         }
       }
       return new SmtlibEvaluator(
-          solver, prover, mode, globalDefs, newAsserted.build(), Optional.empty(), responses);
+          solver,
+          prover,
+          mode,
+          globalDefs,
+          localDefs,
+          newAsserted.build(),
+          Optional.empty(),
+          responses);
     }
 
     @Override
@@ -514,6 +534,7 @@ public class SmtlibEvaluator {
           prover,
           mode,
           globalDefs,
+          localDefs,
           asserted.subList(0, asserted.size() - levels),
           Optional.empty(),
           responses);
@@ -535,6 +556,7 @@ public class SmtlibEvaluator {
           prover,
           mode,
           globalDefs,
+          localDefs,
           Stream.concat(init.stream(), Stream.of(added)).toList(),
           lastAssumptions,
           responses);
@@ -549,6 +571,7 @@ public class SmtlibEvaluator {
           prover,
           mode,
           globalDefs,
+          localDefs,
           asserted,
           lastAssumptions,
           responses.add(new FormulaManager.SolverResponse.AssertedResponse(getAssertions())));
@@ -570,6 +593,7 @@ public class SmtlibEvaluator {
           prover,
           mode,
           globalDefs,
+          localDefs,
           asserted,
           Optional.empty(),
           responses.add(new FormulaManager.SolverResponse.CheckSatResponse(status)));
@@ -597,6 +621,7 @@ public class SmtlibEvaluator {
           prover,
           mode,
           globalDefs,
+          localDefs,
           asserted,
           Optional.of(assumed),
           responses.add(new FormulaManager.SolverResponse.CheckSatResponse(status)));
@@ -611,6 +636,7 @@ public class SmtlibEvaluator {
             prover,
             mode,
             globalDefs,
+            localDefs,
             asserted,
             lastAssumptions,
             responses.add(new FormulaManager.SolverResponse.ModelResponse(model.asList())));
@@ -630,6 +656,7 @@ public class SmtlibEvaluator {
           prover,
           mode,
           globalDefs,
+          localDefs,
           asserted,
           lastAssumptions,
           responses.add(new FormulaManager.SolverResponse.UnsatCoreResponse(core)));
@@ -650,6 +677,7 @@ public class SmtlibEvaluator {
           prover,
           mode,
           globalDefs,
+          localDefs,
           asserted,
           lastAssumptions,
           responses.add(new FormulaManager.SolverResponse.UnsatCoreResponse(core.orElseThrow())));
@@ -675,6 +703,7 @@ public class SmtlibEvaluator {
           prover,
           mode,
           globalDefs,
+          localDefs,
           asserted,
           lastAssumptions,
           responses.add(new FormulaManager.SolverResponse.EvaluationResponse(evaluated.build())));
@@ -690,6 +719,7 @@ public class SmtlibEvaluator {
           newProver(solver),
           mode,
           globalDefs,
+          localDefs,
           ImmutableList.of(ImmutableList.of()),
           Optional.empty(),
           responses);
@@ -713,6 +743,7 @@ public class SmtlibEvaluator {
           prover,
           mode,
           globalDefs,
+          localDefs,
           ImmutableList.of(ImmutableList.of()),
           Optional.empty(),
           responses);
@@ -722,7 +753,14 @@ public class SmtlibEvaluator {
     public SmtlibEvaluator visitExit(SmtlibParser.ExitContext ctx) {
       checkArgument(mode != ParsingMode.TERM, "Command 'exit' is not allowed in term mode");
       return new SmtlibEvaluator(
-          solver, prover, mode, globalDefs, ImmutableList.of(), Optional.empty(), responses);
+          solver,
+          prover,
+          mode,
+          globalDefs,
+          localDefs,
+          ImmutableList.of(),
+          Optional.empty(),
+          responses);
     }
 
     @Override
