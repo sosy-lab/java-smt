@@ -41,7 +41,7 @@ import org.sosy_lab.java_smt.api.SolverContext;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.delegate.parsing.ParsingFormulaManager;
 
-public class SmtlibEvaluator {
+public final class SmtlibEvaluator {
   public enum ParsingMode {
     TERM,
     SCRIPT
@@ -61,6 +61,7 @@ public class SmtlibEvaluator {
 
   private static int counter = 0;
 
+  @SuppressWarnings("checkstyle:parameternumber")
   private SmtlibEvaluator(
       ParsingMode pMode,
       SolverContext pSolver,
@@ -196,7 +197,7 @@ public class SmtlibEvaluator {
     }
   }
 
-  private SortEvaluator sortEvaluator = new SortEvaluator();
+  private final SortEvaluator sortEvaluator = new SortEvaluator();
 
   class ConstEvalator extends SmtlibBaseVisitor<Formula> {
     @Override
@@ -240,7 +241,7 @@ public class SmtlibEvaluator {
     }
   }
 
-  private ConstEvalator constEvalator = new ConstEvalator();
+  private final ConstEvalator constEvalator = new ConstEvalator();
 
   class ExprEvaluator extends SmtlibBaseVisitor<Formula> {
     private final Map<String, Function<List<Integer>, Function<List<Formula>, Formula>>> context;
@@ -285,7 +286,7 @@ public class SmtlibEvaluator {
       }
     }
 
-    private FunctionEvaluator functionEvaluator = new FunctionEvaluator();
+    private final FunctionEvaluator functionEvaluator = new FunctionEvaluator();
 
     ExprEvaluator(Map<String, Function<List<Integer>, Function<List<Formula>, Formula>>> pContext) {
       context = pContext;
@@ -428,7 +429,7 @@ public class SmtlibEvaluator {
     public SmtlibEvaluator visitDeclare(SmtlibParser.DeclareContext ctx) {
       var name = getSymbolValue(ctx.symbol());
       checkArgument(!localDefs.contains(name), "Symbol %s already exists", name);
-      var sorts = transformedImmutableListCopy(ctx.sort(), p -> sortEvaluator.visit(p));
+      var sorts = transformedImmutableListCopy(ctx.sort(), sortEvaluator::visit);
       var left = sorts.subList(0, sorts.size() - 1);
       var right = sorts.get(sorts.size() - 1);
       if (sorts.size() == 1) {

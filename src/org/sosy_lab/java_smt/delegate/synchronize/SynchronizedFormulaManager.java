@@ -187,7 +187,8 @@ class SynchronizedFormulaManager implements FormulaManager {
   }
 
   @Override
-  public List<SolverResponse> parseScript(String smtlib) throws SolverException, InterruptedException {
+  public List<SolverResponse> parseScript(String smtlib)
+      throws SolverException, InterruptedException {
     synchronized (sync) {
       return delegate.parseScript(smtlib);
     }

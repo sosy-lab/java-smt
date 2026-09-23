@@ -181,7 +181,8 @@ public class ParsingFormulaManager implements FormulaManager {
   }
 
   @Override
-  public List<SolverResponse> parseScript(String smtlib) throws SolverException, InterruptedException {
+  public List<SolverResponse> parseScript(String smtlib)
+      throws SolverException, InterruptedException {
     return SmtlibEvaluator.link(solver, this, SmtlibEvaluator.ParsingMode.SCRIPT)
         .apply(parse(lex(smtlib)))
         .getResponses();

@@ -88,9 +88,9 @@ public class SmtlibLexer extends Lexer {
       Simple = 48,
       Quoted = 49,
       Keyword = 50;
-  public static String[] channelNames = {"DEFAULT_TOKEN_CHANNEL", "HIDDEN"};
+  static final String[] channelNames = {"DEFAULT_TOKEN_CHANNEL", "HIDDEN"};
 
-  public static String[] modeNames = {"DEFAULT_MODE"};
+  static final String[] modeNames = {"DEFAULT_MODE"};
 
   private static String[] makeRuleNames() {
     return new String[] {

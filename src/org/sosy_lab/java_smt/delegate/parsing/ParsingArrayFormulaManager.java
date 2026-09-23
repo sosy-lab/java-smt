@@ -16,6 +16,7 @@ import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
 
+@SuppressWarnings("MethodTypeParameterName")
 public class ParsingArrayFormulaManager implements ArrayFormulaManager {
   private final ArrayFormulaManager delegate;
   private final ParsingFormulaManager.Declarations declarations;

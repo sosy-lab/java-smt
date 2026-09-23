@@ -18,6 +18,7 @@ import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula;
 import org.sosy_lab.java_smt.api.NumeralFormulaManager;
 
+@SuppressWarnings("ClassTypeParameterName")
 public abstract class ParsingNumeralFormulaManager<
         ParamFormulaType extends NumeralFormula, ResultFormulaType extends NumeralFormula>
     implements NumeralFormulaManager<ParamFormulaType, ResultFormulaType> {
