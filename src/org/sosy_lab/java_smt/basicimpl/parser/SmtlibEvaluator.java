@@ -89,6 +89,7 @@ public class SmtlibEvaluator {
     return newProver;
   }
 
+  @SuppressWarnings("resource")
   public static SmtlibEvaluator link(
       SolverContext pSolver, ParsingFormulaManager pManager, ParsingMode pMode) {
     return new SmtlibEvaluator(
@@ -679,6 +680,7 @@ public class SmtlibEvaluator {
           responses.add(new FormulaManager.SolverResponse.EvaluationResponse(evaluated.build())));
     }
 
+    @SuppressWarnings("resource")
     @Override
     public SmtlibEvaluator visitResetSolver(SmtlibParser.ResetSolverContext ctx) {
       checkArgument(mode != ParsingMode.TERM, "Command 'reset' is not allowed in term mode");
