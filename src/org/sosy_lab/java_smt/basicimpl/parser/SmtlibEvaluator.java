@@ -660,7 +660,7 @@ public class SmtlibEvaluator {
 
     @Override
     public SmtlibEvaluator visitGetValue(SmtlibParser.GetValueContext ctx) {
-      checkArgument(mode != ParsingMode.TERM, "Command 'get-vale' is not allowed in term mode");
+      checkArgument(mode != ParsingMode.TERM, "Command 'get-value' is not allowed in term mode");
       var terms =
           ctx.expr().stream().map(expr -> new ExprEvaluator(globalDefs).visit(expr)).toList();
 
