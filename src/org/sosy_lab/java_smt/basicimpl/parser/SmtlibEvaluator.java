@@ -508,7 +508,6 @@ public final class SmtlibEvaluator {
                     var nameArg = getSymbolValue(parameters.get(i).symbol());
                     var sortArg = sortEvaluator.visit(parameters.get(i).sort());
                     var value = p.get(i);
-                    // FIXME Probably too strong for bv/fp sorts?
                     checkArgument(mgr.getFormulaType(value).equals(sortArg));
                     updated = addConstant(updated, nameArg, value);
                   }
