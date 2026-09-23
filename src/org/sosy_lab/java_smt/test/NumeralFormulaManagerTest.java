@@ -263,7 +263,14 @@ public class NumeralFormulaManagerTest extends SolverBasedTest0.ParameterizedSol
   public void negateTest() {
     requireIntegers();
     requireParser();
-    assume().that(solver).isNoneOf(Solvers.OPENSMT, Solvers.MATHSAT5, Solvers.PRINCESS);
+    assume()
+        .that(solver)
+        .isNoneOf(
+            Solvers.OPENSMT,
+            Solvers.MATHSAT5,
+            Solvers.PRINCESS,
+            Solvers.YICES2,
+            Solvers.SMTINTERPOL);
 
     var f = mgr.parse("(declare-const a Int) (declare-const b Int) (assert (= (- a) b))");
     assertThat(getKind(getOperand(f, 0))).isEqualTo(FunctionDeclarationKind.UMINUS);

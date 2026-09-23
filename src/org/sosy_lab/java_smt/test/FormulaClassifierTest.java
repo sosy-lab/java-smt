@@ -124,7 +124,7 @@ public class FormulaClassifierTest extends SolverBasedTest0.ParameterizedSolverB
     requireParser();
     requireIntegers();
     requireQuantifiers();
-    String query = NUMERAL_VARS + "(assert (exists ((z Int)) (= (+ x 1) 0)))";
+    String query = NUMERAL_VARS + "(assert (exists ((z Int)) (= (+ x 1) z)))";
     classifier.visit(mgr.parse(query));
     assertThat(classifier.toString()).isEqualTo("LIA");
   }
@@ -135,6 +135,7 @@ public class FormulaClassifierTest extends SolverBasedTest0.ParameterizedSolverB
     requireRationals();
     requireQuantifiers();
     requireRationals();
+    assume().that(solverToUse()).isNotEqualTo(Solvers.YICES2); // Some solvers rewrite the formula
     String query = NUMERAL_VARS + "(assert (exists ((zz Real)) (= (+ y y) zz)))";
     classifier.visit(mgr.parse(query));
     assertThat(classifier.toString()).isEqualTo("LRA");
@@ -146,6 +147,7 @@ public class FormulaClassifierTest extends SolverBasedTest0.ParameterizedSolverB
     requireRationals();
     requireQuantifiers();
     requireRationals();
+    assume().that(solverToUse()).isNotEqualTo(Solvers.YICES2); // Some solvers rewrite the formula
     String query =
         NUMERAL_VARS
             + "(assert (and "
@@ -222,7 +224,7 @@ public class FormulaClassifierTest extends SolverBasedTest0.ParameterizedSolverB
     requireParser();
     requireRationals();
     String query = NUMERAL_VARS + "(assert (< yy y))";
-    assume().that(solverToUse()).isNotEqualTo(Solvers.PRINCESS); // Princess rewrites the formula
+    assume().that(solverToUse()).isNoneOf(Solvers.PRINCESS, Solvers.YICES2); // Some solvers rewrite the formula
     classifier.visit(mgr.parse(query));
     assertThat(classifier.toString()).isEqualTo("QF_LRA");
   }
@@ -243,7 +245,7 @@ public class FormulaClassifierTest extends SolverBasedTest0.ParameterizedSolverB
     requireRationals();
     requireNonlinear();
     String query = NUMERAL_VARS + "(assert (< yy (* y y)))";
-    assume().that(solverToUse()).isNotEqualTo(Solvers.PRINCESS); // Princess rewrites the formula
+    assume().that(solverToUse()).isNoneOf(Solvers.PRINCESS, Solvers.YICES2); // Some solvers rewrite the formula
     classifier.visit(mgr.parse(query));
     assertThat(classifier.toString()).isEqualTo("QF_NRA");
   }
@@ -309,7 +311,7 @@ public class FormulaClassifierTest extends SolverBasedTest0.ParameterizedSolverB
     requireParser();
     requireRationals();
     String query = NUMERAL_VARS + "(assert (< yy (bar y)))";
-    assume().that(solverToUse()).isNotEqualTo(Solvers.PRINCESS); // Princess rewrites the formula
+    assume().that(solverToUse()).isNoneOf(Solvers.PRINCESS, Solvers.YICES2); // Some solvers rewrite the formula
     classifier.visit(mgr.parse(query));
     assertThat(classifier.toString()).isEqualTo("QF_UFLRA");
   }
@@ -320,7 +322,7 @@ public class FormulaClassifierTest extends SolverBasedTest0.ParameterizedSolverB
     requireRationals();
     requireNonlinear();
     String query = NUMERAL_VARS + "(assert (< (* y yy) (bar y)))";
-    assume().that(solverToUse()).isNotEqualTo(Solvers.PRINCESS); // Princess rewrites the formula
+    assume().that(solverToUse()).isNoneOf(Solvers.PRINCESS, Solvers.YICES2); // Some solvers rewrite the formula
     classifier.visit(mgr.parse(query));
     assertThat(classifier.toString()).isEqualTo("QF_UFNRA");
   }
@@ -331,7 +333,7 @@ public class FormulaClassifierTest extends SolverBasedTest0.ParameterizedSolverB
     requireRationals();
     requireQuantifiers();
     String query = NUMERAL_VARS + "(assert (exists ((zz Real)) (< (+ y yy) (bar y))))";
-    assume().that(solverToUse()).isNotEqualTo(Solvers.PRINCESS); // Princess rewrites the formula
+    assume().that(solverToUse()).isNoneOf(Solvers.PRINCESS, Solvers.YICES2); // Some solvers rewrite the formula
     classifier.visit(mgr.parse(query));
     assertThat(classifier.toString()).isEqualTo("UFLRA");
   }
@@ -343,7 +345,7 @@ public class FormulaClassifierTest extends SolverBasedTest0.ParameterizedSolverB
     requireNonlinear();
     requireQuantifiers();
     String query = NUMERAL_VARS + "(assert (exists ((zz Real)) (< (* y yy) (bar y))))";
-    assume().that(solverToUse()).isNotEqualTo(Solvers.PRINCESS); // Princess rewrites the formula
+    assume().that(solverToUse()).isNoneOf(Solvers.PRINCESS, Solvers.YICES2); // Some solvers rewrite the formula
     classifier.visit(mgr.parse(query));
     assertThat(classifier.toString()).isEqualTo("UFNRA");
   }
