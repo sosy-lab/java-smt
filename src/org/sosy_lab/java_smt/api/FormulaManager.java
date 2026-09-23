@@ -251,7 +251,7 @@ public interface FormulaManager {
    * <p>Solver responses to commands like <code>check-sat</code> or <code>get-model</code> are
    * stored in a list and then returned by this function.
    */
-  List<SolverResponse> parseScript(String smtlib);
+  List<SolverResponse> parseScript(String smtlib) throws SolverException, InterruptedException;
 
   /**
    * Serialize an input formula to an SMT-LIB format. Very useful when passing formulas between

@@ -300,7 +300,7 @@ public class ParserTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   }
 
   @Test
-  public void parseScriptStackTest() {
+  public void parseScriptStackTest() throws SolverException, InterruptedException {
     requireIntegers();
 
     String push =
@@ -338,7 +338,7 @@ public class ParserTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   }
 
   @Test
-  public void parseScriptCheckSatTest() {
+  public void parseScriptCheckSatTest() throws SolverException, InterruptedException {
     requireIntegers();
 
     String check =
@@ -367,7 +367,7 @@ public class ParserTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   }
 
   @Test
-  public void parseScriptModelTest() {
+  public void parseScriptModelTest() throws SolverException, InterruptedException {
     requireIntegers();
 
     String modelSmtlib =
@@ -400,7 +400,7 @@ public class ParserTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   }
 
   @Test
-  public void parseScriptUnsatCoreTest() {
+  public void parseScriptUnsatCoreTest() throws SolverException, InterruptedException {
     requireIntegers();
 
     String unsatCoreSmtlib =
@@ -421,7 +421,7 @@ public class ParserTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   }
 
   @Test
-  public void parseScriptUnsatAssumptionsTest() {
+  public void parseScriptUnsatAssumptionsTest() throws SolverException, InterruptedException {
     requireIntegers();
 
     String unsatAssumptionsSmtlib =
@@ -444,7 +444,7 @@ public class ParserTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
 
   @SuppressWarnings("unused")
   @Test
-  public void parseScriptResetTest() {
+  public void parseScriptResetTest() throws SolverException, InterruptedException {
     requireIntegers();
 
     String resetSmtlib =
@@ -482,7 +482,7 @@ public class ParserTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
 
   @SuppressWarnings("unused")
   @Test
-  public void parseScriptExitTest() {
+  public void parseScriptExitTest() throws SolverException, InterruptedException {
     requireIntegers();
 
     String noExitSmtlib =
@@ -501,5 +501,30 @@ public class ParserTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
         (check-sat)
         """;
     assertThrows(IllegalArgumentException.class, () -> mgr.parseScript(earlyExitSmtlib));
+  }
+
+  private Thread cancelIn(int delay) {
+    return new Thread(
+        () -> {
+          try {
+            Thread.sleep(delay);
+            shutdownManager.requestShutdown("Shutdown Request");
+          } catch (InterruptedException exception) {
+            throw new UnsupportedOperationException("Unexpected interrupt", exception);
+          }
+        });
+  }
+
+  @SuppressWarnings("resource")
+  @Test
+  public void parseScriptTimeoutTest() {
+    assume().that(solver).isNoneOf(Solvers.PRINCESS, Solvers.CVC5);
+    requireIntegers();
+
+    var hardProblem = new HardIntegerFormulaGenerator(imgr, bmgr).generate(50);
+    var hardSmtlib = String.format("%s (check-sat)", mgr.dumpFormula(hardProblem));
+
+    cancelIn(500).start();
+    assertThrows(InterruptedException.class, () -> mgr.parseScript(hardSmtlib));
   }
 }

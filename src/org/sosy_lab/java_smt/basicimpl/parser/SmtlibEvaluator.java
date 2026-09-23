@@ -93,7 +93,7 @@ public class SmtlibEvaluator {
       // Start with one level, so that we can pop all formulas that will be added
       newProver.push();
     } catch (InterruptedException e) {
-      throw new RuntimeException(e);
+      sneakyThrow(e);
     }
     return newProver;
   }
@@ -130,6 +130,11 @@ public class SmtlibEvaluator {
 
   public List<FormulaManager.SolverResponse> getResponses() {
     return responses.build();
+  }
+
+  @SuppressWarnings("unchecked")
+  private static <E extends Throwable> void sneakyThrow(Throwable e) throws E {
+    throw (E) e;
   }
 
   public static String genSymbol() {
@@ -515,7 +520,7 @@ public class SmtlibEvaluator {
           newAsserted.add(ImmutableList.of());
 
         } catch (InterruptedException e) {
-          throw new RuntimeException(e);
+          sneakyThrow(e);
         }
       }
       return new SmtlibEvaluator(
@@ -559,7 +564,7 @@ public class SmtlibEvaluator {
       try {
         prover.addConstraint(term);
       } catch (InterruptedException e) {
-        throw new RuntimeException(e);
+        sneakyThrow(e);
       }
       return new SmtlibEvaluator(
           mode,
@@ -598,7 +603,7 @@ public class SmtlibEvaluator {
       } catch (SolverException e) {
         // Return 'unknown' when there is a solver exception
       } catch (InterruptedException e) {
-        throw new RuntimeException(e);
+        sneakyThrow(e);
       }
       return new SmtlibEvaluator(
           mode,
@@ -627,7 +632,7 @@ public class SmtlibEvaluator {
       } catch (SolverException e) {
         // Return 'unknown' when there is a solver exception
       } catch (InterruptedException e) {
-        throw new RuntimeException(e);
+        sneakyThrow(e);
       }
       return new SmtlibEvaluator(
           mode,
@@ -657,7 +662,8 @@ public class SmtlibEvaluator {
             responses.add(new FormulaManager.SolverResponse.ModelResponse(model.asList())));
 
       } catch (SolverException e) {
-        throw new RuntimeException(e);
+        sneakyThrow(e);
+        throw new AssertionError();
       }
     }
 
@@ -686,7 +692,8 @@ public class SmtlibEvaluator {
       try {
         core = prover.unsatCoreOverAssumptions(lastAssumptions.orElseThrow());
       } catch (SolverException | InterruptedException e) {
-        throw new RuntimeException(e);
+        sneakyThrow(e);
+        throw new AssertionError();
       }
       return new SmtlibEvaluator(
           mode,
@@ -712,7 +719,7 @@ public class SmtlibEvaluator {
           var newTerm = evaluator.eval(term);
           evaluated.add(newTerm == null ? term : newTerm);
         } catch (SolverException e) {
-          throw new RuntimeException(e);
+          sneakyThrow(e);
         }
       }
       return new SmtlibEvaluator(
@@ -763,7 +770,7 @@ public class SmtlibEvaluator {
         // Restore empty base level
         prover.push();
       } catch (InterruptedException e) {
-        throw new RuntimeException(e);
+        sneakyThrow(e);
       }
       return new SmtlibEvaluator(
           mode,
@@ -780,15 +787,7 @@ public class SmtlibEvaluator {
     @Override
     public SmtlibEvaluator visitExit(SmtlibParser.ExitContext ctx) {
       return new SmtlibEvaluator(
-          mode,
-          solver,
-          prover,
-          true,
-          globalDefs,
-          localDefs,
-          asserted,
-          lastAssumptions,
-          responses);
+          mode, solver, prover, true, globalDefs, localDefs, asserted, lastAssumptions, responses);
     }
 
     @Override
