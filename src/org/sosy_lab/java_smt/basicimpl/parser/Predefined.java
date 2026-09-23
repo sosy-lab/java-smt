@@ -818,7 +818,7 @@ public class Predefined {
                 .makeRoundingMode(FloatingPointRoundingMode.NEAREST_TIES_AWAY);
           };
         };
-    predefined.put("roundNearestTiesAway", rna);
+    predefined.put("roundNearestTiesToAway", rna);
     predefined.put("RNA", rna);
     Function<List<Integer>, Function<List<Formula>, Formula>> rtp =
         idx -> {
@@ -829,7 +829,7 @@ public class Predefined {
                 .makeRoundingMode(FloatingPointRoundingMode.TOWARD_POSITIVE);
           };
         };
-    predefined.put("roundTowardsPositive", rtp);
+    predefined.put("roundTowardPositive", rtp);
     predefined.put("RTP", rtp);
     Function<List<Integer>, Function<List<Formula>, Formula>> rtn =
         idx -> {
@@ -840,7 +840,7 @@ public class Predefined {
                 .makeRoundingMode(FloatingPointRoundingMode.TOWARD_NEGATIVE);
           };
         };
-    predefined.put("roundTowardsNegative", rtn);
+    predefined.put("roundTowardNegative", rtn);
     predefined.put("RTN", rtn);
     Function<List<Integer>, Function<List<Formula>, Formula>> rtz =
         idx -> {
@@ -851,7 +851,7 @@ public class Predefined {
                 .makeRoundingMode(FloatingPointRoundingMode.TOWARD_ZERO);
           };
         };
-    predefined.put("roundTowardsZero", rtz);
+    predefined.put("roundTowardZero", rtz);
     predefined.put("RTZ", rtz);
 
     // TODO fp
