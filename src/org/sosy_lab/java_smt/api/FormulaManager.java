@@ -224,7 +224,7 @@ public interface FormulaManager {
 
   sealed interface SolverResponse {
     /** Responst to <code>get-assertions</code>. */
-    record AssertedResponse(List<? extends Formula> asserted) implements SolverResponse {}
+    record AssertedResponse(List<BooleanFormula> asserted) implements SolverResponse {}
 
     /** Response to <code>check-sat</code> or <code>check-sat-assuming</code>. */
     record CheckSatResponse(Status status) implements SolverResponse {
