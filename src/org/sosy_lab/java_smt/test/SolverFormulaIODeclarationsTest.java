@@ -203,6 +203,7 @@ public class SolverFormulaIODeclarationsTest
   @Test
   public void parseDeclareRedundantTest1() {
     requireIntegers();
+    @SuppressWarnings("unused")
     IntegerFormula var = imgr.makeVariable("x");
     String query = "(declare-fun x () Int)(declare-fun x () Int)(assert (= 0 x))";
     assertThrows(IllegalArgumentException.class, () -> mgr.parse(query));
@@ -211,6 +212,7 @@ public class SolverFormulaIODeclarationsTest
   @Test
   public void parseDeclareRedundantTest2() {
     requireIntegers();
+    @SuppressWarnings("unused")
     IntegerFormula var =
         fmgr.declareAndCallUF("foo", IntegerType, imgr.makeNumber(1), imgr.makeNumber(2));
     String query =
@@ -221,6 +223,7 @@ public class SolverFormulaIODeclarationsTest
   @Test
   public void parseDeclareRedundantBvTest() {
     requireBitvectors();
+    @SuppressWarnings("unused")
     BitvectorFormula var = bvmgr.makeVariable(8, "x");
     String query =
         "(declare-fun x () (_ BitVec 8))(declare-fun x () (_ BitVec 8))(assert (= x #b00000000))";
