@@ -13,7 +13,6 @@ import static com.google.common.truth.TruthJUnit.assume;
 import static org.junit.Assert.assertThrows;
 import static org.sosy_lab.java_smt.api.FormulaType.BooleanType;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import java.math.BigInteger;
 import java.util.List;
@@ -206,28 +205,13 @@ public class ParserTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   public void parseAllTypeMismatchTest() throws SolverException, InterruptedException {
     requireIntegers();
     String smt = "(declare-fun x () Int)(assert (= x true))"; // Int vs Bool
-    if (solverToUse() == Solvers.Z3) {
-      // Z3 is more lenient and allows this, treating 'true' as 1 and 'false' as 0.
-      List<BooleanFormula> parsed = mgr.parseAll(smt);
-      assertThat(parsed).hasSize(1);
-      assertThatFormula(Iterables.getOnlyElement(parsed))
-          .isEquisatisfiableTo(imgr.equal(imgr.makeVariable("x"), imgr.makeNumber(1)));
-    } else {
-      assertThrows(IllegalArgumentException.class, () -> mgr.parseAll(smt));
-    }
-  }
-
-  @Test
-  public void parseAllUnknownCommandWithAssertionTest() {
-    String smt = "(unknown-command)(assert true)";
-    assertThat(mgr.parseAll(smt)).hasSize(1);
-    assertThat(mgr.parseAll(smt).get(0)).isEqualTo(bmgr.makeTrue());
+    assertThrows(IllegalArgumentException.class, () -> mgr.parseAll(smt));
   }
 
   @Test
   public void parseAllUnknownCommandTest() {
     String smt = "(unknown-command)";
-    assertThat(mgr.parseAll(smt)).isEmpty();
+    assertThrows(IllegalArgumentException.class, () -> mgr.parseAll(smt));
   }
 
   @Test
@@ -260,14 +244,7 @@ public class ParserTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
     requireIntegers();
     // 'assert' is a reserved keyword, cannot be used as a function name in most solvers
     String smt = "(declare-fun assert () Int)(assert (= assert 1))";
-    if (ImmutableList.of(Solvers.Z3, Solvers.CVC5).contains(solverToUse())) {
-      List<BooleanFormula> parsed = mgr.parseAll(smt);
-      assertThat(parsed).hasSize(1);
-      assertThatFormula(Iterables.getOnlyElement(parsed))
-          .isEquisatisfiableTo(imgr.equal(imgr.makeVariable("assert"), imgr.makeNumber(1)));
-    } else {
-      assertThrows(IllegalArgumentException.class, () -> mgr.parseAll(smt));
-    }
+    assertThrows(IllegalArgumentException.class, () -> mgr.parseAll(smt));
   }
 
   @Test
