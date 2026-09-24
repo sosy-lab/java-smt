@@ -702,7 +702,8 @@ public final class SmtlibEvaluator {
         return new SmtlibEvaluator(
                 mode,
                 solver,
-                new ProverState.AssertState(newProver(solver, startState.options)),
+                new ProverState.AssertState(
+                    mode == ParsingMode.TERM ? null : newProver(solver, startState.options)),
                 globalDefs,
                 localDefs,
                 asserted,
@@ -715,10 +716,12 @@ public final class SmtlibEvaluator {
         var last = asserted.get(asserted.size() - 1);
         var init = asserted.subList(0, asserted.size() - 1);
         var added = Stream.concat(last.stream(), Stream.of(term)).toList();
-        try {
-          assertState.prover.addConstraint(term);
-        } catch (InterruptedException e) {
-          sneakyThrow(e);
+        if (mode == ParsingMode.SCRIPT) {
+          try {
+            assertState.prover.addConstraint(term);
+          } catch (InterruptedException e) {
+            sneakyThrow(e);
+          }
         }
         return new SmtlibEvaluator(
             mode,
@@ -1059,7 +1062,9 @@ public final class SmtlibEvaluator {
         }
       } finally {
         if (eval.state instanceof ProverState.AssertState assertState) {
-          assertState.prover.close();
+          if (assertState.prover != null) {
+            assertState.prover.close();
+          }
         }
       }
       return eval;
