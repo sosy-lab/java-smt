@@ -60,8 +60,7 @@ public class TranslateFormulaTest {
 
   @Before
   public void initSolvers() throws InvalidConfigurationException {
-    Configuration empty =
-        Configuration.builder().setOption("solver.useAntlrParser", "true").build();
+    Configuration empty = Configuration.builder().build();
     SolverContextFactory factory =
         new SolverContextFactory(empty, logger, ShutdownManager.create().getNotifier());
 
