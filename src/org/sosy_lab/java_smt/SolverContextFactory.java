@@ -109,7 +109,7 @@ public class SolverContextFactory {
       description =
           "Parse Smtlib with the built-in Antlr parser, instead of relying on the solver for "
               + "parsing")
-  private boolean useAntlrParser = false;
+  private boolean useAntlrParser = true;
 
   @Option(
       secure = true,

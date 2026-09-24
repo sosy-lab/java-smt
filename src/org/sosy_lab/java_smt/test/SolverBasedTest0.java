@@ -136,9 +136,7 @@ public abstract class SolverBasedTest0 {
 
   protected ConfigurationBuilder createTestConfigBuilder() throws InvalidConfigurationException {
     ConfigurationBuilder newConfig =
-        Configuration.builder()
-            .setOption("solver.solver", solverToUse().toString())
-            .setOption("solver.useAntlrParser", "true");
+        Configuration.builder().setOption("solver.solver", solverToUse().toString());
 
     if (enableTracing()) {
       String tracefile =
