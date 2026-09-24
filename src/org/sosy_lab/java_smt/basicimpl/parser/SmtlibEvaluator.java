@@ -41,6 +41,7 @@ import org.sosy_lab.java_smt.api.SolverContext;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.delegate.parsing.ParsingFormulaManager;
 
+@SuppressWarnings("resource")
 public final class SmtlibEvaluator {
   public enum ParsingMode {
     TERM,
@@ -103,7 +104,6 @@ public final class SmtlibEvaluator {
     return newProver;
   }
 
-  @SuppressWarnings("resource")
   public static SmtlibEvaluator link(
       SolverContext pSolver, ParsingFormulaManager pManager, ParsingMode pMode) {
     return new SmtlibEvaluator(
@@ -964,7 +964,6 @@ public final class SmtlibEvaluator {
       }
     }
 
-    @SuppressWarnings("resource")
     @Override
     public SmtlibEvaluator visitResetSolver(SmtlibParser.ResetSolverContext ctx) {
       checkArgument(mode != ParsingMode.TERM, "Command 'reset' is not allowed in term mode");
