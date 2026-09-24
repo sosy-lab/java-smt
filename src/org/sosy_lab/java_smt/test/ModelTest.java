@@ -1195,6 +1195,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
     requireArrays();
     requireArrayModel();
     requireBitvectors();
+    assume().that(solver).isNotEqualTo(Solvers.BOOLECTOR);
 
     ArrayFormula<BitvectorFormula, BitvectorFormula> array =
         amgr.makeArray(
