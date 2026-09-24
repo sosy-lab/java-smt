@@ -203,7 +203,7 @@ public class ParserTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   }
 
   @Test
-  public void parseAllTypeMismatchTest() throws SolverException, InterruptedException {
+  public void parseAllTypeMismatchTest() {
     requireIntegers();
     String smt = "(declare-fun x () Int)(assert (= x true))"; // Int vs Bool
     assertThrows(IllegalArgumentException.class, () -> mgr.parseAll(smt));
@@ -241,7 +241,7 @@ public class ParserTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   }
 
   @Test
-  public void parseAllReservedKeywordTest() throws SolverException, InterruptedException {
+  public void parseAllReservedKeywordTest() {
     requireIntegers();
     // 'assert' is a reserved keyword, cannot be used as a function name in most solvers
     String smt = "(declare-fun assert () Int)(assert (= assert 1))";
