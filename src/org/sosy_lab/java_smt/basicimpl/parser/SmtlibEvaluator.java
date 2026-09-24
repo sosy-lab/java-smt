@@ -47,11 +47,18 @@ public final class SmtlibEvaluator {
     SCRIPT
   }
 
+  private interface ProverState {
+    record StartState(List<SolverContext.ProverOptions> options) implements ProverState {}
+
+    record AssertState(ProverEnvironment prover) implements ProverState {}
+
+    record ExitState() implements ProverState {}
+  }
+
   private final ParsingMode mode;
   private final SolverContext solver;
   private final FormulaManager mgr;
-  private final ProverEnvironment prover;
-  private final boolean closed;
+  private final ProverState state;
 
   private final Map<String, Function<List<Integer>, Function<List<Formula>, Formula>>> globalDefs;
   private final Set<String> localDefs;
@@ -65,8 +72,7 @@ public final class SmtlibEvaluator {
   private SmtlibEvaluator(
       ParsingMode pMode,
       SolverContext pSolver,
-      ProverEnvironment pProver,
-      boolean pClosed,
+      ProverState pProverState,
       Map<String, Function<List<Integer>, Function<List<Formula>, Formula>>> pGlobalDefs,
       Set<String> pLocalDefs,
       List<List<BooleanFormula>> pAsserted,
@@ -75,8 +81,7 @@ public final class SmtlibEvaluator {
     mode = pMode;
     solver = pSolver;
     mgr = pSolver.getFormulaManager();
-    prover = pProver;
-    closed = pClosed;
+    state = pProverState;
     globalDefs = pGlobalDefs;
     localDefs = pLocalDefs;
     asserted = pAsserted;
@@ -84,12 +89,10 @@ public final class SmtlibEvaluator {
     responses = pResponses;
   }
 
-  private static ProverEnvironment newProver(SolverContext pSolver) {
+  private static ProverEnvironment newProver(
+      SolverContext pSolver, List<SolverContext.ProverOptions> pOptions) {
     var newProver =
-        pSolver.newProverEnvironment(
-            SolverContext.ProverOptions.GENERATE_MODELS,
-            SolverContext.ProverOptions.GENERATE_UNSAT_CORE,
-            SolverContext.ProverOptions.GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS);
+        pSolver.newProverEnvironment(pOptions.toArray(new SolverContext.ProverOptions[] {}));
     try {
       // Start with one level, so that we can pop all formulas that will be added
       newProver.push();
@@ -105,8 +108,7 @@ public final class SmtlibEvaluator {
     return new SmtlibEvaluator(
         pMode,
         pSolver,
-        newProver(pSolver),
-        false,
+        new ProverState.StartState(ImmutableList.of()),
         new Predefined(pManager)
             .addTheorySymbols()
             .addUserSymbols(pManager.getDefinedSymbols())
@@ -449,8 +451,7 @@ public final class SmtlibEvaluator {
         return new SmtlibEvaluator(
             mode,
             solver,
-            prover,
-            closed,
+            state,
             addConstant(globalDefs, name, term),
             FluentIterable.concat(localDefs, ImmutableSet.of(name)).toSet(),
             asserted,
@@ -461,8 +462,7 @@ public final class SmtlibEvaluator {
         return new SmtlibEvaluator(
             mode,
             solver,
-            prover,
-            closed,
+            state,
             addFunction(globalDefs, name, p -> mgr.makeApplication(uf, p)),
             FluentIterable.concat(localDefs, ImmutableSet.of(name)).toSet(),
             asserted,
@@ -483,8 +483,7 @@ public final class SmtlibEvaluator {
         return new SmtlibEvaluator(
             mode,
             solver,
-            prover,
-            closed,
+            state,
             addConstant(globalDefs, name, term),
             FluentIterable.concat(localDefs, ImmutableSet.of(name)).toSet(),
             asserted,
@@ -496,8 +495,7 @@ public final class SmtlibEvaluator {
         return new SmtlibEvaluator(
             mode,
             solver,
-            prover,
-            closed,
+            state,
             addFunction(
                 globalDefs,
                 name,
@@ -523,71 +521,117 @@ public final class SmtlibEvaluator {
     @Override
     public SmtlibEvaluator visitPush(SmtlibParser.PushContext ctx) {
       checkArgument(mode != ParsingMode.TERM, "Command 'push' is not allowed in term mode");
-      var levels = Integer.parseInt(ctx.Numeral().getText());
-      ImmutableList.Builder<List<BooleanFormula>> newAsserted = ImmutableList.builder();
-      newAsserted.addAll(asserted);
-      for (var i = 0; i < levels; i++) {
-        try {
-          prover.push();
-          newAsserted.add(ImmutableList.of());
+      if (state instanceof ProverState.StartState startState) {
+        return new SmtlibEvaluator(
+                mode,
+                solver,
+                new ProverState.AssertState(newProver(solver, startState.options)),
+                globalDefs,
+                localDefs,
+                asserted,
+                lastAssumptions,
+                responses)
+            .commandVisitor.visit(ctx);
 
-        } catch (InterruptedException e) {
-          sneakyThrow(e);
+      } else if (state instanceof ProverState.AssertState assertState) {
+        var levels = Integer.parseInt(ctx.Numeral().getText());
+        ImmutableList.Builder<List<BooleanFormula>> newAsserted = ImmutableList.builder();
+        newAsserted.addAll(asserted);
+        for (var i = 0; i < levels; i++) {
+          try {
+            assertState.prover.push();
+            newAsserted.add(ImmutableList.of());
+
+          } catch (InterruptedException e) {
+            sneakyThrow(e);
+          }
         }
+        return new SmtlibEvaluator(
+            mode,
+            solver,
+            state,
+            globalDefs,
+            localDefs,
+            newAsserted.build(),
+            Optional.empty(),
+            responses);
+
+      } else {
+        throw new AssertionError();
       }
-      return new SmtlibEvaluator(
-          mode,
-          solver,
-          prover,
-          closed,
-          globalDefs,
-          localDefs,
-          newAsserted.build(),
-          Optional.empty(),
-          responses);
     }
 
     @Override
     public SmtlibEvaluator visitPop(SmtlibParser.PopContext ctx) {
       checkArgument(mode != ParsingMode.TERM, "Command 'pop' is not allowed in term mode");
-      var levels = Integer.parseInt(ctx.Numeral().getText());
-      checkArgument(levels < asserted.size());
-      for (var i = 0; i < levels; i++) {
-        prover.pop();
+      if (state instanceof ProverState.StartState startState) {
+        return new SmtlibEvaluator(
+                mode,
+                solver,
+                new ProverState.AssertState(newProver(solver, startState.options)),
+                globalDefs,
+                localDefs,
+                asserted,
+                lastAssumptions,
+                responses)
+            .commandVisitor.visit(ctx);
+
+      } else if (state instanceof ProverState.AssertState assertState) {
+        var levels = Integer.parseInt(ctx.Numeral().getText());
+        checkArgument(levels < asserted.size());
+        for (var i = 0; i < levels; i++) {
+          assertState.prover.pop();
+        }
+        return new SmtlibEvaluator(
+            mode,
+            solver,
+            state,
+            globalDefs,
+            localDefs,
+            asserted.subList(0, asserted.size() - levels),
+            Optional.empty(),
+            responses);
+      } else {
+        throw new AssertionError();
       }
-      return new SmtlibEvaluator(
-          mode,
-          solver,
-          prover,
-          closed,
-          globalDefs,
-          localDefs,
-          asserted.subList(0, asserted.size() - levels),
-          Optional.empty(),
-          responses);
     }
 
     @Override
     public SmtlibEvaluator visitAssert(SmtlibParser.AssertContext ctx) {
-      var term = (BooleanFormula) new ExprEvaluator(globalDefs).visit(ctx.expr());
-      var last = asserted.get(asserted.size() - 1);
-      var init = asserted.subList(0, asserted.size() - 1);
-      var added = Stream.concat(last.stream(), Stream.of(term)).toList();
-      try {
-        prover.addConstraint(term);
-      } catch (InterruptedException e) {
-        sneakyThrow(e);
+      if (state instanceof ProverState.StartState startState) {
+        return new SmtlibEvaluator(
+                mode,
+                solver,
+                new ProverState.AssertState(newProver(solver, startState.options)),
+                globalDefs,
+                localDefs,
+                asserted,
+                lastAssumptions,
+                responses)
+            .commandVisitor.visit(ctx);
+
+      } else if (state instanceof ProverState.AssertState assertState) {
+        var term = (BooleanFormula) new ExprEvaluator(globalDefs).visit(ctx.expr());
+        var last = asserted.get(asserted.size() - 1);
+        var init = asserted.subList(0, asserted.size() - 1);
+        var added = Stream.concat(last.stream(), Stream.of(term)).toList();
+        try {
+          assertState.prover.addConstraint(term);
+        } catch (InterruptedException e) {
+          sneakyThrow(e);
+        }
+        return new SmtlibEvaluator(
+            mode,
+            solver,
+            state,
+            globalDefs,
+            localDefs,
+            Stream.concat(init.stream(), Stream.of(added)).toList(),
+            lastAssumptions,
+            responses);
+      } else {
+        throw new AssertionError();
       }
-      return new SmtlibEvaluator(
-          mode,
-          solver,
-          prover,
-          closed,
-          globalDefs,
-          localDefs,
-          Stream.concat(init.stream(), Stream.of(added)).toList(),
-          lastAssumptions,
-          responses);
     }
 
     @Override
@@ -597,8 +641,7 @@ public final class SmtlibEvaluator {
       return new SmtlibEvaluator(
           mode,
           solver,
-          prover,
-          closed,
+          state,
           globalDefs,
           localDefs,
           asserted,
@@ -609,72 +652,117 @@ public final class SmtlibEvaluator {
     @Override
     public SmtlibEvaluator visitCheckSat(SmtlibParser.CheckSatContext ctx) {
       checkArgument(mode != ParsingMode.TERM, "Command 'check-sat' is not allowed in term mode");
-      var status = Status.UNKNOWN;
-      try {
-        status = prover.isUnsat() ? Status.UNSAT : Status.SAT;
-      } catch (SolverException e) {
-        // Return 'unknown' when there is a solver exception
-      } catch (InterruptedException e) {
-        sneakyThrow(e);
+      if (state instanceof ProverState.StartState startState) {
+        return new SmtlibEvaluator(
+                mode,
+                solver,
+                new ProverState.AssertState(newProver(solver, startState.options)),
+                globalDefs,
+                localDefs,
+                asserted,
+                lastAssumptions,
+                responses)
+            .commandVisitor.visit(ctx);
+
+      } else if (state instanceof ProverState.AssertState assertState) {
+        var status = Status.UNKNOWN;
+        try {
+          status = assertState.prover.isUnsat() ? Status.UNSAT : Status.SAT;
+        } catch (SolverException e) {
+          // Return 'unknown' when there is a solver exception
+        } catch (InterruptedException e) {
+          sneakyThrow(e);
+        }
+        return new SmtlibEvaluator(
+            mode,
+            solver,
+            state,
+            globalDefs,
+            localDefs,
+            asserted,
+            Optional.empty(),
+            responses.add(new FormulaManager.SolverResponse.CheckSatResponse(status)));
+      } else {
+        throw new AssertionError();
       }
-      return new SmtlibEvaluator(
-          mode,
-          solver,
-          prover,
-          closed,
-          globalDefs,
-          localDefs,
-          asserted,
-          Optional.empty(),
-          responses.add(new FormulaManager.SolverResponse.CheckSatResponse(status)));
     }
 
     @Override
     public SmtlibEvaluator visitCheckSatAssuming(SmtlibParser.CheckSatAssumingContext ctx) {
       checkArgument(
           mode != ParsingMode.TERM, "Command 'check-sat-assuming' is not allowed in term mode");
-      var assumed =
-          ctx.expr().stream()
-              .map(expr -> (BooleanFormula) new ExprEvaluator(globalDefs).visit(expr))
-              .toList();
+      if (state instanceof ProverState.StartState startState) {
+        return new SmtlibEvaluator(
+                mode,
+                solver,
+                new ProverState.AssertState(newProver(solver, startState.options)),
+                globalDefs,
+                localDefs,
+                asserted,
+                lastAssumptions,
+                responses)
+            .commandVisitor.visit(ctx);
 
-      var status = Status.UNKNOWN;
-      try {
-        status = prover.isUnsatWithAssumptions(assumed) ? Status.UNSAT : Status.SAT;
-      } catch (SolverException e) {
-        // Return 'unknown' when there is a solver exception
-      } catch (InterruptedException e) {
-        sneakyThrow(e);
+      } else if (state instanceof ProverState.AssertState assertState) {
+        var assumed =
+            ctx.expr().stream()
+                .map(expr -> (BooleanFormula) new ExprEvaluator(globalDefs).visit(expr))
+                .toList();
+
+        var status = Status.UNKNOWN;
+        try {
+          status = assertState.prover.isUnsatWithAssumptions(assumed) ? Status.UNSAT : Status.SAT;
+        } catch (SolverException e) {
+          // Return 'unknown' when there is a solver exception
+        } catch (InterruptedException e) {
+          sneakyThrow(e);
+        }
+        return new SmtlibEvaluator(
+            mode,
+            solver,
+            state,
+            globalDefs,
+            localDefs,
+            asserted,
+            Optional.of(assumed),
+            responses.add(new FormulaManager.SolverResponse.CheckSatResponse(status)));
+      } else {
+        throw new AssertionError();
       }
-      return new SmtlibEvaluator(
-          mode,
-          solver,
-          prover,
-          closed,
-          globalDefs,
-          localDefs,
-          asserted,
-          Optional.of(assumed),
-          responses.add(new FormulaManager.SolverResponse.CheckSatResponse(status)));
     }
 
     @Override
     public SmtlibEvaluator visitGetModel(SmtlibParser.GetModelContext ctx) {
       checkArgument(mode != ParsingMode.TERM, "Command 'get-model' is not allowed in term mode");
-      try (var model = prover.getModel()) {
+      if (state instanceof ProverState.StartState startState) {
         return new SmtlibEvaluator(
-            mode,
-            solver,
-            prover,
-            closed,
-            globalDefs,
-            localDefs,
-            asserted,
-            lastAssumptions,
-            responses.add(new FormulaManager.SolverResponse.ModelResponse(model.asList())));
+                mode,
+                solver,
+                new ProverState.AssertState(newProver(solver, startState.options)),
+                globalDefs,
+                localDefs,
+                asserted,
+                lastAssumptions,
+                responses)
+            .commandVisitor.visit(ctx);
 
-      } catch (SolverException e) {
-        sneakyThrow(e);
+      } else if (state instanceof ProverState.AssertState assertState) {
+        try (var model = assertState.prover.getModel()) {
+          return new SmtlibEvaluator(
+              mode,
+              solver,
+              state,
+              globalDefs,
+              localDefs,
+              asserted,
+              lastAssumptions,
+              responses.add(new FormulaManager.SolverResponse.ModelResponse(model.asList())));
+
+        } catch (SolverException e) {
+          sneakyThrow(e);
+          throw new AssertionError();
+        }
+      } else {
         throw new AssertionError();
       }
     }
@@ -683,74 +771,121 @@ public final class SmtlibEvaluator {
     public SmtlibEvaluator visitGetUnsatCore(SmtlibParser.GetUnsatCoreContext ctx) {
       checkArgument(
           mode != ParsingMode.TERM, "Command 'get-unsat-core' is not allowed in term mode");
-      List<BooleanFormula> core = prover.getUnsatCore();
-      return new SmtlibEvaluator(
-          mode,
-          solver,
-          prover,
-          closed,
-          globalDefs,
-          localDefs,
-          asserted,
-          lastAssumptions,
-          responses.add(new FormulaManager.SolverResponse.UnsatCoreResponse(core)));
+      if (state instanceof ProverState.StartState startState) {
+        return new SmtlibEvaluator(
+                mode,
+                solver,
+                new ProverState.AssertState(newProver(solver, startState.options)),
+                globalDefs,
+                localDefs,
+                asserted,
+                lastAssumptions,
+                responses)
+            .commandVisitor.visit(ctx);
+
+      } else if (state instanceof ProverState.AssertState assertState) {
+        List<BooleanFormula> core = assertState.prover.getUnsatCore();
+        return new SmtlibEvaluator(
+            mode,
+            solver,
+            state,
+            globalDefs,
+            localDefs,
+            asserted,
+            lastAssumptions,
+            responses.add(new FormulaManager.SolverResponse.UnsatCoreResponse(core)));
+      } else {
+        throw new AssertionError();
+      }
     }
 
     @Override
     public SmtlibEvaluator visitGetUnsatAssumptions(SmtlibParser.GetUnsatAssumptionsContext ctx) {
       checkArgument(
           mode != ParsingMode.TERM, "Command 'get-unsat-assumptions' is not allowed in term mode");
-      Optional<List<BooleanFormula>> core;
-      try {
-        core = prover.unsatCoreOverAssumptions(lastAssumptions.orElseThrow());
-      } catch (SolverException | InterruptedException e) {
-        sneakyThrow(e);
+      if (state instanceof ProverState.StartState startState) {
+        return new SmtlibEvaluator(
+                mode,
+                solver,
+                new ProverState.AssertState(newProver(solver, startState.options)),
+                globalDefs,
+                localDefs,
+                asserted,
+                lastAssumptions,
+                responses)
+            .commandVisitor.visit(ctx);
+
+      } else if (state instanceof ProverState.AssertState assertState) {
+        Optional<List<BooleanFormula>> core;
+        try {
+          core = assertState.prover.unsatCoreOverAssumptions(lastAssumptions.orElseThrow());
+        } catch (SolverException | InterruptedException e) {
+          sneakyThrow(e);
+          throw new AssertionError();
+        }
+        return new SmtlibEvaluator(
+            mode,
+            solver,
+            state,
+            globalDefs,
+            localDefs,
+            asserted,
+            lastAssumptions,
+            responses.add(new FormulaManager.SolverResponse.UnsatCoreResponse(core.orElseThrow())));
+      } else {
         throw new AssertionError();
       }
-      return new SmtlibEvaluator(
-          mode,
-          solver,
-          prover,
-          closed,
-          globalDefs,
-          localDefs,
-          asserted,
-          lastAssumptions,
-          responses.add(new FormulaManager.SolverResponse.UnsatCoreResponse(core.orElseThrow())));
     }
 
     @Override
     public SmtlibEvaluator visitGetValue(SmtlibParser.GetValueContext ctx) {
       checkArgument(mode != ParsingMode.TERM, "Command 'get-value' is not allowed in term mode");
-      var terms =
-          ctx.expr().stream().map(expr -> new ExprEvaluator(globalDefs).visit(expr)).toList();
+      if (state instanceof ProverState.StartState startState) {
+        return new SmtlibEvaluator(
+                mode,
+                solver,
+                new ProverState.AssertState(newProver(solver, startState.options)),
+                globalDefs,
+                localDefs,
+                asserted,
+                lastAssumptions,
+                responses)
+            .commandVisitor.visit(ctx);
 
-      ImmutableList.Builder<Formula> evaluated = ImmutableList.builder();
-      for (var term : terms) {
-        try (var evaluator = prover.getEvaluator()) {
-          var newTerm = evaluator.eval(term);
-          evaluated.add(newTerm == null ? term : newTerm);
-        } catch (SolverException e) {
-          sneakyThrow(e);
+      } else if (state instanceof ProverState.AssertState assertState) {
+        var terms =
+            ctx.expr().stream().map(expr -> new ExprEvaluator(globalDefs).visit(expr)).toList();
+
+        ImmutableList.Builder<Formula> evaluated = ImmutableList.builder();
+        for (var term : terms) {
+          try (var evaluator = assertState.prover.getEvaluator()) {
+            var newTerm = evaluator.eval(term);
+            evaluated.add(newTerm == null ? term : newTerm);
+          } catch (SolverException e) {
+            sneakyThrow(e);
+          }
         }
+        return new SmtlibEvaluator(
+            mode,
+            solver,
+            state,
+            globalDefs,
+            localDefs,
+            asserted,
+            lastAssumptions,
+            responses.add(new FormulaManager.SolverResponse.EvaluationResponse(evaluated.build())));
+      } else {
+        throw new AssertionError();
       }
-      return new SmtlibEvaluator(
-          mode,
-          solver,
-          prover,
-          closed,
-          globalDefs,
-          localDefs,
-          asserted,
-          lastAssumptions,
-          responses.add(new FormulaManager.SolverResponse.EvaluationResponse(evaluated.build())));
     }
 
     @SuppressWarnings("resource")
     @Override
     public SmtlibEvaluator visitResetSolver(SmtlibParser.ResetSolverContext ctx) {
       checkArgument(mode != ParsingMode.TERM, "Command 'reset' is not allowed in term mode");
-      prover.close();
+      if (state instanceof ProverState.AssertState assertState) {
+        assertState.prover.close();
+      }
       // Remove all symbols that were defined in this smtlib file from the context
       ImmutableMap.Builder<String, Function<List<Integer>, Function<List<Formula>, Formula>>>
           nonlocal = ImmutableMap.builder();
@@ -763,8 +898,7 @@ public final class SmtlibEvaluator {
       return new SmtlibEvaluator(
           mode,
           solver,
-          newProver(solver),
-          closed,
+          new ProverState.StartState(ImmutableList.of()),
           nonlocal.buildOrThrow(),
           ImmutableSet.of(),
           ImmutableList.of(ImmutableList.of()),
@@ -776,31 +910,44 @@ public final class SmtlibEvaluator {
     public SmtlibEvaluator visitResetAssertions(SmtlibParser.ResetAssertionsContext ctx) {
       checkArgument(
           mode != ParsingMode.TERM, "Command 'reset-assertions' is not allowed in term mode");
-      for (var i = 0; i < asserted.size(); i++) {
-        prover.pop();
+      if (state instanceof ProverState.AssertState assertState) {
+        for (var i = 0; i < asserted.size(); i++) {
+          assertState.prover.pop();
+        }
+        try {
+          // Restore empty base level
+          assertState.prover.push();
+        } catch (InterruptedException e) {
+          sneakyThrow(e);
+        }
+        return new SmtlibEvaluator(
+            mode,
+            solver,
+            state,
+            globalDefs,
+            localDefs,
+            ImmutableList.of(ImmutableList.of()),
+            Optional.empty(),
+            responses);
+      } else {
+        throw new AssertionError();
       }
-      try {
-        // Restore empty base level
-        prover.push();
-      } catch (InterruptedException e) {
-        sneakyThrow(e);
-      }
-      return new SmtlibEvaluator(
-          mode,
-          solver,
-          prover,
-          closed,
-          globalDefs,
-          localDefs,
-          ImmutableList.of(ImmutableList.of()),
-          Optional.empty(),
-          responses);
     }
 
     @Override
     public SmtlibEvaluator visitExit(SmtlibParser.ExitContext ctx) {
+      if (state instanceof ProverState.AssertState assertState) {
+        assertState.prover.close();
+      }
       return new SmtlibEvaluator(
-          mode, solver, prover, true, globalDefs, localDefs, asserted, lastAssumptions, responses);
+          mode,
+          solver,
+          new ProverState.ExitState(),
+          globalDefs,
+          localDefs,
+          asserted,
+          lastAssumptions,
+          responses);
     }
 
     @Override
@@ -808,11 +955,15 @@ public final class SmtlibEvaluator {
       var eval = SmtlibEvaluator.this;
       try {
         for (var cmd : ctx.command()) {
-          checkArgument(!eval.closed, "Can't run any more commands. Solver was closed");
+          if (eval.state instanceof ProverState.ExitState) {
+            throw new IllegalArgumentException("Can't run any more commands. Solver was closed");
+          }
           eval = eval.commandVisitor.visit(cmd);
         }
       } finally {
-        prover.close();
+        if (eval.state instanceof ProverState.AssertState assertState) {
+          assertState.prover.close();
+        }
       }
       return eval;
     }
