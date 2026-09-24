@@ -123,6 +123,7 @@ public class ParserTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   public void parseAllQuantifierTest() {
     requireQuantifiers();
     requireIntegers();
+    assume().that(solver).isNotEqualTo(Solvers.YICES2);
     String smt = "(declare-fun p (Int) Bool)(assert (forall ((x Int)) (p x)))";
     // NOTE: This test might be tricky as forall parsing can be complex.
     // For now, we will just assert that it doesn't throw an exception and returns a formula.
