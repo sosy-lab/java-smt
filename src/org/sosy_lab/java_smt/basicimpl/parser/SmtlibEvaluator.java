@@ -23,12 +23,13 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Stream;
 import org.antlr.v4.runtime.tree.ParseTree;
+import org.sosy_lab.common.collect.PathCopyingPersistentTreeMap;
+import org.sosy_lab.common.collect.PersistentMap;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.FloatingPointNumber;
 import org.sosy_lab.java_smt.api.Formula;
@@ -62,8 +63,9 @@ public final class SmtlibEvaluator {
   private final FormulaManager mgr;
   private final ProverState state;
 
-  private final Map<String, Function<List<Integer>, Function<List<Formula>, Formula>>> globalDefs;
-  private final Set<String> localDefs;
+  private final PersistentMap<String, Function<List<Integer>, Function<List<Formula>, Formula>>>
+      globalDefs;
+  private final PersistentMap<String, Object> localDefs;
   private final List<List<BooleanFormula>> asserted;
   private final Optional<List<BooleanFormula>> lastAssumptions;
   private final ImmutableList.Builder<FormulaManager.SolverResponse> responses;
@@ -75,8 +77,8 @@ public final class SmtlibEvaluator {
       ParsingMode pMode,
       SolverContext pSolver,
       ProverState pProverState,
-      Map<String, Function<List<Integer>, Function<List<Formula>, Formula>>> pGlobalDefs,
-      Set<String> pLocalDefs,
+      PersistentMap<String, Function<List<Integer>, Function<List<Formula>, Formula>>> pGlobalDefs,
+      PersistentMap<String, Object> pLocalDefs,
       List<List<BooleanFormula>> pAsserted,
       Optional<List<BooleanFormula>> pLastAssumptions,
       ImmutableList.Builder<FormulaManager.SolverResponse> pResponses) {
@@ -110,11 +112,12 @@ public final class SmtlibEvaluator {
         pMode,
         pSolver,
         new ProverState.StartState(Optional.empty(), ImmutableSet.of()),
-        new Predefined(pManager)
-            .addTheorySymbols()
-            .addUserSymbols(pManager.getDefinedSymbols())
-            .build(),
-        ImmutableSet.of(),
+        PathCopyingPersistentTreeMap.copyOf(
+            new Predefined(pManager)
+                .addTheorySymbols()
+                .addUserSymbols(pManager.getDefinedSymbols())
+                .build()),
+        PathCopyingPersistentTreeMap.of(),
         ImmutableList.of(ImmutableList.of()),
         Optional.empty(),
         ImmutableList.builder());
@@ -260,7 +263,8 @@ public final class SmtlibEvaluator {
   private final ConstEvalator constEvalator = new ConstEvalator();
 
   class ExprEvaluator extends SmtlibBaseVisitor<Formula> {
-    private final Map<String, Function<List<Integer>, Function<List<Formula>, Formula>>> context;
+    private final PersistentMap<String, Function<List<Integer>, Function<List<Formula>, Formula>>>
+        context;
 
     class FunctionEvaluator extends SmtlibBaseVisitor<Function<List<Formula>, Formula>> {
       @Override
@@ -304,16 +308,21 @@ public final class SmtlibEvaluator {
 
     private final FunctionEvaluator functionEvaluator = new FunctionEvaluator();
 
-    ExprEvaluator(Map<String, Function<List<Integer>, Function<List<Formula>, Formula>>> pContext) {
+    ExprEvaluator(
+        PersistentMap<String, Function<List<Integer>, Function<List<Formula>, Formula>>> pContext) {
       context = pContext;
     }
 
     private Function<List<Integer>, Function<List<Formula>, Formula>> lookup(String symbol) {
-      checkArgument(
-          context.containsKey(symbol),
-          "Symbol `%s` is not defined. Context has %s",
-          symbol,
-          context.isEmpty() ? "no symbols" : "symbols " + Joiner.on(", ").join(context.keySet()));
+      if (!context.containsKey(symbol)) {
+        throw new IllegalArgumentException(
+            "Symbol `%s` is not defined. Context has %s"
+                .formatted(
+                    symbol,
+                    context.isEmpty()
+                        ? "no symbols"
+                        : "symbols " + Joiner.on(", ").join(context.keySet())));
+      }
       return context.get(symbol);
     }
 
@@ -339,8 +348,8 @@ public final class SmtlibEvaluator {
 
     @Override
     public Formula visitLet(SmtlibParser.LetContext ctx) {
-      Map<String, Function<List<Integer>, Function<List<Formula>, Formula>>> local =
-          ImmutableMap.of();
+      PersistentMap<String, Function<List<Integer>, Function<List<Formula>, Formula>>> local =
+          PathCopyingPersistentTreeMap.of();
       for (var binding : ctx.binding()) {
         var sym = getSymbolValue(binding.symbol());
         checkArgument(
@@ -350,7 +359,10 @@ public final class SmtlibEvaluator {
       }
       ImmutableMap.Builder<String, Function<List<Integer>, Function<List<Formula>, Formula>>>
           builder = ImmutableMap.builder();
-      var updated = builder.putAll(context).putAll(local).buildOrThrow();
+      var updated = context;
+      for (var entry : local.entrySet()) {
+        updated = updated.putAndCopy(entry.getKey(), entry.getValue());
+      }
       return new ExprEvaluator(updated).visit(ctx.expr());
     }
 
@@ -383,36 +395,39 @@ public final class SmtlibEvaluator {
 
     @Override
     public Formula visitApp(SmtlibParser.AppContext ctx) {
-      var f = functionEvaluator.visit(ctx.expr(0));
       ImmutableList.Builder<Formula> builder = ImmutableList.builder();
-      for (int i = 1; i < ctx.expr().size(); i++) {
-        builder.add(visit(ctx.expr(i)));
+      Function<List<Formula>, Formula> f = null;
+      var app = true;
+      for (var sub : ctx.expr()) {
+        if (app) {
+          f = functionEvaluator.visit(sub);
+          app = false;
+        } else {
+          builder.add(visit(sub));
+        }
       }
       return f.apply(builder.build());
     }
   }
 
-  private static Map<String, Function<List<Integer>, Function<List<Formula>, Formula>>> addFunction(
-      Map<String, Function<List<Integer>, Function<List<Formula>, Formula>>> context,
-      String name,
-      Function<List<Formula>, Formula> function) {
-    ImmutableMap.Builder<String, Function<List<Integer>, Function<List<Formula>, Formula>>>
-        builder = ImmutableMap.builder();
-    return builder
-        .putAll(context)
-        .put(
-            name,
-            idx -> {
-              checkArgument(idx.isEmpty());
-              return function;
-            })
-        .buildKeepingLast();
+  private static PersistentMap<String, Function<List<Integer>, Function<List<Formula>, Formula>>>
+      addFunction(
+          PersistentMap<String, Function<List<Integer>, Function<List<Formula>, Formula>>> context,
+          String name,
+          Function<List<Formula>, Formula> function) {
+    return context.putAndCopy(
+        name,
+        idx -> {
+          checkArgument(idx.isEmpty());
+          return function;
+        });
   }
 
-  private static Map<String, Function<List<Integer>, Function<List<Formula>, Formula>>> addConstant(
-      Map<String, Function<List<Integer>, Function<List<Formula>, Formula>>> context,
-      String name,
-      Formula value) {
+  private static PersistentMap<String, Function<List<Integer>, Function<List<Formula>, Formula>>>
+      addConstant(
+          PersistentMap<String, Function<List<Integer>, Function<List<Formula>, Formula>>> context,
+          String name,
+          Formula value) {
     return addFunction(
         context,
         name,
@@ -513,7 +528,7 @@ public final class SmtlibEvaluator {
 
       } else {
         var name = getSymbolValue(ctx.symbol());
-        checkArgument(!localDefs.contains(name), "Symbol %s already exists", name);
+        checkArgument(!localDefs.containsKey(name), "Symbol %s already exists", name);
         var sorts = transformedImmutableListCopy(ctx.sort(), sortEvaluator::visit);
         var left = sorts.subList(0, sorts.size() - 1);
         var right = sorts.get(sorts.size() - 1);
@@ -524,7 +539,7 @@ public final class SmtlibEvaluator {
               solver,
               state,
               addConstant(globalDefs, name, term),
-              FluentIterable.concat(localDefs, ImmutableSet.of(name)).toSet(),
+              localDefs.putAndCopy(name, null),
               asserted,
               lastAssumptions,
               responses);
@@ -535,7 +550,7 @@ public final class SmtlibEvaluator {
               solver,
               state,
               addFunction(globalDefs, name, p -> mgr.makeApplication(uf, p)),
-              FluentIterable.concat(localDefs, ImmutableSet.of(name)).toSet(),
+              localDefs.putAndCopy(name, null),
               asserted,
               lastAssumptions,
               responses);
@@ -559,7 +574,7 @@ public final class SmtlibEvaluator {
 
       } else {
         var name = getSymbolValue(ctx.symbol());
-        checkArgument(!localDefs.contains(name), "Symbol %s already exists", name);
+        checkArgument(!localDefs.containsKey(name), "Symbol %s already exists", name);
         var sort = sortEvaluator.visit(ctx.sort());
         var parameters = ctx.sortedVar();
         if (parameters.isEmpty()) {
@@ -570,7 +585,7 @@ public final class SmtlibEvaluator {
               solver,
               state,
               addConstant(globalDefs, name, term),
-              FluentIterable.concat(localDefs, ImmutableSet.of(name)).toSet(),
+              localDefs.putAndCopy(name, null),
               asserted,
               lastAssumptions,
               responses);
@@ -595,7 +610,7 @@ public final class SmtlibEvaluator {
                     }
                     return new ExprEvaluator(updated).visit(ctx.expr());
                   }),
-              FluentIterable.concat(localDefs, ImmutableSet.of(name)).toSet(),
+              localDefs.putAndCopy(name, null),
               asserted,
               lastAssumptions,
               responses);
@@ -971,20 +986,20 @@ public final class SmtlibEvaluator {
         assertState.prover.close();
       }
       // Remove all symbols that were defined in this smtlib file from the context
-      ImmutableMap.Builder<String, Function<List<Integer>, Function<List<Formula>, Formula>>>
-          nonlocal = ImmutableMap.builder();
+      PersistentMap<String, Function<List<Integer>, Function<List<Formula>, Formula>>> nonlocal =
+          PathCopyingPersistentTreeMap.of();
       for (var entry : globalDefs.entrySet()) {
         var symbol = entry.getKey();
-        if (!localDefs.contains(symbol)) {
-          nonlocal.put(symbol, entry.getValue());
+        if (!localDefs.containsKey(symbol)) {
+          nonlocal = nonlocal.putAndCopy(symbol, entry.getValue());
         }
       }
       return new SmtlibEvaluator(
           mode,
           solver,
           new ProverState.StartState(Optional.empty(), ImmutableSet.of()),
-          nonlocal.buildOrThrow(),
-          ImmutableSet.of(),
+          nonlocal,
+          PathCopyingPersistentTreeMap.of(),
           ImmutableList.of(ImmutableList.of()),
           Optional.empty(),
           responses);
