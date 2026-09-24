@@ -357,8 +357,6 @@ public final class SmtlibEvaluator {
         var term = visit(binding.expr());
         local = addConstant(local, sym, term);
       }
-      ImmutableMap.Builder<String, Function<List<Integer>, Function<List<Formula>, Formula>>>
-          builder = ImmutableMap.builder();
       var updated = context;
       for (var entry : local.entrySet()) {
         updated = updated.putAndCopy(entry.getKey(), entry.getValue());
@@ -406,7 +404,11 @@ public final class SmtlibEvaluator {
           builder.add(visit(sub));
         }
       }
-      return f.apply(builder.build());
+      if (f != null) {
+        return f.apply(builder.build());
+      } else {
+        throw new AssertionError();
+      }
     }
   }
 
