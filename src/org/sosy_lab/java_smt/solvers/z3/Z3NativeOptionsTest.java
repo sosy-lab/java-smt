@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Set;
 import org.junit.Test;
 import org.sosy_lab.common.ShutdownManager;
+import org.sosy_lab.common.configuration.ConfigurationBuilder;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BasicProverEnvironment;
@@ -39,6 +40,11 @@ public class Z3NativeOptionsTest extends SolverBasedTest0 {
       (assert (forall ((a Int) (x Int) (b Int)) (=> (and (< a x) (< x b)) (Itp a b))))
       (assert (forall ((a Int) (b Int)) (=> (Itp a b) (not (< b a)))))
       """;
+
+  @Override
+  protected ConfigurationBuilder createTestConfigBuilder() throws InvalidConfigurationException {
+    return super.createTestConfigBuilder().setOption("solver.useAntlrParser", "false");
+  }
 
   @Override
   protected Solvers solverToUse() {
