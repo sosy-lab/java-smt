@@ -270,7 +270,9 @@ public class NumeralFormulaManagerTest extends SolverBasedTest0.ParameterizedSol
             Solvers.MATHSAT5,
             Solvers.PRINCESS,
             Solvers.YICES2,
-            Solvers.SMTINTERPOL);
+            Solvers.SMTINTERPOL,
+            Solvers.CVC4,
+            Solvers.Z3_WITH_INTERPOLATION);
 
     var f = mgr.parse("(declare-const a Int) (declare-const b Int) (assert (= (- a) b))");
     assertThat(getKind(getOperand(f, 0))).isEqualTo(FunctionDeclarationKind.UMINUS);

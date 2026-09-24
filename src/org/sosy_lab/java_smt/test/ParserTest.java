@@ -330,6 +330,16 @@ public class ParserTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
 
     assertThat(((SolverResponse.CheckSatResponse) checkResponse.get(0)).status())
         .isEqualTo(Status.SAT);
+  }
+
+  @Test
+  public void parseScriptCheckSatAssumingTest() throws SolverException, InterruptedException {
+    requireIntegers();
+    assume()
+        .that(solver)
+        .isNoneOf(
+            Solvers.MATHSAT5,
+            Solvers.Z3_WITH_INTERPOLATION); // Only support (negated) literals as assumptions
 
     String checkAssuming =
         """
@@ -502,7 +512,8 @@ public class ParserTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   @SuppressWarnings("resource")
   @Test
   public void parseScriptTimeoutTest() {
-    assume().that(solver).isNoneOf(Solvers.PRINCESS, Solvers.CVC5);
+    assume().that(solver).isNoneOf(Solvers.PRINCESS, Solvers.CVC5); // Don't support timeout
+    assume().that(solver).isNotEqualTo(Solvers.YICES2); // Can't print smtlib
     requireIntegers();
 
     var hardProblem = new HardIntegerFormulaGenerator(imgr, bmgr).generate(50);

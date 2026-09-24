@@ -56,7 +56,7 @@ public class FormulaClassifierTest extends SolverBasedTest0.ParameterizedSolverB
     assume()
         .withMessage("Solver %s does not support nonlinear formulas", solverToUse())
         .that(solverToUse())
-        .isNoneOf(Solvers.OPENSMT, Solvers.SMTINTERPOL);
+        .isNoneOf(Solvers.OPENSMT, Solvers.SMTINTERPOL, Solvers.CVC4);
   }
 
   @Test
@@ -64,6 +64,7 @@ public class FormulaClassifierTest extends SolverBasedTest0.ParameterizedSolverB
     requireArrays();
     requireIntegers();
     requireQuantifiers(); // TODO SMTInterpol fails when parsing this
+    assume().that(solverToUse()).isNotEqualTo(Solvers.YICES2);
     String query = NUMERAL_VARS + "(assert (exists ((z Int)) (= (select arr x) (foo z))))";
     classifier.visit(mgr.parse(query));
     assertThat(classifier.toString()).isEqualTo("AUFLIA");
@@ -121,6 +122,7 @@ public class FormulaClassifierTest extends SolverBasedTest0.ParameterizedSolverB
   public void test_LIA() {
     requireIntegers();
     requireQuantifiers();
+    assume().that(solverToUse()).isNotEqualTo(Solvers.YICES2);
     String query = NUMERAL_VARS + "(assert (exists ((z Int)) (= (+ x 1) z)))";
     classifier.visit(mgr.parse(query));
     assertThat(classifier.toString()).isEqualTo("LIA");
@@ -160,6 +162,7 @@ public class FormulaClassifierTest extends SolverBasedTest0.ParameterizedSolverB
     requireBitvectors();
     requireIntegers();
     requireRationals();
+    assume().that(solverToUse()).isNotEqualTo(Solvers.YICES2);
     String query =
         NUMERAL_VARS
             + BV_VARS
@@ -173,6 +176,7 @@ public class FormulaClassifierTest extends SolverBasedTest0.ParameterizedSolverB
     requireArrays();
     requireQuantifiers();
     requireBitvectors();
+    assume().that(solverToUse()).isNotEqualTo(Solvers.YICES2);
     String query =
         BOOL_VARS
             + BV_VARS

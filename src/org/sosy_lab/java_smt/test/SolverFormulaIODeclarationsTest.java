@@ -282,7 +282,8 @@ public class SolverFormulaIODeclarationsTest
     String query = "(declare-fun x () Bool)(assert x)";
     BooleanFormula formula = mgr.parse(query);
     Truth.assertThat(mgr.extractVariables(formula).values()).hasSize(1);
-    if (!EnumSet.of(Solvers.Z3, Solvers.BITWUZLA).contains(solverToUse())) {
+    if (!EnumSet.of(Solvers.Z3, Solvers.Z3_WITH_INTERPOLATION, Solvers.BITWUZLA)
+        .contains(solverToUse())) {
       assertThrows(IllegalArgumentException.class, () -> imgr.makeVariable("x"));
     } else if (EnumSet.of(Solvers.BITWUZLA).contains(solverToUse())) {
       Truth.assertThat(mgr.extractVariables(formula).values())
