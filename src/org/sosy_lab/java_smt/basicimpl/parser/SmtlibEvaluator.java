@@ -48,7 +48,7 @@ public final class SmtlibEvaluator {
   }
 
   private interface ProverState {
-    record StartState(Optional<String> logic, List<SolverContext.ProverOptions> options)
+    record StartState(Optional<String> logic, Set<SolverContext.ProverOptions> options)
         implements ProverState {}
 
     record AssertState(ProverEnvironment prover) implements ProverState {}
@@ -91,7 +91,7 @@ public final class SmtlibEvaluator {
   }
 
   private static ProverEnvironment newProver(
-      SolverContext pSolver, List<SolverContext.ProverOptions> pOptions) {
+      SolverContext pSolver, Set<SolverContext.ProverOptions> pOptions) {
     var newProver =
         pSolver.newProverEnvironment(pOptions.toArray(new SolverContext.ProverOptions[] {}));
     try {
@@ -109,7 +109,7 @@ public final class SmtlibEvaluator {
     return new SmtlibEvaluator(
         pMode,
         pSolver,
-        new ProverState.StartState(Optional.empty(), ImmutableList.of()),
+        new ProverState.StartState(Optional.empty(), ImmutableSet.of()),
         new Predefined(pManager)
             .addTheorySymbols()
             .addUserSymbols(pManager.getDefinedSymbols())
@@ -429,9 +429,53 @@ public final class SmtlibEvaluator {
       return SmtlibEvaluator.this;
     }
 
+    private Set<SolverContext.ProverOptions> newOptionSet(
+        Set<SolverContext.ProverOptions> optionSet,
+        SolverContext.ProverOptions option,
+        boolean value) {
+      if (value) {
+        return FluentIterable.concat(optionSet, ImmutableSet.of(option)).toSet();
+      } else {
+        return FluentIterable.from(optionSet).filter(v -> v != option).toSet();
+      }
+    }
+
     @Override
     public SmtlibEvaluator visitSetOption(SmtlibParser.SetOptionContext ctx) {
-      throw new IllegalArgumentException("Options are not supported");
+      if (state instanceof ProverState.StartState startState) {
+        var option = ctx.attribute().keyword().getText();
+        var supportedOptions =
+            ImmutableMap.of(
+                ":produce-models", SolverContext.ProverOptions.GENERATE_MODELS,
+                ":produce-unsat-assumptions",
+                    SolverContext.ProverOptions.GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS,
+                ":produce-unsat-cores", SolverContext.ProverOptions.GENERATE_UNSAT_CORE);
+        if (supportedOptions.containsKey(option)) {
+          var value = ctx.attribute().expr().getText();
+          checkArgument(value.equals("true") || value.equals("false"));
+          return new SmtlibEvaluator(
+              mode,
+              solver,
+              new ProverState.StartState(
+                  startState.logic,
+                  newOptionSet(
+                      startState.options,
+                      supportedOptions.get(option),
+                      Boolean.parseBoolean(value))),
+              globalDefs,
+              localDefs,
+              asserted,
+              lastAssumptions,
+              responses);
+
+        } else {
+          // TODO Report that we skipped the option
+          return SmtlibEvaluator.this;
+        }
+
+      } else {
+        throw new AssertionError("Can't set options. Solver already initialized");
+      }
     }
 
     @Override
@@ -939,7 +983,7 @@ public final class SmtlibEvaluator {
       return new SmtlibEvaluator(
           mode,
           solver,
-          new ProverState.StartState(Optional.empty(), ImmutableList.of()),
+          new ProverState.StartState(Optional.empty(), ImmutableSet.of()),
           nonlocal.buildOrThrow(),
           ImmutableSet.of(),
           ImmutableList.of(ImmutableList.of()),

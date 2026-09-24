@@ -350,6 +350,7 @@ public class ParserTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
 
     String modelSmtlib =
         """
+        (set-option :produce-models true)
         (declare-const v Int)
         (assert (= v 0))
         (check-sat)
@@ -365,6 +366,7 @@ public class ParserTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
 
     String evalSmtlib =
         """
+        (set-option :produce-models true)
         (declare-const v Int)
         (assert (= v 0))
         (check-sat)
@@ -384,6 +386,7 @@ public class ParserTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
 
     String unsatCoreSmtlib =
         """
+        (set-option :produce-unsat-cores true)
         (declare-const v Int)
         (declare-const w Int)
         (assert (and (= v 0) (> v 0)))
@@ -406,6 +409,7 @@ public class ParserTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
 
     String unsatAssumptionsSmtlib =
         """
+        (set-option :produce-unsat-assumptions true)
         (declare-const A Bool)
         (declare-const B Bool)
         (assert (xor A B))
