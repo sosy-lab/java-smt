@@ -48,7 +48,8 @@ public final class SmtlibEvaluator {
   }
 
   private interface ProverState {
-    record StartState(List<SolverContext.ProverOptions> options) implements ProverState {}
+    record StartState(Optional<String> logic, List<SolverContext.ProverOptions> options)
+        implements ProverState {}
 
     record AssertState(ProverEnvironment prover) implements ProverState {}
 
@@ -108,7 +109,7 @@ public final class SmtlibEvaluator {
     return new SmtlibEvaluator(
         pMode,
         pSolver,
-        new ProverState.StartState(ImmutableList.of()),
+        new ProverState.StartState(Optional.empty(), ImmutableList.of()),
         new Predefined(pManager)
             .addTheorySymbols()
             .addUserSymbols(pManager.getDefinedSymbols())
@@ -435,86 +436,126 @@ public final class SmtlibEvaluator {
 
     @Override
     public SmtlibEvaluator visitSetLogic(SmtlibParser.SetLogicContext ctx) {
-      // Ignore for now
-      return SmtlibEvaluator.this;
+      if (state instanceof ProverState.StartState startState) {
+        checkArgument(startState.logic.isEmpty(), "Logic has already been set");
+        return new SmtlibEvaluator(
+            mode,
+            solver,
+            new ProverState.StartState(Optional.of(ctx.getText()), startState.options),
+            globalDefs,
+            localDefs,
+            asserted,
+            lastAssumptions,
+            responses);
+
+      } else {
+        throw new IllegalArgumentException("Solver is already running");
+      }
     }
 
     @Override
     public SmtlibEvaluator visitDeclare(SmtlibParser.DeclareContext ctx) {
-      var name = getSymbolValue(ctx.symbol());
-      checkArgument(!localDefs.contains(name), "Symbol %s already exists", name);
-      var sorts = transformedImmutableListCopy(ctx.sort(), sortEvaluator::visit);
-      var left = sorts.subList(0, sorts.size() - 1);
-      var right = sorts.get(sorts.size() - 1);
-      if (sorts.size() == 1) {
-        var term = mgr.makeVariable(right, name);
+      if (state instanceof ProverState.StartState startState && startState.logic.isEmpty()) {
         return new SmtlibEvaluator(
-            mode,
-            solver,
-            state,
-            addConstant(globalDefs, name, term),
-            FluentIterable.concat(localDefs, ImmutableSet.of(name)).toSet(),
-            asserted,
-            lastAssumptions,
-            responses);
+                mode,
+                solver,
+                new ProverState.StartState(Optional.of("ALL"), startState.options),
+                globalDefs,
+                localDefs,
+                asserted,
+                lastAssumptions,
+                responses)
+            .commandVisitor.visit(ctx);
+
       } else {
-        var uf = mgr.getUFManager().declareUF(name, right, left.toArray(new FormulaType<?>[0]));
-        return new SmtlibEvaluator(
-            mode,
-            solver,
-            state,
-            addFunction(globalDefs, name, p -> mgr.makeApplication(uf, p)),
-            FluentIterable.concat(localDefs, ImmutableSet.of(name)).toSet(),
-            asserted,
-            lastAssumptions,
-            responses);
+        var name = getSymbolValue(ctx.symbol());
+        checkArgument(!localDefs.contains(name), "Symbol %s already exists", name);
+        var sorts = transformedImmutableListCopy(ctx.sort(), sortEvaluator::visit);
+        var left = sorts.subList(0, sorts.size() - 1);
+        var right = sorts.get(sorts.size() - 1);
+        if (sorts.size() == 1) {
+          var term = mgr.makeVariable(right, name);
+          return new SmtlibEvaluator(
+              mode,
+              solver,
+              state,
+              addConstant(globalDefs, name, term),
+              FluentIterable.concat(localDefs, ImmutableSet.of(name)).toSet(),
+              asserted,
+              lastAssumptions,
+              responses);
+        } else {
+          var uf = mgr.getUFManager().declareUF(name, right, left.toArray(new FormulaType<?>[0]));
+          return new SmtlibEvaluator(
+              mode,
+              solver,
+              state,
+              addFunction(globalDefs, name, p -> mgr.makeApplication(uf, p)),
+              FluentIterable.concat(localDefs, ImmutableSet.of(name)).toSet(),
+              asserted,
+              lastAssumptions,
+              responses);
+        }
       }
     }
 
     @Override
     public SmtlibEvaluator visitDefine(SmtlibParser.DefineContext ctx) {
-      var name = getSymbolValue(ctx.symbol());
-      checkArgument(!localDefs.contains(name), "Symbol %s already exists", name);
-      var sort = sortEvaluator.visit(ctx.sort());
-      var parameters = ctx.sortedVar();
-      if (parameters.isEmpty()) {
-        var term = new ExprEvaluator(globalDefs).visit(ctx.expr());
-        checkArgument(mgr.getFormulaType(term).equals(sort));
+      if (state instanceof ProverState.StartState startState && startState.logic.isEmpty()) {
         return new SmtlibEvaluator(
-            mode,
-            solver,
-            state,
-            addConstant(globalDefs, name, term),
-            FluentIterable.concat(localDefs, ImmutableSet.of(name)).toSet(),
-            asserted,
-            lastAssumptions,
-            responses);
-      } else {
-        var capture = globalDefs;
-        // TODO Evaluate once during creation to catch any errors right away
-        return new SmtlibEvaluator(
-            mode,
-            solver,
-            state,
-            addFunction(
+                mode,
+                solver,
+                new ProverState.StartState(Optional.of("ALL"), startState.options),
                 globalDefs,
-                name,
-                p -> {
-                  checkArgument(p.size() == parameters.size());
-                  var updated = capture;
-                  for (int i = 0; i < p.size(); i++) {
-                    var nameArg = getSymbolValue(parameters.get(i).symbol());
-                    var sortArg = sortEvaluator.visit(parameters.get(i).sort());
-                    var value = p.get(i);
-                    checkArgument(mgr.getFormulaType(value).equals(sortArg));
-                    updated = addConstant(updated, nameArg, value);
-                  }
-                  return new ExprEvaluator(updated).visit(ctx.expr());
-                }),
-            FluentIterable.concat(localDefs, ImmutableSet.of(name)).toSet(),
-            asserted,
-            lastAssumptions,
-            responses);
+                localDefs,
+                asserted,
+                lastAssumptions,
+                responses)
+            .commandVisitor.visit(ctx);
+
+      } else {
+        var name = getSymbolValue(ctx.symbol());
+        checkArgument(!localDefs.contains(name), "Symbol %s already exists", name);
+        var sort = sortEvaluator.visit(ctx.sort());
+        var parameters = ctx.sortedVar();
+        if (parameters.isEmpty()) {
+          var term = new ExprEvaluator(globalDefs).visit(ctx.expr());
+          checkArgument(mgr.getFormulaType(term).equals(sort));
+          return new SmtlibEvaluator(
+              mode,
+              solver,
+              state,
+              addConstant(globalDefs, name, term),
+              FluentIterable.concat(localDefs, ImmutableSet.of(name)).toSet(),
+              asserted,
+              lastAssumptions,
+              responses);
+        } else {
+          var capture = globalDefs;
+          return new SmtlibEvaluator(
+              mode,
+              solver,
+              state,
+              addFunction(
+                  globalDefs,
+                  name,
+                  p -> {
+                    checkArgument(p.size() == parameters.size());
+                    var updated = capture;
+                    for (int i = 0; i < p.size(); i++) {
+                      var nameArg = getSymbolValue(parameters.get(i).symbol());
+                      var sortArg = sortEvaluator.visit(parameters.get(i).sort());
+                      var value = p.get(i);
+                      checkArgument(mgr.getFormulaType(value).equals(sortArg));
+                      updated = addConstant(updated, nameArg, value);
+                    }
+                    return new ExprEvaluator(updated).visit(ctx.expr());
+                  }),
+              FluentIterable.concat(localDefs, ImmutableSet.of(name)).toSet(),
+              asserted,
+              lastAssumptions,
+              responses);
+        }
       }
     }
 
@@ -898,7 +939,7 @@ public final class SmtlibEvaluator {
       return new SmtlibEvaluator(
           mode,
           solver,
-          new ProverState.StartState(ImmutableList.of()),
+          new ProverState.StartState(Optional.empty(), ImmutableList.of()),
           nonlocal.buildOrThrow(),
           ImmutableSet.of(),
           ImmutableList.of(ImmutableList.of()),
