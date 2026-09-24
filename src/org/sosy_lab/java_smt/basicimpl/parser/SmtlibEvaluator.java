@@ -1039,9 +1039,7 @@ public final class SmtlibEvaluator {
       var eval = SmtlibEvaluator.this;
       try {
         for (var cmd : ctx.command()) {
-          if (eval.state instanceof ProverState.ExitState) {
-            throw new IllegalArgumentException("Can't run any more commands. Solver was closed");
-          }
+          checkArgument(!(eval.state instanceof ProverState.ExitState), "Can't run any more commands. Solver was closed");
           eval = eval.commandVisitor.visit(cmd);
         }
       } finally {
