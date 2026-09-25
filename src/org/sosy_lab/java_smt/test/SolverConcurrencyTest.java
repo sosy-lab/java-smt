@@ -293,11 +293,10 @@ public class SolverConcurrencyTest {
   public void testFormulaTranslationWithConcurrentContexts()
       throws InvalidConfigurationException, InterruptedException, SolverException {
     requireIntegers();
-    // CVC4 and Yices2 do not support parsing and therefore no translation.
     assume()
-        .withMessage("Solver does not support translation of formulas")
+        .withMessage("Solver does not support printing smtlib formulas")
         .that(solver)
-        .isNoneOf(Solvers.CVC4, Solvers.YICES2);
+        .isNotEqualTo(Solvers.YICES2);
 
     ConcurrentLinkedQueue<ContextAndFormula> contextAndFormulaList = new ConcurrentLinkedQueue<>();
 
@@ -528,15 +527,14 @@ public class SolverConcurrencyTest {
   @Test
   public void continuousRunningThreadFormulaTransferTranslateTest() {
     requireIntegers();
-    // CVC4 and Yices2 do not support parsing and therefore no translation.
     assume()
-        .withMessage("Solver does not support translation of formulas")
+        .withMessage("Solver crashes in this test")
         .that(solver)
-        .isNoneOf(Solvers.CVC4, Solvers.YICES2);
+        .isNotEqualTo(Solvers.Z3_WITH_INTERPOLATION);
     assume()
-        .withMessage("Princess will run out of memory")
+        .withMessage("Solver does not support printing smtlib formulas")
         .that(solver)
-        .isNotEqualTo(Solvers.PRINCESS);
+        .isNotEqualTo(Solvers.YICES2);
 
     // This is fine! We might access this more than once at a time,
     // but that gives only access to the bucket, which is threadsafe.
