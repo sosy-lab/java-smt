@@ -30,6 +30,9 @@ import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FunctionDeclaration;
 import org.sosy_lab.java_smt.api.NumeralFormula;
+import org.sosy_lab.java_smt.api.RegexFormula;
+import org.sosy_lab.java_smt.api.StringFormula;
+import org.sosy_lab.java_smt.api.visitors.DefaultFormulaVisitor;
 import org.sosy_lab.java_smt.delegate.parsing.ParsingFormulaManager;
 
 public class Predefined {
@@ -1290,6 +1293,382 @@ public class Predefined {
           };
         });
 
+    // Strings
+    predefined.put(
+        "str.++",
+        idx -> {
+          Preconditions.checkArgument(idx.isEmpty());
+          return p -> {
+            Preconditions.checkArgument(p.size() >= 2);
+            return foldl1(
+                (a, b) ->
+                    mgr.getStringFormulaManager().concat((StringFormula) a, (StringFormula) b),
+                p);
+          };
+        });
+    predefined.put(
+        "str.len",
+        idx -> {
+          Preconditions.checkArgument(idx.isEmpty());
+          return p -> {
+            Preconditions.checkArgument(p.size() == 1);
+            return mgr.getStringFormulaManager().length((StringFormula) p.get(0));
+          };
+        });
+    predefined.put(
+        "str.<",
+        idx -> {
+          Preconditions.checkArgument(idx.isEmpty());
+          return p -> {
+            Preconditions.checkArgument(p.size() >= 2);
+            return chain(
+                (a, b) ->
+                    mgr.getStringFormulaManager().lessThan((StringFormula) a, (StringFormula) b),
+                p);
+          };
+        });
+    predefined.put(
+        "str.to_re",
+        idx -> {
+          Preconditions.checkArgument(idx.isEmpty());
+          return p -> {
+            Preconditions.checkArgument(p.size() == 1);
+            Preconditions.checkArgument(p.get(0) instanceof StringFormula);
+            // This workaround is less general than the smtlib definition
+            // FIXME Add makeRegex(StringFormula) to JavaSMT?
+            var constant =
+                mgr.visit(
+                    p.get(0),
+                    new DefaultFormulaVisitor<String>() {
+                      @Override
+                      protected String visitDefault(Formula f) {
+                        throw new UnsupportedOperationException();
+                      }
+
+                      @Override
+                      public String visitConstant(Formula f, Object value) {
+                        return (String) value;
+                      }
+                    });
+            return mgr.getStringFormulaManager().makeRegex(constant);
+          };
+        });
+    predefined.put(
+        "str.in_re",
+        idx -> {
+          Preconditions.checkArgument(idx.isEmpty());
+          return p -> {
+            Preconditions.checkArgument(p.size() == 2);
+            return mgr.getStringFormulaManager()
+                .in((StringFormula) p.get(0), (RegexFormula) p.get(1));
+          };
+        });
+    predefined.put(
+        "re.none",
+        idx -> {
+          Preconditions.checkArgument(idx.isEmpty());
+          return p -> {
+            Preconditions.checkArgument(p.isEmpty());
+            return mgr.getStringFormulaManager().none();
+          };
+        });
+    predefined.put(
+        "re.all",
+        idx -> {
+          Preconditions.checkArgument(idx.isEmpty());
+          return p -> {
+            Preconditions.checkArgument(p.isEmpty());
+            return mgr.getStringFormulaManager().all();
+          };
+        });
+    predefined.put(
+        "re.allChar",
+        idx -> {
+          Preconditions.checkArgument(idx.isEmpty());
+          return p -> {
+            Preconditions.checkArgument(p.isEmpty());
+            return mgr.getStringFormulaManager().allChar();
+          };
+        });
+    predefined.put(
+        "re.++",
+        idx -> {
+          Preconditions.checkArgument(idx.isEmpty());
+          return p -> {
+            Preconditions.checkArgument(p.size() >= 2);
+            return foldl1(
+                (a, b) ->
+                    mgr.getStringFormulaManager()
+                        .concatRegex(ImmutableList.of((RegexFormula) a, (RegexFormula) b)),
+                p);
+          };
+        });
+    predefined.put(
+        "re.union",
+        idx -> {
+          Preconditions.checkArgument(idx.isEmpty());
+          return p -> {
+            Preconditions.checkArgument(p.size() >= 2);
+            return foldl1(
+                (a, b) -> mgr.getStringFormulaManager().union((RegexFormula) a, (RegexFormula) b),
+                p);
+          };
+        });
+    predefined.put(
+        "re.inter",
+        idx -> {
+          Preconditions.checkArgument(idx.isEmpty());
+          return p -> {
+            Preconditions.checkArgument(p.size() >= 2);
+            return foldl1(
+                (a, b) ->
+                    mgr.getStringFormulaManager().intersection((RegexFormula) a, (RegexFormula) b),
+                p);
+          };
+        });
+    predefined.put(
+        "re.*",
+        idx -> {
+          Preconditions.checkArgument(idx.isEmpty());
+          return p -> {
+            Preconditions.checkArgument(p.size() == 1);
+            return mgr.getStringFormulaManager().closure((RegexFormula) p.get(0));
+          };
+        });
+    predefined.put(
+        "str.<=",
+        idx -> {
+          Preconditions.checkArgument(idx.isEmpty());
+          return p -> {
+            Preconditions.checkArgument(p.size() >= 2);
+            return chain(
+                (a, b) ->
+                    mgr.getStringFormulaManager()
+                        .lessOrEquals((StringFormula) a, (StringFormula) b),
+                p);
+          };
+        });
+    predefined.put(
+        "str.at",
+        idx -> {
+          Preconditions.checkArgument(idx.isEmpty());
+          return p -> {
+            Preconditions.checkArgument(p.size() == 2);
+            return mgr.getStringFormulaManager()
+                .charAt((StringFormula) p.get(1), (NumeralFormula.IntegerFormula) p.get(0));
+          };
+        });
+    predefined.put(
+        "str.substr",
+        idx -> {
+          Preconditions.checkArgument(idx.isEmpty());
+          return p -> {
+            Preconditions.checkArgument(p.size() == 3);
+            return mgr.getStringFormulaManager()
+                .substring(
+                    (StringFormula) p.get(2),
+                    (NumeralFormula.IntegerFormula) p.get(0),
+                    (NumeralFormula.IntegerFormula) p.get(1));
+          };
+        });
+    predefined.put(
+        "str.prefixof",
+        idx -> {
+          Preconditions.checkArgument(idx.isEmpty());
+          return p -> {
+            Preconditions.checkArgument(p.size() == 2);
+            return mgr.getStringFormulaManager()
+                .prefix((StringFormula) p.get(0), (StringFormula) p.get(1));
+          };
+        });
+    predefined.put(
+        "str.suffixof",
+        idx -> {
+          Preconditions.checkArgument(idx.isEmpty());
+          return p -> {
+            Preconditions.checkArgument(p.size() == 2);
+            return mgr.getStringFormulaManager()
+                .suffix((StringFormula) p.get(0), (StringFormula) p.get(1));
+          };
+        });
+    predefined.put(
+        "str.contains",
+        idx -> {
+          Preconditions.checkArgument(idx.isEmpty());
+          return p -> {
+            Preconditions.checkArgument(p.size() == 2);
+            return mgr.getStringFormulaManager()
+                .contains((StringFormula) p.get(0), (StringFormula) p.get(1));
+          };
+        });
+    predefined.put(
+        "str.indexof",
+        idx -> {
+          Preconditions.checkArgument(idx.isEmpty());
+          return p -> {
+            Preconditions.checkArgument(p.size() == 3);
+            return mgr.getStringFormulaManager()
+                .indexOf(
+                    (StringFormula) p.get(0),
+                    (StringFormula) p.get(1),
+                    (NumeralFormula.IntegerFormula) p.get(2));
+          };
+        });
+    predefined.put(
+        "str.replace",
+        idx -> {
+          Preconditions.checkArgument(idx.isEmpty());
+          return p -> {
+            Preconditions.checkArgument(p.size() == 3);
+            return mgr.getStringFormulaManager()
+                .replace(
+                    (StringFormula) p.get(0), (StringFormula) p.get(1), (StringFormula) p.get(2));
+          };
+        });
+    predefined.put(
+        "str.replace_all",
+        idx -> {
+          Preconditions.checkArgument(idx.isEmpty());
+          return p -> {
+            Preconditions.checkArgument(p.size() == 3);
+            return mgr.getStringFormulaManager()
+                .replaceAll(
+                    (StringFormula) p.get(0), (StringFormula) p.get(1), (StringFormula) p.get(2));
+          };
+        });
+    predefined.put(
+        "str.replace_re",
+        idx -> {
+          Preconditions.checkArgument(idx.isEmpty());
+          return p -> {
+            Preconditions.checkArgument(p.size() == 3);
+            // FIXME Add to JavaSMT?
+            throw new UnsupportedOperationException();
+          };
+        });
+    predefined.put(
+        "str.replace_re_all",
+        idx -> {
+          Preconditions.checkArgument(idx.isEmpty());
+          return p -> {
+            Preconditions.checkArgument(p.size() == 3);
+            // FIXME Add to JavaSMT?
+            throw new UnsupportedOperationException();
+          };
+        });
+    predefined.put(
+        "re.comp",
+        idx -> {
+          Preconditions.checkArgument(idx.isEmpty());
+          return p -> {
+            Preconditions.checkArgument(p.size() == 1);
+            return mgr.getStringFormulaManager().complement((RegexFormula) p.get(0));
+          };
+        });
+    predefined.put(
+        "re.diff",
+        idx -> {
+          Preconditions.checkArgument(idx.isEmpty());
+          return p -> {
+            Preconditions.checkArgument(p.size() >= 2);
+            return foldl1(
+                (a, b) ->
+                    mgr.getStringFormulaManager().difference((RegexFormula) a, (RegexFormula) b),
+                p);
+          };
+        });
+    predefined.put(
+        "re.+",
+        idx -> {
+          Preconditions.checkArgument(idx.isEmpty());
+          return p -> {
+            Preconditions.checkArgument(p.size() == 1);
+            return mgr.getStringFormulaManager().cross((RegexFormula) p.get(0));
+          };
+        });
+    predefined.put(
+        "re.opt",
+        idx -> {
+          Preconditions.checkArgument(idx.isEmpty());
+          return p -> {
+            Preconditions.checkArgument(p.size() == 1);
+            return mgr.getStringFormulaManager().optional((RegexFormula) p.get(0));
+          };
+        });
+    predefined.put(
+        "re.range",
+        idx -> {
+          Preconditions.checkArgument(idx.isEmpty());
+          return p -> {
+            Preconditions.checkArgument(p.size() == 2);
+            return mgr.getStringFormulaManager()
+                .range((StringFormula) p.get(0), (StringFormula) p.get(1));
+          };
+        });
+    predefined.put(
+        "re.^",
+        idx -> {
+          Preconditions.checkArgument(idx.size() == 1);
+          return p -> {
+            Preconditions.checkArgument(p.size() == 1);
+            return mgr.getStringFormulaManager().times((RegexFormula) p.get(0), idx.get(0));
+          };
+        });
+    predefined.put(
+        "re.loop",
+        idx -> {
+          Preconditions.checkArgument(idx.size() == 2);
+          return p -> {
+            Preconditions.checkArgument(p.size() == 1);
+            throw new UnsupportedOperationException(); // FIXME Add to JavaSMT?
+          };
+        });
+    predefined.put(
+        "str.is_digit",
+        idx -> {
+          Preconditions.checkArgument(idx.isEmpty());
+          return p -> {
+            Preconditions.checkArgument(p.size() == 1);
+            throw new UnsupportedOperationException(); // FIXME Add to JavaSMT?
+          };
+        });
+    predefined.put(
+        "str.to_code",
+        idx -> {
+          Preconditions.checkArgument(idx.isEmpty());
+          return p -> {
+            Preconditions.checkArgument(p.size() == 1);
+            return mgr.getStringFormulaManager().toIntegerFormula((StringFormula) p.get(0));
+          };
+        });
+    predefined.put(
+        "str.from_code",
+        idx -> {
+          Preconditions.checkArgument(idx.isEmpty());
+          return p -> {
+            Preconditions.checkArgument(p.size() == 1);
+            return mgr.getStringFormulaManager()
+                .fromCodePoint((NumeralFormula.IntegerFormula) p.get(0));
+          };
+        });
+    predefined.put(
+        "str.to_int",
+        idx -> {
+          Preconditions.checkArgument(idx.isEmpty());
+          return p -> {
+            Preconditions.checkArgument(p.size() == 1);
+            return mgr.getStringFormulaManager().toIntegerFormula((StringFormula) p.get(0));
+          };
+        });
+    predefined.put(
+        "str.from_int",
+        idx -> {
+          Preconditions.checkArgument(idx.isEmpty());
+          return p -> {
+            Preconditions.checkArgument(p.size() == 1);
+            throw new UnsupportedOperationException(); // FIXME Add to JavaSMT?
+          };
+        });
     return this;
   }
 

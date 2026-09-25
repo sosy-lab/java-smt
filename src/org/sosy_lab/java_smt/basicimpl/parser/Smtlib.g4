@@ -152,6 +152,8 @@ sort
     : 'Bool'                                       # SortBool
     | 'Int'                                        # SortInt
     | 'Real'                                       # SortReal
+    | 'String'                                     # SortString
+    | 'RegLan'                                     # SortRegex
     | '(' '_' 'BitVec' integer ')'                 # SortBitvec
     | 'RoundingMode'                               # SortRoundingMode
     | ('Float16'

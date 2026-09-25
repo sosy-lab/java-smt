@@ -174,6 +174,16 @@ public final class SmtlibEvaluator {
     }
 
     @Override
+    public FormulaType<?> visitSortString(SmtlibParser.SortStringContext ctx) {
+      return FormulaType.StringType;
+    }
+
+    @Override
+    public FormulaType<?> visitSortRegex(SmtlibParser.SortRegexContext ctx) {
+      return FormulaType.RegexType;
+    }
+
+    @Override
     public FormulaType<?> visitSortBitvec(SmtlibParser.SortBitvecContext ctx) {
       return FormulaType.getBitvectorTypeWithSize(getIntegerValue(ctx.integer()).intValueExact());
     }
@@ -257,6 +267,12 @@ public final class SmtlibEvaluator {
     @Override
     public Formula visitReal(SmtlibParser.RealContext ctx) {
       return mgr.getRationalFormulaManager().makeNumber(new BigDecimal(ctx.getText()));
+    }
+
+    @Override
+    public Formula visitString(SmtlibParser.StringContext ctx) {
+      var str = ctx.getText().substring(1, ctx.getText().length() - 1);
+      return mgr.getStringFormulaManager().makeString(str.replace("\"\"", "\""));
     }
   }
 

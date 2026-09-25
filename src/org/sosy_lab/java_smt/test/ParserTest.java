@@ -139,16 +139,22 @@ public class ParserTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   @Test
   public void parseAllStringTest() throws SolverException, InterruptedException {
     requireStrings();
-    assume()
-        .withMessage("Solver %s does not support parsing strings", solverToUse())
-        .that(solverToUse())
-        .isNotEqualTo(Solvers.PRINCESS);
-
     String smt = "(declare-fun s () String)(assert (= s \"hello\"))";
     List<BooleanFormula> parsed = mgr.parseAll(smt);
     assertThat(parsed).hasSize(1);
     assertThatFormula(Iterables.getOnlyElement(parsed))
         .isEquisatisfiableTo(smgr.equal(smgr.makeVariable("s"), smgr.makeString("hello")));
+  }
+
+
+  @Test
+  public void parseAllStringEscapeTest() throws SolverException, InterruptedException {
+    requireStrings();
+    String smt = "(declare-fun s () String)(assert (= s \"hel\"\"lo\"))";
+    List<BooleanFormula> parsed = mgr.parseAll(smt);
+    assertThat(parsed).hasSize(1);
+    assertThatFormula(Iterables.getOnlyElement(parsed))
+            .isEquisatisfiableTo(smgr.equal(smgr.makeVariable("s"), smgr.makeString("hel\"lo")));
   }
 
   @Test

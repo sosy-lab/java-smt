@@ -121,6 +121,24 @@ public interface SmtlibVisitor<T> extends ParseTreeVisitor<T> {
   T visitSortReal(SmtlibParser.SortRealContext ctx);
 
   /**
+   * Visit a parse tree produced by the {@code SortString} labeled alternative in {@link
+   * SmtlibParser#sort}.
+   *
+   * @param ctx the parse tree
+   * @return the visitor result
+   */
+  T visitSortString(SmtlibParser.SortStringContext ctx);
+
+  /**
+   * Visit a parse tree produced by the {@code SortRegex} labeled alternative in {@link
+   * SmtlibParser#sort}.
+   *
+   * @param ctx the parse tree
+   * @return the visitor result
+   */
+  T visitSortRegex(SmtlibParser.SortRegexContext ctx);
+
+  /**
    * Visit a parse tree produced by the {@code SortBitvec} labeled alternative in {@link
    * SmtlibParser#sort}.
    *
