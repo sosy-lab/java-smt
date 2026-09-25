@@ -126,17 +126,6 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
     return smgr.makeString(AbstractStringFormulaManager.unescapeUnicodeForSmtlib(pString));
   }
 
-  private void requireVariableStringLiterals() {
-    // FIXME: Remove once we've updated to Ostrich 2.0
-    // See https://github.com/uuverifiers/ostrich/issues/88
-    assume()
-        .withMessage(
-            "Princess currently requires at least one of the arguments to be a "
-                + "singleton string")
-        .that(solverToUse())
-        .isNotEqualTo(Solvers.PRINCESS);
-  }
-
   // Tests
 
   @Test
@@ -157,11 +146,6 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
 
   @Test
   public void testOutputUnescape() throws SolverException, InterruptedException {
-    // Princess does not (fully) support evaluating String formulas when the partial model is
-    // used. This has already been fixed upstream
-    // TODO Enable this test once we update Princess to the next version
-    assume().that(solver).isNotEqualTo(Solvers.PRINCESS);
-
     // Test if Unicode escape sequences get properly converted back when reading from the model.
     try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
       assertThat(!prover.isUnsat()).isTrue();
@@ -371,7 +355,7 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
     StringFormula lower = smgr.makeVariable("lower");
     if (solver != Solvers.PRINCESS && solver != Solvers.CVC4) {
       // FIXME CVC4 only supports String constants as bounds and will fail for variables
-      // FIXME Princess will crash when using variables as bounds
+      // FIXME Princess only supports singleton strings for re.range
       assertThatFormula(
               bmgr.and(
                   smgr.equal(lower, smgr.makeString("a")),
@@ -551,8 +535,9 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
         .withMessage("Solver is quite slow for this example")
         .that(solverToUse())
         .isNotEqualTo(Solvers.CVC5);
-
-    requireVariableStringLiterals();
+    // Princess returns a false model for the first check and hangs for the second
+    // TODO Report to the developers
+    assume().that(solver).isNotEqualTo(Solvers.PRINCESS);
 
     StringFormula var1 = smgr.makeVariable("0");
     StringFormula var2 = smgr.makeVariable("1");
@@ -890,18 +875,17 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
 
   @Test
   public void testStringToCodePoint() throws SolverException, InterruptedException {
-    // TODO report to developers
-    assume()
-        .withMessage("Solver %s crashes", solverToUse())
-        .that(solverToUse())
-        .isNotEqualTo(Solvers.PRINCESS);
-
     assertEqual(smgr.toCodePoint(a), imgr.makeNumber('a'));
     assertEqual(smgr.toCodePoint(b), imgr.makeNumber('b'));
 
-    // string of length != 1 are invalid and return -1
-    assertEqual(smgr.toCodePoint(ab), imgr.makeNumber(-1));
-    assertEqual(smgr.toCodePoint(empty), imgr.makeNumber(-1));
+    if (solver != Solvers.PRINCESS) {
+      // string of length != 1 are invalid and return -1
+      assertEqual(smgr.toCodePoint(ab), imgr.makeNumber(-1));
+      assertEqual(smgr.toCodePoint(empty), imgr.makeNumber(-1));
+    } else {
+      // In Princess the return value seems to be undefined
+      // TODO Report to the developers
+    }
   }
 
   @Test
@@ -918,11 +902,11 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
 
   @Test
   public void testFromCodePointInRange() throws SolverException, InterruptedException {
-    // TODO report to developers
-    assume()
-        .withMessage("Solver %s crashes", solverToUse())
-        .that(solverToUse())
-        .isNotEqualTo(Solvers.PRINCESS);
+    // Fails on Princess as
+    // 1) Codepoints > 0xFFFF are not supported
+    // 2) str_to_code returns 0 for empty strings
+    // TODO Report to the developers
+    assume().that(solver).isNotEqualTo(Solvers.PRINCESS);
 
     IntegerFormula cp = imgr.makeVariable("cp");
     StringFormula str = smgr.fromCodePoint(cp);
@@ -1187,8 +1171,6 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
 
   @Test
   public void testStringVariableContains() throws SolverException, InterruptedException {
-    requireVariableStringLiterals();
-
     StringFormula var1 = smgr.makeVariable("var1");
     StringFormula var2 = smgr.makeVariable("var2");
 
@@ -1234,8 +1216,6 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
         .withMessage("Solver %s runs endlessly on this task", solverToUse())
         .that(solverToUse())
         .isNotEqualTo(Solvers.Z3);
-
-    requireVariableStringLiterals();
 
     StringFormula var1 = smgr.makeVariable("var1");
     StringFormula var2 = smgr.makeVariable("var2");
@@ -1289,7 +1269,10 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
 
   @Test
   public void testStringVariableIndexOf() throws SolverException, InterruptedException {
-    requireVariableStringLiterals();
+    assume()
+        .withMessage("Solver %s runs endlessly on this task", solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.PRINCESS);
 
     StringFormula var1 = smgr.makeVariable("var1");
     StringFormula var2 = smgr.makeVariable("var2");
@@ -1372,9 +1355,7 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
     assume()
         .withMessage("Solver %s runs endlessly on this task", solverToUse())
         .that(solverToUse())
-        .isNoneOf(Solvers.Z3, Solvers.CVC4);
-
-    requireVariableStringLiterals();
+        .isNoneOf(Solvers.Z3, Solvers.CVC4, Solvers.PRINCESS);
 
     StringFormula var1 = smgr.makeVariable("var1");
     StringFormula var2 = smgr.makeVariable("var2");
@@ -1458,9 +1439,6 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
 
   @Test
   public void testStringVariablesSubstring() throws SolverException, InterruptedException {
-    // FIXME: Princess will timeout on this test
-    assume().that(solverToUse()).isNotEqualTo(Solvers.PRINCESS);
-
     StringFormula var1 = smgr.makeVariable("var1");
     StringFormula var2 = smgr.makeVariable("var2");
     IntegerFormula intVar1 = imgr.makeVariable("intVar1");
@@ -1540,7 +1518,10 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
 
   @Test
   public void testStringVariableReplaceSubstring() throws SolverException, InterruptedException {
-    requireVariableStringLiterals();
+    assume()
+        .withMessage("Solver %s runs out of stack on this task", solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.PRINCESS);
 
     // TODO: Z3 had a regression from Z3 4.13.4 to 4.14.0 in the first implication, running
     //  indefinitely. We fixed this by reordering the arguments of the AND expression in the left
@@ -1646,9 +1627,7 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
     assume()
         .withMessage("Solver %s runs endlessly on this task.", solverToUse())
         .that(solverToUse())
-        .isNoneOf(Solvers.CVC4, Solvers.Z3);
-
-    requireVariableStringLiterals();
+        .isNoneOf(Solvers.CVC4, Solvers.Z3, Solvers.PRINCESS);
 
     StringFormula original = smgr.makeVariable("original");
     StringFormula replacement = smgr.makeVariable("replacement");
@@ -1700,8 +1679,6 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
         .withMessage("Solver %s runs endlessly on this task.", solverToUse())
         .that(solverToUse())
         .isNoneOf(Solvers.Z3, Solvers.CVC5);
-
-    requireVariableStringLiterals();
 
     StringFormula var1 = smgr.makeVariable("var1");
     StringFormula var2 = smgr.makeVariable("var2");
@@ -1765,7 +1742,10 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
         .that(solverToUse())
         .isNotEqualTo(Solvers.Z3);
 
-    requireVariableStringLiterals();
+    assume()
+        .withMessage("Solver %s runs endlessly on this task", solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.PRINCESS);
 
     // 2 concats is the max number CVC4 supports without running endlessly
     for (int numOfConcats = 0; numOfConcats < 3; numOfConcats++) {
@@ -1800,8 +1780,10 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
         .withMessage("Solver %s does not support replaceAll()", solverToUse())
         .that(solverToUse())
         .isNotEqualTo(Solvers.Z3);
-
-    requireVariableStringLiterals();
+    assume()
+        .withMessage("Solver %s runs out of stack on this task", solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.PRINCESS);
 
     // I couldn't find stronger constraints in the implication that don't run endlessly.....
     StringFormula original = smgr.makeVariable("original");
