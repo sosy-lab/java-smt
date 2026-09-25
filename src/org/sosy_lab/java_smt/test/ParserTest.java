@@ -333,7 +333,7 @@ public class ParserTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
     var checkResponse = mgr.parseScript(check);
 
     assertThat(((SolverResponse.CheckSatResponse) checkResponse.get(0)).status())
-        .isEqualTo(Status.SAT);
+        .isEqualTo(new Status.Sat());
   }
 
   @Test
@@ -355,7 +355,7 @@ public class ParserTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
     var assumingResponse = mgr.parseScript(checkAssuming);
 
     assertThat(((SolverResponse.CheckSatResponse) assumingResponse.get(0)).status())
-        .isEqualTo(Status.UNSAT);
+        .isEqualTo(new Status.Unsat());
   }
 
   @Test

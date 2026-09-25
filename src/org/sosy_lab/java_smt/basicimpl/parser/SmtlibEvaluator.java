@@ -771,11 +771,11 @@ public final class SmtlibEvaluator {
             .commandVisitor.visit(ctx);
 
       } else if (state instanceof ProverState.AssertState assertState) {
-        var status = Status.UNKNOWN;
+        Status status = null;
         try {
-          status = assertState.prover.isUnsat() ? Status.UNSAT : Status.SAT;
+          status = assertState.prover.isUnsat() ? new Status.Unsat() : new Status.Sat();
         } catch (SolverException e) {
-          // Return 'unknown' when there is a solver exception
+          status = new Status.Unknown(e.getMessage());
         } catch (InterruptedException e) {
           sneakyThrow(e);
         }
@@ -816,11 +816,14 @@ public final class SmtlibEvaluator {
                 .map(expr -> (BooleanFormula) new ExprEvaluator(globalDefs).visit(expr))
                 .toList();
 
-        var status = Status.UNKNOWN;
+        Status status = null;
         try {
-          status = assertState.prover.isUnsatWithAssumptions(assumed) ? Status.UNSAT : Status.SAT;
+          status =
+              assertState.prover.isUnsatWithAssumptions(assumed)
+                  ? new Status.Unsat()
+                  : new Status.Sat();
         } catch (SolverException e) {
-          // Return 'unknown' when there is a solver exception
+          status = new Status.Unknown(e.getMessage());
         } catch (InterruptedException e) {
           sneakyThrow(e);
         }

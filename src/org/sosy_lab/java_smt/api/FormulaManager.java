@@ -228,10 +228,12 @@ public interface FormulaManager {
 
     /** Response to <code>check-sat</code> or <code>check-sat-assuming</code>. */
     record CheckSatResponse(Status status) implements SolverResponse {
-      public enum Status {
-        SAT,
-        UNSAT,
-        UNKNOWN
+      public sealed interface Status {
+        record Sat() implements Status {}
+
+        record Unsat() implements Status {}
+
+        record Unknown(String reason) implements Status {}
       }
     }
 
