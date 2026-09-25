@@ -18925,4 +18925,4 @@ Publications:
   (=> DAT3M_spec_assumption a!1)))
 (assert DAT3M_spec_assumption)
 (set-info :status unsat)
-(check-sat)
+; (check-sat)

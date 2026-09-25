@@ -14,10 +14,14 @@ import static org.junit.Assert.assertThrows;
 import static org.sosy_lab.java_smt.api.FormulaType.BooleanType;
 
 import com.google.common.collect.Iterables;
+import java.io.IOException;
 import java.math.BigInteger;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
+import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.FormulaManager.SolverResponse;
@@ -521,5 +525,76 @@ public class ParserTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
 
     cancelIn(500).start();
     assertThrows(InterruptedException.class, () -> mgr.parseScript(hardSmtlib));
+  }
+
+  @Test
+  public void parseAllShortBenchmarkTest() throws IOException {
+    assume()
+        .that(solver)
+        .isNotEqualTo(
+            Solvers.BOOLECTOR); // Fails with "Unexpected formula type for BV formula: Boolean"
+    requireBitvectors();
+
+    @SuppressWarnings("unused")
+    List<BooleanFormula> smtlib =
+        context
+            .getFormulaManager()
+            .parseAll(
+                Files.readString(Path.of("src/org/sosy_lab/java_smt/test/manyRegReads.smt2")));
+  }
+
+  @Test
+  public void parseAllShortBenchmarkNativeTest() throws IOException, InvalidConfigurationException {
+    setAdditionalConfigOptionForSolver("solver.useAntlrParser", "false");
+
+    assume()
+        .that(solver)
+        .isNoneOf(Solvers.BOOLECTOR, Solvers.CVC4, Solvers.YICES2); // No native parser
+    requireBitvectors();
+
+    @SuppressWarnings("unused")
+    List<BooleanFormula> smtlib =
+        context
+            .getFormulaManager()
+            .parseAll(
+                Files.readString(Path.of("src/org/sosy_lab/java_smt/test/manyRegReads.smt2")));
+  }
+
+  @Test
+  public void parseAllBenchmarkTest() throws IOException {
+    requireBitvectors();
+    requireIntegers();
+    assume()
+        .that(solver)
+        .isNotEqualTo(
+            Solvers.BOOLECTOR); // Fails with "Unexpected formula type for BV formula: Boolean"
+    assume()
+        .that(solver)
+        .isNoneOf(
+            Solvers.Z3,
+            Solvers.Z3_WITH_INTERPOLATION); // FIXME: Takes forever in SolverContext.close()
+
+    @SuppressWarnings("unused")
+    List<BooleanFormula> smtlib =
+        context
+            .getFormulaManager()
+            .parseAll(Files.readString(Path.of("src/org/sosy_lab/java_smt/test/client.smt2")));
+  }
+
+  @Test
+  public void parseAllBenchmarkNativeTest() throws IOException, InvalidConfigurationException {
+    setAdditionalConfigOptionForSolver("solver.useAntlrParser", "false");
+
+    requireBitvectors();
+    requireIntegers();
+    assume()
+        .that(solver)
+        .isNoneOf(Solvers.BOOLECTOR, Solvers.CVC4, Solvers.YICES2); // No native parser
+
+    @SuppressWarnings("unused")
+    List<BooleanFormula> smtlib =
+        context
+            .getFormulaManager()
+            .parseAll(Files.readString(Path.of("src/org/sosy_lab/java_smt/test/client.smt2")));
   }
 }
