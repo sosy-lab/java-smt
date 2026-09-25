@@ -375,7 +375,7 @@ public class ParserTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
     var model = ((SolverResponse.ModelResponse) modelResponse.get(1)).model();
 
     assertThat(model).hasSize(1);
-    assertThat(model.get(0).getName()).isEqualTo("v");
+    assertThat(model.get(0).getName()).startsWith("v");
     assertThat(model.get(0).getValue()).isEqualTo(new BigInteger("0"));
 
     String evalSmtlib =
@@ -413,7 +413,8 @@ public class ParserTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
     var unsatCore = ((SolverResponse.UnsatCoreResponse) unsatCoreResponse.get(1)).core();
 
     assertThat(unsatCore).hasSize(1);
-    assertThat(mgr.extractVariables(unsatCore.get(0)).keySet()).containsExactly("v");
+    var variableName = mgr.extractVariables(unsatCore.get(0)).keySet().stream().iterator().next();
+    assertThat(variableName).startsWith("v");
   }
 
   @Test
@@ -437,7 +438,9 @@ public class ParserTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
         ((SolverResponse.UnsatCoreResponse) unsatAssumptionsResponse.get(1)).core();
 
     assertThat(unsatAssumptionsCore).hasSize(1);
-    assertThat(mgr.extractVariables(unsatAssumptionsCore.get(0)).keySet()).containsExactly("B");
+    var variableName =
+        mgr.extractVariables(unsatAssumptionsCore.get(0)).keySet().stream().iterator().next();
+    assertThat(variableName).startsWith("B");
   }
 
   @SuppressWarnings("unused")

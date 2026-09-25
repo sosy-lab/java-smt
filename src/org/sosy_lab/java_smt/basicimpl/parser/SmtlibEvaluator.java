@@ -534,8 +534,10 @@ public final class SmtlibEvaluator {
         var sorts = transformedImmutableListCopy(ctx.sort(), sortEvaluator::visit);
         var left = sorts.subList(0, sorts.size() - 1);
         var right = sorts.get(sorts.size() - 1);
+
+        var localName = mode == ParsingMode.FORMULA ? name : name + genSymbol();
         if (sorts.size() == 1) {
-          var term = mgr.makeVariable(right, name);
+          var term = mgr.makeVariable(right, localName);
           return new SmtlibEvaluator(
               mode,
               solver,
