@@ -856,9 +856,6 @@ public class Predefined {
         };
     predefined.put("roundTowardZero", rtz);
     predefined.put("RTZ", rtz);
-
-    // TODO fp
-
     predefined.put(
         "+oo",
         idx -> {
