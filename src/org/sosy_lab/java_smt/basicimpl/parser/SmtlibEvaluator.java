@@ -1040,7 +1040,7 @@ public final class SmtlibEvaluator {
 
     @Override
     public SmtlibEvaluator visitExit(SmtlibParser.ExitContext ctx) {
-      if (state instanceof ProverState.AssertState assertState) {
+      if (state instanceof ProverState.AssertState assertState && assertState.prover != null) {
         assertState.prover.close();
       }
       return new SmtlibEvaluator(
