@@ -1382,7 +1382,7 @@ public class Predefined {
           };
         });
     predefined.put(
-        "re.allChar",
+        "re.allchar",
         idx -> {
           Preconditions.checkArgument(idx.isEmpty());
           return p -> {
