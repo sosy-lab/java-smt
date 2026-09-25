@@ -45,7 +45,7 @@ import org.sosy_lab.java_smt.delegate.parsing.ParsingFormulaManager;
 @SuppressWarnings("resource")
 public final class SmtlibEvaluator {
   public enum ParsingMode {
-    TERM,
+    FORMULA,
     SCRIPT
   }
 
@@ -622,7 +622,7 @@ public final class SmtlibEvaluator {
 
     @Override
     public SmtlibEvaluator visitPush(SmtlibParser.PushContext ctx) {
-      checkArgument(mode != ParsingMode.TERM, "Command 'push' is not allowed in term mode");
+      checkArgument(mode != ParsingMode.FORMULA, "Command 'push' is not allowed in formula mode");
       if (state instanceof ProverState.StartState startState) {
         return new SmtlibEvaluator(
                 mode,
@@ -665,7 +665,7 @@ public final class SmtlibEvaluator {
 
     @Override
     public SmtlibEvaluator visitPop(SmtlibParser.PopContext ctx) {
-      checkArgument(mode != ParsingMode.TERM, "Command 'pop' is not allowed in term mode");
+      checkArgument(mode != ParsingMode.FORMULA, "Command 'pop' is not allowed in formula mode");
       if (state instanceof ProverState.StartState startState) {
         return new SmtlibEvaluator(
                 mode,
@@ -705,7 +705,7 @@ public final class SmtlibEvaluator {
                 mode,
                 solver,
                 new ProverState.AssertState(
-                    mode == ParsingMode.TERM ? null : newProver(solver, startState.options)),
+                    mode == ParsingMode.FORMULA ? null : newProver(solver, startState.options)),
                 globalDefs,
                 localDefs,
                 asserted,
@@ -742,7 +742,7 @@ public final class SmtlibEvaluator {
     @Override
     public SmtlibEvaluator visitGetAssertions(SmtlibParser.GetAssertionsContext ctx) {
       checkArgument(
-          mode != ParsingMode.TERM, "Command 'get-assertions' is not allowed in term mode");
+          mode != ParsingMode.FORMULA, "Command 'get-assertions' is not allowed in formula mode");
       return new SmtlibEvaluator(
           mode,
           solver,
@@ -756,7 +756,8 @@ public final class SmtlibEvaluator {
 
     @Override
     public SmtlibEvaluator visitCheckSat(SmtlibParser.CheckSatContext ctx) {
-      checkArgument(mode != ParsingMode.TERM, "Command 'check-sat' is not allowed in term mode");
+      checkArgument(
+          mode != ParsingMode.FORMULA, "Command 'check-sat' is not allowed in formula mode");
       if (state instanceof ProverState.StartState startState) {
         return new SmtlibEvaluator(
                 mode,
@@ -795,7 +796,8 @@ public final class SmtlibEvaluator {
     @Override
     public SmtlibEvaluator visitCheckSatAssuming(SmtlibParser.CheckSatAssumingContext ctx) {
       checkArgument(
-          mode != ParsingMode.TERM, "Command 'check-sat-assuming' is not allowed in term mode");
+          mode != ParsingMode.FORMULA,
+          "Command 'check-sat-assuming' is not allowed in formula mode");
       if (state instanceof ProverState.StartState startState) {
         return new SmtlibEvaluator(
                 mode,
@@ -838,7 +840,8 @@ public final class SmtlibEvaluator {
 
     @Override
     public SmtlibEvaluator visitGetModel(SmtlibParser.GetModelContext ctx) {
-      checkArgument(mode != ParsingMode.TERM, "Command 'get-model' is not allowed in term mode");
+      checkArgument(
+          mode != ParsingMode.FORMULA, "Command 'get-model' is not allowed in formula mode");
       if (state instanceof ProverState.StartState startState) {
         return new SmtlibEvaluator(
                 mode,
@@ -875,7 +878,7 @@ public final class SmtlibEvaluator {
     @Override
     public SmtlibEvaluator visitGetUnsatCore(SmtlibParser.GetUnsatCoreContext ctx) {
       checkArgument(
-          mode != ParsingMode.TERM, "Command 'get-unsat-core' is not allowed in term mode");
+          mode != ParsingMode.FORMULA, "Command 'get-unsat-core' is not allowed in formula mode");
       if (state instanceof ProverState.StartState startState) {
         return new SmtlibEvaluator(
                 mode,
@@ -907,7 +910,8 @@ public final class SmtlibEvaluator {
     @Override
     public SmtlibEvaluator visitGetUnsatAssumptions(SmtlibParser.GetUnsatAssumptionsContext ctx) {
       checkArgument(
-          mode != ParsingMode.TERM, "Command 'get-unsat-assumptions' is not allowed in term mode");
+          mode != ParsingMode.FORMULA,
+          "Command 'get-unsat-assumptions' is not allowed in formula mode");
       if (state instanceof ProverState.StartState startState) {
         return new SmtlibEvaluator(
                 mode,
@@ -944,7 +948,8 @@ public final class SmtlibEvaluator {
 
     @Override
     public SmtlibEvaluator visitGetValue(SmtlibParser.GetValueContext ctx) {
-      checkArgument(mode != ParsingMode.TERM, "Command 'get-value' is not allowed in term mode");
+      checkArgument(
+          mode != ParsingMode.FORMULA, "Command 'get-value' is not allowed in formula mode");
       if (state instanceof ProverState.StartState startState) {
         return new SmtlibEvaluator(
                 mode,
@@ -986,7 +991,7 @@ public final class SmtlibEvaluator {
 
     @Override
     public SmtlibEvaluator visitResetSolver(SmtlibParser.ResetSolverContext ctx) {
-      checkArgument(mode != ParsingMode.TERM, "Command 'reset' is not allowed in term mode");
+      checkArgument(mode != ParsingMode.FORMULA, "Command 'reset' is not allowed in formula mode");
       if (state instanceof ProverState.AssertState assertState) {
         assertState.prover.close();
       }
@@ -1013,7 +1018,7 @@ public final class SmtlibEvaluator {
     @Override
     public SmtlibEvaluator visitResetAssertions(SmtlibParser.ResetAssertionsContext ctx) {
       checkArgument(
-          mode != ParsingMode.TERM, "Command 'reset-assertions' is not allowed in term mode");
+          mode != ParsingMode.FORMULA, "Command 'reset-assertions' is not allowed in formula mode");
       if (state instanceof ProverState.AssertState assertState) {
         for (var i = 0; i < asserted.size(); i++) {
           assertState.prover.pop();
