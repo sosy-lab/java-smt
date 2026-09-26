@@ -364,20 +364,17 @@ public final class SmtlibEvaluator {
 
     @Override
     public Formula visitLet(SmtlibParser.LetContext ctx) {
-      PersistentMap<String, Function<List<Integer>, Function<List<Formula>, Formula>>> local =
-          PathCopyingPersistentTreeMap.of();
+      PersistentMap<String, Void> letDefs = PathCopyingPersistentTreeMap.of();
+      var newContext = context;
       for (var binding : ctx.binding()) {
         var sym = getSymbolValue(binding.symbol());
         checkArgument(
-            !local.containsKey(sym), "Let block contains more than one definition for %s", sym);
-        var term = visit(binding.expr());
-        local = addConstant(local, sym, term);
+            !letDefs.containsKey(sym), "Let block contains more than one definition for %s", sym);
+        letDefs = letDefs.putAndCopy(sym, null);
+        var term = new ExprEvaluator(newContext).visit(binding.expr());
+        newContext = addConstant(newContext, sym, term);
       }
-      var updated = context;
-      for (var entry : local.entrySet()) {
-        updated = updated.putAndCopy(entry.getKey(), entry.getValue());
-      }
-      return new ExprEvaluator(updated).visit(ctx.expr());
+      return new ExprEvaluator(newContext).visit(ctx.expr());
     }
 
     @Override
