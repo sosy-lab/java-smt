@@ -225,8 +225,8 @@ public interface FormulaManager {
   List<BooleanFormula> parseAll(String s) throws IllegalArgumentException;
 
   sealed interface SolverResponse {
-    /** Responst to <code>get-assertions</code>. */
-    record AssertedResponse(List<BooleanFormula> asserted) implements SolverResponse {}
+    /** Response to <code>get-assertions</code>. */
+    record AssertionsResponse(List<BooleanFormula> assertions) implements SolverResponse {}
 
     /** Response to <code>check-sat</code> or <code>check-sat-assuming</code>. */
     record CheckSatResponse(Status status) implements SolverResponse {

@@ -305,9 +305,9 @@ public class ParserTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
         """;
     var pushResponse = mgr.parseScript(push);
 
-    assertThat(((SolverResponse.AssertedResponse) pushResponse.get(0)).asserted()).hasSize(0);
-    assertThat(((SolverResponse.AssertedResponse) pushResponse.get(1)).asserted()).hasSize(2);
-    assertThat(((SolverResponse.AssertedResponse) pushResponse.get(2)).asserted()).hasSize(1);
+    assertThat(((SolverResponse.AssertionsResponse) pushResponse.get(0)).assertions()).hasSize(0);
+    assertThat(((SolverResponse.AssertionsResponse) pushResponse.get(1)).assertions()).hasSize(2);
+    assertThat(((SolverResponse.AssertionsResponse) pushResponse.get(2)).assertions()).hasSize(1);
 
     String reset =
         """
@@ -320,8 +320,8 @@ public class ParserTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
         """;
     var resetResponse = mgr.parseScript(reset);
 
-    assertThat(((SolverResponse.AssertedResponse) resetResponse.get(0)).asserted()).hasSize(1);
-    assertThat(((SolverResponse.AssertedResponse) resetResponse.get(1)).asserted()).hasSize(0);
+    assertThat(((SolverResponse.AssertionsResponse) resetResponse.get(0)).assertions()).hasSize(1);
+    assertThat(((SolverResponse.AssertionsResponse) resetResponse.get(1)).assertions()).hasSize(0);
   }
 
   @Test

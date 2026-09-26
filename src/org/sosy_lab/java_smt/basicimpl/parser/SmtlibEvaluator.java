@@ -760,7 +760,7 @@ public final class SmtlibEvaluator {
     public SmtlibEvaluator visitGetAssertions(SmtlibParser.GetAssertionsContext ctx) {
       checkArgument(
           mode != ParsingMode.FORMULA, "Command 'get-assertions' is not allowed in formula mode");
-      responses.accept(new FormulaManager.SolverResponse.AssertedResponse(getAssertions()));
+      responses.accept(new FormulaManager.SolverResponse.AssertionsResponse(getAssertions()));
       return new SmtlibEvaluator(
           mode, solver, state, globalDefs, localDefs, asserted, lastAssumptions, responses);
     }
