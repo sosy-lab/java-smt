@@ -14,6 +14,7 @@ import com.google.common.collect.ImmutableMap;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 import org.sosy_lab.common.Appender;
 import org.sosy_lab.common.Appenders;
 import org.sosy_lab.java_smt.api.ArrayFormulaManager;
@@ -187,10 +188,10 @@ class SynchronizedFormulaManager implements FormulaManager {
   }
 
   @Override
-  public List<SolverResponse> parseScript(String smtlib)
+  public void parseScript(Consumer<SolverResponse> responseListener, String smtlib)
       throws SolverException, InterruptedException {
     synchronized (sync) {
-      return delegate.parseScript(smtlib);
+      delegate.parseScript(responseListener, smtlib);
     }
   }
 

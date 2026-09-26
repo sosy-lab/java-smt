@@ -14,6 +14,7 @@ import com.google.common.collect.ImmutableMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.ConsoleErrorListener;
@@ -175,17 +176,16 @@ public class ParsingFormulaManager implements FormulaManager {
 
   @Override
   public List<BooleanFormula> parseAll(String smtlib) throws IllegalArgumentException {
-    return SmtlibEvaluator.link(solver, this, SmtlibEvaluator.ParsingMode.FORMULA)
+    return SmtlibEvaluator.link(solver, this, SmtlibEvaluator.ParsingMode.FORMULA, response -> {})
         .apply(parse(lex(smtlib)))
         .getAssertions();
   }
 
   @Override
-  public List<SolverResponse> parseScript(String smtlib)
+  public void parseScript(Consumer<SolverResponse> responseListener, String smtlib)
       throws SolverException, InterruptedException {
-    return SmtlibEvaluator.link(solver, this, SmtlibEvaluator.ParsingMode.SCRIPT)
-        .apply(parse(lex(smtlib)))
-        .getResponses();
+    SmtlibEvaluator.link(solver, this, SmtlibEvaluator.ParsingMode.SCRIPT, responseListener)
+        .apply(parse(lex(smtlib)));
   }
 
   @Override

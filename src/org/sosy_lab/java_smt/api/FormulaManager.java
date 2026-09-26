@@ -10,6 +10,7 @@ package org.sosy_lab.java_smt.api;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
@@ -17,6 +18,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.function.Consumer;
 import org.sosy_lab.common.Appender;
 import org.sosy_lab.java_smt.api.visitors.FormulaTransformationVisitor;
 import org.sosy_lab.java_smt.api.visitors.FormulaVisitor;
@@ -247,13 +249,31 @@ public interface FormulaManager {
     record EvaluationResponse(List<Formula> value) implements SolverResponse {}
   }
 
+  interface SolverResponseListener {
+    void processSolverResponse(SolverResponse response);
+  }
+
+  /**
+   * Read and evaluate a SMTLIB script in a new {@link ProverEnvironment}.
+   *
+   * <p>Solver responses to commands like <code>check-sat</code> or <code>get-model</code> are sent
+   * directly to a listener
+   */
+  void parseScript(Consumer<SolverResponse> responseListener, String smtlib)
+      throws SolverException, InterruptedException;
+
   /**
    * Read and evaluate a SMTLIB script in a new {@link ProverEnvironment}.
    *
    * <p>Solver responses to commands like <code>check-sat</code> or <code>get-model</code> are
    * stored in a list and then returned by this function.
    */
-  List<SolverResponse> parseScript(String smtlib) throws SolverException, InterruptedException;
+  default List<SolverResponse> parseScript(String smtlib)
+      throws SolverException, InterruptedException {
+    ImmutableList.Builder<SolverResponse> responses = new ImmutableList.Builder<>();
+    parseScript(responses::add, smtlib);
+    return responses.build();
+  }
 
   /**
    * Serialize an input formula to an SMT-LIB format. Very useful when passing formulas between

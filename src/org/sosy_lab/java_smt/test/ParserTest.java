@@ -146,7 +146,6 @@ public class ParserTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
         .isEquisatisfiableTo(smgr.equal(smgr.makeVariable("s"), smgr.makeString("hello")));
   }
 
-
   @Test
   public void parseAllStringEscapeTest() throws SolverException, InterruptedException {
     requireStrings();
@@ -154,7 +153,7 @@ public class ParserTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
     List<BooleanFormula> parsed = mgr.parseAll(smt);
     assertThat(parsed).hasSize(1);
     assertThatFormula(Iterables.getOnlyElement(parsed))
-            .isEquisatisfiableTo(smgr.equal(smgr.makeVariable("s"), smgr.makeString("hel\"lo")));
+        .isEquisatisfiableTo(smgr.equal(smgr.makeVariable("s"), smgr.makeString("hel\"lo")));
   }
 
   @Test

@@ -22,6 +22,7 @@ import java.math.BigInteger;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Consumer;
 import java.util.logging.Level;
 import org.sosy_lab.common.Appender;
 import org.sosy_lab.common.log.LogManager;
@@ -1105,7 +1106,7 @@ class TraceFormulaManager implements FormulaManager {
   }
 
   @Override
-  public List<SolverResponse> parseScript(String smtlib) {
+  public void parseScript(Consumer<SolverResponse> responseListener, String smtlib) {
     throw new UnsupportedOperationException();
   }
 
