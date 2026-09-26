@@ -249,10 +249,6 @@ public interface FormulaManager {
     record EvaluationResponse(List<Formula> value) implements SolverResponse {}
   }
 
-  interface SolverResponseListener {
-    void processSolverResponse(SolverResponse response);
-  }
-
   /**
    * Read and evaluate a SMTLIB script in a new {@link ProverEnvironment}.
    *
