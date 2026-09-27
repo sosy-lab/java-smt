@@ -24,6 +24,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -34,11 +35,14 @@ import org.antlr.v4.runtime.tree.ParseTree;
 import org.sosy_lab.common.collect.PathCopyingPersistentTreeMap;
 import org.sosy_lab.common.collect.PersistentMap;
 import org.sosy_lab.java_smt.api.BooleanFormula;
+import org.sosy_lab.java_smt.api.Evaluator;
 import org.sosy_lab.java_smt.api.FloatingPointNumber;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.FormulaManager.SolverResponse.CheckSatResponse.Status;
 import org.sosy_lab.java_smt.api.FormulaType;
+import org.sosy_lab.java_smt.api.FunctionDeclaration;
+import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.QuantifiedFormulaManager;
 import org.sosy_lab.java_smt.api.SolverContext;
@@ -126,20 +130,20 @@ public final class SmtlibEvaluator {
     }
 
     private String toBinary(String bitvec) {
-      var prefix = bitvec.substring(0, 2);
-      var number = bitvec.substring(2);
+      String prefix = bitvec.substring(0, 2);
+      String number = bitvec.substring(2);
 
       if (prefix.equals("#b")) {
         return number;
       } else {
-        var binary = new BigInteger(number, 16).toString(2);
+        String binary = new BigInteger(number, 16).toString(2);
         return "0".repeat(4 * number.length() - binary.length()) + binary;
       }
     }
 
     @Override
     public Formula visitBitvec(SmtlibParser.BitvecContext ctx) {
-      var binary = toBinary(ctx.getText());
+      String binary = toBinary(ctx.getText());
       return manager
           .getBitvectorFormulaManager()
           .makeBitvector(binary.length(), new BigInteger(binary, 2));
@@ -147,9 +151,9 @@ public final class SmtlibEvaluator {
 
     @Override
     public Formula visitFloat(SmtlibParser.FloatContext ctx) {
-      var b0 = toBinary(ctx.bitvec(0).getText());
-      var b1 = toBinary(ctx.bitvec(1).getText());
-      var b2 = toBinary(ctx.bitvec(2).getText());
+      String b0 = toBinary(ctx.bitvec(0).getText());
+      String b1 = toBinary(ctx.bitvec(1).getText());
+      String b2 = toBinary(ctx.bitvec(2).getText());
       checkArgument(b0.length() == 1);
       return manager
           .getFloatingPointFormulaManager()
@@ -172,7 +176,7 @@ public final class SmtlibEvaluator {
 
     @Override
     public Formula visitString(SmtlibParser.StringContext ctx) {
-      var str = ctx.getText().substring(1, ctx.getText().length() - 1);
+      String str = ctx.getText().substring(1, ctx.getText().length() - 1);
       return manager.getStringFormulaManager().makeString(str.replace("\"\"", "\""));
     }
   }
@@ -186,7 +190,7 @@ public final class SmtlibEvaluator {
 
       @Override
       public Function<List<Formula>, Formula> visitIndexed(SmtlibParser.IndexedContext ctx) {
-        var symbol = getSymbolValue(ctx.symbol());
+        String symbol = getSymbolValue(ctx.symbol());
         if (symbol.matches("bv\\d+")) {
           // Special case: BV defines symbols (_ bvX m) to create bitvector literals. Here we
           // have to get the value of the bitvector straight from the symbol name
@@ -211,10 +215,10 @@ public final class SmtlibEvaluator {
       @Override
       public Function<List<Formula>, Formula> visitAs(SmtlibParser.AsContext ctx) {
         checkArgument(getSymbolValue(ctx.symbol()).equals("const"));
-        var sort = sortEvaluator.visit(ctx.sort());
+        FormulaType<?> sort = sortEvaluator.visit(ctx.sort());
         checkArgument(sort.isArrayType());
         @SuppressWarnings("rawtypes")
-        var arraySort = (FormulaType.ArrayFormulaType) sort;
+        FormulaType.ArrayFormulaType arraySort = (FormulaType.ArrayFormulaType) sort;
         return value -> manager.getArrayFormulaManager().makeArray(arraySort, value.get(0));
       }
     }
@@ -265,13 +269,14 @@ public final class SmtlibEvaluator {
     @Override
     public Formula visitLet(SmtlibParser.LetContext ctx) {
       PersistentMap<String, Void> letDefs = PathCopyingPersistentTreeMap.of();
-      var newContext = context;
-      for (var binding : ctx.binding()) {
-        var sym = getSymbolValue(binding.symbol());
+      PersistentMap<String, Function<List<Integer>, Function<List<Formula>, Formula>>> newContext =
+          context;
+      for (SmtlibParser.BindingContext binding : ctx.binding()) {
+        String sym = getSymbolValue(binding.symbol());
         checkArgument(
             !letDefs.containsKey(sym), "Let block contains more than one definition for %s", sym);
         letDefs = letDefs.putAndCopy(sym, null);
-        var term = new ExprEvaluator(newContext).visit(binding.expr());
+        Formula term = new ExprEvaluator(newContext).visit(binding.expr());
         newContext = addConstant(newContext, sym, term);
       }
       return new ExprEvaluator(newContext).visit(ctx.expr());
@@ -279,19 +284,20 @@ public final class SmtlibEvaluator {
 
     @Override
     public Formula visitQuantified(SmtlibParser.QuantifiedContext ctx) {
-      var variables = new ArrayList<Formula>();
-      var updated = context;
-      for (var sortedVar : ctx.sortedVar()) {
-        var name = getSymbolValue(sortedVar.symbol());
-        var sort = sortEvaluator.visit(sortedVar.sort());
-        var term = manager.makeVariable(sort, genSymbol());
+      ArrayList<Formula> variables = new ArrayList<>();
+      PersistentMap<String, Function<List<Integer>, Function<List<Formula>, Formula>>> updated =
+          context;
+      for (SmtlibParser.SortedVarContext sortedVar : ctx.sortedVar()) {
+        String name = getSymbolValue(sortedVar.symbol());
+        FormulaType<?> sort = sortEvaluator.visit(sortedVar.sort());
+        Formula term = manager.makeVariable(sort, genSymbol());
         updated = addConstant(updated, name, term);
         variables.add(term);
       }
-      var evaluated = new ExprEvaluator(updated).visit(ctx.expr());
+      Formula evaluated = new ExprEvaluator(updated).visit(ctx.expr());
       checkArgument(evaluated instanceof BooleanFormula);
-      var acc = (BooleanFormula) evaluated;
-      for (var bound : Lists.reverse(variables)) {
+      BooleanFormula acc = (BooleanFormula) evaluated;
+      for (Formula bound : Lists.reverse(variables)) {
         acc =
             manager
                 .getQuantifiedFormulaManager()
@@ -309,8 +315,8 @@ public final class SmtlibEvaluator {
     public Formula visitApp(SmtlibParser.AppContext ctx) {
       ImmutableList.Builder<Formula> builder = ImmutableList.builder();
       Function<List<Formula>, Formula> f = null;
-      var app = true;
-      for (var sub : ctx.expr()) {
+      boolean app = true;
+      for (SmtlibParser.ExprContext sub : ctx.expr()) {
         if (app) {
           f = functionEvaluator.visit(sub);
           app = false;
@@ -413,7 +419,7 @@ public final class SmtlibEvaluator {
     }
 
     private ProverEnvironment newProver(Set<SolverContext.ProverOptions> pOptions) {
-      var newProver =
+      ProverEnvironment newProver =
           solver.newProverEnvironment(pOptions.toArray(new SolverContext.ProverOptions[] {}));
       try {
         // Start with one level, so that we can pop all formulas that will be added
@@ -444,8 +450,8 @@ public final class SmtlibEvaluator {
     @Override
     public CommandVisitor visitSetOption(SmtlibParser.SetOptionContext ctx) {
       if (state instanceof ProverState.StartState startState) {
-        var option = ctx.attribute().keyword().getText();
-        var supportedOptions =
+        String option = ctx.attribute().keyword().getText();
+        ImmutableMap<String, SolverContext.ProverOptions> supportedOptions =
             ImmutableMap.of(
                 ":produce-models",
                 SolverContext.ProverOptions.GENERATE_MODELS,
@@ -454,7 +460,7 @@ public final class SmtlibEvaluator {
                 ":produce-unsat-cores",
                 SolverContext.ProverOptions.GENERATE_UNSAT_CORE);
         if (supportedOptions.containsKey(option)) {
-          var value = ctx.attribute().expr().getText();
+          String value = ctx.attribute().expr().getText();
           checkArgument(value.equals("true") || value.equals("false"));
           return new CommandVisitor(
               new ProverState.StartState(
@@ -509,15 +515,15 @@ public final class SmtlibEvaluator {
             .visit(ctx);
 
       } else {
-        var name = getSymbolValue(ctx.symbol());
+        String name = getSymbolValue(ctx.symbol());
         checkArgument(!localDefs.containsKey(name), "Symbol %s already exists", name);
         var sorts = transformedImmutableListCopy(ctx.sort(), sortEvaluator::visit);
         var left = sorts.subList(0, sorts.size() - 1);
-        var right = sorts.get(sorts.size() - 1);
+        FormulaType<?> right = sorts.get(sorts.size() - 1);
 
-        var localName = mode == ParsingMode.FORMULA ? name : name + genSymbol();
+        String localName = mode == ParsingMode.FORMULA ? name : name + genSymbol();
         if (sorts.size() == 1) {
-          var term = manager.makeVariable(right, localName);
+          Formula term = manager.makeVariable(right, localName);
           return new CommandVisitor(
               state,
               addConstant(globalDefs, name, term),
@@ -526,7 +532,7 @@ public final class SmtlibEvaluator {
               lastAssumptions,
               responses);
         } else {
-          var uf =
+          FunctionDeclaration<?> uf =
               manager.getUFManager().declareUF(name, right, left.toArray(new FormulaType<?>[0]));
           return new CommandVisitor(
               state,
@@ -552,12 +558,12 @@ public final class SmtlibEvaluator {
             .visit(ctx);
 
       } else {
-        var name = getSymbolValue(ctx.symbol());
+        String name = getSymbolValue(ctx.symbol());
         checkArgument(!localDefs.containsKey(name), "Symbol %s already exists", name);
-        var sort = sortEvaluator.visit(ctx.sort());
-        var parameters = ctx.sortedVar();
+        FormulaType<?> sort = sortEvaluator.visit(ctx.sort());
+        List<SmtlibParser.SortedVarContext> parameters = ctx.sortedVar();
         if (parameters.isEmpty()) {
-          var term = new ExprEvaluator(globalDefs).visit(ctx.expr());
+          Formula term = new ExprEvaluator(globalDefs).visit(ctx.expr());
           checkArgument(manager.getFormulaType(term).equals(sort));
           return new CommandVisitor(
               state,
@@ -567,7 +573,8 @@ public final class SmtlibEvaluator {
               lastAssumptions,
               responses);
         } else {
-          var capture = globalDefs;
+          PersistentMap<String, Function<List<Integer>, Function<List<Formula>, Formula>>> capture =
+              globalDefs;
           return new CommandVisitor(
               state,
               addFunction(
@@ -575,11 +582,12 @@ public final class SmtlibEvaluator {
                   name,
                   p -> {
                     checkArgument(p.size() == parameters.size());
-                    var updated = capture;
+                    PersistentMap<String, Function<List<Integer>, Function<List<Formula>, Formula>>>
+                        updated = capture;
                     for (int i = 0; i < p.size(); i++) {
-                      var nameArg = getSymbolValue(parameters.get(i).symbol());
-                      var sortArg = sortEvaluator.visit(parameters.get(i).sort());
-                      var value = p.get(i);
+                      String nameArg = getSymbolValue(parameters.get(i).symbol());
+                      FormulaType<?> sortArg = sortEvaluator.visit(parameters.get(i).sort());
+                      Formula value = p.get(i);
                       checkArgument(manager.getFormulaType(value).equals(sortArg));
                       updated = addConstant(updated, nameArg, value);
                     }
@@ -607,10 +615,10 @@ public final class SmtlibEvaluator {
             .visit(ctx);
 
       } else if (state instanceof ProverState.AssertState assertState) {
-        var levels = Integer.parseInt(ctx.Numeral().getText());
+        int levels = Integer.parseInt(ctx.Numeral().getText());
         ImmutableList.Builder<List<BooleanFormula>> newAsserted = ImmutableList.builder();
         newAsserted.addAll(asserted);
-        for (var i = 0; i < levels; i++) {
+        for (int i = 0; i < levels; i++) {
           try {
             assertState.prover.push();
             newAsserted.add(ImmutableList.of());
@@ -641,9 +649,9 @@ public final class SmtlibEvaluator {
             .visit(ctx);
 
       } else if (state instanceof ProverState.AssertState assertState) {
-        var levels = Integer.parseInt(ctx.Numeral().getText());
+        int levels = Integer.parseInt(ctx.Numeral().getText());
         checkArgument(levels < asserted.size());
-        for (var i = 0; i < levels; i++) {
+        for (int i = 0; i < levels; i++) {
           assertState.prover.pop();
         }
         return new CommandVisitor(
@@ -660,7 +668,7 @@ public final class SmtlibEvaluator {
 
     @Override
     public CommandVisitor visitAssert(SmtlibParser.AssertContext ctx) {
-      var term = (BooleanFormula) new ExprEvaluator(globalDefs).visit(ctx.expr());
+      BooleanFormula term = (BooleanFormula) new ExprEvaluator(globalDefs).visit(ctx.expr());
       if (mode == ParsingMode.SCRIPT) {
         if (state instanceof ProverState.StartState startState) {
           return new CommandVisitor(
@@ -682,9 +690,9 @@ public final class SmtlibEvaluator {
           throw new AssertionError();
         }
       }
-      var last = asserted.get(asserted.size() - 1);
-      var init = asserted.subList(0, asserted.size() - 1);
-      var added = Stream.concat(last.stream(), Stream.of(term)).toList();
+      List<BooleanFormula> last = asserted.get(asserted.size() - 1);
+      List<List<BooleanFormula>> init = asserted.subList(0, asserted.size() - 1);
+      List<BooleanFormula> added = Stream.concat(last.stream(), Stream.of(term)).toList();
       return new CommandVisitor(
           state,
           globalDefs,
@@ -696,7 +704,7 @@ public final class SmtlibEvaluator {
 
     List<BooleanFormula> getAssertions() {
       ImmutableList.Builder<BooleanFormula> builder = ImmutableList.builder();
-      for (var level : asserted) {
+      for (List<BooleanFormula> level : asserted) {
         builder.addAll(level);
       }
       return builder.build();
@@ -757,7 +765,7 @@ public final class SmtlibEvaluator {
             .visit(ctx);
 
       } else if (state instanceof ProverState.AssertState assertState) {
-        var assumed =
+        List<BooleanFormula> assumed =
             ctx.expr().stream()
                 .map(expr -> (BooleanFormula) new ExprEvaluator(globalDefs).visit(expr))
                 .toList();
@@ -796,7 +804,7 @@ public final class SmtlibEvaluator {
             .visit(ctx);
 
       } else if (state instanceof ProverState.AssertState assertState) {
-        try (var model = assertState.prover.getModel()) {
+        try (Model model = assertState.prover.getModel()) {
           responses.accept(new FormulaManager.SolverResponse.ModelResponse(model.asList()));
           return new CommandVisitor(
               state, globalDefs, localDefs, asserted, lastAssumptions, responses);
@@ -880,13 +888,13 @@ public final class SmtlibEvaluator {
             .visit(ctx);
 
       } else if (state instanceof ProverState.AssertState assertState) {
-        var terms =
+        List<Formula> terms =
             ctx.expr().stream().map(expr -> new ExprEvaluator(globalDefs).visit(expr)).toList();
 
         ImmutableList.Builder<Formula> evaluated = ImmutableList.builder();
-        for (var term : terms) {
-          try (var evaluator = assertState.prover.getEvaluator()) {
-            var newTerm = evaluator.eval(term);
+        for (Formula term : terms) {
+          try (Evaluator evaluator = assertState.prover.getEvaluator()) {
+            Formula newTerm = evaluator.eval(term);
             evaluated.add(newTerm == null ? term : newTerm);
           } catch (SolverException e) {
             sneakyThrow(e);
@@ -909,8 +917,9 @@ public final class SmtlibEvaluator {
       // Remove all symbols that were defined in this smtlib file from the context
       PersistentMap<String, Function<List<Integer>, Function<List<Formula>, Formula>>> nonlocal =
           PathCopyingPersistentTreeMap.of();
-      for (var entry : globalDefs.entrySet()) {
-        var symbol = entry.getKey();
+      for (Map.Entry<String, Function<List<Integer>, Function<List<Formula>, Formula>>> entry :
+          globalDefs.entrySet()) {
+        String symbol = entry.getKey();
         if (!localDefs.containsKey(symbol)) {
           nonlocal = nonlocal.putAndCopy(symbol, entry.getValue());
         }
@@ -929,7 +938,7 @@ public final class SmtlibEvaluator {
       checkArgument(
           mode != ParsingMode.FORMULA, "Command 'reset-assertions' is not allowed in formula mode");
       if (state instanceof ProverState.AssertState assertState) {
-        for (var i = 0; i < asserted.size(); i++) {
+        for (int i = 0; i < asserted.size(); i++) {
           assertState.prover.pop();
         }
         try {
@@ -961,9 +970,9 @@ public final class SmtlibEvaluator {
 
     @Override
     public CommandVisitor visitSmtlib(SmtlibParser.SmtlibContext ctx) {
-      var eval = this;
+      CommandVisitor eval = this;
       try {
-        for (var cmd : ctx.command()) {
+        for (SmtlibParser.CommandContext cmd : ctx.command()) {
           try {
             checkArgument(
                 !(eval.state instanceof ProverState.ExitState),
@@ -971,8 +980,8 @@ public final class SmtlibEvaluator {
             eval = eval.visit(cmd);
 
           } catch (RuntimeException e) {
-            var line = cmd.start.getLine();
-            var source =
+            int line = cmd.start.getLine();
+            String source =
                 cmd.start
                     .getInputStream()
                     .getText(new Interval(cmd.start.getStartIndex(), cmd.stop.getStopIndex()));
@@ -1043,7 +1052,7 @@ public final class SmtlibEvaluator {
   }
 
   private static String getSymbolValue(SmtlibParser.SymbolContext ctx) {
-    var str = ctx.getText();
+    String str = ctx.getText();
     return str.charAt(0) == '|' ? str.substring(1, str.length() - 1) : str;
   }
 

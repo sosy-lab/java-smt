@@ -46,16 +46,16 @@ public class Predefined {
   }
 
   private <T> T foldr1(BinaryOperator<T> f, List<T> list) {
-    var acc = list.get(list.size() - 1);
-    for (var term : Lists.reverse(list.subList(0, list.size() - 1))) {
+    T acc = list.get(list.size() - 1);
+    for (T term : Lists.reverse(list.subList(0, list.size() - 1))) {
       acc = f.apply(term, acc);
     }
     return acc;
   }
 
   private <T> T foldl1(BinaryOperator<T> f, List<T> list) {
-    var acc = list.get(0);
-    for (var term : list.subList(1, list.size())) {
+    T acc = list.get(0);
+    for (T term : list.subList(1, list.size())) {
       acc = f.apply(acc, term);
     }
     return acc;
@@ -64,9 +64,9 @@ public class Predefined {
   private <T extends Formula> BooleanFormula chain(
       BiFunction<T, T, BooleanFormula> f, List<T> list) {
     ImmutableList.Builder<BooleanFormula> terms = ImmutableList.builder();
-    var last = list.get(0);
+    T last = list.get(0);
     for (int i = 1; i < list.size(); i++) {
-      var curr = list.get(i);
+      T curr = list.get(i);
       terms.add(f.apply(last, curr));
       last = curr;
     }
@@ -164,7 +164,7 @@ public class Predefined {
           Preconditions.checkArgument(idx.isEmpty());
           return p -> {
             Preconditions.checkArgument(p.size() >= 2);
-            var argType = mgr.getFormulaType(p.get(0));
+            FormulaType<Formula> argType = mgr.getFormulaType(p.get(0));
             if (argType.isNumeralType() && calculateReturnType(p).isRationalType()) {
               // Special case: Cast mixed numeric terms to real for comparison
               return chain(
@@ -317,8 +317,8 @@ public class Predefined {
           Preconditions.checkArgument(idx.isEmpty());
           return p -> {
             Preconditions.checkArgument(p.size() == 1);
-            var term = (NumeralFormula.IntegerFormula) p.get(0);
-            var zero = mgr.getIntegerFormulaManager().makeNumber(0);
+            NumeralFormula.IntegerFormula term = (NumeralFormula.IntegerFormula) p.get(0);
+            NumeralFormula.IntegerFormula zero = mgr.getIntegerFormulaManager().makeNumber(0);
             return mgr.getBooleanFormulaManager()
                 .ifThenElse(
                     mgr.getIntegerFormulaManager().greaterOrEquals(term, zero),
@@ -1196,8 +1196,8 @@ public class Predefined {
                       FormulaType.getFloatingPointTypeFromSizesWithHiddenBit(
                           idx.get(0), idx.get(1)));
             } else {
-              var rm = (FloatingPointRoundingModeFormula) p.get(0);
-              var from = p.get(1);
+              FloatingPointRoundingModeFormula rm = (FloatingPointRoundingModeFormula) p.get(0);
+              Formula from = p.get(1);
               return mgr.getFloatingPointFormulaManager()
                   .castFrom(
                       from,
@@ -1214,8 +1214,8 @@ public class Predefined {
           Preconditions.checkArgument(idx.size() == 2);
           return p -> {
             Preconditions.checkArgument(p.size() == 2);
-            var rm = (FloatingPointRoundingModeFormula) p.get(0);
-            var from = (BitvectorFormula) p.get(1);
+            FloatingPointRoundingModeFormula rm = (FloatingPointRoundingModeFormula) p.get(0);
+            BitvectorFormula from = (BitvectorFormula) p.get(1);
             return mgr.getFloatingPointFormulaManager()
                 .castFrom(
                     from,
@@ -1230,9 +1230,9 @@ public class Predefined {
           Preconditions.checkArgument(idx.size() == 1);
           return p -> {
             Preconditions.checkArgument(p.size() == 2);
-            var rm = (FloatingPointRoundingModeFormula) p.get(0);
-            var from = (FloatingPointFormula) p.get(1);
-            var toType = FormulaType.getBitvectorTypeWithSize(idx.get(0));
+            FloatingPointRoundingModeFormula rm = (FloatingPointRoundingModeFormula) p.get(0);
+            FloatingPointFormula from = (FloatingPointFormula) p.get(1);
+            FormulaType.BitvectorType toType = FormulaType.getBitvectorTypeWithSize(idx.get(0));
             return mgr.getFloatingPointFormulaManager()
                 .castTo(
                     from,
@@ -1247,9 +1247,9 @@ public class Predefined {
           Preconditions.checkArgument(idx.size() == 1);
           return p -> {
             Preconditions.checkArgument(p.size() == 2);
-            var rm = (FloatingPointRoundingModeFormula) p.get(0);
-            var from = (FloatingPointFormula) p.get(1);
-            var toType = FormulaType.getBitvectorTypeWithSize(idx.get(0));
+            FloatingPointRoundingModeFormula rm = (FloatingPointRoundingModeFormula) p.get(0);
+            FloatingPointFormula from = (FloatingPointFormula) p.get(1);
+            FormulaType.BitvectorType toType = FormulaType.getBitvectorTypeWithSize(idx.get(0));
             return mgr.getFloatingPointFormulaManager()
                 .castTo(
                     from,
@@ -1264,7 +1264,7 @@ public class Predefined {
           Preconditions.checkArgument(idx.isEmpty());
           return p -> {
             Preconditions.checkArgument(p.size() == 1);
-            var from = (FloatingPointFormula) p.get(0);
+            FloatingPointFormula from = (FloatingPointFormula) p.get(0);
             return mgr.getFloatingPointFormulaManager()
                 .castTo(from, true, FormulaType.RationalType);
           };
@@ -1333,10 +1333,10 @@ public class Predefined {
             Preconditions.checkArgument(p.get(0) instanceof StringFormula);
             // This workaround is less general than the smtlib definition
             // FIXME Add makeRegex(StringFormula) to JavaSMT?
-            var constant =
+            String constant =
                 mgr.visit(
                     p.get(0),
-                    new DefaultFormulaVisitor<String>() {
+                    new DefaultFormulaVisitor<>() {
                       @Override
                       protected String visitDefault(Formula f) {
                         throw new UnsupportedOperationException();
