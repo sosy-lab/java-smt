@@ -58,94 +58,6 @@ public final class SmtlibEvaluator {
     SCRIPT
   }
 
-  private interface ProverState {
-    record StartState(Optional<String> logic, Set<SolverContext.ProverOptions> options)
-        implements ProverState {}
-
-    record AssertState(ProverEnvironment prover) implements ProverState {}
-
-    record ExitState() implements ProverState {}
-  }
-
-  private final ParsingMode mode;
-
-  private final SolverContext solver;
-  private final ParsingFormulaManager manager;
-
-  private static int counter = 0;
-
-  public SmtlibEvaluator(
-      ParsingMode pMode,
-      SolverContext pSolver,
-      ParsingFormulaManager pManager,
-      Consumer<FormulaManager.SolverResponse> pResponseListener) {
-    mode = pMode;
-    solver = pSolver;
-    manager = pManager;
-    commandVisitor =
-        new CommandVisitor(
-            new ProverState.StartState(Optional.empty(), ImmutableSet.of()),
-            PathCopyingPersistentTreeMap.copyOf(
-                new Predefined(pManager)
-                    .addTheorySymbols()
-                    .addUserSymbols(pManager.getDefinedSymbols())
-                    .build()),
-            PathCopyingPersistentTreeMap.of(),
-            ImmutableList.of(ImmutableList.of()),
-            Optional.empty(),
-            pResponseListener);
-  }
-
-  private SmtlibEvaluator(
-      ParsingMode pMode,
-      SolverContext pSolver,
-      ParsingFormulaManager pManager,
-      CommandVisitor pCommandVisitor) {
-    mode = pMode;
-    solver = pSolver;
-    manager = pManager;
-    commandVisitor = pCommandVisitor;
-  }
-
-  @CanIgnoreReturnValue
-  public SmtlibEvaluator apply(ParseTree pSmtlib) {
-    return new SmtlibEvaluator(mode, solver, manager, commandVisitor.visit(pSmtlib));
-  }
-
-  public List<BooleanFormula> getAssertions() {
-    return commandVisitor.getAssertions();
-  }
-
-  @SuppressWarnings("unchecked")
-  private static <E extends Throwable> void sneakyThrow(Throwable e) throws E {
-    throw (E) e;
-  }
-
-  private static String genSymbol() {
-    return String.format(".%s", counter++);
-  }
-
-  private static BigInteger getIntegerValue(SmtlibParser.IntegerContext ctx) {
-    return new BigInteger(ctx.getText());
-  }
-
-  private static String getSymbolValue(SmtlibParser.SymbolContext ctx) {
-    var str = ctx.getText();
-    return str.charAt(0) == '|' ? str.substring(1, str.length() - 1) : str;
-  }
-
-  private ProverEnvironment newProver(Set<SolverContext.ProverOptions> pOptions) {
-    var newProver =
-        solver.newProverEnvironment(pOptions.toArray(new SolverContext.ProverOptions[] {}));
-    try {
-      // Start with one level, so that we can pop all formulas that will be added
-      newProver.push();
-    } catch (InterruptedException e) {
-      sneakyThrow(e);
-    }
-    return newProver;
-  }
-
   static class SortEvaluator extends SmtlibBaseVisitor<FormulaType<?>> {
     @Override
     public FormulaType<?> visitSortBool(SmtlibParser.SortBoolContext ctx) {
@@ -207,8 +119,6 @@ public final class SmtlibEvaluator {
     }
   }
 
-  private final SortEvaluator sortEvaluator = new SortEvaluator();
-
   class ConstEvalator extends SmtlibBaseVisitor<Formula> {
     @Override
     public Formula visitBoolean(SmtlibParser.BooleanContext ctx) {
@@ -267,12 +177,7 @@ public final class SmtlibEvaluator {
     }
   }
 
-  private final ConstEvalator constEvalator = new ConstEvalator();
-
   class ExprEvaluator extends SmtlibBaseVisitor<Formula> {
-    private final PersistentMap<String, Function<List<Integer>, Function<List<Formula>, Formula>>>
-        context;
-
     class FunctionEvaluator extends SmtlibBaseVisitor<Function<List<Formula>, Formula>> {
       @Override
       public Function<List<Formula>, Formula> visitVar(SmtlibParser.VarContext ctx) {
@@ -313,6 +218,9 @@ public final class SmtlibEvaluator {
         return value -> manager.getArrayFormulaManager().makeArray(arraySort, value.get(0));
       }
     }
+
+    private final PersistentMap<String, Function<List<Integer>, Function<List<Formula>, Formula>>>
+        context;
 
     private final FunctionEvaluator functionEvaluator = new FunctionEvaluator();
 
@@ -446,6 +354,15 @@ public final class SmtlibEvaluator {
   }
 
   class CommandVisitor extends SmtlibBaseVisitor<CommandVisitor> implements AutoCloseable {
+    private interface ProverState {
+      record StartState(Optional<String> logic, Set<SolverContext.ProverOptions> options)
+          implements ProverState {}
+
+      record AssertState(ProverEnvironment prover) implements ProverState {}
+
+      record ExitState() implements ProverState {}
+    }
+
     private final ProverState state;
 
     private final PersistentMap<String, Function<List<Integer>, Function<List<Formula>, Formula>>>
@@ -473,8 +390,38 @@ public final class SmtlibEvaluator {
       responses = pResponses;
     }
 
+    CommandVisitor(
+        PersistentMap<String, Function<List<Integer>, Function<List<Formula>, Formula>>>
+            pGlobalDefs,
+        Consumer<FormulaManager.SolverResponse> pResponses) {
+      this(
+          new CommandVisitor.ProverState.StartState(Optional.empty(), ImmutableSet.of()),
+          pGlobalDefs,
+          PathCopyingPersistentTreeMap.of(),
+          ImmutableList.of(ImmutableList.of()),
+          Optional.empty(),
+          pResponses);
+    }
+
     public boolean isClosed() {
       return state instanceof ProverState.ExitState;
+    }
+
+    @SuppressWarnings("unchecked")
+    private static <E extends Throwable> void sneakyThrow(Throwable e) throws E {
+      throw (E) e;
+    }
+
+    private ProverEnvironment newProver(Set<SolverContext.ProverOptions> pOptions) {
+      var newProver =
+          solver.newProverEnvironment(pOptions.toArray(new SolverContext.ProverOptions[] {}));
+      try {
+        // Start with one level, so that we can pop all formulas that will be added
+        newProver.push();
+      } catch (InterruptedException e) {
+        sneakyThrow(e);
+      }
+      return newProver;
     }
 
     @Override
@@ -500,10 +447,12 @@ public final class SmtlibEvaluator {
         var option = ctx.attribute().keyword().getText();
         var supportedOptions =
             ImmutableMap.of(
-                ":produce-models", SolverContext.ProverOptions.GENERATE_MODELS,
+                ":produce-models",
+                SolverContext.ProverOptions.GENERATE_MODELS,
                 ":produce-unsat-assumptions",
-                    SolverContext.ProverOptions.GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS,
-                ":produce-unsat-cores", SolverContext.ProverOptions.GENERATE_UNSAT_CORE);
+                SolverContext.ProverOptions.GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS,
+                ":produce-unsat-cores",
+                SolverContext.ProverOptions.GENERATE_UNSAT_CORE);
         if (supportedOptions.containsKey(option)) {
           var value = ctx.attribute().expr().getText();
           checkArgument(value.equals("true") || value.equals("false"));
@@ -1044,5 +993,66 @@ public final class SmtlibEvaluator {
     }
   }
 
+  private final ParsingMode mode;
+
+  private final SolverContext solver;
+  private final ParsingFormulaManager manager;
+
+  private static int counter = 0;
+
+  private final SortEvaluator sortEvaluator = new SortEvaluator();
+  private final ConstEvalator constEvalator = new ConstEvalator();
+
   private final CommandVisitor commandVisitor;
+
+  public SmtlibEvaluator(
+      ParsingMode pMode,
+      SolverContext pSolver,
+      ParsingFormulaManager pManager,
+      Consumer<FormulaManager.SolverResponse> pResponseListener) {
+    mode = pMode;
+    solver = pSolver;
+    manager = pManager;
+    commandVisitor =
+        new CommandVisitor(
+            PathCopyingPersistentTreeMap.copyOf(
+                new Predefined(pManager)
+                    .addTheorySymbols()
+                    .addUserSymbols(pManager.getDefinedSymbols())
+                    .build()),
+            pResponseListener);
+  }
+
+  private SmtlibEvaluator(
+      ParsingMode pMode,
+      SolverContext pSolver,
+      ParsingFormulaManager pManager,
+      CommandVisitor pCommandVisitor) {
+    mode = pMode;
+    solver = pSolver;
+    manager = pManager;
+    commandVisitor = pCommandVisitor;
+  }
+
+  private static String genSymbol() {
+    return String.format(".%s", counter++);
+  }
+
+  private static BigInteger getIntegerValue(SmtlibParser.IntegerContext ctx) {
+    return new BigInteger(ctx.getText());
+  }
+
+  private static String getSymbolValue(SmtlibParser.SymbolContext ctx) {
+    var str = ctx.getText();
+    return str.charAt(0) == '|' ? str.substring(1, str.length() - 1) : str;
+  }
+
+  @CanIgnoreReturnValue
+  public SmtlibEvaluator apply(ParseTree pSmtlib) {
+    return new SmtlibEvaluator(mode, solver, manager, commandVisitor.visit(pSmtlib));
+  }
+
+  public List<BooleanFormula> getAssertions() {
+    return commandVisitor.getAssertions();
+  }
 }
