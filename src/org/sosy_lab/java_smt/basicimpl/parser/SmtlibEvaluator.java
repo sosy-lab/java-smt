@@ -318,7 +318,7 @@ public final class SmtlibEvaluator {
       Formula evaluated = new ExprEvaluator(updated).visit(ctx.expr());
       checkArgument(evaluated instanceof BooleanFormula);
       BooleanFormula acc = (BooleanFormula) evaluated;
-      for (Formula bound : Lists.reverse(variables.build())) {
+      for (Formula bound : variables.build().reverse()) {
         acc =
             manager
                 .getQuantifiedFormulaManager()
