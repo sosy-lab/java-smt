@@ -45,6 +45,7 @@ import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.QuantifiedFormulaManager;
 import org.sosy_lab.java_smt.api.SolverContext;
+import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.delegate.parsing.ParsingFormulaManager;
 
@@ -455,7 +456,7 @@ public final class SmtlibEvaluator {
       throw (E) e;
     }
 
-    /** Open a new {@link ProverEnvironment} with the given {@link SolverContext.ProverOptions}. */
+    /** Open a new {@link ProverEnvironment} with the given {@link ProverOptions}. */
     private ProverEnvironment newProver(Set<SolverContext.ProverOptions> pOptions) {
       ProverEnvironment newProver =
           solver.newProverEnvironment(pOptions.toArray(new SolverContext.ProverOptions[] {}));
