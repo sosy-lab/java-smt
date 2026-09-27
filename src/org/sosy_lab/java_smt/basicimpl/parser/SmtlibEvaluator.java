@@ -20,6 +20,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
+import java.io.Serial;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -52,6 +53,8 @@ import org.sosy_lab.java_smt.delegate.parsing.ParsingFormulaManager;
 @SuppressWarnings("resource")
 public final class SmtlibEvaluator {
   public static class SmtlibException extends IllegalArgumentException {
+    @Serial private static final long serialVersionUID = -5011762550769108967L;
+
     SmtlibException(int line, String source, Throwable t) {
       super("Error in line %s:%n%s".formatted(line, source), t);
     }
