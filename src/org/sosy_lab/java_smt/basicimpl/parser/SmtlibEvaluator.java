@@ -50,6 +50,7 @@ import org.sosy_lab.java_smt.api.SolverContext;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.delegate.parsing.ParsingFormulaManager;
 
+/** Evaluates a Smtlib script after parsing. */
 @SuppressWarnings("resource")
 public final class SmtlibEvaluator {
   public static class SmtlibException extends IllegalArgumentException {
@@ -60,11 +61,21 @@ public final class SmtlibEvaluator {
     }
   }
 
+  /** Selects a sublanguage for the evaluator. */
   public enum ParsingMode {
+    /**
+     * Only allows a subset of Smtlib commands for formula parsing.
+     *
+     * <p>In formula mode only <code>(declare-const)</code>, <code>(dedine-const)</code>, <code>
+     * (define-fun)</code>, <code>(define-fun)</code> and <code>(assert)</code> are allowed. Can be
+     * used to deserialize a solver term that has been written out as Smtlib
+     */
     FORMULA,
+    /** Full Smtlib script will all commands that are found in the standard. */
     SCRIPT
   }
 
+  /** Create a {@link FormulaType} from a Smtlib sort. */
   static class SortEvaluator extends SmtlibBaseVisitor<FormulaType<?>> {
     @Override
     public FormulaType<?> visitSortBool(SmtlibParser.SortBoolContext ctx) {
@@ -126,6 +137,7 @@ public final class SmtlibEvaluator {
     }
   }
 
+  /** Create a {@link Formula} from a value expression in Smtlib. */
   class ConstEvalator extends SmtlibBaseVisitor<Formula> {
     @Override
     public Formula visitBoolean(SmtlibParser.BooleanContext ctx) {
@@ -184,6 +196,7 @@ public final class SmtlibEvaluator {
     }
   }
 
+  /** Create a {@link Formula} from an expression in Smtlib. */
   class ExprEvaluator extends SmtlibBaseVisitor<Formula> {
     class FunctionEvaluator extends SmtlibBaseVisitor<Function<List<Formula>, Formula>> {
       @Override
@@ -226,6 +239,11 @@ public final class SmtlibEvaluator {
       }
     }
 
+    /**
+     * Maps symbol names to definitions.
+     *
+     * <p>Contains theory symbols, as well as all user-defined symbols
+     */
     private final PersistentMap<String, Function<List<Integer>, Function<List<Formula>, Formula>>>
         context;
 
@@ -236,6 +254,7 @@ public final class SmtlibEvaluator {
       context = pContext;
     }
 
+    /** Look up a symbol in the context to get its definition. */
     private Function<List<Integer>, Function<List<Formula>, Formula>> lookup(String symbol) {
       if (!context.containsKey(symbol)) {
         throw new IllegalArgumentException(
@@ -335,6 +354,7 @@ public final class SmtlibEvaluator {
     }
   }
 
+  /** Add a function symbol to the context. */
   private static PersistentMap<String, Function<List<Integer>, Function<List<Formula>, Formula>>>
       addFunction(
           PersistentMap<String, Function<List<Integer>, Function<List<Formula>, Formula>>> context,
@@ -348,6 +368,7 @@ public final class SmtlibEvaluator {
         });
   }
 
+  /** Add a constant symbol to the context. */
   private static PersistentMap<String, Function<List<Integer>, Function<List<Formula>, Formula>>>
       addConstant(
           PersistentMap<String, Function<List<Integer>, Function<List<Formula>, Formula>>> context,
@@ -363,21 +384,41 @@ public final class SmtlibEvaluator {
   }
 
   class CommandVisitor extends SmtlibBaseVisitor<CommandVisitor> implements AutoCloseable {
+    /** Prover state machine, similar to "solver execution modes" in Smtlib. */
     private interface ProverState {
+      /**
+       * Start state.
+       *
+       * <p>Entered at the start of the Smtlib script. Allows <code>(set-info></code>, <code>
+       * (set-option)</code> and <code>(set-logic)</code>. Setting the logic will create a prover
+       * and the state transitions to {@link ProverState.AssertState AssertState}. If {@link
+       * ParsingMode#FORMULA ParsingMode.FORMULA} is used, no prover will be created and the state
+       * machine never leaves the initial state
+       */
       record StartState(Optional<String> logic, Set<SolverContext.ProverOptions> options)
           implements ProverState {}
 
+      /**
+       * Assert state.
+       *
+       * <p>Entered by <code>(set-logic)</code> and left when the prover is destroyed by <code>
+       * (exit)</code> or <code>(reset)</code>. Allows all commands except <code>(set-logic)</code>
+       * and <code>(set-option)</code> as the prover has already been initialized
+       */
       record AssertState(ProverEnvironment prover) implements ProverState {}
 
+      /**
+       * Exit state.
+       *
+       * <p>Entered when <code>(exit)</code> has run
+       */
       record ExitState() implements ProverState {}
     }
 
     private final ProverState state;
-
     private final PersistentMap<String, Function<List<Integer>, Function<List<Formula>, Formula>>>
         globalDefs;
     private final PersistentMap<String, Object> localDefs;
-
     private final List<List<BooleanFormula>> asserted;
     private final Optional<List<BooleanFormula>> lastAssumptions;
 
@@ -406,6 +447,7 @@ public final class SmtlibEvaluator {
           Optional.empty());
     }
 
+    /** Returns <code>true</code> once <code>(exit)</code> has closed the prover. */
     public boolean isClosed() {
       return state instanceof ProverState.ExitState;
     }
@@ -415,6 +457,7 @@ public final class SmtlibEvaluator {
       throw (E) e;
     }
 
+    /** Open a new {@link ProverEnvironment} with the given {@link SolverContext.ProverOptions}. */
     private ProverEnvironment newProver(Set<SolverContext.ProverOptions> pOptions) {
       ProverEnvironment newProver =
           solver.newProverEnvironment(pOptions.toArray(new SolverContext.ProverOptions[] {}));
@@ -433,6 +476,7 @@ public final class SmtlibEvaluator {
       return this;
     }
 
+    /** Helper function to update an option set with a new setting. */
     private Set<SolverContext.ProverOptions> newOptionSet(
         Set<SolverContext.ProverOptions> optionSet,
         SolverContext.ProverOptions option,
@@ -686,6 +730,7 @@ public final class SmtlibEvaluator {
           lastAssumptions);
     }
 
+    /** Returns a list of all assertions that are currently on the stack. */
     List<BooleanFormula> getAssertions() {
       ImmutableList.Builder<BooleanFormula> builder = ImmutableList.builder();
       for (List<BooleanFormula> level : asserted) {
@@ -976,14 +1021,14 @@ public final class SmtlibEvaluator {
   private final SolverContext solver;
   private final ParsingFormulaManager manager;
 
-  private static int counter = 0;
-
   private final SortEvaluator sortEvaluator = new SortEvaluator();
   private final ConstEvalator constEvalator = new ConstEvalator();
 
   private final CommandVisitor commandVisitor;
 
   private final Consumer<FormulaManager.SolverResponse> responseListener;
+
+  private static int counter = 0;
 
   public SmtlibEvaluator(
       ParsingMode pMode,
@@ -1016,25 +1061,30 @@ public final class SmtlibEvaluator {
     responseListener = pResponseListener;
   }
 
+  /** Generate a fresh variable name. */
   private static String genSymbol() {
     return String.format(".%s", counter++);
   }
 
+  /** Parse an Smtlib integer value. */
   private static BigInteger getIntegerValue(SmtlibParser.IntegerContext ctx) {
     return new BigInteger(ctx.getText());
   }
 
+  /** Parse a Smtlib symbol name and remove the quotes if necessary. */
   private static String getSymbolValue(SmtlibParser.SymbolContext ctx) {
     String str = ctx.getText();
     return str.charAt(0) == '|' ? str.substring(1, str.length() - 1) : str;
   }
 
+  /** Run the evaluator for the given Smtlib input. */
   @CanIgnoreReturnValue
   public SmtlibEvaluator apply(ParseTree pSmtlib) {
     return new SmtlibEvaluator(
         mode, solver, manager, commandVisitor.visit(pSmtlib), responseListener);
   }
 
+  /** Return a list of all assertions that are currently on the stack. */
   public List<BooleanFormula> getAssertions() {
     return commandVisitor.getAssertions();
   }

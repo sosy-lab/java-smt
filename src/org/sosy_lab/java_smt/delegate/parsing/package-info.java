@@ -6,10 +6,7 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-/* Adds checks that help find common user errors.
- * The classes from this package ensure that objects are only used on the thread that created
- * them, and that formulas are not used out of the context that created them.
- */
+/** Tracks user-defined symbols so that they can be accessed while parsing Smtlib formulas. */
 @com.google.errorprone.annotations.CheckReturnValue
 @javax.annotation.ParametersAreNonnullByDefault
 @org.sosy_lab.common.annotations.FieldsAreNonnullByDefault

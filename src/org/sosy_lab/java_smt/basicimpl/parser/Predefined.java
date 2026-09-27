@@ -35,6 +35,7 @@ import org.sosy_lab.java_smt.api.StringFormula;
 import org.sosy_lab.java_smt.api.visitors.DefaultFormulaVisitor;
 import org.sosy_lab.java_smt.delegate.parsing.ParsingFormulaManager;
 
+/** Helper class to add theories and user-defined symbols to the parser context. */
 public class Predefined {
   private final FormulaManager mgr;
 
@@ -73,12 +74,28 @@ public class Predefined {
     return foldl1((term, acc) -> mgr.getBooleanFormulaManager().and(term, acc), terms.build());
   }
 
+  /** Helper function to apply "upcasting" to mixed integer-real functions. */
   private FormulaType<?> calculateReturnType(List<Formula> list) {
     return list.stream().anyMatch(p -> p instanceof NumeralFormula.RationalFormula)
         ? FormulaType.RationalType
         : FormulaType.IntegerType;
   }
 
+  /**
+   * Add background theory symbols to the parser.
+   *
+   * <p>The included Smtlib theories are:
+   *
+   * <ul>
+   *   <li>Core
+   *   <li>Ints
+   *   <li>Reals
+   *   <li>FixedSizeBitVectors
+   *   <li>FloatingPoint
+   *   <li>Strings
+   *   <li>ArraysEx
+   * </ul>
+   */
   @SuppressWarnings({"unchecked", "rawtypes"})
   public Predefined addTheorySymbols() {
     // Core
@@ -1669,6 +1686,7 @@ public class Predefined {
     return this;
   }
 
+  /** Copy existing user-defined symbols to the parser. */
   public Predefined addUserSymbols(ParsingFormulaManager.Declarations pDeclarations) {
     for (Map.Entry<String, Formula> constant : pDeclarations.constants().entrySet()) {
       predefined.put(

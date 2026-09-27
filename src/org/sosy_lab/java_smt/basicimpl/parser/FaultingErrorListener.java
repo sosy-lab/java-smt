@@ -14,6 +14,11 @@ import org.antlr.v4.runtime.BaseErrorListener;
 import org.antlr.v4.runtime.RecognitionException;
 import org.antlr.v4.runtime.Recognizer;
 
+/**
+ * Error handler for the Antlr parser.
+ *
+ * <p>Adds line information to parser error messages
+ */
 public class FaultingErrorListener extends BaseErrorListener {
   private final String prefix;
 
