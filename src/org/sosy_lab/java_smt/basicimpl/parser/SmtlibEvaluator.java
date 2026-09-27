@@ -137,7 +137,7 @@ public final class SmtlibEvaluator {
   }
 
   /** Create a {@link Formula} from a value expression in Smtlib. */
-  class ConstEvalator extends SmtlibBaseVisitor<Formula> {
+  class ConstEvaluator extends SmtlibBaseVisitor<Formula> {
     @Override
     public Formula visitBoolean(SmtlibParser.BooleanContext ctx) {
       return manager.getBooleanFormulaManager().makeBoolean(Boolean.parseBoolean(ctx.getText()));
@@ -269,7 +269,7 @@ public final class SmtlibEvaluator {
 
     @Override
     public Formula visitConst(SmtlibParser.ConstContext ctx) {
-      return constEvalator.visit(ctx.children.get(0));
+      return constEvaluator.visit(ctx.children.get(0));
     }
 
     @Override
@@ -1021,7 +1021,7 @@ public final class SmtlibEvaluator {
   private final ParsingFormulaManager manager;
 
   private final SortEvaluator sortEvaluator = new SortEvaluator();
-  private final ConstEvalator constEvalator = new ConstEvalator();
+  private final ConstEvaluator constEvaluator = new ConstEvaluator();
 
   private final CommandVisitor commandVisitor;
 
