@@ -29,6 +29,7 @@ import org.sosy_lab.java_smt.api.FormulaManager.SolverResponse.CheckSatResponse.
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.SolverException;
+import org.sosy_lab.java_smt.basicimpl.parser.SmtlibEvaluator;
 
 public class ParserTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
 
@@ -604,5 +605,23 @@ public class ParserTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
         context
             .getFormulaManager()
             .parseAll(Files.readString(Path.of("src/org/sosy_lab/java_smt/test/client.smt2")));
+  }
+
+  @Test
+  public void parseAllExceptionTest() {
+    requireIntegers();
+
+    String exceptionSmtlib =
+        """
+        (declare-const v Int)
+        (declare-const v Int
+
+        )
+        (assert (= v 0))
+        """;
+
+    assertThrows(
+        SmtlibEvaluator.SmtlibException.class,
+        () -> context.getFormulaManager().parseAll(exceptionSmtlib));
   }
 }

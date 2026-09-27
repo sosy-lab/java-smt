@@ -29,6 +29,7 @@ import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Stream;
+import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.sosy_lab.common.collect.PathCopyingPersistentTreeMap;
 import org.sosy_lab.common.collect.PersistentMap;
@@ -46,6 +47,12 @@ import org.sosy_lab.java_smt.delegate.parsing.ParsingFormulaManager;
 
 @SuppressWarnings("resource")
 public final class SmtlibEvaluator {
+  public static class SmtlibException extends IllegalArgumentException {
+    SmtlibException(int line, String source, Throwable t) {
+      super("Error in line %s:%n%s".formatted(line, source), t);
+    }
+  }
+
   public enum ParsingMode {
     FORMULA,
     SCRIPT
@@ -1008,10 +1015,20 @@ public final class SmtlibEvaluator {
       var eval = this;
       try {
         for (var cmd : ctx.command()) {
-          checkArgument(
-              !(eval.state instanceof ProverState.ExitState),
-              "Can't run any more commands. Solver was closed");
-          eval = eval.visit(cmd);
+          try {
+            checkArgument(
+                !(eval.state instanceof ProverState.ExitState),
+                "Can't run any more commands. Solver was closed");
+            eval = eval.visit(cmd);
+
+          } catch (RuntimeException e) {
+            var line = cmd.start.getLine();
+            var source =
+                cmd.start
+                    .getInputStream()
+                    .getText(new Interval(cmd.start.getStartIndex(), cmd.stop.getStopIndex()));
+            throw new SmtlibException(line, source, e);
+          }
         }
       } finally {
         eval.close();
