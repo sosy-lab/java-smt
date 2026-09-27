@@ -704,39 +704,38 @@ public final class SmtlibEvaluator {
 
     @Override
     public CommandVisitor visitAssert(SmtlibParser.AssertContext ctx) {
-      if (state instanceof ProverState.StartState startState) {
-        return new CommandVisitor(
-                new ProverState.AssertState(
-                    mode == ParsingMode.FORMULA ? null : newProver(startState.options)),
-                globalDefs,
-                localDefs,
-                asserted,
-                lastAssumptions,
-                responses)
-            .visit(ctx);
+      var term = (BooleanFormula) new ExprEvaluator(globalDefs).visit(ctx.expr());
+      if (mode == ParsingMode.SCRIPT) {
+        if (state instanceof ProverState.StartState startState) {
+          return new CommandVisitor(
+                  new ProverState.AssertState(newProver(startState.options)),
+                  globalDefs,
+                  localDefs,
+                  asserted,
+                  lastAssumptions,
+                  responses)
+              .visit(ctx);
 
-      } else if (state instanceof ProverState.AssertState assertState) {
-        var term = (BooleanFormula) new ExprEvaluator(globalDefs).visit(ctx.expr());
-        var last = asserted.get(asserted.size() - 1);
-        var init = asserted.subList(0, asserted.size() - 1);
-        var added = Stream.concat(last.stream(), Stream.of(term)).toList();
-        if (mode == ParsingMode.SCRIPT) {
+        } else if (state instanceof ProverState.AssertState assertState) {
           try {
             assertState.prover.addConstraint(term);
           } catch (InterruptedException e) {
             sneakyThrow(e);
           }
+        } else {
+          throw new AssertionError();
         }
-        return new CommandVisitor(
-            state,
-            globalDefs,
-            localDefs,
-            Stream.concat(init.stream(), Stream.of(added)).toList(),
-            lastAssumptions,
-            responses);
-      } else {
-        throw new AssertionError();
       }
+      var last = asserted.get(asserted.size() - 1);
+      var init = asserted.subList(0, asserted.size() - 1);
+      var added = Stream.concat(last.stream(), Stream.of(term)).toList();
+      return new CommandVisitor(
+          state,
+          globalDefs,
+          localDefs,
+          Stream.concat(init.stream(), Stream.of(added)).toList(),
+          lastAssumptions,
+          responses);
     }
 
     List<BooleanFormula> getAssertions() {
@@ -997,7 +996,7 @@ public final class SmtlibEvaluator {
 
     @Override
     public CommandVisitor visitExit(SmtlibParser.ExitContext ctx) {
-      if (state instanceof ProverState.AssertState assertState && assertState.prover != null) {
+      if (state instanceof ProverState.AssertState assertState) {
         assertState.prover.close();
       }
       return new CommandVisitor(
@@ -1023,9 +1022,7 @@ public final class SmtlibEvaluator {
     @Override
     public void close() {
       if (state instanceof ProverState.AssertState assertState) {
-        if (assertState.prover != null) {
-          assertState.prover.close();
-        }
+        assertState.prover.close();
       }
     }
   }
