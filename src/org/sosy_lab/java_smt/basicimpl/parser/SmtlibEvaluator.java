@@ -23,7 +23,6 @@ import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import java.io.Serial;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -306,7 +305,7 @@ public final class SmtlibEvaluator {
 
     @Override
     public Formula visitQuantified(SmtlibParser.QuantifiedContext ctx) {
-      ArrayList<Formula> variables = new ArrayList<>();
+      ImmutableList.Builder<Formula> variables = ImmutableList.builder();
       PersistentMap<String, Function<List<Integer>, Function<List<Formula>, Formula>>> updated =
           context;
       for (SmtlibParser.SortedVarContext sortedVar : ctx.sortedVar()) {
@@ -319,7 +318,7 @@ public final class SmtlibEvaluator {
       Formula evaluated = new ExprEvaluator(updated).visit(ctx.expr());
       checkArgument(evaluated instanceof BooleanFormula);
       BooleanFormula acc = (BooleanFormula) evaluated;
-      for (Formula bound : Lists.reverse(variables)) {
+      for (Formula bound : Lists.reverse(variables.build())) {
         acc =
             manager
                 .getQuantifiedFormulaManager()
