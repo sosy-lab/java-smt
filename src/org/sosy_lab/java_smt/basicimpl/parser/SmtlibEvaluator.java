@@ -378,35 +378,29 @@ public final class SmtlibEvaluator {
     private final List<List<BooleanFormula>> asserted;
     private final Optional<List<BooleanFormula>> lastAssumptions;
 
-    private final Consumer<FormulaManager.SolverResponse> responses;
-
     CommandVisitor(
         ProverState pState,
         PersistentMap<String, Function<List<Integer>, Function<List<Formula>, Formula>>>
             pGlobalDefs,
         PersistentMap<String, Object> pLocalDefs,
         List<List<BooleanFormula>> pAsserted,
-        Optional<List<BooleanFormula>> pLastAssumptions,
-        Consumer<FormulaManager.SolverResponse> pResponses) {
+        Optional<List<BooleanFormula>> pLastAssumptions) {
       state = pState;
       globalDefs = pGlobalDefs;
       localDefs = pLocalDefs;
       asserted = pAsserted;
       lastAssumptions = pLastAssumptions;
-      responses = pResponses;
     }
 
     CommandVisitor(
         PersistentMap<String, Function<List<Integer>, Function<List<Formula>, Formula>>>
-            pGlobalDefs,
-        Consumer<FormulaManager.SolverResponse> pResponses) {
+            pGlobalDefs) {
       this(
           new CommandVisitor.ProverState.StartState(Optional.empty(), ImmutableSet.of()),
           pGlobalDefs,
           PathCopyingPersistentTreeMap.of(),
           ImmutableList.of(ImmutableList.of()),
-          Optional.empty(),
-          pResponses);
+          Optional.empty());
     }
 
     public boolean isClosed() {
@@ -472,8 +466,7 @@ public final class SmtlibEvaluator {
               globalDefs,
               localDefs,
               asserted,
-              lastAssumptions,
-              responses);
+              lastAssumptions);
 
         } else {
           // TODO Report that we skipped the option
@@ -494,8 +487,7 @@ public final class SmtlibEvaluator {
             globalDefs,
             localDefs,
             asserted,
-            lastAssumptions,
-            responses);
+            lastAssumptions);
 
       } else {
         throw new IllegalArgumentException("Solver is already running");
@@ -510,8 +502,7 @@ public final class SmtlibEvaluator {
                 globalDefs,
                 localDefs,
                 asserted,
-                lastAssumptions,
-                responses)
+                lastAssumptions)
             .visit(ctx);
 
       } else {
@@ -529,8 +520,7 @@ public final class SmtlibEvaluator {
               addConstant(globalDefs, name, term),
               localDefs.putAndCopy(name, null),
               asserted,
-              lastAssumptions,
-              responses);
+              lastAssumptions);
         } else {
           FunctionDeclaration<?> uf =
               manager.getUFManager().declareUF(name, right, left.toArray(new FormulaType<?>[0]));
@@ -539,8 +529,7 @@ public final class SmtlibEvaluator {
               addFunction(globalDefs, name, p -> manager.makeApplication(uf, p)),
               localDefs.putAndCopy(name, null),
               asserted,
-              lastAssumptions,
-              responses);
+              lastAssumptions);
         }
       }
     }
@@ -553,8 +542,7 @@ public final class SmtlibEvaluator {
                 globalDefs,
                 localDefs,
                 asserted,
-                lastAssumptions,
-                responses)
+                lastAssumptions)
             .visit(ctx);
 
       } else {
@@ -570,8 +558,7 @@ public final class SmtlibEvaluator {
               addConstant(globalDefs, name, term),
               localDefs.putAndCopy(name, null),
               asserted,
-              lastAssumptions,
-              responses);
+              lastAssumptions);
         } else {
           PersistentMap<String, Function<List<Integer>, Function<List<Formula>, Formula>>> capture =
               globalDefs;
@@ -595,8 +582,7 @@ public final class SmtlibEvaluator {
                   }),
               localDefs.putAndCopy(name, null),
               asserted,
-              lastAssumptions,
-              responses);
+              lastAssumptions);
         }
       }
     }
@@ -610,8 +596,7 @@ public final class SmtlibEvaluator {
                 globalDefs,
                 localDefs,
                 asserted,
-                lastAssumptions,
-                responses)
+                lastAssumptions)
             .visit(ctx);
 
       } else if (state instanceof ProverState.AssertState assertState) {
@@ -628,7 +613,7 @@ public final class SmtlibEvaluator {
           }
         }
         return new CommandVisitor(
-            state, globalDefs, localDefs, newAsserted.build(), Optional.empty(), responses);
+            state, globalDefs, localDefs, newAsserted.build(), Optional.empty());
 
       } else {
         throw new AssertionError();
@@ -644,8 +629,7 @@ public final class SmtlibEvaluator {
                 globalDefs,
                 localDefs,
                 asserted,
-                lastAssumptions,
-                responses)
+                lastAssumptions)
             .visit(ctx);
 
       } else if (state instanceof ProverState.AssertState assertState) {
@@ -659,8 +643,7 @@ public final class SmtlibEvaluator {
             globalDefs,
             localDefs,
             asserted.subList(0, asserted.size() - levels),
-            Optional.empty(),
-            responses);
+            Optional.empty());
       } else {
         throw new AssertionError();
       }
@@ -676,8 +659,7 @@ public final class SmtlibEvaluator {
                   globalDefs,
                   localDefs,
                   asserted,
-                  lastAssumptions,
-                  responses)
+                  lastAssumptions)
               .visit(ctx);
 
         } else if (state instanceof ProverState.AssertState assertState) {
@@ -698,8 +680,7 @@ public final class SmtlibEvaluator {
           globalDefs,
           localDefs,
           Stream.concat(init.stream(), Stream.of(added)).toList(),
-          lastAssumptions,
-          responses);
+          lastAssumptions);
     }
 
     List<BooleanFormula> getAssertions() {
@@ -714,8 +695,9 @@ public final class SmtlibEvaluator {
     public CommandVisitor visitGetAssertions(SmtlibParser.GetAssertionsContext ctx) {
       checkArgument(
           mode != ParsingMode.FORMULA, "Command 'get-assertions' is not allowed in formula mode");
-      responses.accept(new FormulaManager.SolverResponse.AssertionsResponse(getAssertions()));
-      return new CommandVisitor(state, globalDefs, localDefs, asserted, lastAssumptions, responses);
+      responseListener.accept(
+          new FormulaManager.SolverResponse.AssertionsResponse(getAssertions()));
+      return new CommandVisitor(state, globalDefs, localDefs, asserted, lastAssumptions);
     }
 
     @Override
@@ -728,8 +710,7 @@ public final class SmtlibEvaluator {
                 globalDefs,
                 localDefs,
                 asserted,
-                lastAssumptions,
-                responses)
+                lastAssumptions)
             .visit(ctx);
 
       } else if (state instanceof ProverState.AssertState assertState) {
@@ -741,9 +722,8 @@ public final class SmtlibEvaluator {
         } catch (InterruptedException e) {
           sneakyThrow(e);
         }
-        responses.accept(new FormulaManager.SolverResponse.CheckSatResponse(status));
-        return new CommandVisitor(
-            state, globalDefs, localDefs, asserted, Optional.empty(), responses);
+        responseListener.accept(new FormulaManager.SolverResponse.CheckSatResponse(status));
+        return new CommandVisitor(state, globalDefs, localDefs, asserted, Optional.empty());
       } else {
         throw new AssertionError();
       }
@@ -760,8 +740,7 @@ public final class SmtlibEvaluator {
                 globalDefs,
                 localDefs,
                 asserted,
-                lastAssumptions,
-                responses)
+                lastAssumptions)
             .visit(ctx);
 
       } else if (state instanceof ProverState.AssertState assertState) {
@@ -781,9 +760,8 @@ public final class SmtlibEvaluator {
         } catch (InterruptedException e) {
           sneakyThrow(e);
         }
-        responses.accept(new FormulaManager.SolverResponse.CheckSatResponse(status));
-        return new CommandVisitor(
-            state, globalDefs, localDefs, asserted, Optional.of(assumed), responses);
+        responseListener.accept(new FormulaManager.SolverResponse.CheckSatResponse(status));
+        return new CommandVisitor(state, globalDefs, localDefs, asserted, Optional.of(assumed));
       } else {
         throw new AssertionError();
       }
@@ -799,15 +777,13 @@ public final class SmtlibEvaluator {
                 globalDefs,
                 localDefs,
                 asserted,
-                lastAssumptions,
-                responses)
+                lastAssumptions)
             .visit(ctx);
 
       } else if (state instanceof ProverState.AssertState assertState) {
         try (Model model = assertState.prover.getModel()) {
-          responses.accept(new FormulaManager.SolverResponse.ModelResponse(model.asList()));
-          return new CommandVisitor(
-              state, globalDefs, localDefs, asserted, lastAssumptions, responses);
+          responseListener.accept(new FormulaManager.SolverResponse.ModelResponse(model.asList()));
+          return new CommandVisitor(state, globalDefs, localDefs, asserted, lastAssumptions);
 
         } catch (SolverException e) {
           sneakyThrow(e);
@@ -828,15 +804,13 @@ public final class SmtlibEvaluator {
                 globalDefs,
                 localDefs,
                 asserted,
-                lastAssumptions,
-                responses)
+                lastAssumptions)
             .visit(ctx);
 
       } else if (state instanceof ProverState.AssertState assertState) {
         List<BooleanFormula> core = assertState.prover.getUnsatCore();
-        responses.accept(new FormulaManager.SolverResponse.UnsatCoreResponse(core));
-        return new CommandVisitor(
-            state, globalDefs, localDefs, asserted, lastAssumptions, responses);
+        responseListener.accept(new FormulaManager.SolverResponse.UnsatCoreResponse(core));
+        return new CommandVisitor(state, globalDefs, localDefs, asserted, lastAssumptions);
       } else {
         throw new AssertionError();
       }
@@ -853,8 +827,7 @@ public final class SmtlibEvaluator {
                 globalDefs,
                 localDefs,
                 asserted,
-                lastAssumptions,
-                responses)
+                lastAssumptions)
             .visit(ctx);
 
       } else if (state instanceof ProverState.AssertState assertState) {
@@ -865,9 +838,9 @@ public final class SmtlibEvaluator {
           sneakyThrow(e);
           throw new AssertionError();
         }
-        responses.accept(new FormulaManager.SolverResponse.UnsatCoreResponse(core.orElseThrow()));
-        return new CommandVisitor(
-            state, globalDefs, localDefs, asserted, lastAssumptions, responses);
+        responseListener.accept(
+            new FormulaManager.SolverResponse.UnsatCoreResponse(core.orElseThrow()));
+        return new CommandVisitor(state, globalDefs, localDefs, asserted, lastAssumptions);
       } else {
         throw new AssertionError();
       }
@@ -883,8 +856,7 @@ public final class SmtlibEvaluator {
                 globalDefs,
                 localDefs,
                 asserted,
-                lastAssumptions,
-                responses)
+                lastAssumptions)
             .visit(ctx);
 
       } else if (state instanceof ProverState.AssertState assertState) {
@@ -900,9 +872,9 @@ public final class SmtlibEvaluator {
             sneakyThrow(e);
           }
         }
-        responses.accept(new FormulaManager.SolverResponse.EvaluationResponse(evaluated.build()));
-        return new CommandVisitor(
-            state, globalDefs, localDefs, asserted, lastAssumptions, responses);
+        responseListener.accept(
+            new FormulaManager.SolverResponse.EvaluationResponse(evaluated.build()));
+        return new CommandVisitor(state, globalDefs, localDefs, asserted, lastAssumptions);
       } else {
         throw new AssertionError();
       }
@@ -929,8 +901,7 @@ public final class SmtlibEvaluator {
           nonlocal,
           PathCopyingPersistentTreeMap.of(),
           ImmutableList.of(ImmutableList.of()),
-          Optional.empty(),
-          responses);
+          Optional.empty());
     }
 
     @Override
@@ -948,12 +919,7 @@ public final class SmtlibEvaluator {
           sneakyThrow(e);
         }
         return new CommandVisitor(
-            state,
-            globalDefs,
-            localDefs,
-            ImmutableList.of(ImmutableList.of()),
-            Optional.empty(),
-            responses);
+            state, globalDefs, localDefs, ImmutableList.of(ImmutableList.of()), Optional.empty());
       } else {
         throw new AssertionError();
       }
@@ -965,7 +931,7 @@ public final class SmtlibEvaluator {
         assertState.prover.close();
       }
       return new CommandVisitor(
-          new ProverState.ExitState(), globalDefs, localDefs, asserted, lastAssumptions, responses);
+          new ProverState.ExitState(), globalDefs, localDefs, asserted, lastAssumptions);
     }
 
     @Override
@@ -1014,6 +980,8 @@ public final class SmtlibEvaluator {
 
   private final CommandVisitor commandVisitor;
 
+  private final Consumer<FormulaManager.SolverResponse> responseListener;
+
   public SmtlibEvaluator(
       ParsingMode pMode,
       SolverContext pSolver,
@@ -1028,19 +996,21 @@ public final class SmtlibEvaluator {
                 new Predefined(pManager)
                     .addTheorySymbols()
                     .addUserSymbols(pManager.getDefinedSymbols())
-                    .build()),
-            pResponseListener);
+                    .build()));
+    responseListener = pResponseListener;
   }
 
   private SmtlibEvaluator(
       ParsingMode pMode,
       SolverContext pSolver,
       ParsingFormulaManager pManager,
-      CommandVisitor pCommandVisitor) {
+      CommandVisitor pCommandVisitor,
+      Consumer<FormulaManager.SolverResponse> pResponseListener) {
     mode = pMode;
     solver = pSolver;
     manager = pManager;
     commandVisitor = pCommandVisitor;
+    responseListener = pResponseListener;
   }
 
   private static String genSymbol() {
@@ -1058,7 +1028,8 @@ public final class SmtlibEvaluator {
 
   @CanIgnoreReturnValue
   public SmtlibEvaluator apply(ParseTree pSmtlib) {
-    return new SmtlibEvaluator(mode, solver, manager, commandVisitor.visit(pSmtlib));
+    return new SmtlibEvaluator(
+        mode, solver, manager, commandVisitor.visit(pSmtlib), responseListener);
   }
 
   public List<BooleanFormula> getAssertions() {
