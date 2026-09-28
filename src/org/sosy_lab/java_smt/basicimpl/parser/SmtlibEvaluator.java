@@ -307,17 +307,14 @@ public final class SmtlibEvaluator {
         variables.add(term);
       }
       Formula evaluated = new ExprEvaluator(updated).visit(ctx.expr());
-      checkArgument(evaluated instanceof BooleanFormula);
-      BooleanFormula acc =
-          manager
-              .getQuantifiedFormulaManager()
-              .mkQuantifier(
-                  ctx.quantifier().getRuleIndex() == 0
-                      ? QuantifiedFormulaManager.Quantifier.EXISTS
-                      : QuantifiedFormulaManager.Quantifier.FORALL,
-                  variables.build(),
-                  (BooleanFormula) evaluated);
-      return acc;
+      return manager
+          .getQuantifiedFormulaManager()
+          .mkQuantifier(
+              ctx.quantifier().getRuleIndex() == 0
+                  ? QuantifiedFormulaManager.Quantifier.EXISTS
+                  : QuantifiedFormulaManager.Quantifier.FORALL,
+              variables.build(),
+              (BooleanFormula) evaluated);
     }
 
     @Override
