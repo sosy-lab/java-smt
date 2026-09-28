@@ -237,6 +237,39 @@ public class ParserTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   }
 
   @Test
+  public void parseAllEvaluationErrorTest() {
+    requireIntegers();
+
+    String exceptionSmtlib =
+        """
+            (declare-const v Int)
+            (declare-const v Int
+
+            )
+            (assert (= v 0))
+            """;
+
+    assertThrows(
+        SmtlibException.class,
+        () -> {
+          try {
+            var unused = mgr.parseAll(exceptionSmtlib);
+          } catch (SmtlibException e) {
+            assertThat(e.getLine()).isEqualTo(2);
+            assertThat(e.getColumn()).isEqualTo(1);
+            assertThat(e.getInfo())
+                .isEqualTo(
+                    """
+                                (declare-const v Int
+
+                                )\
+                                """);
+            throw e;
+          }
+        });
+  }
+
+  @Test
   public void parseAllUndeclaredVariableTest() {
     String smt = "(assert (= x 1))"; // 'x' not declared
     assertThrows(IllegalArgumentException.class, () -> mgr.parseAll(smt));
@@ -260,8 +293,8 @@ public class ParserTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   public void parserAllIllegalCommandTest() {
     String smt =
         """
-        (declare-const x Int)
-        (assert (= x 1))
+        (declare-const x Bool)
+        (assert x)
         (check-sat)
         """;
     assertThrows(
@@ -659,22 +692,5 @@ public class ParserTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
         context
             .getFormulaManager()
             .parseAll(Files.readString(Path.of("src/org/sosy_lab/java_smt/test/client.smt2")));
-  }
-
-  @Test
-  public void parseAllExceptionTest() {
-    requireIntegers();
-
-    String exceptionSmtlib =
-        """
-        (declare-const v Int)
-        (declare-const v Int
-
-        )
-        (assert (= v 0))
-        """;
-
-    assertThrows(
-        SmtlibException.class, () -> context.getFormulaManager().parseAll(exceptionSmtlib));
   }
 }
