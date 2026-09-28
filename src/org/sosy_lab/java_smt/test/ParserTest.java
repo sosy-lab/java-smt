@@ -21,6 +21,7 @@ import java.nio.file.Path;
 import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
+import org.sosy_lab.common.configuration.ConfigurationBuilder;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -32,6 +33,13 @@ import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.parser.SmtlibException;
 
 public class ParserTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
+
+  @Override
+  protected ConfigurationBuilder createTestConfigBuilder() throws InvalidConfigurationException {
+    return solver == Solvers.Z3 || solver == Solvers.Z3_WITH_INTERPOLATION
+        ? super.createTestConfigBuilder().setOption("solver.z3.usePhantomReferences", "true")
+        : super.createTestConfigBuilder();
+  }
 
   @Before
   public void setUp() {
@@ -669,12 +677,6 @@ public class ParserTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
         .that(solver)
         .isNotEqualTo(
             Solvers.BOOLECTOR); // Fails with "Unexpected formula type for BV formula: Boolean"
-    assume()
-        .that(solver)
-        .isNoneOf(
-            Solvers.Z3,
-            Solvers.Z3_WITH_INTERPOLATION); // FIXME: Takes forever in SolverContext.close()
-
     @SuppressWarnings("unused")
     List<BooleanFormula> smtlib =
         context

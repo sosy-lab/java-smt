@@ -43,7 +43,7 @@ public class Z3NativeOptionsTest extends SolverBasedTest0 {
 
   @Override
   protected ConfigurationBuilder createTestConfigBuilder() throws InvalidConfigurationException {
-    return super.createTestConfigBuilder().setOption("solver.useAntlrParser", "false");
+    return super.createTestConfigBuilder().setOption("solver.z3.usePhantomReferences", "true");
   }
 
   @Override
