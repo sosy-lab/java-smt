@@ -191,7 +191,7 @@ class DebuggingFormulaManager implements FormulaManager {
   }
 
   @Override
-  public void parseScript(Consumer<SolverResponse> responseListener, String smtlib) {
+  public void parseAndRun(Consumer<SolverResponse> responseListener, String smtlib) {
     throw new UnsupportedOperationException();
   }
 

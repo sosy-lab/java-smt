@@ -484,7 +484,7 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
   }
 
   @Override
-  public void parseScript(Consumer<SolverResponse> responseListener, String smtlib) {
+  public void parseAndRun(Consumer<SolverResponse> responseListener, String smtlib) {
     throw new UnsupportedOperationException();
   }
 

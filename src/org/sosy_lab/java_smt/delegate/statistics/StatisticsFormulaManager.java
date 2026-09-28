@@ -153,9 +153,9 @@ class StatisticsFormulaManager implements FormulaManager {
   }
 
   @Override
-  public void parseScript(Consumer<SolverResponse> responseListener, String smtlib)
+  public void parseAndRun(Consumer<SolverResponse> responseListener, String smtlib)
       throws SmtlibException, InterruptedException {
-    delegate.parseScript(responseListener, smtlib);
+    delegate.parseAndRun(responseListener, smtlib);
   }
 
   @Override

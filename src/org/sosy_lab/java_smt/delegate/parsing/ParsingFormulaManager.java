@@ -183,7 +183,7 @@ public class ParsingFormulaManager implements FormulaManager {
   }
 
   @Override
-  public void parseScript(Consumer<SolverResponse> responseListener, String smtlib)
+  public void parseAndRun(Consumer<SolverResponse> responseListener, String smtlib)
       throws SmtlibException, InterruptedException {
     new SmtlibEvaluator(SmtlibEvaluator.ParsingMode.SCRIPT, solver, this, responseListener)
         .apply(parse(lex(smtlib)));

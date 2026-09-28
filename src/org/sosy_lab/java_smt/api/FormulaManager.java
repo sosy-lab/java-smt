@@ -256,7 +256,7 @@ public interface FormulaManager {
    * <p>Solver responses to commands like <code>check-sat</code> or <code>get-model</code> are sent
    * directly to a listener
    */
-  void parseScript(Consumer<SolverResponse> responseListener, String smtlib)
+  void parseAndRun(Consumer<SolverResponse> responseListener, String smtlib)
       throws SmtlibException, InterruptedException;
 
   /**
@@ -265,10 +265,10 @@ public interface FormulaManager {
    * <p>Solver responses to commands like <code>check-sat</code> or <code>get-model</code> are
    * stored in a list and then returned by this function.
    */
-  default List<SolverResponse> parseScript(String smtlib)
+  default List<SolverResponse> parseAndRun(String smtlib)
       throws SmtlibException, InterruptedException {
     ImmutableList.Builder<SolverResponse> responses = new ImmutableList.Builder<>();
-    parseScript(responses::add, smtlib);
+    parseAndRun(responses::add, smtlib);
     return responses.build();
   }
 

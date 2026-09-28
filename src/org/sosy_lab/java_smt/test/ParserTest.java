@@ -242,12 +242,12 @@ public class ParserTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
 
     String exceptionSmtlib =
         """
-            (declare-const v Int)
-            (declare-const v Int
+        (declare-const v Int)
+        (declare-const v Int
 
-            )
-            (assert (= v 0))
-            """;
+        )
+        (assert (= v 0))
+        """;
 
     assertThrows(
         SmtlibException.class,
@@ -260,10 +260,10 @@ public class ParserTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
             assertThat(e.getInfo())
                 .isEqualTo(
                     """
-                                (declare-const v Int
+                    (declare-const v Int
 
-                                )\
-                                """);
+                    )\
+                    """);
             throw e;
           }
         });
@@ -391,7 +391,7 @@ public class ParserTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
         (get-assertions)
         (exit)
         """;
-    var pushResponse = mgr.parseScript(push);
+    var pushResponse = mgr.parseAndRun(push);
 
     assertThat(((SolverResponse.AssertionsResponse) pushResponse.get(0)).assertions()).hasSize(0);
     assertThat(((SolverResponse.AssertionsResponse) pushResponse.get(1)).assertions()).hasSize(2);
@@ -406,7 +406,7 @@ public class ParserTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
         (get-assertions)
         (exit)
         """;
-    var resetResponse = mgr.parseScript(reset);
+    var resetResponse = mgr.parseAndRun(reset);
 
     assertThat(((SolverResponse.AssertionsResponse) resetResponse.get(0)).assertions()).hasSize(1);
     assertThat(((SolverResponse.AssertionsResponse) resetResponse.get(1)).assertions()).hasSize(0);
@@ -423,7 +423,7 @@ public class ParserTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
         (check-sat)
         (exit)
         """;
-    var checkResponse = mgr.parseScript(check);
+    var checkResponse = mgr.parseAndRun(check);
 
     assertThat(((SolverResponse.CheckSatResponse) checkResponse.get(0)).status())
         .isEqualTo(new Status.Sat());
@@ -445,7 +445,7 @@ public class ParserTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
         (check-sat-assuming ((= v 1)))
         (exit)
         """;
-    var assumingResponse = mgr.parseScript(checkAssuming);
+    var assumingResponse = mgr.parseAndRun(checkAssuming);
 
     assertThat(((SolverResponse.CheckSatResponse) assumingResponse.get(0)).status())
         .isEqualTo(new Status.Unsat());
@@ -464,7 +464,7 @@ public class ParserTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
         (get-model)
         (exit)
         """;
-    var modelResponse = mgr.parseScript(modelSmtlib);
+    var modelResponse = mgr.parseAndRun(modelSmtlib);
     var model = ((SolverResponse.ModelResponse) modelResponse.get(1)).model();
 
     assertThat(model).hasSize(1);
@@ -480,7 +480,7 @@ public class ParserTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
         (get-value (v))
         (exit)
         """;
-    var evalResponse = mgr.parseScript(evalSmtlib);
+    var evalResponse = mgr.parseAndRun(evalSmtlib);
 
     assertThat(((SolverResponse.EvaluationResponse) evalResponse.get(1)).value().get(0))
         .isEqualTo(imgr.makeNumber(0));
@@ -502,7 +502,7 @@ public class ParserTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
         (get-unsat-core)
         (exit)
         """;
-    var unsatCoreResponse = mgr.parseScript(unsatCoreSmtlib);
+    var unsatCoreResponse = mgr.parseAndRun(unsatCoreSmtlib);
     var unsatCore = ((SolverResponse.UnsatCoreResponse) unsatCoreResponse.get(1)).core();
 
     assertThat(unsatCore).hasSize(1);
@@ -526,7 +526,7 @@ public class ParserTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
         (get-unsat-assumptions)
         (exit)
         """;
-    var unsatAssumptionsResponse = mgr.parseScript(unsatAssumptionsSmtlib);
+    var unsatAssumptionsResponse = mgr.parseAndRun(unsatAssumptionsSmtlib);
     var unsatAssumptionsCore =
         ((SolverResponse.UnsatCoreResponse) unsatAssumptionsResponse.get(1)).core();
 
@@ -549,7 +549,7 @@ public class ParserTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
         (check-sat)
         (exit)
         """;
-    assertThrows(IllegalArgumentException.class, () -> mgr.parseScript(resetSmtlib));
+    assertThrows(IllegalArgumentException.class, () -> mgr.parseAndRun(resetSmtlib));
 
     String redeclareSmtlib =
         """
@@ -560,7 +560,7 @@ public class ParserTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
         (check-sat)
         (exit)
         """;
-    var redeclareResponse = mgr.parseScript(redeclareSmtlib);
+    var redeclareResponse = mgr.parseAndRun(redeclareSmtlib);
 
     String redefineSmtlib =
         """
@@ -571,7 +571,7 @@ public class ParserTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
         (check-sat)
         (exit)
         """;
-    var redefineResponse = mgr.parseScript(redefineSmtlib);
+    var redefineResponse = mgr.parseAndRun(redefineSmtlib);
   }
 
   @SuppressWarnings("unused")
@@ -585,7 +585,7 @@ public class ParserTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
         (assert (= v 0))
         (check-sat)
         """;
-    var noExit = mgr.parseScript(noExitSmtlib);
+    var noExit = mgr.parseAndRun(noExitSmtlib);
 
     String earlyExitSmtlib =
         """
@@ -594,7 +594,7 @@ public class ParserTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
         (exit)
         (check-sat)
         """;
-    assertThrows(IllegalArgumentException.class, () -> mgr.parseScript(earlyExitSmtlib));
+    assertThrows(IllegalArgumentException.class, () -> mgr.parseAndRun(earlyExitSmtlib));
   }
 
   private Thread cancelIn(int delay) {
@@ -620,7 +620,7 @@ public class ParserTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
     var hardSmtlib = String.format("%s (check-sat)", mgr.dumpFormula(hardProblem));
 
     cancelIn(500).start();
-    assertThrows(InterruptedException.class, () -> mgr.parseScript(hardSmtlib));
+    assertThrows(InterruptedException.class, () -> mgr.parseAndRun(hardSmtlib));
   }
 
   @Test
