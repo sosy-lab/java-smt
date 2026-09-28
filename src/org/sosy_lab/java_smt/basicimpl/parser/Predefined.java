@@ -46,6 +46,7 @@ public class Predefined {
     mgr = pManager;
   }
 
+  /** Used for function symbols that are <code>:right-assoc</code>. */
   private <T> T foldr1(BinaryOperator<T> f, List<T> list) {
     T acc = list.get(list.size() - 1);
     for (T term : Lists.reverse(list.subList(0, list.size() - 1))) {
@@ -54,6 +55,7 @@ public class Predefined {
     return acc;
   }
 
+  /** Used for function symbols that are <code>:left-assoc</code>. */
   private <T> T foldl1(BinaryOperator<T> f, List<T> list) {
     T acc = list.get(0);
     for (T term : list.subList(1, list.size())) {
@@ -62,6 +64,7 @@ public class Predefined {
     return acc;
   }
 
+  /** Used for function symbols that are <code>:chainable</code>. */
   private <T extends Formula> BooleanFormula chain(
       BiFunction<T, T, BooleanFormula> f, List<T> list) {
     ImmutableList.Builder<BooleanFormula> terms = ImmutableList.builder();
