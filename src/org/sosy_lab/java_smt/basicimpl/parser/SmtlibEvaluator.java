@@ -308,18 +308,15 @@ public final class SmtlibEvaluator {
       }
       Formula evaluated = new ExprEvaluator(updated).visit(ctx.expr());
       checkArgument(evaluated instanceof BooleanFormula);
-      BooleanFormula acc = (BooleanFormula) evaluated;
-      for (Formula bound : variables.build().reverse()) {
-        acc =
-            manager
-                .getQuantifiedFormulaManager()
-                .mkQuantifier(
-                    ctx.quantifier().getRuleIndex() == 0
-                        ? QuantifiedFormulaManager.Quantifier.EXISTS
-                        : QuantifiedFormulaManager.Quantifier.FORALL,
-                    ImmutableList.of(bound),
-                    acc);
-      }
+      BooleanFormula acc =
+          manager
+              .getQuantifiedFormulaManager()
+              .mkQuantifier(
+                  ctx.quantifier().getRuleIndex() == 0
+                      ? QuantifiedFormulaManager.Quantifier.EXISTS
+                      : QuantifiedFormulaManager.Quantifier.FORALL,
+                  variables.build(),
+                  (BooleanFormula) evaluated);
       return acc;
     }
 
