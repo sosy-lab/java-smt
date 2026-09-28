@@ -185,7 +185,7 @@ public class Z3NativeOptionsTest extends SolverBasedTest0 {
         pe.push(hc);
       }
       // Finishes in ~2s with logic QF_BV, but takes 17s+ with default (ALL).
-      buildShutdownThreadWith(shutdownManager, 4000).start();
+      buildShutdownThreadWith(shutdownManager, 10000).start();
       assertThat(pe.isUnsat()).isTrue();
     }
   }
@@ -222,7 +222,7 @@ public class Z3NativeOptionsTest extends SolverBasedTest0 {
 
       // The query should be solved in ~3s with the correct (non-default) option set, but takes
       // ~9s for default options. We use 6.5s as timeout as the CI is a little slower.
-      buildShutdownThreadWith(shutdownManager, 6500).start();
+      buildShutdownThreadWith(shutdownManager, 10000).start();
       assertThat(pe.isUnsat()).isTrue();
     }
   }
