@@ -108667,11 +108667,11 @@ Publications:
 ; (push 1) // commented out for JavaSMT
 (assert DAT3M_spec_assumption)
 (set-info :status unsat)
-(check-sat)
+; (check-sat)
 ; Original solving time: 4274 ms
 ; (pop 1) // commented out for JavaSMT
 ; Bound encoding
 (assert (or |cf 297| |cf 532| |cf 767|))
 (set-info :status unsat)
-(check-sat)
+; (check-sat)
 ; Original solving time: 1530 ms

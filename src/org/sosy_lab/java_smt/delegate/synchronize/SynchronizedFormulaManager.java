@@ -14,6 +14,7 @@ import com.google.common.collect.ImmutableMap;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 import org.sosy_lab.common.Appender;
 import org.sosy_lab.common.Appenders;
 import org.sosy_lab.java_smt.api.ArrayFormulaManager;
@@ -38,6 +39,7 @@ import org.sosy_lab.java_smt.api.UFManager;
 import org.sosy_lab.java_smt.api.visitors.FormulaTransformationVisitor;
 import org.sosy_lab.java_smt.api.visitors.FormulaVisitor;
 import org.sosy_lab.java_smt.api.visitors.TraversalProcess;
+import org.sosy_lab.java_smt.basicimpl.parser.SmtlibException;
 
 class SynchronizedFormulaManager implements FormulaManager {
 
@@ -183,6 +185,14 @@ class SynchronizedFormulaManager implements FormulaManager {
   public List<BooleanFormula> parseAll(String pS) throws IllegalArgumentException {
     synchronized (sync) {
       return delegate.parseAll(pS);
+    }
+  }
+
+  @Override
+  public void parseAndRun(Consumer<SolverResponse> responseListener, String smtlib)
+      throws SmtlibException, InterruptedException {
+    synchronized (sync) {
+      delegate.parseAndRun(responseListener, smtlib);
     }
   }
 

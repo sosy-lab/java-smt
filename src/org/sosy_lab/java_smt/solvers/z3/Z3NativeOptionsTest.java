@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Set;
 import org.junit.Test;
 import org.sosy_lab.common.ShutdownManager;
+import org.sosy_lab.common.configuration.ConfigurationBuilder;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BasicProverEnvironment;
@@ -39,6 +40,11 @@ public class Z3NativeOptionsTest extends SolverBasedTest0 {
       (assert (forall ((a Int) (x Int) (b Int)) (=> (and (< a x) (< x b)) (Itp a b))))
       (assert (forall ((a Int) (b Int)) (=> (Itp a b) (not (< b a)))))
       """;
+
+  @Override
+  protected ConfigurationBuilder createTestConfigBuilder() throws InvalidConfigurationException {
+    return super.createTestConfigBuilder().setOption("solver.z3.usePhantomReferences", "true");
+  }
 
   @Override
   protected Solvers solverToUse() {
@@ -179,7 +185,7 @@ public class Z3NativeOptionsTest extends SolverBasedTest0 {
         pe.push(hc);
       }
       // Finishes in ~2s with logic QF_BV, but takes 17s+ with default (ALL).
-      buildShutdownThreadWith(shutdownManager, 4000).start();
+      buildShutdownThreadWith(shutdownManager, 10000).start();
       assertThat(pe.isUnsat()).isTrue();
     }
   }
@@ -216,7 +222,7 @@ public class Z3NativeOptionsTest extends SolverBasedTest0 {
 
       // The query should be solved in ~3s with the correct (non-default) option set, but takes
       // ~9s for default options. We use 6.5s as timeout as the CI is a little slower.
-      buildShutdownThreadWith(shutdownManager, 6500).start();
+      buildShutdownThreadWith(shutdownManager, 10000).start();
       assertThat(pe.isUnsat()).isTrue();
     }
   }

@@ -28,6 +28,7 @@ import org.sosy_lab.java_smt.api.SolverContext;
 import org.sosy_lab.java_smt.basicimpl.AbstractNumeralFormulaManager.NonLinearArithmetic;
 import org.sosy_lab.java_smt.delegate.debugging.DebuggingSolverContext;
 import org.sosy_lab.java_smt.delegate.logging.LoggingSolverContext;
+import org.sosy_lab.java_smt.delegate.parsing.ParsingSolverContext;
 import org.sosy_lab.java_smt.delegate.statistics.StatisticsSolverContext;
 import org.sosy_lab.java_smt.delegate.synchronize.SynchronizedSolverContext;
 import org.sosy_lab.java_smt.delegate.trace.TraceSolverContext;
@@ -102,6 +103,13 @@ public class SolverContextFactory {
       secure = true,
       description = "Enable API tracing to record all calls to the JavaSMT library")
   private boolean trace = false;
+
+  @Option(
+      secure = true,
+      description =
+          "Parse Smtlib with the built-in Antlr parser, instead of relying on the solver for "
+              + "parsing")
+  private boolean useAntlrParser = true;
 
   @Option(
       secure = true,
@@ -238,6 +246,9 @@ public class SolverContextFactory {
     }
     if (trace) {
       context = new TraceSolverContext(solverToCreate, config, context, logger);
+    }
+    if (useAntlrParser) {
+      context = new ParsingSolverContext(context);
     }
     if (collectStatistics) {
       // statistics need to be the most outer wrapping layer.
