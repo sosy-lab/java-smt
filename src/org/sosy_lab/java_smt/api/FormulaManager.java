@@ -23,6 +23,7 @@ import org.sosy_lab.common.Appender;
 import org.sosy_lab.java_smt.api.visitors.FormulaTransformationVisitor;
 import org.sosy_lab.java_smt.api.visitors.FormulaVisitor;
 import org.sosy_lab.java_smt.api.visitors.TraversalProcess;
+import org.sosy_lab.java_smt.basicimpl.parser.SmtlibException;
 
 /** FormulaManager class contains all operations which can be performed on formulas. */
 public interface FormulaManager {
@@ -256,7 +257,7 @@ public interface FormulaManager {
    * directly to a listener
    */
   void parseScript(Consumer<SolverResponse> responseListener, String smtlib)
-      throws SolverException, InterruptedException;
+      throws SmtlibException, InterruptedException;
 
   /**
    * Read and evaluate a SMTLIB script in a new {@link ProverEnvironment}.
@@ -265,7 +266,7 @@ public interface FormulaManager {
    * stored in a list and then returned by this function.
    */
   default List<SolverResponse> parseScript(String smtlib)
-      throws SolverException, InterruptedException {
+      throws SmtlibException, InterruptedException {
     ImmutableList.Builder<SolverResponse> responses = new ImmutableList.Builder<>();
     parseScript(responses::add, smtlib);
     return responses.build();

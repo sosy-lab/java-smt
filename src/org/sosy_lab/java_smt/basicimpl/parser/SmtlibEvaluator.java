@@ -19,7 +19,6 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
-import java.io.Serial;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.List;
@@ -52,14 +51,6 @@ import org.sosy_lab.java_smt.delegate.parsing.ParsingFormulaManager;
 /** Evaluates a Smtlib script after parsing. */
 @SuppressWarnings("resource")
 public final class SmtlibEvaluator {
-  public static class SmtlibException extends IllegalArgumentException {
-    @Serial private static final long serialVersionUID = -5011762550769108967L;
-
-    SmtlibException(int line, String source, Throwable t) {
-      super("Error in line %s:%n%s".formatted(line, source), t);
-    }
-  }
-
   /** Selects a sublanguage for the evaluator. */
   public enum ParsingMode {
     /**
@@ -994,11 +985,12 @@ public final class SmtlibEvaluator {
 
           } catch (RuntimeException e) {
             int line = cmd.start.getLine();
+            int column = cmd.start.getCharPositionInLine() + 1;
             String source =
                 cmd.start
                     .getInputStream()
                     .getText(new Interval(cmd.start.getStartIndex(), cmd.stop.getStopIndex()));
-            throw new SmtlibException(line, source, e);
+            throw new SmtlibException("Evaluating error", line, column, source, e);
           }
         }
       } finally {

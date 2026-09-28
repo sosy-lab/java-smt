@@ -29,7 +29,6 @@ public class FaultingErrorListener extends BaseErrorListener {
   @Override
   public void syntaxError(
       Recognizer<?, ?> recognizer, Object o, int i, int j, String s, RecognitionException e) {
-    throw new IllegalArgumentException(
-        String.format("%s on line %s, column %s: %s", prefix, i, j, s));
+    throw new SmtlibException(prefix, i, j + 1, s);
   }
 }

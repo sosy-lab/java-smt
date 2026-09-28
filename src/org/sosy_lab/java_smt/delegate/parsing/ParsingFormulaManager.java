@@ -44,6 +44,7 @@ import org.sosy_lab.java_smt.api.visitors.FormulaVisitor;
 import org.sosy_lab.java_smt.api.visitors.TraversalProcess;
 import org.sosy_lab.java_smt.basicimpl.parser.FaultingErrorListener;
 import org.sosy_lab.java_smt.basicimpl.parser.SmtlibEvaluator;
+import org.sosy_lab.java_smt.basicimpl.parser.SmtlibException;
 import org.sosy_lab.java_smt.basicimpl.parser.SmtlibLexer;
 import org.sosy_lab.java_smt.basicimpl.parser.SmtlibParser;
 
@@ -183,7 +184,7 @@ public class ParsingFormulaManager implements FormulaManager {
 
   @Override
   public void parseScript(Consumer<SolverResponse> responseListener, String smtlib)
-      throws SolverException, InterruptedException {
+      throws SmtlibException, InterruptedException {
     new SmtlibEvaluator(SmtlibEvaluator.ParsingMode.SCRIPT, solver, this, responseListener)
         .apply(parse(lex(smtlib)));
   }

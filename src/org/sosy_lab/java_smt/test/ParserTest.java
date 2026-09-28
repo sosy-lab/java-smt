@@ -29,7 +29,7 @@ import org.sosy_lab.java_smt.api.FormulaManager.SolverResponse.CheckSatResponse.
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.SolverException;
-import org.sosy_lab.java_smt.basicimpl.parser.SmtlibEvaluator;
+import org.sosy_lab.java_smt.basicimpl.parser.SmtlibException;
 
 public class ParserTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
 
@@ -200,10 +200,40 @@ public class ParserTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
     assertThat(mgr.parseAll(smt).get(0)).isInstanceOf(BooleanFormula.class);
   }
 
+  @SuppressWarnings("unused")
+  @Test
+  public void parseAllLexerErrorTest() {
+    String smt = "|\\|"; // "\" is not allowed as part of a quoted symbol
+    assertThrows(
+        IllegalArgumentException.class,
+        () -> {
+          try {
+            var unused = mgr.parseAll(smt);
+          } catch (SmtlibException e) {
+            assertThat(e.getMessage()).startsWith("Lexing error");
+            assertThat(e.getLine()).isEqualTo(1);
+            assertThat(e.getColumn()).isEqualTo(1);
+            throw e;
+          }
+        });
+  }
+
+  @SuppressWarnings("unused")
   @Test
   public void parseAllSyntaxErrorTest() {
     String smt = "(assert (= x 1)"; // Missing closing parenthesis
-    assertThrows(IllegalArgumentException.class, () -> mgr.parseAll(smt));
+    assertThrows(
+        IllegalArgumentException.class,
+        () -> {
+          try {
+            var unused = mgr.parseAll(smt);
+          } catch (SmtlibException e) {
+            assertThat(e.getMessage()).startsWith("Parsing error");
+            assertThat(e.getLine()).isEqualTo(1);
+            assertThat(e.getColumn()).isEqualTo(16);
+            throw e;
+          }
+        });
   }
 
   @Test
@@ -223,6 +253,30 @@ public class ParserTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   public void parseAllUnknownCommandTest() {
     String smt = "(unknown-command)";
     assertThrows(IllegalArgumentException.class, () -> mgr.parseAll(smt));
+  }
+
+  @SuppressWarnings("unused")
+  @Test
+  public void parserAllIllegalCommandTest() {
+    String smt =
+        """
+        (declare-const x Int)
+        (assert (= x 1))
+        (check-sat)
+        """;
+    assertThrows(
+        SmtlibException.class,
+        () -> {
+          try {
+            var unused = mgr.parseAll(smt);
+          } catch (SmtlibException e) {
+            assertThat(e.getMessage()).startsWith("Evaluating error");
+            assertThat(e.getInfo()).isEqualTo("(check-sat)");
+            assertThat(e.getLine()).isEqualTo(3);
+            assertThat(e.getColumn()).isEqualTo(1);
+            throw e;
+          }
+        });
   }
 
   @Test
@@ -288,7 +342,7 @@ public class ParserTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   }
 
   @Test
-  public void parseScriptStackTest() throws SolverException, InterruptedException {
+  public void parseScriptStackTest() throws InterruptedException {
     requireIntegers();
 
     String push =
@@ -326,7 +380,7 @@ public class ParserTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   }
 
   @Test
-  public void parseScriptCheckSatTest() throws SolverException, InterruptedException {
+  public void parseScriptCheckSatTest() throws InterruptedException {
     requireIntegers();
 
     String check =
@@ -343,7 +397,7 @@ public class ParserTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   }
 
   @Test
-  public void parseScriptCheckSatAssumingTest() throws SolverException, InterruptedException {
+  public void parseScriptCheckSatAssumingTest() throws InterruptedException {
     requireIntegers();
     assume()
         .that(solver)
@@ -365,7 +419,7 @@ public class ParserTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   }
 
   @Test
-  public void parseScriptModelTest() throws SolverException, InterruptedException {
+  public void parseScriptModelTest() throws InterruptedException {
     requireIntegers();
 
     String modelSmtlib =
@@ -400,7 +454,7 @@ public class ParserTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   }
 
   @Test
-  public void parseScriptUnsatCoreTest() throws SolverException, InterruptedException {
+  public void parseScriptUnsatCoreTest() throws InterruptedException {
     requireIntegers();
     requireUnsatCore();
 
@@ -424,7 +478,7 @@ public class ParserTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   }
 
   @Test
-  public void parseScriptUnsatAssumptionsTest() throws SolverException, InterruptedException {
+  public void parseScriptUnsatAssumptionsTest() throws InterruptedException {
     requireIntegers();
     requireUnsatCoreOverAssumptions();
 
@@ -451,7 +505,7 @@ public class ParserTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
 
   @SuppressWarnings("unused")
   @Test
-  public void parseScriptResetTest() throws SolverException, InterruptedException {
+  public void parseScriptResetTest() throws InterruptedException {
     requireIntegers();
 
     String resetSmtlib =
@@ -489,7 +543,7 @@ public class ParserTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
 
   @SuppressWarnings("unused")
   @Test
-  public void parseScriptExitTest() throws SolverException, InterruptedException {
+  public void parseScriptExitTest() throws InterruptedException {
     requireIntegers();
 
     String noExitSmtlib =
@@ -621,7 +675,6 @@ public class ParserTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
         """;
 
     assertThrows(
-        SmtlibEvaluator.SmtlibException.class,
-        () -> context.getFormulaManager().parseAll(exceptionSmtlib));
+        SmtlibException.class, () -> context.getFormulaManager().parseAll(exceptionSmtlib));
   }
 }

@@ -38,6 +38,7 @@ import org.sosy_lab.java_smt.api.UFManager;
 import org.sosy_lab.java_smt.api.visitors.FormulaTransformationVisitor;
 import org.sosy_lab.java_smt.api.visitors.FormulaVisitor;
 import org.sosy_lab.java_smt.api.visitors.TraversalProcess;
+import org.sosy_lab.java_smt.basicimpl.parser.SmtlibException;
 
 class StatisticsFormulaManager implements FormulaManager {
 
@@ -153,7 +154,7 @@ class StatisticsFormulaManager implements FormulaManager {
 
   @Override
   public void parseScript(Consumer<SolverResponse> responseListener, String smtlib)
-      throws SolverException, InterruptedException {
+      throws SmtlibException, InterruptedException {
     delegate.parseScript(responseListener, smtlib);
   }
 
