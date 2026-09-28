@@ -200,7 +200,6 @@ public class ParserTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
     assertThat(mgr.parseAll(smt).get(0)).isInstanceOf(BooleanFormula.class);
   }
 
-  @SuppressWarnings("unused")
   @Test
   public void parseAllLexerErrorTest() {
     String smt = "|\\|"; // "\" is not allowed as part of a quoted symbol
@@ -208,7 +207,9 @@ public class ParserTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
         IllegalArgumentException.class,
         () -> {
           try {
+            @SuppressWarnings("unused")
             var unused = mgr.parseAll(smt);
+
           } catch (SmtlibException e) {
             assertThat(e.getMessage()).startsWith("Lexing error");
             assertThat(e.getLine()).isEqualTo(1);
@@ -218,7 +219,6 @@ public class ParserTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
         });
   }
 
-  @SuppressWarnings("unused")
   @Test
   public void parseAllSyntaxErrorTest() {
     String smt = "(assert (= x 1)"; // Missing closing parenthesis
@@ -226,7 +226,9 @@ public class ParserTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
         IllegalArgumentException.class,
         () -> {
           try {
+            @SuppressWarnings("unused")
             var unused = mgr.parseAll(smt);
+
           } catch (SmtlibException e) {
             assertThat(e.getMessage()).startsWith("Parsing error");
             assertThat(e.getLine()).isEqualTo(1);
@@ -253,7 +255,9 @@ public class ParserTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
         SmtlibException.class,
         () -> {
           try {
+            @SuppressWarnings("unused")
             var unused = mgr.parseAll(exceptionSmtlib);
+
           } catch (SmtlibException e) {
             assertThat(e.getLine()).isEqualTo(2);
             assertThat(e.getColumn()).isEqualTo(1);
@@ -288,7 +292,6 @@ public class ParserTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
     assertThrows(IllegalArgumentException.class, () -> mgr.parseAll(smt));
   }
 
-  @SuppressWarnings("unused")
   @Test
   public void parserAllIllegalCommandTest() {
     String smt =
@@ -301,7 +304,9 @@ public class ParserTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
         SmtlibException.class,
         () -> {
           try {
+            @SuppressWarnings("unused")
             var unused = mgr.parseAll(smt);
+
           } catch (SmtlibException e) {
             assertThat(e.getMessage()).startsWith("Evaluating error");
             assertThat(e.getInfo()).isEqualTo("(check-sat)");
