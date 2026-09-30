@@ -110,7 +110,7 @@ abstract class PrincessAbstractProver<E> extends AbstractProverWithAllSat<E> {
     // Introduce abbreviation symbols for shared subterms before pushing the formula
     var abbreviated =
         api.abbrevSharedExpressionsWithMap(t, creator.getEnv().getMinAtomsForAbbreviation());
-    abbreviated._2.foreachEntry(abbreviations::put);
+    abbreviations.putAll(asJava(abbreviated._2));
 
     api.addAssertion((IFormula) abbreviated._1);
     return formulaId;
