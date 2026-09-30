@@ -15,6 +15,7 @@ import static scala.collection.JavaConverters.asScala;
 import ap.api.PartialModel;
 import ap.api.SimpleAPI;
 import ap.api.SimpleAPI.SimpleAPIException;
+import ap.parser.IExpression;
 import ap.parser.IFormula;
 import ap.parser.IFunction;
 import ap.parser.ITerm;
@@ -24,7 +25,9 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Deque;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.Callable;
@@ -52,6 +55,8 @@ abstract class PrincessAbstractProver<E> extends AbstractProverWithAllSat<E> {
   protected final Deque<PersistentMap<Integer, BooleanFormula>> partitions = new ArrayDeque<>();
 
   private final PrincessFormulaCreator creator;
+
+  protected final Map<IExpression, IExpression> abbreviations = new HashMap<>();
 
   PrincessAbstractProver(
       PrincessFormulaManager pMgr,
@@ -101,8 +106,13 @@ abstract class PrincessAbstractProver<E> extends AbstractProverWithAllSat<E> {
     api.setPartitionNumber(formulaId);
 
     final IFormula t = (IFormula) mgr.extractInfo(constraint);
-    api.addAssertion(api.abbrevSharedExpressions(t, creator.getEnv().getMinAtomsForAbbreviation()));
 
+    // Introduce abbreviation symbols for shared subterms before pushing the formula
+    var abbreviated =
+        api.abbrevSharedExpressionsWithMap(t, creator.getEnv().getMinAtomsForAbbreviation());
+    abbreviated._2.foreachEntry(abbreviations::put);
+
+    api.addAssertion((IFormula) abbreviated._1);
     return formulaId;
   }
 
