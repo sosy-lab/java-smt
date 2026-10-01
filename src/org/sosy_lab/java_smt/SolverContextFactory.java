@@ -10,6 +10,7 @@ package org.sosy_lab.java_smt;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.google.common.collect.ImmutableSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -63,7 +64,71 @@ public class SolverContextFactory {
     CVC4,
     CVC5,
     YICES2,
-    BITWUZLA
+    BITWUZLA;
+
+    /** List available solvers for this platform. */
+    @SuppressWarnings("deprecation")
+    public static Set<Solvers> available() {
+      return switch (NativeLibraries.OS.guessOperatingSystem()) {
+        case LINUX ->
+            switch (NativeLibraries.Architecture.guessVmArchitecture()) {
+              case ARM64 ->
+                  ImmutableSet.of(
+                      Solvers.BITWUZLA,
+                      Solvers.CVC5,
+                      Solvers.MATHSAT5,
+                      Solvers.OPENSMT,
+                      Solvers.PRINCESS,
+                      Solvers.SMTINTERPOL,
+                      Solvers.Z3,
+                      Solvers.Z3_WITH_INTERPOLATION);
+              case X86_64 ->
+                  ImmutableSet.of(
+                      Solvers.BITWUZLA,
+                      Solvers.BOOLECTOR,
+                      Solvers.CVC4,
+                      Solvers.CVC5,
+                      Solvers.MATHSAT5,
+                      Solvers.OPENSMT,
+                      Solvers.PRINCESS,
+                      Solvers.SMTINTERPOL,
+                      Solvers.YICES2,
+                      Solvers.Z3,
+                      Solvers.Z3_WITH_INTERPOLATION);
+
+              default -> ImmutableSet.of(Solvers.PRINCESS, Solvers.SMTINTERPOL);
+            };
+
+        case WINDOWS ->
+            switch (NativeLibraries.Architecture.guessVmArchitecture()) {
+              case ARM64 ->
+                  ImmutableSet.of(Solvers.CVC5, Solvers.PRINCESS, Solvers.SMTINTERPOL, Solvers.Z3);
+              case X86_64 ->
+                  ImmutableSet.of(
+                      Solvers.BITWUZLA,
+                      Solvers.CVC5,
+                      Solvers.MATHSAT5,
+                      Solvers.PRINCESS,
+                      Solvers.SMTINTERPOL,
+                      Solvers.YICES2,
+                      Solvers.Z3);
+
+              default -> ImmutableSet.of(Solvers.PRINCESS, Solvers.SMTINTERPOL);
+            };
+
+        case MACOSX ->
+            switch (NativeLibraries.Architecture.guessVmArchitecture()) {
+              case ARM64 ->
+                  ImmutableSet.of(Solvers.CVC5, Solvers.PRINCESS, Solvers.SMTINTERPOL, Solvers.Z3);
+              case X86_64 ->
+                  ImmutableSet.of(Solvers.CVC5, Solvers.PRINCESS, Solvers.SMTINTERPOL, Solvers.Z3);
+
+              default -> ImmutableSet.of(Solvers.PRINCESS, Solvers.SMTINTERPOL);
+            };
+
+        default -> ImmutableSet.of(Solvers.PRINCESS, Solvers.SMTINTERPOL);
+      };
+    }
   }
 
   @Option(secure = true, description = "Export solver queries in SmtLib format into a file.")

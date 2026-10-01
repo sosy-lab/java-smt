@@ -248,6 +248,10 @@ public abstract class SolverBasedTest0 {
    * automatically (re)assigned.
    */
   private void initSolverWith(Configuration pConfiguration) throws InvalidConfigurationException {
+    assume()
+        .withMessage("Solver %s not supported on this platform", solverToUse())
+        .that(Solvers.available().contains(solverToUse()))
+        .isTrue();
     config = pConfiguration;
     factory = new SolverContextFactory(config, logger, shutdownNotifierToUse());
     try {
