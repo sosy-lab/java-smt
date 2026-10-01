@@ -18,6 +18,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.truth.Truth;
 import java.util.Collection;
 import java.util.Map;
+import java.util.Objects;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.junit.After;
 import org.junit.Before;
@@ -257,11 +258,14 @@ public abstract class SolverBasedTest0 {
     try {
       context = factory.generateContext();
     } catch (InvalidConfigurationException e) {
-      assume()
-          .withMessage(e.getMessage())
-          .that(e)
-          .hasCauseThat()
-          .isNotInstanceOf(UnsatisfiedLinkError.class);
+      String flag = System.getProperty("javasmt.test.ignore-link-errors");
+      if (!Objects.equals(flag, "false")) {
+        assume()
+            .withMessage(e.getMessage())
+            .that(e)
+            .hasCauseThat()
+            .isNotInstanceOf(UnsatisfiedLinkError.class);
+      }
       throw e;
     }
     mgr = context.getFormulaManager();
