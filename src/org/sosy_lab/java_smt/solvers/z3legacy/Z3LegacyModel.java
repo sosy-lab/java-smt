@@ -38,15 +38,21 @@ final class Z3LegacyModel extends AbstractModel<Long, Long, Long> {
   private final long z3context;
   private static final Pattern Z3_IRRELEVANT_MODEL_TERM_PATTERN = Pattern.compile(".*![0-9]+");
 
+  private final Set<String> namedAssertions;
   private final Z3LegacyFormulaCreator z3creator;
 
   Z3LegacyModel(
-      AbstractProver<?> pProver, long z3context, long z3model, Z3LegacyFormulaCreator pCreator) {
+      AbstractProver<?> pProver,
+      Set<String> pNamedAssertions,
+      long z3context,
+      long z3model,
+      Z3LegacyFormulaCreator pCreator) {
     super(pProver, pCreator);
     Native.modelIncRef(z3context, z3model);
     model = z3model;
     this.z3context = z3context;
     z3creator = pCreator;
+    namedAssertions = pNamedAssertions;
   }
 
   @Override
@@ -59,7 +65,9 @@ final class Z3LegacyModel extends AbstractModel<Long, Long, Long> {
       for (int constIdx = 0; constIdx < Native.modelGetNumConsts(z3context, model); constIdx++) {
         long keyDecl = Native.modelGetConstDecl(z3context, model, constIdx);
         Native.incRef(z3context, keyDecl);
-        out.addAll(getConstAssignments(keyDecl));
+        if (!isInternalSymbol(keyDecl)) {
+          out.addAll(getConstAssignments(keyDecl));
+        }
         Native.decRef(z3context, keyDecl);
       }
 
@@ -89,6 +97,10 @@ final class Z3LegacyModel extends AbstractModel<Long, Long, Long> {
       case Z3_OP_SELECT, Z3_OP_ARRAY_EXT -> true;
       default -> {
         long declName = Native.getDeclName(z3context, funcDecl);
+        if (namedAssertions.contains(z3creator.symbolToString(declName))) {
+          // Names for unsat core assertions
+          yield true;
+        }
         Z3_symbol_kind kind = Z3_symbol_kind.fromInt(Native.getSymbolKind(z3context, declName));
         if (kind == Z3_symbol_kind.Z3_INT_SYMBOL) { // bound variables
           yield true;
