@@ -140,7 +140,7 @@ public class UnsatCoreTest extends SolverBasedTest0.ParameterizedSolverBasedTest
             SolverContext.ProverOptions.GENERATE_UNSAT_CORE)) {
       prover.addConstraint(bmgr.xor(varA, varB));
 
-      var core = prover.unsatCoreOverAssumptions(ImmutableList.of(varA, varB)).get();
+      var core = prover.unsatCoreOverAssumptions(ImmutableList.of(varA, varB)).orElseThrow();
       assertThat(core).containsExactly(varA, varB);
     }
   }
