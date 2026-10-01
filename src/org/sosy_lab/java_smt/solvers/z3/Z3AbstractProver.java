@@ -200,7 +200,11 @@ abstract class Z3AbstractProver extends AbstractProverWithAllSat<Void> {
     Native.astVectorIncRef(z3context, unsatCore);
     for (int i = 0; i < Native.astVectorSize(z3context, unsatCore); i++) {
       long ast = Native.astVectorGet(z3context, unsatCore, i);
-      core.add(creator.encapsulateBoolean(ast));
+      String varName = Native.astToString(z3context, ast);
+      if (storedConstraints == null || !storedConstraints.peek().containsKey(varName)) {
+        // Only add assumptions to the core and skip tracked assertions
+        core.add(creator.encapsulateBoolean(ast));
+      }
     }
     Native.astVectorDecRef(z3context, unsatCore);
     return Optional.of(core);
