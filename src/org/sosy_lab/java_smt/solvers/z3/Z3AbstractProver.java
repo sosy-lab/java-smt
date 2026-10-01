@@ -10,6 +10,7 @@ package org.sosy_lab.java_smt.solvers.z3;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.io.MoreFiles;
 import com.microsoft.z3.Native;
 import com.microsoft.z3.Z3Exception;
@@ -122,7 +123,9 @@ abstract class Z3AbstractProver extends AbstractProverWithAllSat<Void> {
 
   @Override
   protected Z3Model getEvaluatorWithoutChecks() throws SolverException {
-    return new Z3Model(this, z3context, getZ3Model(), creator);
+    Set<String> nameAssertions =
+        storedConstraints == null ? ImmutableSet.of() : storedConstraints.peek().keySet();
+    return new Z3Model(this, nameAssertions, z3context, getZ3Model(), creator);
   }
 
   protected abstract long getZ3Model() throws SolverException;

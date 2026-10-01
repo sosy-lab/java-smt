@@ -12,6 +12,7 @@ package org.sosy_lab.java_smt.solvers.z3legacy;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.io.MoreFiles;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import com.microsoft.z3legacy.Native;
@@ -127,7 +128,9 @@ abstract class Z3LegacyAbstractProver<T> extends AbstractProverWithAllSat<T> {
 
   @Override
   protected Z3LegacyModel getEvaluatorWithoutChecks() throws SolverException {
-    return new Z3LegacyModel(this, z3context, getZ3Model(), creator);
+    Set<String> nameAssertions =
+        storedConstraints == null ? ImmutableSet.of() : storedConstraints.peek().keySet();
+    return new Z3LegacyModel(this, nameAssertions, z3context, getZ3Model(), creator);
   }
 
   protected long getZ3Model() {
