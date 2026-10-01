@@ -74,15 +74,15 @@ public class SolverContextFactoryTest {
   private void requirePlatformSupported() {
     assume()
         .withMessage("Solver %s is not yet supported on this platform", solverToUse())
-        .that(Solvers.available().contains(solverToUse()))
-        .isTrue();
+        .that(Solvers.available())
+        .contains(solver);
   }
 
   private void requirePlatformNotSupported() {
     assume()
         .withMessage("Solver %s is not yet supported on this platform", solverToUse())
-        .that(Solvers.available().contains(solverToUse()))
-        .isFalse();
+        .that(Solvers.available())
+        .doesNotContain(solver);
   }
 
   @Before
