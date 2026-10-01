@@ -14,9 +14,12 @@ import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.TruthJUnit.assume;
 import static org.junit.Assert.assertThrows;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import org.junit.Test;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
+import org.sosy_lab.java_smt.api.Model;
+import org.sosy_lab.java_smt.api.SolverContext;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 
@@ -118,6 +121,47 @@ public class UnsatCoreTest extends SolverBasedTest0.ParameterizedSolverBasedTest
       var assumptions = ImmutableSet.of(a, b);
       assertThat(prover.isUnsatWithAssumptions(assumptions)).isTrue();
       assertThrows(IllegalStateException.class, () -> prover.unsatCoreOverAssumptions(assumptions));
+    }
+  }
+
+  @Test
+  public void unsatCoreZ3Test() throws InterruptedException, SolverException {
+    requireUnsatCoreOverAssumptions();
+
+    // FIXME Yices also has issues when options for unsat-core and unsat-assumptions are combined
+    assume().that(solver).isNotEqualTo(Solvers.YICES2);
+
+    var varA = bmgr.makeVariable("A");
+    var varB = bmgr.makeVariable("B");
+
+    try (var prover =
+        context.newProverEnvironment(
+            SolverContext.ProverOptions.GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS,
+            SolverContext.ProverOptions.GENERATE_UNSAT_CORE)) {
+      prover.addConstraint(bmgr.xor(varA, varB));
+
+      var core = prover.unsatCoreOverAssumptions(ImmutableList.of(varA, varB)).get();
+      assertThat(core).containsExactly(varA, varB);
+    }
+  }
+
+  @Test
+  public void unsatCoreZ3ModelTest() throws SolverException, InterruptedException {
+    requireUnsatCore();
+    requireIntegers();
+
+    var var1 = imgr.makeVariable("v");
+    try (var prover =
+        context.newProverEnvironment(
+            SolverContext.ProverOptions.GENERATE_MODELS,
+            SolverContext.ProverOptions.GENERATE_UNSAT_CORE)) {
+      prover.addConstraint(imgr.equal(var1, imgr.makeNumber(0)));
+      assertThat(prover.isUnsat()).isFalse();
+
+      try (var model = prover.getModel()) {
+        assertThat(model.asList().stream().map(Model.ValueAssignment::getName).toList())
+            .containsExactly("v");
+      }
     }
   }
 }
