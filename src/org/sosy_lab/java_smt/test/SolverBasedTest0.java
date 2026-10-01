@@ -258,7 +258,7 @@ public abstract class SolverBasedTest0 {
     try {
       context = factory.generateContext();
     } catch (InvalidConfigurationException e) {
-      String flag = System.getProperty("javasmt.test.ignore-link-errors");
+      String flag = System.getProperty("ignoreLinkErrors");
       if (!Objects.equals(flag, "false")) {
         assume()
             .withMessage(e.getMessage())
