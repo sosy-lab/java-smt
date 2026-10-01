@@ -8,7 +8,6 @@
 
 package org.sosy_lab.java_smt.test;
 
-import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.Truth.assert_;
 import static com.google.common.truth.TruthJUnit.assume;
 import static org.junit.Assert.assertThrows;
@@ -106,10 +105,10 @@ public class SolverContextFactoryTest {
       String flag = System.getProperty("ignoreLinkErrors");
       if (Objects.equals(flag, "true")) {
         assume()
-                .withMessage(e.getMessage())
-                .that(e)
-                .hasCauseThat()
-                .isNotInstanceOf(UnsatisfiedLinkError.class);
+            .withMessage(e.getMessage())
+            .that(e)
+            .hasCauseThat()
+            .isNotInstanceOf(UnsatisfiedLinkError.class);
       }
       throw e;
     }
