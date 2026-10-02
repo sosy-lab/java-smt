@@ -27,6 +27,12 @@ SPDX-License-Identifier: Apache-2.0
     <!-- Define property that contains the Ant version for getting the matching ant-junit version. -->
     <antversion property="ant.version.exact"/>
 
+    <!-- Ignore tests for missing solvers.
+         Set to "true" to always skip tests if solver or their dependencies are missing, and "false" to throw an error.
+         If no value is provided, only SolverContextFactoryTest will fail if a solver is missing, while all other tests
+         are skipped. -->
+    <property name="ignoreLinkErrors" value=""/>
+
     <!-- Load the JUnit plugin for Ant if it's not installed. -->
     <condition property="ant.junit.available">
         <typefound name="junit"/>
@@ -56,7 +62,8 @@ SPDX-License-Identifier: Apache-2.0
             <assertions><enable/></assertions>
             <formatter type="xml"/>
             <classpath refid="classpath.junit"/>
-            <sysproperty key="java.awt.headless" value="true" />
+            <sysproperty key="java.awt.headless" value="true"/>
+            <sysproperty key="ignoreLinkErrors" value="${ignoreLinkErrors}"/>
             <batchtest fork="true" todir="${junit.dir}">
               <fileset dir="${class.dir}">
                 <patternset refid="test.sources"/>
@@ -119,7 +126,8 @@ SPDX-License-Identifier: Apache-2.0
                 <assertions><enable/></assertions>
                 <formatter type="xml"/>
                 <classpath refid="classpath.junit"/>
-                <sysproperty key="java.awt.headless" value="true" />
+                <sysproperty key="java.awt.headless" value="true"/>
+                <sysproperty key="ignoreLinkErrors" value="${ignoreLinkErrors}"/>
                 <batchtest fork="true" todir="${junit.dir}">
                     <fileset dir="${class.dir}">
                         <include name="**/*Test.*"/>

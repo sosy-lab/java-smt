@@ -125,7 +125,7 @@ spotbugs:
     - "ldd --version"
     - "java -version"
   script:
-    - "ant $ANT_PROPS_CHECKS unit-tests-coverage"
+    - "ant $ANT_PROPS_CHECKS -DignoreLinkErrors=true unit-tests-coverage"
   artifacts:
     paths:
       - "JUnit.html"
@@ -139,7 +139,7 @@ spotbugs:
 .unit-tests-quick:
   extends: [ .binary_check, .unit-tests ]
   script:
-    - "ant $ANT_PROPS_CHECKS unit-tests-quick"
+    - "ant $ANT_PROPS_CHECKS -DignoreLinkErrors=true unit-tests-quick"
   artifacts:
     paths:
       - "JUnit.html" # no coverage files available

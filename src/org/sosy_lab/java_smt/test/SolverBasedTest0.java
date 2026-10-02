@@ -18,6 +18,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.truth.Truth;
 import java.util.Collection;
 import java.util.Map;
+import java.util.Objects;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.junit.After;
 import org.junit.Before;
@@ -248,16 +249,23 @@ public abstract class SolverBasedTest0 {
    * automatically (re)assigned.
    */
   private void initSolverWith(Configuration pConfiguration) throws InvalidConfigurationException {
+    assume()
+        .withMessage("Solver %s not supported on this platform", solverToUse())
+        .that(Solvers.available().contains(solverToUse()))
+        .isTrue();
     config = pConfiguration;
     factory = new SolverContextFactory(config, logger, shutdownNotifierToUse());
     try {
       context = factory.generateContext();
     } catch (InvalidConfigurationException e) {
-      assume()
-          .withMessage(e.getMessage())
-          .that(e)
-          .hasCauseThat()
-          .isNotInstanceOf(UnsatisfiedLinkError.class);
+      String flag = System.getProperty("ignoreLinkErrors");
+      if (!Objects.equals(flag, "false")) {
+        assume()
+            .withMessage(e.getMessage())
+            .that(e)
+            .hasCauseThat()
+            .isNotInstanceOf(UnsatisfiedLinkError.class);
+      }
       throw e;
     }
     mgr = context.getFormulaManager();
