@@ -38,8 +38,7 @@ class PrincessStringFormulaManager
   @Override
   protected IExpression makeStringImpl(String value) {
     checkArgument(!containsSurrogatePair(value), "Princess does not support surrogate pairs.");
-    IExpression strExpr = PrincessEnvironment.stringTheory.string2Term(value);
-    return getFormulaCreator().getEnv().simplify(strExpr); // simplify MOD in chars
+    return PrincessEnvironment.stringTheory.string2Term(value);
   }
 
   /** returns whether any character of the string is part of a surrogate pair. */
