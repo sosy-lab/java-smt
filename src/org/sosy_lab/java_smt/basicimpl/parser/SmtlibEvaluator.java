@@ -288,7 +288,7 @@ public final class SmtlibEvaluator {
         checkArgument(
             !letDefs.containsKey(sym), "Let block contains more than one definition for %s", sym);
         letDefs = letDefs.putAndCopy(sym, null);
-        Formula term = new ExprEvaluator(newContext).visit(binding.expr());
+        Formula term = new ExprEvaluator(context).visit(binding.expr());
         newContext = addConstant(newContext, sym, term);
       }
       return new ExprEvaluator(newContext).visit(ctx.expr());
