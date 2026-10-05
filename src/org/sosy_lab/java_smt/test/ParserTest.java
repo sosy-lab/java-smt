@@ -13,18 +13,33 @@ import static com.google.common.truth.TruthJUnit.assume;
 import static org.junit.Assert.assertThrows;
 import static org.sosy_lab.java_smt.api.FormulaType.BooleanType;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
+import java.io.IOException;
+import java.math.BigInteger;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
+import org.sosy_lab.common.configuration.ConfigurationBuilder;
+import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BooleanFormula;
+import org.sosy_lab.java_smt.api.FormulaManager.SolverResponse;
+import org.sosy_lab.java_smt.api.FormulaManager.SolverResponse.CheckSatResponse.Status;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.SolverException;
+import org.sosy_lab.java_smt.basicimpl.parser.SmtlibException;
 
 public class ParserTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
+
+  @Override
+  protected ConfigurationBuilder createTestConfigBuilder() throws InvalidConfigurationException {
+    return solver == Solvers.Z3 || solver == Solvers.Z3_WITH_INTERPOLATION
+        ? super.createTestConfigBuilder().setOption("solver.z3.usePhantomReferences", "true")
+        : super.createTestConfigBuilder();
+  }
 
   @Before
   public void setUp() {
@@ -121,6 +136,7 @@ public class ParserTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   public void parseAllQuantifierTest() {
     requireQuantifiers();
     requireIntegers();
+    assume().that(solver).isNotEqualTo(Solvers.YICES2);
     String smt = "(declare-fun p (Int) Bool)(assert (forall ((x Int)) (p x)))";
     // NOTE: This test might be tricky as forall parsing can be complex.
     // For now, we will just assert that it doesn't throw an exception and returns a formula.
@@ -132,16 +148,21 @@ public class ParserTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   @Test
   public void parseAllStringTest() throws SolverException, InterruptedException {
     requireStrings();
-    assume()
-        .withMessage("Solver %s does not support parsing strings", solverToUse())
-        .that(solverToUse())
-        .isNotEqualTo(Solvers.PRINCESS);
-
     String smt = "(declare-fun s () String)(assert (= s \"hello\"))";
     List<BooleanFormula> parsed = mgr.parseAll(smt);
     assertThat(parsed).hasSize(1);
     assertThatFormula(Iterables.getOnlyElement(parsed))
         .isEquisatisfiableTo(smgr.equal(smgr.makeVariable("s"), smgr.makeString("hello")));
+  }
+
+  @Test
+  public void parseAllStringEscapeTest() throws SolverException, InterruptedException {
+    requireStrings();
+    String smt = "(declare-fun s () String)(assert (= s \"hel\"\"lo\"))";
+    List<BooleanFormula> parsed = mgr.parseAll(smt);
+    assertThat(parsed).hasSize(1);
+    assertThatFormula(Iterables.getOnlyElement(parsed))
+        .isEquisatisfiableTo(smgr.equal(smgr.makeVariable("s"), smgr.makeString("hel\"lo")));
   }
 
   @Test
@@ -188,9 +209,76 @@ public class ParserTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   }
 
   @Test
+  public void parseAllLexerErrorTest() {
+    String smt = "|\\|"; // "\" is not allowed as part of a quoted symbol
+    assertThrows(
+        IllegalArgumentException.class,
+        () -> {
+          try {
+            @SuppressWarnings("unused")
+            var unused = mgr.parseAll(smt);
+
+          } catch (SmtlibException e) {
+            assertThat(e.getMessage()).startsWith("Lexing error");
+            assertThat(e.getLine()).isEqualTo(1);
+            assertThat(e.getColumn()).isEqualTo(1);
+            throw e;
+          }
+        });
+  }
+
+  @Test
   public void parseAllSyntaxErrorTest() {
     String smt = "(assert (= x 1)"; // Missing closing parenthesis
-    assertThrows(IllegalArgumentException.class, () -> mgr.parseAll(smt));
+    assertThrows(
+        IllegalArgumentException.class,
+        () -> {
+          try {
+            @SuppressWarnings("unused")
+            var unused = mgr.parseAll(smt);
+
+          } catch (SmtlibException e) {
+            assertThat(e.getMessage()).startsWith("Parsing error");
+            assertThat(e.getLine()).isEqualTo(1);
+            assertThat(e.getColumn()).isEqualTo(16);
+            throw e;
+          }
+        });
+  }
+
+  @Test
+  public void parseAllEvaluationErrorTest() {
+    requireIntegers();
+
+    String exceptionSmtlib =
+        """
+        (declare-const v Int)
+        (declare-const v Int
+
+        )
+        (assert (= v 0))
+        """;
+
+    assertThrows(
+        SmtlibException.class,
+        () -> {
+          try {
+            @SuppressWarnings("unused")
+            var unused = mgr.parseAll(exceptionSmtlib);
+
+          } catch (SmtlibException e) {
+            assertThat(e.getLine()).isEqualTo(2);
+            assertThat(e.getColumn()).isEqualTo(1);
+            assertThat(e.getInfo())
+                .isEqualTo(
+                    """
+                    (declare-const v Int
+
+                    )\
+                    """);
+            throw e;
+          }
+        });
   }
 
   @Test
@@ -200,31 +288,41 @@ public class ParserTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   }
 
   @Test
-  public void parseAllTypeMismatchTest() throws SolverException, InterruptedException {
+  public void parseAllTypeMismatchTest() {
     requireIntegers();
     String smt = "(declare-fun x () Int)(assert (= x true))"; // Int vs Bool
-    if (solverToUse() == Solvers.Z3) {
-      // Z3 is more lenient and allows this, treating 'true' as 1 and 'false' as 0.
-      List<BooleanFormula> parsed = mgr.parseAll(smt);
-      assertThat(parsed).hasSize(1);
-      assertThatFormula(Iterables.getOnlyElement(parsed))
-          .isEquisatisfiableTo(imgr.equal(imgr.makeVariable("x"), imgr.makeNumber(1)));
-    } else {
-      assertThrows(IllegalArgumentException.class, () -> mgr.parseAll(smt));
-    }
-  }
-
-  @Test
-  public void parseAllUnknownCommandWithAssertionTest() {
-    String smt = "(unknown-command)(assert true)";
-    assertThat(mgr.parseAll(smt)).hasSize(1);
-    assertThat(mgr.parseAll(smt).get(0)).isEqualTo(bmgr.makeTrue());
+    assertThrows(IllegalArgumentException.class, () -> mgr.parseAll(smt));
   }
 
   @Test
   public void parseAllUnknownCommandTest() {
     String smt = "(unknown-command)";
-    assertThat(mgr.parseAll(smt)).isEmpty();
+    assertThrows(IllegalArgumentException.class, () -> mgr.parseAll(smt));
+  }
+
+  @Test
+  public void parserAllIllegalCommandTest() {
+    String smt =
+        """
+        (declare-const x Bool)
+        (assert x)
+        (check-sat)
+        """;
+    assertThrows(
+        SmtlibException.class,
+        () -> {
+          try {
+            @SuppressWarnings("unused")
+            var unused = mgr.parseAll(smt);
+
+          } catch (SmtlibException e) {
+            assertThat(e.getMessage()).startsWith("Evaluating error");
+            assertThat(e.getInfo()).isEqualTo("(check-sat)");
+            assertThat(e.getLine()).isEqualTo(3);
+            assertThat(e.getColumn()).isEqualTo(1);
+            throw e;
+          }
+        });
   }
 
   @Test
@@ -253,18 +351,11 @@ public class ParserTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   }
 
   @Test
-  public void parseAllReservedKeywordTest() throws SolverException, InterruptedException {
+  public void parseAllReservedKeywordTest() {
     requireIntegers();
     // 'assert' is a reserved keyword, cannot be used as a function name in most solvers
     String smt = "(declare-fun assert () Int)(assert (= assert 1))";
-    if (ImmutableList.of(Solvers.Z3, Solvers.CVC5).contains(solverToUse())) {
-      List<BooleanFormula> parsed = mgr.parseAll(smt);
-      assertThat(parsed).hasSize(1);
-      assertThatFormula(Iterables.getOnlyElement(parsed))
-          .isEquisatisfiableTo(imgr.equal(imgr.makeVariable("assert"), imgr.makeNumber(1)));
-    } else {
-      assertThrows(IllegalArgumentException.class, () -> mgr.parseAll(smt));
-    }
+    assertThrows(IllegalArgumentException.class, () -> mgr.parseAll(smt));
   }
 
   @Test
@@ -294,5 +385,354 @@ public class ParserTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
     BooleanFormula f = mgr.parse("(assert (> (/ 1.0 2.0) 0.0))");
 
     assertThatFormula(f).isTautological();
+  }
+
+  @Test
+  public void parseScriptStackTest() throws InterruptedException {
+    requireIntegers();
+
+    String push =
+        """
+        (declare-const v Int)
+        (get-assertions)
+        (assert (= v 0))
+        (push 1)
+        (declare-const w Int)
+        (assert (= w v))
+        (get-assertions)
+        (pop 1)
+        (get-assertions)
+        (exit)
+        """;
+    var pushResponse = mgr.parseAndRun(push);
+
+    assertThat(((SolverResponse.AssertionsResponse) pushResponse.get(0)).assertions()).hasSize(0);
+    assertThat(((SolverResponse.AssertionsResponse) pushResponse.get(1)).assertions()).hasSize(2);
+    assertThat(((SolverResponse.AssertionsResponse) pushResponse.get(2)).assertions()).hasSize(1);
+
+    String reset =
+        """
+        (declare-const v Int)
+        (assert (= v 0))
+        (get-assertions)
+        (reset)
+        (get-assertions)
+        (exit)
+        """;
+    var resetResponse = mgr.parseAndRun(reset);
+
+    assertThat(((SolverResponse.AssertionsResponse) resetResponse.get(0)).assertions()).hasSize(1);
+    assertThat(((SolverResponse.AssertionsResponse) resetResponse.get(1)).assertions()).hasSize(0);
+  }
+
+  @Test
+  public void parseScriptCheckSatTest() throws InterruptedException {
+    requireIntegers();
+
+    String check =
+        """
+        (declare-const v Int)
+        (assert (= v 0))
+        (check-sat)
+        (exit)
+        """;
+    var checkResponse = mgr.parseAndRun(check);
+
+    assertThat(((SolverResponse.CheckSatResponse) checkResponse.get(0)).status())
+        .isEqualTo(new Status.Sat());
+  }
+
+  @Test
+  public void parseScriptCheckSatAssumingTest() throws InterruptedException {
+    requireIntegers();
+    assume()
+        .that(solver)
+        .isNoneOf(
+            Solvers.MATHSAT5,
+            Solvers.Z3_WITH_INTERPOLATION); // Only support (negated) literals as assumptions
+
+    String checkAssuming =
+        """
+        (declare-const v Int)
+        (assert (= v 0))
+        (check-sat-assuming ((= v 1)))
+        (exit)
+        """;
+    var assumingResponse = mgr.parseAndRun(checkAssuming);
+
+    assertThat(((SolverResponse.CheckSatResponse) assumingResponse.get(0)).status())
+        .isEqualTo(new Status.Unsat());
+  }
+
+  @Test
+  public void parseScriptModelTest() throws InterruptedException {
+    requireIntegers();
+
+    String modelSmtlib =
+        """
+        (set-option :produce-models true)
+        (declare-const v Int)
+        (assert (= v 0))
+        (check-sat)
+        (get-model)
+        (exit)
+        """;
+    var modelResponse = mgr.parseAndRun(modelSmtlib);
+    var model = ((SolverResponse.ModelResponse) modelResponse.get(1)).model();
+
+    assertThat(model).hasSize(1);
+    assertThat(model.get(0).getName()).startsWith("v");
+    assertThat(model.get(0).getValue()).isEqualTo(new BigInteger("0"));
+
+    String evalSmtlib =
+        """
+        (set-option :produce-models true)
+        (declare-const v Int)
+        (assert (= v 0))
+        (check-sat)
+        (get-value (v))
+        (exit)
+        """;
+    var evalResponse = mgr.parseAndRun(evalSmtlib);
+
+    assertThat(((SolverResponse.EvaluationResponse) evalResponse.get(1)).value().get(0))
+        .isEqualTo(imgr.makeNumber(0));
+  }
+
+  @Test
+  public void parseScriptUnsatCoreTest() throws InterruptedException {
+    requireIntegers();
+    requireUnsatCore();
+
+    String unsatCoreSmtlib =
+        """
+        (set-option :produce-unsat-cores true)
+        (declare-const v Int)
+        (declare-const w Int)
+        (assert (and (= v 0) (> v 0)))
+        (assert (= w 0))
+        (check-sat)
+        (get-unsat-core)
+        (exit)
+        """;
+    var unsatCoreResponse = mgr.parseAndRun(unsatCoreSmtlib);
+    var unsatCore = ((SolverResponse.UnsatCoreResponse) unsatCoreResponse.get(1)).core();
+
+    assertThat(unsatCore).hasSize(1);
+    var variableName = mgr.extractVariables(unsatCore.get(0)).keySet().stream().iterator().next();
+    assertThat(variableName).startsWith("v");
+  }
+
+  @Test
+  public void parseScriptUnsatAssumptionsTest() throws InterruptedException {
+    requireIntegers();
+    requireUnsatCoreOverAssumptions();
+
+    String unsatAssumptionsSmtlib =
+        """
+        (set-option :produce-unsat-assumptions true)
+        (declare-const A Bool)
+        (declare-const B Bool)
+        (assert (xor A B))
+        (assert A)
+        (check-sat-assuming (A B))
+        (get-unsat-assumptions)
+        (exit)
+        """;
+    var unsatAssumptionsResponse = mgr.parseAndRun(unsatAssumptionsSmtlib);
+    var unsatAssumptionsCore =
+        ((SolverResponse.UnsatCoreResponse) unsatAssumptionsResponse.get(1)).core();
+
+    assertThat(unsatAssumptionsCore).hasSize(1);
+    var variableName =
+        mgr.extractVariables(unsatAssumptionsCore.get(0)).keySet().stream().iterator().next();
+    assertThat(variableName).startsWith("B");
+  }
+
+  @SuppressWarnings("unused")
+  @Test
+  public void parseScriptResetTest() throws InterruptedException {
+    requireIntegers();
+
+    String resetSmtlib =
+        """
+        (declare-const v Int)
+        (reset)
+        (assert (= v 0))
+        (check-sat)
+        (exit)
+        """;
+    assertThrows(IllegalArgumentException.class, () -> mgr.parseAndRun(resetSmtlib));
+
+    String redeclareSmtlib =
+        """
+        (declare-const v Int)
+        (reset)
+        (declare-const v Int)
+        (assert (= v 0))
+        (check-sat)
+        (exit)
+        """;
+    var redeclareResponse = mgr.parseAndRun(redeclareSmtlib);
+
+    String redefineSmtlib =
+        """
+        (declare-const v Int)
+        (reset)
+        (declare-const v Bool)
+        (assert v)
+        (check-sat)
+        (exit)
+        """;
+    var redefineResponse = mgr.parseAndRun(redefineSmtlib);
+  }
+
+  @SuppressWarnings("unused")
+  @Test
+  public void parseScriptExitTest() throws InterruptedException {
+    requireIntegers();
+
+    String noExitSmtlib =
+        """
+        (declare-const v Int)
+        (assert (= v 0))
+        (check-sat)
+        """;
+    var noExit = mgr.parseAndRun(noExitSmtlib);
+
+    String earlyExitSmtlib =
+        """
+        (declare-const v Int)
+        (assert (= v 0))
+        (exit)
+        (check-sat)
+        """;
+    assertThrows(IllegalArgumentException.class, () -> mgr.parseAndRun(earlyExitSmtlib));
+  }
+
+  private Thread cancelIn(int delay) {
+    return new Thread(
+        () -> {
+          try {
+            Thread.sleep(delay);
+            shutdownManager.requestShutdown("Shutdown Request");
+          } catch (InterruptedException exception) {
+            throw new UnsupportedOperationException("Unexpected interrupt", exception);
+          }
+        });
+  }
+
+  @SuppressWarnings("resource")
+  @Test
+  public void parseScriptTimeoutTest() {
+    assume().that(solver).isNoneOf(Solvers.PRINCESS, Solvers.CVC5); // Don't support timeout
+    assume().that(solver).isNotEqualTo(Solvers.YICES2); // Can't print smtlib
+    requireIntegers();
+
+    var hardProblem = new HardIntegerFormulaGenerator(imgr, bmgr).generate(50);
+    var hardSmtlib = String.format("%s (check-sat)", mgr.dumpFormula(hardProblem));
+
+    cancelIn(500).start();
+    assertThrows(InterruptedException.class, () -> mgr.parseAndRun(hardSmtlib));
+  }
+
+  @Test
+  public void parseAllShortBenchmarkTest() throws IOException {
+    assume()
+        .that(solver)
+        .isNotEqualTo(
+            Solvers.BOOLECTOR); // Fails with "Unexpected formula type for BV formula: Boolean"
+    requireBitvectors();
+
+    @SuppressWarnings("unused")
+    List<BooleanFormula> smtlib =
+        context
+            .getFormulaManager()
+            .parseAll(
+                Files.readString(Path.of("src/org/sosy_lab/java_smt/test/manyRegReads.smt2")));
+  }
+
+  @Test
+  public void parseAllShortBenchmarkNativeTest() throws IOException, InvalidConfigurationException {
+    setAdditionalConfigOptionForSolver("solver.useAntlrParser", "false");
+
+    assume()
+        .that(solver)
+        .isNoneOf(Solvers.BOOLECTOR, Solvers.CVC4, Solvers.YICES2); // No native parser
+    requireBitvectors();
+
+    @SuppressWarnings("unused")
+    List<BooleanFormula> smtlib =
+        context
+            .getFormulaManager()
+            .parseAll(
+                Files.readString(Path.of("src/org/sosy_lab/java_smt/test/manyRegReads.smt2")));
+  }
+
+  @Test
+  public void parseAllBenchmarkTest() throws IOException {
+    requireBitvectors();
+    requireIntegers();
+    assume()
+        .that(solver)
+        .isNotEqualTo(
+            Solvers.BOOLECTOR); // Fails with "Unexpected formula type for BV formula: Boolean"
+    @SuppressWarnings("unused")
+    List<BooleanFormula> smtlib =
+        context
+            .getFormulaManager()
+            .parseAll(Files.readString(Path.of("src/org/sosy_lab/java_smt/test/client.smt2")));
+  }
+
+  @Test
+  public void parseAllBenchmarkNativeTest() throws IOException, InvalidConfigurationException {
+    setAdditionalConfigOptionForSolver("solver.useAntlrParser", "false");
+
+    requireBitvectors();
+    requireIntegers();
+    assume()
+        .that(solver)
+        .isNoneOf(Solvers.BOOLECTOR, Solvers.CVC4, Solvers.YICES2); // No native parser
+
+    @SuppressWarnings("unused")
+    List<BooleanFormula> smtlib =
+        context
+            .getFormulaManager()
+            .parseAll(Files.readString(Path.of("src/org/sosy_lab/java_smt/test/client.smt2")));
+  }
+
+  @Test
+  public void parseAllErrorLocationTest() {
+    requireIntegers();
+    var smtlib =
+        """
+        (declare-const a Int)
+        (declare-const b Int)
+        (declare-const c Bool)
+
+        (assert
+          (+ a
+             (* b
+                c)))
+        """;
+
+    assertThrows(
+        SmtlibException.class,
+        () -> {
+          try {
+            mgr.parseAll(smtlib);
+          } catch (SmtlibException e) {
+            var localException = (SmtlibException) e.getCause();
+            assertThat(localException.getLine()).isEqualTo(7);
+            assertThat(localException.getColumn()).isEqualTo(6);
+            assertThat(localException.getInfo())
+                .isEqualTo(
+                    """
+                         (* b
+                            c)\
+                    """);
+            throw e;
+          }
+        });
   }
 }

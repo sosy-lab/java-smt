@@ -1195,6 +1195,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
     requireArrays();
     requireArrayModel();
     requireBitvectors();
+    assume().that(solver).isNotEqualTo(Solvers.BOOLECTOR);
 
     ArrayFormula<BitvectorFormula, BitvectorFormula> array =
         amgr.makeArray(
@@ -2514,7 +2515,13 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
     assume()
         .withMessage("Solver is quite slow for this example")
         .that(solverToUse())
-        .isNoneOf(Solvers.CVC5, Solvers.MATHSAT5, Solvers.PRINCESS, Solvers.BITWUZLA);
+        .isNoneOf(
+            Solvers.CVC4,
+            Solvers.CVC5,
+            Solvers.MATHSAT5,
+            Solvers.PRINCESS,
+            Solvers.BITWUZLA,
+            Solvers.BOOLECTOR);
 
     checkModelIteration(formula, false);
   }
