@@ -700,4 +700,38 @@ public class ParserTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
             .getFormulaManager()
             .parseAll(Files.readString(Path.of("src/org/sosy_lab/java_smt/test/client.smt2")));
   }
+
+  @Test
+  public void parseAllErrorLocationTest() {
+    var smtlib =
+        """
+        (declare-const a Int)
+        (declare-const b Int)
+        (declare-const c Bool)
+
+        (assert
+          (+ a
+             (* b
+                c)))
+        """;
+
+    assertThrows(
+        SmtlibException.class,
+        () -> {
+          try {
+            mgr.parseAll(smtlib);
+          } catch (SmtlibException e) {
+            var localException = (SmtlibException) e.getCause();
+            assertThat(localException.getLine()).isEqualTo(7);
+            assertThat(localException.getColumn()).isEqualTo(6);
+            assertThat(localException.getInfo())
+                .isEqualTo(
+                    """
+                         (* b
+                            c)\
+                    """);
+            throw e;
+          }
+        });
+  }
 }

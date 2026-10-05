@@ -28,6 +28,7 @@ import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Stream;
+import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.sosy_lab.common.collect.PathCopyingPersistentTreeMap;
@@ -334,6 +335,27 @@ public final class SmtlibEvaluator {
         return f.apply(builder.build());
       } else {
         throw new AssertionError();
+      }
+    }
+
+    @Override
+    public Formula visit(ParseTree tree) {
+      ParserRuleContext expr = (ParserRuleContext) tree;
+      try {
+        return super.visit(expr);
+      } catch (RuntimeException e) {
+        if (e instanceof SmtlibException) {
+          throw e;
+        } else {
+          int line = expr.start.getLine();
+          int column = expr.start.getCharPositionInLine() + 1;
+          String source =
+              " ".repeat(column - 1)
+                  + expr.start
+                      .getInputStream()
+                      .getText(new Interval(expr.start.getStartIndex(), expr.stop.getStopIndex()));
+          throw new SmtlibException("Evaluating error", line, column, source, e);
+        }
       }
     }
   }
