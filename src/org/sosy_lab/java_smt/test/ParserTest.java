@@ -703,6 +703,7 @@ public class ParserTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
 
   @Test
   public void parseAllErrorLocationTest() {
+    requireIntegers();
     var smtlib =
         """
         (declare-const a Int)
