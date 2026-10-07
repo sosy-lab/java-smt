@@ -21,6 +21,7 @@ import ap.parser.IFunction;
 import ap.parser.IIntLit;
 import ap.parser.ITerm;
 import ap.parser.ITermITE;
+import ap.parser.SMTParser2InputAbsy.SMTFunctionType;
 import ap.terfor.preds.Predicate;
 import ap.theories.nia.GroebnerMultiplication;
 import ap.types.Sort;
@@ -85,6 +86,20 @@ abstract sealed class PrincessFunctionDeclaration {
 
       argSorts = pArgSorts;
       returnSort = pReturnSort;
+      function = pFunction;
+    }
+
+    PrincessIFunctionDeclaration(IFunction pFunction, SMTFunctionType pType) {
+      super(pFunction);
+
+      ImmutableList.Builder<FormulaType<?>> builder = ImmutableList.builder();
+      for (int i = 0; i < pType.arguments().size(); i++) {
+        builder.add(
+            PrincessEnvironment.getFormulaTypeFromSort(pType.arguments().apply(i).toSort()));
+      }
+
+      argSorts = builder.build();
+      returnSort = PrincessEnvironment.getFormulaTypeFromSort(pType.result().toSort());
       function = pFunction;
     }
 

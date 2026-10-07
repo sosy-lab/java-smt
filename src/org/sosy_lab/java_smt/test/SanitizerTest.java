@@ -36,19 +36,53 @@ public class SanitizerTest extends SolverBasedTest0.ParameterizedSolverBasedTest
     String wrongLogic = "(set-logic QF_UF)" + "(declare-const v Int)" + "(assert (= v 3))";
     assertThatFormula(mgr.parse(wrongLogic)).isEquivalentTo(expected);
 
-    // Try setting the logic when it's not the beginning of the input string
+    // Try setting the logic when it's not the beginning of the input string (this is allowed as
+    // long as nothing has been declared/defined/asserted)
     String logicAfterOption =
         "(set-option :produce-models true)"
             + "(set-logic ALL)"
             + "(declare-const v Int)"
             + "(assert (= v 3))";
-    assertThrows(IllegalArgumentException.class, () -> mgr.parse(logicAfterOption));
+    assertThatFormula(mgr.parse(logicAfterOption)).isEquivalentTo(expected);
+  }
 
+  // 'set-logic' may only be used once without calling 'reset', and has to be called before
+  // certain other commands are used (according to the standard). But we allow some leniency due
+  // to many solvers not sticking to this and assume logic 'ALL' if none has been chosen before
+  // the first define/declare/assert command.
+  @Test
+  public void logicSelectionFailingTest() {
     // Try setting the logic when it's already been set
+    // First try broadest followed by more strict logic
     String logicTwice =
-        "(set-logic ALL)" + "(declare-const v Int)" + "(set-logic QF_UF)" + " (assert (= v 3))";
+        "(set-logic ALL)" + "(set-logic QF_UF)" + "(declare-const v Int)" + " (assert (= v 3))";
     assertThrows(IllegalArgumentException.class, () -> mgr.parse(logicTwice));
 
+    // Try the reverse (restricted logic to more broad)
+    String logicTwice2 =
+        "(set-logic QF_UF)" + "(set-logic ALL)" + "(declare-const v Int)" + " (assert (= v 3))";
+    assertThrows(IllegalArgumentException.class, () -> mgr.parse(logicTwice2));
+
+    // Try setting the logic when it's already been set after something has been declared
+    String logicAfterDeclareDouble =
+        "(set-logic ALL)" + "(declare-const v Int)" + "(set-logic QF_UF)" + " (assert (= v 3))";
+    assertThrows(IllegalArgumentException.class, () -> mgr.parse(logicAfterDeclareDouble));
+
+    // Try setting the logic after something has been declared (i.e. logic set implicitly)
+    String logicAfterDeclare = "(declare-const v Int)" + "(set-logic QF_UF)" + " (assert (= v 3))";
+    assertThrows(IllegalArgumentException.class, () -> mgr.parse(logicAfterDeclare));
+
+    // Try setting the logic after something has been asserted
+    String logicAfterAssert = "(declare-const v Int)" + " (assert (= v 3))" + "(set-logic QF_UF)";
+    assertThrows(IllegalArgumentException.class, () -> mgr.parse(logicAfterAssert));
+
+    // Try setting the logic after something has been defined
+    String logicAfterDefine = "(define-const v Int)" + "(set-logic QF_UF)" + " (assert (= v 3))";
+    assertThrows(IllegalArgumentException.class, () -> mgr.parse(logicAfterDefine));
+  }
+
+  @Test
+  public void resetTest() {
     // Call (reset) and *then* set the logic again
     // FIXME: We currently don't support the (reset) command and expect and exception to be thrown
     // here

@@ -106,7 +106,7 @@ SPDX-License-Identifier: Apache-2.0
 
         <!-- Compile java proxies and create jar file -->
         <mkdir dir="${bitwuzla.path}/install/java/build"/>
-        <javac release="11" debug="true" srcdir="${source.path}/libbitwuzla/src/" destdir="${bitwuzla.path}/install/java/build" includeantruntime="false" failonerror="true">
+        <javac release="17" debug="true" srcdir="${source.path}/libbitwuzla/src/" destdir="${bitwuzla.path}/install/java/build" includeantruntime="false" failonerror="true">
             <include name="org/sosy_lab/java_smt/solvers/bitwuzla/api/*.java"/>
         </javac>
         <jar destfile="${bitwuzla.dist.dir}/bitwuzla-${bitwuzla.version}.jar" basedir="${bitwuzla.path}/install/java/build"/>

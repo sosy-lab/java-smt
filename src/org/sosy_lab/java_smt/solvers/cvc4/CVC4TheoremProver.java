@@ -37,10 +37,6 @@ import org.sosy_lab.java_smt.basicimpl.ShutdownHook;
 class CVC4TheoremProver extends AbstractProverWithAllSat<Void>
     implements ProverEnvironment, BasicProverEnvironment<Void> {
 
-  // Keep a global list of all provers to prevent the garbge collector from doing its job
-  // See https://github.com/sosy-lab/java-smt/issues/169
-  private static List<CVC4TheoremProver> provers = new ArrayList<>();
-
   private final CVC4FormulaCreator creator;
   private final int randomSeed;
   SmtEngine smtEngine; // final except for SL theory
@@ -67,10 +63,6 @@ class CVC4TheoremProver extends AbstractProverWithAllSat<Void>
       Set<ProverOptions> pOptions,
       BooleanFormulaManager pBmgr) {
     super(pOptions, pBmgr, pShutdownNotifier);
-
-    synchronized (CVC4TheoremProver.class) {
-      provers.add(this);
-    }
 
     creator = pFormulaCreator;
     randomSeed = pRandomSeed;
@@ -151,8 +143,7 @@ class CVC4TheoremProver extends AbstractProverWithAllSat<Void>
 
   @SuppressWarnings("resource")
   @Override
-  public CVC4Model getModel() throws SolverException {
-    checkGenerateModels();
+  public CVC4Model getModelImpl() throws SolverException {
     // special case for CVC4: Models are not permanent and need to be closed
     // before any change is applied to the prover stack. So, we register the Model as Evaluator.
     return registerEvaluator(
@@ -164,8 +155,7 @@ class CVC4TheoremProver extends AbstractProverWithAllSat<Void>
   }
 
   @Override
-  public Evaluator getEvaluator() {
-    checkGenerateModels();
+  protected Evaluator getEvaluatorImpl() {
     return getEvaluatorWithoutChecks();
   }
 
@@ -245,7 +235,7 @@ class CVC4TheoremProver extends AbstractProverWithAllSat<Void>
   @Override
   public void close() {
     if (!closed) {
-      // Never release a prover
+      // Never close the context
     }
     super.close();
   }

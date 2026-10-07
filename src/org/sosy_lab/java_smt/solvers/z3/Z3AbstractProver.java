@@ -36,12 +36,16 @@ import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractProverWithAllSat;
 import org.sosy_lab.java_smt.basicimpl.CachingModel;
+import org.sosy_lab.java_smt.solvers.z3.Z3SolverContext.Engine;
 
 abstract class Z3AbstractProver extends AbstractProverWithAllSat<Void> {
 
   protected final Z3FormulaCreator creator;
   protected final long z3context;
   protected final Z3FormulaManager mgr;
+
+  protected final Engine engine;
+  protected final Optional<String> logic;
 
   private final UniqueIdGenerator trackId = new UniqueIdGenerator();
   @Nullable private final Deque<PersistentMap<String, BooleanFormula>> storedConstraints;
@@ -51,12 +55,16 @@ abstract class Z3AbstractProver extends AbstractProverWithAllSat<Void> {
   Z3AbstractProver(
       Z3FormulaCreator pCreator,
       Z3FormulaManager pMgr,
+      Optional<String> pLogic,
+      Engine pEngine,
       Set<ProverOptions> pOptions,
       @Nullable PathCounterTemplate pLogfile,
       ShutdownNotifier pShutdownNotifier) {
     super(pOptions, pMgr.getBooleanFormulaManager(), pShutdownNotifier);
     creator = pCreator;
     z3context = creator.getEnv();
+    logic = pLogic;
+    engine = pEngine;
 
     if (pOptions.contains(ProverOptions.GENERATE_UNSAT_CORE)) {
       storedConstraints = new ArrayDeque<>();
@@ -108,8 +116,7 @@ abstract class Z3AbstractProver extends AbstractProverWithAllSat<Void> {
 
   @SuppressWarnings("resource")
   @Override
-  public Model getModel() throws SolverException {
-    checkGenerateModels();
+  protected Model getModelImpl() throws SolverException {
     return new CachingModel(getEvaluatorWithoutChecks());
   }
 

@@ -29,7 +29,6 @@ import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractProverWithAllSat;
 import org.sosy_lab.java_smt.solvers.bitwuzla.api.Bitwuzla;
-import org.sosy_lab.java_smt.solvers.bitwuzla.api.Kind;
 import org.sosy_lab.java_smt.solvers.bitwuzla.api.Option;
 import org.sosy_lab.java_smt.solvers.bitwuzla.api.Options;
 import org.sosy_lab.java_smt.solvers.bitwuzla.api.Result;
@@ -103,9 +102,6 @@ abstract class BitwuzlaAbstractProver<T> extends AbstractProverWithAllSat<T> {
   @CanIgnoreReturnValue
   protected int addConstraint0(BooleanFormula constraint) {
     Term formula = creator.extractInfo(constraint);
-    for (Term t : creator.getConstraintsForTerm(formula)) {
-      formula = creator.getEnv().mk_term(Kind.AND, formula, t);
-    }
     env.assert_formula(formula);
 
     var label = BitwuzlaAbstractProver.ID_GENERATOR.getFreshId();
@@ -165,11 +161,15 @@ abstract class BitwuzlaAbstractProver<T> extends AbstractProverWithAllSat<T> {
    */
   @SuppressWarnings("resource")
   @Override
-  public Model getModel() throws SolverException {
-    checkGenerateModels();
+  protected Model getModelImpl() throws SolverException {
     // special case for Bitwuzla: Models are not permanent and need to be closed
     // before any change is applied to the prover stack. So, we register the Model as Evaluator.
-    return getEvaluatorWithoutChecks();
+    return registerEvaluator(
+        new BitwuzlaModel(
+            env,
+            this,
+            creator,
+            Collections2.transform(getAssertedFormulas(), creator::extractInfo)));
   }
 
   /**
@@ -202,7 +202,6 @@ abstract class BitwuzlaAbstractProver<T> extends AbstractProverWithAllSat<T> {
     for (BooleanFormula formula : assumptions) {
       Term term = creator.extractInfo(formula);
       newAssumptions.add(term);
-      newAssumptions.addAll(creator.getConstraintsForTerm(term));
     }
     Result result = env.check_sat(new Vector_Term(newAssumptions));
 
@@ -227,13 +226,8 @@ abstract class BitwuzlaAbstractProver<T> extends AbstractProverWithAllSat<T> {
 
   @SuppressWarnings("resource")
   @Override
-  protected BitwuzlaModel getEvaluatorWithoutChecks() {
-    return registerEvaluator(
-        new BitwuzlaModel(
-            env,
-            this,
-            creator,
-            Collections2.transform(getAssertedFormulas(), creator::extractInfo)));
+  protected BitwuzlaEvaluator getEvaluatorWithoutChecks() {
+    return registerEvaluator(new BitwuzlaEvaluator(this, creator));
   }
 
   public boolean isClosed() {

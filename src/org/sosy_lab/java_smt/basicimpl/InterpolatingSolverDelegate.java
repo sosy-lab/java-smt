@@ -93,7 +93,7 @@ public class InterpolatingSolverDelegate extends AbstractProver<String>
   }
 
   @Override
-  public Model getModel() throws SolverException {
+  protected Model getModelImpl() throws SolverException {
     return delegate.getModel();
   }
 

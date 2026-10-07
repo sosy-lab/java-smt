@@ -11,9 +11,9 @@ SPDX-License-Identifier: Apache-2.0
 -->
 
 <ivy-module version="2.0"
-    xmlns:e="http://ant.apache.org/ivy/extra"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:noNamespaceSchemaLocation="http://ant.apache.org/ivy/schemas/ivy.xsd">
+            xmlns:e="http://ant.apache.org/ivy/extra"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xsi:noNamespaceSchemaLocation="http://ant.apache.org/ivy/schemas/ivy.xsd">
     <info organisation="org.sosy_lab" module="javasmt-yices2">
         <license name="Apache2 and GNU GPLv3" url="https://github.com/SRI-CSL/yices2/blob/master/LICENSE.txt"/>
         <description>
@@ -23,29 +23,31 @@ SPDX-License-Identifier: Apache-2.0
     </info>
 
     <configurations>
-      <!-- default config, provides only x64 for backwards-compatibility -->
-      <conf name="runtime" extends="runtime-x64"/>
+        <!-- default config, provides only x64 for backwards-compatibility -->
+        <conf name="runtime" extends="runtime-x64"/>
 
-      <!-- main configurations -->
-      <conf name="runtime-x64" extends="runtime-linux-x64, runtime-windows-x64"/>
+        <!-- main configurations -->
+        <conf name="runtime-x64" extends="runtime-linux-x64, runtime-windows-x64"/>
+        <conf name="sources"/>
+        <conf name="javadoc"/>
+        <conf name="contrib"/>
 
-      <!-- basic configurations -->
-      <conf name="runtime-linux-x64" extends="runtime-common"/>
-      <conf name="runtime-windows-x64" extends="runtime-common"/>
+        <!-- basic configurations -->
+        <conf name="runtime-linux-x64" extends="runtime-common"/>
+        <conf name="runtime-windows-x64" extends="runtime-common"/>
 
-      <conf name="runtime-common" visibility="private"/>
-
-      <conf name="sources" description="sources of JavaSMT's component for Yices2" />
+        <conf name="runtime-common" visibility="private"/>
     </configurations>
 
     <publications defaultconf="runtime">
-        <artifact />
+        <artifact/>
         <artifact conf="sources" type="source" e:classifier="sources" ext="jar"/>
+        <artifact conf="javadoc" type="javadoc" e:classifier="javadoc" ext="jar"/>
     </publications>
 
     <dependencies>
-        <dependency org="org.sosy_lab" name="javasmt-solver-yices2" rev="2.7.0-gdc5687ca"
-                    conf="runtime-linux-x64->solver-yices2-linux-x64; runtime-windows-x64->solver-yices2-windows-x64"/>
+        <dependency org="org.sosy_lab" name="javasmt-solver-yices2" rev="2.7.0-4f83bf00e"
+                    conf="runtime-linux-x64->solver-yices2-linux-x64; runtime-windows-x64->solver-yices2-windows-x64; contrib->sources,javadoc"/>
 
         <!-- keep the following dependencies synchronized with the default lib/ivy.xml and build-jar-yices2.xml -->
 
@@ -61,7 +63,6 @@ SPDX-License-Identifier: Apache-2.0
         <!-- Annotations we use for @Nullable etc. -->
         <dependency org="org.checkerframework" name="checker-qual" rev="3.51.0"
                     conf="runtime-common->default; sources->sources"/>
-
     </dependencies>
 
 </ivy-module>

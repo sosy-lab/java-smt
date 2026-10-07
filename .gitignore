@@ -78,3 +78,6 @@ build.properties
 /output
 
 pom.xml
+
+
+hs_err_*.log

@@ -8,8 +8,6 @@
 
 package org.sosy_lab.java_smt.solvers.z3;
 
-import static com.google.common.base.Preconditions.checkState;
-
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import com.microsoft.z3.Native;
@@ -31,6 +29,7 @@ import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.OptimizationProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
+import org.sosy_lab.java_smt.solvers.z3.Z3SolverContext.Engine;
 
 class Z3OptimizationProver extends Z3AbstractProver implements OptimizationProverEnvironment {
 
@@ -42,11 +41,13 @@ class Z3OptimizationProver extends Z3AbstractProver implements OptimizationProve
       Z3FormulaCreator creator,
       LogManager pLogger,
       Z3FormulaManager pMgr,
+      Optional<String> pLogic,
+      Engine pEngine,
       Set<ProverOptions> pOptions,
       ImmutableMap<String, Object> pSolverOptions,
       @Nullable PathCounterTemplate pLogfile,
       ShutdownNotifier pShutdownNotifier) {
-    super(creator, pMgr, pOptions, pLogfile, pShutdownNotifier);
+    super(creator, pMgr, pLogic, pEngine, pOptions, pLogfile, pShutdownNotifier);
     z3optSolver = Native.mkOptimize(z3context);
     Native.optimizeIncRef(z3context, z3optSolver);
     logger = pLogger;
@@ -63,13 +64,11 @@ class Z3OptimizationProver extends Z3AbstractProver implements OptimizationProve
 
   @Override
   public int maximize(Formula objective) {
-    Preconditions.checkState(!closed);
     return Native.optimizeMaximize(z3context, z3optSolver, creator.extractInfo(objective));
   }
 
   @Override
   public int minimize(Formula objective) {
-    checkState(!closed);
     return Native.optimizeMinimize(z3context, z3optSolver, creator.extractInfo(objective));
   }
 
@@ -146,15 +145,11 @@ class Z3OptimizationProver extends Z3AbstractProver implements OptimizationProve
 
   @Override
   public Optional<Rational> upper(int handle, Rational epsilon) {
-    checkState(!closed);
-    checkGenerateModels();
     return round(handle, epsilon, Native::optimizeGetUpperAsVector);
   }
 
   @Override
   public Optional<Rational> lower(int handle, Rational epsilon) {
-    checkState(!closed);
-    checkGenerateModels();
     return round(handle, epsilon, Native::optimizeGetLowerAsVector);
   }
 

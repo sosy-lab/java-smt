@@ -16,7 +16,7 @@ SPDX-License-Identifier: Apache-2.0
 
   <groupId>org.sosy_lab.java_smt_example</groupId>
   <artifactId>java-smt-maven-example</artifactId>
-  <version>1.12</version>
+  <version>2.0</version>
   <name>java-smt-maven-example</name>
   <description>Example Maven project to show how to use JavaSMT with native solver libraries.</description>
   <url>https://github.com/sosy-lab/java-smt</url>
@@ -73,29 +73,51 @@ SPDX-License-Identifier: Apache-2.0
     <system.arch>x64</system.arch>
 
     <!-- versions of dependencies -->
-    <javasmt.version>5.0.0</javasmt.version>
-    <bitwuzla.version>0.7.0-13.1-g595512ae</bitwuzla.version>
+    <javasmt.version>6.0.0</javasmt.version>
+    <bitwuzla.version>0.8.2-339-g550ed911</bitwuzla.version>
     <boolector.version>3.2.2-g1a89c229</boolector.version>
     <cvc4.version>1.8-prerelease-2020-06-24-g7825d8f28</cvc4.version>
-    <cvc5.version>1.0.5-g4cb2ab9eb</cvc5.version>
-    <mathsat.version>5.6.11-glibc2.27</mathsat.version>
-    <opensmt.version>2.8.0-sosy0-ge831bf23</opensmt.version>
-    <javasmt-yices.version>4.1.1-734-g3732f7e08</javasmt-yices.version>
-    <yices.version>2.6.2-396-g194350c1</yices.version>
-    <z3.version>4.13.4</z3.version>
+    <cvc5.version>2026-02-26-d22638a</cvc5.version>
+    <mathsat.version>5.6.15</mathsat.version>
+    <opensmt.version>2.9.0-gef441e1c</opensmt.version>
+    <smtinterpol.version>2.5-1242-g5c50fb6d</smtinterpol.version>
+    <princess.version>2025-11-17</princess.version>
+    <ostrich.version>2.0</ostrich.version>
+    <javasmt-yices.version>5.0.1-1258-gdad634a69</javasmt-yices.version>
+    <yices.version>2.6.4-264-g553897f5</yices.version>
+    <z3.version>4.15.4</z3.version>
+    <z3-legacy.version>4.5.0-gd57a2a6dc</z3-legacy.version>
   </properties>
 
   <dependencies>
+    <!-- JavaSMT Dependencies -->
     <dependency>
       <groupId>org.sosy-lab</groupId>
       <artifactId>java-smt</artifactId>
       <version>${javasmt.version}</version>
     </dependency>
 
+    <!-- Java-based Solvers - plain JAR dependencies are listed here -->
+    <dependency>
+      <groupId>de.uni-freiburg.informatik.ultimate</groupId>
+      <artifactId>smtinterpol</artifactId>
+      <version>${smtinterpol.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>io.github.uuverifiers</groupId>
+      <artifactId>princess_2.13</artifactId>
+      <version>${princess.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>io.github.uuverifiers</groupId>
+      <artifactId>ostrich_2.13</artifactId>
+      <version>${ostrich.version}</version>
+    </dependency>
+
     <!-- MathSAT5 has one dependency (on Linux) -->
     <dependency>
       <groupId>org.sosy-lab</groupId>
-      <artifactId>javasmt-solver-mathsat5</artifactId>
+      <artifactId>javasmt-solver-mathsat</artifactId>
       <version>${mathsat.version}</version>
       <classifier>libmathsat5j-${system.arch}</classifier>
       <type>so</type>
@@ -122,12 +144,33 @@ SPDX-License-Identifier: Apache-2.0
       <classifier>libz3java-${system.arch}</classifier>
     </dependency>
 
+    <!-- Z3-Legacy has three dependencies (on Linux) -->
+    <dependency>
+      <groupId>org.sosy-lab</groupId>
+      <artifactId>javasmt-solver-z3-legacy</artifactId>
+      <version>${z3-legacy.version}</version>
+      <classifier>com.microsoft.z3legacy</classifier>
+    </dependency>
+    <dependency>
+      <groupId>org.sosy-lab</groupId>
+      <artifactId>javasmt-solver-z3-legacy</artifactId>
+      <version>${z3-legacy.version}</version>
+      <type>so</type>
+      <classifier>libz3legacy-${system.arch}</classifier>
+    </dependency>
+    <dependency>
+      <groupId>org.sosy-lab</groupId>
+      <artifactId>javasmt-solver-z3-legacy</artifactId>
+      <version>${z3-legacy.version}</version>
+      <type>so</type>
+      <classifier>libz3javalegacy-${system.arch}</classifier>
+    </dependency>
+
     <!-- Bitwuzla has two dependencies (on Linux) -->
     <dependency>
       <groupId>org.sosy-lab</groupId>
       <artifactId>javasmt-solver-bitwuzla</artifactId>
       <version>${bitwuzla.version}</version>
-      <type>jar</type>
     </dependency>
     <dependency>
       <groupId>org.sosy-lab</groupId>
@@ -165,7 +208,6 @@ SPDX-License-Identifier: Apache-2.0
       <groupId>org.sosy-lab</groupId>
       <artifactId>javasmt-solver-cvc4</artifactId>
       <version>${cvc4.version}</version>
-      <type>jar</type>
       <classifier>CVC4</classifier>
     </dependency>
     <dependency>
@@ -190,48 +232,18 @@ SPDX-License-Identifier: Apache-2.0
       <classifier>libcvc4parser</classifier>
     </dependency>
 
-    <!-- CVC5 has six dependencies (on Linux) -->
+    <!-- CVC5 has two dependencies (on Linux) -->
     <dependency>
       <groupId>org.sosy-lab</groupId>
       <artifactId>javasmt-solver-cvc5</artifactId>
       <version>${cvc5.version}</version>
-      <type>jar</type>
-      <classifier>cvc5</classifier>
     </dependency>
     <dependency>
       <groupId>org.sosy-lab</groupId>
       <artifactId>javasmt-solver-cvc5</artifactId>
       <version>${cvc5.version}</version>
       <type>so</type>
-      <classifier>libcvc5</classifier>
-    </dependency>
-    <dependency>
-      <groupId>org.sosy-lab</groupId>
-      <artifactId>javasmt-solver-cvc5</artifactId>
-      <version>${cvc5.version}</version>
-      <type>so</type>
-      <classifier>libcvc5jni</classifier>
-    </dependency>
-    <dependency>
-      <groupId>org.sosy-lab</groupId>
-      <artifactId>javasmt-solver-cvc5</artifactId>
-      <version>${cvc5.version}</version>
-      <type>so</type>
-      <classifier>libcvc5parser</classifier>
-    </dependency>
-    <dependency>
-      <groupId>org.sosy-lab</groupId>
-      <artifactId>javasmt-solver-cvc5</artifactId>
-      <version>${cvc5.version}</version>
-      <type>so</type>
-      <classifier>libpoly</classifier>
-    </dependency>
-    <dependency>
-      <groupId>org.sosy-lab</groupId>
-      <artifactId>javasmt-solver-cvc5</artifactId>
-      <version>${cvc5.version}</version>
-      <type>so</type>
-      <classifier>libpolyxx</classifier>
+      <classifier>libcvc5jni-${system.arch}</classifier>
     </dependency>
 
     <!-- Yices2 has two dependencies (on Linux) -->
@@ -239,7 +251,12 @@ SPDX-License-Identifier: Apache-2.0
       <groupId>org.sosy-lab</groupId>
       <artifactId>javasmt-yices2</artifactId>
       <version>${javasmt-yices.version}</version> <!-- version of Yices2 bindings in JavaSMT -->
-      <type>jar</type>
+      <exclusions>
+        <exclusion>
+          <groupId>org.sosy-lab</groupId>
+          <artifactId>javasmt-solver-yices2</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.sosy-lab</groupId>
@@ -254,7 +271,6 @@ SPDX-License-Identifier: Apache-2.0
       <groupId>org.sosy-lab</groupId>
       <artifactId>javasmt-solver-opensmt</artifactId>
       <version>${opensmt.version}</version>
-      <type>jar</type>
     </dependency>
     <dependency>
       <groupId>org.sosy-lab</groupId>
@@ -274,225 +290,110 @@ SPDX-License-Identifier: Apache-2.0
   </dependencies>
 
   <build>
-    <pluginManagement>
-      <plugins>
-        <plugin>
-          <!-- This step starts its own JVM that ignores system properties set by the user,
-               because why would those ever be important?! -->
-          <artifactId>maven-surefire-plugin</artifactId>
-          <version>2.22.1</version>
-          <configuration>
-            <!-- For solvers with native binaries, you need to add the classpath to test properly.
+    <plugins>
+      <!-- Executes unit tests and provides the native library path for solvers. -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>3.5.4</version>
+        <configuration>
+          <argLine>-Djava.library.path=${project.dependency.path}</argLine>
+        </configuration>
+      </plugin>
+
+      <!-- Allows running the application via 'mvn exec:exec' with the correct native library path. -->
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>exec-maven-plugin</artifactId>
+        <version>3.5.0</version>
+        <configuration>
+          <executable>java</executable>
+          <arguments>
+            <argument>-Djava.library.path=${project.dependency.path}</argument>
+            <argument>-classpath</argument>
+            <classpath/>
+            <argument>org.sosy_lab.java_smt_example.SolverOverviewTable</argument>
+          </arguments>
+        </configuration>
+      </plugin>
+
+      <!-- Packages the application and configures the manifest to look for JARs in the 'dependency/' folder. -->
+      <plugin>
+        <artifactId>maven-jar-plugin</artifactId>
+        <version>3.5.0</version>
+        <configuration>
+          <archive>
+            <manifest>
+              <!-- For solvers with native binaries, you need to add the classpath to test properly.
                  This path needs to be the location of the sosy-lab.commons.jar and the solver binaries.
                  See maven-dependency-plugin below for more information. -->
-            <argLine>-Djava.library.path=${project.dependency.path}</argLine>
-          </configuration>
-        </plugin>
-        <plugin>
-          <artifactId>maven-jar-plugin</artifactId>
-          <version>3.0.2</version>
-          <configuration>
-            <archive>
-              <manifest>
-                <!-- For solvers with native binaries, you need to add the classpath to test properly.
-                     This path needs to be the location of the sosy-lab.commons.jar and the solver binaries.
-                     See maven-dependency-plugin below for more information. -->
-                <addClasspath>true</addClasspath>
-                <classpathPrefix>${project.dependency.relativepath}</classpathPrefix>
-                <mainClass>org.sosy_lab.java_smt_example.SolverOverviewTable</mainClass>
-              </manifest>
-            </archive>
-          </configuration>
-        </plugin>
-      </plugins>
-    </pluginManagement>
-    <plugins>
-        <plugin>
-          <!-- The dependency plugin allows us to copy or delete files. -->
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-dependency-plugin</artifactId>
-          <version>3.1.1</version>
-          <executions>
-            <execution>
-              <!-- The goal "copy" is used to change the name of the solver libraries (i.e. Z3)
-                   from the name that is used internally in Maven to the normal name. -->
-              <id>copy</id>
-              <phase>initialize</phase>
-              <goals>
-                <goal>copy</goal>
-              </goals>
-            </execution>
-            <execution>
-              <!-- This copies all dependencies to ${project.dependency.path}. -->
-              <!-- We do this, because the sosy-lab.commons dependency (in JavaSMT) searches the
-                   native solver binaries (i.e. MathSAT or Z3) at specific locations and with specific names.
-                   So we just copy the dependencies and set the classpath to this location.
-                   You may of course change this if you know how to.
-                   Default search locations for sosy-lab.commons:
-                   (1) in its own folder (by far the easiest, just copy everything together) or
-                   (2) in the "native library path" as returned by getNativeLibraryPath() in Java,
-                   which is the directory ../native/<arch>-<os>/ relative to the JAR file of sosy-lab.commons,
-                   with the following values depending on your system (arch=x86_64|x86; os=linux|windows|macosx). -->
-              <id>copy-dependencies</id>
-              <phase>validate</phase>
-              <goals>
-                <goal>copy-dependencies</goal>
-              </goals>
-            </execution>
-          </executions>
-          <configuration>
-            <outputDirectory>${project.dependency.path}</outputDirectory>
+              <addClasspath>true</addClasspath>
+              <classpathPrefix>${project.dependency.relativepath}/</classpathPrefix>
+              <mainClass>org.sosy_lab.java_smt_example.SolverOverviewTable</mainClass>
+            </manifest>
+          </archive>
+        </configuration>
+      </plugin>
 
-            <artifactItems>
-              <!-- Here we specify what we want to use for the goal "copy".
-                   In our case we copy the solver dependencies (binaries) to change their names.
-                   groupId/artifactId/version/type/classifier have to match the dependency!
-                   We copy them to ${project.dependency.path} as this is the location
-                   that copy-dependencies uses by default. destFileName specifies the final name.
-                   You may only need some of the artifacts below, depending on what solver(s) you want.
-                   Important: you NEED to set the classpath to ${project.dependency.path} or
-                   wherever you have your sosy-lab.commons + solver binaries!   -->
-
-              <!-- MathSAT5 has one native library -->
-              <artifactItem>
-                <groupId>org.sosy-lab</groupId>
-                <artifactId>javasmt-solver-mathsat5</artifactId>
-                <type>so</type>
-                <classifier>libmathsat5j-${system.arch}</classifier>
-                <destFileName>libmathsat5j.so</destFileName>
-              </artifactItem>
-
-              <!-- Z3 has two native libraries -->
-              <artifactItem>
-                <groupId>org.sosy-lab</groupId>
-                <artifactId>javasmt-solver-z3</artifactId>
-                <type>so</type>
-                <classifier>libz3java-${system.arch}</classifier>
-                <destFileName>libz3java.so</destFileName>
-              </artifactItem>
-              <artifactItem>
-                <groupId>org.sosy-lab</groupId>
-                <artifactId>javasmt-solver-z3</artifactId>
-                <type>so</type>
-                <classifier>libz3-${system.arch}</classifier>
-                <destFileName>libz3.so</destFileName>
-              </artifactItem>
-
-              <!-- Bitwuzla has one dependency (on Linux) -->
-              <artifactItem>
-                <groupId>org.sosy-lab</groupId>
-                <artifactId>javasmt-solver-bitwuzla</artifactId>
-                <type>so</type>
-                <classifier>libbitwuzlaj-${system.arch}</classifier>
-                <destFileName>libbitwuzlaj.so</destFileName>
-              </artifactItem>
-
-              <!-- Boolector has three dependencies (on Linux) -->
-              <artifactItem>
-                <groupId>org.sosy-lab</groupId>
-                <artifactId>javasmt-solver-boolector</artifactId>
-                <type>so</type>
-                <classifier>libboolector</classifier>
-                <destFileName>libboolector.so</destFileName>
-              </artifactItem>
-              <artifactItem>
-                <groupId>org.sosy-lab</groupId>
-                <artifactId>javasmt-solver-boolector</artifactId>
-                <type>so</type>
-                <classifier>libminisat</classifier>
-                <destFileName>libminisat.so</destFileName>
-              </artifactItem>
-              <artifactItem>
-                <groupId>org.sosy-lab</groupId>
-                <artifactId>javasmt-solver-boolector</artifactId>
-                <type>so</type>
-                <classifier>libpicosat</classifier>
-                <destFileName>libpicosat.so</destFileName>
-              </artifactItem>
-
-              <!-- CVC4 has four dependencies (on Linux),
-                   and renaming the JAR file is not required -->
-              <artifactItem>
-                <groupId>org.sosy-lab</groupId>
-                <artifactId>javasmt-solver-cvc4</artifactId>
-                <type>so</type>
-                <classifier>libcvc4</classifier>
-                <destFileName>libcvc4.so</destFileName>
-              </artifactItem>
-              <artifactItem>
-                <groupId>org.sosy-lab</groupId>
-                <artifactId>javasmt-solver-cvc4</artifactId>
-                <type>so</type>
-                <classifier>libcvc4jni</classifier>
-                <destFileName>libcvc4jni.so</destFileName>
-              </artifactItem>
-              <artifactItem>
-                <groupId>org.sosy-lab</groupId>
-                <artifactId>javasmt-solver-cvc4</artifactId>
-                <type>so</type>
-                <classifier>libcvc4parser</classifier>
-                <destFileName>libcvc4parser.so</destFileName>
-              </artifactItem>
-
-              <!-- CVC5 has six dependencies (on Linux),
-                   and renaming the JAR file is not required -->
-              <artifactItem>
-                <groupId>org.sosy-lab</groupId>
-                <artifactId>javasmt-solver-cvc5</artifactId>
-                <type>so</type>
-                <classifier>libcvc5</classifier>
-                <destFileName>libcvc5.so</destFileName>
-              </artifactItem>
-              <artifactItem>
-                <groupId>org.sosy-lab</groupId>
-                <artifactId>javasmt-solver-cvc5</artifactId>
-                <type>so</type>
-                <classifier>libcvc5jni</classifier>
-                <destFileName>libcvc5jni.so</destFileName>
-              </artifactItem>
-              <artifactItem>
-                <groupId>org.sosy-lab</groupId>
-                <artifactId>javasmt-solver-cvc5</artifactId>
-                <type>so</type>
-                <classifier>libcvc5parser</classifier>
-                <destFileName>libcvc5parser.so</destFileName>
-              </artifactItem>
-              <artifactItem>
-                <groupId>org.sosy-lab</groupId>
-                <artifactId>javasmt-solver-cvc5</artifactId>
-                <type>so</type>
-                <classifier>libpoly</classifier>
-                <destFileName>libpoly.so</destFileName>
-              </artifactItem>
-              <artifactItem>
-                <groupId>org.sosy-lab</groupId>
-                <artifactId>javasmt-solver-cvc5</artifactId>
-                <type>so</type>
-                <classifier>libpolyxx</classifier>
-                <destFileName>libpolyxx.so</destFileName>
-              </artifactItem>
-
-              <!-- Yices2 has two dependencies (on Linux),
-                   and renaming the JAR file is not required to be copied.-->
-              <artifactItem>
-                <groupId>org.sosy-lab</groupId>
-                <artifactId>javasmt-solver-yices2</artifactId>
-                <type>so</type>
-                <classifier>libyices2j</classifier>
-                <destFileName>libyices2j.so</destFileName>
-              </artifactItem>
-
-              <!-- OpenSMT has two dependencies (on Linux),
-                   and renaming the JAR file is not required to be copied.-->
-              <artifactItem>
-                <groupId>org.sosy-lab</groupId>
-                <artifactId>javasmt-solver-opensmt</artifactId>
-                <type>so</type>
-                <classifier>libopensmtj-${system.arch}</classifier>
-                <destFileName>libopensmtj.so</destFileName>
-              </artifactItem>
-            </artifactItems>
-          </configuration>
+      <!-- The next two plugins copy and rename the solver dependencies for ${project.dependency.path}.
+         We do this, because the sosy-lab.commons dependency (in JavaSMT) searches the
+         native solver binaries (i.e. MathSAT or Z3) at specific locations and with specific names.
+         So we just copy the dependencies and set the classpath to this location.
+         You may of course change this if you know how to. -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <version>3.1.1</version>
+        <executions>
+          <execution>
+            <id>copy-natives-temp</id>
+            <phase>initialize</phase>
+            <goals>
+              <goal>copy-dependencies</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${project.build.directory}/temp-natives</outputDirectory>
+              <includeTypes>so,dll,dylib</includeTypes>
+              <stripVersion>true</stripVersion>
+            </configuration>
+          </execution>
+          <execution>
+            <id>copy-all-jars</id>
+            <phase>initialize</phase>
+            <goals>
+              <goal>copy-dependencies</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${project.dependency.path}</outputDirectory>
+              <includeTypes>jar</includeTypes>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-antrun-plugin</artifactId>
+        <version>3.1.0</version>
+        <executions>
+          <execution>
+            <id>rename-natives</id>
+            <phase>process-resources</phase>
+            <goals>
+              <goal>run</goal>
+            </goals>
+            <configuration>
+              <target>
+                <copy todir="${project.dependency.path}">
+                  <fileset dir="${project.build.directory}/temp-natives" includes="**/*"/>
+                  <!-- example mapping: from javasmt-solver-z3-libz3java-x64.so to libz3.so, version got already removed above.
+                       "\1" is the library name, "\2" is the file extension. -->
+                  <regexpmapper from="^javasmt-solver-(?:bitwuzla|boolector|cvc4|cvc5|mathsat|opensmt|yices2|z3-legacy|z3)-(.*?)(?:-${system.arch})?\.(so|dll|dylib)$" to="\1.\2" />
+                </copy>
+                <delete dir="${project.build.directory}/temp-natives"/>
+              </target>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>

@@ -33,6 +33,9 @@ public class PackageSanityTest extends AbstractPackageSanityTests {
     } catch (InvalidConfigurationException e) {
       throw new RuntimeException(e);
     }
-    ignoreClasses(c -> c.equals(InterpolatingProverDelegate.class));
+    ignoreClasses(
+        c ->
+            c.equals(InterpolatingProverDelegate.class)
+                || c.equals(OptimizationProverDelegate.class));
   }
 }

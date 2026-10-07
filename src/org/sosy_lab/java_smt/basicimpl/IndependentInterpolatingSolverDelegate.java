@@ -239,7 +239,7 @@ public class IndependentInterpolatingSolverDelegate<T> extends AbstractProver<T>
   }
 
   @Override
-  public Model getModel() throws SolverException {
+  protected Model getModelImpl() throws SolverException {
     return delegate.getModel();
   }
 
