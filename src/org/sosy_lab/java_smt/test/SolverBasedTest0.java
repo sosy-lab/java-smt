@@ -487,7 +487,9 @@ public abstract class SolverBasedTest0 {
               Solvers.MATHSAT5,
               Solvers.BOOLECTOR,
               Solvers.CVC5,
-              Solvers.BITWUZLA);
+              Solvers.BITWUZLA,
+              Solvers.YICES2,
+              Solvers.Z3_WITH_INTERPOLATION);
     } else if (optionList.contains(GENERATE_PROJECTION_BASED_INTERPOLANTS)) {
       assume()
           .withMessage("Only Z3 is enabled for projection-based interpolation")
@@ -498,7 +500,7 @@ public abstract class SolverBasedTest0 {
       assume()
           .withMessage("Solver %s does not support Quantifier Elimination", solverToUse())
           .that(solverToUse())
-          .isNoneOf(Solvers.OPENSMT, Solvers.SMTINTERPOL, Solvers.YICES2);
+          .isNoneOf(Solvers.BITWUZLA, Solvers.YICES2);
     }
     try {
       if (optionList.contains(null)) {
@@ -530,21 +532,12 @@ public abstract class SolverBasedTest0 {
   protected void requireTreeItp(ProverOptions... options) {
     requireInterpolation();
     assume()
-        .withMessage(
-            "Solver independent interpolation strategy %s does not support tree " + "interpolation",
-            solverToUse())
-        .that(options)
-        .asList()
-        .containsNoneIn(INDEPENDENT_INTERPOLATION_STRATEGIES);
-    assume()
         .withMessage("Solver does not support tree-interpolation.")
         .that(solverToUse())
         .isAnyOf(Solvers.SMTINTERPOL, Solvers.PRINCESS, Solvers.Z3_WITH_INTERPOLATION);
 
     assume()
-        .withMessage(
-            "Strategy %s does not support tree interpolation",
-            Arrays.toString(options)) // Optional: print the options for clarity
+        .withMessage("Solver independent interpolation does not support tree interpolation")
         .that(options)
         .asList()
         .containsNoneIn(INDEPENDENT_INTERPOLATION_STRATEGIES);

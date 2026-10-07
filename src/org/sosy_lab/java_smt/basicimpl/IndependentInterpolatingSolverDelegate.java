@@ -103,17 +103,17 @@ public class IndependentInterpolatingSolverDelegate<T> extends AbstractProver<T>
     BooleanFormula conjugatedFormulasOfA = bmgr.and(formulasOfA);
     BooleanFormula conjugatedFormulasOfB = bmgr.and(formulasOfB);
 
-    if (bmgr.isFalse(conjugatedFormulasOfA)) {
-      return bmgr.makeFalse();
-    } else if (bmgr.isFalse(conjugatedFormulasOfB)) {
-      return bmgr.makeTrue();
-    }
-
     BooleanFormula interpolant;
 
     if (interpolationTechnique == null) {
       interpolant = delegate.getInterpolant(identifiersForA);
     } else {
+      if (bmgr.isFalse(conjugatedFormulasOfA)) {
+        return bmgr.makeFalse();
+      } else if (bmgr.isFalse(conjugatedFormulasOfB)) {
+        return bmgr.makeTrue();
+      }
+
       interpolant =
           interpolationTechnique.getInterpolant(conjugatedFormulasOfA, conjugatedFormulasOfB);
     }

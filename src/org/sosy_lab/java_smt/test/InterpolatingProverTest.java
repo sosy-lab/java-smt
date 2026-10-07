@@ -61,7 +61,6 @@ public class InterpolatingProverTest extends ParameterizedInterpolatingSolverBas
   @Test
   @SuppressWarnings("CheckReturnValue")
   public <T> void simpleInterpolation() throws SolverException, InterruptedException {
-    requireIntegers();
     try (InterpolatingProverEnvironment<T> prover = newEnvironmentForTest()) {
       var f1 = lessThanNumber(makeVariable("x"), makeNumber(0));
       var f2 = greaterThanNumber(makeVariable("x"), makeNumber(0));
@@ -78,7 +77,6 @@ public class InterpolatingProverTest extends ParameterizedInterpolatingSolverBas
   @Test
   @SuppressWarnings("CheckReturnValue")
   public <T> void notSoSimpleInterpolation() throws SolverException, InterruptedException {
-    requireIntegers();
     assume()
         .withMessage("Solver %s runs into timeout on this test", solverToUse())
         .that(solverToUse())
@@ -130,8 +128,6 @@ public class InterpolatingProverTest extends ParameterizedInterpolatingSolverBas
 
   @Test
   public <T> void binaryInterpolation() throws SolverException, InterruptedException {
-    requireBitvectors();
-    requireIntegers();
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
 
     int i = index.getFreshId();
@@ -270,11 +266,6 @@ public class InterpolatingProverTest extends ParameterizedInterpolatingSolverBas
   @Test
   public <T> void binaryBVInterpolation1() throws SolverException, InterruptedException {
     assume()
-        .withMessage("Solver %s is not supported or times out", solverToUse())
-        .that(solverToUse())
-        .isNotEqualTo(Solvers.BITWUZLA);
-
-    assume()
         .withMessage("Z3 with strategy %s is not supported or times out", itpStrategyToUse())
         .that(
             solverToUse() == Solvers.Z3
@@ -386,7 +377,6 @@ public class InterpolatingProverTest extends ParameterizedInterpolatingSolverBas
       throws SolverException, InterruptedException {
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
     requireSeqItp();
-    requireIntegers();
 
     Formula zero = makeNumber(0);
     Formula one = makeNumber(1);
@@ -425,7 +415,6 @@ public class InterpolatingProverTest extends ParameterizedInterpolatingSolverBas
   @Test
   public <T> void sequentialInterpolationWithoutPartition()
       throws SolverException, InterruptedException {
-    requireIntegers();
     requireSeqItp();
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
 
@@ -440,7 +429,6 @@ public class InterpolatingProverTest extends ParameterizedInterpolatingSolverBas
   @Test
   public <T> void sequentialInterpolationWithOnePartition()
       throws SolverException, InterruptedException {
-    requireIntegers();
     requireSeqItp();
 
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
@@ -469,7 +457,6 @@ public class InterpolatingProverTest extends ParameterizedInterpolatingSolverBas
   @Test
   public <T> void sequentialInterpolationWithFewPartitions()
       throws SolverException, InterruptedException {
-    requireIntegers();
     requireSeqItp();
 
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
@@ -504,7 +491,6 @@ public class InterpolatingProverTest extends ParameterizedInterpolatingSolverBas
   public <T> void sequentialBVInterpolation() throws SolverException, InterruptedException {
     requireBitvectors();
     requireSeqItp();
-    requireTreeItp();
 
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
 
@@ -1089,7 +1075,6 @@ public class InterpolatingProverTest extends ParameterizedInterpolatingSolverBas
     requireBitvectors();
     requireInterpolation();
     requireSeqItp();
-    requireTreeItp();
 
     assume()
         .withMessage("Solver %s does not support interpolation over bitvectors", solverToUse())
@@ -1163,7 +1148,6 @@ public class InterpolatingProverTest extends ParameterizedInterpolatingSolverBas
 
   @Test
   public <T> void testTrivialInterpolation() throws InterruptedException, SolverException {
-    requireIntegers();
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
     Formula zero = makeNumber(0);
     Formula one = makeNumber(1);
@@ -1210,7 +1194,6 @@ public class InterpolatingProverTest extends ParameterizedInterpolatingSolverBas
   @SuppressWarnings({"unchecked", "unused"})
   @Test
   public <T> void testInvalidToken() throws InterruptedException, SolverException {
-    requireIntegers();
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
 
     // create and push formulas and solve them
@@ -1251,7 +1234,6 @@ public class InterpolatingProverTest extends ParameterizedInterpolatingSolverBas
    */
   @Test
   public <T> void issue381InterpolationTest1() throws InterruptedException, SolverException {
-    requireIntegers();
     requireSeqItp();
     try (InterpolatingProverEnvironment<T> prover = newEnvironmentForTest()) {
       var x = makeVariable("x");
@@ -1279,7 +1261,6 @@ public class InterpolatingProverTest extends ParameterizedInterpolatingSolverBas
    */
   @Test
   public <T> void issue381InterpolationTest2() throws InterruptedException, SolverException {
-    requireIntegers();
     requireSeqItp();
     try (InterpolatingProverEnvironment<T> prover = newEnvironmentForTest()) {
       var x = makeVariable("x");
@@ -1307,7 +1288,6 @@ public class InterpolatingProverTest extends ParameterizedInterpolatingSolverBas
    */
   @Test
   public <T> void issue381InterpolationTest3() throws InterruptedException, SolverException {
-    requireIntegers();
     try (InterpolatingProverEnvironment<T> prover = newEnvironmentForTest()) {
       var x = makeVariable("x");
       var one = makeNumber(1);
