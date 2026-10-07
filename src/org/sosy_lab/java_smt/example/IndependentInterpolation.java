@@ -153,7 +153,6 @@ public final class IndependentInterpolation {
     Preconditions.checkState(unsat, "The example for interpolation should be UNSAT");
 
     BooleanFormula itp = prover.getInterpolant(ImmutableList.of(ip1));
-    logger.log(Level.INFO, "Interpolants are:", itp);
     logger.logf(
         Level.INFO,
         "Interpolation Result:%n"
