@@ -14,6 +14,7 @@ import static com.google.common.truth.Truth.assert_;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.FluentIterable;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Sets;
 import com.google.common.truth.Fact;
 import com.google.common.truth.FailureMetadata;
@@ -281,7 +282,7 @@ public final class BooleanFormulaSubject extends Subject {
    */
   public void isValidInterpolant(BooleanFormula formulaA, BooleanFormula formulaB)
       throws SolverException, InterruptedException {
-    isValidInterpolant(List.of(formulaA), List.of(formulaB));
+    isValidInterpolant(ImmutableList.of(formulaA), ImmutableList.of(formulaB));
   }
 
   /** Checks if the subject is a valid Craig interpolant for the lists of formulas A and B. */
