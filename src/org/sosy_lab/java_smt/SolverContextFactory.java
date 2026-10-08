@@ -27,6 +27,7 @@ import org.sosy_lab.java_smt.api.FloatingPointRoundingMode;
 import org.sosy_lab.java_smt.api.SolverContext;
 import org.sosy_lab.java_smt.basicimpl.AbstractNumeralFormulaManager.NonLinearArithmetic;
 import org.sosy_lab.java_smt.delegate.debugging.DebuggingSolverContext;
+import org.sosy_lab.java_smt.delegate.interpolation.IndependentInterpolationSolverContext;
 import org.sosy_lab.java_smt.delegate.logging.LoggingSolverContext;
 import org.sosy_lab.java_smt.delegate.statistics.StatisticsSolverContext;
 import org.sosy_lab.java_smt.delegate.synchronize.SynchronizedSolverContext;
@@ -120,6 +121,9 @@ public class SolverContextFactory {
               + "or always approximate non-linear arithmetic. "
               + "This affects only the theories of integer and rational arithmetic.")
   private NonLinearArithmetic nonLinearArithmetic = NonLinearArithmetic.USE;
+
+  @Option(secure = true, description = "")
+  private boolean solverIndependentInterpolation = false;
 
   private final LogManager logger;
   private final ShutdownNotifier shutdownNotifier;
@@ -227,6 +231,9 @@ public class SolverContextFactory {
           e);
     }
 
+    if (solverIndependentInterpolation) {
+      context = new IndependentInterpolationSolverContext(config, context);
+    }
     if (useLogger) {
       context = new LoggingSolverContext(logger, context);
     }

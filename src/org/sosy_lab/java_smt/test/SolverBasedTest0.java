@@ -11,22 +11,15 @@ package org.sosy_lab.java_smt.test;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.truth.TruthJUnit.assume;
 import static org.sosy_lab.java_smt.api.FormulaType.getSinglePrecisionFloatingPointType;
-import static org.sosy_lab.java_smt.api.SolverContext.ProverOptions.GENERATE_PROJECTION_BASED_INTERPOLANTS;
-import static org.sosy_lab.java_smt.api.SolverContext.ProverOptions.GENERATE_UNIFORM_BACKWARD_INTERPOLANTS;
-import static org.sosy_lab.java_smt.api.SolverContext.ProverOptions.GENERATE_UNIFORM_FORWARD_INTERPOLANTS;
 import static org.sosy_lab.java_smt.test.BooleanFormulaSubject.assertUsing;
 import static org.sosy_lab.java_smt.test.ProverEnvironmentSubject.assertThat;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
 import com.google.common.truth.Truth;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.junit.After;
 import org.junit.Before;
@@ -71,6 +64,7 @@ import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.api.StringFormula;
 import org.sosy_lab.java_smt.api.StringFormulaManager;
 import org.sosy_lab.java_smt.api.UFManager;
+import org.sosy_lab.java_smt.delegate.interpolation.IndependentInterpolationSolverContext;
 import org.sosy_lab.java_smt.solvers.opensmt.Logics;
 
 /**
@@ -97,8 +91,8 @@ import org.sosy_lab.java_smt.solvers.opensmt.Logics;
  * </code>
  * </pre>
  *
- * <p>{@link #assertThatFormula(BooleanFormula)} can be used to easily write assertions about
- * formulas using Truth.
+ * {@link #assertThatFormula(BooleanFormula)} can be used to easily write assertions about formulas
+ * using Truth.
  *
  * <p>Test that rely on a theory that not all solvers support should call one of the {@code require}
  * methods at the beginning.
@@ -165,12 +159,6 @@ public abstract class SolverBasedTest0 {
 
     return newConfig;
   }
-
-  private static final ImmutableList<ProverOptions> INDEPENDENT_INTERPOLATION_STRATEGIES =
-      ImmutableList.of(
-          GENERATE_UNIFORM_BACKWARD_INTERPOLANTS,
-          GENERATE_PROJECTION_BASED_INTERPOLANTS,
-          GENERATE_UNIFORM_FORWARD_INTERPOLANTS);
 
   /**
    * Determines whether execution tracing is enabled for the test suite.
@@ -473,74 +461,15 @@ public abstract class SolverBasedTest0 {
     }
   }
 
-  protected final void requireInterpolation(ProverOptions... options) {
-    List<ProverOptions> optionList =
-        (options == null) ? ImmutableList.of() : Arrays.asList(options);
-    if (optionList.contains(null) || optionList.isEmpty()) {
-      assume()
-          .withMessage("Solver %s does not support native interpolation", solverToUse())
-          .that(solverToUse())
-          .isAnyOf(
-              Solvers.SMTINTERPOL,
-              Solvers.PRINCESS,
-              Solvers.OPENSMT,
-              Solvers.MATHSAT5,
-              Solvers.BOOLECTOR,
-              Solvers.CVC5,
-              Solvers.BITWUZLA,
-              Solvers.YICES2,
-              Solvers.Z3_WITH_INTERPOLATION);
-    } else if (optionList.contains(GENERATE_PROJECTION_BASED_INTERPOLANTS)) {
-      assume()
-          .withMessage("Only Z3 is enabled for projection-based interpolation")
-          .that(solverToUse())
-          .isEqualTo(Solvers.Z3);
-    } else if (optionList.contains(GENERATE_UNIFORM_FORWARD_INTERPOLANTS)
-        || optionList.contains(GENERATE_UNIFORM_BACKWARD_INTERPOLANTS)) {
-      assume()
-          .withMessage("Solver %s does not support Quantifier Elimination", solverToUse())
-          .that(solverToUse())
-          .isNoneOf(Solvers.BITWUZLA, Solvers.YICES2);
-    }
+  protected void requireInterpolation() {
     try {
-      if (optionList.contains(null)) {
-        context.newProverEnvironmentWithInterpolation().close();
-      } else {
-        context.newProverEnvironmentWithInterpolation(options).close();
-      }
+      context.newProverEnvironmentWithInterpolation().close();
     } catch (UnsupportedOperationException e) {
       assume()
-          .withMessage(
-              "Solver %s threw UnsupportedOperationException for options %s",
-              solverToUse(), Arrays.toString(options))
+          .withMessage("Solver %s does not support interpolation", solverToUse())
           .that(e)
           .isNull();
     }
-  }
-
-  protected void requireSeqItp(ProverOptions... options) {
-    assume()
-        .withMessage(
-            "Solver independent interpolation strategy %s does not support sequential "
-                + "interpolation",
-            solverToUse())
-        .that(options)
-        .asList()
-        .containsNoneIn(INDEPENDENT_INTERPOLATION_STRATEGIES);
-  }
-
-  protected void requireTreeItp(ProverOptions... options) {
-    requireInterpolation();
-    assume()
-        .withMessage("Solver does not support tree-interpolation.")
-        .that(solverToUse())
-        .isAnyOf(Solvers.SMTINTERPOL, Solvers.PRINCESS, Solvers.Z3_WITH_INTERPOLATION);
-
-    assume()
-        .withMessage("Solver independent interpolation does not support tree interpolation")
-        .that(options)
-        .asList()
-        .containsNoneIn(INDEPENDENT_INTERPOLATION_STRATEGIES);
   }
 
   protected void requireParser() {
@@ -742,20 +671,12 @@ public abstract class SolverBasedTest0 {
   public abstract static class ParameterizedInterpolatingSolverBasedTest0
       extends ParameterizedSolverBasedTest0 {
 
-    // GENERATE_MODELS as stand-in for native
-    private static final Set<ProverOptions> ALL_INTERPOLATION_STRATEGIES =
-        ImmutableSet.of(
-            GENERATE_PROJECTION_BASED_INTERPOLANTS,
-            GENERATE_UNIFORM_BACKWARD_INTERPOLANTS,
-            GENERATE_UNIFORM_FORWARD_INTERPOLANTS);
-
     @Parameters(name = "solver {0} with interpolation strategy {1}")
     public static List<Object[]> getAllSolversAndItpStrategies() {
       List<Object[]> lst = new ArrayList<>();
       for (Solvers solver : Solvers.values()) {
-        // No arg for no option (== solver native interpolation)
-        lst.add(new Object[] {solver, null});
-        for (ProverOptions itpStrat : ALL_INTERPOLATION_STRATEGIES) {
+        for (IndependentInterpolationSolverContext.InterpolationMethod itpStrat :
+            IndependentInterpolationSolverContext.InterpolationMethod.values()) {
           lst.add(new Object[] {solver, itpStrat});
         }
       }
@@ -763,30 +684,64 @@ public abstract class SolverBasedTest0 {
     }
 
     @Parameter(1)
-    public ProverOptions interpolationStrategy;
+    public IndependentInterpolationSolverContext.InterpolationMethod interpolationStrategy;
 
-    protected @Nullable ProverOptions itpStrategyToUse() {
+    protected IndependentInterpolationSolverContext.InterpolationMethod itpStrategyToUse() {
       return interpolationStrategy;
     }
 
     @Override
-    protected void requireSeqItp(ProverOptions... options) {
-      List<ProverOptions> allOptions = new ArrayList<>(Arrays.asList(options));
-
-      if (itpStrategyToUse() != null) {
-        allOptions.add(itpStrategyToUse());
-      }
-
-      super.requireSeqItp(allOptions.toArray(new ProverOptions[0]));
+    protected ConfigurationBuilder createTestConfigBuilder() throws InvalidConfigurationException {
+      return super.createTestConfigBuilder()
+          .setOption("solver.solverIndependentInterpolation", "true")
+          .setOption("solver.interpolation.method", interpolationStrategy.name());
     }
 
     @Override
-    protected void requireTreeItp(ProverOptions... options) {
-      List<ProverOptions> allOptions = new ArrayList<>(Arrays.asList(options));
-      if (itpStrategyToUse() != null) {
-        allOptions.add(itpStrategyToUse());
+    protected void requireInterpolation() {
+      switch (interpolationStrategy) {
+        case MODEL_PROJECTION -> {
+          assume()
+              .withMessage("Only Z3 is enabled for projection-based interpolation")
+              .that(solverToUse())
+              .isEqualTo(Solvers.Z3);
+        }
+        case QUANTIFIER_ELIMINATION_FORWARD, QUANTIFIER_ELIMINATION_BACKWARD -> {
+          requireQuantifiers();
+          assume()
+              .withMessage("Solver %s does not support Quantifier Elimination", solverToUse())
+              .that(solverToUse())
+              .isNoneOf(Solvers.BITWUZLA, Solvers.YICES2);
+        }
+        default -> super.requireInterpolation();
       }
-      super.requireTreeItp(allOptions.toArray(new ProverOptions[0]));
+    }
+
+    protected void requireSeqItp() {
+      assume()
+          .withMessage(
+              "Solver independent interpolation strategy %s does not support sequential"
+                  + " interpolation",
+              solverToUse())
+          .that(interpolationStrategy)
+          .isEqualTo(IndependentInterpolationSolverContext.InterpolationMethod.SOLVER);
+
+      requireInterpolation();
+    }
+
+    protected void requireTreeItp(ProverOptions... options) {
+      assume()
+          .withMessage(
+              "Solver independent interpolation strategy %s does not support tree interpolation",
+              solverToUse())
+          .that(interpolationStrategy)
+          .isEqualTo(IndependentInterpolationSolverContext.InterpolationMethod.SOLVER);
+
+      requireInterpolation();
+      assume()
+          .withMessage("Solver does not support tree-interpolation.")
+          .that(solver)
+          .isAnyOf(Solvers.SMTINTERPOL, Solvers.PRINCESS, Solvers.Z3_WITH_INTERPOLATION);
     }
   }
 }

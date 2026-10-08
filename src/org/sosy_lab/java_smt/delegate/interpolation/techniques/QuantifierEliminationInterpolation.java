@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-package org.sosy_lab.java_smt.basicimpl.interpolation_techniques;
+package org.sosy_lab.java_smt.delegate.interpolation.techniques;
 
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -13,17 +13,18 @@ import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.QuantifiedFormulaManager;
 import org.sosy_lab.java_smt.api.QuantifiedFormulaManager.Quantifier;
-import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.api.visitors.DefaultFormulaVisitor;
 import org.sosy_lab.java_smt.api.visitors.TraversalProcess;
+import org.sosy_lab.java_smt.delegate.interpolation.IndependentInterpolationSolverContext;
 
 public class QuantifierEliminationInterpolation extends AbstractInterpolationTechnique {
 
-  private final ProverOptions strategy;
+  private final IndependentInterpolationSolverContext.InterpolationMethod strategy;
   private final QuantifiedFormulaManager qfmgr;
 
-  public QuantifierEliminationInterpolation(FormulaManager pMgr, ProverOptions pStrategy) {
+  public QuantifierEliminationInterpolation(
+      FormulaManager pMgr, IndependentInterpolationSolverContext.InterpolationMethod pStrategy) {
     super(pMgr);
     strategy = pStrategy;
     qfmgr = mgr.getQuantifiedFormulaManager();
@@ -39,31 +40,31 @@ public class QuantifierEliminationInterpolation extends AbstractInterpolationTec
 
     BooleanFormula interpolant;
 
-    if (strategy == ProverOptions.GENERATE_UNIFORM_FORWARD_INTERPOLANTS) {
-      // Forward: interpolate(A(x,y),B(y,z)) = ∃x.A(x,y)
-      List<Formula> exclusiveVariablesInA = removeVariablesFrom(variablesInA, sharedVariables);
+    switch (strategy) {
+      case QUANTIFIER_ELIMINATION_FORWARD -> {
+        // Forward: interpolate(A(x,y),B(y,z)) = ∃x.A(x,y)
+        List<Formula> exclusiveVariablesInA = removeVariablesFrom(variablesInA, sharedVariables);
 
-      if (exclusiveVariablesInA.isEmpty()) {
-        return formulasOfA;
+        if (exclusiveVariablesInA.isEmpty()) {
+          return formulasOfA;
+        }
+
+        BooleanFormula itpForwardQuantified = qfmgr.exists(exclusiveVariablesInA, formulasOfA);
+        interpolant = qfmgr.eliminateQuantifiers(itpForwardQuantified);
       }
+      case QUANTIFIER_ELIMINATION_BACKWARD -> {
+        // Backward: interpolate(A(x,y),B(y,z))=∀z.¬B(y,z)
+        List<Formula> exclusiveVariablesInB = removeVariablesFrom(variablesInB, sharedVariables);
 
-      BooleanFormula itpForwardQuantified = qfmgr.exists(exclusiveVariablesInA, formulasOfA);
-      interpolant = qfmgr.eliminateQuantifiers(itpForwardQuantified);
+        if (exclusiveVariablesInB.isEmpty()) {
+          return bmgr.not(formulasOfB);
+        }
 
-    } else if (strategy == ProverOptions.GENERATE_UNIFORM_BACKWARD_INTERPOLANTS) {
-      // Backward: interpolate(A(x,y),B(y,z))=∀z.¬B(y,z)
-      List<Formula> exclusiveVariablesInB = removeVariablesFrom(variablesInB, sharedVariables);
-
-      if (exclusiveVariablesInB.isEmpty()) {
-        return bmgr.not(formulasOfB);
+        BooleanFormula itpBackwardQuantified =
+            qfmgr.forall(exclusiveVariablesInB, bmgr.not(formulasOfB));
+        interpolant = qfmgr.eliminateQuantifiers(itpBackwardQuantified);
       }
-
-      BooleanFormula itpBackwardQuantified =
-          qfmgr.forall(exclusiveVariablesInB, bmgr.not(formulasOfB));
-      interpolant = qfmgr.eliminateQuantifiers(itpBackwardQuantified);
-
-    } else {
-      throw new AssertionError("Unknown interpolation strategy for QE: " + strategy);
+      default -> throw new AssertionError("Unknown interpolation strategy for QE: " + strategy);
     }
 
     if (isQuantifiedFormula(interpolant)) {

@@ -26,8 +26,8 @@ import org.sosy_lab.java_smt.api.IntegerFormulaManager;
 import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.SolverContext;
-import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
+import org.sosy_lab.java_smt.delegate.interpolation.IndependentInterpolationSolverContext;
 
 public final class IndependentInterpolation {
 
@@ -35,14 +35,18 @@ public final class IndependentInterpolation {
     // never called
   }
 
-  private static final ProverOptions STRATEGY =
-      ProverOptions.GENERATE_UNIFORM_BACKWARD_INTERPOLANTS;
+  private static final IndependentInterpolationSolverContext.InterpolationMethod STRATEGY =
+      IndependentInterpolationSolverContext.InterpolationMethod.QUANTIFIER_ELIMINATION_BACKWARD;
 
   public static void main(String[] args)
       throws InvalidConfigurationException, SolverException, InterruptedException {
 
     // set up a basic environment
-    Configuration config = Configuration.defaultConfiguration();
+    Configuration config =
+        Configuration.builder()
+            .setOption("solver.solverIndependentInterpolation", "true")
+            .setOption("solver.interpolation.method", STRATEGY.name())
+            .build();
     LogManager logger = BasicLogManager.create(config);
     ShutdownNotifier notifier = ShutdownNotifier.createDummy();
 
@@ -53,7 +57,7 @@ public final class IndependentInterpolation {
     try (SolverContext context =
             SolverContextFactory.createSolverContext(config, logger, notifier, solver);
         InterpolatingProverEnvironment<?> prover =
-            context.newProverEnvironmentWithInterpolation(STRATEGY)) {
+            context.newProverEnvironmentWithInterpolation()) {
       logger.log(Level.WARNING, "Using solver " + solver + " in version " + context.getVersion());
       logger.log(Level.INFO, "Interpolation strategy: " + STRATEGY);
 

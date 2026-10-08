@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-package org.sosy_lab.java_smt.basicimpl.interpolation_techniques;
+package org.sosy_lab.java_smt.delegate.interpolation.techniques;
 
 import com.google.common.collect.ImmutableList;
 import java.util.LinkedHashSet;
