@@ -729,7 +729,7 @@ public abstract class SolverBasedTest0 {
       requireInterpolation();
     }
 
-    protected void requireTreeItp(ProverOptions... options) {
+    protected void requireTreeItp() {
       assume()
           .withMessage(
               "Solver independent interpolation strategy %s does not support tree interpolation",

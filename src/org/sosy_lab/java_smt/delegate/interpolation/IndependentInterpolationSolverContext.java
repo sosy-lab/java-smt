@@ -83,6 +83,7 @@ public class IndependentInterpolationSolverContext implements SolverContext {
     return delegate.newProverEnvironment(options);
   }
 
+  @SuppressWarnings("resource")
   @Override
   public InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation(
       ProverOptions... options) {
