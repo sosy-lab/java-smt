@@ -17,6 +17,7 @@ import java.util.Set;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.io.PathCounterTemplate;
+import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 
@@ -37,5 +38,11 @@ class Z3LegacyTheoremProver extends Z3LegacyAbstractProver<Void> implements Prov
     }
     Native.solverSetParams(z3context, z3solver, z3params);
     Native.paramsDecRef(z3context, z3params);
+  }
+
+  @Override
+  protected @Nullable Void addConstraintImpl(BooleanFormula constraint) throws InterruptedException {
+    addConstraint0(constraint);
+    return null;
   }
 }
