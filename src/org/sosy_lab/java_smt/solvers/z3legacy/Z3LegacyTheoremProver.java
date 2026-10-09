@@ -41,7 +41,8 @@ class Z3LegacyTheoremProver extends Z3LegacyAbstractProver<Void> implements Prov
   }
 
   @Override
-  protected @Nullable Void addConstraintImpl(BooleanFormula constraint) throws InterruptedException {
+  protected @Nullable Void addConstraintImpl(BooleanFormula constraint)
+      throws InterruptedException {
     addConstraint0(constraint);
     return null;
   }
