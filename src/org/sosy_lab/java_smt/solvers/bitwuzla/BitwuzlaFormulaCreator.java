@@ -466,7 +466,12 @@ class BitwuzlaFormulaCreator extends FormulaCreator<Term, Sort, TermManager, Bit
           formula,
           arguments.build(),
           FunctionDeclarationImpl.of(
-              name, getDeclarationKind(f), argumentTypes.build(), getFormulaType(f), decl));
+              name,
+              getDeclarationKind(f),
+              ImmutableList.copyOf(f.indices()),
+              argumentTypes.build(),
+              getFormulaType(f),
+              decl));
     }
   }
 
