@@ -140,7 +140,7 @@ abstract class SmtInterpolAbstractProver<T> extends AbstractProver<T> {
 
   @SuppressWarnings("resource")
   @Override
-  public org.sosy_lab.java_smt.api.Model getModelImpl() {
+  protected org.sosy_lab.java_smt.api.Model getModelImpl() {
     final Model model;
     try {
       model = env.getModel();
@@ -165,8 +165,7 @@ abstract class SmtInterpolAbstractProver<T> extends AbstractProver<T> {
   }
 
   @Override
-  public List<BooleanFormula> getUnsatCore() {
-    checkGenerateUnsatCores();
+  protected List<BooleanFormula> getUnsatCoreImpl() {
     return getUnsatCore0(annotatedTerms.peek());
   }
 
@@ -187,9 +186,8 @@ abstract class SmtInterpolAbstractProver<T> extends AbstractProver<T> {
   }
 
   @Override
-  public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(
+  protected Optional<List<BooleanFormula>> unsatCoreOverAssumptionsImpl(
       Collection<BooleanFormula> assumptions) throws InterruptedException, SolverException {
-    checkGenerateUnsatCoresOverAssumptions();
     Map<String, BooleanFormula> annotatedConstraints = new LinkedHashMap<>();
     push();
     for (BooleanFormula assumption : assumptions) {
@@ -199,11 +197,13 @@ abstract class SmtInterpolAbstractProver<T> extends AbstractProver<T> {
     Optional<List<BooleanFormula>> result =
         isUnsat() ? Optional.of(getUnsatCore0(annotatedConstraints)) : Optional.empty();
     pop();
+    // Note: You can not trust the solver anymore due to the pop. The pop() also changes
+    // changedSinceLastSatQuery to true!
     return result;
   }
 
   @Override
-  public ImmutableMap<String, String> getStatistics() {
+  protected ImmutableMap<String, String> getStatisticsImpl() {
     ImmutableMap.Builder<String, String> builder = ImmutableMap.builder();
     SmtInterpolSolverContext.flatten(builder, "", env.getInfo(":all-statistics"));
     return builder.buildOrThrow();
@@ -220,16 +220,17 @@ abstract class SmtInterpolAbstractProver<T> extends AbstractProver<T> {
   }
 
   @Override
-  public boolean isUnsatWithAssumptions(Collection<BooleanFormula> pAssumptions)
+  protected boolean isUnsatWithAssumptionsImpl(Collection<BooleanFormula> pAssumptions)
       throws SolverException, InterruptedException {
+    // While SMTInterpol provides checkSatAssuming(), it requires the assumptions to be
+    // non-annotated, which we don't want due to this conflicting with unsat-core/interpolation
+    // support.
     throw new UnsupportedOperationException(ASSUMPTION_SOLVING_NOT_SUPPORTED);
   }
 
   @Override
-  public <R> R allSat(AllSatCallback<R> callback, List<BooleanFormula> important)
+  protected <R> R allSatImpl(AllSatCallback<R> callback, List<BooleanFormula> important)
       throws InterruptedException, SolverException {
-    checkGenerateAllSat();
-
     Term[] importantTerms = new Term[important.size()];
     int i = 0;
     for (BooleanFormula impF : important) {

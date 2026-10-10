@@ -25,6 +25,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.Set;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.java_smt.api.BasicProverEnvironment;
@@ -81,19 +82,30 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
   }
 
   protected final void checkGenerateAllSat() {
+    // TODO: should this close all evaluators as well?
     Preconditions.checkState(!closed);
     Preconditions.checkState(generateAllSat, TEMPLATE, ProverOptions.GENERATE_ALL_SAT);
   }
 
   protected final void checkGenerateUnsatCores() {
+    // TODO: should this close all evaluators as well?
     Preconditions.checkState(generateUnsatCores, TEMPLATE, ProverOptions.GENERATE_UNSAT_CORE);
     Preconditions.checkState(!closed);
     Preconditions.checkState(!changedSinceLastSatQuery);
     Preconditions.checkState(!wasLastSatCheckSatisfiable);
   }
 
-  protected final void checkGenerateUnsatCoresOverAssumptions() {
+  protected final void checkIsUnsatOverAssumptions(Collection<BooleanFormula> assumptions) {
     Preconditions.checkState(!closed);
+    Preconditions.checkNotNull(assumptions);
+  }
+
+  protected final void checkGenerateUnsatCoresOverAssumptions(
+      Collection<BooleanFormula> assumptions) {
+    // TODO: should this close all evaluators as well?
+    // No need to no check for changedSinceLastSatQuery or wasLastSatCheckSatisfiable, as we
+    // guarantee a call to isUnsatOverAssumptions()
+    checkIsUnsatOverAssumptions(assumptions);
     Preconditions.checkState(
         generateUnsatCoresOverAssumptions,
         TEMPLATE,
@@ -109,6 +121,7 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
   }
 
   private void checkGenerateInterpolants() {
+    // TODO: should this close all evaluators as well?
     Preconditions.checkState(!closed);
     Preconditions.checkState(
         !changedSinceLastSatQuery,
@@ -151,6 +164,10 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
 
   protected abstract boolean hasPersistentModel();
 
+  /**
+   * Sets the flags such that the prover state was changed since the last SAT check and closes all
+   * evaluators.
+   */
   private void setChanged() {
     wasLastSatCheckSatisfiable = false;
     if (!changedSinceLastSatQuery) {
@@ -322,6 +339,93 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
   protected void closeAllEvaluators() {
     ImmutableList.copyOf(evaluators).forEach(Evaluator::close);
     evaluators.clear();
+  }
+
+  // Note: this is also overridden and implemented in our assumptions wrapper (i.e.
+  // BasicProverWithAssumptionsWrapper and its children), without checks/flags. But the
+  // implementation in the assumptions wrapper is guaranteed to use other methods that are
+  // checked and set the flags correctly (push() and isUnsat()), so we can safely ignore it.
+  @Override
+  public final boolean isUnsatWithAssumptions(Collection<BooleanFormula> assumptions)
+      throws SolverException, InterruptedException {
+    checkIsUnsatOverAssumptions(assumptions);
+    changedSinceLastSatQuery = false;
+    wasLastSatCheckSatisfiable = false;
+    final boolean isUnsat = isUnsatWithAssumptionsImpl(assumptions);
+    if (!isUnsat) {
+      wasLastSatCheckSatisfiable = true;
+    }
+    return isUnsat;
+  }
+
+  /**
+   * @implNote implementing this assumes that {@link
+   *     AbstractSolverContext#supportsAssumptionSolving()} is also overridden returning {@code
+   *     true} in the {@link org.sosy_lab.java_smt.api.SolverContext} implementation of this solver,
+   *     as otherwise this method is ignored.
+   */
+  protected abstract boolean isUnsatWithAssumptionsImpl(Collection<BooleanFormula> assumptions)
+      throws SolverException, InterruptedException;
+
+  @Override
+  public final List<BooleanFormula> getUnsatCore() {
+    checkGenerateUnsatCores();
+    return getUnsatCoreImpl();
+  }
+
+  /**
+   * @implSpec override and implement if a solver supports UNSAT-CORE generation.
+   */
+  protected List<BooleanFormula> getUnsatCoreImpl() {
+    throw new UnsupportedOperationException(UNSAT_CORE_NOT_SUPPORTED);
+  }
+
+  @Override
+  public final Optional<List<BooleanFormula>> unsatCoreOverAssumptions(
+      Collection<BooleanFormula> assumptions) throws SolverException, InterruptedException {
+    checkGenerateUnsatCoresOverAssumptions(assumptions);
+    // Since some unsatCoreOverAssumptionsImpl implementations don't use isUnsatWithAssumptions(),
+    // we can not give any guarantees (flags) here, but the implementations need to provide them
+    return unsatCoreOverAssumptionsImpl(assumptions);
+  }
+
+  /**
+   * @implSpec override and implement if a solver supports the generation of UNSAT-COREs over
+   *     assumptions. This implementation must guarantee that {@link
+   *     BasicProverEnvironment#isUnsatWithAssumptions(Collection)}, or equivalent code that also
+   *     sets the flags ({@link #changedSinceLastSatQuery} and {@link #wasLastSatCheckSatisfiable})
+   *     correctly is called to establish satisfiability, before generating the unsat-core. Else,
+   *     override and throw a {@link UnsupportedOperationException} with {@link
+   *     BasicProverEnvironment#UNSAT_CORE_WITH_ASSUMPTIONS_NOT_SUPPORTED}.
+   */
+  protected abstract Optional<List<BooleanFormula>> unsatCoreOverAssumptionsImpl(
+      Collection<BooleanFormula> assumptions) throws SolverException, InterruptedException;
+
+  @Override
+  public final <R> R allSat(AllSatCallback<R> callback, List<BooleanFormula> important)
+      throws InterruptedException, SolverException {
+    checkGenerateAllSat();
+    return allSatImpl(callback, important);
+  }
+
+  /**
+   * @implSpec only override and implement if a solver offers its own AllSAT procedure, otherwise
+   *     inherit {@link AbstractProverWithAllSat} instead of this class.
+   */
+  protected abstract <R> R allSatImpl(AllSatCallback<R> callback, List<BooleanFormula> important)
+      throws InterruptedException, SolverException;
+
+  @Override
+  public final ImmutableMap<String, String> getStatistics() {
+    Preconditions.checkState(!closed);
+    return getStatisticsImpl();
+  }
+
+  /**
+   * @implSpec override and implement for solvers that provide statistics.
+   */
+  protected ImmutableMap<String, String> getStatisticsImpl() {
+    return ImmutableMap.of();
   }
 
   @Override
