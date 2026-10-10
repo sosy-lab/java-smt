@@ -202,6 +202,7 @@ abstract class PrincessAbstractProver<E> extends AbstractProverWithAllSat<E> {
       api.reset(); // cleanup memory, even if we keep a reference to "api" and "mgr"
       creator.getEnv().unregisterStack(this);
       partitions.clear();
+      abbreviations.clear();
     }
     super.close();
   }
