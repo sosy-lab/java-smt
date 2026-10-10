@@ -182,6 +182,13 @@ class StatisticsFloatingPointFormulaManager implements FloatingPointFormulaManag
   }
 
   @Override
+  public BooleanFormula bitwiseEqual(
+      FloatingPointFormula floatValue, BitvectorFormula bitvectorValue) {
+    stats.fpOperations.getAndIncrement();
+    return delegate.bitwiseEqual(floatValue, bitvectorValue);
+  }
+
+  @Override
   public FloatingPointFormula round(
       FloatingPointFormula pFormula, FloatingPointRoundingMode pRoundingMode) {
     stats.fpOperations.getAndIncrement();

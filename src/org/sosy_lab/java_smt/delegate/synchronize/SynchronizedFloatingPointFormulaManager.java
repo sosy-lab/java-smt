@@ -204,6 +204,14 @@ class SynchronizedFloatingPointFormulaManager implements FloatingPointFormulaMan
   }
 
   @Override
+  public BooleanFormula bitwiseEqual(
+      FloatingPointFormula floatValue, BitvectorFormula bitvectorValue) {
+    synchronized (sync) {
+      return delegate.bitwiseEqual(floatValue, bitvectorValue);
+    }
+  }
+
+  @Override
   public FloatingPointFormula round(
       FloatingPointFormula pFormula, FloatingPointRoundingMode pRoundingMode) {
     synchronized (sync) {

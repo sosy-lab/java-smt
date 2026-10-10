@@ -366,13 +366,19 @@ public abstract class SolverBasedTest0 {
   }
 
   @SuppressWarnings("CheckReturnValue")
-  protected final void requireFPToBitvector() {
+  final void requireNativeFPToBitvector() {
     requireFloats();
+    var someFP = fpmgr.makeNumber(0, getSinglePrecisionFloatingPointType());
     try {
-      fpmgr.toIeeeBitvector(fpmgr.makeNumber(0, getSinglePrecisionFloatingPointType()));
+      fpmgr.toIeeeBitvector(someFP);
     } catch (UnsupportedOperationException e) {
       assume()
-          .withMessage("Solver %s does not yet support FP-to-BV conversion", solverToUse())
+          .withMessage(
+              "Solver %s does not support FP-to-BV conversion, use the fallback methods "
+                  + "FloatingPointFormulaManager#toIeeeBitvector(FloatingPointFormula, "
+                  + "String, Map) and/or FloatingPointFormulaManager#toIeeeBitvector"
+                  + "(FloatingPointFormula, String).",
+              solverToUse())
           .that(solverToUse())
           .isNull();
     }
