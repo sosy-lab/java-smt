@@ -12,8 +12,8 @@ import com.google.common.base.Verify;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.PropagatorBackend;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
@@ -21,9 +21,9 @@ import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.api.UserPropagator;
 import org.sosy_lab.java_smt.basicimpl.AbstractUserPropagator;
 
-public class UserPropagatorTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
+public class UserPropagatorTest extends SolverBasedTest.ParameterizedSolverBasedTest {
 
-  @Before
+  @BeforeEach
   public void init() {
     requireUserPropagators();
   }

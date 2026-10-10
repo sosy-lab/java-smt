@@ -12,23 +12,22 @@ import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_crea
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_create_opt_env;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_destroy_config;
 
-import org.junit.AssumptionViolatedException;
-import org.junit.Before;
-import org.junit.BeforeClass;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.opentest4j.TestAbortedException;
 import org.sosy_lab.common.NativeLibraries;
 
 public class Mathsat5OptimizationNativeApiTest extends Mathsat5AbstractNativeApiTest {
-
-  @BeforeClass
+  @BeforeAll
   public static void loadMathsat() {
     try {
       NativeLibraries.loadLibrary("optimathsat5j");
     } catch (UnsatisfiedLinkError e) {
-      throw new AssumptionViolatedException("OptiMathSAT5 is not available", e);
+      throw new TestAbortedException("OptiMathSAT5 is not available", e);
     }
   }
 
-  @Before
+  @BeforeEach
   public void createEnvironment() {
     long cfg = msat_create_config();
     env = msat_create_opt_env(cfg);

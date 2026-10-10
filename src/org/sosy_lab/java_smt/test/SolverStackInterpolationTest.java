@@ -16,7 +16,7 @@ import org.sosy_lab.java_smt.api.SolverContext;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.solvers.opensmt.Logics;
 
-public class SolverStackInterpolationTest extends SolverStackTest0 {
+public class SolverStackInterpolationTest extends SolverStackTest {
 
   @Override
   protected Logics logicToUse() {

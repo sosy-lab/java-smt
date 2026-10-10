@@ -9,16 +9,16 @@
 package org.sosy_lab.java_smt.solvers.bitwuzla;
 
 import static com.google.common.truth.Truth.assertThat;
-import static org.junit.Assert.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.sosy_lab.java_smt.solvers.bitwuzla.BitwuzlaSolverContext.loadLibrary;
 
 import com.google.common.truth.Truth;
-import org.junit.After;
-import org.junit.AssumptionViolatedException;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+import org.opentest4j.TestAbortedException;
 import org.sosy_lab.common.NativeLibraries;
 import org.sosy_lab.java_smt.solvers.bitwuzla.api.Bitwuzla;
 import org.sosy_lab.java_smt.solvers.bitwuzla.api.Kind;
@@ -39,16 +39,16 @@ public class BitwuzlaNativeApiTest {
   private TermManager termManager;
   private Bitwuzla bitwuzla;
 
-  @BeforeClass
+  @BeforeAll
   public static void load() {
     try {
       loadLibrary(NativeLibraries::loadLibrary);
     } catch (UnsatisfiedLinkError e) {
-      throw new AssumptionViolatedException("Bitwuzla is not available", e);
+      throw new TestAbortedException("Bitwuzla is not available", e);
     }
   }
 
-  @Before
+  @BeforeEach
   public void createEnvironment() {
     termManager = new TermManager();
     bitwuzla = new Bitwuzla(termManager, createOptions());
@@ -60,7 +60,7 @@ public class BitwuzlaNativeApiTest {
     return options;
   }
 
-  @After
+  @AfterEach
   public void freeEnvironment() {
     TermManager.deleteReferences();
   }
@@ -772,7 +772,7 @@ public class BitwuzlaNativeApiTest {
   }
 
   // Bitwuzla currently REWRITES terms when parsing
-  @Ignore
+  @Disabled
   @Test
   public void parserTest2() {
     Vector_Term assertions = parse(SMT2DUMP);

@@ -59,11 +59,11 @@ import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_term
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_type_equals;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_type_repr;
 
-import org.junit.AssumptionViolatedException;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+import org.opentest4j.TestAbortedException;
 import org.sosy_lab.common.NativeLibraries;
 import org.sosy_lab.java_smt.api.SolverException;
 
@@ -73,16 +73,16 @@ public class Mathsat5NativeApiTest extends Mathsat5AbstractNativeApiTest {
   private long const1;
   private long var;
 
-  @BeforeClass
+  @BeforeAll
   public static void loadMathsat() {
     try {
       Mathsat5SolverContext.loadLibrary(NativeLibraries::loadLibrary);
     } catch (UnsatisfiedLinkError e) {
-      throw new AssumptionViolatedException("MathSAT5 is not available", e);
+      throw new TestAbortedException("MathSAT5 is not available", e);
     }
   }
 
-  @Before
+  @BeforeEach
   public void createEnvironment() {
     long cfg = msat_create_config();
 
@@ -192,7 +192,7 @@ public class Mathsat5NativeApiTest extends Mathsat5AbstractNativeApiTest {
    * Testing is_pi(x) and x == pi true (Works); Tried x == pi and sin(x) == 0 SAT but solver
    * calculates endlessly.
    */
-  @Ignore
+  @Disabled
   public void piTest() throws IllegalStateException, InterruptedException, SolverException {
     long pi = msat_make_pi(env);
     long sin = msat_make_sin(env, var);
@@ -207,7 +207,7 @@ public class Mathsat5NativeApiTest extends Mathsat5AbstractNativeApiTest {
   }
 
   /** Similar problem as sin(pi); Calculates endlessly (even asin(0) == 0). */
-  @Ignore
+  @Disabled
   public void asinTest() throws IllegalStateException, InterruptedException, SolverException {
     long asin = msat_make_asin(env, var);
 
@@ -230,7 +230,7 @@ public class Mathsat5NativeApiTest extends Mathsat5AbstractNativeApiTest {
    * log(term) == natural log of term Similar problem as asin; Calculates endlessly even with
    * trivial formulas as ln(1) == 0 or log(e^1) == 1.
    */
-  @Ignore
+  @Disabled
   public void logTest() throws IllegalStateException, InterruptedException, SolverException {
     // exp(1) == e
     long logE = msat_make_log(env, msat_make_exp(env, var));

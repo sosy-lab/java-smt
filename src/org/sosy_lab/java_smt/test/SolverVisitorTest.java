@@ -29,8 +29,8 @@ import java.util.Map.Entry;
 import java.util.Random;
 import java.util.Set;
 import java.util.stream.Stream;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.ArrayFormula;
@@ -60,7 +60,7 @@ import org.sosy_lab.java_smt.api.visitors.FormulaTransformationVisitor;
 import org.sosy_lab.java_smt.api.visitors.FormulaVisitor;
 import org.sosy_lab.java_smt.api.visitors.TraversalProcess;
 
-public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
+public class SolverVisitorTest extends SolverBasedTest.ParameterizedSolverBasedTest {
 
   /** visit a formula and fail on OTHER, i.e., unexpected function declaration type. */
   public static final class FunctionDeclarationVisitorNoOther
@@ -160,7 +160,7 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
     }
   }
 
-  @Before
+  @BeforeEach
   public void setup() {
     requireVisitor();
   }

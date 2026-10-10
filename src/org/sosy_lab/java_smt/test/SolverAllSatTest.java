@@ -17,13 +17,14 @@ import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableList;
 import java.util.ArrayList;
 import java.util.List;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameter;
-import org.junit.runners.Parameterized.Parameters;
+import java.util.concurrent.TimeUnit;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Timeout;
+import org.junit.jupiter.params.Parameter;
+import org.junit.jupiter.params.ParameterizedClass;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BasicProverEnvironment;
 import org.sosy_lab.java_smt.api.BasicProverEnvironment.AllSatCallback;
@@ -35,13 +36,13 @@ import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.solvers.opensmt.Logics;
 
-@RunWith(Parameterized.class)
-public class SolverAllSatTest extends SolverBasedTest0 {
+@ParameterizedClass
+@MethodSource("getAllSolvers")
+public class SolverAllSatTest extends SolverBasedTest {
 
-  @Parameters(name = "solver {0} with prover {1}")
   public static Iterable<Object[]> getAllSolvers() {
     List<Object[]> junitParams = new ArrayList<>();
-    for (Solvers solver : ParameterizedSolverBasedTest0.getAllSolvers()) {
+    for (Solvers solver : ParameterizedSolverBasedTest.getAllSolvers()) {
       junitParams.add(new Object[] {solver, "normal"});
       junitParams.add(new Object[] {solver, "itp"});
       junitParams.add(new Object[] {solver, "opt"});
@@ -68,7 +69,7 @@ public class SolverAllSatTest extends SolverBasedTest0 {
 
   private BasicProverEnvironment<?> env;
 
-  @Before
+  @BeforeEach
   public void setupEnvironment() {
     switch (proverEnv) {
       case "normal" -> env = context.newProverEnvironment(ProverOptions.GENERATE_ALL_SAT);
@@ -88,7 +89,7 @@ public class SolverAllSatTest extends SolverBasedTest0 {
     }
   }
 
-  @After
+  @AfterEach
   public void closeEnvironment() {
     if (env != null) {
       env.close();
@@ -178,7 +179,8 @@ public class SolverAllSatTest extends SolverBasedTest0 {
     assertThat(env.allSat(callback, ImmutableList.of(v1, v2))).isEqualTo(EXPECTED_RESULT);
   }
 
-  @Test(timeout = 5_000)
+  @Test
+  @Timeout(value = 5, unit = TimeUnit.SECONDS)
   public void allSatTest_xor() throws SolverException, InterruptedException {
     requireIntegers();
 

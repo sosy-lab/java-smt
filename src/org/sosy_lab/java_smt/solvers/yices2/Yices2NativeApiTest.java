@@ -9,7 +9,7 @@
 package org.sosy_lab.java_smt.solvers.yices2;
 
 import static com.google.common.truth.Truth.assertThat;
-import static org.junit.Assert.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.google.common.collect.ImmutableList;
 import com.sri.yices.BigRational;
@@ -26,24 +26,24 @@ import com.sri.yices.Types;
 import com.sri.yices.Yices;
 import com.sri.yices.YicesException;
 import java.math.BigInteger;
-import org.junit.After;
-import org.junit.AssumptionViolatedException;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.opentest4j.TestAbortedException;
 import org.sosy_lab.common.NativeLibraries;
 import org.sosy_lab.common.rationals.Rational;
 
 public class Yices2NativeApiTest {
 
-  @BeforeClass
+  @BeforeAll
   public static void loadYices() {
     try {
       System.setProperty("yices.skipAutoloader", "true");
       NativeLibraries.loadLibrary("yices2java");
       Yices.isReady();
     } catch (UnsatisfiedLinkError e) {
-      throw new AssumptionViolatedException("Yices2 is not available", e);
+      throw new TestAbortedException("Yices2 is not available", e);
     }
   }
 
@@ -58,12 +58,12 @@ public class Yices2NativeApiTest {
     }
   }
 
-  @Before
+  @BeforeEach
   public void createEnvironment() {
     env = newContext(false);
   }
 
-  @After
+  @AfterEach
   public void freeEnvironment() {
     env.close();
   }

@@ -15,20 +15,20 @@ import com.google.common.base.Throwables;
 import com.google.common.truth.ExpectFailure;
 import com.google.common.truth.ExpectFailure.SimpleSubjectBuilderCallback;
 import com.google.common.truth.SimpleSubjectBuilder;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.sosy_lab.java_smt.api.BasicProverEnvironment;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 
-public class ProverEnvironmentSubjectTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
+public class ProverEnvironmentSubjectTest extends SolverBasedTest.ParameterizedSolverBasedTest {
 
   private BooleanFormula simpleFormula;
   private BooleanFormula contradiction;
 
-  @Before
+  @BeforeEach
   public void setupFormulas() {
     if (imgr != null) {
       simpleFormula = imgr.equal(imgr.makeVariable("a"), imgr.makeNumber(1));

@@ -22,8 +22,8 @@ import com.google.common.truth.TruthJUnit;
 import java.util.Collection;
 import java.util.function.Supplier;
 import java.util.regex.Pattern;
-import org.junit.AssumptionViolatedException;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.opentest4j.TestAbortedException;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -34,7 +34,7 @@ import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.SMTLibTokenizer;
 
 @SuppressWarnings("checkstyle:linelength")
-public class SolverFormulaIOTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
+public class SolverFormulaIOTest extends SolverBasedTest.ParameterizedSolverBasedTest {
 
   private static final String BOOL_CHECK =
       "(declare-fun x () Bool)(declare-fun y () Bool)(assert (= y x))";
@@ -541,7 +541,7 @@ public class SolverFormulaIOTest extends SolverBasedTest0.ParameterizedSolverBas
     try {
       requireParser();
       mgr.parse(dump);
-    } catch (AssumptionViolatedException ave) {
+    } catch (TestAbortedException ave) {
       // ignore, i.e., do not report test-case as skipped.
     }
   }

@@ -15,14 +15,19 @@ SPDX-License-Identifier: Apache-2.0
          Keep this file synchronized with
          https://gitlab.com/sosy-lab/software/java-project-template
     -->
-    <settings defaultResolver="Sosy-Lab"/>
+    <settings defaultResolver="default"/>
     <property name="repo.dir" value="${basedir}/repository"/>
     <resolvers>
         <!-- Resolver for downloading dependencies -->
-        <url name="Sosy-Lab" descriptor="required">
-            <ivy pattern="${ivy.repo.url}/[organisation]/[module]/ivy-[revision].xml" />
-            <artifact pattern="${ivy.repo.url}/[organisation]/[module]/([arch]/)[artifact]-[revision](-[classifier]).[ext]" />
-        </url>
+        <chain name="default">
+            <!-- Download packages from Sosy-Labs -->
+            <url name="Sosy-Lab" descriptor="required">
+                <ivy pattern="${ivy.repo.url}/[organisation]/[module]/ivy-[revision].xml"/>
+                <artifact pattern="${ivy.repo.url}/[organisation]/[module]/([arch]/)[artifact]-[revision](-[classifier]).[ext]"/>
+            </url>
+            <!-- Use Maven central as a fallback -->
+            <ibiblio name="central" m2compatible="true"/>
+        </chain>
 
         <!-- Resolver for publishing this project -->
         <filesystem name="Sosy-Lab-Publish">

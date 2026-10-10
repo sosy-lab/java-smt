@@ -9,7 +9,7 @@
 package org.sosy_lab.java_smt.solvers.cvc5;
 
 import static com.google.common.truth.Truth.assertThat;
-import static org.junit.Assert.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.google.common.base.Preconditions;
 import io.github.cvc5.CVC5ApiException;
@@ -29,12 +29,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import org.junit.After;
-import org.junit.AssumptionViolatedException;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+import org.opentest4j.TestAbortedException;
 import org.sosy_lab.common.NativeLibraries;
 
 /*
@@ -56,12 +56,12 @@ public class CVC5NativeAPITest {
   private static final String INVALID_MODEL_STRING =
       "cannot get model unless after a SAT or UNKNOWN response.";
 
-  @BeforeClass
+  @BeforeAll
   public static void loadCVC5() {
     try {
       CVC5SolverContext.loadLibrary(NativeLibraries::loadLibrary);
     } catch (UnsatisfiedLinkError e) {
-      throw new AssumptionViolatedException("CVC5 is not available", e);
+      throw new TestAbortedException("CVC5 is not available", e);
     }
   }
 
@@ -73,7 +73,7 @@ public class CVC5NativeAPITest {
   private TermManager termManager;
   private Solver solver;
 
-  @Before
+  @BeforeEach
   public void init() throws CVC5ApiException {
     termManager = new TermManager();
     solver = createEnvironment();
@@ -93,7 +93,7 @@ public class CVC5NativeAPITest {
     return newSolver;
   }
 
-  @After
+  @AfterEach
   public void freeEnvironment() {
     Context.deletePointers();
   }
@@ -728,7 +728,7 @@ public class CVC5NativeAPITest {
     assertThat(satCheck.isSat()).isFalse();
   }
 
-  @Ignore
+  @Disabled
   public void checkBvDistinct() throws CVC5ApiException {
     Sort bvSort = termManager.mkBitVectorSort(6);
     List<Term> bvs = new ArrayList<>();
@@ -908,7 +908,7 @@ public class CVC5NativeAPITest {
   }
 
   /** CVC5 does not support Array quantifier elimination. This would run endlessly! */
-  @Ignore
+  @Disabled
   @Test
   public void checkArrayQuantElim() {
     setupArrayQuant();
@@ -1338,7 +1338,7 @@ public class CVC5NativeAPITest {
   }
 
   @Test
-  @Ignore // Does not terminate
+  @Disabled // Does not terminate
   public void testSimpleInterpolation() {
     // Out of InterpolatingProverTest.java
     // Line: 65

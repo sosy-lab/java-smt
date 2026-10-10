@@ -11,7 +11,7 @@ package org.sosy_lab.java_smt.test;
 import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.Truth.assertWithMessage;
 import static com.google.common.truth.TruthJUnit.assume;
-import static org.junit.Assert.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.sosy_lab.java_smt.test.ProverEnvironmentSubject.assertThat;
 
 import com.google.common.collect.ImmutableList;
@@ -20,8 +20,8 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.ArrayFormula;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
@@ -38,11 +38,11 @@ import org.sosy_lab.java_smt.api.SolverException;
  * Tests bitvectors for all solvers that support it. Notice: Boolector does not support integer
  * theory or bitvectors length 1.
  */
-public class BitvectorFormulaManagerTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
+public class BitvectorFormulaManagerTest extends SolverBasedTest.ParameterizedSolverBasedTest {
 
   private static final BitvectorType bvType4 = FormulaType.getBitvectorTypeWithSize(4);
 
-  @Before
+  @BeforeEach
   public void init() {
     requireBitvectors();
   }

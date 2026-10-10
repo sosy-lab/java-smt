@@ -14,11 +14,11 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import java.util.Arrays;
 import java.util.Locale;
-import org.junit.After;
-import org.junit.AssumptionViolatedException;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.opentest4j.TestAbortedException;
 import org.sosy_lab.common.NativeLibraries;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.configuration.Configuration;
@@ -35,21 +35,21 @@ public class BoolectorNativeApiTest {
 
   private long btor;
 
-  @BeforeClass
+  @BeforeAll
   public static void load() {
     try {
       NativeLibraries.loadLibrary("boolector");
     } catch (UnsatisfiedLinkError e) {
-      throw new AssumptionViolatedException("Boolector is not available", e);
+      throw new TestAbortedException("Boolector is not available", e);
     }
   }
 
-  @Before
+  @BeforeEach
   public void createEnvironment() {
     btor = BtorJNI.boolector_new();
   }
 
-  @After
+  @AfterEach
   public void freeEnvironment() {
     BtorJNI.boolector_delete(btor);
   }
