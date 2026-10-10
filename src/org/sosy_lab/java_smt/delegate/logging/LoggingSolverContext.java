@@ -14,6 +14,7 @@ import com.google.common.collect.ImmutableMap;
 import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.FormulaManager;
+import org.sosy_lab.java_smt.api.HornProverEnvironment;
 import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
 import org.sosy_lab.java_smt.api.OptimizationProverEnvironment;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
@@ -54,6 +55,11 @@ public final class LoggingSolverContext implements SolverContext {
   public OptimizationProverEnvironment newOptimizationProverEnvironment(ProverOptions... options) {
     return new LoggingOptimizationProverEnvironment(
         logger, delegate.newOptimizationProverEnvironment(options));
+  }
+
+  @Override
+  public HornProverEnvironment newHornProverEnvironment(ProverOptions... options) {
+    return new LoggingHornProverEnvironment(logger, delegate.newHornProverEnvironment(options));
   }
 
   @Override

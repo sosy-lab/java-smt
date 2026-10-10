@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
 import org.sosy_lab.java_smt.api.FormulaManager;
+import org.sosy_lab.java_smt.api.HornProverEnvironment;
 import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
 import org.sosy_lab.java_smt.api.OptimizationProverEnvironment;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
@@ -77,6 +78,18 @@ public abstract class AbstractSolverContext implements SolverContext {
 
   protected abstract OptimizationProverEnvironment newOptimizationProverEnvironment0(
       Set<ProverOptions> pSet);
+
+  @Override
+  public final HornProverEnvironment newHornProverEnvironment(
+      ProverOptions... options) {
+    return newHornProverEnvironment0(toSet(options));
+  }
+
+  protected HornProverEnvironment newHornProverEnvironment0(
+      Set<ProverOptions> pSet) {
+    // TODO: Fallback to normal ProverEnvironment?
+    throw new UnsupportedOperationException("Solver does not support horn clauses");
+  }
 
   /**
    * Whether the solver supports solving under some given assumptions (with all corresponding
