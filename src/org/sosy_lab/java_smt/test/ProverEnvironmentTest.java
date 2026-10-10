@@ -238,4 +238,13 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
       pProver.pop();
     }
   }
+
+  @SuppressWarnings("unused")
+  @Test
+  public void assertionIdTest() throws InterruptedException {
+    try (var prover = context.newProverEnvironment()) {
+      // Crashes if addConstraint tries to return anything other than 'null'
+      Void id = prover.addConstraint(bmgr.makeTrue());
+    }
+  }
 }
