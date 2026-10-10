@@ -8,7 +8,6 @@
 
 package org.sosy_lab.java_smt.solvers.cvc4;
 
-import com.google.common.base.Preconditions;
 import edu.stanford.CVC4.Expr;
 import edu.stanford.CVC4.ExprManager;
 import edu.stanford.CVC4.SmtEngine;
@@ -28,7 +27,6 @@ class CVC4Evaluator extends AbstractEvaluator<Expr, Type, ExprManager> {
 
   @Override
   public Expr evalImpl(Expr f) {
-    Preconditions.checkState(!isClosed());
     return getValue(f);
   }
 

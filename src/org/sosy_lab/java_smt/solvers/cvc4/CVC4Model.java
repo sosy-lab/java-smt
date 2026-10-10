@@ -11,7 +11,6 @@ package org.sosy_lab.java_smt.solvers.cvc4;
 import static com.google.common.base.Preconditions.checkState;
 import static org.sosy_lab.common.collect.Collections3.transformedImmutableListCopy;
 
-import com.google.common.base.Preconditions;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
@@ -54,7 +53,6 @@ class CVC4Model extends AbstractModel<Expr, Type, ExprManager> {
     // This method looks like a violation of the constraint above: the SMT engine can be changed
     // before querying this method. However, the prover guarantees to close the model before this
     // can happen.
-    Preconditions.checkState(!isClosed());
     return getValue(f);
   }
 

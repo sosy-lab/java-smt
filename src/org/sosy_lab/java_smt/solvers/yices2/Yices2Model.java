@@ -28,13 +28,11 @@ import org.sosy_lab.java_smt.basicimpl.AbstractModel;
 class Yices2Model extends AbstractModel<Integer, Integer, Long> {
 
   private final Model model;
-  private final Yices2AbstractProver<?> prover;
   private final Yices2FormulaCreator formulaCreator;
 
   Yices2Model(Model model, Yices2AbstractProver<?> prover, Yices2FormulaCreator pCreator) {
     super(prover, pCreator);
     this.model = model;
-    this.prover = prover;
     this.formulaCreator = Preconditions.checkNotNull(pCreator);
   }
 
@@ -48,8 +46,7 @@ class Yices2Model extends AbstractModel<Integer, Integer, Long> {
 
   @Override
   public ImmutableList<ValueAssignment> asList() {
-    Preconditions.checkState(!isClosed());
-    Preconditions.checkState(!prover.isClosed(), "cannot use model after prover is closed");
+    Preconditions.checkState(!isProverClosed(), "cannot use model after prover is closed");
     ImmutableList.Builder<ValueAssignment> assignments = ImmutableList.builder();
     int[] termsInModel = model.collectDefinedTerms();
     for (int term : termsInModel) {

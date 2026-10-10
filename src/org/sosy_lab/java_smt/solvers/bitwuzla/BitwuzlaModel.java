@@ -34,7 +34,6 @@ class BitwuzlaModel extends AbstractModel<Term, Sort, TermManager> {
 
   // The prover env, not the creator env!
   private final Bitwuzla bitwuzlaEnv;
-  private final BitwuzlaAbstractProver<?> prover;
   private final ImmutableList<ValueAssignment> model;
 
   BitwuzlaModel(
@@ -44,7 +43,6 @@ class BitwuzlaModel extends AbstractModel<Term, Sort, TermManager> {
       Collection<Term> assertedTerms) {
     super(prover, bitwuzlaCreator);
     this.bitwuzlaEnv = bitwuzlaEnv;
-    this.prover = prover;
 
     // We need to generate and save this at construction time as Bitwuzla has no functionality to
     // give a persistent reference to the model. If the SMT engine is used somewhere else, the
@@ -204,8 +202,7 @@ class BitwuzlaModel extends AbstractModel<Term, Sort, TermManager> {
 
   @Override
   protected @Nullable Term evalImpl(Term formula) {
-    checkState(!isClosed());
-    checkState(!prover.isClosed(), "Cannot use model after prover is closed");
+    checkState(!isProverClosed(), "Cannot use model after prover is closed");
     return bitwuzlaEnv.get_value(formula);
   }
 

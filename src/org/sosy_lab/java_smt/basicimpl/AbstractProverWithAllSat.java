@@ -42,10 +42,8 @@ public abstract class AbstractProverWithAllSat<T> extends AbstractProver<T> {
   }
 
   @Override
-  public <R> R allSat(AllSatCallback<R> callback, List<BooleanFormula> importantPredicates)
+  protected <R> R allSatImpl(AllSatCallback<R> callback, List<BooleanFormula> importantPredicates)
       throws InterruptedException, SolverException {
-    checkGenerateAllSat();
-
     push();
     try {
       // try model-based computation of ALLSAT

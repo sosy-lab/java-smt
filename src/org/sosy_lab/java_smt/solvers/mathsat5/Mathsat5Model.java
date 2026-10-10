@@ -37,20 +37,16 @@ class Mathsat5Model extends AbstractModel<Long, Long, Long> {
   private final long model;
   private final Mathsat5FormulaCreator formulaCreator;
 
-  /** for detecting closed environments, Exception is better than SegFault. */
-  private final Mathsat5AbstractProver<?> prover;
-
   Mathsat5Model(long model, Mathsat5FormulaCreator creator, Mathsat5AbstractProver<?> pProver) {
     super(pProver, creator);
     this.model = model;
     formulaCreator = creator;
-    prover = pProver;
   }
 
   @Override
   public ImmutableList<ValueAssignment> asList() {
     Preconditions.checkState(!isClosed());
-    Preconditions.checkState(!prover.isClosed(), "cannot use model after prover is closed");
+    Preconditions.checkState(!isProverClosed(), "cannot use model after prover is closed");
     ImmutableList.Builder<ValueAssignment> assignments = ImmutableList.builder();
 
     long modelIterator = msat_model_create_iterator(model);
@@ -135,8 +131,7 @@ class Mathsat5Model extends AbstractModel<Long, Long, Long> {
 
   @Override
   protected Long evalImpl(Long formula) {
-    Preconditions.checkState(!isClosed());
-    Preconditions.checkState(!prover.isClosed(), "cannot use model after prover is closed");
+    Preconditions.checkState(!isProverClosed(), "cannot use model after prover is closed");
     return msat_model_eval(model, formula);
   }
 }
