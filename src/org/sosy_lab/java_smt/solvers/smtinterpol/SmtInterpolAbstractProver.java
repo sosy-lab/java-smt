@@ -106,7 +106,7 @@ abstract class SmtInterpolAbstractProver<T> extends AbstractProver<T> {
   }
 
   @Override
-  protected boolean isUnsatImpl() throws InterruptedException {
+  protected boolean isUnsatImpl() throws InterruptedException, SolverException {
     // We actually terminate SmtInterpol during the analysis
     // by using a shutdown listener. However, SmtInterpol resets the
     // mStopEngine flag in DPLLEngine before starting to solve,
@@ -118,21 +118,13 @@ abstract class SmtInterpolAbstractProver<T> extends AbstractProver<T> {
       case SAT -> false;
       case UNSAT -> true;
       case UNKNOWN -> {
-        Object reason = env.getInfo(":reason-unknown");
-        if (!(reason instanceof ReasonUnknown unknown)) {
-          throw new SMTLIBException("checkSat returned UNKNOWN with unknown reason " + reason);
-        }
-        switch (unknown) {
-          case MEMOUT ->
-              // SMTInterpol catches OOM, but we want to have it thrown.
-              throw new OutOfMemoryError("Out of memory during SMTInterpol operation");
-          case CANCELLED -> {
-            shutdownNotifier.shutdownIfNecessary(); // expected if we requested termination
-            throw new SMTLIBException("checkSat returned UNKNOWN with unexpected reason " + reason);
-          }
-          default ->
-              throw new SMTLIBException(
-                  "checkSat returned UNKNOWN with unexpected reason " + reason);
+        var reason = (ReasonUnknown) env.getInfo(":reason-unknown");
+        switch (reason) {
+          case MEMOUT -> throw new OutOfMemoryError();
+          case INCOMPLETE ->
+              throw new SolverException("Incomplete theory, could not decide satisfiability");
+          case CANCELLED -> throw new InterruptedException();
+          default -> throw new RuntimeException("Unknown solver error");
         }
       }
     };

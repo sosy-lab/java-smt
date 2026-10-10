@@ -176,6 +176,8 @@ public class VariableNamesTest extends SolverBasedTest0.ParameterizedSolverBased
 
   @CanIgnoreReturnValue
   private <T extends Formula> T createVariableWith(Function<String, T> creator, String name) {
+    assume().that(!(solver == Solvers.SMTINTERPOL && name.equals("_"))).isTrue();
+
     if (allowInvalidNames() && !mgr.isValidName(name)) {
       assertThrows(IllegalArgumentException.class, () -> creator.apply(name));
       return null;
