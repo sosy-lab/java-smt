@@ -56,7 +56,10 @@ abstract class PrincessAbstractProver<E> extends AbstractProverWithAllSat<E> {
 
   private final PrincessFormulaCreator creator;
 
-  protected final Map<IExpression, IExpression> abbreviations = new HashMap<>();
+  // Contains abbreviation symbols that were introduced when pushing formulas onto the stack to
+  // remove duplicate subterms. It's possible for these internal symbols to leak into interpolants,
+  // and we have to track them here so that they can then be substituted later
+  final Map<IExpression, IExpression> abbreviations = new HashMap<>();
 
   PrincessAbstractProver(
       PrincessFormulaManager pMgr,
@@ -108,6 +111,8 @@ abstract class PrincessAbstractProver<E> extends AbstractProverWithAllSat<E> {
     final IFormula t = (IFormula) mgr.extractInfo(constraint);
 
     // Introduce abbreviation symbols for shared subterms before pushing the formula
+    // The call will return a tuple where the 2nd component is a map from abbreviation symbols to
+    // their term, and the 1st component is the fully substituted original formula
     var abbreviated =
         api.abbrevSharedExpressionsWithMap(t, creator.getEnv().getMinAtomsForAbbreviation());
     abbreviations.putAll(asJava(abbreviated._2));
