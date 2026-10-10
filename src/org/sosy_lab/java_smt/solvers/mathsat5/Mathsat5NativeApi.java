@@ -205,10 +205,21 @@ final class Mathsat5NativeApi {
     return msat_get_interpolant(e, groups_of_a, groups_of_a.length);
   }
 
-  /*
-   * Environment creation
+  /**
+   * Creates a new MathSAT configuration. If you want to set the logic, please use {@link
+   * #msat_create_default_config(String)} instead. Original: msat_config msat_create_config()
    */
   public static native long msat_create_config();
+
+  /**
+   * Creates a new MathSAT configuration with the default settings for the given logic. Original:
+   * msat_config msat_create_default_config(const char * logic)
+   *
+   * @param logic An SMT-LIB logic name
+   * @return A new configuration.
+   * @throws IllegalArgumentException In case of errors.
+   */
+  public static native long msat_create_default_config(final String logic);
 
   public static native void msat_destroy_config(long cfg);
 

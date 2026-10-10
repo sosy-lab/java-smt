@@ -2,7 +2,7 @@
 // an API wrapper for a collection of SMT solvers:
 // https://github.com/sosy-lab/java-smt
 //
-// SPDX-FileCopyrightText: 2020 Dirk Beyer <https://www.sosy-lab.org>
+// SPDX-FileCopyrightText: 2026 Dirk Beyer <https://www.sosy-lab.org>
 //
 // SPDX-License-Identifier: Apache-2.0
 
@@ -12,10 +12,12 @@ import static com.google.common.truth.Truth.assertThat;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_assert_formula;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_check_sat;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_create_config;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_create_default_config;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_create_env;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_decl_get_arity;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_decl_get_name;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_destroy_config;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_destroy_env;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_destroy_model_iterator;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_destroy_proof_manager;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_from_smtlib2;
@@ -59,6 +61,8 @@ import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_term
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_type_equals;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_type_repr;
 
+import com.google.common.collect.ImmutableSet;
+import java.util.Set;
 import org.junit.AssumptionViolatedException;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -68,6 +72,25 @@ import org.sosy_lab.common.NativeLibraries;
 import org.sosy_lab.java_smt.api.SolverException;
 
 public class Mathsat5NativeApiTest extends Mathsat5AbstractNativeApiTest {
+
+  // Some logics and other strings to test how mathsat reacts to them
+  private static final Set<String> LOGICS_TO_TEST =
+      ImmutableSet.of(
+          "unfug",
+          "",
+          "ALL",
+          "QF_LIA",
+          "QF_LRA",
+          "QF_LIRA",
+          "LIRA",
+          "QF_UFLIA",
+          "QF_UFLRA",
+          "QF_UFLIRA",
+          "QF_ALIA",
+          "QF_ALRA",
+          "QF_ALIRA",
+          "UF_AUFLIRA",
+          "AUFLIRA");
 
   private long const0;
   private long const1;
@@ -96,6 +119,36 @@ public class Mathsat5NativeApiTest extends Mathsat5AbstractNativeApiTest {
     const1 = msat_make_number(env, "1");
     long rationalType = msat_get_rational_type(env);
     var = msat_make_variable(env, "rat", rationalType);
+  }
+
+  // MathSAT5 seems to ignore invalid input for logics
+  @Test
+  public void createEnvironmentWithLogics() throws SolverException, InterruptedException {
+    for (String logic : LOGICS_TO_TEST) {
+      // Logics just set certain default settings in MathSAT5
+      long cfgWithLogic = msat_create_default_config(logic);
+      // Set some option just to check whether there are problems
+      msat_set_option_checked(cfgWithLogic, "model_generation", "true");
+
+      long envWithLogic = msat_create_env(cfgWithLogic);
+      msat_destroy_config(cfgWithLogic);
+
+      long const0WithLogic = msat_make_number(envWithLogic, "0");
+      long const1WithLogic = msat_make_number(envWithLogic, "1");
+      long rationalType = msat_get_rational_type(envWithLogic);
+      long varWithLogic = msat_make_variable(envWithLogic, "rat", rationalType);
+
+      long sin = msat_make_sin(envWithLogic, varWithLogic);
+
+      msat_push_backtrack_point(envWithLogic);
+
+      msat_assert_formula(
+          envWithLogic, msat_make_equal(envWithLogic, varWithLogic, const1WithLogic));
+      msat_assert_formula(envWithLogic, msat_make_equal(envWithLogic, sin, const0WithLogic));
+
+      assertThat(msat_check_sat(envWithLogic)).isFalse();
+      msat_destroy_env(envWithLogic);
+    }
   }
 
   @Test
