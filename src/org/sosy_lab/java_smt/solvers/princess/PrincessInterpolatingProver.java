@@ -149,7 +149,10 @@ class PrincessInterpolatingProver extends PrincessAbstractProver<Integer>
         FluentIterable.from(
                 Traverser.<Tree<IFormula>>forTree(node -> asJava(node.children()))
                     .depthFirstPostOrder(tree))
-            .transform(node -> mgr.encapsulateBooleanFormula(node.d()))
+            .transform(
+                node ->
+                    mgr.encapsulateBooleanFormula(
+                        Rewriter.rewrite(node.d(), expr -> abbreviations.getOrDefault(expr, expr))))
             .toList();
     // root of interpolation tree is false, and we have to remove it.
     assert Iterables.getLast(lst).equals(mgr.encapsulateBooleanFormula(new IBoolLit(false)));
