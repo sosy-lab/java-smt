@@ -79,17 +79,10 @@ abstract class PrincessAbstractProver<E> extends AbstractProverWithAllSat<E> {
    */
   @Override
   protected boolean isUnsatImpl() throws SolverException, InterruptedException {
-    if (shutdownNotifier.shouldShutdown()) {
-      throw new InterruptedException();
-    }
     Value status = api.checkSat(false);
-    int timeout = 10;
     while (status.equals(SimpleAPI.ProverStatus$.MODULE$.Running())
         && !shutdownNotifier.shouldShutdown()) {
-      status = api.getStatus(timeout);
-      if (timeout < 1000) {
-        timeout *= 2;
-      }
+      status = api.getStatus(1000);
     }
     status = api.stop(true);
 
