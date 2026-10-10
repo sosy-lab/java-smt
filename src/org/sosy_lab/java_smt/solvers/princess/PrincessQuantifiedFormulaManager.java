@@ -14,6 +14,9 @@ import static scala.collection.JavaConverters.asScala;
 import ap.parser.IConstant;
 import ap.parser.IExpression;
 import ap.parser.IFormula;
+import ap.parser.ISortedQuantified;
+import ap.parser.ISortedVariable;
+import ap.parser.Rewriter;
 import ap.terfor.ConstantTerm;
 import ap.terfor.conjunctions.Quantifier.ALL$;
 import ap.terfor.conjunctions.Quantifier.EX$;
@@ -56,6 +59,25 @@ class PrincessQuantifiedFormulaManager
   protected IExpression eliminateQuantifiers(IExpression formula)
       throws SolverException, InterruptedException {
     checkArgument(formula instanceof IFormula);
-    return env.elimQuantifiers((IFormula) formula);
+    var eliminated = env.elimQuantifiers((IFormula) formula);
+    var quantifiedVariableFix =
+        Rewriter.rewrite(
+            eliminated,
+            term -> {
+              // Rewrite quantifiers with missing variable sorts
+              if (term instanceof ISortedQuantified quantified) {
+                if (quantified.sort().name().equals("any")) {
+                  return new ISortedQuantified(
+                      quantified.quan(), Sort.Integer$.MODULE$, quantified.subformula());
+                }
+              }
+              if (term instanceof ISortedVariable variable) {
+                if (variable.sort().name().equals("any")) {
+                  return new ISortedVariable(variable.index(), Sort.Integer$.MODULE$);
+                }
+              }
+              return term;
+            });
+    return quantifiedVariableFix;
   }
 }
