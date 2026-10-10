@@ -42,7 +42,7 @@ class TraceInterpolatingProverEnvironment<T> extends TraceBasicProverEnvironment
     return mgr.rebuildAll(
         logger.logDefDiscard(
             logger.toVariable(this),
-            "getSeqInterpolant(ImmutableList.of(%s))"
+            "getSeqInterpolants(ImmutableList.of(%s))"
                 .formatted(
                     FluentIterable.from(partitionedFormulas)
                         .transform(p -> "ImmutableList.of(%s)".formatted(logger.toVariables(p)))
@@ -67,7 +67,7 @@ class TraceInterpolatingProverEnvironment<T> extends TraceBasicProverEnvironment
     return mgr.rebuildAll(
         logger.logDefDiscard(
             logger.toVariable(this),
-            "getTreeInterpolant(ImmutableList.of(%s), new int[]{%s})"
+            "getTreeInterpolants(ImmutableList.of(%s), new int[]{%s})"
                 .formatted(
                     FluentIterable.from(partitionedFormulas)
                         .transform(p -> "ImmutableList.of(%s)".formatted(logger.toVariables(p)))
