@@ -14,10 +14,13 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.java_smt.api.BasicProverEnvironment;
 import org.sosy_lab.java_smt.api.BooleanFormula;
+import org.sosy_lab.java_smt.api.Evaluator;
 import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.SolverException;
+import org.sosy_lab.java_smt.api.UserPropagator;
 
 class BasicProverWithAssumptionsWrapper<T, P extends BasicProverEnvironment<T>>
     implements BasicProverEnvironment<T> {
@@ -34,6 +37,12 @@ class BasicProverWithAssumptionsWrapper<T, P extends BasicProverEnvironment<T>>
       delegate.pop();
     }
     solverAssumptionsAsFormula.clear();
+  }
+
+  @Override
+  public @Nullable T push(BooleanFormula f) throws InterruptedException {
+    clearAssumptions();
+    return delegate.push(f);
   }
 
   @Override
@@ -87,6 +96,11 @@ class BasicProverWithAssumptionsWrapper<T, P extends BasicProverEnvironment<T>>
   }
 
   @Override
+  public Evaluator getEvaluator() throws SolverException {
+    return delegate.getEvaluator();
+  }
+
+  @Override
   public ImmutableList<Model.ValueAssignment> getModelAssignments() throws SolverException {
     return delegate.getModelAssignments();
   }
@@ -129,5 +143,10 @@ class BasicProverWithAssumptionsWrapper<T, P extends BasicProverEnvironment<T>>
       throws InterruptedException, SolverException {
     clearAssumptions();
     return delegate.allSat(pCallback, pImportant);
+  }
+
+  @Override
+  public boolean registerUserPropagator(UserPropagator propagator) {
+    return delegate.registerUserPropagator(propagator);
   }
 }

@@ -11,92 +11,16 @@ package org.sosy_lab.java_smt.delegate.debugging;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.ImmutableList;
-import java.math.BigInteger;
-import org.checkerframework.checker.nullness.qual.Nullable;
-import org.sosy_lab.common.rationals.Rational;
-import org.sosy_lab.java_smt.api.BitvectorFormula;
-import org.sosy_lab.java_smt.api.BooleanFormula;
-import org.sosy_lab.java_smt.api.EnumerationFormula;
-import org.sosy_lab.java_smt.api.FloatingPointFormula;
-import org.sosy_lab.java_smt.api.FloatingPointNumber;
-import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.Model;
-import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
-import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
-import org.sosy_lab.java_smt.api.StringFormula;
 
-class DebuggingModel implements Model {
+class DebuggingModel extends DebuggingEvaluator implements Model {
   private final Model delegate;
   private final DebuggingAssertions debugging;
 
   DebuggingModel(Model pDelegate, DebuggingAssertions pDebugging) {
+    super(pDelegate, pDebugging);
     delegate = checkNotNull(pDelegate);
     debugging = pDebugging;
-  }
-
-  @Override
-  public <T extends Formula> @Nullable T eval(T formula) {
-    debugging.assertThreadLocal();
-    debugging.assertFormulaInContext(formula);
-    T result = delegate.eval(formula);
-    debugging.addFormulaTerm(result);
-    return result;
-  }
-
-  @Override
-  public @Nullable Object evaluate(Formula formula) {
-    debugging.assertThreadLocal();
-    debugging.assertFormulaInContext(formula);
-    return delegate.evaluate(formula);
-  }
-
-  @Override
-  public @Nullable BigInteger evaluate(IntegerFormula formula) {
-    debugging.assertThreadLocal();
-    debugging.assertFormulaInContext(formula);
-    return delegate.evaluate(formula);
-  }
-
-  @Override
-  public @Nullable Rational evaluate(RationalFormula formula) {
-    debugging.assertThreadLocal();
-    debugging.assertFormulaInContext(formula);
-    return delegate.evaluate(formula);
-  }
-
-  @Override
-  public @Nullable Boolean evaluate(BooleanFormula formula) {
-    debugging.assertThreadLocal();
-    debugging.assertFormulaInContext(formula);
-    return delegate.evaluate(formula);
-  }
-
-  @Override
-  public @Nullable BigInteger evaluate(BitvectorFormula formula) {
-    debugging.assertThreadLocal();
-    debugging.assertFormulaInContext(formula);
-    return delegate.evaluate(formula);
-  }
-
-  @Override
-  public @Nullable String evaluate(StringFormula formula) {
-    debugging.assertThreadLocal();
-    debugging.assertFormulaInContext(formula);
-    return delegate.evaluate(formula);
-  }
-
-  @Override
-  public @Nullable String evaluate(EnumerationFormula formula) {
-    debugging.assertThreadLocal();
-    debugging.assertFormulaInContext(formula);
-    return delegate.evaluate(formula);
-  }
-
-  @Override
-  public @Nullable FloatingPointNumber evaluate(FloatingPointFormula formula) {
-    debugging.assertThreadLocal();
-    debugging.assertFormulaInContext(formula);
-    return delegate.evaluate(formula);
   }
 
   @Override
@@ -111,11 +35,5 @@ class DebuggingModel implements Model {
       debugging.addFormulaTerm(v.getAssignmentAsFormula());
     }
     return result;
-  }
-
-  @Override
-  public void close() {
-    debugging.assertThreadLocal();
-    delegate.close();
   }
 }

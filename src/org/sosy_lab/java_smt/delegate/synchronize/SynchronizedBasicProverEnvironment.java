@@ -10,6 +10,7 @@ package org.sosy_lab.java_smt.delegate.synchronize;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import java.util.Collection;
 import java.util.List;
@@ -17,9 +18,11 @@ import java.util.Optional;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.java_smt.api.BasicProverEnvironment;
 import org.sosy_lab.java_smt.api.BooleanFormula;
+import org.sosy_lab.java_smt.api.Evaluator;
 import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.SolverContext;
 import org.sosy_lab.java_smt.api.SolverException;
+import org.sosy_lab.java_smt.api.UserPropagator;
 
 class SynchronizedBasicProverEnvironment<T> implements BasicProverEnvironment<T> {
 
@@ -29,6 +32,13 @@ class SynchronizedBasicProverEnvironment<T> implements BasicProverEnvironment<T>
   SynchronizedBasicProverEnvironment(BasicProverEnvironment<T> pDelegate, SolverContext pSync) {
     delegate = checkNotNull(pDelegate);
     sync = checkNotNull(pSync);
+  }
+
+  @Override
+  public @Nullable T push(BooleanFormula f) throws InterruptedException {
+    synchronized (sync) {
+      return delegate.push(f);
+    }
   }
 
   @Override
@@ -82,6 +92,21 @@ class SynchronizedBasicProverEnvironment<T> implements BasicProverEnvironment<T>
     }
   }
 
+  @SuppressWarnings("resource")
+  @Override
+  public Evaluator getEvaluator() throws SolverException {
+    synchronized (sync) {
+      return new SynchronizedEvaluator(delegate.getEvaluator(), sync);
+    }
+  }
+
+  @Override
+  public ImmutableList<Model.ValueAssignment> getModelAssignments() throws SolverException {
+    synchronized (sync) {
+      return delegate.getModelAssignments();
+    }
+  }
+
   @Override
   public List<BooleanFormula> getUnsatCore() {
     synchronized (sync) {
@@ -124,5 +149,10 @@ class SynchronizedBasicProverEnvironment<T> implements BasicProverEnvironment<T>
     synchronized (sync) {
       return delegate.allSat(pCallback, pImportant);
     }
+  }
+
+  @Override
+  public boolean registerUserPropagator(UserPropagator propagator) {
+    throw new UnsupportedOperationException();
   }
 }

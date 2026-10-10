@@ -18,10 +18,12 @@ import java.util.Optional;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.java_smt.api.BasicProverEnvironment;
 import org.sosy_lab.java_smt.api.BooleanFormula;
+import org.sosy_lab.java_smt.api.Evaluator;
 import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.SolverContext;
 import org.sosy_lab.java_smt.api.SolverException;
+import org.sosy_lab.java_smt.api.UserPropagator;
 
 class SynchronizedBasicProverEnvironmentWithContext<T> implements BasicProverEnvironment<T> {
 
@@ -50,6 +52,15 @@ class SynchronizedBasicProverEnvironmentWithContext<T> implements BasicProverEnv
       }
     }
     return result.build();
+  }
+
+  @Override
+  public @Nullable T push(BooleanFormula f) throws InterruptedException {
+    BooleanFormula constraint;
+    synchronized (sync) {
+      constraint = otherManager.translateFrom(f, manager);
+    }
+    return delegate.push(constraint);
   }
 
   @Override
@@ -94,6 +105,22 @@ class SynchronizedBasicProverEnvironmentWithContext<T> implements BasicProverEnv
   public Model getModel() throws SolverException {
     synchronized (sync) {
       return new SynchronizedModelWithContext(delegate.getModel(), sync, manager, otherManager);
+    }
+  }
+
+  @SuppressWarnings("resource")
+  @Override
+  public Evaluator getEvaluator() throws SolverException {
+    synchronized (sync) {
+      return new SynchronizedEvaluatorWithContext(
+          delegate.getEvaluator(), sync, manager, otherManager);
+    }
+  }
+
+  @Override
+  public ImmutableList<Model.ValueAssignment> getModelAssignments() throws SolverException {
+    synchronized (sync) {
+      return delegate.getModelAssignments();
     }
   }
 
@@ -142,6 +169,11 @@ class SynchronizedBasicProverEnvironmentWithContext<T> implements BasicProverEnv
     synchronized (sync) {
       return delegate.allSat(callback, translate(pImportant, manager, otherManager));
     }
+  }
+
+  @Override
+  public boolean registerUserPropagator(UserPropagator propagator) {
+    throw new UnsupportedOperationException();
   }
 
   private class AllSatCallbackWithContext<R> implements AllSatCallback<R> {

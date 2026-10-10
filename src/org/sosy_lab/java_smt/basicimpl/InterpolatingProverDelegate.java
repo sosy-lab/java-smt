@@ -13,14 +13,18 @@ package org.sosy_lab.java_smt.basicimpl;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.java_smt.api.BooleanFormula;
+import org.sosy_lab.java_smt.api.Evaluator;
 import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
 import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.SolverException;
+import org.sosy_lab.java_smt.api.UserPropagator;
 
 /**
  * This delegate enables common implementations for methods in {@link
@@ -69,6 +73,11 @@ class InterpolatingProverDelegate<T> implements InterpolatingProverEnvironment<T
   /* ########################## Delegate methods of ProverEnvironment ########################## */
 
   @Override
+  public @Nullable T push(BooleanFormula f) throws InterruptedException {
+    return itpProver.push(f);
+  }
+
+  @Override
   public void pop() {
     itpProver.pop();
   }
@@ -105,6 +114,16 @@ class InterpolatingProverDelegate<T> implements InterpolatingProverEnvironment<T
   }
 
   @Override
+  public Evaluator getEvaluator() throws SolverException {
+    return itpProver.getEvaluator();
+  }
+
+  @Override
+  public ImmutableList<Model.ValueAssignment> getModelAssignments() throws SolverException {
+    return itpProver.getModelAssignments();
+  }
+
+  @Override
   public List<BooleanFormula> getUnsatCore() {
     return itpProver.getUnsatCore();
   }
@@ -116,6 +135,11 @@ class InterpolatingProverDelegate<T> implements InterpolatingProverEnvironment<T
   }
 
   @Override
+  public ImmutableMap<String, String> getStatistics() {
+    return itpProver.getStatistics();
+  }
+
+  @Override
   public void close() {
     itpProver.close();
   }
@@ -124,6 +148,11 @@ class InterpolatingProverDelegate<T> implements InterpolatingProverEnvironment<T
   public <R> R allSat(AllSatCallback<R> callback, List<BooleanFormula> important)
       throws InterruptedException, SolverException {
     return itpProver.allSat(callback, important);
+  }
+
+  @Override
+  public boolean registerUserPropagator(UserPropagator propagator) {
+    return itpProver.registerUserPropagator(propagator);
   }
 
   /* ############################### Utility methods ############################### */
