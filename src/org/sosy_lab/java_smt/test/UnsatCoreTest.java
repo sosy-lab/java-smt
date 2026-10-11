@@ -170,9 +170,9 @@ public class UnsatCoreTest extends SolverBasedTest0.ParameterizedSolverBasedTest
     requireIntegers();
 
     try (var prover =
-                 context.newProverEnvironment(
-                         SolverContext.ProverOptions.GENERATE_MODELS,
-                         SolverContext.ProverOptions.GENERATE_UNSAT_CORE)) {
+        context.newProverEnvironment(
+            SolverContext.ProverOptions.GENERATE_MODELS,
+            SolverContext.ProverOptions.GENERATE_UNSAT_CORE)) {
       prover.addConstraint(imgr.equal(imgr.makeVariable("v"), imgr.makeNumber(0)));
       prover.addConstraint(mgr.makeEqual(bmgr.makeVariable("Z3_UNSAT_CORE_0"), bmgr.makeFalse()));
 
@@ -180,7 +180,7 @@ public class UnsatCoreTest extends SolverBasedTest0.ParameterizedSolverBasedTest
 
       try (var model = prover.getModel()) {
         assertThat(model.asList().stream().map(Model.ValueAssignment::getName).toList())
-                .containsExactly("v", "Z3_UNSAT_CORE_0");
+            .containsExactly("v", "Z3_UNSAT_CORE_0");
       }
     }
   }
