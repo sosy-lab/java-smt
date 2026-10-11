@@ -150,17 +150,37 @@ public class UnsatCoreTest extends SolverBasedTest0.ParameterizedSolverBasedTest
     requireUnsatCore();
     requireIntegers();
 
-    var var1 = imgr.makeVariable("v");
     try (var prover =
         context.newProverEnvironment(
             SolverContext.ProverOptions.GENERATE_MODELS,
             SolverContext.ProverOptions.GENERATE_UNSAT_CORE)) {
-      prover.addConstraint(imgr.equal(var1, imgr.makeNumber(0)));
+      prover.addConstraint(imgr.equal(imgr.makeVariable("v"), imgr.makeNumber(0)));
       assertThat(prover.isUnsat()).isFalse();
 
       try (var model = prover.getModel()) {
         assertThat(model.asList().stream().map(Model.ValueAssignment::getName).toList())
             .containsExactly("v");
+      }
+    }
+  }
+
+  @Test
+  public void unsatCoreZ3ModelNameCollisionTest() throws SolverException, InterruptedException {
+    requireUnsatCore();
+    requireIntegers();
+
+    try (var prover =
+                 context.newProverEnvironment(
+                         SolverContext.ProverOptions.GENERATE_MODELS,
+                         SolverContext.ProverOptions.GENERATE_UNSAT_CORE)) {
+      prover.addConstraint(imgr.equal(imgr.makeVariable("v"), imgr.makeNumber(0)));
+      prover.addConstraint(mgr.makeEqual(bmgr.makeVariable("Z3_UNSAT_CORE_0"), bmgr.makeFalse()));
+
+      assertThat(prover.isUnsat()).isFalse();
+
+      try (var model = prover.getModel()) {
+        assertThat(model.asList().stream().map(Model.ValueAssignment::getName).toList())
+                .containsExactly("v", "Z3_UNSAT_CORE_0");
       }
     }
   }
