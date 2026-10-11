@@ -15,7 +15,6 @@ import ap.api.SimpleAPI;
 import ap.basetypes.Tree;
 import ap.parser.IBoolLit;
 import ap.parser.IFormula;
-import ap.parser.Rewriter;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableList;
@@ -94,9 +93,7 @@ class PrincessInterpolatingProver extends PrincessAbstractProver<Integer>
     // Substitute abbreviations and convert the data-structure back to Java
     ImmutableList.Builder<BooleanFormula> builder = ImmutableList.builder();
     for (final IFormula itp : asJava(itps)) {
-      builder.add(
-          mgr.encapsulateBooleanFormula(
-              Rewriter.rewrite(itp, expr -> abbreviations.getOrDefault(expr, expr))));
+      builder.add(mgr.encapsulateBooleanFormula(substituteAbbreviations(itp)));
     }
     return builder.build();
   }
@@ -149,10 +146,7 @@ class PrincessInterpolatingProver extends PrincessAbstractProver<Integer>
         FluentIterable.from(
                 Traverser.<Tree<IFormula>>forTree(node -> asJava(node.children()))
                     .depthFirstPostOrder(tree))
-            .transform(
-                node ->
-                    mgr.encapsulateBooleanFormula(
-                        Rewriter.rewrite(node.d(), expr -> abbreviations.getOrDefault(expr, expr))))
+            .transform(node -> mgr.encapsulateBooleanFormula(substituteAbbreviations(node.d())))
             .toList();
     // root of interpolation tree is false, and we have to remove it.
     assert Iterables.getLast(lst).equals(mgr.encapsulateBooleanFormula(new IBoolLit(false)));

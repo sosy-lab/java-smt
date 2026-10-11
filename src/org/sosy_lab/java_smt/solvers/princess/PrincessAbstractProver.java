@@ -19,6 +19,7 @@ import ap.parser.IExpression;
 import ap.parser.IFormula;
 import ap.parser.IFunction;
 import ap.parser.ITerm;
+import ap.parser.Rewriter;
 import com.google.common.base.Preconditions;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import java.util.ArrayDeque;
@@ -59,7 +60,7 @@ abstract class PrincessAbstractProver<E> extends AbstractProverWithAllSat<E> {
   // Contains abbreviation symbols that were introduced when pushing formulas onto the stack to
   // remove duplicate subterms. It's possible for these internal symbols to leak into interpolants,
   // and we have to track them here so that they can then be substituted later
-  final Map<IExpression, IExpression> abbreviations = new HashMap<>();
+  private final Map<IExpression, IExpression> abbreviations = new HashMap<>();
 
   PrincessAbstractProver(
       PrincessFormulaManager pMgr,
@@ -119,6 +120,11 @@ abstract class PrincessAbstractProver<E> extends AbstractProverWithAllSat<E> {
 
     api.addAssertion((IFormula) abbreviated._1);
     return formulaId;
+  }
+
+  /** Replace any abbreviation symbols in the term with their full expansion. */
+  protected IExpression substituteAbbreviations(IExpression root) {
+    return Rewriter.rewrite(root, expr -> abbreviations.getOrDefault(expr, expr));
   }
 
   @Override
