@@ -311,11 +311,17 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
    * stack.
    */
   protected <E extends Evaluator> E registerEvaluator(E pEvaluator) {
+    if (pEvaluator == null) {
+      throw new NullPointerException();
+    }
     evaluators.add(pEvaluator);
     return pEvaluator;
   }
 
   protected void unregisterEvaluator(Evaluator pEvaluator) {
+    if (pEvaluator == null) {
+      throw new NullPointerException();
+    }
     evaluators.remove(pEvaluator);
   }
 
