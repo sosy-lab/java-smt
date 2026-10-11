@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Set;
 import org.junit.Test;
 import org.sosy_lab.common.UniqueIdGenerator;
+import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -1282,6 +1283,43 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
 
       var itps = prover.getInterpolant(ImmutableList.of(eqT));
       assertThat(itps).isNotNull();
+    }
+  }
+
+  // Check that Princess does not leak abbreviation symbols in its interpolants
+  @Test
+  public void princessAbbreviationsTest()
+      throws SolverException, InterruptedException, InvalidConfigurationException {
+    assume().that(solver).isEqualTo(Solvers.PRINCESS);
+
+    // Lower the threshold for introducing abbreviations
+    setAdditionalConfigOptionForSolver("solver.princess.minAtomsForAbbreviation", "0");
+
+    var a = makeVariable("a");
+    var b = makeVariable("b");
+    var c = makeVariable("c");
+    var f = bmgr.makeVariable("f");
+    var g = bmgr.makeVariable("g");
+    var h = bmgr.not(f);
+    var i = bmgr.not(g);
+
+    var s = mgr.makeDistinct(a, b, c);
+    var p = bmgr.and(bmgr.implication(s, f), bmgr.implication(s, g));
+    var q = bmgr.and(bmgr.implication(s, h), bmgr.implication(s, i));
+
+    try (var prover = newEnvironmentForTest()) {
+      var p1 = prover.addConstraint(s);
+      var p2 = prover.addConstraint(p);
+      var p3 = prover.addConstraint(q);
+
+      assertThat(prover.isUnsat()).isTrue();
+
+      var itps = prover.getSeqInterpolants0(ImmutableList.of(p1, p2, p3));
+      for (var itp : itps) {
+        // Check that there are no abbreviation symbols in the interpolants
+        assertThat(mgr.extractVariables(p).keySet())
+            .containsAtLeastElementsIn(mgr.extractVariables(itp).keySet());
+      }
     }
   }
 }
