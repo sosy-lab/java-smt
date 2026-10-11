@@ -32,6 +32,7 @@ import java.util.List;
 import java.util.Map;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.ShutdownNotifier;
+import org.sosy_lab.common.UniqueIdGenerator;
 import org.sosy_lab.common.configuration.Configuration;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.common.configuration.Option;
@@ -132,6 +133,8 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
   // todo: getters for statistic.
   private final Timer cleanupTimer = new Timer();
   protected final ShutdownNotifier shutdownNotifier;
+
+  private final UniqueIdGenerator internalSymbolCounter = new UniqueIdGenerator();
 
   @SuppressWarnings("ParameterNumber")
   Z3FormulaCreator(
@@ -598,6 +601,13 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
           // Bound variable.
           "#" + Native.getSymbolInt(environment, symbol);
     };
+  }
+
+  long makeInternalSymbol(long sort) {
+    long symbol = Native.mkIntSymbol(environment, internalSymbolCounter.getFreshId());
+    long term = Native.mkConst(environment, symbol, sort);
+    Native.incRef(environment, term);
+    return term;
   }
 
   private <R> R visitQuantifier(FormulaVisitor<R> pVisitor, BooleanFormula pFormula, Long pF) {

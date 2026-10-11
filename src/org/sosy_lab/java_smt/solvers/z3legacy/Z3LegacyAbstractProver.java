@@ -12,7 +12,6 @@ package org.sosy_lab.java_smt.solvers.z3legacy;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
 import com.google.common.io.MoreFiles;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import com.microsoft.z3legacy.Native;
@@ -32,7 +31,6 @@ import java.util.Set;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.ShutdownNotifier.ShutdownRequestListener;
-import org.sosy_lab.common.UniqueIdGenerator;
 import org.sosy_lab.common.collect.PathCopyingPersistentTreeMap;
 import org.sosy_lab.common.collect.PersistentMap;
 import org.sosy_lab.common.io.PathCounterTemplate;
@@ -51,8 +49,7 @@ abstract class Z3LegacyAbstractProver<T> extends AbstractProverWithAllSat<T> {
   protected final Z3LegacyFormulaManager mgr;
   private final ShutdownRequestListener interruptListener;
 
-  private final UniqueIdGenerator trackId = new UniqueIdGenerator();
-  @Nullable private final Deque<PersistentMap<String, BooleanFormula>> storedConstraints;
+  @Nullable private final Deque<PersistentMap<Long, BooleanFormula>> storedConstraints;
 
   private final @Nullable PathCounterTemplate logfile;
 
@@ -128,9 +125,7 @@ abstract class Z3LegacyAbstractProver<T> extends AbstractProverWithAllSat<T> {
 
   @Override
   protected Z3LegacyModel getEvaluatorWithoutChecks() throws SolverException {
-    Set<String> nameAssertions =
-        storedConstraints == null ? ImmutableSet.of() : storedConstraints.peek().keySet();
-    return new Z3LegacyModel(this, nameAssertions, z3context, getZ3Model(), creator);
+    return new Z3LegacyModel(this, z3context, getZ3Model(), creator);
   }
 
   protected long getZ3Model() {
@@ -173,10 +168,9 @@ abstract class Z3LegacyAbstractProver<T> extends AbstractProverWithAllSat<T> {
     long e = creator.extractInfo(f);
     try {
       if (storedConstraints != null) { // Unsat core generation is on.
-        String varName = "Z3_UNSAT_CORE_%d".formatted(trackId.getFreshId());
-        BooleanFormula t = mgr.getBooleanFormulaManager().makeVariable(varName);
-        assertContraintAndTrack(e, creator.extractInfo(t));
-        storedConstraints.push(storedConstraints.pop().putAndCopy(varName, f));
+        long id = creator.makeInternalSymbol(creator.getBoolType());
+        assertContraintAndTrack(e, id);
+        storedConstraints.push(storedConstraints.pop().putAndCopy(id, f));
       } else {
         assertContraint(e);
       }
@@ -305,10 +299,7 @@ abstract class Z3LegacyAbstractProver<T> extends AbstractProverWithAllSat<T> {
     Native.astVectorIncRef(z3context, unsatCore);
     for (int i = 0; i < Native.astVectorSize(z3context, unsatCore); i++) {
       long ast = Native.astVectorGet(z3context, unsatCore, i);
-      Native.incRef(z3context, ast);
-      String varName = Native.astToString(z3context, ast);
-      Native.decRef(z3context, ast);
-      constraints.add(storedConstraints.peek().get(varName));
+      constraints.add(storedConstraints.peek().get(ast));
     }
     Native.astVectorDecRef(z3context, unsatCore);
     return constraints;
@@ -326,8 +317,7 @@ abstract class Z3LegacyAbstractProver<T> extends AbstractProverWithAllSat<T> {
     Native.astVectorIncRef(z3context, unsatCore);
     for (int i = 0; i < Native.astVectorSize(z3context, unsatCore); i++) {
       long ast = Native.astVectorGet(z3context, unsatCore, i);
-      String varName = Native.astToString(z3context, ast);
-      if (storedConstraints == null || !storedConstraints.peek().containsKey(varName)) {
+      if (storedConstraints == null || !storedConstraints.peek().containsKey(ast)) {
         // Only add assumptions to the core and skip tracked assertions
         core.add(creator.encapsulateBoolean(ast));
       }
