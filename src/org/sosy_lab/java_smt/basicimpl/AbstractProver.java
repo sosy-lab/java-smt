@@ -142,6 +142,7 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
 
   protected final void checkGenerateTreeInterpolants(
       List<? extends Collection<T>> partitionedFormulas, int[] startOfSubTree) {
+    checkNotNull(startOfSubTree);
     checkGenerateSeqInterpolants(partitionedFormulas);
     assert InterpolatingProverEnvironment.checkTreeStructure(
         partitionedFormulas.size(), startOfSubTree);
