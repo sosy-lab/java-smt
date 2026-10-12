@@ -9,6 +9,7 @@
 package org.sosy_lab.java_smt.basicimpl;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
 import com.google.common.base.Preconditions;
@@ -310,18 +311,16 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
    * This method registers the Evaluator to be cleaned up before the next change on the prover
    * stack.
    */
+  @SuppressWarnings("resource") // Suppress wrong alarm about resource leak
   protected <E extends Evaluator> E registerEvaluator(E pEvaluator) {
-    if (pEvaluator == null) {
-      throw new NullPointerException();
-    }
+    checkNotNull(pEvaluator);
     evaluators.add(pEvaluator);
     return pEvaluator;
   }
 
+  @SuppressWarnings("resource") // Suppress wrong alarm about resource leak
   protected void unregisterEvaluator(Evaluator pEvaluator) {
-    if (pEvaluator == null) {
-      throw new NullPointerException();
-    }
+    checkNotNull(pEvaluator);
     evaluators.remove(pEvaluator);
   }
 
