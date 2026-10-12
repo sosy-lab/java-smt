@@ -121,6 +121,7 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
   }
 
   protected final void checkGenerateInterpolants(Collection<T> formulasOfA) {
+    checkNotNull(formulasOfA);
     checkGenerateInterpolants();
     checkArgument(
         getAssertedConstraintIds().containsAll(formulasOfA),
@@ -129,6 +130,7 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
 
   protected final void checkGenerateSeqInterpolants(
       List<? extends Collection<T>> partitionedFormulas) {
+    checkNotNull(partitionedFormulas);
     checkGenerateInterpolants();
     Preconditions.checkArgument(
         !partitionedFormulas.isEmpty(), "at least one partition should be available.");
