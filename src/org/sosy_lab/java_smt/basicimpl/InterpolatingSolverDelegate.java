@@ -110,7 +110,10 @@ public class InterpolatingSolverDelegate extends AbstractProver<String>
 
   @Override
   public void close() {
-    delegate.close();
+    if (!closed) {
+      super.close();
+      delegate.close();
+    }
   }
 
   @Override

@@ -208,7 +208,10 @@ public class IndependentInterpolatingSolverDelegate<T> extends AbstractProver<T>
 
   @Override
   public void close() {
-    delegate.close();
+    if (!closed) {
+      super.close();
+      delegate.close();
+    }
   }
 
   @Override
