@@ -82,11 +82,9 @@ public class IndependentInterpolatingSolverDelegate<T> extends AbstractProver<T>
     return PREFIX + termIdGenerator.getFreshId();
   }
 
-  /** Check if assertions are enabled. */
-  private boolean areAssertionsEnabled() {
-    boolean enabled = false;
-    assert enabled = true;
-    return enabled;
+  /** Return <code>true</code> here to validate the calculated interpolants. */
+  private boolean shouldInterpolantsBeChecked() {
+    return false;
   }
 
   @Override
@@ -123,7 +121,7 @@ public class IndependentInterpolatingSolverDelegate<T> extends AbstractProver<T>
           interpolationTechnique.getInterpolant(conjugatedFormulasOfA, conjugatedFormulasOfB);
     }
 
-    if (areAssertionsEnabled()) {
+    if (shouldInterpolantsBeChecked()) {
       // Only validate interpolants when assertions are enabled as this is an expensive check
       assertUsing(solverContext)
           .that(interpolant)
