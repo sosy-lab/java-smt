@@ -21,6 +21,7 @@ import com.google.common.collect.Lists;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.sosy_lab.common.UniqueIdGenerator;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
@@ -1304,6 +1305,41 @@ public class InterpolatingProverTest extends ParameterizedInterpolatingSolverBas
 
       var itps = prover.getInterpolant(ImmutableList.of(eqT));
       assertThat(itps).isNotNull();
+    }
+  }
+
+  @Test
+  public <T> void binaryInterpolationWithSharedUninterpretedFunction()
+      throws SolverException, InterruptedException {
+    assume()
+        .withMessage("OpenSMT is configured with QF_LIA, which does not support UFs")
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.OPENSMT);
+    assume()
+        .withMessage("Test segfaults on Yices")
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.YICES2);
+    assume()
+        .withMessage("UFs not supported for model projection based interpolants")
+        .that(interpolationStrategy)
+        .isNotEqualTo(ProverOptions.GENERATE_PROJECTION_BASED_INTERPOLANTS);
+
+    try (InterpolatingProverEnvironment<T> prover = newEnvironmentForTest()) {
+      Formula y = makeVariable("y");
+      Formula fy = fmgr.declareAndCallUF("f", mgr.getFormulaType(y), y);
+
+      // A: f(y) = 0; B: f(y) = 1.
+      // Both f and y are shared, and each partition is satisfiable on its own.
+      BooleanFormula formulaA = mgr.makeEqual(fy, makeNumber(0));
+      BooleanFormula formulaB = mgr.makeEqual(fy, makeNumber(1));
+
+      T idA = prover.addConstraint(formulaA);
+      prover.addConstraint(formulaB);
+      assertThat(prover).isUnsatisfiable();
+
+      BooleanFormula interpolant = prover.getInterpolant(ImmutableList.of(idA));
+
+      assertThatFormula(interpolant).isValidInterpolant(formulaA, formulaB);
     }
   }
 }
