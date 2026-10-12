@@ -273,6 +273,7 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
    *     BooleanFormula}s.
    */
   protected InterpolationGroups getInterpolationGroups(Collection<T> nativeFormulasOfA) {
+    checkNotNull(nativeFormulasOfA);
     ImmutableSet.Builder<BooleanFormula> formulasOfA = ImmutableSet.builder();
     ImmutableSet.Builder<BooleanFormula> formulasOfB = ImmutableSet.builder();
     for (Multimap<BooleanFormula, T> assertedFormulasPerLevel : assertedFormulas) {
