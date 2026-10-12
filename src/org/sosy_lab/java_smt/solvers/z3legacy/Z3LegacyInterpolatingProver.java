@@ -58,7 +58,7 @@ class Z3LegacyInterpolatingProver extends Z3LegacyAbstractProver<Long>
   @CanIgnoreReturnValue
   @Override
   protected Long addConstraintImpl(BooleanFormula f) throws InterruptedException {
-    super.addConstraintImpl(f);
+    addConstraint0(f);
     return (long) ID_GENERATOR.getFreshId();
   }
 

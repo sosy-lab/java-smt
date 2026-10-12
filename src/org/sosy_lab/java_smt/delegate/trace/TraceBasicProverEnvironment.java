@@ -92,7 +92,7 @@ class TraceBasicProverEnvironment<T> implements BasicProverEnvironment<T> {
     return logger
         .logDefDiscard(
             logger.toVariable(this),
-            "getUnsatCoreOverAssumptions(ImmutableList.of(%s))"
+            "unsatCoreOverAssumptions(ImmutableList.of(%s))"
                 .formatted(logger.toVariables(assumptions)),
             () -> delegate.unsatCoreOverAssumptions(assumptions))
         .map(mgr::rebuildAll);

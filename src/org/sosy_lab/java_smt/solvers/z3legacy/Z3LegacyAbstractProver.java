@@ -13,7 +13,6 @@ package org.sosy_lab.java_smt.solvers.z3legacy;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.io.MoreFiles;
-import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import com.microsoft.z3legacy.Native;
 import com.microsoft.z3legacy.Z3Exception;
 import com.microsoft.z3legacy.enumerations.Z3_lbool;
@@ -154,33 +153,21 @@ abstract class Z3LegacyAbstractProver<T> extends AbstractProverWithAllSat<T> {
     pop0();
   }
 
-  protected void assertContraint(long constraint) {
-    Native.solverAssert(z3context, z3solver, constraint);
-  }
-
-  protected void assertContraintAndTrack(long constraint, long symbol) {
-    Native.solverAssertAndTrack(z3context, z3solver, constraint, symbol);
-  }
-
-  @CanIgnoreReturnValue
-  @SuppressWarnings("unchecked")
-  @Override
-  protected T addConstraintImpl(BooleanFormula f) throws InterruptedException {
+  protected void addConstraint0(BooleanFormula f) {
     Preconditions.checkState(!closed);
     long e = creator.extractInfo(f);
     try {
       if (storedConstraints != null) { // Unsat core generation is on.
         String varName = "Z3_UNSAT_CORE_%d".formatted(trackId.getFreshId());
         BooleanFormula t = mgr.getBooleanFormulaManager().makeVariable(varName);
-        assertContraintAndTrack(e, creator.extractInfo(t));
+        Native.solverAssertAndTrack(z3context, z3solver, e, creator.extractInfo(t));
         storedConstraints.push(storedConstraints.pop().putAndCopy(varName, f));
       } else {
-        assertContraint(e);
+        Native.solverAssert(z3context, z3solver, e);
       }
     } catch (Z3Exception exception) {
       throw creator.handleZ3ExceptionAsRuntimeException(exception);
     }
-    return (T) Long.valueOf(e);
   }
 
   protected void push0() {
