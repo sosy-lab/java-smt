@@ -11,9 +11,8 @@
 package org.sosy_lab.java_smt.basicimpl;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.base.Preconditions.checkState;
+import static org.sosy_lab.java_smt.test.BooleanFormulaSubject.assertUsing;
 
-import com.google.common.collect.Sets;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -25,7 +24,6 @@ import org.sosy_lab.java_smt.api.BooleanFormulaManager;
 import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
 import org.sosy_lab.java_smt.api.Model;
-import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
@@ -84,6 +82,16 @@ public class IndependentInterpolatingSolverDelegate<T> extends AbstractProver<T>
     return PREFIX + termIdGenerator.getFreshId();
   }
 
+  /** Check if assertions are enabled. */
+  private boolean areAssertionsEnabled() {
+    try {
+      assert false;
+    } catch (AssertionError e) {
+      return true;
+    }
+    return false;
+  }
+
   @Override
   public BooleanFormula getInterpolant(Collection<T> identifiersForA)
       throws SolverException, InterruptedException {
@@ -118,8 +126,12 @@ public class IndependentInterpolatingSolverDelegate<T> extends AbstractProver<T>
           interpolationTechnique.getInterpolant(conjugatedFormulasOfA, conjugatedFormulasOfB);
     }
 
-    assert satisfiesInterpolationCriteria(
-        interpolant, conjugatedFormulasOfA, conjugatedFormulasOfB);
+    if (areAssertionsEnabled()) {
+      // Only validate interpolants when assertions are enabled as this is an expensive check
+      assertUsing(solverContext)
+          .that(interpolant)
+          .isValidInterpolant(conjugatedFormulasOfA, conjugatedFormulasOfB);
+    }
 
     return interpolant;
   }
@@ -145,61 +157,6 @@ public class IndependentInterpolatingSolverDelegate<T> extends AbstractProver<T>
     }
     throw new UnsupportedOperationException(
         "Sequential interpolants are not supported for independent interpolation currently.");
-  }
-
-  /**
-   * Checks the following 3 criteria for Craig interpolants:
-   *
-   * <p>1. the implication A ⇒ interpolant holds,
-   *
-   * <p>2. the conjunction interpolant ∧ B is unsatisfiable, and
-   *
-   * <p>3. interpolant only contains symbols that occur in both A and B.
-   */
-  private boolean satisfiesInterpolationCriteria(
-      BooleanFormula interpolant,
-      BooleanFormula conjugatedFormulasOfA,
-      BooleanFormula conjugatedFormulasOfB)
-      throws InterruptedException, SolverException {
-
-    // checks that every Symbol of the interpolant appears either in A or B
-    Set<String> interpolantSymbols = mgr.extractVariablesAndUFs(interpolant).keySet();
-    Set<String> interpolASymbols = mgr.extractVariablesAndUFs(conjugatedFormulasOfA).keySet();
-    Set<String> interpolBSymbols = mgr.extractVariablesAndUFs(conjugatedFormulasOfB).keySet();
-    Set<String> intersection = Sets.intersection(interpolASymbols, interpolBSymbols);
-    checkState(
-        intersection.containsAll(interpolantSymbols),
-        "Interpolant contains symbols %s that are not part of both input formula groups A and B.",
-        Sets.difference(interpolantSymbols, intersection));
-
-    try (ProverEnvironment validationSolver = getDistinctProver()) {
-      validationSolver.push();
-      // A -> interpolant is SAT
-      validationSolver.addConstraint(bmgr.implication(conjugatedFormulasOfA, interpolant));
-      checkState(
-          !validationSolver.isUnsat(),
-          "Invalid Craig interpolation: formula group A does not imply the interpolant.");
-      validationSolver.pop();
-
-      validationSolver.push();
-      // interpolant AND B is UNSAT
-      validationSolver.addConstraint(bmgr.and(interpolant, conjugatedFormulasOfB));
-      checkState(
-          validationSolver.isUnsat(),
-          "Invalid Craig interpolation: interpolant does not contradict formula group B.");
-      validationSolver.pop();
-    }
-    return true;
-  }
-
-  /**
-   * Create a new, distinct prover to interpolate on. Will be able to generate models.
-   *
-   * @return A new {@link ProverEnvironment} configured to generate models.
-   */
-  private ProverEnvironment getDistinctProver() {
-    // TODO: we should include the possibility to choose from options here. E.g. CHC/Horn solvers.
-    return solverContext.newProverEnvironment(ProverOptions.GENERATE_MODELS);
   }
 
   @Override
