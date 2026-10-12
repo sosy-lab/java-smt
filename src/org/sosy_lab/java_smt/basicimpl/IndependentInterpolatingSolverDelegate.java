@@ -84,12 +84,9 @@ public class IndependentInterpolatingSolverDelegate<T> extends AbstractProver<T>
 
   /** Check if assertions are enabled. */
   private boolean areAssertionsEnabled() {
-    try {
-      assert false;
-    } catch (AssertionError e) {
-      return true;
-    }
-    return false;
+    boolean enabled = false;
+    assert enabled = true;
+    return enabled;
   }
 
   @Override
