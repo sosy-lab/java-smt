@@ -73,27 +73,32 @@ public abstract class AbstractSolverContext implements SolverContext {
   @SuppressWarnings({"ResultOfMethodCallIgnored", "resource"})
   private InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation1(
       Set<ProverOptions> options) {
-    InterpolatingProverEnvironment<?> out;
-    // Try to get a new prover environment w native interpolation with the current options
-    try {
-      out = newProverEnvironmentWithInterpolation0(options);
-    } catch (UnsupportedOperationException e) {
-      // Check if QuantifiedFormulaManager is available before attempting independent interpolation
-      try {
-        getFormulaManager().getQuantifiedFormulaManager();
-      } catch (UnsupportedOperationException error) {
-        e.addSuppressed(error);
-        throw e;
-      }
-      // If native interpolation is not available, we wrap a normal prover such that it returns
-      // interpolation points
-      ProverEnvironment normalProver = newProverEnvironment0(options);
-      // TODO: only allow this if there is a quantified formula manager available!
-      out = new InterpolatingSolverDelegate(normalProver, options);
-    }
+    if (getIndependentInterpolationStrategy(options) == null) {
+      return newProverEnvironmentWithInterpolation0(options);
 
-    // TODO: do we need the assumptions inside of the interpolation delegate?
-    return new IndependentInterpolatingSolverDelegate<>(this, out, options);
+    } else {
+      // Try to get a new prover environment w native interpolation with the current options
+      InterpolatingProverEnvironment<?> out;
+      try {
+        out = newProverEnvironmentWithInterpolation0(options);
+      } catch (UnsupportedOperationException e) {
+        // Check if QuantifiedFormulaManager is available before attempting independent
+        // interpolation
+        try {
+          getFormulaManager().getQuantifiedFormulaManager();
+        } catch (UnsupportedOperationException error) {
+          e.addSuppressed(error);
+          throw e;
+        }
+        // If native interpolation is not available, we wrap a normal prover such that it returns
+        // interpolation points
+        ProverEnvironment normalProver = newProverEnvironment0(options);
+        out = new InterpolatingSolverDelegate(normalProver, options);
+      }
+
+      // TODO: do we need the assumptions inside of the interpolation delegate?
+      return new IndependentInterpolatingSolverDelegate<>(this, out, options);
+    }
   }
 
   protected abstract InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation0(

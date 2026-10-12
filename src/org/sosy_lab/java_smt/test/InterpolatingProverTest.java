@@ -21,7 +21,6 @@ import com.google.common.collect.Lists;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.sosy_lab.common.UniqueIdGenerator;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
@@ -1340,6 +1339,40 @@ public class InterpolatingProverTest extends ParameterizedInterpolatingSolverBas
       BooleanFormula interpolant = prover.getInterpolant(ImmutableList.of(idA));
 
       assertThatFormula(interpolant).isValidInterpolant(formulaA, formulaB);
+    }
+  }
+
+  @Test
+  @SuppressWarnings("CheckReturnValue")
+  public <T> void basicAssumptionsTest() throws SolverException, InterruptedException {
+    // FIXME Assumptions are broken when using solver independent interpolation
+    assume().that(itpStrategyToUse()).isNull();
+
+    Formula v1 = makeVariable("v1");
+    Formula v2 = makeVariable("v2");
+
+    BooleanFormula suffix1 = bmgr.makeVariable("suffix1");
+    BooleanFormula suffix2 = bmgr.makeVariable("suffix2");
+    BooleanFormula suffix3 = bmgr.makeVariable("suffix3");
+
+    BooleanFormula term1 =
+        bmgr.or(
+            bmgr.and(mgr.makeEqual(v1, makeNumber(1)), bmgr.not(mgr.makeEqual(v1, v2))), suffix1);
+    BooleanFormula term2 = bmgr.or(mgr.makeEqual(v2, makeNumber(1)), suffix2);
+    BooleanFormula term3 = bmgr.or(bmgr.not(mgr.makeEqual(v1, makeNumber(1))), suffix3);
+
+    try (InterpolatingProverEnvironment<T> env = newEnvironmentForTest()) {
+
+      T firstPartForInterpolant = env.push(term1);
+      env.push(term2);
+      env.push(term3);
+
+      assertThat(
+              env.isUnsatWithAssumptions(
+                  ImmutableList.of(bmgr.not(suffix1), bmgr.not(suffix2), suffix3)))
+          .isTrue();
+      assertThat(env.getInterpolant(ImmutableList.of(firstPartForInterpolant)).toString())
+          .doesNotContain("suffix");
     }
   }
 }
