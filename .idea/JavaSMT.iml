@@ -39,6 +39,7 @@
           <root url="jar://$MODULE_DIR$/lib/java/runtime-princess/princess-parser_2.13.jar!/" />
           <root url="jar://$MODULE_DIR$/lib/java/runtime-princess/sourcecode_2.13.jar!/" />
           <root url="jar://$MODULE_DIR$/lib/java/runtime-princess/org.sat4j.core.jar!/" />
+          <root url="jar://$MODULE_DIR$/lib/java/runtime-eldarica/eldarica_2.13.jar!/" />
           <root url="jar://$MODULE_DIR$/lib/java/runtime-cvc5/cvc5.jar!/" />
           <root url="jar://$MODULE_DIR$/lib/java/runtime-princess/ostrich_2.13.jar!/" />
           <root url="jar://$MODULE_DIR$/lib/java/runtime-princess/scala-parser-combinators_2.13.jar!/" />

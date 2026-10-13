@@ -1,0 +1,21 @@
+// This file is part of JavaSMT,
+// an API wrapper for a collection of SMT solvers:
+// https://github.com/sosy-lab/java-smt
+//
+// SPDX-FileCopyrightText: 2020 Dirk Beyer <https://www.sosy-lab.org>
+//
+// SPDX-License-Identifier: Apache-2.0
+
+package org.sosy_lab.java_smt.delegate.logging;
+
+import org.sosy_lab.common.log.LogManager;
+import org.sosy_lab.java_smt.api.HornProverEnvironment;
+
+/** Wrapper for a horn solver. */
+class LoggingHornProverEnvironment extends LoggingBasicProverEnvironment<Void>
+    implements HornProverEnvironment {
+
+  LoggingHornProverEnvironment(LogManager logger, HornProverEnvironment delegate) {
+    super(delegate, logger);
+  }
+}

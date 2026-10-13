@@ -16,6 +16,7 @@ import org.sosy_lab.common.configuration.Configuration;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.common.io.PathCounterTemplate;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
+import org.sosy_lab.java_smt.api.HornProverEnvironment;
 import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
 import org.sosy_lab.java_smt.api.OptimizationProverEnvironment;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
@@ -75,7 +76,8 @@ public final class PrincessSolverContext extends AbstractSolverContext {
   @SuppressWarnings("resource")
   @Override
   protected ProverEnvironment newProverEnvironment0(Set<ProverOptions> options) {
-    return (PrincessTheoremProver) creator.getEnv().getNewProver(false, manager, creator, options);
+    return (PrincessTheoremProver) creator.getEnv().getNewProver(false, false,manager, creator,
+        options);
   }
 
   @SuppressWarnings("resource")
@@ -83,13 +85,19 @@ public final class PrincessSolverContext extends AbstractSolverContext {
   protected InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation0(
       Set<ProverOptions> options) {
     return (PrincessInterpolatingProver)
-        creator.getEnv().getNewProver(true, manager, creator, options);
+        creator.getEnv().getNewProver(true, false, manager, creator, options);
   }
 
   @Override
   public OptimizationProverEnvironment newOptimizationProverEnvironment0(
       Set<ProverOptions> options) {
     throw new UnsupportedOperationException("Princess does not support optimization");
+  }
+
+  @Override
+  protected HornProverEnvironment newHornProverEnvironment0(Set<ProverOptions> options) {
+    return (EldaricaHornProver)
+        creator.getEnv().getNewProver(false, true, manager, creator, options);
   }
 
   @Override
