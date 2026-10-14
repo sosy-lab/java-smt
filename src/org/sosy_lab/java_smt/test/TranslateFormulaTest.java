@@ -89,33 +89,6 @@ public class TranslateFormulaTest {
     }
   }
 
-  private void requireParserTo() {
-    assume()
-        .withMessage("Solver %s does not support parsing formulae", translateTo)
-        .that(translateTo)
-        .isNoneOf(Solvers.CVC4, Solvers.BOOLECTOR, Solvers.YICES2);
-
-    assume()
-        .withMessage(
-            "Solver %s segfaults when parsing short queries or reports invalid length", translateTo)
-        .that(translateTo)
-        .isNotEqualTo(Solvers.Z3_WITH_INTERPOLATION);
-  }
-
-  private void requireParserFrom() {
-    assume()
-        .withMessage("Solver %s does not support parsing formulae", translateFrom)
-        .that(translateFrom)
-        .isNoneOf(Solvers.CVC4, Solvers.BOOLECTOR, Solvers.YICES2);
-
-    assume()
-        .withMessage(
-            "Solver %s segfaults when parsing short queries or reports invalid length",
-            translateFrom)
-        .that(translateFrom)
-        .isNotEqualTo(Solvers.Z3_WITH_INTERPOLATION);
-  }
-
   private void requireIntegers() {
     assume()
         .withMessage("Solver %s does not support integer theory", translateFrom)
@@ -129,8 +102,6 @@ public class TranslateFormulaTest {
 
   @Test
   public void testDumpingAndParsing() throws SolverException, InterruptedException {
-    requireParserTo();
-
     BooleanFormula input = createTestFormula(managerFrom);
     String out = managerFrom.dumpFormula(input).toString();
     BooleanFormula parsed = managerTo.parse(out);
@@ -140,8 +111,6 @@ public class TranslateFormulaTest {
 
   @Test
   public void testTranslating() throws SolverException, InterruptedException {
-    requireParserTo();
-
     BooleanFormula inputFrom = createTestFormula(managerFrom);
     BooleanFormula inputTo = createTestFormula(managerTo);
     BooleanFormula translatedInput = managerTo.translateFrom(inputFrom, managerFrom);
@@ -181,9 +150,6 @@ public class TranslateFormulaTest {
 
   @Test
   public void testTranslatingAndReverse() throws SolverException, InterruptedException {
-    requireParserTo();
-    requireParserFrom();
-
     BooleanFormula inputFrom = createTestFormula(managerFrom);
     BooleanFormula translatedInput = managerTo.translateFrom(inputFrom, managerFrom);
     BooleanFormula translatedReverseInput = managerFrom.translateFrom(translatedInput, managerTo);

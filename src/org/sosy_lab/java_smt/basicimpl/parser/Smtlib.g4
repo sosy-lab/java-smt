@@ -1,0 +1,281 @@
+/*
+ * This file is part of JavaSMT,
+ * an API wrapper for a collection of SMT solvers:
+ * https://github.com/sosy-lab/java-smt
+ *
+ * SPDX-FileCopyrightText: 2025 Dirk Beyer <https://www.sosy-lab.org>
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+grammar Smtlib;
+
+Comment
+    : ';' ~[\n\r]* -> skip
+    ;
+
+White
+    : [ \t\r\n]+ -> skip
+    ;
+
+boolean
+    : 'true'
+    | 'false'
+    ;
+
+fragment BinaryDigit
+    : [01]
+    ;
+
+Binary
+    : '#b' BinaryDigit+
+    ;
+
+fragment HexDigit
+    : '0'..'9'
+    | 'a'..'f'
+    | 'A'..'F'
+    ;
+
+HexaDecimal
+    : '#x' HexDigit+
+    ;
+
+bitvec
+    : Binary
+    | HexaDecimal
+    ;
+
+float
+    : '(' 'fp' bitvec bitvec bitvec ')'
+    ;
+
+fragment Digit
+    : [0-9]
+    ;
+
+Numeral
+    : '0'
+    | [1-9] Digit*
+    ;
+
+integer
+    : Numeral
+    ;
+
+Decimal
+    : Numeral '.' '0'* Numeral
+    ;
+
+real
+    : Decimal
+    ;
+
+fragment StringChar
+    : '\u0020' .. '\u0021' // Skip '"'
+    | '\u0023' .. '\u007E' // Skip <Delete>
+    | '\u0080' .. '\uffff'
+    | '""'                 // Add escaped '"' back in
+    ;
+
+String
+    : '"' StringChar* '"'
+    ;
+
+string
+    : String
+    ;
+
+literal
+    : boolean
+    | integer
+    | real
+    | bitvec
+    | float
+    | string
+    ;
+
+fragment Sym
+    : 'a'..'z'
+    | 'A'..'Z'
+    | '+'
+    | '='
+    | '/'
+    | '*'
+    | '%'
+    | '?'
+    | '!'
+    | '$'
+    | '-'
+    | '_'
+    | '~'
+    | '&'
+    | '^'
+    | '<'
+    | '>'
+    | '@'
+    | '.'
+    ;
+
+Simple
+    : Sym (Sym | Digit)*
+    ;
+
+fragment QuotedChar
+    : '\u0009'             // \t
+    | '\u000A'             // \n
+    | '\u000D'             // \r
+    | '\u0020' .. '\u005B' // Skip '\'
+    | '\u005D' .. '\u007B' // Skip '|'
+    | '\u007D' .. '\u007E' // Skip <Delete>
+    | '\u0080' .. '\uffff'
+    ;
+
+Quoted
+    : '|' QuotedChar* '|'
+    ;
+
+symbol
+    : Simple
+    | Quoted
+    ;
+
+Keyword
+    : ':' Simple
+    ;
+
+keyword
+    : Keyword
+    ;
+
+sort
+    : 'Bool'                                       # SortBool
+    | 'Int'                                        # SortInt
+    | 'Real'                                       # SortReal
+    | 'String'                                     # SortString
+    | 'RegLan'                                     # SortRegex
+    | '(' '_' 'BitVec' integer ')'                 # SortBitvec
+    | 'RoundingMode'                               # SortRoundingMode
+    | ('Float16'
+      |'Float32'
+      |'Float64'
+      |'Float128'
+      |'(' '_' 'FloatingPoint' integer integer ')'
+      )                                            # SortFloat
+    | '(' 'Array' sort sort ')'                    # SortArray
+    ;
+
+quantifier
+    : 'forall'
+    | 'exists'
+    ;
+
+sortedVar
+    : '(' symbol sort ')'
+    ;
+
+binding
+    : '(' symbol expr ')'
+    ;
+
+attribute
+    : keyword expr?
+    ;
+
+expr
+    : literal                                    # Const
+    | symbol                                     # Var
+    | '(' '_' symbol integer+ ')'                # Indexed
+    | '(' 'as' symbol sort ')'                   # As
+    | '(' '!' expr attribute+ ')'                # Annotated
+    | '(' 'let' '(' binding+ ')' expr ')'        # Let
+    | '(' quantifier '(' sortedVar+ ')' expr ')' # Quantified
+    | '(' expr expr+ ')'                         # App
+    ;
+
+setInfo
+    : '(' 'set-info' attribute ')'
+    ;
+
+setOption
+    : '(' 'set-option' attribute ')'
+    ;
+
+setLogic
+    : '(' 'set-logic' symbol ')'
+    ;
+
+declare
+    : '(' 'declare-const' symbol sort ')'
+    | '(' 'declare-fun' symbol '(' sort* ')' sort ')'
+    ;
+
+define
+    : '(' 'define-const' symbol sort expr ')'
+    | '(' 'define-fun' symbol '(' sortedVar* ')' sort expr ')'
+    ;
+
+push
+    : '(' 'push' Numeral ')'
+    ;
+
+pop
+    : '(' 'pop' Numeral ')'
+    ;
+
+assert
+    : '(' 'assert' expr ')'
+    ;
+
+getAssertions
+    : '(' 'get-assertions' ')'
+    ;
+
+check
+    : '(' 'check-sat' ')'                        # CheckSat
+    | '(' 'check-sat-assuming' '(' expr* ')' ')' # CheckSatAssuming
+    ;
+
+getModel
+    : '(' 'get-model' ')'
+    ;
+
+getCore
+    : '(' 'get-unsat-core' ')'        # GetUnsatCore
+    | '(' 'get-unsat-assumptions' ')' # GetUnsatAssumptions
+    ;
+
+getValue
+    : '(' 'get-value' '(' expr+ ')' ')'
+    ;
+
+reset
+    : '(' 'reset' ')'            # ResetSolver
+    | '(' 'reset-assertions' ')' # ResetAssertions
+    ;
+
+exit
+    : '(' 'exit' ')'
+    ;
+
+command
+    : setInfo
+    | setOption
+    | setLogic
+    | declare
+    | define
+    | push
+    | pop
+    | assert
+    | getAssertions
+    | check
+    | getModel
+    | getCore
+    | getValue
+    | reset
+    | exit
+    ;
+
+smtlib
+    : command* EOF
+    ;

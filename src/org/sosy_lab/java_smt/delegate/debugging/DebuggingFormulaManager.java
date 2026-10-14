@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 import org.sosy_lab.common.Appender;
 import org.sosy_lab.common.Appenders;
 import org.sosy_lab.java_smt.api.ArrayFormulaManager;
@@ -187,6 +188,11 @@ class DebuggingFormulaManager implements FormulaManager {
     List<BooleanFormula> results = delegate.parseAll(s);
     results.forEach(debugging::addFormulaTerm);
     return results;
+  }
+
+  @Override
+  public void parseAndRun(Consumer<SolverResponse> responseListener, String smtlib) {
+    throw new UnsupportedOperationException();
   }
 
   @Override

@@ -10,6 +10,7 @@ package org.sosy_lab.java_smt.api;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
@@ -17,10 +18,12 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.function.Consumer;
 import org.sosy_lab.common.Appender;
 import org.sosy_lab.java_smt.api.visitors.FormulaTransformationVisitor;
 import org.sosy_lab.java_smt.api.visitors.FormulaVisitor;
 import org.sosy_lab.java_smt.api.visitors.TraversalProcess;
+import org.sosy_lab.java_smt.basicimpl.parser.SmtlibException;
 
 /** FormulaManager class contains all operations which can be performed on formulas. */
 public interface FormulaManager {
@@ -221,6 +224,53 @@ public interface FormulaManager {
    * @throws IllegalArgumentException If the string cannot be parsed.
    */
   List<BooleanFormula> parseAll(String s) throws IllegalArgumentException;
+
+  sealed interface SolverResponse {
+    /** Response to <code>get-assertions</code>. */
+    record AssertionsResponse(List<BooleanFormula> assertions) implements SolverResponse {}
+
+    /** Response to <code>check-sat</code> or <code>check-sat-assuming</code>. */
+    record CheckSatResponse(Status status) implements SolverResponse {
+      public sealed interface Status {
+        record Sat() implements Status {}
+
+        record Unsat() implements Status {}
+
+        record Unknown(String reason) implements Status {}
+      }
+    }
+
+    /** Response to <code>get-model</code>. */
+    record ModelResponse(List<Model.ValueAssignment> model) implements SolverResponse {}
+
+    /** Response to <code>get-unsat-core</code> or <code>get-unsat-assumptions</code>. */
+    record UnsatCoreResponse(List<BooleanFormula> core) implements SolverResponse {}
+
+    /** Response to <code>get-value</code>. */
+    record EvaluationResponse(List<Formula> value) implements SolverResponse {}
+  }
+
+  /**
+   * Read and evaluate a SMTLIB script in a new {@link ProverEnvironment}.
+   *
+   * <p>Solver responses to commands like <code>check-sat</code> or <code>get-model</code> are sent
+   * directly to a listener
+   */
+  void parseAndRun(Consumer<SolverResponse> responseListener, String smtlib)
+      throws SmtlibException, InterruptedException;
+
+  /**
+   * Read and evaluate a SMTLIB script in a new {@link ProverEnvironment}.
+   *
+   * <p>Solver responses to commands like <code>check-sat</code> or <code>get-model</code> are
+   * stored in a list and then returned by this function.
+   */
+  default List<SolverResponse> parseAndRun(String smtlib)
+      throws SmtlibException, InterruptedException {
+    ImmutableList.Builder<SolverResponse> responses = new ImmutableList.Builder<>();
+    parseAndRun(responses::add, smtlib);
+    return responses.build();
+  }
 
   /**
    * Serialize an input formula to an SMT-LIB format. Very useful when passing formulas between

@@ -22,6 +22,7 @@ import java.math.BigInteger;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Consumer;
 import java.util.logging.Level;
 import org.sosy_lab.common.Appender;
 import org.sosy_lab.common.log.LogManager;
@@ -1102,6 +1103,11 @@ class TraceFormulaManager implements FormulaManager {
     return rebuildAll(
         logger.logDefDiscard(
             "mgr", "parseAll(%s)".formatted(logger.printString(s)), () -> delegate.parseAll(s)));
+  }
+
+  @Override
+  public void parseAndRun(Consumer<SolverResponse> responseListener, String smtlib) {
+    throw new UnsupportedOperationException();
   }
 
   @Override

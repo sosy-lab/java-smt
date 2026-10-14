@@ -187,10 +187,14 @@ class Yices2BitvectorFormulaManager
 
   @Override
   protected Integer extend(Integer pNumber, int pExtensionBits, boolean pSigned) {
-    if (pSigned) {
-      return Terms.bvSignExtend(pNumber, pExtensionBits);
+    if (pExtensionBits == 0) {
+      return pNumber;
     } else {
-      return Terms.bvZeroExtend(pNumber, pExtensionBits);
+      if (pSigned) {
+        return Terms.bvSignExtend(pNumber, pExtensionBits);
+      } else {
+        return Terms.bvZeroExtend(pNumber, pExtensionBits);
+      }
     }
   }
 

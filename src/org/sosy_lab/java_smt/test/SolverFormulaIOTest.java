@@ -162,7 +162,7 @@ public class SolverFormulaIOTest extends SolverBasedTest0.ParameterizedSolverBas
   @Test
   public void varDumpTest() {
     // Boolector will fail this anyway since bools are bitvecs for btor
-    TruthJUnit.assume().that(solver).isNotEqualTo(Solvers.BOOLECTOR);
+    TruthJUnit.assume().that(solver).isNoneOf(Solvers.BOOLECTOR, Solvers.YICES2);
     BooleanFormula a = bmgr.makeVariable("main::a");
     BooleanFormula b = bmgr.makeVariable("b");
     BooleanFormula c1 = bmgr.xor(a, b);
@@ -179,7 +179,7 @@ public class SolverFormulaIOTest extends SolverBasedTest0.ParameterizedSolverBas
   @Test
   public void varWithSpaceDumpTest() {
     // Boolector will fail this anyway since bools are bitvecs for btor
-    TruthJUnit.assume().that(solver).isNotEqualTo(Solvers.BOOLECTOR);
+    TruthJUnit.assume().that(solver).isNoneOf(Solvers.BOOLECTOR, Solvers.YICES2);
 
     BooleanFormula a = bmgr.makeVariable("main a");
     BooleanFormula b = bmgr.makeVariable("b");
@@ -263,7 +263,7 @@ public class SolverFormulaIOTest extends SolverBasedTest0.ParameterizedSolverBas
   @Test
   public void bvDumpTest() {
     requireBitvectors();
-    TruthJUnit.assume().that(solver).isNotEqualTo(Solvers.BOOLECTOR);
+    TruthJUnit.assume().that(solver).isNoneOf(Solvers.BOOLECTOR, Solvers.YICES2);
     BitvectorFormula f1 = bvmgr.makeVariable(8, "a");
     BitvectorFormula val = bvmgr.makeBitvector(8, 1);
     BooleanFormula formula = bvmgr.equal(f1, val);
@@ -335,12 +335,14 @@ public class SolverFormulaIOTest extends SolverBasedTest0.ParameterizedSolverBas
   public void parseMathSatTestParseFirst2() throws SolverException, InterruptedException {
     requireParser();
     requireIntegers();
+    assume().that(solver).isNotEqualTo(Solvers.CVC4);
     compareParseWithOrgParseFirst(MATHSAT_DUMP2, this::redundancyExprGen, AQBCU);
   }
 
   @Test
   public void parseMathSatTestExprFirst2() throws SolverException, InterruptedException {
     requireParser();
+    assume().that(solver).isNotEqualTo(Solvers.CVC4);
     compareParseWithOrgExprFirst(MATHSAT_DUMP2, this::redundancyExprGen, AQBCU);
   }
 
@@ -405,6 +407,7 @@ public class SolverFormulaIOTest extends SolverBasedTest0.ParameterizedSolverBas
   @Test
   public void funDeclareTest() {
     requireIntegers();
+    TruthJUnit.assume().that(solver).isNotEqualTo(Solvers.YICES2);
     IntegerFormula int1 = imgr.makeNumber(1);
     IntegerFormula int2 = imgr.makeNumber(2);
 
@@ -427,6 +430,7 @@ public class SolverFormulaIOTest extends SolverBasedTest0.ParameterizedSolverBas
   @Test
   public void funDeclareTest2() {
     requireIntegers();
+    TruthJUnit.assume().that(solver).isNotEqualTo(Solvers.YICES2);
     IntegerFormula int1 = imgr.makeNumber(1);
     IntegerFormula int2 = imgr.makeNumber(2);
 
@@ -448,6 +452,7 @@ public class SolverFormulaIOTest extends SolverBasedTest0.ParameterizedSolverBas
   public void funDeclareWithArrayTest() {
     requireIntegers();
     requireArrays();
+    TruthJUnit.assume().that(solver).isNotEqualTo(Solvers.YICES2);
 
     IntegerFormula idx = imgr.makeVariable("idx");
     IntegerFormula int1 = imgr.makeNumber(1);

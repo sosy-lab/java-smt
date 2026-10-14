@@ -124,6 +124,9 @@ SPDX-License-Identifier: Apache-2.0
              Change version number in build/build-ivy.xml for upgrading. -->
         <dependency org="org.apache.ivy" name="ivy" rev="${ivy.target_version}" conf="build->default"/>
 
+        <!-- ANTLR -->
+        <dependency org="org.antlr" name="antlr4-runtime" rev="4.13.2" conf="core->default"/>
+
         <!-- Annotations we use for @Nullable etc. -->
         <dependency org="org.checkerframework" name="checker-qual" rev="3.54.0" conf="core->default; contrib->sources"/>
 

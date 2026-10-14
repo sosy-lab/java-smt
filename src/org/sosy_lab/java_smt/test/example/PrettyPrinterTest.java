@@ -73,6 +73,15 @@ public class PrettyPrinterTest extends ParameterizedSolverBasedTest0 {
                 )
               )\
               """;
+          case YICES2 ->
+              """
+              (AND
+                (EQ (select arr x) (foo 3))
+                (NOT
+                  (GTE (ADD x (MUL -1 xx)) 0)
+                )
+              )\
+              """;
           default ->
               """
               (and
@@ -169,6 +178,32 @@ public class PrettyPrinterTest extends ParameterizedSolverBasedTest0 {
                 )
               )\
               """;
+          case YICES2 ->
+              """
+              (AND
+                (EQ
+                  (select
+                    arr
+                    x
+                  )
+                  (foo
+                    3
+                  )
+                )
+                (NOT
+                  (GTE
+                    (ADD
+                      x
+                      (MUL
+                        -1
+                        xx
+                      )
+                    )
+                    0
+                  )
+                )
+              )\
+              """;
           default ->
               """
               (and
@@ -242,6 +277,21 @@ public class PrettyPrinterTest extends ParameterizedSolverBasedTest0 {
                 { rank=same;
                   3 [label="(<= 0 (+ x (* -1 xx)))", shape="rectangle", style="filled", fillcolor="white"];
                   1 [label="(= (select arr x) (foo 3))", shape="rectangle", style="filled", fillcolor="white"];
+                }
+              }\
+              """;
+          case YICES2 ->
+              """
+              digraph SMT {
+                rankdir=LR
+                0 [label="AND", shape="circle", style="filled", fillcolor="lightblue"];
+                0 -> 1 [label=""];
+                0 -> 2 [label=""];
+                2 [label="NOT", shape="circle", style="filled", fillcolor="orange"];
+                2 -> 3 [label=""];
+                { rank=same;
+                  3 [label="(>= (+ x (* -1 xx)) 0)", shape="rectangle", style="filled", fillcolor="white"];
+                  1 [label="(= (arr x) (foo 3))", shape="rectangle", style="filled", fillcolor="white"];
                 }
               }\
               """;
@@ -356,6 +406,40 @@ public class PrettyPrinterTest extends ParameterizedSolverBasedTest0 {
                 6 [label="x", shape="rectangle", style="filled", fillcolor="white"];
                 4 [label="0", shape="rectangle", style="filled", fillcolor="grey"];
                 1 [label="=", shape="circle", style="filled", fillcolor="white"];
+                1 -> 10 [label="0"];
+                1 -> 11 [label="1"];
+                11 [label="foo", shape="circle", style="filled", fillcolor="white"];
+                11 -> 12 [label="0"];
+                12 [label="3", shape="rectangle", style="filled", fillcolor="grey"];
+                10 [label="select", shape="circle", style="filled", fillcolor="white"];
+                10 -> 13 [label="0"];
+                10 -> 6 [label="1"];
+                13 [label="arr", shape="rectangle", style="filled", fillcolor="white"];
+              }\
+              """;
+          case YICES2 ->
+              """
+              digraph SMT {
+                rankdir=LR
+                0 [label="AND", shape="circle", style="filled", fillcolor="lightblue"];
+                0 -> 1 [label=""];
+                0 -> 2 [label=""];
+                2 [label="NOT", shape="circle", style="filled", fillcolor="orange"];
+                2 -> 3 [label=""];
+                3 [label="GTE", shape="circle", style="filled", fillcolor="white"];
+                3 -> 4 [label="0"];
+                3 -> 5 [label="1"];
+                5 [label="0", shape="rectangle", style="filled", fillcolor="grey"];
+                4 [label="ADD", shape="circle", style="filled", fillcolor="white"];
+                4 -> 6 [label="0"];
+                4 -> 7 [label="1"];
+                7 [label="MUL", shape="circle", style="filled", fillcolor="white"];
+                7 -> 8 [label="0"];
+                7 -> 9 [label="1"];
+                9 [label="xx", shape="rectangle", style="filled", fillcolor="white"];
+                8 [label="-1", shape="rectangle", style="filled", fillcolor="grey"];
+                6 [label="x", shape="rectangle", style="filled", fillcolor="white"];
+                1 [label="EQ", shape="circle", style="filled", fillcolor="white"];
                 1 -> 10 [label="0"];
                 1 -> 11 [label="1"];
                 11 [label="foo", shape="circle", style="filled", fillcolor="white"];
