@@ -78,17 +78,25 @@ abstract class PrincessAbstractProver<E> extends AbstractProverWithAllSat<E> {
    * SAT or UNSAT.
    */
   @Override
-  protected boolean isUnsatImpl() throws SolverException {
-    final Value result = api.checkSat(true);
-    if (result.equals(SimpleAPI.ProverStatus$.MODULE$.Sat())) {
+  protected boolean isUnsatImpl() throws SolverException, InterruptedException {
+    Value status = api.checkSat(false);
+    while (status.equals(SimpleAPI.ProverStatus$.MODULE$.Running())
+        && !shutdownNotifier.shouldShutdown()) {
+      status = api.getStatus(1000);
+    }
+    status = api.stop(true);
+
+    if (shutdownNotifier.shouldShutdown()) {
+      throw new InterruptedException();
+    } else if (status.equals(SimpleAPI.ProverStatus$.MODULE$.Sat())) {
       return false;
-    } else if (result.equals(SimpleAPI.ProverStatus$.MODULE$.Unsat())) {
+    } else if (status.equals(SimpleAPI.ProverStatus$.MODULE$.Unsat())) {
       return true;
-    } else if (result.equals(SimpleAPI.ProverStatus$.MODULE$.OutOfMemory())) {
+    } else if (status.equals(SimpleAPI.ProverStatus$.MODULE$.OutOfMemory())) {
       throw new SolverException(
           "Princess ran out of stack or heap memory, try increasing their sizes.");
     } else {
-      throw new SolverException("Princess' checkSat call returned " + result);
+      throw new SolverException("Princess' checkSat call returned " + status);
     }
   }
 
