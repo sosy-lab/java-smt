@@ -655,8 +655,7 @@ public abstract class SolverBasedTest0 {
 
     @Parameters(name = "{0}")
     public static Solvers[] getAllSolvers() {
-      return new Solvers[] {Solvers.YICES2};
-      // return Solvers.values();
+      return Solvers.values();
     }
 
     @Parameter(0)
