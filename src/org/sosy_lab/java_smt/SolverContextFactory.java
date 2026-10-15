@@ -87,7 +87,7 @@ public class SolverContextFactory {
      * the missing solvers can be removed by setting the <code>javasmt.test.excludeSolvers</code>
      * property. Conversely, if you've compiled your own binaries for a platform that is not
      * officially supported, the list can be extended by setting the <code>
-     * javasmt.test.excludeSolvers</code> property
+     * javasmt.test.includeSolvers</code> property
      *
      * <p>Examples:
      *
