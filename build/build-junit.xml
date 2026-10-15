@@ -27,11 +27,8 @@ SPDX-License-Identifier: Apache-2.0
     <!-- Define property that contains the Ant version for getting the matching ant-junit version. -->
     <antversion property="ant.version.exact"/>
 
-    <!-- Ignore tests for missing solvers.
-         Set to "true" to always skip tests if solver or their dependencies are missing, and "false" to throw an error.
-         If no value is provided, only SolverContextFactoryTest will fail if a solver is missing, while all other tests
-         are skipped. -->
-    <property name="ignoreLinkErrors" value=""/>
+    <property name="javasmt.test.includeSolvers" value=""/>
+    <property name="javasmt.test.excludeSolvers" value=""/>
 
     <!-- Load the JUnit plugin for Ant if it's not installed. -->
     <condition property="ant.junit.available">
@@ -63,7 +60,8 @@ SPDX-License-Identifier: Apache-2.0
             <formatter type="xml"/>
             <classpath refid="classpath.junit"/>
             <sysproperty key="java.awt.headless" value="true"/>
-            <sysproperty key="ignoreLinkErrors" value="${ignoreLinkErrors}"/>
+            <sysproperty key="javasmt.test.includeSolvers" value="${javasmt.test.includeSolvers}"/>
+            <sysproperty key="javasmt.test.excludeSolvers" value="${javasmt.test.excludeSolvers}"/>
             <batchtest fork="true" todir="${junit.dir}">
               <fileset dir="${class.dir}">
                 <patternset refid="test.sources"/>
@@ -127,7 +125,8 @@ SPDX-License-Identifier: Apache-2.0
                 <formatter type="xml"/>
                 <classpath refid="classpath.junit"/>
                 <sysproperty key="java.awt.headless" value="true"/>
-                <sysproperty key="ignoreLinkErrors" value="${ignoreLinkErrors}"/>
+                <sysproperty key="javasmt.test.includeSolvers" value="${javasmt.test.includeSolvers}"/>
+                <sysproperty key="javasmt.test.excludeSolvers" value="${javasmt.test.excludeSolvers}"/>
                 <batchtest fork="true" todir="${junit.dir}">
                     <fileset dir="${class.dir}">
                         <include name="**/*Test.*"/>
