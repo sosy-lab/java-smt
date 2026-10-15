@@ -87,7 +87,6 @@ import org.sosy_lab.java_smt.solvers.opensmt.Logics;
  *  }
  * </code>
  * </pre>
- *
  * The test runner uses {@link Solvers#bundled()} to find out which solvers are available on your
  * platform. If you didn't install all available solvers, or compiled additional binaries yourself,
  * please use the properties <code>"javasmt.test.includeSolvers</code> and <code>
