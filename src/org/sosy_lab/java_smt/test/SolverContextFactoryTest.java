@@ -12,7 +12,6 @@ import static com.google.common.truth.Truth.assert_;
 import static com.google.common.truth.TruthJUnit.assume;
 import static org.junit.Assert.assertThrows;
 
-import java.util.Objects;
 import java.util.regex.Pattern;
 import org.junit.Before;
 import org.junit.Test;
@@ -94,23 +93,12 @@ public class SolverContextFactoryTest {
   @Test
   public void createSolverContextFactoryWithDefaultLoader() throws InvalidConfigurationException {
     requirePlatformSupported();
-
     SolverContextFactory factory =
         new SolverContextFactory(config, logger, shutdownManager.getNotifier());
     try (SolverContext context = factory.generateContext()) {
       @SuppressWarnings("unused")
       FormulaManager mgr = context.getFormulaManager();
       checkVersion(context);
-    } catch (InvalidConfigurationException e) {
-      String flag = System.getProperty("ignoreLinkErrors");
-      if (Objects.equals(flag, "true")) {
-        assume()
-            .withMessage(e.getMessage())
-            .that(e)
-            .hasCauseThat()
-            .isNotInstanceOf(UnsatisfiedLinkError.class);
-      }
-      throw e;
     }
   }
 
