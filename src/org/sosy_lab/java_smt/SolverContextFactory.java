@@ -10,6 +10,7 @@ package org.sosy_lab.java_smt;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Strings.nullToEmpty;
 
 import com.google.common.base.Splitter;
 import com.google.common.collect.FluentIterable;
@@ -140,7 +141,7 @@ public class SolverContextFactory {
               Splitter.on(",")
                   .omitEmptyStrings()
                   .trimResults()
-                  .splitToList(solvers == null ? "" : solvers))
+                  .splitToList(nullToEmpty(solvers)))
           .transform(String::toUpperCase)
           .transform(Solvers::valueOf)
           .toSet();
