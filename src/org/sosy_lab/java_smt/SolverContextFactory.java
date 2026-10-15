@@ -71,94 +71,12 @@ public class SolverContextFactory {
     YICES2,
     BITWUZLA;
 
-    @SuppressWarnings("deprecation")
-    private static final Set<Solvers> defaults =
-        switch (NativeLibraries.OS.guessOperatingSystem()) {
-          case LINUX ->
-              switch (NativeLibraries.Architecture.guessVmArchitecture()) {
-                case ARM64 ->
-                    ImmutableSet.of(
-                        Solvers.BITWUZLA,
-                        Solvers.CVC5,
-                        Solvers.MATHSAT5,
-                        Solvers.OPENSMT,
-                        Solvers.PRINCESS,
-                        Solvers.SMTINTERPOL,
-                        Solvers.Z3,
-                        Solvers.Z3_WITH_INTERPOLATION);
-                case X86_64 ->
-                    ImmutableSet.of(
-                        Solvers.BITWUZLA,
-                        Solvers.BOOLECTOR,
-                        Solvers.CVC4,
-                        Solvers.CVC5,
-                        Solvers.MATHSAT5,
-                        Solvers.OPENSMT,
-                        Solvers.PRINCESS,
-                        Solvers.SMTINTERPOL,
-                        Solvers.YICES2,
-                        Solvers.Z3,
-                        Solvers.Z3_WITH_INTERPOLATION);
-
-                default -> ImmutableSet.of(Solvers.PRINCESS, Solvers.SMTINTERPOL);
-              };
-
-          case WINDOWS ->
-              switch (NativeLibraries.Architecture.guessVmArchitecture()) {
-                case ARM64 ->
-                    ImmutableSet.of(
-                        Solvers.CVC5, Solvers.PRINCESS, Solvers.SMTINTERPOL, Solvers.Z3);
-                case X86_64 ->
-                    ImmutableSet.of(
-                        Solvers.BITWUZLA,
-                        Solvers.CVC5,
-                        Solvers.MATHSAT5,
-                        Solvers.PRINCESS,
-                        Solvers.SMTINTERPOL,
-                        Solvers.YICES2,
-                        Solvers.Z3);
-
-                default -> ImmutableSet.of(Solvers.PRINCESS, Solvers.SMTINTERPOL);
-              };
-
-          case MACOSX ->
-              switch (NativeLibraries.Architecture.guessVmArchitecture()) {
-                case ARM64 ->
-                    ImmutableSet.of(
-                        Solvers.CVC5, Solvers.PRINCESS, Solvers.SMTINTERPOL, Solvers.Z3);
-                case X86_64 ->
-                    ImmutableSet.of(
-                        Solvers.CVC5, Solvers.PRINCESS, Solvers.SMTINTERPOL, Solvers.Z3);
-
-                default -> ImmutableSet.of(Solvers.PRINCESS, Solvers.SMTINTERPOL);
-              };
-
-          default -> ImmutableSet.of(Solvers.PRINCESS, Solvers.SMTINTERPOL);
-        };
-
     private static Set<Solvers> parseSelectedSolvers(@Nullable String solvers) {
       return FluentIterable.from(
-              Splitter.on(",")
-                  .omitEmptyStrings()
-                  .trimResults()
-                  .splitToList(nullToEmpty(solvers)))
+              Splitter.on(",").omitEmptyStrings().trimResults().splitToList(nullToEmpty(solvers)))
           .transform(String::toUpperCase)
           .transform(Solvers::valueOf)
           .toSet();
-    }
-
-    private static final Set<Solvers> includes =
-        parseSelectedSolvers(System.getProperty("javasmt.test.includeSolvers"));
-    private static final Set<Solvers> excludes =
-        parseSelectedSolvers(System.getProperty("javasmt.test.excludeSolvers"));
-
-    static {
-      checkArgument(
-          Sets.intersection(includes, excludes).isEmpty(),
-          "Solvers found on both the \"include\" and \"exclude\" list. When setting the "
-              + "properties \"javasmt.test.includeSolvers\" and  \"javasmt.test.excludeSolvers\" "
-              + "to modify the list of available solvers, please make sure that there is no "
-              + "overlap between the lists");
     }
 
     /**
@@ -181,7 +99,84 @@ public class SolverContextFactory {
      *       <p><code>ant -Djavasmt.test.includeSolvers=bitwuzla tests</code>
      * </ul>
      */
+    @SuppressWarnings("deprecation")
     public static Set<Solvers> bundled() {
+      Set<Solvers> defaults =
+          switch (NativeLibraries.OS.guessOperatingSystem()) {
+            case LINUX ->
+                switch (NativeLibraries.Architecture.guessVmArchitecture()) {
+                  case ARM64 ->
+                      ImmutableSet.of(
+                          Solvers.BITWUZLA,
+                          Solvers.CVC5,
+                          Solvers.MATHSAT5,
+                          Solvers.OPENSMT,
+                          Solvers.PRINCESS,
+                          Solvers.SMTINTERPOL,
+                          Solvers.Z3,
+                          Solvers.Z3_WITH_INTERPOLATION);
+                  case X86_64 ->
+                      ImmutableSet.of(
+                          Solvers.BITWUZLA,
+                          Solvers.BOOLECTOR,
+                          Solvers.CVC4,
+                          Solvers.CVC5,
+                          Solvers.MATHSAT5,
+                          Solvers.OPENSMT,
+                          Solvers.PRINCESS,
+                          Solvers.SMTINTERPOL,
+                          Solvers.YICES2,
+                          Solvers.Z3,
+                          Solvers.Z3_WITH_INTERPOLATION);
+
+                  default -> ImmutableSet.of(Solvers.PRINCESS, Solvers.SMTINTERPOL);
+                };
+
+            case WINDOWS ->
+                switch (NativeLibraries.Architecture.guessVmArchitecture()) {
+                  case ARM64 ->
+                      ImmutableSet.of(
+                          Solvers.CVC5, Solvers.PRINCESS, Solvers.SMTINTERPOL, Solvers.Z3);
+                  case X86_64 ->
+                      ImmutableSet.of(
+                          Solvers.BITWUZLA,
+                          Solvers.CVC5,
+                          Solvers.MATHSAT5,
+                          Solvers.PRINCESS,
+                          Solvers.SMTINTERPOL,
+                          Solvers.YICES2,
+                          Solvers.Z3);
+
+                  default -> ImmutableSet.of(Solvers.PRINCESS, Solvers.SMTINTERPOL);
+                };
+
+            case MACOSX ->
+                switch (NativeLibraries.Architecture.guessVmArchitecture()) {
+                  case ARM64 ->
+                      ImmutableSet.of(
+                          Solvers.CVC5, Solvers.PRINCESS, Solvers.SMTINTERPOL, Solvers.Z3);
+                  case X86_64 ->
+                      ImmutableSet.of(
+                          Solvers.CVC5, Solvers.PRINCESS, Solvers.SMTINTERPOL, Solvers.Z3);
+
+                  default -> ImmutableSet.of(Solvers.PRINCESS, Solvers.SMTINTERPOL);
+                };
+
+            default -> ImmutableSet.of(Solvers.PRINCESS, Solvers.SMTINTERPOL);
+          };
+
+      Set<Solvers> includes =
+          parseSelectedSolvers(System.getProperty("javasmt.test.includeSolvers"));
+      Set<Solvers> excludes =
+          parseSelectedSolvers(System.getProperty("javasmt.test.excludeSolvers"));
+
+      checkArgument(
+          Sets.intersection(includes, excludes).isEmpty(),
+          "Solvers found on both the \"include\" and \"exclude\" list. When setting the "
+              + "properties \"javasmt.test.includeSolvers\" and  \"javasmt.test.excludeSolvers\" "
+              + "to modify the list of available solvers, please make sure that there is no "
+              + "overlap between the lists");
+
       return Sets.difference(Sets.union(defaults, includes), excludes);
     }
   }
