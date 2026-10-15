@@ -160,8 +160,21 @@ public class SolverContextFactory {
               + "overlap between the lists");
     }
 
-    /** List available solvers for this platform. */
-    public static Set<Solvers> available() {
+    /**
+     * Lists all solvers that can be used on the current platform.
+     *
+     * <p>By default, this list will contain all solvers that have binaries available for your
+     * platform in the official sosy-lab repository. If you did not install all available solvers,
+     * the missing solvers can be removed by setting the <code>javasmt.test.excludeSolvers</code>
+     * property. Conversely, if you've compiled your own binaries for a platform that is not
+     * officially supported, the list can be extended by setting the <code>
+     * javasmt.test.excludeSolvers</code> property
+     *
+     * <p>If you're using {@link org.sosy_lab.java_smt.test.SolverBasedTest0 SolverBasedTest0} for
+     * testing it is important to ensure that the list matches your current installation as tests
+     * will be skipped for solvers that are not on the list
+     */
+    public static Set<Solvers> bundled() {
       return Sets.difference(Sets.union(defaults, includes), excludes);
     }
   }
