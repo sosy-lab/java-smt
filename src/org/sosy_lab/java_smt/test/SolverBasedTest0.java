@@ -18,7 +18,6 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.truth.Truth;
 import java.util.Collection;
 import java.util.Map;
-import java.util.Objects;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.junit.After;
 import org.junit.Before;
