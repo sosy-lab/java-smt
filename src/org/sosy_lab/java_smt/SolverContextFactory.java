@@ -170,9 +170,15 @@ public class SolverContextFactory {
      * officially supported, the list can be extended by setting the <code>
      * javasmt.test.excludeSolvers</code> property
      *
-     * <p>If you're using {@link org.sosy_lab.java_smt.test.SolverBasedTest0 SolverBasedTest0} for
-     * testing it is important to ensure that the list matches your current installation as tests
-     * will be skipped for solvers that are not on the list
+     * <p>Examples:
+     *
+     * <ul>
+     *   <li>Exclude Yices2 and MathSat5 from the tests:
+     *       <p><code>ant -Djavasmt.test.excludeSolvers=yices2,mathsat5 tests</code>
+     *   <li>Include Bitwuzla in the tests, even if there are no official binaries for you platform
+     *       available
+     *       <p><code>ant -Djavasmt.test.includeSolvers=bitwuzla tests</code>
+     * </ul>
      */
     public static Set<Solvers> bundled() {
       return Sets.difference(Sets.union(defaults, includes), excludes);

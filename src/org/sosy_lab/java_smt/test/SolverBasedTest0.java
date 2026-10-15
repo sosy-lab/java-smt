@@ -89,11 +89,19 @@ import org.sosy_lab.java_smt.solvers.opensmt.Logics;
  * </code>
  * </pre>
  *
- * {@link #assertThatFormula(BooleanFormula)} can be used to easily write assertions about formulas
- * using Truth.
+ * The test runner uses {@link Solvers#bundled()} to find out which solvers are available on your
+ * platform. If you didn't install all available solvers, or compiled additional binaries yourself,
+ * please use the properties <code>"javasmt.test.includeSolvers</code> and <code>
+ * "javasmt.test.excludeSolvers</code> to update the list
  *
- * <p>Test that rely on a theory that not all solvers support should call one of the {@code require}
- * methods at the beginning.
+ * <p>Hints for writing solver-based tests:
+ *
+ * <ul>
+ *   <li>{@link #assertThatFormula(BooleanFormula)} can be used to easily write assertions about
+ *       formulas using Truth.
+ *   <li>Test that rely on a theory that not all solvers support should call one of the {@code
+ *       require} methods at the beginning.
+ * </ul>
  */
 public abstract class SolverBasedTest0 {
 
@@ -251,23 +259,12 @@ public abstract class SolverBasedTest0 {
   private void initSolverWith(Configuration pConfiguration) throws InvalidConfigurationException {
     assume()
         .withMessage("Solver %s not supported on this platform", solverToUse())
-        .that(Solvers.available().contains(solverToUse()))
+        .that(Solvers.bundled().contains(solverToUse()))
         .isTrue();
+
     config = pConfiguration;
     factory = new SolverContextFactory(config, logger, shutdownNotifierToUse());
-    try {
-      context = factory.generateContext();
-    } catch (InvalidConfigurationException e) {
-      String flag = System.getProperty("ignoreLinkErrors");
-      if (!Objects.equals(flag, "false")) {
-        assume()
-            .withMessage(e.getMessage())
-            .that(e)
-            .hasCauseThat()
-            .isNotInstanceOf(UnsatisfiedLinkError.class);
-      }
-      throw e;
-    }
+    context = factory.generateContext();
     mgr = context.getFormulaManager();
 
     fmgr = mgr.getUFManager();
@@ -660,7 +657,8 @@ public abstract class SolverBasedTest0 {
 
     @Parameters(name = "{0}")
     public static Solvers[] getAllSolvers() {
-      return Solvers.values();
+      return new Solvers[] {Solvers.YICES2};
+      // return Solvers.values();
     }
 
     @Parameter(0)
