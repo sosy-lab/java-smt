@@ -27,6 +27,9 @@ SPDX-License-Identifier: Apache-2.0
     <!-- Define property that contains the Ant version for getting the matching ant-junit version. -->
     <antversion property="ant.version.exact"/>
 
+    <property name="javasmt.test.includeSolvers" value=""/>
+    <property name="javasmt.test.excludeSolvers" value=""/>
+
     <!-- Load the JUnit plugin for Ant if it's not installed. -->
     <condition property="ant.junit.available">
         <typefound name="junit"/>
@@ -56,7 +59,9 @@ SPDX-License-Identifier: Apache-2.0
             <assertions><enable/></assertions>
             <formatter type="xml"/>
             <classpath refid="classpath.junit"/>
-            <sysproperty key="java.awt.headless" value="true" />
+            <sysproperty key="java.awt.headless" value="true"/>
+            <sysproperty key="javasmt.test.includeSolvers" value="${javasmt.test.includeSolvers}"/>
+            <sysproperty key="javasmt.test.excludeSolvers" value="${javasmt.test.excludeSolvers}"/>
             <batchtest fork="true" todir="${junit.dir}">
               <fileset dir="${class.dir}">
                 <patternset refid="test.sources"/>
@@ -119,7 +124,9 @@ SPDX-License-Identifier: Apache-2.0
                 <assertions><enable/></assertions>
                 <formatter type="xml"/>
                 <classpath refid="classpath.junit"/>
-                <sysproperty key="java.awt.headless" value="true" />
+                <sysproperty key="java.awt.headless" value="true"/>
+                <sysproperty key="javasmt.test.includeSolvers" value="${javasmt.test.includeSolvers}"/>
+                <sysproperty key="javasmt.test.excludeSolvers" value="${javasmt.test.excludeSolvers}"/>
                 <batchtest fork="true" todir="${junit.dir}">
                     <fileset dir="${class.dir}">
                         <include name="**/*Test.*"/>

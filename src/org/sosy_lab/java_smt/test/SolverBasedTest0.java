@@ -87,12 +87,19 @@ import org.sosy_lab.java_smt.solvers.opensmt.Logics;
  *  }
  * </code>
  * </pre>
+ * The test runner uses {@link Solvers#bundled()} to find out which solvers are available on your
+ * platform. If you didn't install all available solvers, or compiled additional binaries yourself,
+ * please use the properties <code>"javasmt.test.includeSolvers</code> and <code>
+ * "javasmt.test.excludeSolvers</code> to update the list
  *
- * {@link #assertThatFormula(BooleanFormula)} can be used to easily write assertions about formulas
- * using Truth.
+ * <p>Hints for writing solver-based tests:
  *
- * <p>Test that rely on a theory that not all solvers support should call one of the {@code require}
- * methods at the beginning.
+ * <ul>
+ *   <li>{@link #assertThatFormula(BooleanFormula)} can be used to easily write assertions about
+ *       formulas using Truth.
+ *   <li>Test that rely on a theory that not all solvers support should call one of the {@code
+ *       require} methods at the beginning.
+ * </ul>
  */
 public abstract class SolverBasedTest0 {
 
@@ -181,6 +188,13 @@ public abstract class SolverBasedTest0 {
     return false;
   }
 
+  /**
+   * Return <code>true</code> here if missing solvers should be silently skipped in the tests.
+   */
+  protected boolean skipTestsWhenSolverIsMissing() {
+    return false;
+  }
+
   @Before
   public final void initSolver() throws InvalidConfigurationException {
     Configuration configuration = createTestConfigBuilder().build();
@@ -248,16 +262,23 @@ public abstract class SolverBasedTest0 {
    * automatically (re)assigned.
    */
   private void initSolverWith(Configuration pConfiguration) throws InvalidConfigurationException {
+    assume()
+        .withMessage("Solver %s not supported on this platform", solverToUse())
+        .that(Solvers.bundled())
+        .contains(solverToUse());
+
     config = pConfiguration;
     factory = new SolverContextFactory(config, logger, shutdownNotifierToUse());
     try {
       context = factory.generateContext();
     } catch (InvalidConfigurationException e) {
-      assume()
-          .withMessage(e.getMessage())
-          .that(e)
-          .hasCauseThat()
-          .isNotInstanceOf(UnsatisfiedLinkError.class);
+      if (skipTestsWhenSolverIsMissing()) {
+        assume()
+            .withMessage(e.getMessage())
+            .that(e)
+            .hasCauseThat()
+            .isNotInstanceOf(UnsatisfiedLinkError.class);
+      }
       throw e;
     }
     mgr = context.getFormulaManager();

@@ -24,6 +24,7 @@ variables:
   IVY_CACHE_DIR: "${CI_PROJECT_DIR}/.ivy2"
   ANT_PROPS_BUILD: "-Divy.disable=true"
   ANT_PROPS_CHECKS: "-Divy.disable=true -DskipBuild=true"
+  EXCLUDED_SOLVERS: "-Djavasmt.test.excludeSolvers=opensmt,mathsat5,z3,cvc5,yices2,bitwuzla"
 
 
 # Download dependencies and provide them to later stages
@@ -125,7 +126,7 @@ spotbugs:
     - "ldd --version"
     - "java -version"
   script:
-    - "ant $ANT_PROPS_CHECKS unit-tests-coverage"
+    - "ant $ANT_PROPS_CHECKS $EXCLUDED_SOLVERS unit-tests-coverage"
   artifacts:
     paths:
       - "JUnit.html"
@@ -139,7 +140,7 @@ spotbugs:
 .unit-tests-quick:
   extends: [ .binary_check, .unit-tests ]
   script:
-    - "ant $ANT_PROPS_CHECKS unit-tests-quick"
+    - "ant $ANT_PROPS_CHECKS $EXCLUDED_SOLVERS unit-tests-quick"
   artifacts:
     paths:
       - "JUnit.html" # no coverage files available
@@ -156,6 +157,7 @@ unit-tests:x86_64:jdk-21:
 unit-tests:x86_64:jdk-24:
   extends: .unit-tests
   needs: [ build-dependencies, build:jdk-24 ]
+  variables: { EXCLUDED_SOLVERS: "" }
   image: "${CI_REGISTRY_IMAGE}/test:jdk-24"
 
 unit-tests:arm64:jdk-17:
@@ -169,6 +171,7 @@ unit-tests:arm64:jdk-21:
 unit-tests:arm64:jdk-24:
   extends: .unit-tests-quick
   needs: [ build-dependencies, build:jdk-24 ]
+  variables: { EXCLUDED_SOLVERS: "" }
   image: { name: "${CI_REGISTRY_IMAGE}/test:jdk-24-arm64", docker: { platform: linux/arm64 } }
 
 refaster:

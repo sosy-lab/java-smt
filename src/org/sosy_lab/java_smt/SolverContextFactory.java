@@ -8,8 +8,14 @@
 
 package org.sosy_lab.java_smt;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Strings.nullToEmpty;
 
+import com.google.common.base.Splitter;
+import com.google.common.collect.FluentIterable;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Sets;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -63,7 +69,116 @@ public class SolverContextFactory {
     CVC4,
     CVC5,
     YICES2,
-    BITWUZLA
+    BITWUZLA;
+
+    private static Set<Solvers> parseSelectedSolvers(@Nullable String solvers) {
+      return FluentIterable.from(
+              Splitter.on(",").omitEmptyStrings().trimResults().splitToList(nullToEmpty(solvers)))
+          .transform(String::toUpperCase)
+          .transform(Solvers::valueOf)
+          .toSet();
+    }
+
+    /**
+     * Lists all solvers that can be used on the current platform.
+     *
+     * <p>By default, this list will contain all solvers that have binaries available for your
+     * platform in the official sosy-lab repository. If you did not install all available solvers,
+     * the missing solvers can be removed by setting the <code>javasmt.test.excludeSolvers</code>
+     * property. Conversely, if you've compiled your own binaries for a platform that is not
+     * officially supported, the list can be extended by setting the <code>
+     * javasmt.test.includeSolvers</code> property
+     *
+     * <p>Examples:
+     *
+     * <ul>
+     *   <li>Exclude Yices2 and MathSat5 from the tests:
+     *       <p><code>ant -Djavasmt.test.excludeSolvers=yices2,mathsat5 tests</code>
+     *   <li>Include Bitwuzla in the tests, even if there are no official binaries for you platform
+     *       available
+     *       <p><code>ant -Djavasmt.test.includeSolvers=bitwuzla tests</code>
+     * </ul>
+     */
+    @SuppressWarnings("deprecation")
+    public static Set<Solvers> bundled() {
+      Set<Solvers> defaults =
+          switch (NativeLibraries.OS.guessOperatingSystem()) {
+            case LINUX ->
+                switch (NativeLibraries.Architecture.guessVmArchitecture()) {
+                  case ARM64 ->
+                      ImmutableSet.of(
+                          Solvers.BITWUZLA,
+                          Solvers.CVC5,
+                          Solvers.MATHSAT5,
+                          Solvers.OPENSMT,
+                          Solvers.PRINCESS,
+                          Solvers.SMTINTERPOL,
+                          Solvers.Z3,
+                          Solvers.Z3_WITH_INTERPOLATION);
+                  case X86_64 ->
+                      ImmutableSet.of(
+                          Solvers.BITWUZLA,
+                          Solvers.BOOLECTOR,
+                          Solvers.CVC4,
+                          Solvers.CVC5,
+                          Solvers.MATHSAT5,
+                          Solvers.OPENSMT,
+                          Solvers.PRINCESS,
+                          Solvers.SMTINTERPOL,
+                          Solvers.YICES2,
+                          Solvers.Z3,
+                          Solvers.Z3_WITH_INTERPOLATION);
+
+                  default -> ImmutableSet.of(Solvers.PRINCESS, Solvers.SMTINTERPOL);
+                };
+
+            case WINDOWS ->
+                switch (NativeLibraries.Architecture.guessVmArchitecture()) {
+                  case ARM64 ->
+                      ImmutableSet.of(
+                          Solvers.CVC5, Solvers.PRINCESS, Solvers.SMTINTERPOL, Solvers.Z3);
+                  case X86_64 ->
+                      ImmutableSet.of(
+                          Solvers.BITWUZLA,
+                          Solvers.CVC5,
+                          Solvers.MATHSAT5,
+                          Solvers.PRINCESS,
+                          Solvers.SMTINTERPOL,
+                          Solvers.YICES2,
+                          Solvers.Z3);
+
+                  default -> ImmutableSet.of(Solvers.PRINCESS, Solvers.SMTINTERPOL);
+                };
+
+            case MACOSX ->
+                switch (NativeLibraries.Architecture.guessVmArchitecture()) {
+                  case ARM64 ->
+                      ImmutableSet.of(
+                          Solvers.CVC5, Solvers.PRINCESS, Solvers.SMTINTERPOL, Solvers.Z3);
+                  case X86_64 ->
+                      ImmutableSet.of(
+                          Solvers.CVC5, Solvers.PRINCESS, Solvers.SMTINTERPOL, Solvers.Z3);
+
+                  default -> ImmutableSet.of(Solvers.PRINCESS, Solvers.SMTINTERPOL);
+                };
+
+            default -> ImmutableSet.of(Solvers.PRINCESS, Solvers.SMTINTERPOL);
+          };
+
+      Set<Solvers> includes =
+          parseSelectedSolvers(System.getProperty("javasmt.test.includeSolvers"));
+      Set<Solvers> excludes =
+          parseSelectedSolvers(System.getProperty("javasmt.test.excludeSolvers"));
+
+      checkArgument(
+          Sets.intersection(includes, excludes).isEmpty(),
+          "Solvers found on both the \"include\" and \"exclude\" list. When setting the "
+              + "properties \"javasmt.test.includeSolvers\" and  \"javasmt.test.excludeSolvers\" "
+              + "to modify the list of available solvers, please make sure that there is no "
+              + "overlap between the lists");
+
+      return Sets.difference(Sets.union(defaults, includes), excludes);
+    }
   }
 
   @Option(secure = true, description = "Export solver queries in SmtLib format into a file.")

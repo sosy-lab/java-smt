@@ -37,6 +37,13 @@ public class OptimizationTest extends SolverBasedTest0.ParameterizedSolverBasedT
     return super.createTestConfigBuilder().setOption("solver.mathsat5.loadOptimathsat5", "true");
   }
 
+  @Override
+  protected boolean skipTestsWhenSolverIsMissing() {
+    // OptiMathSAT is only available for Linux and will fail to load on other operating systems
+    // We return 'true' here to skip the tests if OptiMathSAT can't be loaded
+    return solver == Solvers.MATHSAT5;
+  }
+
   @Before
   public void skipUnsupportedSolvers() {
     requireOptimization();
