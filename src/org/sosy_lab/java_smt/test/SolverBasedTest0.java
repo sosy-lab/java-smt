@@ -188,6 +188,13 @@ public abstract class SolverBasedTest0 {
     return false;
   }
 
+  /**
+   * Return <code>true</code> here if missing solvers should be silently skipped in the tests.
+   */
+  protected boolean failWhenSolverIsMissing() {
+    return true;
+  }
+
   @Before
   public final void initSolver() throws InvalidConfigurationException {
     Configuration configuration = createTestConfigBuilder().build();
@@ -262,7 +269,18 @@ public abstract class SolverBasedTest0 {
 
     config = pConfiguration;
     factory = new SolverContextFactory(config, logger, shutdownNotifierToUse());
-    context = factory.generateContext();
+    try {
+      context = factory.generateContext();
+    } catch (InvalidConfigurationException e) {
+      if (failWhenSolverIsMissing()) {
+        assume()
+            .withMessage(e.getMessage())
+            .that(e)
+            .hasCauseThat()
+            .isNotInstanceOf(UnsatisfiedLinkError.class);
+      }
+      throw e;
+    }
     mgr = context.getFormulaManager();
 
     fmgr = mgr.getUFManager();
