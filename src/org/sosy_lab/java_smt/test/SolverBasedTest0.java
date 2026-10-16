@@ -191,8 +191,8 @@ public abstract class SolverBasedTest0 {
   /**
    * Return <code>true</code> here if missing solvers should be silently skipped in the tests.
    */
-  protected boolean failWhenSolverIsMissing() {
-    return true;
+  protected boolean skipTestsWhenSolverIsMissing() {
+    return false;
   }
 
   @Before
@@ -272,7 +272,7 @@ public abstract class SolverBasedTest0 {
     try {
       context = factory.generateContext();
     } catch (InvalidConfigurationException e) {
-      if (failWhenSolverIsMissing()) {
+      if (skipTestsWhenSolverIsMissing()) {
         assume()
             .withMessage(e.getMessage())
             .that(e)
