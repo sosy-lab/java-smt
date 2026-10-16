@@ -40,7 +40,7 @@ public class OptimizationTest extends SolverBasedTest0.ParameterizedSolverBasedT
   @Override
   protected boolean skipTestsWhenSolverIsMissing() {
     // OptiMathSAT is only available for Linux and will fail to load on other operating systems
-    // We return 'false' here to skip the tests if OptiMathSAT can't be loaded
+    // We return 'true' here to skip the tests if OptiMathSAT can't be loaded
     return solver == Solvers.MATHSAT5;
   }
 
