@@ -104,29 +104,42 @@ ant publish-z3 -Dz3.path=$Z3_DIR -Dz3.version=$Z3_VERSION-glibc_2.27
 ```
 
 
-### Publishing Z3 v4.5.0 (aka LegacyZ3)
+### Publishing Z3 4.7.1 (aka LegacyZ3)
 
-The legacy version of Z3 (v4.5.0) is still integrated,
+The legacy version of Z3 (4.7.1) is still integrated,
 because it provides support for Craig interpolation in Z3.
-This feature was removed in some later version of Z3.
+This feature was removed in later version of Z3.
 
-For publishing the legacy version of Z3 (v4.5.0),
-please follow the instructions in the `lib/native/source/z3-4.5.0/README.md` file,
-which explains how to patch the original Z3 v4.5.0 source code
+For publishing the legacy version of Z3, we first have to patch the Z3 source code
 so that the Java package names include the string `legacy`.
-This is necessary to avoid conflicts with later versions of Z3.
+This is necessary to avoid conflicts with our solver bindings for newer versions of Z3.
 
-These steps can be performed in a Docker environment based on Ubuntu 18.04,
+The following steps can be performed in a Docker environment based on Ubuntu 18.04,
 which is provided under `/docker` in the JavaSMT repository.
-After building the patched Z3 v4.5.0 version,
-you can publish it with the following command in the JavaSMT directory:
+
+1) Clone and checkout the exact commit
+```bash
+git clone https://github.com/Z3Prover/z3.git
+cd z3
+git checkout 3b1b82bef05a1b5fd69ece79c80a95fb6d72a990
+```
+
+2) Copy the patchfile into the repo (4.7.1-legacy.patch in `lib/native/source/z3-4.7.1`)
+
+3) Apply the patch
+```bash
+git apply --check 4.7.1-legacy.patch
+git apply 4.7.1-legacy.patch
+```
+
+After patching the source, we build the binaries as follows:
 ```bash
 ant publish-z3-legacy -Dz3.path=<Z3_PATH> -Dz3.customRev=<VERSION>
 ```
 
 Example:
 ```bash
-ant publish-z3-legacy -Dz3.path=../solvers/z3/z3 -Dz3.customRev=4.5.0
+ant publish-z3-legacy -Dz3.path=/workspace/z3 -Dz3.customRev=4.7.1
 ```
 
 ### Publishing CVC4

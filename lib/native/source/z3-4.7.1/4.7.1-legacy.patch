@@ -1,0 +1,1277 @@
+diff --git a/src/api/java/Z3Object.java b/src/api/java/Z3Object.java
+--- a/src/api/java/Z3Object.java	(revision 3b1b82bef05a1b5fd69ece79c80a95fb6d72a990)
++++ b/src/api/java/Z3Object.java	(date 1792278932024)
+@@ -15,7 +15,7 @@
+     
+ **/ 
+ 
+-package com.microsoft.z3;
++package com.microsoft.z3legacy;
+ 
+ /**
+  * Internal base class for interfacing with native Z3 objects. Should not be
+diff --git a/src/api/java/ParamDescrs.java b/src/api/java/ParamDescrs.java
+--- a/src/api/java/ParamDescrs.java	(revision 3b1b82bef05a1b5fd69ece79c80a95fb6d72a990)
++++ b/src/api/java/ParamDescrs.java	(date 1792278932032)
+@@ -15,9 +15,9 @@
+     
+ **/ 
+ 
+-package com.microsoft.z3;
++package com.microsoft.z3legacy;
+ 
+-import com.microsoft.z3.enumerations.Z3_param_kind;
++import com.microsoft.z3legacy.enumerations.Z3_param_kind;
+ 
+ /**
+  * A ParamDescrs describes a set of parameters.
+diff --git a/src/api/java/ListSort.java b/src/api/java/ListSort.java
+--- a/src/api/java/ListSort.java	(revision 3b1b82bef05a1b5fd69ece79c80a95fb6d72a990)
++++ b/src/api/java/ListSort.java	(date 1792278932039)
+@@ -15,9 +15,9 @@
+     
+ **/ 
+ 
+-package com.microsoft.z3;
++package com.microsoft.z3legacy;
+ 
+-import com.microsoft.z3.Native.LongPtr;
++import com.microsoft.z3legacy.Native.LongPtr;
+ 
+ /**
+  * List sorts.
+diff --git a/src/api/java/FuncDecl.java b/src/api/java/FuncDecl.java
+--- a/src/api/java/FuncDecl.java	(revision 3b1b82bef05a1b5fd69ece79c80a95fb6d72a990)
++++ b/src/api/java/FuncDecl.java	(date 1792278932047)
+@@ -15,11 +15,11 @@
+ 
+ **/
+ 
+-package com.microsoft.z3;
++package com.microsoft.z3legacy;
+ 
+-import com.microsoft.z3.enumerations.Z3_ast_kind;
+-import com.microsoft.z3.enumerations.Z3_decl_kind;
+-import com.microsoft.z3.enumerations.Z3_parameter_kind;
++import com.microsoft.z3legacy.enumerations.Z3_ast_kind;
++import com.microsoft.z3legacy.enumerations.Z3_decl_kind;
++import com.microsoft.z3legacy.enumerations.Z3_parameter_kind;
+ 
+ /**
+  * Function declarations.
+diff --git a/src/api/java/Expr.java b/src/api/java/Expr.java
+--- a/src/api/java/Expr.java	(revision 3b1b82bef05a1b5fd69ece79c80a95fb6d72a990)
++++ b/src/api/java/Expr.java	(date 1792278932059)
+@@ -15,12 +15,12 @@
+     
+ **/
+ 
+-package com.microsoft.z3;
++package com.microsoft.z3legacy;
+ 
+-import com.microsoft.z3.enumerations.Z3_ast_kind;
+-import com.microsoft.z3.enumerations.Z3_decl_kind;
+-import com.microsoft.z3.enumerations.Z3_lbool;
+-import com.microsoft.z3.enumerations.Z3_sort_kind;
++import com.microsoft.z3legacy.enumerations.Z3_ast_kind;
++import com.microsoft.z3legacy.enumerations.Z3_decl_kind;
++import com.microsoft.z3legacy.enumerations.Z3_lbool;
++import com.microsoft.z3legacy.enumerations.Z3_sort_kind;
+ 
+ /* using System; */
+ 
+diff --git a/src/api/java/Pattern.java b/src/api/java/Pattern.java
+--- a/src/api/java/Pattern.java	(revision 3b1b82bef05a1b5fd69ece79c80a95fb6d72a990)
++++ b/src/api/java/Pattern.java	(date 1792278932066)
+@@ -15,7 +15,7 @@
+     
+ **/ 
+ 
+-package com.microsoft.z3;
++package com.microsoft.z3legacy;
+ 
+ /**
+  * Patterns comprise a list of terms. The list should be non-empty. If the list
+diff --git a/src/api/java/Goal.java b/src/api/java/Goal.java
+--- a/src/api/java/Goal.java	(revision 3b1b82bef05a1b5fd69ece79c80a95fb6d72a990)
++++ b/src/api/java/Goal.java	(date 1792278932074)
+@@ -15,9 +15,9 @@
+     
+ **/ 
+ 
+-package com.microsoft.z3;
++package com.microsoft.z3legacy;
+ 
+-import com.microsoft.z3.enumerations.Z3_goal_prec;
++import com.microsoft.z3legacy.enumerations.Z3_goal_prec;
+ 
+ /**
+  * A goal (aka problem). A goal is essentially a set of formulas, that can be
+diff --git a/src/api/java/EnumSort.java b/src/api/java/EnumSort.java
+--- a/src/api/java/EnumSort.java	(revision 3b1b82bef05a1b5fd69ece79c80a95fb6d72a990)
++++ b/src/api/java/EnumSort.java	(date 1792278932081)
+@@ -15,7 +15,7 @@
+     
+ **/
+ 
+-package com.microsoft.z3;
++package com.microsoft.z3legacy;
+ 
+ /**
+  * Enumeration sorts.
+diff --git a/src/api/java/ProbeDecRefQueue.java b/src/api/java/ProbeDecRefQueue.java
+--- a/src/api/java/ProbeDecRefQueue.java	(revision 3b1b82bef05a1b5fd69ece79c80a95fb6d72a990)
++++ b/src/api/java/ProbeDecRefQueue.java	(date 1792278932088)
+@@ -15,7 +15,7 @@
+     
+ **/ 
+ 
+-package com.microsoft.z3;
++package com.microsoft.z3legacy;
+ 
+ class ProbeDecRefQueue extends IDecRefQueue<Probe>
+ {
+diff --git a/src/api/java/FPExpr.java b/src/api/java/FPExpr.java
+--- a/src/api/java/FPExpr.java	(revision 3b1b82bef05a1b5fd69ece79c80a95fb6d72a990)
++++ b/src/api/java/FPExpr.java	(date 1792278932095)
+@@ -14,7 +14,7 @@
+ Notes:
+     
+ --*/
+-package com.microsoft.z3;
++package com.microsoft.z3legacy;
+ 
+ /**
+  * FloatingPoint Expressions
+diff --git a/src/api/java/ArithSort.java b/src/api/java/ArithSort.java
+--- a/src/api/java/ArithSort.java	(revision 3b1b82bef05a1b5fd69ece79c80a95fb6d72a990)
++++ b/src/api/java/ArithSort.java	(date 1792278932102)
+@@ -15,7 +15,7 @@
+     
+ **/
+ 
+-package com.microsoft.z3;
++package com.microsoft.z3legacy;
+ 
+ /**
+  * An arithmetic sort, i.e., Int or Real.
+diff --git a/src/api/java/IntNum.java b/src/api/java/IntNum.java
+--- a/src/api/java/IntNum.java	(revision 3b1b82bef05a1b5fd69ece79c80a95fb6d72a990)
++++ b/src/api/java/IntNum.java	(date 1792278932108)
+@@ -15,7 +15,7 @@
+     
+ **/ 
+ 
+-package com.microsoft.z3;
++package com.microsoft.z3legacy;
+ 
+ import java.math.BigInteger;
+ 
+diff --git a/src/api/java/BitVecNum.java b/src/api/java/BitVecNum.java
+--- a/src/api/java/BitVecNum.java	(revision 3b1b82bef05a1b5fd69ece79c80a95fb6d72a990)
++++ b/src/api/java/BitVecNum.java	(date 1792278932115)
+@@ -15,7 +15,7 @@
+     
+ **/
+ 
+-package com.microsoft.z3;
++package com.microsoft.z3legacy;
+ 
+ import java.math.BigInteger;
+ 
+diff --git a/src/api/java/SeqSort.java b/src/api/java/SeqSort.java
+--- a/src/api/java/SeqSort.java	(revision 3b1b82bef05a1b5fd69ece79c80a95fb6d72a990)
++++ b/src/api/java/SeqSort.java	(date 1792278932121)
+@@ -15,7 +15,7 @@
+     
+ **/ 
+ 
+-package com.microsoft.z3;
++package com.microsoft.z3legacy;
+ 
+ /**
+  * A Sequence sort
+diff --git a/src/api/java/UninterpretedSort.java b/src/api/java/UninterpretedSort.java
+--- a/src/api/java/UninterpretedSort.java	(revision 3b1b82bef05a1b5fd69ece79c80a95fb6d72a990)
++++ b/src/api/java/UninterpretedSort.java	(date 1792278932128)
+@@ -15,7 +15,7 @@
+     
+ **/ 
+ 
+-package com.microsoft.z3;
++package com.microsoft.z3legacy;
+ 
+ /**
+  * Uninterpreted Sorts
+diff --git a/src/api/java/InterpolationContext.java b/src/api/java/InterpolationContext.java
+--- a/src/api/java/InterpolationContext.java	(revision 3b1b82bef05a1b5fd69ece79c80a95fb6d72a990)
++++ b/src/api/java/InterpolationContext.java	(date 1792278932135)
+@@ -15,9 +15,9 @@
+     
+ **/ 
+ 
+-package com.microsoft.z3;
++package com.microsoft.z3legacy;
+ 
+-import com.microsoft.z3.enumerations.Z3_lbool;
++import com.microsoft.z3legacy.enumerations.Z3_lbool;
+ 
+ import java.util.Map;
+ 
+diff --git a/src/api/java/RelationSort.java b/src/api/java/RelationSort.java
+--- a/src/api/java/RelationSort.java	(revision 3b1b82bef05a1b5fd69ece79c80a95fb6d72a990)
++++ b/src/api/java/RelationSort.java	(date 1792278932142)
+@@ -15,7 +15,7 @@
+     
+ **/ 
+ 
+-package com.microsoft.z3;
++package com.microsoft.z3legacy;
+ 
+ /**
+  * Relation sorts.
+diff --git a/src/api/java/FuncInterpEntryDecRefQueue.java b/src/api/java/FuncInterpEntryDecRefQueue.java
+--- a/src/api/java/FuncInterpEntryDecRefQueue.java	(revision 3b1b82bef05a1b5fd69ece79c80a95fb6d72a990)
++++ b/src/api/java/FuncInterpEntryDecRefQueue.java	(date 1792278932149)
+@@ -15,7 +15,7 @@
+     
+ **/
+ 
+-package com.microsoft.z3;
++package com.microsoft.z3legacy;
+ 
+ class FuncInterpEntryDecRefQueue extends IDecRefQueue<FuncInterp.Entry> {
+     public FuncInterpEntryDecRefQueue() 
+diff --git a/src/api/java/Optimize.java b/src/api/java/Optimize.java
+--- a/src/api/java/Optimize.java	(revision 3b1b82bef05a1b5fd69ece79c80a95fb6d72a990)
++++ b/src/api/java/Optimize.java	(date 1792278932156)
+@@ -16,9 +16,9 @@
+ Notes:
+ **/
+ 
+-package com.microsoft.z3;
++package com.microsoft.z3legacy;
+ 
+-import com.microsoft.z3.enumerations.Z3_lbool;
++import com.microsoft.z3legacy.enumerations.Z3_lbool;
+ 
+ 
+ /**
+diff --git a/src/api/java/Solver.java b/src/api/java/Solver.java
+--- a/src/api/java/Solver.java	(revision 3b1b82bef05a1b5fd69ece79c80a95fb6d72a990)
++++ b/src/api/java/Solver.java	(date 1792278932163)
+@@ -16,9 +16,9 @@
+     
+ **/ 
+ 
+-package com.microsoft.z3;
++package com.microsoft.z3legacy;
+ 
+-import com.microsoft.z3.enumerations.Z3_lbool;
++import com.microsoft.z3legacy.enumerations.Z3_lbool;
+ 
+ /**
+  * Solvers.
+diff --git a/src/api/java/Constructor.java b/src/api/java/Constructor.java
+--- a/src/api/java/Constructor.java	(revision 3b1b82bef05a1b5fd69ece79c80a95fb6d72a990)
++++ b/src/api/java/Constructor.java	(date 1792278932170)
+@@ -15,7 +15,7 @@
+     
+ **/
+ 
+-package com.microsoft.z3;
++package com.microsoft.z3legacy;
+ 
+ /**
+  * Constructors are used for datatype sorts.
+diff --git a/src/api/java/IntExpr.java b/src/api/java/IntExpr.java
+--- a/src/api/java/IntExpr.java	(revision 3b1b82bef05a1b5fd69ece79c80a95fb6d72a990)
++++ b/src/api/java/IntExpr.java	(date 1792278932178)
+@@ -15,7 +15,7 @@
+     
+ **/ 
+ 
+-package com.microsoft.z3;
++package com.microsoft.z3legacy;
+ 
+ /**
+  * Int expressions
+diff --git a/src/api/java/SeqExpr.java b/src/api/java/SeqExpr.java
+--- a/src/api/java/SeqExpr.java	(revision 3b1b82bef05a1b5fd69ece79c80a95fb6d72a990)
++++ b/src/api/java/SeqExpr.java	(date 1792278932185)
+@@ -15,7 +15,7 @@
+     
+ **/ 
+ 
+-package com.microsoft.z3;
++package com.microsoft.z3legacy;
+ 
+ /**
+  * Seq expressions
+diff --git a/src/api/java/ModelDecRefQueue.java b/src/api/java/ModelDecRefQueue.java
+--- a/src/api/java/ModelDecRefQueue.java	(revision 3b1b82bef05a1b5fd69ece79c80a95fb6d72a990)
++++ b/src/api/java/ModelDecRefQueue.java	(date 1792278932193)
+@@ -15,7 +15,7 @@
+     
+ **/ 
+ 
+-package com.microsoft.z3;
++package com.microsoft.z3legacy;
+ 
+ class ModelDecRefQueue extends IDecRefQueue<Model> {
+     public ModelDecRefQueue() 
+diff --git a/src/api/java/ASTDecRefQueue.java b/src/api/java/ASTDecRefQueue.java
+--- a/src/api/java/ASTDecRefQueue.java	(revision 3b1b82bef05a1b5fd69ece79c80a95fb6d72a990)
++++ b/src/api/java/ASTDecRefQueue.java	(date 1792278932201)
+@@ -15,7 +15,7 @@
+     
+ **/
+ 
+-package com.microsoft.z3;
++package com.microsoft.z3legacy;
+ 
+ class ASTDecRefQueue extends IDecRefQueue<AST>
+ {
+diff --git a/src/api/java/AlgebraicNum.java b/src/api/java/AlgebraicNum.java
+--- a/src/api/java/AlgebraicNum.java	(revision 3b1b82bef05a1b5fd69ece79c80a95fb6d72a990)
++++ b/src/api/java/AlgebraicNum.java	(date 1792278932209)
+@@ -15,7 +15,7 @@
+     
+ **/
+ 
+-package com.microsoft.z3;
++package com.microsoft.z3legacy;
+ 
+ /**
+  * Algebraic numbers
+diff --git a/src/api/java/FPSort.java b/src/api/java/FPSort.java
+--- a/src/api/java/FPSort.java	(revision 3b1b82bef05a1b5fd69ece79c80a95fb6d72a990)
++++ b/src/api/java/FPSort.java	(date 1792278932217)
+@@ -14,7 +14,7 @@
+ Notes:
+     
+ --*/
+-package com.microsoft.z3;
++package com.microsoft.z3legacy;
+ 
+ /**
+  * A FloatingPoint sort
+diff --git a/src/api/java/OptimizeDecRefQueue.java b/src/api/java/OptimizeDecRefQueue.java
+--- a/src/api/java/OptimizeDecRefQueue.java	(revision 3b1b82bef05a1b5fd69ece79c80a95fb6d72a990)
++++ b/src/api/java/OptimizeDecRefQueue.java	(date 1792278932224)
+@@ -15,7 +15,7 @@
+     
+ **/ 
+ 
+-package com.microsoft.z3;
++package com.microsoft.z3legacy;
+ 
+ class OptimizeDecRefQueue extends IDecRefQueue<Optimize> {
+     public OptimizeDecRefQueue() 
+diff --git a/src/api/java/AST.java b/src/api/java/AST.java
+--- a/src/api/java/AST.java	(revision 3b1b82bef05a1b5fd69ece79c80a95fb6d72a990)
++++ b/src/api/java/AST.java	(date 1792278932231)
+@@ -15,9 +15,9 @@
+     
+ **/
+ 
+-package com.microsoft.z3;
++package com.microsoft.z3legacy;
+ 
+-import com.microsoft.z3.enumerations.Z3_ast_kind;
++import com.microsoft.z3legacy.enumerations.Z3_ast_kind;
+ 
+ /**
+  * The abstract syntax tree (AST) class.
+diff --git a/src/api/java/SetSort.java b/src/api/java/SetSort.java
+--- a/src/api/java/SetSort.java	(revision 3b1b82bef05a1b5fd69ece79c80a95fb6d72a990)
++++ b/src/api/java/SetSort.java	(date 1792278932238)
+@@ -15,7 +15,7 @@
+     
+ **/ 
+ 
+-package com.microsoft.z3;
++package com.microsoft.z3legacy;
+ 
+ /**
+  * Set sorts.
+diff --git a/src/api/java/ASTVector.java b/src/api/java/ASTVector.java
+--- a/src/api/java/ASTVector.java	(revision 3b1b82bef05a1b5fd69ece79c80a95fb6d72a990)
++++ b/src/api/java/ASTVector.java	(date 1792278932245)
+@@ -15,7 +15,7 @@
+     
+ **/
+ 
+-package com.microsoft.z3;
++package com.microsoft.z3legacy;
+ 
+ /**
+  * Vectors of ASTs.
+diff --git a/src/api/java/ASTMap.java b/src/api/java/ASTMap.java
+--- a/src/api/java/ASTMap.java	(revision 3b1b82bef05a1b5fd69ece79c80a95fb6d72a990)
++++ b/src/api/java/ASTMap.java	(date 1792278932253)
+@@ -15,7 +15,7 @@
+     
+ **/
+ 
+-package com.microsoft.z3;
++package com.microsoft.z3legacy;
+ 
+ /**
+  * Map from AST to AST
+diff --git a/src/api/java/Sort.java b/src/api/java/Sort.java
+--- a/src/api/java/Sort.java	(revision 3b1b82bef05a1b5fd69ece79c80a95fb6d72a990)
++++ b/src/api/java/Sort.java	(date 1792278932260)
+@@ -15,10 +15,10 @@
+     
+ **/ 
+ 
+-package com.microsoft.z3;
++package com.microsoft.z3legacy;
+ 
+-import com.microsoft.z3.enumerations.Z3_ast_kind;
+-import com.microsoft.z3.enumerations.Z3_sort_kind;
++import com.microsoft.z3legacy.enumerations.Z3_ast_kind;
++import com.microsoft.z3legacy.enumerations.Z3_sort_kind;
+ 
+ /**
+  * The Sort class implements type information for ASTs.
+diff --git a/src/api/java/ArithExpr.java b/src/api/java/ArithExpr.java
+--- a/src/api/java/ArithExpr.java	(revision 3b1b82bef05a1b5fd69ece79c80a95fb6d72a990)
++++ b/src/api/java/ArithExpr.java	(date 1792278932266)
+@@ -15,7 +15,7 @@
+     
+ **/
+ 
+-package com.microsoft.z3;
++package com.microsoft.z3legacy;
+ 
+ /**
+  * Arithmetic expressions (int/real)
+diff --git a/src/api/java/ApplyResult.java b/src/api/java/ApplyResult.java
+--- a/src/api/java/ApplyResult.java	(revision 3b1b82bef05a1b5fd69ece79c80a95fb6d72a990)
++++ b/src/api/java/ApplyResult.java	(date 1792278932273)
+@@ -15,7 +15,7 @@
+     
+ **/
+ 
+-package com.microsoft.z3;
++package com.microsoft.z3legacy;
+ 
+ /**
+  * ApplyResult objects represent the result of an application of a tactic to a
+diff --git a/src/api/java/FPRMSort.java b/src/api/java/FPRMSort.java
+--- a/src/api/java/FPRMSort.java	(revision 3b1b82bef05a1b5fd69ece79c80a95fb6d72a990)
++++ b/src/api/java/FPRMSort.java	(date 1792278932279)
+@@ -14,7 +14,7 @@
+ Notes:
+     
+ --*/
+-package com.microsoft.z3;
++package com.microsoft.z3legacy;
+ 
+ /**
+  * The FloatingPoint RoundingMode sort
+diff --git a/src/api/java/SolverDecRefQueue.java b/src/api/java/SolverDecRefQueue.java
+--- a/src/api/java/SolverDecRefQueue.java	(revision 3b1b82bef05a1b5fd69ece79c80a95fb6d72a990)
++++ b/src/api/java/SolverDecRefQueue.java	(date 1792278932286)
+@@ -15,7 +15,7 @@
+     
+ **/ 
+ 
+-package com.microsoft.z3;
++package com.microsoft.z3legacy;
+ 
+ class SolverDecRefQueue extends IDecRefQueue<Solver> {
+     public SolverDecRefQueue() { super(); }
+diff --git a/src/api/java/IntSort.java b/src/api/java/IntSort.java
+--- a/src/api/java/IntSort.java	(revision 3b1b82bef05a1b5fd69ece79c80a95fb6d72a990)
++++ b/src/api/java/IntSort.java	(date 1792278932292)
+@@ -15,7 +15,7 @@
+     
+ **/ 
+ 
+-package com.microsoft.z3;
++package com.microsoft.z3legacy;
+ 
+ /**
+  * An Integer sort
+diff --git a/src/api/java/FuncInterpDecRefQueue.java b/src/api/java/FuncInterpDecRefQueue.java
+--- a/src/api/java/FuncInterpDecRefQueue.java	(revision 3b1b82bef05a1b5fd69ece79c80a95fb6d72a990)
++++ b/src/api/java/FuncInterpDecRefQueue.java	(date 1792278932298)
+@@ -15,7 +15,7 @@
+     
+ **/ 
+ 
+-package com.microsoft.z3;
++package com.microsoft.z3legacy;
+ 
+ class FuncInterpDecRefQueue extends IDecRefQueue<FuncInterp>
+ {
+diff --git a/src/api/java/FPRMExpr.java b/src/api/java/FPRMExpr.java
+--- a/src/api/java/FPRMExpr.java	(revision 3b1b82bef05a1b5fd69ece79c80a95fb6d72a990)
++++ b/src/api/java/FPRMExpr.java	(date 1792278932305)
+@@ -14,7 +14,7 @@
+ Notes:
+     
+ --*/
+-package com.microsoft.z3;
++package com.microsoft.z3legacy;
+ 
+ /**
+  * FloatingPoint RoundingMode Expressions
+diff --git a/src/api/java/ArrayExpr.java b/src/api/java/ArrayExpr.java
+--- a/src/api/java/ArrayExpr.java	(revision 3b1b82bef05a1b5fd69ece79c80a95fb6d72a990)
++++ b/src/api/java/ArrayExpr.java	(date 1792278932311)
+@@ -15,7 +15,7 @@
+     
+ **/
+ 
+-package com.microsoft.z3;
++package com.microsoft.z3legacy;
+ 
+ 
+ /**
+diff --git a/src/api/java/FiniteDomainNum.java b/src/api/java/FiniteDomainNum.java
+--- a/src/api/java/FiniteDomainNum.java	(revision 3b1b82bef05a1b5fd69ece79c80a95fb6d72a990)
++++ b/src/api/java/FiniteDomainNum.java	(date 1792278932317)
+@@ -15,7 +15,7 @@
+     
+ **/ 
+ 
+-package com.microsoft.z3;
++package com.microsoft.z3legacy;
+ 
+ import java.math.BigInteger;
+ 
+diff --git a/src/api/java/ReExpr.java b/src/api/java/ReExpr.java
+--- a/src/api/java/ReExpr.java	(revision 3b1b82bef05a1b5fd69ece79c80a95fb6d72a990)
++++ b/src/api/java/ReExpr.java	(date 1792278932323)
+@@ -15,7 +15,7 @@
+     
+ **/ 
+ 
+-package com.microsoft.z3;
++package com.microsoft.z3legacy;
+ 
+ /**
+  * Re expressions
+diff --git a/src/api/java/GoalDecRefQueue.java b/src/api/java/GoalDecRefQueue.java
+--- a/src/api/java/GoalDecRefQueue.java	(revision 3b1b82bef05a1b5fd69ece79c80a95fb6d72a990)
++++ b/src/api/java/GoalDecRefQueue.java	(date 1792278932330)
+@@ -15,7 +15,7 @@
+     
+ **/ 
+ 
+-package com.microsoft.z3;
++package com.microsoft.z3legacy;
+ 
+ class GoalDecRefQueue extends IDecRefQueue<Goal> {
+     public GoalDecRefQueue() 
+diff --git a/src/api/java/Version.java b/src/api/java/Version.java
+--- a/src/api/java/Version.java	(revision 3b1b82bef05a1b5fd69ece79c80a95fb6d72a990)
++++ b/src/api/java/Version.java	(date 1792278932338)
+@@ -15,7 +15,7 @@
+     
+ **/ 
+ 
+-package com.microsoft.z3;
++package com.microsoft.z3legacy;
+ 
+ /**
+  * Version information. 
+diff --git a/src/api/java/ReSort.java b/src/api/java/ReSort.java
+--- a/src/api/java/ReSort.java	(revision 3b1b82bef05a1b5fd69ece79c80a95fb6d72a990)
++++ b/src/api/java/ReSort.java	(date 1792278932345)
+@@ -15,7 +15,7 @@
+     
+ **/ 
+ 
+-package com.microsoft.z3;
++package com.microsoft.z3legacy;
+ 
+ /**
+  * A Regular expression sort
+diff --git a/src/api/java/FiniteDomainExpr.java b/src/api/java/FiniteDomainExpr.java
+--- a/src/api/java/FiniteDomainExpr.java	(revision 3b1b82bef05a1b5fd69ece79c80a95fb6d72a990)
++++ b/src/api/java/FiniteDomainExpr.java	(date 1792278932352)
+@@ -15,7 +15,7 @@
+     
+ **/ 
+ 
+-package com.microsoft.z3;
++package com.microsoft.z3legacy;
+ 
+ /**
+  * Finite-domain expressions
+diff --git a/src/api/java/FuncInterp.java b/src/api/java/FuncInterp.java
+--- a/src/api/java/FuncInterp.java	(revision 3b1b82bef05a1b5fd69ece79c80a95fb6d72a990)
++++ b/src/api/java/FuncInterp.java	(date 1792278932359)
+@@ -15,7 +15,7 @@
+     
+ **/ 
+ 
+-package com.microsoft.z3;
++package com.microsoft.z3legacy;
+ 
+ /**
+  * A function interpretation is represented as a finite map and an 'else' value.
+diff --git a/src/api/java/RealSort.java b/src/api/java/RealSort.java
+--- a/src/api/java/RealSort.java	(revision 3b1b82bef05a1b5fd69ece79c80a95fb6d72a990)
++++ b/src/api/java/RealSort.java	(date 1792278932365)
+@@ -15,7 +15,7 @@
+     
+ **/ 
+ 
+-package com.microsoft.z3;
++package com.microsoft.z3legacy;
+ 
+ /**
+  * A real sort
+diff --git a/src/api/java/DatatypeExpr.java b/src/api/java/DatatypeExpr.java
+--- a/src/api/java/DatatypeExpr.java	(revision 3b1b82bef05a1b5fd69ece79c80a95fb6d72a990)
++++ b/src/api/java/DatatypeExpr.java	(date 1792278932372)
+@@ -15,7 +15,7 @@
+     
+ **/
+ 
+-package com.microsoft.z3;
++package com.microsoft.z3legacy;
+ 
+ /**
+  * Datatype expressions
+diff --git a/src/api/java/BitVecExpr.java b/src/api/java/BitVecExpr.java
+--- a/src/api/java/BitVecExpr.java	(revision 3b1b82bef05a1b5fd69ece79c80a95fb6d72a990)
++++ b/src/api/java/BitVecExpr.java	(date 1792278932378)
+@@ -15,7 +15,7 @@
+     
+ **/
+ 
+-package com.microsoft.z3;
++package com.microsoft.z3legacy;
+ 
+ /**
+  * Bit-vector expressions
+diff --git a/src/api/java/ParamDescrsDecRefQueue.java b/src/api/java/ParamDescrsDecRefQueue.java
+--- a/src/api/java/ParamDescrsDecRefQueue.java	(revision 3b1b82bef05a1b5fd69ece79c80a95fb6d72a990)
++++ b/src/api/java/ParamDescrsDecRefQueue.java	(date 1792278932384)
+@@ -15,7 +15,7 @@
+     
+ **/ 
+ 
+-package com.microsoft.z3;
++package com.microsoft.z3legacy;
+ 
+ class ParamDescrsDecRefQueue extends IDecRefQueue<ParamDescrs> {
+     public ParamDescrsDecRefQueue() 
+diff --git a/src/api/java/Global.java b/src/api/java/Global.java
+--- a/src/api/java/Global.java	(revision 3b1b82bef05a1b5fd69ece79c80a95fb6d72a990)
++++ b/src/api/java/Global.java	(date 1792278932391)
+@@ -15,7 +15,7 @@
+     
+ **/ 
+ 
+-package com.microsoft.z3;
++package com.microsoft.z3legacy;
+ 
+ /**
+  * Global functions for Z3. 
+diff --git a/src/api/java/AstMapDecRefQueue.java b/src/api/java/AstMapDecRefQueue.java
+--- a/src/api/java/AstMapDecRefQueue.java	(revision 3b1b82bef05a1b5fd69ece79c80a95fb6d72a990)
++++ b/src/api/java/AstMapDecRefQueue.java	(date 1792278932397)
+@@ -15,7 +15,7 @@
+     
+ **/
+ 
+-package com.microsoft.z3;
++package com.microsoft.z3legacy;
+ 
+ class ASTMapDecRefQueue extends IDecRefQueue<ASTMap> {
+     public ASTMapDecRefQueue() 
+diff --git a/src/api/java/Status.java b/src/api/java/Status.java
+--- a/src/api/java/Status.java	(revision 3b1b82bef05a1b5fd69ece79c80a95fb6d72a990)
++++ b/src/api/java/Status.java	(date 1792278932402)
+@@ -15,7 +15,7 @@
+     
+ **/ 
+ 
+-package com.microsoft.z3;
++package com.microsoft.z3legacy;
+ 
+ /**
+  * Status values.
+diff --git a/src/api/java/StringSymbol.java b/src/api/java/StringSymbol.java
+--- a/src/api/java/StringSymbol.java	(revision 3b1b82bef05a1b5fd69ece79c80a95fb6d72a990)
++++ b/src/api/java/StringSymbol.java	(date 1792278932411)
+@@ -15,9 +15,9 @@
+     
+ **/ 
+ 
+-package com.microsoft.z3;
++package com.microsoft.z3legacy;
+ 
+-import com.microsoft.z3.enumerations.Z3_symbol_kind;
++import com.microsoft.z3legacy.enumerations.Z3_symbol_kind;
+ 
+ /**
+  * Named symbols
+diff --git a/src/api/java/RealExpr.java b/src/api/java/RealExpr.java
+--- a/src/api/java/RealExpr.java	(revision 3b1b82bef05a1b5fd69ece79c80a95fb6d72a990)
++++ b/src/api/java/RealExpr.java	(date 1792278932417)
+@@ -15,7 +15,7 @@
+     
+ **/ 
+ 
+-package com.microsoft.z3;
++package com.microsoft.z3legacy;
+ 
+ /**
+  * Real expressions
+diff --git a/src/api/java/BoolSort.java b/src/api/java/BoolSort.java
+--- a/src/api/java/BoolSort.java	(revision 3b1b82bef05a1b5fd69ece79c80a95fb6d72a990)
++++ b/src/api/java/BoolSort.java	(date 1792278932423)
+@@ -15,7 +15,7 @@
+     
+ **/
+ 
+-package com.microsoft.z3;
++package com.microsoft.z3legacy;
+ 
+ /**
+  * A Boolean sort.
+diff --git a/src/api/java/TupleSort.java b/src/api/java/TupleSort.java
+--- a/src/api/java/TupleSort.java	(revision 3b1b82bef05a1b5fd69ece79c80a95fb6d72a990)
++++ b/src/api/java/TupleSort.java	(date 1792278932429)
+@@ -15,7 +15,7 @@
+     
+ **/ 
+ 
+-package com.microsoft.z3;
++package com.microsoft.z3legacy;
+ 
+ /**
+  * Tuple sorts.
+diff --git a/src/api/java/BitVecSort.java b/src/api/java/BitVecSort.java
+--- a/src/api/java/BitVecSort.java	(revision 3b1b82bef05a1b5fd69ece79c80a95fb6d72a990)
++++ b/src/api/java/BitVecSort.java	(date 1792278932436)
+@@ -15,7 +15,7 @@
+     
+ **/
+ 
+-package com.microsoft.z3;
++package com.microsoft.z3legacy;
+ 
+ /**
+  * Bit-vector sorts.
+diff --git a/src/api/java/DatatypeSort.java b/src/api/java/DatatypeSort.java
+--- a/src/api/java/DatatypeSort.java	(revision 3b1b82bef05a1b5fd69ece79c80a95fb6d72a990)
++++ b/src/api/java/DatatypeSort.java	(date 1792278932443)
+@@ -15,7 +15,7 @@
+     
+ **/
+ 
+-package com.microsoft.z3;
++package com.microsoft.z3legacy;
+ 
+ /**
+  * Datatype sorts.
+diff --git a/src/api/java/FPNum.java b/src/api/java/FPNum.java
+--- a/src/api/java/FPNum.java	(revision 3b1b82bef05a1b5fd69ece79c80a95fb6d72a990)
++++ b/src/api/java/FPNum.java	(date 1792278932452)
+@@ -14,7 +14,7 @@
+ Notes:
+     
+ --*/
+-package com.microsoft.z3;
++package com.microsoft.z3legacy;
+ 
+ /**
+  * FloatingPoint Numerals
+diff --git a/src/api/java/Model.java b/src/api/java/Model.java
+--- a/src/api/java/Model.java	(revision 3b1b82bef05a1b5fd69ece79c80a95fb6d72a990)
++++ b/src/api/java/Model.java	(date 1792278932461)
+@@ -15,9 +15,9 @@
+     
+ **/ 
+ 
+-package com.microsoft.z3;
++package com.microsoft.z3legacy;
+ 
+-import com.microsoft.z3.enumerations.Z3_sort_kind;
++import com.microsoft.z3legacy.enumerations.Z3_sort_kind;
+ 
+ /**
+  * A Model contains interpretations (assignments) of constants and functions.
+diff --git a/src/api/java/README b/src/api/java/README
+--- a/src/api/java/README	(revision 3b1b82bef05a1b5fd69ece79c80a95fb6d72a990)
++++ b/src/api/java/README	(date 1792278932470)
+@@ -3,4 +3,4 @@
+ 
+ The Java bindings will be included in the Z3 build if it is configured with   
+ the option --java to python scripts/mk_make.py. This will produce the   
+-com.microsoft.z3.jar package in the build directory.
++com.microsoft.z3legacy.jar package in the build directory.
+diff --git a/src/api/java/TacticDecRefQueue.java b/src/api/java/TacticDecRefQueue.java
+--- a/src/api/java/TacticDecRefQueue.java	(revision 3b1b82bef05a1b5fd69ece79c80a95fb6d72a990)
++++ b/src/api/java/TacticDecRefQueue.java	(date 1792278932480)
+@@ -15,7 +15,7 @@
+     
+ **/ 
+ 
+-package com.microsoft.z3;
++package com.microsoft.z3legacy;
+ 
+ class TacticDecRefQueue extends IDecRefQueue<Tactic> {
+     public TacticDecRefQueue() 
+diff --git a/src/api/java/Params.java b/src/api/java/Params.java
+--- a/src/api/java/Params.java	(revision 3b1b82bef05a1b5fd69ece79c80a95fb6d72a990)
++++ b/src/api/java/Params.java	(date 1792278932491)
+@@ -16,7 +16,7 @@
+ **/ 
+ 
+ 
+-package com.microsoft.z3;
++package com.microsoft.z3legacy;
+ 
+ /**
+  * A ParameterSet represents a configuration in the form of Symbol/value pairs.
+diff --git a/src/api/java/IntSymbol.java b/src/api/java/IntSymbol.java
+--- a/src/api/java/IntSymbol.java	(revision 3b1b82bef05a1b5fd69ece79c80a95fb6d72a990)
++++ b/src/api/java/IntSymbol.java	(date 1792278932500)
+@@ -15,9 +15,9 @@
+     
+ **/ 
+ 
+-package com.microsoft.z3;
++package com.microsoft.z3legacy;
+ 
+-import com.microsoft.z3.enumerations.Z3_symbol_kind;
++import com.microsoft.z3legacy.enumerations.Z3_symbol_kind;
+ 
+ /**
+  * Numbered symbols
+diff --git a/src/api/java/BoolExpr.java b/src/api/java/BoolExpr.java
+--- a/src/api/java/BoolExpr.java	(revision 3b1b82bef05a1b5fd69ece79c80a95fb6d72a990)
++++ b/src/api/java/BoolExpr.java	(date 1792278932508)
+@@ -15,7 +15,7 @@
+     
+ **/
+ 
+-package com.microsoft.z3;
++package com.microsoft.z3legacy;
+ 
+ /**
+  * Boolean expressions
+diff --git a/scripts/mk_project.py b/scripts/mk_project.py
+--- a/scripts/mk_project.py	(revision 3b1b82bef05a1b5fd69ece79c80a95fb6d72a990)
++++ b/scripts/mk_project.py	(date 1792278932518)
+@@ -83,12 +83,12 @@
+     add_exe('test', ['api', 'fuzzing', 'simplex'], exe_name='test-z3', install=False)
+     _libz3Component = add_dll('api_dll', ['api', 'sat', 'extra_cmds'], 'api/dll',
+                               reexports=['api'],
+-                              dll_name='libz3',
++                              dll_name='libz3legacy',
+                               static=build_static_lib(),
+                               export_files=API_files,
+                               staging_link='python')
+     add_dot_net_dll('dotnet', ['api_dll'], 'api/dotnet', dll_name='Microsoft.Z3', assembly_info_dir='Properties', default_key_file='src/api/dotnet/Microsoft.Z3.snk')
+-    add_java_dll('java', ['api_dll'], 'api/java', dll_name='libz3java', package_name="com.microsoft.z3", manifest_file='manifest')
++    add_java_dll('java', ['api_dll'], 'api/java', dll_name='libz3javalegacy', package_name="com.microsoft.z3legacy", manifest_file='manifest')
+     add_ml_lib('ml', ['api_dll'], 'api/ml', lib_name='libz3ml')
+     add_hlib('cpp', 'api/c++', includes2install=['z3++.h'])
+     set_z3py_dir('api/python')
+diff --git a/scripts/mk_util.py b/scripts/mk_util.py
+--- a/scripts/mk_util.py	(revision 3b1b82bef05a1b5fd69ece79c80a95fb6d72a990)
++++ b/scripts/mk_util.py	(date 1792278932530)
+@@ -1793,7 +1793,7 @@
+         if is_java_enabled():
+             mk_dir(os.path.join(BUILD_DIR, 'api', 'java', 'classes'))
+             dllfile = '%s$(SO_EXT)' % self.dll_name
+-            out.write('libz3java$(SO_EXT): libz3$(SO_EXT) %s\n' % os.path.join(self.to_src_dir, 'Native.cpp'))
++            out.write('libz3javalegacy$(SO_EXT): libz3legacy$(SO_EXT) %s\n' % os.path.join(self.to_src_dir, 'Native.cpp'))
+             t = '\t$(CXX) $(CXXFLAGS) $(CXX_OUT_FLAG)api/java/Native$(OBJ_EXT) -I"%s" -I"%s/PLATFORM" -I%s %s/Native.cpp\n' % (JNI_HOME, JNI_HOME, get_component('api').to_src_dir, self.to_src_dir)
+             if IS_OSX:
+                 t = t.replace('PLATFORM', 'darwin')
+@@ -1813,12 +1813,12 @@
+                 t = t.replace('PLATFORM', 'win32')
+             out.write(t)
+             if IS_WINDOWS: # On Windows, CL creates a .lib file to link against.
+-                out.write('\t$(SLINK) $(SLINK_OUT_FLAG)libz3java$(SO_EXT) $(SLINK_FLAGS) %s$(OBJ_EXT) libz3$(LIB_EXT)\n' %
++                out.write('\t$(SLINK) $(SLINK_OUT_FLAG)libz3javalegacy$(SO_EXT) $(SLINK_FLAGS) %s$(OBJ_EXT) libz3legacy$(LIB_EXT)\n' %
+                           os.path.join('api', 'java', 'Native'))
+             else:
+-                out.write('\t$(SLINK) $(SLINK_OUT_FLAG)libz3java$(SO_EXT) $(SLINK_FLAGS) %s$(OBJ_EXT) libz3$(SO_EXT)\n' %
++                out.write('\t$(SLINK) $(SLINK_OUT_FLAG)libz3javalegacy$(SO_EXT) $(SLINK_FLAGS) %s$(OBJ_EXT) libz3legacy$(SO_EXT)\n' %
+                           os.path.join('api', 'java', 'Native'))
+-            out.write('%s.jar: libz3java$(SO_EXT) ' % self.package_name)
++            out.write('%s.jar: libz3javalegacy$(SO_EXT) ' % self.package_name)
+             deps = ''
+             for jfile in get_java_files(self.src_dir):
+                 deps += ('%s ' % os.path.join(self.to_src_dir, jfile))
+diff --git a/src/api/java/IDecRefQueue.java b/src/api/java/IDecRefQueue.java
+--- a/src/api/java/IDecRefQueue.java	(revision 3b1b82bef05a1b5fd69ece79c80a95fb6d72a990)
++++ b/src/api/java/IDecRefQueue.java	(date 1792278932539)
+@@ -15,7 +15,7 @@
+     
+ **/
+ 
+-package com.microsoft.z3;
++package com.microsoft.z3legacy;
+ 
+ import java.lang.ref.PhantomReference;
+ import java.lang.ref.Reference;
+diff --git a/src/api/java/StatisticsDecRefQueue.java b/src/api/java/StatisticsDecRefQueue.java
+--- a/src/api/java/StatisticsDecRefQueue.java	(revision 3b1b82bef05a1b5fd69ece79c80a95fb6d72a990)
++++ b/src/api/java/StatisticsDecRefQueue.java	(date 1792278932549)
+@@ -15,7 +15,7 @@
+     
+ **/ 
+ 
+-package com.microsoft.z3;
++package com.microsoft.z3legacy;
+ 
+ class StatisticsDecRefQueue extends IDecRefQueue<Statistics> {
+     public StatisticsDecRefQueue() 
+diff --git a/src/api/java/ParamsDecRefQueue.java b/src/api/java/ParamsDecRefQueue.java
+--- a/src/api/java/ParamsDecRefQueue.java	(revision 3b1b82bef05a1b5fd69ece79c80a95fb6d72a990)
++++ b/src/api/java/ParamsDecRefQueue.java	(date 1792278932575)
+@@ -15,7 +15,7 @@
+     
+ **/ 
+ 
+-package com.microsoft.z3;
++package com.microsoft.z3legacy;
+ 
+ class ParamsDecRefQueue extends IDecRefQueue<Params> {
+     public ParamsDecRefQueue() 
+diff --git a/scripts/update_api.py b/scripts/update_api.py
+--- a/scripts/update_api.py	(revision 3b1b82bef05a1b5fd69ece79c80a95fb6d72a990)
++++ b/scripts/update_api.py	(date 1792278932566)
+@@ -387,7 +387,7 @@
+     dotnet.write('        public delegate void Z3_error_handler(Z3_context c, Z3_error_code e);\n\n')
+     dotnet.write('        public class LIB\n')
+     dotnet.write('        {\n')
+-    dotnet.write('            const string Z3_DLL_NAME = \"libz3\";\n'
++    dotnet.write('            const string Z3_DLL_NAME = \"libz3legacy\";\n'
+                  '            \n')
+     dotnet.write('            [DllImport(Z3_DLL_NAME, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]\n')
+     dotnet.write('            public extern static void Z3_set_error_handler(Z3_context a0, Z3_error_handler a1);\n\n')
+@@ -512,8 +512,13 @@
+     java_native.write('  public static native void setInternalErrorHandler(long ctx);\n\n')
+ 
+     java_native.write('  static {\n')
+-    java_native.write('    try { System.loadLibrary("z3java"); }\n')
+-    java_native.write('    catch (UnsatisfiedLinkError ex) { System.loadLibrary("libz3java"); }\n')
++    java_native.write('    if (!Boolean.parseBoolean(System.getProperty("z3.skipLibraryLoad"))) {\n')
++    java_native.write('      try {\n')
++    java_native.write('        System.loadLibrary("z3legacyjava");\n')
++    java_native.write('      } catch (UnsatisfiedLinkError ex) {\n')
++    java_native.write('        System.loadLibrary("libz3legacyjava");\n')
++    java_native.write('      }\n')
++    java_native.write('    }\n')
+     java_native.write('  }\n')
+ 
+     java_native.write('\n')
+@@ -1669,7 +1674,7 @@
+   try:
+     d = os.path.realpath(d)
+     if os.path.isdir(d):
+-      d = os.path.join(d, 'libz3.%s' % _ext)
++      d = os.path.join(d, 'libz3legacy.%s' % _ext)
+       if os.path.isfile(d):
+         _lib = ctypes.CDLL(d)
+         break
+@@ -1679,26 +1684,26 @@
+ if _lib is None:
+   # If all else failed, ask the system to find it.
+   try:
+-    _lib = ctypes.CDLL('libz3.%s' % _ext)
++    _lib = ctypes.CDLL('libz3legacy.%s' % _ext)
+   except:
+     pass
+ 
+ if _lib is None:
+-  print("Could not find libz3.%s; consider adding the directory containing it to" % _ext)
++  print("Could not find libz3legacy.%s; consider adding the directory containing it to" % _ext)
+   print("  - your system's PATH environment variable,")
+   print("  - the Z3_LIBRARY_PATH environment variable, or ")
+   print("  - to the custom Z3_LIBRARY_DIRS Python-builtin before importing the z3 module, e.g. via")
+   if sys.version < '3':
+     print("    import __builtin__")
+-    print("    __builtin__.Z3_LIB_DIRS = [ '/path/to/libz3.%s' ] " % _ext)
++    print("    __builtin__.Z3_LIB_DIRS = [ '/path/to/libz3legacy.%s' ] " % _ext)
+   else:
+     print("    import builtins")
+-    print("    builtins.Z3_LIB_DIRS = [ '/path/to/libz3.%s' ] " % _ext)
+-  raise Z3Exception("libz3.%s not found." % _ext)
++    print("    builtins.Z3_LIB_DIRS = [ '/path/to/libz3legacy.%s' ] " % _ext)
++  raise Z3Exception("libz3legacy.%s not found." % _ext)
+ 
+ def _to_ascii(s):
+   if isinstance(s, str):
+-    try: 
++    try:
+       return s.encode('ascii')
+     except:
+       # kick the bucket down the road.  :-J
+diff --git a/src/api/java/FixedpointDecRefQueue.java b/src/api/java/FixedpointDecRefQueue.java
+--- a/src/api/java/FixedpointDecRefQueue.java	(revision 3b1b82bef05a1b5fd69ece79c80a95fb6d72a990)
++++ b/src/api/java/FixedpointDecRefQueue.java	(date 1792278932582)
+@@ -15,7 +15,7 @@
+     
+ **/ 
+ 
+-package com.microsoft.z3;
++package com.microsoft.z3legacy;
+ 
+ class FixedpointDecRefQueue extends IDecRefQueue<Fixedpoint> {
+     public FixedpointDecRefQueue() 
+diff --git a/src/api/java/ConstructorDecRefQueue.java b/src/api/java/ConstructorDecRefQueue.java
+--- a/src/api/java/ConstructorDecRefQueue.java	(revision 3b1b82bef05a1b5fd69ece79c80a95fb6d72a990)
++++ b/src/api/java/ConstructorDecRefQueue.java	(date 1792278932590)
+@@ -1,4 +1,4 @@
+-package com.microsoft.z3;
++package com.microsoft.z3legacy;
+ 
+ public class ConstructorDecRefQueue extends IDecRefQueue<Constructor> {
+     public ConstructorDecRefQueue() {
+diff --git a/src/api/java/Fixedpoint.java b/src/api/java/Fixedpoint.java
+--- a/src/api/java/Fixedpoint.java	(revision 3b1b82bef05a1b5fd69ece79c80a95fb6d72a990)
++++ b/src/api/java/Fixedpoint.java	(date 1792278932598)
+@@ -15,9 +15,9 @@
+     
+ **/ 
+ 
+-package com.microsoft.z3;
++package com.microsoft.z3legacy;
+ 
+-import com.microsoft.z3.enumerations.Z3_lbool;
++import com.microsoft.z3legacy.enumerations.Z3_lbool;
+ 
+ /**
+  * Object for managing fixedpoints
+diff --git a/src/api/java/Probe.java b/src/api/java/Probe.java
+--- a/src/api/java/Probe.java	(revision 3b1b82bef05a1b5fd69ece79c80a95fb6d72a990)
++++ b/src/api/java/Probe.java	(date 1792278932606)
+@@ -15,7 +15,7 @@
+     
+ **/ 
+ 
+-package com.microsoft.z3;
++package com.microsoft.z3legacy;
+ 
+ /**
+  * Probes are used to inspect a goal (aka problem) and collect information that
+diff --git a/src/api/java/Z3Exception.java b/src/api/java/Z3Exception.java
+--- a/src/api/java/Z3Exception.java	(revision 3b1b82bef05a1b5fd69ece79c80a95fb6d72a990)
++++ b/src/api/java/Z3Exception.java	(date 1792278932613)
+@@ -15,7 +15,7 @@
+     
+ **/ 
+ 
+-package com.microsoft.z3;
++package com.microsoft.z3legacy;
+ 
+ 
+ /**
+diff --git a/src/api/java/Quantifier.java b/src/api/java/Quantifier.java
+--- a/src/api/java/Quantifier.java	(revision 3b1b82bef05a1b5fd69ece79c80a95fb6d72a990)
++++ b/src/api/java/Quantifier.java	(date 1792278932620)
+@@ -15,9 +15,9 @@
+     
+ **/ 
+ 
+-package com.microsoft.z3;
++package com.microsoft.z3legacy;
+ 
+-import com.microsoft.z3.enumerations.Z3_ast_kind;
++import com.microsoft.z3legacy.enumerations.Z3_ast_kind;
+ 
+ /**
+  * Quantifier expressions.
+diff --git a/src/api/java/Log.java b/src/api/java/Log.java
+--- a/src/api/java/Log.java	(revision 3b1b82bef05a1b5fd69ece79c80a95fb6d72a990)
++++ b/src/api/java/Log.java	(date 1792278932628)
+@@ -15,7 +15,7 @@
+     
+ **/ 
+ 
+-package com.microsoft.z3;
++package com.microsoft.z3legacy;
+ 
+ /**
+  * Interaction logging for Z3.
+diff --git a/src/api/java/Context.java b/src/api/java/Context.java
+--- a/src/api/java/Context.java	(revision 3b1b82bef05a1b5fd69ece79c80a95fb6d72a990)
++++ b/src/api/java/Context.java	(date 1792278932638)
+@@ -15,11 +15,11 @@
+     
+ **/
+ 
+-package com.microsoft.z3;
++package com.microsoft.z3legacy;
+ 
+-import static com.microsoft.z3.Constructor.of;
++import static com.microsoft.z3legacy.Constructor.of;
+ 
+-import com.microsoft.z3.enumerations.Z3_ast_print_mode;
++import com.microsoft.z3legacy.enumerations.Z3_ast_print_mode;
+ 
+ import java.util.Map;
+ 
+diff --git a/src/api/java/ConstructorListDecRefQueue.java b/src/api/java/ConstructorListDecRefQueue.java
+--- a/src/api/java/ConstructorListDecRefQueue.java	(revision 3b1b82bef05a1b5fd69ece79c80a95fb6d72a990)
++++ b/src/api/java/ConstructorListDecRefQueue.java	(date 1792278932645)
+@@ -1,4 +1,4 @@
+-package com.microsoft.z3;
++package com.microsoft.z3legacy;
+ 
+ public class ConstructorListDecRefQueue extends IDecRefQueue<ConstructorList> {
+     public ConstructorListDecRefQueue() {
+diff --git a/src/api/java/ConstructorList.java b/src/api/java/ConstructorList.java
+--- a/src/api/java/ConstructorList.java	(revision 3b1b82bef05a1b5fd69ece79c80a95fb6d72a990)
++++ b/src/api/java/ConstructorList.java	(date 1792278932651)
+@@ -15,7 +15,7 @@
+     
+ **/
+ 
+-package com.microsoft.z3;
++package com.microsoft.z3legacy;
+ 
+ /**
+  * Lists of constructors
+diff --git a/src/api/java/ApplyResultDecRefQueue.java b/src/api/java/ApplyResultDecRefQueue.java
+--- a/src/api/java/ApplyResultDecRefQueue.java	(revision 3b1b82bef05a1b5fd69ece79c80a95fb6d72a990)
++++ b/src/api/java/ApplyResultDecRefQueue.java	(date 1792278932658)
+@@ -15,7 +15,7 @@
+     
+ **/
+ 
+-package com.microsoft.z3;
++package com.microsoft.z3legacy;
+ 
+ class ApplyResultDecRefQueue extends IDecRefQueue<ApplyResult>
+ {
+diff --git a/src/api/java/RatNum.java b/src/api/java/RatNum.java
+--- a/src/api/java/RatNum.java	(revision 3b1b82bef05a1b5fd69ece79c80a95fb6d72a990)
++++ b/src/api/java/RatNum.java	(date 1792278932666)
+@@ -15,7 +15,7 @@
+     
+ **/ 
+ 
+-package com.microsoft.z3;
++package com.microsoft.z3legacy;
+ 
+ import java.math.BigInteger;
+ 
+diff --git a/src/api/java/Tactic.java b/src/api/java/Tactic.java
+--- a/src/api/java/Tactic.java	(revision 3b1b82bef05a1b5fd69ece79c80a95fb6d72a990)
++++ b/src/api/java/Tactic.java	(date 1792278932673)
+@@ -15,7 +15,7 @@
+     
+ **/ 
+ 
+-package com.microsoft.z3;
++package com.microsoft.z3legacy;
+ 
+ /**
+  * Tactics are the basic building block for creating custom solvers for specific
+diff --git a/src/api/java/CMakeLists.txt b/src/api/java/CMakeLists.txt
+--- a/src/api/java/CMakeLists.txt	(revision 3b1b82bef05a1b5fd69ece79c80a95fb6d72a990)
++++ b/src/api/java/CMakeLists.txt	(date 1792278932681)
+@@ -54,7 +54,7 @@
+ # This prevents CMake from automatically defining ``z3java_EXPORTS``
+ set_property(TARGET z3java PROPERTY DEFINE_SYMBOL "")
+ 
+-# Rule to generate the ``com.microsoft.z3.enumerations`` package
++# Rule to generate the ``com.microsoft.z3legacy.enumerations`` package
+ # FIXME: This list of files is fragile
+ set(Z3_JAVA_ENUMERATION_PACKAGE_FILES
+   Z3_ast_kind.java
+@@ -199,7 +199,7 @@
+     z3JavaJar
+ )
+ 
+-# Rule to build ``com.microsoft.z3.jar``
++# Rule to build ``com.microsoft.z3legacy.jar``
+ # TODO: Should we set ``CMAKE_JNI_TARGET`` to ``TRUE``?
+ add_jar(z3JavaJar
+   SOURCES ${Z3_JAVA_JAR_SOURCE_FILES_FULL_PATH}
+diff --git a/src/api/java/FiniteDomainSort.java b/src/api/java/FiniteDomainSort.java
+--- a/src/api/java/FiniteDomainSort.java	(revision 3b1b82bef05a1b5fd69ece79c80a95fb6d72a990)
++++ b/src/api/java/FiniteDomainSort.java	(date 1792278932688)
+@@ -15,7 +15,7 @@
+     
+ **/
+ 
+-package com.microsoft.z3;
++package com.microsoft.z3legacy;
+ 
+ /**
+  * Finite domain sorts.
+diff --git a/src/api/java/Symbol.java b/src/api/java/Symbol.java
+--- a/src/api/java/Symbol.java	(revision 3b1b82bef05a1b5fd69ece79c80a95fb6d72a990)
++++ b/src/api/java/Symbol.java	(date 1792278932695)
+@@ -15,9 +15,9 @@
+     
+ **/ 
+ 
+-package com.microsoft.z3;
++package com.microsoft.z3legacy;
+ 
+-import com.microsoft.z3.enumerations.Z3_symbol_kind;
++import com.microsoft.z3legacy.enumerations.Z3_symbol_kind;
+ 
+ /**
+  * Symbols are used to name several term and type constructors.
+diff --git a/src/api/java/FPRMNum.java b/src/api/java/FPRMNum.java
+--- a/src/api/java/FPRMNum.java	(revision 3b1b82bef05a1b5fd69ece79c80a95fb6d72a990)
++++ b/src/api/java/FPRMNum.java	(date 1792278932701)
+@@ -14,9 +14,9 @@
+ Notes:
+     
+ --*/
+-package com.microsoft.z3;
++package com.microsoft.z3legacy;
+ 
+-import com.microsoft.z3.enumerations.Z3_decl_kind;
++import com.microsoft.z3legacy.enumerations.Z3_decl_kind;
+ 
+ /**
+  * FloatingPoint RoundingMode Numerals
+diff --git a/src/api/java/AstVectorDecRefQueue.java b/src/api/java/AstVectorDecRefQueue.java
+--- a/src/api/java/AstVectorDecRefQueue.java	(revision 3b1b82bef05a1b5fd69ece79c80a95fb6d72a990)
++++ b/src/api/java/AstVectorDecRefQueue.java	(date 1792278932707)
+@@ -15,7 +15,7 @@
+     
+ **/
+ 
+-package com.microsoft.z3;
++package com.microsoft.z3legacy;
+ 
+ class ASTVectorDecRefQueue extends IDecRefQueue<ASTVector> {
+     public ASTVectorDecRefQueue() 
+diff --git a/src/api/java/Statistics.java b/src/api/java/Statistics.java
+--- a/src/api/java/Statistics.java	(revision 3b1b82bef05a1b5fd69ece79c80a95fb6d72a990)
++++ b/src/api/java/Statistics.java	(date 1792278932713)
+@@ -15,7 +15,7 @@
+     
+ **/ 
+ 
+-package com.microsoft.z3;
++package com.microsoft.z3legacy;
+ 
+ /**
+  * Objects of this class track statistical information about solvers.
+diff --git a/src/api/java/ArraySort.java b/src/api/java/ArraySort.java
+--- a/src/api/java/ArraySort.java	(revision 3b1b82bef05a1b5fd69ece79c80a95fb6d72a990)
++++ b/src/api/java/ArraySort.java	(date 1792278932719)
+@@ -15,7 +15,7 @@
+     
+ **/
+ 
+-package com.microsoft.z3;
++package com.microsoft.z3legacy;
+ 
+ /**
+  * Array sorts.
