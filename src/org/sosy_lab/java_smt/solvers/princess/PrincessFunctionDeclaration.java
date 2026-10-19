@@ -23,6 +23,7 @@ import ap.parser.ITerm;
 import ap.parser.ITermITE;
 import ap.parser.SMTParser2InputAbsy.SMTFunctionType;
 import ap.terfor.preds.Predicate;
+import ap.theories.bitvectors.ModuloArithmetic$;
 import ap.theories.nia.GroebnerMultiplication;
 import ap.types.Sort;
 import ap.types.Sort$;
@@ -248,6 +249,33 @@ abstract sealed class PrincessFunctionDeclaration {
     public IExpression makeApp(PrincessEnvironment env, List<IExpression> args) {
       checkArgument(args.size() == 2);
       return GroebnerMultiplication.mult((ITerm) args.get(0), (ITerm) args.get(1));
+    }
+  }
+
+  static final class PrincessBitvectorExtractDeclaration extends PrincessFunctionDeclaration {
+    private final int upper;
+    private final int lower;
+
+    PrincessBitvectorExtractDeclaration(int pUpper, int pLower) {
+      upper = pUpper;
+      lower = pLower;
+    }
+
+    @Override
+    public IExpression makeApp(PrincessEnvironment env, List<IExpression> args) {
+      checkArgument(args.size() == 1);
+      return ModuloArithmetic$.MODULE$.extract(upper, lower, (ITerm) args.get(0));
+    }
+  }
+
+  static final class PrincessBitvectorConcatDeclaration extends PrincessFunctionDeclaration {
+
+    PrincessBitvectorConcatDeclaration() {}
+
+    @Override
+    public IExpression makeApp(PrincessEnvironment env, List<IExpression> args) {
+      checkArgument(args.size() == 2);
+      return ModuloArithmetic$.MODULE$.concat((ITerm) args.get(0), (ITerm) args.get(1));
     }
   }
 }

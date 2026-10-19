@@ -10,6 +10,7 @@
 
 package org.sosy_lab.java_smt.delegate.trace;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static org.sosy_lab.common.collect.Collections3.transformedImmutableListCopy;
 import static org.sosy_lab.common.collect.Collections3.transformedImmutableSetCopy;
 
@@ -270,138 +271,7 @@ class TraceFormulaManager implements FormulaManager {
   }
 
   private <T extends Formula> int getArity(FunctionDeclaration<T> pDeclaration) {
-    return switch (pDeclaration.getKind()) {
-      case AND,
-          OR,
-          IFF,
-          XOR,
-          IMPLIES,
-          DISTINCT,
-          SUB,
-          ADD,
-          DIV,
-          MUL,
-          LT,
-          LTE,
-          GT,
-          GTE,
-          EQ,
-          BV_CONCAT,
-          BV_OR,
-          BV_AND,
-          BV_XOR,
-          BV_SUB,
-          BV_ADD,
-          BV_MUL,
-          STR_CONCAT,
-          STR_LT,
-          STR_LE,
-          RE_CONCAT,
-          RE_DIFFERENCE,
-          RE_UNION,
-          RE_INTERSECT ->
-          -1;
-      case RE_NONE, SEP_NIL -> 0;
-      case INT_TO_BV,
-          NOT,
-          UMINUS,
-          EQ_ZERO,
-          GTE_ZERO,
-          FLOOR,
-          TO_REAL,
-          CONST,
-          BV_EXTRACT,
-          BV_SIGN_EXTENSION,
-          BV_ZERO_EXTENSION,
-          BV_NOT,
-          BV_NEG,
-          BV_ROTATE_LEFT_BY_INT,
-          BV_ROTATE_RIGHT_BY_INT,
-          UBV_TO_INT,
-          SBV_TO_INT,
-          FP_NEG,
-          FP_ABS,
-          FP_IS_NAN,
-          FP_IS_INF,
-          FP_IS_ZERO,
-          FP_IS_NEGATIVE,
-          FP_IS_SUBNORMAL,
-          FP_IS_NORMAL,
-          FP_AS_IEEEBV,
-          FP_FROM_IEEEBV,
-          RE_PLUS,
-          RE_STAR,
-          INT_TO_STR,
-          STR_FROM_CODE,
-          STR_TO_CODE,
-          STR_LENGTH,
-          STR_TO_INT,
-          STR_TO_RE,
-          RE_COMPLEMENT,
-          RE_OPTIONAL ->
-          1;
-      case SELECT,
-          MODULO,
-          BV_SDIV,
-          BV_UDIV,
-          BV_SREM,
-          BV_UREM,
-          BV_SMOD,
-          BV_ULT,
-          BV_SLT,
-          BV_ULE,
-          BV_SLE,
-          BV_UGT,
-          BV_SGT,
-          BV_UGE,
-          BV_SGE,
-          BV_SHL,
-          BV_LSHR,
-          BV_ASHR,
-          BV_ROTATE_LEFT,
-          BV_ROTATE_RIGHT,
-          BV_UCASTTO_FP,
-          BV_SCASTTO_FP,
-          FP_MAX,
-          FP_MIN,
-          FP_SQRT,
-          FP_REM,
-          FP_LT,
-          FP_LE,
-          FP_GE,
-          FP_GT,
-          FP_EQ,
-          FP_ROUND_TO_INTEGRAL,
-          FP_CASTTO_FP,
-          FP_CASTTO_SBV,
-          FP_CASTTO_UBV,
-          STR_CHAR_AT,
-          STR_CONTAINS,
-          STR_IN_RE,
-          STR_PREFIX,
-          STR_SUFFIX,
-          RE_RANGE,
-          SEP_PTO,
-          SEP_EMP,
-          SEP_STAR,
-          SEP_WAND ->
-          2;
-      case ITE,
-          STORE,
-          FP_SUB,
-          FP_ADD,
-          FP_DIV,
-          FP_MUL,
-          STR_INDEX_OF,
-          STR_REPLACE,
-          STR_REPLACE_ALL,
-          STR_SUBSTRING ->
-          3;
-      default ->
-          throw new IllegalArgumentException(
-              "Unsupported kind: \"%s\" (%s)"
-                  .formatted(pDeclaration.getName(), pDeclaration.getKind()));
-    };
+    return FunctionDeclarationKind.getArity(pDeclaration.getKind());
   }
 
   @SuppressWarnings({"unchecked", "rawtypes"})
@@ -569,18 +439,44 @@ class TraceFormulaManager implements FormulaManager {
             yield (T) getRationalFormulaManager().floor((NumeralFormula) args.get(0));
           }
         }
-        // FIXME Requires indexed functions
-        // case INT_TO_BV:
-        // case BV_EXTRACT:
-        case BV_CONCAT -> {
-          Preconditions.checkArgument(args.size() == 2);
+        case INT_TO_BV -> {
+          checkArgument(declaration.getIndices().size() == 1);
           yield (T)
               getBitvectorFormulaManager()
-                  .concat((BitvectorFormula) args.get(0), (BitvectorFormula) args.get(1));
+                  .makeBitvector(declaration.getIndices().get(0), (IntegerFormula) args.get(0));
         }
-        // FIXME Requires indexed functions
-        // case BV_SIGN_EXTENSION:
-        // case BV_ZERO_EXTENSION:
+        case BV_EXTRACT -> {
+          checkArgument(declaration.getIndices().size() == 2);
+          yield (T)
+              getBitvectorFormulaManager()
+                  .extract(
+                      (BitvectorFormula) args.get(0),
+                      declaration.getIndices().get(0),
+                      declaration.getIndices().get(1));
+        }
+        case BV_CONCAT -> {
+          checkArgument(!args.isEmpty(), "Expected at least one argument");
+          var concat = (T) args.get(0);
+          for (var p = 1; p < args.size(); p++) {
+            concat =
+                (T)
+                    getBitvectorFormulaManager()
+                        .concat((BitvectorFormula) concat, (BitvectorFormula) args.get(p));
+          }
+          yield concat;
+        }
+        case BV_SIGN_EXTENSION -> {
+          checkArgument(declaration.getIndices().size() == 1);
+          yield (T)
+              getBitvectorFormulaManager()
+                  .extend((BitvectorFormula) args.get(0), declaration.getIndices().get(0), true);
+        }
+        case BV_ZERO_EXTENSION -> {
+          checkArgument(declaration.getIndices().size() == 1);
+          yield (T)
+              getBitvectorFormulaManager()
+                  .extend((BitvectorFormula) args.get(0), declaration.getIndices().get(0), false);
+        }
         case BV_NOT -> (T) getBitvectorFormulaManager().not((BitvectorFormula) args.get(0));
         case BV_NEG -> (T) getBitvectorFormulaManager().negate((BitvectorFormula) args.get(0));
         case BV_OR -> {
@@ -708,9 +604,18 @@ class TraceFormulaManager implements FormulaManager {
             (T)
                 getBitvectorFormulaManager()
                     .rotateRight((BitvectorFormula) args.get(0), (BitvectorFormula) args.get(1));
-        // FIXME Requires indexed functions
-        // case BV_ROTATE_LEFT_BY_INT:
-        // case BV_ROTATE_RIGHT_BY_INT:
+        case BV_ROTATE_LEFT_BY_INT -> {
+          checkArgument(declaration.getIndices().size() == 1);
+          yield (T)
+              getBitvectorFormulaManager()
+                  .rotateLeft((BitvectorFormula) args.get(0), declaration.getIndices().get(0));
+        }
+        case BV_ROTATE_RIGHT_BY_INT -> {
+          checkArgument(declaration.getIndices().size() == 1);
+          yield (T)
+              getBitvectorFormulaManager()
+                  .rotateRight((BitvectorFormula) args.get(0), declaration.getIndices().get(0));
+        }
         case BV_UCASTTO_FP ->
             (T)
                 getFloatingPointFormulaManager()
