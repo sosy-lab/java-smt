@@ -116,6 +116,9 @@ abstract class PrincessAbstractProver<E> extends AbstractProverWithAllSat<E> {
     // their term, and the 1st component is the fully substituted original formula
     var abbreviated =
         api.abbrevSharedExpressionsWithMap(t, creator.getEnv().getMinAtomsForAbbreviation());
+    // Store newly introduces abbreviation symbols for later. Note that Princess always introduces
+    // fresh symbols for abbreviations, so there can be no clashes with earlier symbols, even when
+    // the state of the solver has changed and old frames were popped
     abbreviations.putAll(asJava(abbreviated._2));
 
     api.addAssertion((IFormula) abbreviated._1);
