@@ -1314,11 +1314,21 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
 
       assertThat(prover.isUnsat()).isTrue();
 
-      var itps = prover.getSeqInterpolants0(ImmutableList.of(p1, p2, p3));
+      var partitioned =
+          ImmutableList.of(ImmutableList.of(p1), ImmutableList.of(p2), ImmutableList.of(p3));
+
+      var itps = prover.getSeqInterpolants(partitioned);
       for (var itp : itps) {
         // Check that there are no abbreviation symbols in the interpolants
         assertThat(mgr.extractVariables(p).keySet())
             .containsAtLeastElementsIn(mgr.extractVariables(itp).keySet());
+      }
+
+      var treeItps = prover.getTreeInterpolants(partitioned, new int[partitioned.size()]);
+      for (var itp : treeItps) {
+        // Check that there are no abbreviation symbols in the interpolants
+        assertThat(mgr.extractVariables(p).keySet())
+                .containsAtLeastElementsIn(mgr.extractVariables(itp).keySet());
       }
     }
   }
