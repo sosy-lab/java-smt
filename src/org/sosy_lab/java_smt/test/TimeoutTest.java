@@ -69,11 +69,10 @@ public class TimeoutTest extends SolverBasedTest0 {
     //   The issue here seems to be that CVC5SolverContext.close() will free the C++ objects while
     //   the solver is still running. We could consider finding a work-around for this, or maybe
     //   ask the developers for a way to interrupt the solver.
-    // TODO Add interruption for Princess
     assume()
         .withMessage("%s does not support interruption", solverToUse())
         .that(solverToUse())
-        .isNoneOf(Solvers.PRINCESS, Solvers.CVC5);
+        .isNotEqualTo(Solvers.CVC5);
   }
 
   @Test
