@@ -86,9 +86,9 @@ abstract class PrincessAbstractProver<E> extends AbstractProverWithAllSat<E> {
     }
     status = api.stop(true);
 
-    if (shutdownNotifier.shouldShutdown()) {
-      throw new InterruptedException();
-    } else if (status.equals(SimpleAPI.ProverStatus$.MODULE$.Sat())) {
+    shutdownNotifier.shutdownIfNecessary();
+
+    if (status.equals(SimpleAPI.ProverStatus$.MODULE$.Sat())) {
       return false;
     } else if (status.equals(SimpleAPI.ProverStatus$.MODULE$.Unsat())) {
       return true;
