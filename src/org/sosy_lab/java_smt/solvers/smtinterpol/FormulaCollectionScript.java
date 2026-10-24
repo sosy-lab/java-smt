@@ -10,6 +10,7 @@ package org.sosy_lab.java_smt.solvers.smtinterpol;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.google.common.collect.FluentIterable;
 import de.uni_freiburg.informatik.ultimate.logic.Annotation;
 import de.uni_freiburg.informatik.ultimate.logic.ApplicationTerm;
 import de.uni_freiburg.informatik.ultimate.logic.Assignments;
@@ -28,6 +29,7 @@ import de.uni_freiburg.informatik.ultimate.logic.Theory;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -70,14 +72,18 @@ class FormulaCollectionScript implements Script {
 
   @Override
   public void declareFun(String fun, Sort[] paramSorts, Sort resultSort) throws SMTLIBException {
-    FunctionSymbol fsym = theory.getFunction(fun, paramSorts);
-
-    if (fsym == null) {
+    var functions = theory.getDeclaredFunctions();
+    if (!functions.containsKey(fun)) {
+      // There is no function with that name yet: create a new symbol
       script.declareFun(fun, paramSorts, resultSort);
     } else {
-      if (!fsym.getReturnSort().equals(resultSort)) {
+      // A symbol with the same name already exists: Check if the signature matches and throw an
+      // exception otherwise
+      var decl = functions.get(fun);
+      if (!Arrays.equals(decl.getParameterSorts(), paramSorts)
+          || !decl.getReturnSort().equals(resultSort)) {
         throw new SMTLIBException(
-            "Function " + fun + " is already declared with different definition");
+            "Function '%s' already declared with a different sort".formatted(fun));
       }
     }
   }
@@ -85,18 +91,21 @@ class FormulaCollectionScript implements Script {
   @Override
   public void defineFun(String fun, TermVariable[] params, Sort resultSort, Term definition)
       throws SMTLIBException {
-    Sort[] paramSorts = new Sort[params.length];
-    for (int i = 0; i < paramSorts.length; i++) {
-      paramSorts[i] = params[i].getSort();
-    }
-    FunctionSymbol fsym = theory.getFunction(fun, paramSorts);
-
-    if (fsym == null) {
+    var functions = theory.getDeclaredFunctions();
+    if (!functions.containsKey(fun)) {
+      // There is no function with that name yet: create a new symbol
       script.defineFun(fun, params, resultSort, definition);
     } else {
-      if (!fsym.getDefinition().equals(definition) || !fsym.getReturnSort().equals(resultSort)) {
+      // A symbol with the same name already exists: Check if the signature and the definition
+      // match and throw an exception otherwise
+      var decl = functions.get(fun);
+      if (!Arrays.equals(
+              decl.getParameterSorts(),
+              FluentIterable.from(params).transform(TermVariable::getSort).toArray(Sort.class))
+          || !decl.getReturnSort().equals(resultSort)
+          || !decl.getDefinition().equals(definition)) {
         throw new SMTLIBException(
-            "Function " + fun + " is already defined with different definition");
+            "Function '%s' already declared with a different sort".formatted(fun));
       }
     }
   }

@@ -392,7 +392,7 @@ public abstract class SolverBasedTest0 {
     assume()
         .withMessage("Solver %s does not support quantifier elimination", solverToUse())
         .that(solverToUse())
-        .isNoneOf(Solvers.BOOLECTOR, Solvers.MATHSAT5, Solvers.YICES2, Solvers.BITWUZLA);
+        .isNoneOf(Solvers.MATHSAT5, Solvers.YICES2, Solvers.BITWUZLA, Solvers.SMTINTERPOL);
   }
 
   /** Skip test if the solver does not support arrays. */

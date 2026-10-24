@@ -124,7 +124,11 @@ public final class SmtInterpolSolverContext extends AbstractSolverContext {
         new SmtInterpolIntegerFormulaManager(creator, pNonLinearArithmetic);
     SmtInterpolRationalFormulaManager rationalTheory =
         new SmtInterpolRationalFormulaManager(creator, pNonLinearArithmetic);
+    SmtInterpolBitvectorFormulaManager bitvectorTheory =
+        new SmtInterpolBitvectorFormulaManager(creator, booleanTheory);
     SmtInterpolArrayFormulaManager arrayTheory = new SmtInterpolArrayFormulaManager(creator);
+    SmtInterpolQuantifiedFormulaManager quantifiedTheory =
+        new SmtInterpolQuantifiedFormulaManager(creator);
     SmtInterpolFormulaManager manager =
         new SmtInterpolFormulaManager(
             creator,
@@ -132,7 +136,9 @@ public final class SmtInterpolSolverContext extends AbstractSolverContext {
             booleanTheory,
             integerTheory,
             rationalTheory,
+            bitvectorTheory,
             arrayTheory,
+            quantifiedTheory,
             logger);
     return new SmtInterpolSolverContext(manager, pShutdownNotifier, settings);
   }
@@ -140,7 +146,7 @@ public final class SmtInterpolSolverContext extends AbstractSolverContext {
   /** instantiate the central SMTInterpol script from where all others are copied. */
   private static Script getSmtInterpolScript(
       ShutdownNotifier pShutdownNotifier,
-      @javax.annotation.Nullable PathCounterTemplate smtLogfile,
+      @Nullable PathCounterTemplate smtLogfile,
       SmtInterpolSettings settings,
       LogManager logger)
       throws InvalidConfigurationException {
@@ -160,11 +166,7 @@ public final class SmtInterpolSolverContext extends AbstractSolverContext {
             e);
       }
     }
-    // TODO: We would like to use Logics.ALL here and let the solver decide which logics are needed.
-    // But ... SMTInterpol eagerly checks logics for model generation,
-    // so we limit the available theories here to a large set of logics,
-    // including Arrays, UFs, and non-linear arithmetics over Ints and Rationals.
-    script.setLogic(Logics.AUFNIRA);
+    script.setLogic(Logics.ALL);
     return script;
   }
 

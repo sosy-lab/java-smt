@@ -90,7 +90,7 @@ class LoggingSmtInterpolInterpolatingProver extends SmtInterpolInterpolatingProv
   }
 
   @Override
-  protected boolean isUnsatImpl() throws InterruptedException {
+  protected boolean isUnsatImpl() throws InterruptedException, SolverException {
     out.print("(check-sat)");
     boolean isUnsat = super.isUnsatImpl();
     out.println(" ; " + (isUnsat ? "UNSAT" : "SAT"));
