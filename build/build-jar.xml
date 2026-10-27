@@ -46,6 +46,8 @@ SPDX-License-Identifier: Apache-2.0
                 <attribute name="Implementation-Title" value="${ant.project.name}"/>
                 <attribute name="Implementation-Version" value="${version}"/>
                 <attribute name="Implementation-URL" value="${project.url}"/>
+
+                <attribute name="Automatic-Module-Name" value="${automatic.module.name}"/>
             </manifest>
         </jar>
     </target>
