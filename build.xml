@@ -16,9 +16,14 @@ SPDX-License-Identifier: Apache-2.0
     <property file="build.properties"/>
     <property environment="env"/>
 
+    <!-- We set the module name for JavaSMT Jars using this variable. This should NEVER be changed! -->
+    <property name="automatic.module.name" value="org.sosy_lab.java_smt"/>
+
     <!-- Yices2 is under GPL3 and has to be seperated from Apache2-licensed software. -->
     <property name="yices2Sources" value="org/sosy_lab/java_smt/solvers/yices2/**.java"/>
     <property name="yices2Classes" value="org/sosy_lab/java_smt/solvers/yices2/**.class"/>
+    <!-- We set the module name for JavaSMT-Yices2 Jars using this variable. This should NEVER be changed! -->
+    <property name="yices2.automatic.module.name" value="org.sosy_lab.java_smt.solvers.yices2"/>
 
     <!-- one configuration per solver -->
     <property name="ivy.solver.configurations" value="
