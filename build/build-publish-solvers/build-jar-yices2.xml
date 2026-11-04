@@ -24,6 +24,12 @@ SPDX-License-Identifier: Apache-2.0
 
     <target name="jar-yices2" depends="determine-version, build"
               description="Create a runnable JAR file of all classes related to Yices2">
+        <fail unless="yices2.automatic.module.name"
+              message="Cannot build JavaSMT-Yices2 Jar, yices2.automatic.module.name must be set."/>
+        <fail message="Cannot build JavaSMT-Yices2 Jar, yices2.automatic.module.name must not be blank or contain spaces.">
+            <condition><matches string="${yices2.automatic.module.name}" pattern="\A\z|[ ]"/></condition>
+        </fail>
+
         <property name="yices2jar.file" value="javasmt-yices2-${version}.jar"/>
         <copy todir="${class.dir}"><fileset dir=".." includes="META-INF/**"/></copy>
         <manifestclasspath property="yices2Classpath.jar" jarfile="${ivy.lib.dir}/runtime-yices2/${jar.file}" maxParentLevels="0">
