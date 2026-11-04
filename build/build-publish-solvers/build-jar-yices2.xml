@@ -24,10 +24,10 @@ SPDX-License-Identifier: Apache-2.0
 
     <target name="jar-yices2" depends="determine-version, build"
               description="Create a runnable JAR file of all classes related to Yices2">
-        <fail unless="yices2.automatic.module.name"
-              message="Cannot build JavaSMT-Yices2 Jar, yices2.automatic.module.name must be set."/>
-        <fail message="Cannot build JavaSMT-Yices2 Jar, yices2.automatic.module.name must not be blank or contain spaces.">
-            <condition><matches string="${yices2.automatic.module.name}" pattern="\A\z|[ ]"/></condition>
+        <fail unless="javasmt.yices2.module.name"
+              message="Cannot build JavaSMT-Yices2 Jar, javasmt.yices2.module.name must be set."/>
+        <fail message="Cannot build JavaSMT-Yices2 Jar, javasmt.yices2.module.name must not be blank or contain spaces.">
+            <condition><matches string="${javasmt.yices2.module.name}" pattern="\A\z|[ ]"/></condition>
         </fail>
 
         <property name="yices2jar.file" value="javasmt-yices2-${version}.jar"/>
@@ -52,7 +52,7 @@ SPDX-License-Identifier: Apache-2.0
                 <attribute name="Implementation-Version" value="${version}"/>
                 <attribute name="Implementation-URL" value="${project.url}"/>
 
-                <attribute name="Automatic-Module-Name" value="${yices2.automatic.module.name}"/>
+                <attribute name="Automatic-Module-Name" value="${javasmt.yices2.module.name}"/>
             </manifest>
         </jar>
     </target>
