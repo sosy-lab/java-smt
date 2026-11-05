@@ -561,7 +561,12 @@ class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long, Intege
           case ADD -> Terms.add(args);
           case DIV -> {
             checkArgument(args.size() == 2);
-            yield Terms.div(args.get(0), args.get(1));
+            var type1 = Terms.typeOf(args.get(0));
+            var type2 = Terms.typeOf(args.get(1));
+            checkArgument(type1 == type2);
+            yield Types.isInt(type1)
+                ? Terms.idiv(args.get(0), args.get(1))
+                : Terms.div(args.get(0), args.get(1));
           }
           case MUL -> Terms.mul(args);
           case MODULO -> {
