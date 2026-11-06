@@ -72,7 +72,7 @@ SPDX-License-Identifier: Apache-2.0
         <copy file="lib/native/source/libmathsat5j/libmathsat5j-x64.so" tofile="${mathsat.dist.dir}/x64/libmathsat5j-${mathsat.version}.so"/>
         <copy file="lib/native/source/libmathsat5j/libmathsat5j-arm64.so" tofile="${mathsat.dist.dir}/arm64/libmathsat5j-${mathsat.version}.so"/>
         <copy file="lib/native/source/libmathsat5j/mathsat5j.dll" tofile="${mathsat.dist.dir}/x64/mathsat5j-${mathsat.version}.dll"/>
-        <copy file="${mathsat-windows-x64.path}/lib/mathsat.dll" tofile="${mathsat.dist.dir}/x64/mathsat-${mathsat.version}.dll"/>
+        <copy file="${mathsat-windows-x64.path}/bin/mathsat.dll" tofile="${mathsat.dist.dir}/x64/mathsat-${mathsat.version}.dll"/>
         <copy file="${mathsat-windows-x64.path}/bin/gmp.dll" tofile="${mathsat.dist.dir}/x64/gmp-${mathsat.version}.dll"/>
         <copy file="${gmp-windows-x64.path}/.libs/libgmp-10.dll" tofile="${mathsat.dist.dir}/x64/gmp-${mathsat.version}.dll"/>
 

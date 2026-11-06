@@ -66,7 +66,7 @@ JNI_DIR="$3"/include
 JNI_HEADERS="-I${JNI_DIR}/ -I${JNI_DIR}/win32/"
 
 MSAT_SRC_DIR="$1"/include
-MSAT_LIB_DIR="$1"/lib
+MSAT_LIB_DIR="$1"/bin
 MSAT_BIN_DIR="$1"/bin
 
 GMP_DIR="$2"
