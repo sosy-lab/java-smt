@@ -338,6 +338,8 @@ Since MathSAT5 5.6.12, using Ubuntu 18.04 or 22.04 with older GLIBC no longer wo
 First, [download the (reentrant!) Linux and Windows64 binary release](http://mathsat.fbk.eu/download.html) in the same version, unpack them.
 Then provide the necessary dependencies (GMP/JDK for Linux (x64 and arm64) and GMP/JDK for Windows (x64))
 as described in the compilation scripts (see `lib/native/source/libmathsat5j/compileFor<PLATFORM>.sh`).
+The Ubuntu 24.04 container provides all of them automatically in the `/dependencies` folder, 
+e.g. the `/dependencies/mathsat` folder provides GMP 6.3.0 configured for MathSAT5.
 Then execute the following command in the JavaSMT directory,
 where `$MATHSAT_PATH_<ARCH>` is the paths to the corresponding MathSAT root directory,
 and `$MATHSAT_VERSION` is the version number of MathSAT (all-in-one command, runtime is about 10s):
@@ -353,18 +355,18 @@ ant publish-mathsat \
     -Djdk-linux-arm64.path=$JDK_PATH_LINUX_ARM64 \
     -Dmathsat.version=$MATHSAT_VERSION
 ```
-Example:
+Example (using the Ubuntu 24.04 container):
 ```bash
 ant publish-mathsat \
      -Dmathsat-linux-x64.path=/workspace/solvers/mathsat/mathsat-5.6.12-linux-x86_64 \
-     -Dgmp-linux-x64.path=/workspace/solvers/gmp/gmp-6.3.0-linux-x64 \
+     -Dgmp-linux-x64.path=/dependencies/mathsat/gmp-6.3.0-linux-x64 \
      -Dmathsat-windows-x64.path=/workspace/solvers/mathsat/mathsat-5.6.12-win64 \
-     -Djdk-windows-x64.path=/workspace/solvers/jdk/openjdk-17.0.2_windows-x64_bin/jdk-17.0.2 \
-     -Dgmp-windows-x64.path=/workspace/solvers/gmp/gmp-6.3.0-win-x64 \
+     -Djdk-windows-x64.path=/dependencies/jdk17-windows-x64 \
+     -Dgmp-windows-x64.path=/dependencies/mathsat/gmp-6.3.0-win-x64 \
      -Dmathsat-linux-arm64.path=/workspace/solvers/mathsat/mathsat-5.6.12-linux-aarch64 \
-     -Dgmp-linux-arm64.path=/workspace/solvers/gmp/gmp-6.3.0-linux-arm64 \
-     -Djdk-linux-arm64.path=/workspace/solvers/jdk/openjdk-17.0.2_linux-aarch64_bin/jdk-17.0.2 \
-     -Dmathsat.version=5.6.12
+     -Dgmp-linux-arm64.path=/dependencies/mathsat/gmp-6.3.0-linux-arm64 \
+     -Djdk-linux-arm64.path=/dependencies/jdk17-linux-aarch64 \
+     -Dmathsat.version=5.6.19
 ```
 Finally, follow the instructions shown in the message at the end.
 
