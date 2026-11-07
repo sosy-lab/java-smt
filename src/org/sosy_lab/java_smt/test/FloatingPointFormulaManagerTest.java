@@ -15,6 +15,7 @@ import static org.junit.Assert.assertThrows;
 import static org.sosy_lab.java_smt.api.FormulaType.getFloatingPointTypeFromSizesWithHiddenBit;
 import static org.sosy_lab.java_smt.api.FormulaType.getFloatingPointTypeFromSizesWithoutHiddenBit;
 import static org.sosy_lab.java_smt.test.ProverEnvironmentSubject.assertThat;
+import static org.sosy_lab.java_smt.test.SolverContextFactoryTest.IS_WINDOWS;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
@@ -721,8 +722,11 @@ public class FloatingPointFormulaManagerTest
     assertThatFormula(fpmgr.isNegative(nj2)).isTautological();
 
     // Z3 supports at least FloatingPointType(15, 112). Larger types seem to be rounded.
-    if (!ImmutableSet.of(Solvers.Z3, Solvers.Z3_WITH_INTERPOLATION, Solvers.CVC4)
-        .contains(solver)) {
+    // CVC5 on Windows also rounds this since CVC5 version 1.4.2 (or possibly 1.4.0), possibly
+    // due to missing MPFR fow Windows on our side.
+    // TODO: re-enable CVC5 Windows once fixed
+    if (!ImmutableSet.of(Solvers.Z3, Solvers.Z3_WITH_INTERPOLATION, Solvers.CVC4).contains(solver)
+        && !(IS_WINDOWS && solver == Solvers.CVC5)) {
       // check unequality for very large types
       int exponentSize = solver == Solvers.BITWUZLA ? 30 : 100; // Bitwuzla has issues above 40 bit.
       FloatingPointType largeType =
