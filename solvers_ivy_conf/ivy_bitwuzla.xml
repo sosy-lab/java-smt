@@ -16,9 +16,15 @@ SPDX-License-Identifier: Apache-2.0
             xsi:noNamespaceSchemaLocation="http://ant.apache.org/ivy/schemas/ivy.xsd">
     <info organisation="org.sosy_lab" module="javasmt-solver-bitwuzla">
       <license name="MIT License" url="https://github.com/bitwuzla/bitwuzla/blob/main/COPYING"/>
+      <license name="Apache License, Version 2.0 (JavaSMT JNI wrapper)" url="https://www.apache.org/licenses/LICENSE-2.0.txt"/>
+      <license name="GNU LGPL v3 or later, or GNU GPL v2 or later (GMP)" url="https://gmplib.org/manual/Copying"/>
+      <license name="GNU LGPL v3 or later (MPFR)" url="https://www.gnu.org/licenses/lgpl-3.0.html"/>
         <description>
             Bitwuzla solver and JavaSMT JNI wrapper.
-            Bitwuzla is provided under the MIT License.
+            Bitwuzla is provided under the MIT License,
+            and the JNI wrapper under the Apache License, Version 2.0.
+            The native library also contains GMP and MPFR,
+            which are provided under their own licenses.
         </description>
     </info>
 
