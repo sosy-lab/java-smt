@@ -10,19 +10,54 @@ SPDX-FileCopyrightText: 2026 Dirk Beyer <https://www.sosy-lab.org>
 SPDX-License-Identifier: Apache-2.0
 -->
 
-<!-- vim: set tabstop=8 shiftwidth=4 expandtab sts=4 filetype=ant fdm=marker: -->
-<project name="publish-solvers-cvc5" basedir="." xmlns:ivy="antlib:org.apache.ivy.ant">
+<project name="publish-solvers-cvc5" basedir="." xmlns:ivy="antlib:org.apache.ivy.ant" xmlns:if="ant:if">
     <import file="macros.xml"/>
 
-    <property name="cvc5.url" value="https://github.com/cvc5/cvc5/releases/download/latest"/>
     <property name="cvc5.downloads" value="./downloads/cvc5"/>
     <property name="cvc5.distDir" value="${ivy.solver.dist.dir}/cvc5"/>
 
     <target name="init-cvc5" description="Clean up CVC5 binaries and Java bindings.">
-        <fail unless="cvc5.version">
-            Please specify a version with the flag -Dcvc5.version=XXX.
-            The version must match one of the daily builds from https://github.com/cvc5/cvc5/releases
+        <fail if="cvc5.version">
+            cvc5.version is set internally.
+            Please specify exactly one of -Dcvc5.dailyReleaseTag=XXX for a daily build, e.g. 2026-11-07-abcdef0,
+            or -Dcvc5.releaseTag=cvc5-X.Y.Z for an official release with version X.Y.Z for the used tag, e.g. cvc5-1.2.3
         </fail>
+
+        <fail>
+            <condition>
+                <not>
+                    <xor>
+                        <isset property="cvc5.dailyReleaseTag"/>
+                        <isset property="cvc5.releaseTag"/>
+                    </xor>
+                </not>
+            </condition>
+            Please specify exactly one of -Dcvc5.dailyReleaseTag=XXX for a daily build, e.g. 2026-11-07-abcdef0,
+            or -Dcvc5.releaseTag=cvc5-X.Y.Z for an official release with version X.Y.Z for the used tag, e.g. cvc5-1.2.3
+        </fail>
+
+        <fail if:set="cvc5.releaseTag">
+            <condition>
+                <not><matches string="${cvc5.releaseTag}" pattern="(?U)\Acvc5-\S+\z"/></not>
+            </condition>
+            Please specify a release tag such as -Dcvc5.releaseTag=cvc5-1.4.2. For daily builds, use -Dcvc5.dailyReleaseTag=XXX.
+        </fail>
+
+        <!-- Set cvc5.version used in the names of our release -->
+        <property name="cvc5.version" value="${cvc5.dailyReleaseTag}" if:set="cvc5.dailyReleaseTag"/>
+        <loadresource property="cvc5.version" if:set="cvc5.releaseTag">
+            <concat>${cvc5.releaseTag}</concat>
+            <filterchain>
+                <replaceregex pattern="^cvc5-" replace=""/>
+            </filterchain>
+        </loadresource>
+
+        <property name="cvc5.gitVersion" value="${cvc5.releaseTag}" if:set="cvc5.releaseTag"/>
+        <property name="cvc5.url" value="https://github.com/cvc5/cvc5/releases/download/${cvc5.releaseTag}" if:set="cvc5.releaseTag"/>
+        <property name="cvc5.download.suffix" value="" if:set="cvc5.releaseTag"/>
+
+        <property name="cvc5.url" value="https://github.com/cvc5/cvc5/releases/download/latest"/>
+        <property name="cvc5.download.suffix" value="-${cvc5.dailyReleaseTag}" if:set="cvc5.dailyReleaseTag"/>
 
         <delete dir="${cvc5.distDir}" quiet="true"/>
 
@@ -33,49 +68,49 @@ SPDX-License-Identifier: Apache-2.0
 
     <target name="download-cvc5" depends="init-cvc5" description="Download CVC5 binaries and Java bindings.">
         <!-- Download binaries for Linux on x64 -->
-        <get src="${cvc5.url}/cvc5-Linux-x86_64-static-${cvc5.version}.zip" dest="${cvc5.downloads}" verbose="true"/>
+        <get src="${cvc5.url}/cvc5-Linux-x86_64-static${cvc5.download.suffix}.zip" dest="${cvc5.downloads}/cvc5-Linux-x86_64-static-${cvc5.version}.zip" verbose="true"/>
         <unzip src="${cvc5.downloads}/cvc5-Linux-x86_64-static-${cvc5.version}.zip" dest="${cvc5.distDir}/x64">
             <patternset><include name="cvc5-Linux-x86_64-static/lib/libcvc5jni.so"/></patternset>
             <mapper type="merge" to="libcvc5jni-${cvc5.version}.so"/>
         </unzip>
 
         <!-- Download binaries for Linux on arm64 -->
-        <get src="${cvc5.url}/cvc5-Linux-arm64-static-${cvc5.version}.zip" dest="${cvc5.downloads}" verbose="true"/>
+        <get src="${cvc5.url}/cvc5-Linux-arm64-static${cvc5.download.suffix}.zip" dest="${cvc5.downloads}/cvc5-Linux-arm64-static-${cvc5.version}.zip" verbose="true"/>
         <unzip src="${cvc5.downloads}/cvc5-Linux-arm64-static-${cvc5.version}.zip" dest="${cvc5.distDir}/arm64">
             <patternset><include name="cvc5-Linux-arm64-static/lib/libcvc5jni.so"/></patternset>
             <mapper type="merge" to="libcvc5jni-${cvc5.version}.so"/>
         </unzip>
 
         <!-- Download binaries for macOS on x64 -->
-        <get src="${cvc5.url}/cvc5-macOS-x86_64-static-${cvc5.version}.zip" dest="${cvc5.downloads}" verbose="true"/>
+        <get src="${cvc5.url}/cvc5-macOS-x86_64-static${cvc5.download.suffix}.zip" dest="${cvc5.downloads}/cvc5-macOS-x86_64-static-${cvc5.version}.zip" verbose="true"/>
         <unzip src="${cvc5.downloads}/cvc5-macOS-x86_64-static-${cvc5.version}.zip" dest="${cvc5.distDir}/x64">
             <patternset><include name="cvc5-macOS-x86_64-static/lib/libcvc5jni.dylib"/></patternset>
             <mapper type="merge" to="libcvc5jni-${cvc5.version}.dylib"/>
         </unzip>
 
         <!-- Download binaries for macOS on arm64 -->
-        <get src="${cvc5.url}/cvc5-macOS-arm64-static-${cvc5.version}.zip" dest="${cvc5.downloads}" verbose="true"/>
+        <get src="${cvc5.url}/cvc5-macOS-arm64-static${cvc5.download.suffix}.zip" dest="${cvc5.downloads}/cvc5-macOS-arm64-static-${cvc5.version}.zip" verbose="true"/>
         <unzip src="${cvc5.downloads}/cvc5-macOS-arm64-static-${cvc5.version}.zip" dest="${cvc5.distDir}/arm64">
             <patternset><include name="cvc5-macOS-arm64-static/lib/libcvc5jni.dylib"/></patternset>
             <mapper type="merge" to="libcvc5jni-${cvc5.version}.dylib"/>
         </unzip>
 
         <!-- Download binaries for Windows on x64 -->
-        <get src="${cvc5.url}/cvc5-Win64-x86_64-static-${cvc5.version}.zip" dest="${cvc5.downloads}" verbose="true"/>
+        <get src="${cvc5.url}/cvc5-Win64-x86_64-static${cvc5.download.suffix}.zip" dest="${cvc5.downloads}/cvc5-Win64-x86_64-static-${cvc5.version}.zip" verbose="true"/>
         <unzip src="${cvc5.downloads}/cvc5-Win64-x86_64-static-${cvc5.version}.zip" dest="${cvc5.distDir}/x64">
             <patternset><include name="cvc5-Win64-x86_64-static/bin/cvc5jni.dll"/></patternset>
             <mapper type="merge" to="libcvc5jni-${cvc5.version}.dll"/>
         </unzip>
 
         <!-- Download binaries for Windows on arm64 -->
-        <get src="${cvc5.url}/cvc5-Win64-arm64-static-${cvc5.version}.zip" dest="${cvc5.downloads}" verbose="true"/>
+        <get src="${cvc5.url}/cvc5-Win64-arm64-static${cvc5.download.suffix}.zip" dest="${cvc5.downloads}/cvc5-Win64-arm64-static-${cvc5.version}.zip" verbose="true"/>
         <unzip src="${cvc5.downloads}/cvc5-Win64-arm64-static-${cvc5.version}.zip" dest="${cvc5.distDir}/arm64">
             <patternset><include name="cvc5-Win64-arm64-static/bin/cvc5jni.dll"/></patternset>
             <mapper type="merge" to="libcvc5jni-${cvc5.version}.dll"/>
         </unzip>
 
         <!-- Download the Java bindings -->
-        <get src="${cvc5.url}/cvc5-Linux-arm64-java-api-${cvc5.version}.jar" dest="${cvc5.downloads}/cvc5-${cvc5.version}.jar" verbose="true"/>
+        <get src="${cvc5.url}/cvc5-Linux-arm64-java-api${cvc5.download.suffix}.jar" dest="${cvc5.downloads}/cvc5-${cvc5.version}.jar" verbose="true"/>
         <!-- Remove bundled binary -->
         <zip destfile="${cvc5.distDir}/cvc5-${cvc5.version}.jar">
             <zipfileset src="${cvc5.downloads}/cvc5-${cvc5.version}.jar">
