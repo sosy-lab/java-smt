@@ -41,8 +41,8 @@ SPDX-License-Identifier: Apache-2.0
           <url>http://mathsat.fbk.eu/download.html</url>
       </license>
       <license>
-          <name>GMP is licensed both GNU LGPL v3 and GNU GPL v2</name>
-          <url>https://www.gnu.org/licenses/lgpl-3.0.en.html</url>
+          <name>GNU LGPL v3 or later, or GNU GPL v2 or later (GMP)</name>
+          <url>https://gmplib.org/manual/Copying</url>
       </license>
   </licenses>
 

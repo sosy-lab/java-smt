@@ -25,6 +25,14 @@ SPDX-License-Identifier: Apache-2.0
           <name>MIT License</name>
           <url>https://opensource.org/licenses/MIT</url>
       </license>
+      <license>
+          <name>Apache License, Version 2.0 (JavaSMT JNI wrapper)</name>
+          <url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
+      </license>
+      <license>
+          <name>GNU LGPL v3 or later, or GNU GPL v2 or later (GMP)</name>
+          <url>https://gmplib.org/manual/Copying</url>
+      </license>
   </licenses>
 
   <organization>
