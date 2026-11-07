@@ -133,13 +133,13 @@ RUN wget https://www.mpfr.org/mpfr-current/mpfr-4.2.2.tar.xz \
   && make install \
   && make clean
 
-# Install the Jdk for Windows x64
-RUN wget https://download.java.net/openjdk/jdk11/ri/openjdk-11+28_windows-x64_bin.zip \
- && unzip openjdk-11+28_windows-x64_bin.zip \
- && mv jdk-11 jdk11-windows-x64 \
- && rm openjdk-11+28_windows-x64_bin.zip
+# Install JDK 17 for Windows x64
+RUN wget https://download.java.net/java/GA/jdk17.0.2/dfd4a8d0985749f896bed50d7138ee7f/8/GPL/openjdk-17.0.2_windows-x64_bin.zip \
+ && unzip openjdk-17.0.2_windows-x64_bin.zip \
+ && mv jdk-17.0.2 jdk17-windows-x64 \
+ && rm openjdk-17.0.2_windows-x64_bin.zip
 
-# Install the Jdk for Linux arm64
+# Install JDK 17 for Linux arm64
 RUN wget https://download.java.net/java/GA/jdk17.0.2/dfd4a8d0985749f896bed50d7138ee7f/8/GPL/openjdk-17.0.2_linux-aarch64_bin.tar.gz \
  && tar -xzf openjdk-17.0.2_linux-aarch64_bin.tar.gz \
  && mv jdk-17.0.2 jdk17-linux-aarch64 \
