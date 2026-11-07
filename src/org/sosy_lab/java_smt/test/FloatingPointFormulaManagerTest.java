@@ -722,8 +722,8 @@ public class FloatingPointFormulaManagerTest
     assertThatFormula(fpmgr.isNegative(nj2)).isTautological();
 
     // Z3 supports at least FloatingPointType(15, 112). Larger types seem to be rounded.
-    // CVC5 on Windows also rounds this since CVC5 version 1.4.2 (or possibly 1.4.0), possibly
-    // due to missing MPFR fow Windows on our side.
+    // CVC5 on Windows also rounds this since CVC5 version 1.4.2 (or possibly 1.4.0),
+    // due to missing MPFR in CVC5s release version for Windows.
     // TODO: re-enable CVC5 Windows once fixed
     if (!ImmutableSet.of(Solvers.Z3, Solvers.Z3_WITH_INTERPOLATION, Solvers.CVC4).contains(solver)
         && !(IS_WINDOWS && solver == Solvers.CVC5)) {
