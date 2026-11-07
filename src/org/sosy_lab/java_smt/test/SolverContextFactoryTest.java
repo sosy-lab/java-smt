@@ -152,7 +152,7 @@ public class SolverContextFactoryTest {
       case "bitwuzlaj" -> new String[] {"GLIBC_2.33", "GLIBCXX_3.4.26", "GLIBCXX_3.4.29"};
       case "opensmtj" -> new String[] {"GLIBC_2.33", "GLIBCXX_3.4.26", "GLIBCXX_3.4.29"};
       case "mathsat5j" -> new String[] {"GLIBC_2.33", "GLIBC_2.38"};
-      case "cvc5jni" -> new String[] {"GLIBC_2.32"};
+      case "cvc5jni" -> new String[] {"GLIBC_2.32", "GLIBCXX_3.4.29"};
       case "yices2java" -> new String[] {"GLIBC_2.34"};
       default -> new String[] {};
     };
