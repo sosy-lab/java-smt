@@ -8,7 +8,9 @@
 
 package org.sosy_lab.java_smt.solvers.z3;
 
-import com.google.common.base.Preconditions;
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkState;
+
 import com.google.common.collect.ImmutableMap;
 import com.google.common.io.MoreFiles;
 import com.microsoft.z3.Native;
@@ -77,6 +79,53 @@ abstract class Z3AbstractProver extends AbstractProverWithAllSat<Void> {
     mgr = pMgr;
   }
 
+  /**
+   * Adds the simplifiers to the solver and returns the solver. For an empty list of simplifiers,
+   * the original solver is returned. May throw for invalid simplifiers.
+   */
+  protected long addSimplifierToSolver(
+      final long initialSolver, final List<String> pSimplifiersToBuild) {
+    if (pSimplifiersToBuild.isEmpty()) {
+      return initialSolver;
+    }
+
+    try {
+      final long simplifiers = buildSimplifiers(pSimplifiersToBuild);
+
+      Native.solverDecRef(z3context, initialSolver);
+      final long solverWithSimplifiers =
+          Native.solverAddSimplifier(z3context, initialSolver, simplifiers);
+      Native.solverIncRef(z3context, solverWithSimplifiers);
+
+      return solverWithSimplifiers;
+    } catch (Z3Exception pZ3Exception) {
+      // TODO: look into what is thrown how for invalid simplifiers and return a useful error
+      throw new IllegalArgumentException(pZ3Exception.getMessage());
+    }
+  }
+
+  /** Expects a non-empty list of simplifier strings and returns the combined simplifier. */
+  private long buildSimplifiers(final List<String> pSimplifiersToBuild) {
+    checkArgument(!pSimplifiersToBuild.isEmpty());
+
+    long combinedSimplifiers = 0;
+    for (String name : pSimplifiersToBuild) {
+      long currentSimplifier = Native.mkSimplifier(z3context, name);
+
+      // TODO: look into correct ref counting here!
+      if (combinedSimplifiers == 0) {
+        combinedSimplifiers = currentSimplifier;
+      } else {
+        combinedSimplifiers =
+            Native.simplifierAndThen(z3context, combinedSimplifiers, currentSimplifier);
+      }
+    }
+
+    checkState(combinedSimplifiers != 0, "Error when creating Z3 simplifiers");
+    Native.simplifierIncRef(z3context, combinedSimplifiers);
+    return combinedSimplifiers;
+  }
+
   void addParameter(long z3params, String key, Object value) {
     long keySymbol = Native.mkStringSymbol(z3context, key);
     if (value instanceof Boolean b) {
@@ -133,7 +182,7 @@ abstract class Z3AbstractProver extends AbstractProverWithAllSat<Void> {
 
   @Override
   protected Void addConstraintImpl(BooleanFormula f) throws InterruptedException {
-    Preconditions.checkState(!closed);
+    checkState(!closed);
     long e = creator.extractInfo(f);
     try {
       if (storedConstraints != null) { // Unsat core generation is on.
@@ -151,14 +200,14 @@ abstract class Z3AbstractProver extends AbstractProverWithAllSat<Void> {
   }
 
   protected void push0() {
-    Preconditions.checkState(!closed);
+    checkState(!closed);
     if (storedConstraints != null) {
       storedConstraints.push(storedConstraints.peek());
     }
   }
 
   protected void pop0() {
-    Preconditions.checkState(!closed);
+    checkState(!closed);
     if (storedConstraints != null) {
       storedConstraints.pop();
     }
@@ -211,7 +260,7 @@ abstract class Z3AbstractProver extends AbstractProverWithAllSat<Void> {
   @Override
   public ImmutableMap<String, String> getStatistics() {
     // Z3 sigsevs if you try to get statistics for closed environments
-    Preconditions.checkState(!closed);
+    checkState(!closed);
 
     ImmutableMap.Builder<String, String> builder = ImmutableMap.builder();
     Set<String> seenKeys = new HashSet<>();
