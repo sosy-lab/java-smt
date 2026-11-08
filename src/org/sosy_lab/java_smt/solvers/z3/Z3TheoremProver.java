@@ -12,17 +12,23 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static org.sosy_lab.java_smt.solvers.z3.Z3SolverContext.ENGINE_CONFIG_KEY;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.microsoft.z3.Native;
 import com.microsoft.z3.Z3Exception;
 import com.microsoft.z3.enumerations.Z3_lbool;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.ShutdownNotifier.ShutdownRequestListener;
+import org.sosy_lab.common.configuration.Configuration;
+import org.sosy_lab.common.configuration.InvalidConfigurationException;
+import org.sosy_lab.common.configuration.Option;
+import org.sosy_lab.common.configuration.Options;
 import org.sosy_lab.common.io.PathCounterTemplate;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
@@ -32,6 +38,22 @@ import org.sosy_lab.java_smt.api.UserPropagator;
 import org.sosy_lab.java_smt.solvers.z3.Z3SolverContext.Engine;
 
 class Z3TheoremProver extends Z3AbstractProver implements ProverEnvironment {
+
+  @Options(prefix = "prover.z3")
+  private static class Z3ProverOptions {
+
+    /** Simplifiers */
+    @Option(
+        secure = true,
+        description =
+            "List of simplifiers applied before each satisfiability check in the "
+                + "ProverEnvironment that this Configuration is given to.")
+    List<String> simplifiers = ImmutableList.of();
+
+    Z3ProverOptions(Configuration config) throws InvalidConfigurationException {
+      config.inject(this);
+    }
+  }
 
   private final long z3solver;
   private final ShutdownRequestListener interruptListener;
@@ -45,18 +67,20 @@ class Z3TheoremProver extends Z3AbstractProver implements ProverEnvironment {
       Engine pEngine,
       Set<ProverOptions> pOptions,
       ImmutableMap<String, Object> pSolverOptions,
+      @Nullable Configuration proverConfig,
       @Nullable PathCounterTemplate pLogfile,
-      ShutdownNotifier pShutdownNotifier) {
+      ShutdownNotifier pShutdownNotifier)
+      throws InvalidConfigurationException {
     super(creator, pMgr, pLogic, pEngine, pOptions, pLogfile, pShutdownNotifier);
-    if (!logic.orElse("ALL").equalsIgnoreCase("ALL")) {
-      // mkSolverForLogic() allows setting logics,
-      // which seem to be getting ignored if set via options
-      long logicSymbol = Native.mkStringSymbol(z3context, logic.orElseThrow());
-      z3solver = Native.mkSolverForLogic(z3context, logicSymbol);
-    } else {
-      z3solver = Native.mkSolver(z3context);
+
+    List<String> simplifiers = ImmutableList.of();
+    if (proverConfig != null) {
+      // Resolve prover specific options and apply them
+      Z3ProverOptions proverOptions = new Z3ProverOptions(proverConfig);
+      simplifiers = proverOptions.simplifiers;
     }
-    Native.solverIncRef(z3context, z3solver);
+
+    z3solver = buildZ3Solver(z3context, logic, simplifiers);
 
     interruptListener = reason -> Native.solverInterrupt(z3context, z3solver);
     shutdownNotifier.register(interruptListener);
@@ -71,6 +95,25 @@ class Z3TheoremProver extends Z3AbstractProver implements ProverEnvironment {
     }
     Native.solverSetParams(z3context, z3solver, z3params);
     Native.paramsDecRef(z3context, z3params);
+  }
+
+  private static long buildZ3Solver(
+      final long z3context, final Optional<String> logic, final List<String> pSimplifiers) {
+
+    long z3solver;
+    if (!logic.orElse("ALL").equalsIgnoreCase("ALL")) {
+      // mkSolverForLogic() allows setting logics,
+      // which seem to be getting ignored if set via options
+      long logicSymbol = Native.mkStringSymbol(z3context, logic.orElseThrow());
+      z3solver = Native.mkSolverForLogic(z3context, logicSymbol);
+    } else {
+      z3solver = Native.mkSolver(z3context);
+    }
+
+    z3solver = addSimplifierToSolver(z3context, z3solver, pSimplifiers);
+    Native.solverIncRef(z3context, z3solver);
+
+    return z3solver;
   }
 
   @Override
