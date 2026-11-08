@@ -12,6 +12,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.ImmutableMap;
 import java.util.Map;
+import org.sosy_lab.common.configuration.Configuration;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
@@ -37,6 +38,14 @@ public class StatisticsSolverContext implements SolverContext {
   @Override
   public ProverEnvironment newProverEnvironment(ProverOptions... pOptions) {
     return new StatisticsProverEnvironment(delegate.newProverEnvironment(pOptions), stats);
+  }
+
+  @SuppressWarnings("resource")
+  @Override
+  public ProverEnvironment newProverEnvironment(
+      Configuration proverConfig, ProverOptions... options) {
+    return new StatisticsProverEnvironment(
+        delegate.newProverEnvironment(proverConfig, options), stats);
   }
 
   @SuppressWarnings("resource")

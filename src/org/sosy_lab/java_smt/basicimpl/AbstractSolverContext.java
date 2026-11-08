@@ -14,6 +14,7 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
+import org.sosy_lab.common.configuration.Configuration;
 import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
 import org.sosy_lab.java_smt.api.OptimizationProverEnvironment;
@@ -39,15 +40,34 @@ public abstract class AbstractSolverContext implements SolverContext {
   @Override
   public final ProverEnvironment newProverEnvironment(ProverOptions... options) {
     ProverEnvironment out = newProverEnvironment0(toSet(options));
-    if (!supportsAssumptionSolving()) {
-      // In the case we do not already have a prover environment with assumptions,
-      // we add a wrapper to it
-      out = new ProverWithAssumptionsWrapper(out);
-    }
-    return out;
+    return wrapProverEnvironmentForAssumptionSolvingIfNeeded(out);
+  }
+
+  @SuppressWarnings("resource")
+  @Override
+  public final ProverEnvironment newProverEnvironment(
+      Configuration proverConfig, ProverOptions... options) {
+    ProverEnvironment out = newProverEnvironment0(proverConfig, toSet(options));
+    return wrapProverEnvironmentForAssumptionSolvingIfNeeded(out);
   }
 
   protected abstract ProverEnvironment newProverEnvironment0(Set<ProverOptions> options);
+
+  protected ProverEnvironment newProverEnvironment0(
+      Configuration solverSpecificProverOptions, Set<ProverOptions> options) {
+    throw new UnsupportedOperationException(
+        "Prover with Configuration not supported by this " + "solver");
+  }
+
+  private ProverEnvironment wrapProverEnvironmentForAssumptionSolvingIfNeeded(
+      ProverEnvironment out) {
+    if (!supportsAssumptionSolving()) {
+      // In the case we do not already have a prover environment with assumptions,
+      // we add a wrapper to it
+      return new ProverWithAssumptionsWrapper(out);
+    }
+    return out;
+  }
 
   @SuppressWarnings("resource")
   @Override

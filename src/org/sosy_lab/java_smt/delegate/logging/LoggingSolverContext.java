@@ -11,6 +11,7 @@ package org.sosy_lab.java_smt.delegate.logging;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.ImmutableMap;
+import org.sosy_lab.common.configuration.Configuration;
 import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.FormulaManager;
@@ -39,6 +40,14 @@ public final class LoggingSolverContext implements SolverContext {
   @Override
   public ProverEnvironment newProverEnvironment(ProverOptions... pOptions) {
     return new LoggingProverEnvironment(logger, delegate.newProverEnvironment(pOptions));
+  }
+
+  @SuppressWarnings("resource")
+  @Override
+  public ProverEnvironment newProverEnvironment(
+      Configuration proverConfig, ProverOptions... options) {
+    return new LoggingProverEnvironment(
+        logger, delegate.newProverEnvironment(proverConfig, options));
   }
 
   @SuppressWarnings("resource")

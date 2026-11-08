@@ -10,6 +10,7 @@ package org.sosy_lab.java_smt.api;
 
 import com.google.common.collect.ImmutableMap;
 import java.util.Collection;
+import org.sosy_lab.common.configuration.Configuration;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 
 /**
@@ -69,6 +70,18 @@ public interface SolverContext extends AutoCloseable {
    *     {@link ProverOptions} are turned off by default.
    */
   ProverEnvironment newProverEnvironment(ProverOptions... options);
+
+  /**
+   * Create a fresh new {@link ProverEnvironment} which encapsulates an assertion stack and can be
+   * used to check formulas for unsatisfiability.
+   *
+   * @param proverConfig additional {@link Configuration} used to set solver specific options. E.g.
+   *     simplifiers in Z3. TODO: point to the allowed configurations and add some way of getting
+   *     the options inside.
+   * @param options Options specified for the prover environment. All the options specified in
+   *     {@link ProverOptions} are turned off by default.
+   */
+  ProverEnvironment newProverEnvironment(Configuration proverConfig, ProverOptions... options);
 
   /**
    * Create a fresh new {@link InterpolatingProverEnvironment} which encapsulates an assertion stack

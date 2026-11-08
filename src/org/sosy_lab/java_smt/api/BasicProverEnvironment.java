@@ -179,6 +179,20 @@ public interface BasicProverEnvironment<T> extends AutoCloseable {
   void close();
 
   /**
+   * Applies the given simplifiers to the current {@link ProverEnvironment}. Simplifiers need to be
+   * added to the {@link ProverEnvironment} directly after creation and before any other API is
+   * used, e.g. before adding any constraint. This is currently only supported by Z3 and requires
+   * {@link String}s equal to the simplifiers defined by Z3.
+   *
+   * @throws UnsupportedOperationException should the solver and/or current {@link
+   *     ProverEnvironment} not support simplifiers.
+   */
+  default void addSimplifiers(List<String> simplifiersToApply)
+      throws UnsupportedOperationException {
+    throw new UnsupportedOperationException("Simplifiers are not supported by this solver");
+  }
+
+  /**
    * Get all satisfying assignments of the current environment with regard to a subset of terms, and
    * create a region representing all those models.
    *
