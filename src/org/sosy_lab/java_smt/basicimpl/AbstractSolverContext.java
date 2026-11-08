@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
 import org.sosy_lab.common.configuration.Configuration;
+import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
 import org.sosy_lab.java_smt.api.OptimizationProverEnvironment;
@@ -46,7 +47,7 @@ public abstract class AbstractSolverContext implements SolverContext {
   @SuppressWarnings("resource")
   @Override
   public final ProverEnvironment newProverEnvironment(
-      Configuration proverConfig, ProverOptions... options) {
+      Configuration proverConfig, ProverOptions... options) throws InvalidConfigurationException {
     ProverEnvironment out = newProverEnvironment0(proverConfig, toSet(options));
     return wrapProverEnvironmentForAssumptionSolvingIfNeeded(out);
   }
@@ -54,7 +55,8 @@ public abstract class AbstractSolverContext implements SolverContext {
   protected abstract ProverEnvironment newProverEnvironment0(Set<ProverOptions> options);
 
   protected ProverEnvironment newProverEnvironment0(
-      Configuration solverSpecificProverOptions, Set<ProverOptions> options) {
+      Configuration solverSpecificProverOptions, Set<ProverOptions> options)
+      throws InvalidConfigurationException {
     throw new UnsupportedOperationException(
         "Prover with Configuration not supported by this " + "solver");
   }

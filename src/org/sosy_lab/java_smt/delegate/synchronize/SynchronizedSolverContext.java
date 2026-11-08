@@ -97,7 +97,7 @@ public class SynchronizedSolverContext implements SolverContext {
   @SuppressWarnings("resource")
   @Override
   public ProverEnvironment newProverEnvironment(
-      Configuration proverConfig, ProverOptions... options) {
+      Configuration proverConfig, ProverOptions... options) throws InvalidConfigurationException {
     synchronized (sync) {
       if (useSeperateProvers) {
         SolverContext otherContext = createOtherContext();

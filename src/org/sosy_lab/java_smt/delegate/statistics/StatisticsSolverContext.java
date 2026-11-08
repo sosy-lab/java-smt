@@ -13,6 +13,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import com.google.common.collect.ImmutableMap;
 import java.util.Map;
 import org.sosy_lab.common.configuration.Configuration;
+import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
@@ -43,7 +44,7 @@ public class StatisticsSolverContext implements SolverContext {
   @SuppressWarnings("resource")
   @Override
   public ProverEnvironment newProverEnvironment(
-      Configuration proverConfig, ProverOptions... options) {
+      Configuration proverConfig, ProverOptions... options) throws InvalidConfigurationException {
     return new StatisticsProverEnvironment(
         delegate.newProverEnvironment(proverConfig, options), stats);
   }

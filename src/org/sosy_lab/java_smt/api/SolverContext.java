@@ -11,6 +11,7 @@ package org.sosy_lab.java_smt.api;
 import com.google.common.collect.ImmutableMap;
 import java.util.Collection;
 import org.sosy_lab.common.configuration.Configuration;
+import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 
 /**
@@ -81,7 +82,8 @@ public interface SolverContext extends AutoCloseable {
    * @param options Options specified for the prover environment. All the options specified in
    *     {@link ProverOptions} are turned off by default.
    */
-  ProverEnvironment newProverEnvironment(Configuration proverConfig, ProverOptions... options);
+  ProverEnvironment newProverEnvironment(Configuration proverConfig, ProverOptions... options)
+      throws InvalidConfigurationException;
 
   /**
    * Create a fresh new {@link InterpolatingProverEnvironment} which encapsulates an assertion stack
