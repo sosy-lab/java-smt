@@ -9,6 +9,7 @@
 package org.sosy_lab.java_smt.solvers.z3;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
 import com.google.common.collect.ImmutableMap;
@@ -81,23 +82,25 @@ abstract class Z3AbstractProver extends AbstractProverWithAllSat<Void> {
 
   /**
    * Adds the simplifiers to the solver and returns the solver. For an empty list of simplifiers,
-   * the original solver is returned. May throw for invalid simplifiers.
+   * the original solver is returned. This method does not handle any reference counting for the
+   * solver.
+   *
+   * @throws IllegalArgumentException for invalid simplifiers.
+   * @throws NullPointerException if pSimplifiersToBuild is null.
    */
-  protected long addSimplifierToSolver(
-      final long initialSolver, final List<String> pSimplifiersToBuild) {
+  protected static long addSimplifierToSolver(
+      final long z3context, final long initialSolver, final List<String> pSimplifiersToBuild) {
+
+    checkNotNull(pSimplifiersToBuild);
     if (pSimplifiersToBuild.isEmpty()) {
       return initialSolver;
     }
 
     try {
-      final long simplifiers = buildSimplifiers(pSimplifiersToBuild);
+      final long simplifiers = buildSimplifiers(z3context, pSimplifiersToBuild);
 
-      Native.solverDecRef(z3context, initialSolver);
-      final long solverWithSimplifiers =
-          Native.solverAddSimplifier(z3context, initialSolver, simplifiers);
-      Native.solverIncRef(z3context, solverWithSimplifiers);
+      return Native.solverAddSimplifier(z3context, initialSolver, simplifiers);
 
-      return solverWithSimplifiers;
     } catch (Z3Exception pZ3Exception) {
       // TODO: look into what is thrown how for invalid simplifiers and return a useful error
       throw new IllegalArgumentException(pZ3Exception.getMessage());
@@ -105,7 +108,8 @@ abstract class Z3AbstractProver extends AbstractProverWithAllSat<Void> {
   }
 
   /** Expects a non-empty list of simplifier strings and returns the combined simplifier. */
-  private long buildSimplifiers(final List<String> pSimplifiersToBuild) {
+  private static long buildSimplifiers(
+      final long z3context, final List<String> pSimplifiersToBuild) {
     checkArgument(!pSimplifiersToBuild.isEmpty());
 
     long combinedSimplifiers = 0;
