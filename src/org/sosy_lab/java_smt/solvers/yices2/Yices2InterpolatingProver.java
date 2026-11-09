@@ -122,6 +122,14 @@ class Yices2InterpolatingProver extends Yices2AbstractProver<Integer>
     try (var ctxA = newContext("mcsat");
         var ctxB = newContext("dpllt")) {
 
+      // Start by pushing A2..A(k) onto the B stack
+      // B = A2
+      //     ...
+      //     Ak-1
+      //     Ak
+      // Since we can only push formulas while the stack is not unsatisfiable, some of the initial
+      // groups may be missing. We can skip these initial groups and simply return 'true' as
+      // interpolants until B is no longer unsat by itself
       int skipped = 0;
       for (int i = groups.size() - 1; i > 0; i--) {
         ctxB.push();
@@ -134,10 +142,13 @@ class Yices2InterpolatingProver extends Yices2AbstractProver<Integer>
       }
       ImmutableList.Builder<BooleanFormula> builder = ImmutableList.builder();
 
+      // I(0) = true
       var lastItp = Terms.mkTrue();
+
+      // Calculate an inductive interpolation sequence
       for (int i = 0; i < groups.size() - 1; i++) {
         if (i < skipped) {
-          // Interpolants are 'true' until B is no longer unsat by itself
+          // Skip the initial part of the sequence where B was 'false'
           builder.add(creator.encapsulateBoolean(lastItp));
 
         } else {
@@ -146,11 +157,14 @@ class Yices2InterpolatingProver extends Yices2AbstractProver<Integer>
           ctxA.assertFormula(lastItp);
           ctxA.assertFormulas(groups.get(i));
 
+          // Calculate the next interpolant in the sequence
+          // A: I(i-1) & A(i)
+          // B: A(i+1) & A(i+2) & ... & A(k)
           lastItp = interpolate(ctxA, ctxB);
           builder.add(creator.encapsulateBoolean(lastItp));
 
-          ctxA.pop();
-          ctxB.pop();
+          ctxA.pop(); // Reset A
+          ctxB.pop(); // Remove A(i+1) from B
         }
       }
 
