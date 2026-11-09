@@ -294,7 +294,7 @@ public class MixedArithmeticsTest extends SolverBasedTest0.ParameterizedSolverBa
     assume().that(solver).isEqualTo(Solvers.YICES2);
 
     var a = imgr.makeNumber(-2);
-    var b = rmgr.divide(imgr.makeVariable("main::x@3"), imgr.makeNumber(2));
+    var b = rmgr.divide(imgr.makeVariable("main::x@3"), imgr.makeVariable("c"));
     var f = rmgr.multiply(a, b);
 
     var g = mgr.transformRecursively(f, new FormulaTransformationVisitor(mgr) {});
