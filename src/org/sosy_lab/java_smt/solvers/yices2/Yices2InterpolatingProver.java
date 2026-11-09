@@ -105,7 +105,10 @@ class Yices2InterpolatingProver extends Yices2AbstractProver<Integer>
       case UNSAT -> {
         return context.getInterpolant();
       }
-      case UNKNOWN -> throw new SolverException("Could not interpolate");
+      case UNKNOWN ->
+          throw new SolverException(
+              "Solver returned 'Unknown' while trying to interpolate. It's possible that the"
+                  + " formulas use a theory that is not supported by the MCSat solver.");
       default -> throw new RuntimeException("Inconsistent SAT result during interpolation");
     }
   }
