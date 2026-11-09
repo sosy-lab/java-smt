@@ -26,6 +26,7 @@ import org.sosy_lab.java_smt.api.NumeralFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
 import org.sosy_lab.java_smt.api.SolverException;
+import org.sosy_lab.java_smt.api.visitors.FormulaTransformationVisitor;
 
 public class MixedArithmeticsTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
 
@@ -274,5 +275,29 @@ public class MixedArithmeticsTest extends SolverBasedTest0.ParameterizedSolverBa
     assertThat(mgr.getFormulaType(sumRat).isRationalType()).isTrue();
     RationalFormula simplifiedSumRat = mgr.simplify(sumRat);
     assertThat(mgr.getFormulaType(simplifiedSumRat).isRationalType()).isTrue();
+  }
+
+  @Test
+  public void yicesVisitorTest() {
+    assume().that(solver).isEqualTo(Solvers.YICES2);
+
+    var a = imgr.makeNumber(-2);
+    var b = imgr.divide(imgr.makeVariable("main::x@3"), imgr.makeNumber(2));
+    var f = imgr.multiply(a, b);
+
+    var g = mgr.transformRecursively(f, new FormulaTransformationVisitor(mgr) {});
+    assertThat(g).isEqualTo(f);
+  }
+
+  @Test
+  public void yicesMixedVisitorTest() {
+    assume().that(solver).isEqualTo(Solvers.YICES2);
+
+    var a = imgr.makeNumber(-2);
+    var b = rmgr.divide(imgr.makeVariable("main::x@3"), imgr.makeNumber(2));
+    var f = rmgr.multiply(a, b);
+
+    var g = mgr.transformRecursively(f, new FormulaTransformationVisitor(mgr) {});
+    assertThat(g).isEqualTo(f);
   }
 }
