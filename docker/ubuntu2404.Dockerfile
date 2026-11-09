@@ -20,7 +20,7 @@ ENV LANGUAGE=en_US.UTF-8
 # Install basic packages for building several solvers
 RUN apt-get update \
  && apt-get install -y \
-        wget curl git build-essential cmake pkg-config patchelf unzip \
+        wget curl git build-essential cmake pkg-config patchelf unzip nano \
         openjdk-17-jdk ant maven \
         gcc-mingw-w64-x86-64-posix g++-mingw-w64-x86-64-posix mingw-w64-tools \
         gcc-aarch64-linux-gnu g++-aarch64-linux-gnu \
@@ -54,11 +54,58 @@ RUN apt-get update \
 
 WORKDIR /dependencies
 
-# Install GMP for linux on x64 and arm64
+
+# Build GMP for MathSAT5: Linux x64, Linux ARM64, and Windows x64
+# This is not installed and does not conflict with the GMP below.
 RUN wget https://gmplib.org/download/gmp/gmp-6.3.0.tar.xz \
  && tar xf gmp-6.3.0.tar.xz \
- && rm gmp-6.3.0.tar.xz \
- && cd gmp-6.3.0 \
+ && mkdir /dependencies/mathsat \
+ && cd /dependencies/mathsat \
+ && mkdir gmp-6.3.0-linux-x64 \
+ && tar xf ../gmp-6.3.0.tar.xz -C gmp-6.3.0-linux-x64 --strip-components=1 \
+ && mkdir gmp-6.3.0-linux-arm64 \
+ && tar xf ../gmp-6.3.0.tar.xz -C gmp-6.3.0-linux-arm64 --strip-components=1 \
+ && mkdir gmp-6.3.0-win-x64 \
+ && tar xf ../gmp-6.3.0.tar.xz -C gmp-6.3.0-win-x64 --strip-components=1 \
+ && rm ../gmp-6.3.0.tar.xz \
+ && cd /dependencies/mathsat/gmp-6.3.0-linux-x64 \
+ && ./configure \
+      --enable-cxx \
+      --with-pic \
+      --disable-shared \
+      --enable-static \
+      --enable-fat \
+ && make -j4 \
+ && cd /dependencies/mathsat/gmp-6.3.0-linux-arm64 \
+ && ./configure \
+      --host=aarch64-linux-gnu \
+      --enable-cxx \
+      --with-pic \
+      --disable-shared \
+      --enable-static \
+      --enable-fat \
+      CC=aarch64-linux-gnu-gcc \
+      CXX=aarch64-linux-gnu-g++ \
+      LD=aarch64-linux-gnu-ld \
+ && make -j4 \
+ && cd /dependencies/mathsat/gmp-6.3.0-win-x64 \
+ && ./configure \
+      --host=x86_64-w64-mingw32 \
+      --enable-cxx \
+      --with-pic \
+      --enable-shared \
+      --disable-static \
+      --enable-fat \
+      CC=x86_64-w64-mingw32-gcc-posix \
+      CXX=x86_64-w64-mingw32-g++-posix \
+      LD=x86_64-w64-mingw32-ld \
+ && make -j4
+
+
+# Install GMP for linux on x64 and arm64 and build it for Windows (for solvers like Bitwuzla)
+# This should not be used for MathSAT5!
+# GMP and its folder are already provided by the GMP install of MathSAT5 above.
+RUN cd /dependencies/gmp-6.3.0 \
  && ./configure \
       --enable-cxx \
       --with-pic \
@@ -121,13 +168,13 @@ RUN wget https://www.mpfr.org/mpfr-current/mpfr-4.2.2.tar.xz \
   && make install \
   && make clean
 
-# Install the Jdk for Windows x64
-RUN wget https://download.java.net/openjdk/jdk11/ri/openjdk-11+28_windows-x64_bin.zip \
- && unzip openjdk-11+28_windows-x64_bin.zip \
- && mv jdk-11 jdk11-windows-x64 \
- && rm openjdk-11+28_windows-x64_bin.zip
+# Install JDK 17 for Windows x64
+RUN wget https://download.java.net/java/GA/jdk17.0.2/dfd4a8d0985749f896bed50d7138ee7f/8/GPL/openjdk-17.0.2_windows-x64_bin.zip \
+ && unzip openjdk-17.0.2_windows-x64_bin.zip \
+ && mv jdk-17.0.2 jdk17-windows-x64 \
+ && rm openjdk-17.0.2_windows-x64_bin.zip
 
-# Install the Jdk for Linux arm64
+# Install JDK 17 for Linux arm64
 RUN wget https://download.java.net/java/GA/jdk17.0.2/dfd4a8d0985749f896bed50d7138ee7f/8/GPL/openjdk-17.0.2_linux-aarch64_bin.tar.gz \
  && tar -xzf openjdk-17.0.2_linux-aarch64_bin.tar.gz \
  && mv jdk-17.0.2 jdk17-linux-aarch64 \
