@@ -66,14 +66,13 @@ class Yices2InterpolatingProver extends Yices2AbstractProver<Integer>
         var ctxB = newContext("dpllt")) {
 
       ctxA.assertFormulas(Ints.toArray(transformedImmutableSetCopy(setA, stack.peekLast()::get)));
-      try {
-        ctxB.assertFormulas(Ints.toArray(transformedImmutableSetCopy(setB, stack.peekLast()::get)));
-        ctxB.push(); // Will trigger an exception if B is already unsat by itself
+      ctxB.assertFormulas(Ints.toArray(transformedImmutableSetCopy(setB, stack.peekLast()::get)));
 
-      } catch (YicesException e) {
+      if (ctxB.getStatus() == Status.UNSAT) {
         return creator.encapsulateBoolean(Terms.mkTrue());
+      } else {
+        return creator.encapsulateBoolean(interpolate(ctxA, ctxB));
       }
-      return creator.encapsulateBoolean(interpolate(ctxA, ctxB));
     }
   }
 
@@ -123,20 +122,16 @@ class Yices2InterpolatingProver extends Yices2AbstractProver<Integer>
     try (var ctxA = newContext("mcsat");
         var ctxB = newContext("dpllt")) {
 
-      ctxB.push();
       int skipped = 0;
       for (int i = groups.size() - 1; i > 0; i--) {
-        try {
-          ctxB.assertFormulas(groups.get(i));
-          ctxB.push();
-        } catch (YicesException e) {
-          // Yices will throw this exception once the Bs have become unsat
+        ctxB.push();
+        ctxB.assertFormulas(groups.get(i));
+        if (ctxB.getStatus() == Status.UNSAT) {
+          ctxB.pop();
           skipped = i;
           break;
         }
       }
-      ctxB.pop();
-
       ImmutableList.Builder<BooleanFormula> builder = ImmutableList.builder();
 
       var lastItp = Terms.mkTrue();
