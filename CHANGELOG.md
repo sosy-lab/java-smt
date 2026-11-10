@@ -10,6 +10,56 @@ SPDX-License-Identifier: Apache-2.0
 
 # JavaSMT ChangeLog
 
+## JavaSMT 7.0.0
+
+#### Note: Version 7 will be the last mayor release for Java 17. We will adopt Java 21 soon.
+
+
+### Breaking Changes
+
+- JavaSMT now requires at least Java 17.
+- Removed experimental floating-point to IEEE bitvector conversion (`toIeeeBitvector()`) for Bitwuzla due to problems. `toIeeeBitvector()` now throws `UnsupportedOperationException`.
+
+### SMT Solver updates
+
+- Bitwuzla: updated to version `0.9.1-g8d1eb010`
+- CVC4: updated to version `1.8.1-11-g1f9dbdca4`
+- CVC5: updated to version `1.4.2`. As a consequence, CVC5 now requires at least `GLIBCXX_3.4.29`.
+- MathSAT5: updated to version `5.6.19`
+- OpenSMT2: updated to version `2.9.2-ge4c80308`
+- Yices2: updated to version `2.7.0-4f83bf00e`
+- Z3: updated to version `4.17.0-1009b13`
+
+- JavaSMT-Yices2 has also been updated to version `6.0.0-765-g10a6621ae` for the new Yices2 version `2.7.0-4f83bf00e`.
+
+### New Additions
+
+- New solver tracing mode: set config option `solver.trace=true` to record all JavaSMT API calls related to solvers. A script to convert traces to SMT-LIB2 can be found here: `scripts/traceToSmtlib.py`.
+- Yices2 now uses the official Java bindings and provides Windows x64 binaries. MCSAT is the default and supports nonlinear arithmetic and division by zero. Set `solver.yices2.solverType=dpllt` to select DPLL(T). Binary and sequential interpolants use MCSAT.
+- Z3 added `solver.z3.logic`, `solver.z3.engine`, and `solver.z3.furtherOptions`, allowing the setting of the logic, engine and additional general options that do not need special API.
+- Added formula visitor kinds for the empty regular language and separation logic.
+- CVC5 now supports formula simplification in JavaSMT.
+
+### Updates
+
+- Bitwuzla and Boolector now support zero-argument uninterpreted functions.
+- CVC4, CVC5, and Princess now reuse the same symbol for a variable and a zero-argument function of the same name.
+- Fixed a bug with CVC4 randomly segmentation faulting.
+- CVC5 parsing now reuses variables referenced by quoted names.
+- Fixed crashes on parsing epsilon terms using Princess.
+- The SMT-LIB parser accepts `set-logic` after `set-option`. For multiple assertions, `parse()` now directs callers to `parseAll()`.
+- CVC5 and SMTInterpol visitors now recognize unary negation of integers and reals.
+- Z3 filters solver-generated constants from models, fixing an AllSAT loop.
+- The non-interpolating Z3_WITH_INTERPOLATION prover now returns `null` from `addConstraint()`, fixing a `ClassCastException`.
+- Improved `allSat()` for Bitwuzla, creating fewer Java proxies in `extractVariablesAndUFs()`.
+- Bitwuzla and Yices2 report recognized interpolation failures as `SolverException`.
+- OpenSMT2 now reports unsupported interpolation logics and model export involving arrays as `SolverException`s.
+- MathSAT5 now reports `na: proof splitting not supported` during interpolation as a `SolverException` instead of `IllegalArgumentException`.
+- Improved precondition checks for interpolation, optimization, and model generation. E.g. Z3 optimization now checks the preconditions for model access.
+- Corrected wrong trace method names `unsatCoreOverAssumptions`, `getSeqInterpolants`, and `getTreeInterpolants`.
+- Added missing Javadoc and source JARs for JavaSMT and solver bindings.
+
+
 ## JavaSMT 6.0.0
 
 #### Note: Version 6 will be the last mayor release for Java 11. We will move to Java 17 soon after and aim to subsequently adopt Java 21 still in 2026.

@@ -66,7 +66,7 @@ JavaSMT supports several SMT solvers (see [Getting Started](doc/Getting-started.
 | [Bitwuzla](https://bitwuzla.github.io/)                                 | :heavy_check_mark:² | :heavy_check_mark:² | :heavy_check_mark: |                    |                                                         |                    | a fast solver for bitvector logic                                           |
 | [Boolector](https://boolector.github.io/)                               | :heavy_check_mark:  |                     |                    |                    |                                                         |                    | a fast solver for bitvector logic, misses formula introspection, deprecated |
 | [CVC4](https://cvc4.github.io/)                                         | :heavy_check_mark:  |                     |                    |                    |                                                         |                    |                                                                             |
-| [CVC5](https://cvc5.github.io/)                                         | :heavy_check_mark:  | :heavy_check_mark:  | :heavy_check_mark: | :heavy_check_mark: |                   :heavy_check_mark:                    | :heavy_check_mark: |                                                                             |
+| [CVC5](https://cvc5.github.io/)                                         | :heavy_check_mark:²  | :heavy_check_mark:²  | :heavy_check_mark:² | :heavy_check_mark:² |                   :heavy_check_mark:²                    | :heavy_check_mark:² |                                                                             |
 | [MathSAT5](http://mathsat.fbk.eu/)                                      | :heavy_check_mark:³ | :heavy_check_mark:³ | :heavy_check_mark: |                    | [maybe](https://github.com/sosy-lab/java-smt/pull/430)⁴ |                    |                                                                             |
 | [OpenSMT](https://verify.inf.usi.ch/opensmt)                            | :heavy_check_mark:² | :heavy_check_mark:² |                    |                    |                                                         |                    |                                                                             |
 | [OptiMathSAT](http://optimathsat.disi.unitn.it/)                        | :heavy_check_mark:  |                     |                    |                    |                                                         |                    | based on MathSAT5, with support for optimization queries                    |
@@ -202,6 +202,8 @@ These include examples for the usage of many of JavaSMTs solvers and features, f
   features. This can be used to determine which solvers are available on any machine executing it.
 
 Furthermore, JavaSMT provides users with additional features available for many solvers:
+- API tracing: set config option `solver.trace=true` to record all JavaSMT API calls related to 
+  solvers. This can help find problems based on the order of calls used etc. A script to convert traces to SMT-LIB2 can be found here: `scripts/traceToSmtlib.py`.
 - Debug-Mode: setting the option `useDebugMode=true`, in the configuration used to create a
   `SolverContext`, applies additional checks to catch common usage errors. The checks 
   performed by this option are solver-sensitive and throw exceptions on operations that 
