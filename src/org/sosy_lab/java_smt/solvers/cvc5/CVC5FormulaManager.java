@@ -158,10 +158,13 @@ class CVC5FormulaManager extends AbstractFormulaManager<Term, Sort, TermManager,
     return declarations;
   }
 
+  /*
+  TODO: temporarily disabled due to https://github.com/sosy-lab/java-smt/issues/743
   @Override
   protected Term simplify(Term f) throws InterruptedException {
     return creator.getSolver().simplify(f);
   }
+  */
 
   @Override
   public <T extends Formula> T substitute(
