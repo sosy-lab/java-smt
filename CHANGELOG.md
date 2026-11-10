@@ -38,7 +38,6 @@ SPDX-License-Identifier: Apache-2.0
 - Yices2 now uses the official Java bindings and provides Windows x64 binaries. MCSAT is the default and supports nonlinear arithmetic and division by zero. Set `solver.yices2.solverType=dpllt` to select DPLL(T). Binary and sequential interpolants use MCSAT.
 - Z3 added `solver.z3.logic`, `solver.z3.engine`, and `solver.z3.furtherOptions`, allowing the setting of the logic, engine and additional general options that do not need special API.
 - Added formula visitor kinds for the empty regular language and separation logic.
-- CVC5 now supports formula simplification in JavaSMT.
 
 ### Updates
 
