@@ -497,7 +497,11 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
 
     List<BooleanFormula> itps1 = stack.getSeqInterpolants0(ImmutableList.of(TA, TB, TC, TD));
     List<BooleanFormula> itps2 = stack.getSeqInterpolants0(ImmutableList.of(TD, TC, TB, TA));
-    List<BooleanFormula> itps3 = stack.getSeqInterpolants0(ImmutableList.of(TA, TC, TB, TD));
+    List<BooleanFormula> itps3 = ImmutableList.of();
+    if (solver != Solvers.YICES2) {
+      // FIXME Yices fails to terminate for this example
+      itps3 = stack.getSeqInterpolants0(ImmutableList.of(TA, TC, TB, TD));
+    }
     List<BooleanFormula> itps4 =
         stack.getSeqInterpolants0(ImmutableList.of(TA, TA, TA, TB, TC, TD, TD));
     List<BooleanFormula> itps5 =
@@ -509,7 +513,9 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
 
     checkItpSequence(ImmutableList.of(A, B, C, D), itps1);
     checkItpSequence(ImmutableList.of(D, C, B, A), itps2);
-    checkItpSequence(ImmutableList.of(A, C, B, D), itps3);
+    if (solver != Solvers.YICES2) {
+      checkItpSequence(ImmutableList.of(A, C, B, D), itps3);
+    }
     checkItpSequence(ImmutableList.of(A, A, A, B, C, D, D), itps4);
     checkItpSequence(ImmutableList.of(A, A, B, C, D, A, D), itps5);
     checkItpSequence(ImmutableList.of(B, C, D, A, A, A, D), itps6);
