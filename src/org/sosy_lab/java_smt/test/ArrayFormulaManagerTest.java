@@ -221,6 +221,10 @@ public class ArrayFormulaManagerTest extends SolverBasedTest0.ParameterizedSolve
         .withMessage("Solver %s does not yet support array initialization", solverToUse())
         .that(solverToUse())
         .isNotEqualTo(Solvers.BOOLECTOR);
+    assume()
+        .withMessage("SmtInterpol does not support constant arrays over bitvectors")
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.SMTINTERPOL);
 
     final int size = 8;
 
