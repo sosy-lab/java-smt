@@ -482,7 +482,8 @@ class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long, Intege
       functionArgs = getArgs(pF);
     }
     if (functionDeclaration == null) {
-      functionDeclaration = buildDeclaration(functionKind, functionIndex, functionArgs);
+      functionDeclaration =
+          buildDeclaration(functionKind, functionIndex, functionArgs, getFormulaType(pFormula));
     }
 
     final ImmutableList<FormulaType<?>> argTypes =
@@ -505,11 +506,14 @@ class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long, Intege
         pFormula,
         args,
         FunctionDeclarationImpl.of(
-            functionName, functionKind, argTypes, getFormulaType(pF), functionDeclaration));
+            functionName, functionKind, argTypes, getFormulaType(pFormula), functionDeclaration));
   }
 
-  private int buildDeclaration(
-      FunctionDeclarationKind pKind, List<Integer> pIndex, List<Integer> pArgs) {
+  private <T extends Formula> int buildDeclaration(
+      FunctionDeclarationKind pKind,
+      List<Integer> pIndex,
+      List<Integer> pArgs,
+      FormulaType<T> pFormulaType) {
     ImmutableList.Builder<Integer> builder = ImmutableList.builder();
     int c = 0;
     for (var arg : pArgs) {
@@ -561,7 +565,9 @@ class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long, Intege
           case ADD -> Terms.add(args);
           case DIV -> {
             checkArgument(args.size() == 2);
-            yield Terms.div(args.get(0), args.get(1));
+            yield pFormulaType.isIntegerType()
+                ? Terms.idiv(args.get(0), args.get(1))
+                : Terms.div(args.get(0), args.get(1));
           }
           case MUL -> Terms.mul(args);
           case MODULO -> {
