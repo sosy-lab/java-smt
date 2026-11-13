@@ -163,6 +163,7 @@ SPDX-License-Identifier: Apache-2.0
                  failonwarning="false">
             <fileset dir="${cvc5.downloads}/cvc5-sources/src/api/java">
                 <include name="**/*.java"/>
+                <exclude name="**/Proof.java"/>
             </fileset>
             <link href="https://docs.oracle.com/en/java/javase/17/docs/api/"/>
             <doctitle><![CDATA[<h1>cvc5</h1>]]></doctitle>
