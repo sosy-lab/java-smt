@@ -79,6 +79,7 @@ abstract class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
 
     if (incremental) {
       solver = getNewSolver();
+      solver.setTerminator(shutdownNotifier::shouldShutdown);
     }
   }
 
@@ -194,6 +195,7 @@ abstract class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
         solver.close(); // cleanup
       }
       solver = getNewSolver();
+      solver.setTerminator(shutdownNotifier::shouldShutdown);
 
       ImmutableSet<BooleanFormula> assertedFormulas = getAssertedFormulas();
       if (enableSL) {
@@ -208,9 +210,6 @@ abstract class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
     } catch (Exception e) {
       // we actually only want to catch CVC5ApiException, but need to catch all.
       throw new SolverException("CVC5 failed during satisfiability check", e);
-    } finally {
-      /* Shutdown currently not possible in CVC5. */
-      shutdownNotifier.shutdownIfNecessary();
     }
     return convertSatResult(result);
   }
