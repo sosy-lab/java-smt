@@ -191,7 +191,7 @@ abstract class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
     if (!incremental) {
       // in non-incremental mode, we need to create a new solver instance for each sat check
       if (solver != null) {
-        solver.deletePointer(); // cleanup
+        solver.close(); // cleanup
       }
       solver = getNewSolver();
 
@@ -319,7 +319,7 @@ abstract class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
   public void close() {
     if (!closed) {
       assertedTerms.clear();
-      solver.deletePointer();
+      solver.close();
     }
     super.close();
   }
