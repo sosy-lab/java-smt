@@ -141,6 +141,19 @@ public class TraceSolverContext implements SolverContext {
 
   @SuppressWarnings("resource")
   @Override
+  public ProverEnvironment newProverEnvironment(
+      Configuration proverConfig, ProverOptions... options) {
+    return logger.logDefKeep(
+        "context",
+        "newProverEnvironment(%s, %s)"
+            .formatted(proverConfig.asPropertiesString(), getOptionsForLogging(options)),
+        () ->
+            new TraceProverEnvironment(
+                delegate.newProverEnvironment(proverConfig, options), mgr, logger));
+  }
+
+  @SuppressWarnings("resource")
+  @Override
   public InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation(
       ProverOptions... options) {
     return logger.logDefKeep(

@@ -96,6 +96,25 @@ public class SynchronizedSolverContext implements SolverContext {
 
   @SuppressWarnings("resource")
   @Override
+  public ProverEnvironment newProverEnvironment(
+      Configuration proverConfig, ProverOptions... options) throws InvalidConfigurationException {
+    synchronized (sync) {
+      if (useSeperateProvers) {
+        SolverContext otherContext = createOtherContext();
+        return new SynchronizedProverEnvironmentWithContext(
+            otherContext.newProverEnvironment(proverConfig, options),
+            sync,
+            delegate.getFormulaManager(),
+            otherContext.getFormulaManager());
+      } else {
+        return new SynchronizedProverEnvironment(
+            delegate.newProverEnvironment(proverConfig, options), delegate);
+      }
+    }
+  }
+
+  @SuppressWarnings("resource")
+  @Override
   public InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation(
       ProverOptions... pOptions) {
     synchronized (sync) {

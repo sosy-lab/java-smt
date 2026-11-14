@@ -364,6 +364,28 @@ public final class Z3SolverContext extends AbstractSolverContext {
   @Override
   protected ProverEnvironment newProverEnvironment0(Set<ProverOptions> options) {
     Preconditions.checkState(!closed.get(), "solver context is already closed");
+    try {
+      return new Z3TheoremProver(
+          creator,
+          manager,
+          logic,
+          engine,
+          options,
+          buildSolverOptions(options),
+          null,
+          extraOptions.logfile,
+          shutdownNotifier);
+    } catch (InvalidConfigurationException pE) {
+      // Can never happen, as we do not have a configuration argument here
+      throw new RuntimeException(pE);
+    }
+  }
+
+  @Override
+  protected ProverEnvironment newProverEnvironment0(
+      Configuration solverSpecificProverOptions, Set<ProverOptions> options)
+      throws InvalidConfigurationException {
+    Preconditions.checkState(!closed.get(), "solver context is already closed");
     return new Z3TheoremProver(
         creator,
         manager,
@@ -371,6 +393,7 @@ public final class Z3SolverContext extends AbstractSolverContext {
         engine,
         options,
         buildSolverOptions(options),
+        solverSpecificProverOptions,
         extraOptions.logfile,
         shutdownNotifier);
   }

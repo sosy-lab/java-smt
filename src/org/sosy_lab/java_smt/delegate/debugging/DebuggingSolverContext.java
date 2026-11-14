@@ -49,6 +49,15 @@ public class DebuggingSolverContext implements SolverContext {
 
   @SuppressWarnings("resource")
   @Override
+  public ProverEnvironment newProverEnvironment(
+      Configuration proverConfig, ProverOptions... options) throws InvalidConfigurationException {
+    debugging.assertThreadLocal();
+    return new DebuggingProverEnvironment(
+        delegate.newProverEnvironment(proverConfig, options), debugging);
+  }
+
+  @SuppressWarnings("resource")
+  @Override
   public InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation(
       ProverOptions... options) {
     debugging.assertThreadLocal();
