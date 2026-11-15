@@ -141,6 +141,17 @@ SPDX-License-Identifier: Apache-2.0
         <get src="${ivy.repo.url}/org.sosy_lab/${publish.full-name}/ivy-${publish.version}.xml"
              dest="${ivy.resolved.file}"/>
 
+        <!--
+            The published ivy.xml stores the declared version as 'revConstraint' and a resolved
+            version as 'rev'. Ivy resolves all configurations together, so 'rev' may come from a
+            build/test configuration instead of the runtime classpath (e.g. JavaSMT 7.0.0 declares
+            and uses Guava 33.5.0-jre, but its ivy.xml has rev="33.4.8-jre").
+            The POM must contain the declared versions, so we use 'revConstraint' for 'rev'.
+        -->
+        <replaceregexp file="${ivy.resolved.file}" flags="g"
+                       match='rev="[^"]*"(\s+)revConstraint="([^"]*)"'
+                       replace='rev="\2"\1revConstraint="\2"'/>
+
         <!-- Load properties from the downloaded ivy.xml -->
         <xmlproperty file="${ivy.resolved.file}" prefix="ivyxml" collapseAttributes="true" keepRoot="false"/>
 
