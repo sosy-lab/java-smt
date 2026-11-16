@@ -10,7 +10,6 @@
 
 package org.sosy_lab.java_smt.solvers.yices2;
 
-import static com.google.common.base.Preconditions.checkArgument;
 import static org.sosy_lab.common.collect.Collections3.transformedImmutableSetCopy;
 
 import com.google.common.collect.FluentIterable;
@@ -22,6 +21,7 @@ import com.sri.yices.Context;
 import com.sri.yices.InterpolationContext;
 import com.sri.yices.Status;
 import com.sri.yices.Terms;
+import com.sri.yices.YicesException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -37,6 +37,12 @@ import org.sosy_lab.java_smt.solvers.yices2.Yices2SolverContext.Yices2Parameters
 
 class Yices2InterpolatingProver extends Yices2AbstractProver<Integer>
     implements InterpolatingProverEnvironment<Integer> {
+
+  private static final ImmutableSet<String> ACCEPTED_INTERPOLATION_ERROR_MESSAGES =
+      ImmutableSet.of(
+          "mcsat: unsupported theory\n",
+          "mcsat: assumption variable has a type that mcsat cannot decide on\n");
+
   Yices2InterpolatingProver(
       Yices2FormulaCreator creator,
       Set<ProverOptions> pOptions,
@@ -55,11 +61,6 @@ class Yices2InterpolatingProver extends Yices2AbstractProver<Integer>
   @Override
   public BooleanFormula getInterpolant(Collection<Integer> formulasOfA)
       throws SolverException, InterruptedException {
-    checkGenerateInterpolants();
-    checkArgument(
-        getAssertedConstraintIds().containsAll(formulasOfA),
-        "Interpolation can only be done over previously asserted formulas.");
-
     var setA = ImmutableSet.copyOf(formulasOfA);
     var setB = Sets.difference(getAssertedConstraintIds(), setA);
 
@@ -78,7 +79,7 @@ class Yices2InterpolatingProver extends Yices2AbstractProver<Integer>
   }
 
   private int interpolate(Collection<Integer> setA, Collection<Integer> setB)
-      throws InterruptedException {
+      throws InterruptedException, SolverException {
     try (var ctxA = newSolverStack();
         var ctxB = newSolverStack()) {
 
@@ -89,12 +90,21 @@ class Yices2InterpolatingProver extends Yices2AbstractProver<Integer>
       // TODO How to abort this?
       // For now, let's just check before and after the call:
       shutdownNotifier.shutdownIfNecessary();
-      var status = context.check(DEFAULT_PARAMS, false);
+      Status status;
+      try {
+        status = context.check(DEFAULT_PARAMS, false);
+      } catch (YicesException e) {
+        if (ACCEPTED_INTERPOLATION_ERROR_MESSAGES.contains(e.getMessage())) {
+          throw new SolverException(e.getMessage().stripTrailing());
+        } else {
+          throw e;
+        }
+      }
       shutdownNotifier.shutdownIfNecessary();
       if (status == Status.UNSAT) {
         return context.getInterpolant();
       } else {
-        throw new IllegalArgumentException("Solver state must be unsat");
+        throw new IllegalStateException("Solver state must be unsat");
       }
     }
   }
@@ -102,13 +112,6 @@ class Yices2InterpolatingProver extends Yices2AbstractProver<Integer>
   @Override
   public List<BooleanFormula> getSeqInterpolants(List<? extends Collection<Integer>> partitions)
       throws SolverException, InterruptedException {
-    checkGenerateInterpolants();
-    checkArgument(!partitions.isEmpty(), "at least one partition should be available.");
-    final Set<Integer> assertedConstraintIds = getAssertedConstraintIds();
-    checkArgument(
-        partitions.stream().allMatch(assertedConstraintIds::containsAll),
-        "interpolation can only be done over previously asserted formulas.");
-
     final int n = partitions.size();
     final List<BooleanFormula> itps = new ArrayList<>();
     var previousItp = Terms.mkTrue();

@@ -15,7 +15,6 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
-import edu.stanford.CVC4.ArrayType;
 import edu.stanford.CVC4.Expr;
 import edu.stanford.CVC4.ExprManager;
 import edu.stanford.CVC4.Kind;
@@ -162,7 +161,7 @@ class CVC4Model extends AbstractModel<Expr, Type, ExprManager> {
       Expr select = creator.getEnv().mkExpr(Kind.SELECT, expr, index);
 
       // CASE 1: nested array dimension, let's recurse deeper
-      if (new ArrayType(expr.getType()).getConstituentType().isArray()) {
+      if (element.getType().isArray()) {
         result.addAll(buildArrayAssignments(select, element));
 
       } else {

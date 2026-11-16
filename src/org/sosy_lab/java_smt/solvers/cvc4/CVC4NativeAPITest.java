@@ -29,8 +29,6 @@ import edu.stanford.CVC4.SortType;
 import edu.stanford.CVC4.Type;
 import edu.stanford.CVC4.UnsatCore;
 import edu.stanford.CVC4.vectorExpr;
-import java.io.FileNotFoundException;
-import java.io.UnsupportedEncodingException;
 import org.junit.After;
 import org.junit.AssumptionViolatedException;
 import org.junit.Before;
@@ -532,9 +530,8 @@ public class CVC4NativeAPITest {
     Expr zero = exprMgr.mkConst(new Rational(0));
 
     Expr xBound = exprMgr.mkBoundVar("x", exprMgr.integerType());
-    vectorExpr vec = new vectorExpr();
-    vec.add(xBound);
-    Expr quantifiedVars = exprMgr.mkExpr(Kind.BOUND_VAR_LIST, vec);
+    Expr quantifiedVars =
+        exprMgr.mkExpr(Kind.BOUND_VAR_LIST, new vectorExpr(exprMgr, new Expr[] {xBound}));
     Expr aAtxEq0s = aAtxEq0.substitute(x, xBound);
     Expr exists = exprMgr.mkExpr(Kind.EXISTS, quantifiedVars, exprMgr.mkExpr(Kind.NOT, aAtxEq0s));
     Expr notExists = exprMgr.mkExpr(Kind.NOT, exists);
@@ -568,9 +565,8 @@ public class CVC4NativeAPITest {
     Expr body = exprMgr.mkExpr(Kind.OR, first, second);
 
     Expr xBound = exprMgr.mkBoundVar("x", exprMgr.integerType());
-    vectorExpr vec = new vectorExpr();
-    vec.add(xBound);
-    Expr quantifiedVars = exprMgr.mkExpr(Kind.BOUND_VAR_LIST, vec);
+    Expr quantifiedVars =
+        exprMgr.mkExpr(Kind.BOUND_VAR_LIST, new vectorExpr(exprMgr, new Expr[] {xBound}));
     Expr bodySubst = body.substitute(x, xBound);
     Expr assertion = exprMgr.mkExpr(Kind.FORALL, quantifiedVars, bodySubst);
 
@@ -582,7 +578,7 @@ public class CVC4NativeAPITest {
 
   @SuppressWarnings("unused")
   @Test
-  public void checkQuantifierWithUf() throws FileNotFoundException, UnsupportedEncodingException {
+  public void checkQuantifierWithUf() {
     Expr var = exprMgr.mkVar("var", exprMgr.integerType());
     // start with a normal, free variable!
     Expr boundVar = exprMgr.mkVar("boundVar", exprMgr.integerType());
@@ -603,9 +599,8 @@ public class CVC4NativeAPITest {
 
     // This is the bound variable used for boundVar
     Expr boundVarBound = exprMgr.mkBoundVar("boundVar", exprMgr.integerType());
-    vectorExpr vec = new vectorExpr();
-    vec.add(boundVarBound);
-    Expr quantifiedVars = exprMgr.mkExpr(Kind.BOUND_VAR_LIST, vec);
+    Expr quantifiedVars =
+        exprMgr.mkExpr(Kind.BOUND_VAR_LIST, new vectorExpr(exprMgr, new Expr[] {boundVarBound}));
     // Subst all boundVar variables with the bound version
     Expr bodySubst = body.substitute(boundVar, boundVarBound);
     Expr quantFormula = exprMgr.mkExpr(Kind.EXISTS, quantifiedVars, bodySubst);
@@ -641,9 +636,8 @@ public class CVC4NativeAPITest {
     Expr body = exprMgr.mkExpr(Kind.OR, aAtxEq0, aAtxEq1);
 
     Expr xBound = exprMgr.mkBoundVar("x_b", exprMgr.integerType());
-    vectorExpr vec = new vectorExpr();
-    vec.add(xBound);
-    Expr quantifiedVars = exprMgr.mkExpr(Kind.BOUND_VAR_LIST, vec);
+    Expr quantifiedVars =
+        exprMgr.mkExpr(Kind.BOUND_VAR_LIST, new vectorExpr(exprMgr, new Expr[] {xBound}));
     Expr bodySubst = body.substitute(x, xBound);
     Expr assertion = exprMgr.mkExpr(Kind.FORALL, quantifiedVars, bodySubst);
 
@@ -685,9 +679,8 @@ public class CVC4NativeAPITest {
             Kind.EQUAL, exprMgr.mkExpr(Kind.MULT, xBv, yBv), exprMgr.mkConst(new BitVector(1)));
 
     Expr xBound = exprMgr.mkBoundVar("y_bv", exprMgr.mkBitVectorType(width));
-    vectorExpr vec = new vectorExpr();
-    vec.add(xBound);
-    Expr quantifiedVars = exprMgr.mkExpr(Kind.BOUND_VAR_LIST, vec);
+    Expr quantifiedVars =
+        exprMgr.mkExpr(Kind.BOUND_VAR_LIST, new vectorExpr(exprMgr, new Expr[] {xBound}));
     Expr bodySubst = body.substitute(yBv, xBound);
     Expr assertion = exprMgr.mkExpr(Kind.EXISTS, quantifiedVars, bodySubst);
 

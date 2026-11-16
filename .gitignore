@@ -72,9 +72,13 @@ solvers_maven_conf/*.asc
 
 build.properties
 /.apt-generated/
+/.options-collection
 /repository
 /dist
 /downloads
 /output
 
 pom.xml
+
+
+hs_err_*.log

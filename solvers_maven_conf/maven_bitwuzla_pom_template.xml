@@ -6,7 +6,7 @@ This file is part of JavaSMT,
 an API wrapper for a collection of SMT solvers:
 https://github.com/sosy-lab/java-smt
 
-SPDX-FileCopyrightText: 2024 Dirk Beyer <https://www.sosy-lab.org>
+SPDX-FileCopyrightText: 2026 Dirk Beyer <https://www.sosy-lab.org>
 
 SPDX-License-Identifier: Apache-2.0
 -->
@@ -24,6 +24,18 @@ SPDX-License-Identifier: Apache-2.0
       <license>
           <name>MIT License</name>
           <url>https://opensource.org/licenses/MIT</url>
+      </license>
+      <license>
+          <name>Apache License, Version 2.0 (JavaSMT JNI wrapper)</name>
+          <url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
+      </license>
+      <license>
+          <name>GNU LGPL v3 or later, or GNU GPL v2 or later (GMP)</name>
+          <url>https://gmplib.org/manual/Copying</url>
+      </license>
+      <license>
+          <name>GNU LGPL v3 or later (MPFR)</name>
+          <url>https://www.gnu.org/licenses/lgpl-3.0.html</url>
       </license>
   </licenses>
 

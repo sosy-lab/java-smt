@@ -163,6 +163,11 @@ public final class BitwuzlaSolverContext extends AbstractSolverContext {
    */
   private static Options setFurtherOptions(Options pOptions, String pFurtherOptions)
       throws InvalidConfigurationException {
+
+    if (pFurtherOptions.isEmpty()) {
+      return pOptions;
+    }
+
     MapSplitter optionSplitter =
         Splitter.on(',')
             .trimResults()

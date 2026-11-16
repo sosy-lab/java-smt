@@ -144,8 +144,7 @@ abstract class Mathsat5AbstractProver<T2> extends AbstractProver<T2> {
 
   @SuppressWarnings("resource")
   @Override
-  public Model getModel() throws SolverException {
-    checkGenerateModels();
+  protected Model getModelImpl() throws SolverException {
     return new CachingModel(new Mathsat5Model(getMsatModel(), creator, this));
   }
 
@@ -153,14 +152,12 @@ abstract class Mathsat5AbstractProver<T2> extends AbstractProver<T2> {
    * @throws SolverException if an expected MathSAT failure occurs
    */
   protected long getMsatModel() throws SolverException {
-    checkGenerateModels();
     return Mathsat5NativeApi.msat_get_model(curEnv);
   }
 
   @SuppressWarnings("resource")
   @Override
-  public Evaluator getEvaluator() {
-    checkGenerateModels();
+  protected Evaluator getEvaluatorImpl() {
     return registerEvaluator(new Mathsat5Evaluator(this, creator, curEnv));
   }
 

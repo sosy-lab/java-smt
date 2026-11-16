@@ -23,6 +23,7 @@ SPDX-License-Identifier: Apache-2.0
 
     <!-- Can be overridden from including file. -->
     <property name="junit.dir" value="junit"/>
+    <property name="junit.report" value="JUnit.html"/>
 
     <!-- Define property that contains the Ant version for getting the matching ant-junit version. -->
     <antversion property="ant.version.exact"/>
@@ -57,6 +58,7 @@ SPDX-License-Identifier: Apache-2.0
             <formatter type="xml"/>
             <classpath refid="classpath.junit"/>
             <sysproperty key="java.awt.headless" value="true" />
+            <jvmarg value="--enable-native-access=ALL-UNNAMED"/>
             <batchtest fork="true" todir="${junit.dir}">
               <fileset dir="${class.dir}">
                 <patternset refid="test.sources"/>
@@ -65,7 +67,9 @@ SPDX-License-Identifier: Apache-2.0
         </junit>
         <junitreport todir="${junit.dir}">
             <fileset dir="${junit.dir}" includes="TEST-*.xml"/>
-            <report format="noframes"/>
+            <report format="noframes">
+                <param name="TITLE" expression="Unit-Test Results for ${ant.project.name}"/>
+            </report>
         </junitreport>
         <move file="junit-noframes.html" tofile="JUnit.html"/>
         <fail if="junit.failed" message="JUnit tests failed, look at JUnit.html"/>
@@ -120,6 +124,7 @@ SPDX-License-Identifier: Apache-2.0
                 <formatter type="xml"/>
                 <classpath refid="classpath.junit"/>
                 <sysproperty key="java.awt.headless" value="true" />
+                <jvmarg value="--enable-native-access=ALL-UNNAMED"/>
                 <batchtest fork="true" todir="${junit.dir}">
                     <fileset dir="${class.dir}">
                         <include name="**/*Test.*"/>
@@ -140,7 +145,9 @@ SPDX-License-Identifier: Apache-2.0
         </jacoco:report>
         <junitreport todir="${junit.dir}">
             <fileset dir="${junit.dir}" includes="TEST-*.xml"/>
-            <report format="noframes"/>
+            <report format="noframes">
+                <param name="TITLE" expression="Unit-Test Results for ${ant.project.name}"/>
+            </report>
         </junitreport>
         <exec executable="awk" failifexecutionfails="false" failonerror="false">
             <arg value="-F,"/>
@@ -149,7 +156,7 @@ SPDX-License-Identifier: Apache-2.0
             <arg value='{ instructions += $4 + $5; covered += $5 } END { print covered, " / ", instructions, " instructions covered"; print 100*covered/instructions, "% covered" }'/>
             <arg value="${junit.dir}/coverage.csv"/>
         </exec>
-        <move file="junit-noframes.html" tofile="JUnit.html"/>
-        <fail if="junit.failed" message="JUnit tests failed, look at JUnit.html"/>
+        <move file="junit-noframes.html" tofile="${junit.report}"/>
+        <fail if="junit.failed" message="JUnit tests failed, look at ${junit.report}"/>
     </target>
 </project>
