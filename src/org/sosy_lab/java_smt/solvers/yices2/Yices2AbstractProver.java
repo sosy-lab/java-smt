@@ -12,7 +12,6 @@ import com.google.common.base.Preconditions;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import com.sri.yices.Config;
 import com.sri.yices.Context;
-import com.sri.yices.Parameters;
 import com.sri.yices.Status;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -52,8 +51,6 @@ import org.sosy_lab.java_smt.solvers.yices2.Yices2SolverContext.Yices2Parameters
  */
 abstract class Yices2AbstractProver<T> extends AbstractProverWithAllSat<T>
     implements BasicProverEnvironment<T> {
-
-  static final Parameters DEFAULT_PARAMS = new Parameters(); // use default setting in the solver
 
   protected final Yices2FormulaCreator creator;
   protected final Context curEnv;
@@ -159,14 +156,12 @@ abstract class Yices2AbstractProver<T> extends AbstractProverWithAllSat<T>
       // calculate an unsat core
       unsat =
           !satCheckWithShutdownNotifier(
-              () -> curEnv.checkWithAssumptions(DEFAULT_PARAMS, getAllConstraints()),
+              () -> curEnv.checkWithAssumptions(null, getAllConstraints()),
               curEnv,
               shutdownNotifier);
 
     } else {
-      unsat =
-          !satCheckWithShutdownNotifier(
-              () -> curEnv.check(DEFAULT_PARAMS), curEnv, shutdownNotifier);
+      unsat = !satCheckWithShutdownNotifier(curEnv::check, curEnv, shutdownNotifier);
 
       if (unsat && stackSizeToUnsat == Integer.MAX_VALUE) {
         stackSizeToUnsat = size();
@@ -195,7 +190,7 @@ abstract class Yices2AbstractProver<T> extends AbstractProverWithAllSat<T>
 
     final boolean isUnsat =
         !satCheckWithShutdownNotifier(
-            () -> curEnv.checkWithAssumptions(DEFAULT_PARAMS, uncapsulate(pAssumptions)),
+            () -> curEnv.checkWithAssumptions(null, uncapsulate(pAssumptions)),
             curEnv,
             shutdownNotifier);
     if (!isUnsat) {

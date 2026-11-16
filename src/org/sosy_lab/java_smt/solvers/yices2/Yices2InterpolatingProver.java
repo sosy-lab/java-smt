@@ -92,7 +92,7 @@ class Yices2InterpolatingProver extends Yices2AbstractProver<Integer>
       shutdownNotifier.shutdownIfNecessary();
       Status status;
       try {
-        status = context.check(DEFAULT_PARAMS, false);
+        status = context.check(null, false);
       } catch (YicesException e) {
         if (ACCEPTED_INTERPOLATION_ERROR_MESSAGES.contains(e.getMessage())) {
           throw new SolverException(e.getMessage().stripTrailing());
