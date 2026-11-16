@@ -72,6 +72,8 @@ class Yices2InterpolatingProver extends Yices2AbstractProver<Integer>
 
   private Context newSolverStack() {
     try (var cfg = new Config()) {
+      // We need two stacks for interpolation, and at least the "A" stack needs to use MCSat:
+      // https://yices.csl.sri.com/doc/context-operations.html#c.yices_check_context_with_interpolation
       cfg.set("solver-type", "mcsat");
       cfg.set("model-interpolation", "true");
       return new Context(cfg);
