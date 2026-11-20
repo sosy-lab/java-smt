@@ -196,7 +196,7 @@ SPDX-License-Identifier: Apache-2.0
         <!-- Download a more recent Jdk to avoid compile errors -->
         <get src="https://download.oracle.com/java/21/archive/jdk-21.0.10_windows-x64_bin.zip" dest="/dependencies" verbose="true"/>
         <unzip src="/dependencies/jdk-21.0.10_windows-x64_bin.zip" dest="/dependencies"/>
-        <delete file="/dependencies/jdk-21_windows-x64_bin.zip" failonerror="true"/>
+        <delete file="/dependencies/jdk-21.0.10_windows-x64_bin.zip" failonerror="true"/>
         <move file="/dependencies/jdk-21.0.10" tofile="/dependencies/jdk21-windows-x64" failonerror="true"/>
     </target>
 
