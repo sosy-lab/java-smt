@@ -227,11 +227,15 @@ SPDX-License-Identifier: Apache-2.0
 
         <!-- link the wrapper to create libopensmtj-x64.so -->
         <!-- Licensing:
-             GMP is licensed under LGPL:
-              - https://www.gnu.org/licenses/lgpl-3.0.html
+             GMP is licensed under LGPL-3.0-or-later OR GPL-2.0-or-later:
+              - https://gmplib.org/manual/Copying
              OpenSMT is licensed under MIT license:
               - https://github.com/opensmt/opensmt/blob/main/COPYING
-             Based on that information, we provide the whole library including its dependencies under the MIT license.
+             The JNI wrapper is part of JavaSMT and licensed under Apache-2.0.
+             The library statically links GMP, which stays under its license,
+             so the license metadata in solvers_ivy_conf/ivy_opensmt.xml
+             and solvers_maven_conf/maven_opensmt_pom_template.xml
+             lists the licenses of all parts of the library.
         -->
         <!-- Link the wrapper and create a new lib -->
         <exec executable="gcc" dir="${source.path}" failonerror="true">
@@ -275,11 +279,15 @@ SPDX-License-Identifier: Apache-2.0
 
         <!-- link the wrapper to create libopensmtj-arm64.so -->
         <!-- Licensing:
-             GMP is licensed under LGPL:
-              - https://www.gnu.org/licenses/lgpl-3.0.html
+             GMP is licensed under LGPL-3.0-or-later OR GPL-2.0-or-later:
+              - https://gmplib.org/manual/Copying
              OpenSMT is licensed under MIT license:
               - https://github.com/opensmt/opensmt/blob/main/COPYING
-             Based on that information, we provide the whole library including its dependencies under the MIT license.
+             The JNI wrapper is part of JavaSMT and licensed under Apache-2.0.
+             The library statically links GMP, which stays under its license,
+             so the license metadata in solvers_ivy_conf/ivy_opensmt.xml
+             and solvers_maven_conf/maven_opensmt_pom_template.xml
+             lists the licenses of all parts of the library.
         -->
         <!-- Link the wrapper and create a new lib -->
         <exec executable="aarch64-linux-gnu-g++" dir="${source.path}" failonerror="true">

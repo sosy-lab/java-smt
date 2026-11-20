@@ -27,6 +27,12 @@ SPDX-License-Identifier: Apache-2.0
     <property name="jar.sources.excludes" value="**/*Test.java"/>
 
     <target name="jar" depends="determine-version,build" description="Create a runnable JAR file">
+        <fail unless="javasmt.module.name"
+              message="Cannot build JavaSMT Jar, javasmt.module.name must be set."/>
+        <fail message="Cannot build JavaSMT Jar, javasmt.module.name must not be blank or contain spaces.">
+            <condition><matches string="${javasmt.module.name}" pattern="\A\z|[ ]"/></condition>
+        </fail>
+
         <property name="jar.file" value="${ivy.module}-${version}.jar"/>
         <copy todir="${class.dir}"><fileset dir="." includes="META-INF/**"/></copy>
         <manifestclasspath property="classpath.jar"
@@ -46,6 +52,8 @@ SPDX-License-Identifier: Apache-2.0
                 <attribute name="Implementation-Title" value="${ant.project.name}"/>
                 <attribute name="Implementation-Version" value="${version}"/>
                 <attribute name="Implementation-URL" value="${project.url}"/>
+
+                <attribute name="Automatic-Module-Name" value="${javasmt.module.name}"/>
             </manifest>
         </jar>
     </target>

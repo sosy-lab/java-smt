@@ -19,6 +19,7 @@ import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
+import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.solvers.opensmt.OpenSmtSolverContext.OpenSMTOptions;
 import org.sosy_lab.java_smt.solvers.opensmt.api.PTRef;
 import org.sosy_lab.java_smt.solvers.opensmt.api.VectorInt;
@@ -68,15 +69,29 @@ class OpenSmtInterpolatingProver extends OpenSmtAbstractProver<Integer>
     super.popImpl();
   }
 
+  /**
+   * Check if OpenSMT supports interpolation for the current logic, and throw an {@link
+   * SolverException} otherwise.
+   */
+  private void checkLogicSupportInterpolation() throws SolverException {
+    if (!creator.getLogic().doesLogicSupportInterpolation()) {
+      throw new SolverException(
+          "OpenSMT does not support interpolation for the specified logic %s."
+              .formatted(creator.getLogic()));
+    }
+  }
+
   @Override
-  public BooleanFormula getInterpolant(Collection<Integer> formulasOfA) {
+  public BooleanFormula getInterpolant(Collection<Integer> formulasOfA) throws SolverException {
+    checkLogicSupportInterpolation();
     return creator.encapsulateBoolean(
         osmtSolver.getInterpolationContext().getSingleInterpolant(new VectorInt(formulasOfA)));
   }
 
   @Override
   public List<BooleanFormula> getSeqInterpolants(
-      List<? extends Collection<Integer>> partitionedFormulas) {
+      List<? extends Collection<Integer>> partitionedFormulas) throws SolverException {
+    checkLogicSupportInterpolation();
     VectorVectorInt partitions = new VectorVectorInt();
     for (int i = 1; i < partitionedFormulas.size(); i++) {
       VectorInt prefix = new VectorInt();

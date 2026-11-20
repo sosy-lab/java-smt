@@ -16,9 +16,14 @@ SPDX-License-Identifier: Apache-2.0
     xsi:noNamespaceSchemaLocation="http://ant.apache.org/ivy/schemas/ivy.xsd">
     <info organisation="org.sosy_lab" module="javasmt-solver-opensmt">
         <license name="MIT License" url="https://github.com/usi-verification-and-security/opensmt/blob/master/LICENSE"/>
+        <license name="Apache License, Version 2.0 (JavaSMT JNI wrapper)" url="https://www.apache.org/licenses/LICENSE-2.0.txt"/>
+        <license name="GNU LGPL v3 or later, or GNU GPL v2 or later (GMP)" url="https://gmplib.org/manual/Copying"/>
         <description>
             OpenSMT solver and JNI wrapper.
-            OpenSMT is provided under the MIT License.
+            OpenSMT is provided under the MIT License,
+            and the JNI wrapper under the Apache License, Version 2.0.
+            The native library also contains GMP,
+            which is provided under its own license.
         </description>
     </info>
 

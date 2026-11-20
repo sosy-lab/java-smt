@@ -9,7 +9,6 @@
 package org.sosy_lab.java_smt.solvers.bitwuzla;
 
 import static com.google.common.base.Preconditions.checkArgument;
-import static org.sosy_lab.common.collect.Collections3.transformedImmutableSetCopy;
 import static org.sosy_lab.java_smt.api.FormulaType.getFloatingPointTypeFromSizesWithHiddenBit;
 
 import com.google.common.base.Preconditions;
@@ -20,17 +19,8 @@ import com.google.common.collect.Table;
 import java.math.BigInteger;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Deque;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Optional;
-import java.util.Set;
 import java.util.function.BiConsumer;
 import org.sosy_lab.java_smt.api.ArrayFormula;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
@@ -65,22 +55,6 @@ import org.sosy_lab.java_smt.solvers.bitwuzla.api.Vector_Term;
 class BitwuzlaFormulaCreator extends FormulaCreator<Term, Sort, TermManager, BitwuzlaDeclaration> {
 
   private final Table<String, Sort, Term> formulaCache = HashBasedTable.create();
-
-  /**
-   * This mapping stores symbols and their constraints, such as from fp-to-bv casts with their
-   * defining equation.
-   *
-   * <p>Bitwuzla does not support casts from floating-point to bitvector natively. The reason given
-   * is that the value is undefined for NaN and that the SMT-LIB standard also does not include such
-   * an operation. We try to work around this limitation by introducing a fresh variable <code>
-   * __CAST_FROM_BV_XXX</code>for the result and then adding the constraint <code>
-   * fp.to_fp(__CAST_FROM_BV_XXX) = &lt;float-term&gt;</code> as a side-condition. This is also what
-   * is recommended by the SMT-LIB2 standard. The map <code>variableCasts</code> is used to store
-   * these side-conditions so that they can later be added as assertions. The keys of the map are
-   * the newly introduced variable symbols and the values are the defining equations as mentioned
-   * above.
-   */
-  private final Map<String, Term> constraintsForVariables = new HashMap<>();
 
   BitwuzlaFormulaCreator(TermManager pTermManager) {
     super(pTermManager, pTermManager.mk_bool_sort(), null, null, null, null);
@@ -566,22 +540,6 @@ class BitwuzlaFormulaCreator extends FormulaCreator<Term, Sort, TermManager, Bit
     return formulaCache;
   }
 
-  // True if the entered String has an existing variable in the cache.
-  protected boolean formulaCacheContains(String variable) {
-    // There is always only 1 type permitted per variable
-    return formulaCache.containsRow(variable);
-  }
-
-  // Optional that contains the variable to the entered String if there is one.
-  protected Optional<Term> getFormulaFromCache(String variable) {
-    Iterator<Entry<Sort, Term>> entrySetIter = formulaCache.row(variable).entrySet().iterator();
-    if (entrySetIter.hasNext()) {
-      // If there is a non-empty row for an entry, there is only one entry
-      return Optional.of(entrySetIter.next().getValue());
-    }
-    return Optional.empty();
-  }
-
   @Override
   public Object convertValue(Term term) {
     Preconditions.checkArgument(term.is_value(), "Term \"%s\" is not a value.", term);
@@ -604,37 +562,6 @@ class BitwuzlaFormulaCreator extends FormulaCreator<Term, Sort, TermManager, Bit
           getFloatingPointTypeFromSizesWithHiddenBit(exponentSize, mantissaSizeWithHiddenBit));
     }
     throw new AssertionError("Unknown value type.");
-  }
-
-  /** Add a constraint that is pushed onto the prover stack whenever the variable is used. */
-  public void addConstraintForVariable(String variable, Term constraint) {
-    constraintsForVariables.put(variable, constraint);
-  }
-
-  /**
-   * Returns a set of additional constraints (side-conditions) that are needed to use some variables
-   * from the given term, such as utility variables from casts.
-   *
-   * <p>Bitwuzla does not support fp-to-bv conversion natively. We have to use side-conditions as a
-   * workaround. When a term containing fp-to-bv casts is added to the assertion stack these
-   * side-conditions need to be collected by calling this method and then also adding them to the
-   * assertion stack.
-   */
-  public Collection<Term> getConstraintsForTerm(Term pTerm) {
-    final Set<String> usedConstraintVariables = new LinkedHashSet<>();
-    final Deque<String> waitlist = new ArrayDeque<>(extractVariablesAndUFs(pTerm, false).keySet());
-    while (!waitlist.isEmpty()) {
-      String current = waitlist.pop();
-      if (constraintsForVariables.containsKey(current)) { // ignore variables without constraints
-        if (usedConstraintVariables.add(current)) {
-          // if we found a new variable with constraint, get transitive variables from constraint
-          Term constraint = constraintsForVariables.get(current);
-          waitlist.addAll(extractVariablesAndUFs(constraint, false).keySet());
-        }
-      }
-    }
-
-    return transformedImmutableSetCopy(usedConstraintVariables, constraintsForVariables::get);
   }
 
   @Override

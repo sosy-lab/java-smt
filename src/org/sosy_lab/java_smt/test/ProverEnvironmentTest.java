@@ -238,4 +238,12 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
       pProver.pop();
     }
   }
+
+  // Test that non-interpolation provers return Void (null) IDs always
+  @Test
+  public void assertionIdNullTest() throws InterruptedException {
+    try (var prover = context.newProverEnvironment()) {
+      assertThat(prover.addConstraint(bmgr.makeTrue())).isNull();
+    }
+  }
 }

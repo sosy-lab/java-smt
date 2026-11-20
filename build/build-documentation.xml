@@ -11,7 +11,7 @@ SPDX-License-Identifier: Apache-2.0
 -->
 
 <!-- vim: set tabstop=8 shiftwidth=4 expandtab filetype=ant : -->
-<project name="documentation" basedir=".">
+<project name="documentation" basedir="." xmlns:if="ant:if" xmlns:unless="ant:unless">
 
     <!-- Targets for building documentation. -->
 
@@ -22,6 +22,10 @@ SPDX-License-Identifier: Apache-2.0
 
     <!-- These properties can be overridden from including file. -->
     <property name="documentation.options.file" value="${class.dir}/org/sosy_lab/${package}/ConfigurationOptions.txt"/>
+    <!-- Patterns (relative to class.dir and source.dir) of classes whose options are not collected.
+         If set, the including file needs to define the path "classpath.libraries" (the classpath without class.dir). -->
+    <property name="documentation.options.excludes" value=""/>
+    <property name="documentation.options.tmp.dir" value=".options-collection"/>
     <property name="documentation.javadoc.dir" value="Javadoc"/>
     <property name="documentation.javadoc.exclude" value=""/>
     <property name="javadoc.doclint" value="-Xdoclint:all,-missing"/>
@@ -29,17 +33,37 @@ SPDX-License-Identifier: Apache-2.0
     <target name="collect-options" depends="build-project">
         <echo message="running OptionCollector..." level="info"/>
 
+        <local name="options.excluded"/>
+        <condition property="options.excluded">
+            <length string="${documentation.options.excludes}" when="greater" length="0"/>
+        </condition>
+
+        <!-- OptionCollector collects options of all classes in directories (not in JARs)
+             and reads their default values from the sources next to them
+             (or in "../src" if the directory is named "bin" or "classes").
+             So for excluding classes, we copy the remaining classes and their sources into a separate directory. -->
+        <delete dir="${documentation.options.tmp.dir}" if:set="options.excluded"/>
+        <copy todir="${documentation.options.tmp.dir}" if:set="options.excluded">
+            <fileset dir="${class.dir}" excludes="${documentation.options.excludes}"/>
+            <fileset dir="${source.dir}" excludes="${documentation.options.excludes}"/>
+        </copy>
+
         <java classname="org.sosy_lab.common.configuration.OptionCollector"
             fork="true"
             output="${documentation.options.file}" append="false"
             failonerror="true"
             logError="true">
 
-            <classpath refid="classpath"/>
+            <classpath refid="classpath" unless:set="options.excluded"/>
+            <classpath if:set="options.excluded">
+                <pathelement location="${documentation.options.tmp.dir}"/>
+                <path refid="classpath.libraries"/>
+            </classpath>
 
             <!-- "-v" is a optional param for verbose output of OptionCollector -->
             <!-- <arg value="-v"/> -->
         </java>
+        <delete dir="${documentation.options.tmp.dir}" if:set="options.excluded"/>
         <echo message="Options collected." level="info"/>
     </target>
 

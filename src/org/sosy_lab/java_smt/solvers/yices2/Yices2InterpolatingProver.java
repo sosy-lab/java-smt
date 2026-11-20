@@ -19,6 +19,7 @@ import com.google.common.primitives.Ints;
 import com.sri.yices.InterpolationContext;
 import com.sri.yices.Status;
 import com.sri.yices.Terms;
+import com.sri.yices.YicesException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -33,6 +34,12 @@ import org.sosy_lab.java_smt.api.SolverException;
 
 class Yices2InterpolatingProver extends Yices2AbstractProver<Integer>
     implements InterpolatingProverEnvironment<Integer> {
+
+  private static final ImmutableSet<String> ACCEPTED_INTERPOLATION_ERROR_MESSAGES =
+      ImmutableSet.of(
+          "mcsat: unsupported theory\n",
+          "mcsat: assumption variable has a type that mcsat cannot decide on\n");
+
   Yices2InterpolatingProver(
       Yices2FormulaCreator creator,
       Set<ProverOptions> pOptions,
@@ -61,7 +68,7 @@ class Yices2InterpolatingProver extends Yices2AbstractProver<Integer>
   }
 
   private int interpolate(Collection<Integer> setA, Collection<Integer> setB)
-      throws InterruptedException {
+      throws InterruptedException, SolverException {
     try (var ctxA = newContext("mcsat");
         var ctxB = newContext("mcsat")) {
 
@@ -72,12 +79,21 @@ class Yices2InterpolatingProver extends Yices2AbstractProver<Integer>
       // TODO How to abort this?
       // For now, let's just check before and after the call:
       shutdownNotifier.shutdownIfNecessary();
-      var status = context.check(DEFAULT_PARAMS, false);
+      Status status;
+      try {
+        status = context.check(DEFAULT_PARAMS, false);
+      } catch (YicesException e) {
+        if (ACCEPTED_INTERPOLATION_ERROR_MESSAGES.contains(e.getMessage())) {
+          throw new SolverException(e.getMessage().stripTrailing());
+        } else {
+          throw e;
+        }
+      }
       shutdownNotifier.shutdownIfNecessary();
       if (status == Status.UNSAT) {
         return context.getInterpolant();
       } else {
-        throw new IllegalArgumentException("Solver state must be unsat");
+        throw new IllegalStateException("Solver state must be unsat");
       }
     }
   }

@@ -16,8 +16,12 @@ SPDX-License-Identifier: Apache-2.0
     xsi:noNamespaceSchemaLocation="http://ant.apache.org/ivy/schemas/ivy.xsd">
     <info organisation="org.sosy_lab" module="javasmt-solver-optimathsat">
         <license name="For research and evaluation purposes only" url="http://optimathsat.disi.unitn.it/pages/download.html"/>
+        <license name="Apache License, Version 2.0 (JavaSMT JNI wrapper)" url="https://www.apache.org/licenses/LICENSE-2.0.txt"/>
+        <license name="GNU LGPL v3 or later, or GNU GPL v2 or later (GMP)" url="https://gmplib.org/manual/Copying"/>
         <description>
             OptiMathSAT solver and the JavaSMT JNI wrapper.
+            The module also contains GMP,
+            which is provided under its own license.
         </description>
     </info>
 

@@ -170,11 +170,17 @@ SPDX-License-Identifier: Apache-2.0
 
         <!-- link the wrapper to create libbitwuzlaj-x64.so -->
         <!-- Licensing:
-             GMP is licensed under LGPL:
-              - https://www.gnu.org/licenses/lgpl-3.0.html
+             GMP is licensed under LGPL-3.0-or-later OR GPL-2.0-or-later,
+             and MPFR under LGPL-3.0-or-later:
+              - https://gmplib.org/manual/Copying
+              - https://www.mpfr.org/mpfr-current/mpfr.html#Copying
              Bitwuzla is licensed under MIT license:
               - https://github.com/bitwuzla/bitwuzla/blob/main/COPYING
-             Based on that information, we provide the whole library including its dependencies under the MIT license.
+             The JNI wrapper is part of JavaSMT and licensed under Apache-2.0.
+             The library statically links GMP and MPFR, which stay under their licenses,
+             so the license metadata in solvers_ivy_conf/ivy_bitwuzla.xml
+             and solvers_maven_conf/maven_bitwuzla_pom_template.xml
+             lists the licenses of all parts of the library.
         -->
         <exec executable="g++" dir="${source.path}/libbitwuzla" failonerror="true">
             <arg value="-shared"/>
@@ -229,11 +235,17 @@ SPDX-License-Identifier: Apache-2.0
 
         <!-- link the wrapper to create libbitwuzlaj-arm64.so -->
         <!-- Licensing:
-             GMP is licensed under LGPL:
-              - https://www.gnu.org/licenses/lgpl-3.0.html
+             GMP is licensed under LGPL-3.0-or-later OR GPL-2.0-or-later,
+             and MPFR under LGPL-3.0-or-later:
+              - https://gmplib.org/manual/Copying
+              - https://www.mpfr.org/mpfr-current/mpfr.html#Copying
              Bitwuzla is licensed under MIT license:
               - https://github.com/bitwuzla/bitwuzla/blob/main/COPYING
-             Based on that information, we provide the whole library including its dependencies under the MIT license.
+             The JNI wrapper is part of JavaSMT and licensed under Apache-2.0.
+             The library statically links GMP and MPFR, which stay under their licenses,
+             so the license metadata in solvers_ivy_conf/ivy_bitwuzla.xml
+             and solvers_maven_conf/maven_bitwuzla_pom_template.xml
+             lists the licenses of all parts of the library.
         -->
         <exec executable="aarch64-linux-gnu-g++" dir="${source.path}/libbitwuzla" failonerror="true">
             <arg value="-shared"/>
@@ -299,11 +311,17 @@ SPDX-License-Identifier: Apache-2.0
               - https://gcc.gnu.org/onlinedocs/libstdc++/manual/license.html
              Winpthreads is licensed under MIT:
               - https://sourceforge.net/p/mingw-w64/mingw-w64/ci/master/tree/mingw-w64-libraries/winpthreads/COPYING
-             GMP is licensed under LGPL:
-              - https://www.gnu.org/licenses/lgpl-3.0.html
+             GMP is licensed under LGPL-3.0-or-later OR GPL-2.0-or-later,
+             and MPFR under LGPL-3.0-or-later:
+              - https://gmplib.org/manual/Copying
+              - https://www.mpfr.org/mpfr-current/mpfr.html#Copying
              Bitwuzla is licensed under MIT license:
               - https://github.com/bitwuzla/bitwuzla/blob/main/COPYING
-             Based on that information, we provide the whole library including its dependencies under the MIT license.
+             The JNI wrapper is part of JavaSMT and licensed under Apache-2.0.
+             The library statically links GMP and MPFR, which stay under their licenses,
+             so the license metadata in solvers_ivy_conf/ivy_bitwuzla.xml
+             and solvers_maven_conf/maven_bitwuzla_pom_template.xml
+             lists the licenses of all parts of the library.
         -->
         <exec executable="x86_64-w64-mingw32-g++" dir="${source.path}/libbitwuzla" failonerror="true">
             <arg value="-std=c++17"/>

@@ -8,13 +8,16 @@
 
 package org.sosy_lab.java_smt.test;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.truth.TruthJUnit.assume;
 import static org.sosy_lab.java_smt.api.FormulaType.getSinglePrecisionFloatingPointType;
 import static org.sosy_lab.java_smt.test.BooleanFormulaSubject.assertUsing;
 import static org.sosy_lab.java_smt.test.ProverEnvironmentSubject.assertThat;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.common.truth.Truth;
 import java.util.Collection;
+import java.util.Map;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.junit.After;
 import org.junit.Before;
@@ -180,8 +183,72 @@ public abstract class SolverBasedTest0 {
 
   @Before
   public final void initSolver() throws InvalidConfigurationException {
-    config = createTestConfigBuilder().build();
+    Configuration configuration = createTestConfigBuilder().build();
 
+    initSolverWith(configuration);
+  }
+
+  /**
+   * Adds the given option to the config (all other options are retained) and re-initializes the
+   * current solver with this configuration. No solver object created before calling this is valid
+   * after executing this, as the old context is closed!
+   */
+  protected void setAdditionalConfigOptionForSolver(String optionName, String optionValue)
+      throws InvalidConfigurationException {
+    setAdditionalConfigOptionForSolver(ImmutableMap.of(optionName, optionValue));
+  }
+
+  /**
+   * Adds the given option to the config (all other options are retained) and re-initializes the
+   * current solver with this configuration. No solver object created before calling this is valid
+   * after executing this, as the old context is closed!
+   */
+  protected void setAdditionalConfigOptionForSolver(
+      String optionName1, String optionValue1, String optionName2, String optionValue2)
+      throws InvalidConfigurationException {
+    checkArgument(!optionName1.equalsIgnoreCase(optionValue2));
+    setAdditionalConfigOptionForSolver(
+        ImmutableMap.of(optionName1, optionValue1, optionName2, optionValue2));
+  }
+
+  /**
+   * Adds the given option to the config (all other options are retained) and re-initializes the
+   * current solver with this configuration. No solver object created before calling this is valid
+   * after executing this, as the old context is closed!
+   */
+  protected void setAdditionalConfigOptionForSolver(
+      String optionName1,
+      String optionValue1,
+      String optionName2,
+      String optionValue2,
+      String optionName3,
+      String optionValue3)
+      throws InvalidConfigurationException {
+    checkArgument(!optionName1.equalsIgnoreCase(optionValue2));
+    checkArgument(!optionName1.equalsIgnoreCase(optionValue3));
+    checkArgument(!optionName2.equalsIgnoreCase(optionValue3));
+    setAdditionalConfigOptionForSolver(
+        ImmutableMap.of(
+            optionName1, optionValue1, optionName2, optionValue2, optionName3, optionValue3));
+  }
+
+  /**
+   * Adds the given option to the config (all other options are retained) and re-initializes the
+   * current solver with this configuration. No solver object created before calling this is valid
+   * after executing this, as the old context is closed!
+   */
+  protected void setAdditionalConfigOptionForSolver(Map<String, String> optionsMap)
+      throws InvalidConfigurationException {
+    context.close();
+    initSolverWith(Configuration.builder().copyFrom(config).setOptions(optionsMap).build());
+  }
+
+  /**
+   * Initializes the currently set solver with the config given. All relevant fields are
+   * automatically (re)assigned.
+   */
+  private void initSolverWith(Configuration pConfiguration) throws InvalidConfigurationException {
+    config = pConfiguration;
     factory = new SolverContextFactory(config, logger, shutdownNotifierToUse());
     try {
       context = factory.generateContext();
