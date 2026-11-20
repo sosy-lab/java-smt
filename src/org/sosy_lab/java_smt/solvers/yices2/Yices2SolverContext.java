@@ -11,6 +11,7 @@ package org.sosy_lab.java_smt.solvers.yices2;
 import com.sri.yices.Yices;
 import java.util.Set;
 import java.util.function.Consumer;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.configuration.Configuration;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
@@ -29,6 +30,12 @@ public final class Yices2SolverContext extends AbstractSolverContext {
 
   @Options(prefix = "solver.yices2")
   static class Yices2Parameters {
+    @Option(
+        secure = true,
+        description = "DEPRECATED: Backend to use for the solver",
+        values = {"dpllt", "mcsat"})
+    @Nullable String solverType;
+
     @Option(
         secure = true,
         description =
@@ -92,6 +99,10 @@ public final class Yices2SolverContext extends AbstractSolverContext {
 
     Yices2Parameters(Configuration config) throws InvalidConfigurationException {
       config.inject(this);
+      if (solverType != null) {
+        throw new InvalidConfigurationException(
+            "Option \"solver.yices2.solverType\" is no longer supported.");
+      }
     }
   }
 
