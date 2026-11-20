@@ -100,9 +100,13 @@ diff --git a/src/main/java/com/sri/yices/Makefile b/src/main/java/com/sri/yices/
 +LIBS := -lyices -lcudd -lpoly -lgmpxx -lgmp
  
  CXX ?= g++
- 
-@@ -86,7 +94,10 @@
- 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -dynamiclib -o $@ yicesJNI.o $(LIBS)
+
+@@ -83,10 +91,13 @@
+ 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -Wall -c yicesJNI.cpp
+
+ libyices2java.dylib: yicesJNI.o
+-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -dynamiclib -o $@ yicesJNI.o $(LIBS)
++	$(CXX) $(CFLAGS) $(LDFLAGS) -o $@ yicesJNI.o -dynamiclib $(YICES_PATH)/lib/libyices.a $(CUDD_PATH)/lib/libcudd.a $(POLY_PATH)/lib/libpoly.a $(GMP_PATH)/lib/libgmpxx.a $(GMP_PATH)/lib/libgmp.a -lc -lm
  
  libyices2java.so: yicesJNI.o
 -	$(CXX) $(CFLAGS) $(LDFLAGS) -shared -o $@ yicesJNI.o $(LIBS)

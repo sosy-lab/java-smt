@@ -50,6 +50,13 @@ SPDX-License-Identifier: Apache-2.0
         <condition property="yices-java.installed">
             <available file="${yices2.buildDir}/yices2_java_bindings/dist/lib" type="dir"/>
         </condition>
+
+        <condition property="build.architecture" value="arm64" else="x64">
+            <os arch="aarch64"/>
+        </condition>
+        <condition property="build.homebrew" value="/opt/homebrew" else="/usr/local">
+            <os arch="aarch64"/>
+        </condition>
     </target>
 
     <target name="download-cudd" depends="build-initialize" unless="cudd.downloaded">
@@ -80,6 +87,23 @@ SPDX-License-Identifier: Apache-2.0
             <arg value="--host"/>
             <arg value="x86_64-w64-mingw32"/>
             <arg value="--prefix=${yices2.buildDir}/cudd/install/x64-windows"/>
+        </exec>
+        <exec executable="make" dir="${yices2.buildDir}/cudd" failonerror="true">
+            <arg value="-j"/>
+            <arg value="install"/>
+        </exec>
+        <exec executable="make" dir="${yices2.buildDir}/cudd" failonerror="true">
+            <arg value="clean"/>
+        </exec>
+    </target>
+    <target name="build-cudd-macOS" depends="download-cudd" unless="cudd.installed">
+        <exec executable="aclocal" dir="${yices2.buildDir}/cudd" failonerror="true"/>
+        <exec executable="autoconf" dir="${yices2.buildDir}/cudd" failonerror="true"/>
+        <exec executable="automake" dir="${yices2.buildDir}/cudd" failonerror="true"/>
+        <!-- macOS build -->
+        <exec executable="./configure" dir="${yices2.buildDir}/cudd" failonerror="true">
+            <env key="CFLAGS" value="-fPIC"/>
+            <arg value="--prefix=${yices2.buildDir}/cudd/install/${build.architecture}-macos"/>
         </exec>
         <exec executable="make" dir="${yices2.buildDir}/cudd" failonerror="true">
             <arg value="-j"/>
@@ -121,6 +145,23 @@ SPDX-License-Identifier: Apache-2.0
             <arg value="-DCMAKE_INSTALL_PREFIX=${yices2.buildDir}/libpoly/install/x64-windows"/>
             <arg value="-DGMP_INCLUDE_DIR=/dependencies/gmp-6.3.0/install/x64-windows/include"/>
             <arg value="-DGMP_LIBRARY=/dependencies/gmp-6.3.0/install/x64-windows/lib/libgmp.a"/>
+            <arg value="-DLIBPOLY_BUILD_PYTHON_API=OFF"/>
+        </exec>
+        <exec executable="make" dir="${yices2.buildDir}/libpoly/build" failonerror="true">
+            <arg value="-j"/>
+            <arg value="install"/>
+        </exec>
+        <delete dir="${yices2.buildDir}/libpoly/build"/>
+    </target>
+    <target name="build-libpoly-macOS" depends="download-libpoly" unless="libpoly.installed">
+        <!-- macOS build -->
+        <mkdir dir="${yices2.buildDir}/libpoly/build"/>
+        <exec executable="cmake" dir="${yices2.buildDir}/libpoly/build" failonerror="true">
+            <arg value=".."/>
+            <arg value="-DCMAKE_BUILD_TYPE=Release"/>
+            <arg value="-DCMAKE_INSTALL_PREFIX=${yices2.buildDir}/libpoly/install/${build.architecture}-macos"/>
+            <arg value="-DGMP_INCLUDE_DIR=${build.homebrew}/include"/>
+            <arg value="-DGMP_LIBRARY=${build.homebrew}/lib/libgmp.a"/>
             <arg value="-DLIBPOLY_BUILD_PYTHON_API=OFF"/>
         </exec>
         <exec executable="make" dir="${yices2.buildDir}/libpoly/build" failonerror="true">
@@ -183,6 +224,33 @@ SPDX-License-Identifier: Apache-2.0
             <arg value="OPTION=mingw32"/>
         </exec>
     </target>
+    <target name="build-yices2-macOS"
+            depends="build-cudd-macOS, build-libpoly-macOS, download-yices2" unless="yices.installed">
+        <exec executable="git" dir="${yices2.buildDir}/yices2" failonerror="true">
+            <arg value="apply"/>
+            <arg value="${basedir}/lib/native/source/yices2/yices.patch"/>
+        </exec>
+        <exec executable="autoconf" dir="${yices2.buildDir}/yices2" failonerror="true"/>
+        <delete file="${yices2.buildDir}/yices2/INSTALL"/>
+        <mkdir dir="${yices2.buildDir}/yices2/install"/>
+        <!-- macOS build -->
+        <exec executable="./configure" dir="${yices2.buildDir}/yices2" failonerror="true">
+            <env key="LDFLAGS" value="-L${build.homebrew}/lib -L${yices2.buildDir}/libpoly/install/${build.architecture}-macos/lib -L${yices2.buildDir}/cudd/install/${build.architecture}-macos/lib"/>
+            <env key="CFLAGS" value="-I${build.homebrew}/include -I${yices2.buildDir}/libpoly/install/${build.architecture}-macos/include -I${yices2.buildDir}/cudd/install/${build.architecture}-macos/include"/>
+            <arg value="--enable-mcsat"/>
+            <arg value="--enable-thread-safety"/>
+            <arg value="--prefix=${yices2.buildDir}/yices2/install/${build.architecture}-macos"/>
+        </exec>
+        <exec executable="make" dir="${yices2.buildDir}/yices2" failonerror="true">
+            <arg value="-j"/>
+        </exec>
+        <exec executable="make" dir="${yices2.buildDir}/yices2" failonerror="true">
+            <arg value="install"/>
+        </exec>
+        <exec executable="make" dir="${yices2.buildDir}/yices2" failonerror="true">
+            <arg value="clean"/>
+        </exec>
+    </target>
     <target name="clean-yices2" depends="build-initialize, clean-yices2-java" if="yices.installed">
         <delete dir="${yices2.buildDir}/yices2/install"/>
         <exec executable="git" dir="${yices2.buildDir}/yices2" failonerror="true">
@@ -235,6 +303,25 @@ SPDX-License-Identifier: Apache-2.0
             <arg value="install"/>
         </exec>
     </target>
+    <target name="build-yices2-java-macOS"
+            depends="build-yices2-macOS, download-yices2-java"
+            unless="yices-java.installed">
+        <exec executable="git" dir="${yices2.buildDir}/yices2_java_bindings" failonerror="true">
+            <arg value="apply"/>
+            <arg value="${basedir}/lib/native/source/yices2/jni.patch"/>
+        </exec>
+        <mkdir dir="${yices2.buildDir}/yices2_java_bindings/dist/lib"/>
+        <!-- macOS build -->
+        <exec executable="ant" dir="${yices2.buildDir}/yices2_java_bindings" failonerror="true">
+            <env key="OS" value="darwin"/>
+            <env key="JNI_PATH" value="${java.home}/include"/>
+            <env key="GMP_PATH" value="${build.homebrew}"/>
+            <env key="CUDD_PATH" value="${yices2.buildDir}/cudd/install/${build.architecture}-macos"/>
+            <env key="POLY_PATH" value="${yices2.buildDir}/libpoly/install/${build.architecture}-macos"/>
+            <env key="YICES_PATH" value="${yices2.buildDir}/yices2/install/${build.architecture}-macos"/>
+            <arg value="install"/>
+        </exec>
+    </target>
     <target name="clean-yices2-java" depends="build-initialize" if="yices-java.installed">
         <exec executable="ant" dir="${yices2.buildDir}/yices2_java_bindings" failonerror="true">
             <arg value="clean"/>
@@ -244,6 +331,15 @@ SPDX-License-Identifier: Apache-2.0
             <arg value="-R"/>
             <arg value="${basedir}/lib/native/source/yices2/jni.patch"/>
         </exec>
+    </target>
+
+    <target name="publish-yices2-macOS" depends="load-ivy, build-yices2-java-macOS"
+            description="Compile Yices2 binaries for macOS">
+        <condition property="install.architecture" value="arm64" else="x86_64">
+            <os arch="aarch64"/>
+        </condition>
+        <mkdir dir="lib/native/${build.architecture}-macosx"/>
+        <copy file="${yices2.buildDir}/yices2_java_bindings/dist/lib/libyices2java.dylib" tofile="lib/native/${install.architecture}-macosx/libyices2java.dylib" failonerror="true"/>
     </target>
 
     <target name="publish-yices2" depends="load-ivy, build-yices2-java"
