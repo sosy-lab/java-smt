@@ -87,6 +87,9 @@ abstract class Yices2AbstractProver<T> extends AbstractProverWithAllSat<T>
   Context newContext(Yices2Parameters options) {
     try (var cfg = new Config(options.logic)) {
       cfg.set("mode", options.mode);
+      // Setting this to 'auto' allows Yices to pick between Simplex and Floyd-Warshall based on a
+      // heuristic when a difference logic is selected, and the mode is set to 'one-shot'
+      cfg.set("arith-solver", "auto");
       return new Context(cfg);
     }
   }
