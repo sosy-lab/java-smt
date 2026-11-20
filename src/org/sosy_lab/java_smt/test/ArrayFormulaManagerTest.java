@@ -88,9 +88,9 @@ public class ArrayFormulaManagerTest extends SolverBasedTest0.ParameterizedSolve
     StringFormula stringTwo = smgr.makeString("two");
     IntegerFormula intFour = imgr.makeNumber(4);
     ArrayFormula<IntegerFormula, StringFormula> arr1 =
-        amgr.makeArray("arr1", FormulaType.IntegerType, StringType);
+        amgr.makeArray("arr1", IntegerType, StringType);
     ArrayFormula<IntegerFormula, StringFormula> arr2 =
-        amgr.makeArray("arr2", FormulaType.IntegerType, StringType);
+        amgr.makeArray("arr2", IntegerType, StringType);
     BooleanFormula query =
         bmgr.and(
             amgr.equivalence(arr2, amgr.store(arr1, intFour, stringTwo)),

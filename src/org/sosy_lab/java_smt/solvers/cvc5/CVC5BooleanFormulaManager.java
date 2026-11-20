@@ -90,14 +90,11 @@ class CVC5BooleanFormulaManager
         operands.add(operand);
       }
     }
-    switch (operands.size()) {
-      case 0:
-        return pTrue;
-      case 1:
-        return Iterables.getOnlyElement(operands);
-      default:
-        return termManager.mkTerm(Kind.AND, operands.toArray(new Term[0]));
-    }
+    return switch (operands.size()) {
+      case 0 -> pTrue;
+      case 1 -> Iterables.getOnlyElement(operands);
+      default -> termManager.mkTerm(Kind.AND, operands.toArray(new Term[0]));
+    };
   }
 
   @Override
@@ -129,14 +126,11 @@ class CVC5BooleanFormulaManager
         operands.add(operand);
       }
     }
-    switch (operands.size()) {
-      case 0:
-        return pFalse;
-      case 1:
-        return Iterables.getOnlyElement(operands);
-      default:
-        return termManager.mkTerm(Kind.OR, operands.toArray(new Term[0]));
-    }
+    return switch (operands.size()) {
+      case 0 -> pFalse;
+      case 1 -> Iterables.getOnlyElement(operands);
+      default -> termManager.mkTerm(Kind.OR, operands.toArray(new Term[0]));
+    };
   }
 
   @Override

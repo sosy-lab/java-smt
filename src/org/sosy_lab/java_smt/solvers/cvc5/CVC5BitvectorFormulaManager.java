@@ -131,7 +131,7 @@ class CVC5BitvectorFormulaManager
       return termManager.mkTerm(op, pNumber);
     } catch (CVC5ApiException e) {
       throw new IllegalArgumentException(
-          String.format("You tried rotation a bitvector %s with shift %d", pNumber, pToRotate), e);
+          "You tried rotation a bitvector %s with shift %d".formatted(pNumber, pToRotate), e);
     }
   }
 
@@ -142,7 +142,7 @@ class CVC5BitvectorFormulaManager
       return termManager.mkTerm(op, pNumber);
     } catch (CVC5ApiException e) {
       throw new IllegalArgumentException(
-          String.format("You tried rotation a bitvector %s with shift %d", pNumber, pToRotate), e);
+          "You tried rotation a bitvector %s with shift %d".formatted(pNumber, pToRotate), e);
     }
   }
 

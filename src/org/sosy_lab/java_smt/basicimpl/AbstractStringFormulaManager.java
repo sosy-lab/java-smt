@@ -167,14 +167,11 @@ public abstract class AbstractStringFormulaManager<TFormulaInfo, TType, TEnv, TF
 
   @Override
   public StringFormula concat(List<StringFormula> parts) {
-    switch (parts.size()) {
-      case 0:
-        return makeString(""); // empty sequence
-      case 1:
-        return Iterables.getOnlyElement(parts);
-      default:
-        return wrapString(concatImpl(Lists.transform(parts, this::extractInfo)));
-    }
+    return switch (parts.size()) {
+      case 0 -> makeString(""); // empty sequence
+      case 1 -> Iterables.getOnlyElement(parts);
+      default -> wrapString(concatImpl(Lists.transform(parts, this::extractInfo)));
+    };
   }
 
   protected abstract TFormulaInfo concatImpl(List<TFormulaInfo> parts);
@@ -286,14 +283,11 @@ public abstract class AbstractStringFormulaManager<TFormulaInfo, TType, TEnv, TF
 
   @Override
   public RegexFormula concatRegex(List<RegexFormula> parts) {
-    switch (parts.size()) {
-      case 0:
-        return none(); // empty sequence
-      case 1:
-        return Iterables.getOnlyElement(parts);
-      default:
-        return wrapRegex(concatRegexImpl(Lists.transform(parts, this::extractInfo)));
-    }
+    return switch (parts.size()) {
+      case 0 -> none(); // empty sequence
+      case 1 -> Iterables.getOnlyElement(parts);
+      default -> wrapRegex(concatRegexImpl(Lists.transform(parts, this::extractInfo)));
+    };
   }
 
   protected abstract TFormulaInfo concatRegexImpl(List<TFormulaInfo> parts);

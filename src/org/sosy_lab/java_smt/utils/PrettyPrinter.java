@@ -68,51 +68,29 @@ public final class PrettyPrinter {
   }
 
   private static boolean isBooleanFunction(FunctionDeclarationKind kind) {
-    switch (kind) {
-      case AND:
-      case OR:
-      case NOT:
-      case ITE:
-      case IFF:
-      case XOR:
-      case IMPLIES:
-        return true;
-      default:
-        return false;
-    }
+    return switch (kind) {
+      case AND, OR, NOT, ITE, IFF, XOR, IMPLIES -> true;
+      default -> false;
+    };
   }
 
   private static String getColor(FunctionDeclarationKind kind) {
-    switch (kind) {
-      case AND:
-        return "lightblue";
-      case OR:
-        return "lightgreen";
-      case NOT:
-        return "orange";
-      case ITE:
-        return "yellow";
-      case IFF:
-      case XOR:
-      case IMPLIES:
-        return "lightpink";
-      default:
-        return "white";
-    }
+    return switch (kind) {
+      case AND -> "lightblue";
+      case OR -> "lightgreen";
+      case NOT -> "orange";
+      case ITE -> "yellow";
+      case IFF, XOR, IMPLIES -> "lightpink";
+      default -> "white";
+    };
   }
 
   private static String getEdgeLabel(FunctionDeclarationKind kind, int operandId) {
     // for some functions, the order of operands is not important, so we return an empty String
-    switch (kind) {
-      case AND:
-      case OR:
-      case NOT:
-      case IFF:
-      case XOR:
-        return "";
-      default:
-        return Integer.toString(operandId);
-    }
+    return switch (kind) {
+      case AND, OR, NOT, IFF, XOR -> "";
+      default -> Integer.toString(operandId);
+    };
   }
 
   private static final class PrettyPrintVisitor extends DefaultFormulaVisitor<Void> {
@@ -230,13 +208,12 @@ public final class PrettyPrinter {
     }
 
     private String formatNode(Formula f, String label, String shape, String color) {
-      return String.format(
-          "  %d [label=\"%s\", shape=\"%s\", style=\"filled\", fillcolor=\"%s\"];%n",
-          getId(f), label, shape, color);
+      return "  %d [label=\"%s\", shape=\"%s\", style=\"filled\", fillcolor=\"%s\"];%n"
+          .formatted(getId(f), label, shape, color);
     }
 
     private String formatEdge(Formula from, Formula to, String label) {
-      return String.format("  %d -> %d [label=\"%s\"];%n", getId(from), getId(to), label);
+      return "  %d -> %d [label=\"%s\"];%n".formatted(getId(from), getId(to), label);
     }
 
     @Override

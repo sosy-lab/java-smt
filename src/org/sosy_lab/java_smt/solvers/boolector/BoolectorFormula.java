@@ -16,7 +16,7 @@ import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
 
 @Immutable
-abstract class BoolectorFormula implements Formula {
+abstract sealed class BoolectorFormula implements Formula {
 
   private final long btorTerm;
   private final long btor; // We need the boolector instance to calculate the hash
@@ -35,11 +35,9 @@ abstract class BoolectorFormula implements Formula {
     if (o == this) {
       return true;
     }
-    if (!(o instanceof BoolectorFormula)) {
-      return false;
-    }
-    BoolectorFormula other = (BoolectorFormula) o;
-    return btor == other.btor && btorTerm == other.btorTerm;
+    return (o instanceof BoolectorFormula other)
+        && btor == other.btor
+        && btorTerm == other.btorTerm;
   }
 
   @Override

@@ -80,8 +80,8 @@ public interface SLFormulaManager {
    *
    * @param <AF> the type of the address formula.
    * @param <AT> the type of the address formula type.
-   * @param pAdressType the type of the address formula.
+   * @param pAddressType the type of the address formula.
    * @return a formula representing the "nil" element for the given address type.
    */
-  <AF extends Formula, AT extends FormulaType<AF>> AF makeNilElement(AT pAdressType);
+  <AF extends Formula, AT extends FormulaType<AF>> AF makeNilElement(AT pAddressType);
 }

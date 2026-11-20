@@ -279,7 +279,7 @@ public class SolverOverviewTable {
     /** The constructor builds the header of the table. */
     public RowBuilder() {
       lines.add(SEPERATOR_LINE);
-      lines.add(String.format(INFO_COLUMN, "Solver", "Version", "Theories", "Features"));
+      lines.add(INFO_COLUMN.formatted("Solver", "Version", "Theories", "Features"));
       lines.add(SEPERATOR_LINE);
     }
 
@@ -310,7 +310,7 @@ public class SolverOverviewTable {
         String theoriesL = theoriesLines.get(i);
         String featuresL = featuresLines.get(i);
 
-        lines.add(String.format(INFO_COLUMN, nameL, versionL, theoriesL, featuresL));
+        lines.add(INFO_COLUMN.formatted(nameL, versionL, theoriesL, featuresL));
       }
 
       lines.add(SEPERATOR_LINE);

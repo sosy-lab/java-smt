@@ -12,7 +12,6 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.collect.Maps.difference;
 
-import com.google.auto.value.AutoValue;
 import com.google.common.base.Verify;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableList;
@@ -211,27 +210,25 @@ public class UfElimination {
     }
   }
 
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({"unchecked", "rawtypes"})
   @CheckReturnValue
   private BooleanFormula makeEqual(Formula pLhs, Formula pRhs) {
     BooleanFormula t;
-    if (pLhs instanceof BooleanFormula && pRhs instanceof BooleanFormula) {
-      t = bfmgr.equivalence((BooleanFormula) pLhs, (BooleanFormula) pRhs);
-    } else if (pLhs instanceof IntegerFormula && pRhs instanceof IntegerFormula) {
-      t = fmgr.getIntegerFormulaManager().equal((IntegerFormula) pLhs, (IntegerFormula) pRhs);
-    } else if (pLhs instanceof StringFormula && pRhs instanceof StringFormula) {
-      t = fmgr.getStringFormulaManager().equal((StringFormula) pLhs, (StringFormula) pRhs);
-    } else if (pLhs instanceof NumeralFormula && pRhs instanceof NumeralFormula) {
-      t = fmgr.getRationalFormulaManager().equal((NumeralFormula) pLhs, (NumeralFormula) pRhs);
-    } else if (pLhs instanceof BitvectorFormula) {
-      t = fmgr.getBitvectorFormulaManager().equal((BitvectorFormula) pLhs, (BitvectorFormula) pRhs);
-    } else if (pLhs instanceof FloatingPointFormula && pRhs instanceof FloatingPointFormula) {
+    if (pLhs instanceof BooleanFormula lhs && pRhs instanceof BooleanFormula rhs) {
+      t = bfmgr.equivalence(lhs, rhs);
+    } else if (pLhs instanceof IntegerFormula lhs && pRhs instanceof IntegerFormula rhs) {
+      t = fmgr.getIntegerFormulaManager().equal(lhs, rhs);
+    } else if (pLhs instanceof StringFormula lhs && pRhs instanceof StringFormula rhs) {
+      t = fmgr.getStringFormulaManager().equal(lhs, rhs);
+    } else if (pLhs instanceof NumeralFormula lhs && pRhs instanceof NumeralFormula rhs) {
+      t = fmgr.getRationalFormulaManager().equal(lhs, rhs);
+    } else if (pLhs instanceof BitvectorFormula lhs && pRhs instanceof BitvectorFormula rhs) {
+      t = fmgr.getBitvectorFormulaManager().equal(lhs, rhs);
+    } else if (pLhs instanceof FloatingPointFormula lhs
+        && pRhs instanceof FloatingPointFormula rhs) {
       FloatingPointFormulaManager fpfmgr = fmgr.getFloatingPointFormulaManager();
-      t = fpfmgr.equalWithFPSemantics((FloatingPointFormula) pLhs, (FloatingPointFormula) pRhs);
-    } else if (pLhs instanceof ArrayFormula<?, ?> && pRhs instanceof ArrayFormula<?, ?>) {
-      ArrayFormula<?, ?> lhs = (ArrayFormula<?, ?>) pLhs;
-      @SuppressWarnings("rawtypes")
-      ArrayFormula rhs = (ArrayFormula) pRhs;
+      t = fpfmgr.equalWithFPSemantics(lhs, rhs);
+    } else if (pLhs instanceof ArrayFormula lhs && pRhs instanceof ArrayFormula rhs) {
       t = fmgr.getArrayFormulaManager().equivalence(lhs, rhs);
     } else {
       throw new IllegalArgumentException("Not supported interface");
@@ -330,19 +327,19 @@ public class UfElimination {
     return fmgr.makeVariable(pType, prefix + UNIQUE_ID_GENERATOR.getFreshId());
   }
 
-  @AutoValue
-  abstract static class UninterpretedFunctionApplication {
+  record UninterpretedFunctionApplication(
+      Formula getFormula, ImmutableList<Formula> getArguments, Formula getSubstitution) {
+
+    public UninterpretedFunctionApplication {
+      checkNotNull(getFormula);
+      checkNotNull(getArguments);
+      checkNotNull(getSubstitution);
+    }
 
     static UninterpretedFunctionApplication create(
         Formula pF, List<Formula> pArguments, Formula pSubstitution) {
-      return new AutoValue_UfElimination_UninterpretedFunctionApplication(
+      return new UninterpretedFunctionApplication(
           pF, ImmutableList.copyOf(pArguments), pSubstitution);
     }
-
-    abstract Formula getFormula();
-
-    abstract ImmutableList<Formula> getArguments();
-
-    abstract Formula getSubstitution();
   }
 }

@@ -55,21 +55,15 @@ class Yices2Model extends AbstractModel<Integer, Integer, Long> {
     for (int term : termsInModel) {
       YVal yval = model.getValue(term);
       switch (yval.tag) {
-        case BOOL:
-        case RATIONAL:
-        case ALGEBRAIC:
-        case BV:
-          assignments.add(getSimpleAssignment(term));
-          continue;
-        case FUNCTION: // UFs and Arrays
+        case BOOL, RATIONAL, ALGEBRAIC, BV -> assignments.add(getSimpleAssignment(term));
+        case FUNCTION -> { // UFs and Arrays
           if (formulaCreator.isArrayVariable(term)) {
             assignments.addAll(getArrayAssignment(term, yval));
           } else {
             assignments.addAll(getFunctionAssignment(term, yval));
           }
-          continue;
-        default:
-          throw new UnsupportedOperationException("YVAL with unexpected tag: " + yval.tag);
+        }
+        default -> throw new UnsupportedOperationException("YVAL with unexpected tag: " + yval.tag);
       }
     }
 
@@ -180,21 +174,19 @@ class Yices2Model extends AbstractModel<Integer, Integer, Long> {
 
   /** Convert a Yices value to a Java value. */
   private Object toValue(YVal value, int type) {
-    switch (value.tag) {
-      case BOOL:
-        return model.boolValue(value);
-      case RATIONAL:
+    return switch (value.tag) {
+      case BOOL -> model.boolValue(value);
+      case RATIONAL -> {
         if (Types.isInt(type)) {
-          return model.bigIntegerValue(value);
+          yield model.bigIntegerValue(value);
         } else {
           var rational = model.bigRationalValue(value);
-          return Rational.of(rational.getNumerator(), rational.getDenominator());
+          yield Rational.of(rational.getNumerator(), rational.getDenominator());
         }
-      case BV:
-        return Yices2FormulaCreator.bitsToInteger(model.bvValue(value));
-      default:
-        throw new IllegalArgumentException("Unexpected value type: " + value.tag);
-    }
+      }
+      case BV -> Yices2FormulaCreator.bitsToInteger(model.bvValue(value));
+      default -> throw new IllegalArgumentException("Unexpected value type: " + value.tag);
+    };
   }
 
   /** Create a term for a constant value. */

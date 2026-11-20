@@ -68,43 +68,58 @@ For Maven:
 <dependency>
   <groupId>org.sosy-lab</groupId>
   <artifactId>java-smt</artifactId>
-  <version>5.0.0-61-gea80187e</version>
+  <version>6.0.0</version>
 </dependency>
 ```
 
-Currently, only `SMTInterpol` and `Princess` are automatically fetched from Maven Central,
-because they are written in Java and Scala, and thus are available on every machine.
-Shared object for other solvers, such as `MathSAT5` and `Z3`, can be added by using additional 
-dependencies (example for Linux x64):
+Since release 6.0.0, JavaSMT does no longer include Java-based solvers automatically, but instead provides them as separate dependencies.
+This unifies the installation process for all solvers and allows users to only install the solvers they need.
+Solvers, such as `MathSAT5`, `SMTInterpol` and `Z3`, can be added by using additional dependencies (example for Linux x64):
 
 ```xml
-<!-- MathSAT5 has one dependency -->
+<!-- MathSAT5 has one dependency: 
+  - a native library for Linux x64
+-->
 <dependency>
   <groupId>org.sosy-lab</groupId>
   <artifactId>javasmt-solver-mathsat5</artifactId>
-  <version>5.6.5</version>
+  <version>5.6.15</version>
+  <classifier>libmathsat5j-x64</classifier>
   <type>so</type>
 </dependency>
 
-<!-- Z3 has three dependencies -->
+<!-- SMTInterpol has one dependency:
+  - a JAR file for a Java-based solver
+-->
+<dependency>
+  <groupId>de.uni-freiburg.informatik.ultimate</groupId>
+  <artifactId>smtinterpol</artifactId>
+  <version>2.5-1242-g5c50fb6d</version>
+</dependency>
+
+<!-- Z3 has three dependencies: 
+  - a JAR file for JNI bindings (providing the package com.microsoft.z3)
+  - a native library for Linux x64 providing the JNI bindings
+  - a native library for Linux x64 providing the Z3 solver
+-->
 <dependency>
   <groupId>org.sosy-lab</groupId>
   <artifactId>javasmt-solver-z3</artifactId>
-  <version>4.8.10</version>
+  <version>4.15.4</version>
 </dependency>
 <dependency>
   <groupId>org.sosy-lab</groupId>
   <artifactId>javasmt-solver-z3</artifactId>
-  <version>4.8.10</version>
+  <version>4.15.4</version>
+  <classifier>libz3-x64</classifier>
   <type>so</type>
-  <classifier>libz3</classifier>
 </dependency>
 <dependency>
   <groupId>org.sosy-lab</groupId>
   <artifactId>javasmt-solver-z3</artifactId>
-  <version>4.8.10</version>
+  <version>4.15.4</version>
+  <classifier>libz3java-x64</classifier>
   <type>so</type>
-  <classifier>libz3java</classifier>
 </dependency>
 ```
 
@@ -112,11 +127,13 @@ The XML snippets for other solvers available via Maven,
 such as `Boolector`, `CVC4`, `CVC5`, `OpenSMT`, `Princess`, and `Yices2`,
 can be found in the [`POM file`](Example-Maven-Project/pom.xml) of our [`Example-Maven-Project`](Example-Maven-Project).
 
-If you are not using Linux and we provide a solver binary for your system,
-you might need to set the dependencies accordingly, e.g.,
+If you are not using Linux, but Windows or macOS, or if you want to use a different architecture,
+such as `arm64`, you might need to set the dependencies accordingly, e.g.,
 change the type from `so` to `dll` (for Windows) or `dylib` (for macOS),
 and specify an architecture (e.g., `x64` or `arm64`).
-You can look up the required dependency files and filename extension in the [Ivy repository][].
+You can look up the required dependency files and filename extension in the [Ivy repository][] or [Maven Central][].
+Note that some solvers are not available for all platforms,
+so you might need to check the [Readme](../README.md) for supported platforms and solvers.
 
 Additionally, you can add and configure some Maven plugins to load the libraries automatically
 and place them in the correct directories when assembling your application.
@@ -142,8 +159,8 @@ And finally configure the classpath for your jar-plugin:
 </manifest>
 ```
 
-See [`Example-Maven-Project`](Example-Maven-Project) for more information and a working example.
-See [`Example-Maven-Web-Project`](Example-Maven-Web-Project) for more information about a Dynamic-Web-Project runnable by Tomcat 9.
+See [`Example-Maven-Project`](Example-Maven-Project) for more information and a working example application.
+See [`Example-Maven-Web-Project`](Example-Maven-Web-Project) for more information about a Dynamic-Web-Project runnable by Tomcat.
 
 
 ### Manual Installation
@@ -156,25 +173,24 @@ In order to perform the manual installation, the following steps should be follo
    **JavaSMT might not yet support the latest version on the solver's webpage,
    but only the latest version in the [Ivy index](https://www.sosy-lab.org/ivy/org.sosy_lab/java-smt/).
    Please file an issue, if the update of a solver library is required.**
- - Suppose the version `5.0.0` was chosen.
-   Ivy description file [`ivy-5.0.0.xml`](https://www.sosy-lab.org/ivy/org.sosy_lab/java-smt/ivy-5.0.0.xml) can
+ - Suppose the version `6.0.0` was chosen.
+   Ivy description file [`ivy-6.0.0.xml`](https://www.sosy-lab.org/ivy/org.sosy_lab/java-smt/ivy-6.0.0.xml) can
    be consulted in order to determine all the files which should be fetched.
  - The artifacts tag specifies what files the release depends on.
-   In the example case, those are `java-smt-5.0.0.jar` and (optionally)
-   `java-smt-5.0.0-sources.jar`, located in the same directory.
+   In the example case, those are `java-smt-6.0.0.jar` and (optionally)
+   `java-smt-6.0.0-sources.jar`, located in the same directory.
  - Finally, the dependencies can be manually followed and resolved.
-   E.g. in the example, Z3 version `4.13.3` is specified,
-   which is described by the corresponding [XML](https://www.sosy-lab.org/ivy/org.sosy_lab/javasmt-solver-z3/ivy-4.13.3.xml)
+   E.g. in the example, Z3 version `4.15.4` is specified,
+   which is described by the corresponding [XML](https://www.sosy-lab.org/ivy/org.sosy_lab/javasmt-solver-z3/ivy-4.15.4.xml)
    file, specifying what binaries should be fetched from the corresponding
    [directory](https://www.sosy-lab.org/ivy/org.sosy_lab/javasmt-solver-z3/).
 
 
 ### Binaries for Native Solvers
 
-When using Ivy or Maven for installation on a 64-bit Linux platform,
+When using Ivy for installation on a 64-bit Linux platform,
 solver binaries for native solvers are downloaded automatically, if available.
 The [Readme](../README.md) contains a list of solvers and supported platforms.
-Everything should work as is after installation.
 
 Without Ivy or Maven you need to download and install the binaries manually as described above under [Manual Installation](#manual-installation).
 You can either copy them into the directory of the JavaSMT JAR file,
@@ -229,7 +245,9 @@ can just use the JavaSMT API as follows:
 
 If you want to use a custom loading mechanism, you can do so by implementing
 a simple consumer interface and passing it to the `SolverContextFactory`.
-The following example uses the default Java class loader to load the native libraries:
+The following example uses the default Java class loader to load the native libraries,
+depending on the default environment variables `JAVA_LIBRARY_PATH` and `LD_LIBRARY_PATH`
+or option `-Djava.library.path`:
 
 ```java
     SolverContext context = SolverContextFactory.createSolverContext(
@@ -305,7 +323,9 @@ Once the constraint is generated, we can solve it and get the model:
       prover.addConstraint(constraint);
       boolean isUnsat = prover.isUnsat();
       if (!isUnsat) {
-        Model model = prover.getModel();
+        try (Model model = prover.getModel()) {
+            // Do something with the model
+        }
       }
     }
 ```

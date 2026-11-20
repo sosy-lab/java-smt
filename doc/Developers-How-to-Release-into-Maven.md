@@ -3,7 +3,7 @@ This file is part of JavaSMT,
 an API wrapper for a collection of SMT solvers:
 https://github.com/sosy-lab/java-smt
 
-SPDX-FileCopyrightText: 2021 Dirk Beyer <https://www.sosy-lab.org>
+SPDX-FileCopyrightText: 2026 Dirk Beyer <https://www.sosy-lab.org>
 
 SPDX-License-Identifier: Apache-2.0
 -->
@@ -13,90 +13,78 @@ SPDX-License-Identifier: Apache-2.0
 Please read the hints on release in the [developer documentation](Developers.md) first.
 
 We only release something to Maven after doing an Ivy release.
-With our project infrastructure is much simpler to test packages from (local) Ivy repository than from Maven.
+Our infrastructure is designed to resolve artifacts from our [Ivy repository](https://www.sosy-lab.org/ivy/) and package them for Maven Central.
 
-Make sure that all necessary dependency libraries are already released on Maven Central,
-before (or at least while) publishing a new version of JavaSMT.
-Maven does not check for existing or non-existing dependencies automatically.
-Dependencies like `SMTIntinterpol`, `Princess`, and `SoSy-Lab Common` need to be available via Maven in the correct version.
-A release of `SoSy-Lab Common` can be uploaded to Maven by us, even afterward :-).
-
+Make sure that all necessary dependency libraries are already released on Maven Central
+before (or shortly after) publishing a new version of JavaSMT.
+Dependencies like `SMTInterpol`, `Princess`, and `SoSy-Lab Common` need to be available via Maven in the correct version.
 
 ## Automation vs. Manual Steps
 
-The release to Maven Central is currently not fully automated due to the bug in the
-ANT script provided by Maven Central documentation.
-For publishing to Maven Central, we use the [Nexus Repository Manager][].
-We first upload files into that repository, and later manually publish them from there.
-There is no need to manually change any file for the upload process.
-
+The release process uses the [Sonatype Central Publishing Portal](https://central.sonatype.com/):
+1. **Automated Upload:** Use Ant targets to resolve artifacts from Ivy, generate POMs, sign artifacts, and upload a deployment bundle.
+2. **Manual Release:** Log in to the portal to review the validated deployment and finalize the release.
 
 ## Requirements
 
-Please make sure that you have a valid user account and configured your local settings accordingly.
-For example, insert the following content into `~/.m2/settings.xml`:
+### 1. Account
+Register at [Sonatype Central](https://central.sonatype.com/) and ensure you have access to the `org.sosy-lab` namespace.
+
+### 2. PGP Key
+- You need a GPG key pair (RSA 2048-bit or higher).
+- Your public key **must** be published to a supported keyserver:
+  `gpg --keyserver keyserver.ubuntu.com --send-keys <KEY_ID>`
+- For the publication process, the passphrase can be provided via `-Dgpg.passphrase=...` or stored in `build.properties`.
+  There is no interactive prompt, so ensure the passphrase is accessible to the build process.
+
+### 3. Authentication Token
+- Log in to [Sonatype Central](https://central.sonatype.com/), go to **Account**, and **Generate User Token**.
+- Add the credentials to your `~/.m2/settings.xml` as follows:
 
 ```xml
 <settings>
-  <servers>
-    <server>
-      <id>ossrh</id>
-      <username>USER</username>
-      <password>PASSWORD</password>
-    </server>
-  </servers>
-  <profiles>
-    <profile>
-      <id>gpg</id>
-      <properties>
-        <gpg.executable>gpg</gpg.executable>
-        <!-- optional <gpg.passphrase>PASSPHRASE</gpg.passphrase> -->
-      </properties>
-    </profile>
-  </profiles>
-  <mirrors>
-    <mirror>
-      <id>centralhttps</id>
-      <mirrorOf>central</mirrorOf>
-      <name>Maven central https</name>
-      <url>https://repo1.maven.org/maven2/</url>
-    </mirror>
-  </mirrors>
+    <servers>
+        <server>
+            <id>SonatypeCentral</id>
+            <username>TOKEN_NAME</username>
+            <password>TOKEN_PASSWORD</password>
+        </server>
+    </servers>
 </settings>
 ```
 
-If default system settings are not configured for HTTPS,
-we get an 501 error when downloading further maven dependencies.
-Thus, we add a mirror for HTTPS.
-
-You might need to store `maven-ant-tasks-2.1.3.jar` (or newer version) under `~/.ant/lib/`
-to avoid a failure when creating the task `antlib:org.apache.maven.artifact.ant:mvn`.
-
-
 ## Publishing
 
-For publishing JavaSMT itself:
-- Execute `ant stage` to upload the local build of JavaSMT into the [Nexus Repository Manager][].
-  This is ideally done directly after a release to our [Ivy Repository][].
-- Login to the [Nexus Repository Manager][] and freeze (`close`) the entry in the [staging repositories][],
-  and inspect the files for correctness and completeness!
-- Later `release` your staged bundle.
-  After some delay (a few hours) the release is automatically synced to Maven Central.
+To publish a component, use the `publish-to-maven-central` Ant target.
+This target automatically handles the resolution from Ivy and the bundle creation.
 
-For publishing binary solvers like Boolector, CVC4, MathSAT5, Yices2, or Z3, the process is similar:
-- Execute `ant stage-SOLVER` to upload the currently installed binary solvers into the [Nexus Repository Manager]
-  whenever there was an update for the corresponding solver.
-  This is ideally done directly after a release of the solver to our [Ivy Repository][].
-  For Yices2, we might require the execution of `ant stage-javasmt-yices2` to release the package `javasmt-yices2`.
-- Login to the [Nexus Repository Manager][] and freeze (`close`) the entry in the [staging repositories][],
-  and inspect the files for correctness and completeness!
-- Later `release` your staged bundle.
-  After some delay (a few hours) the release is automatically synced to Maven Central.
+### Commands
 
-Additional instructions are available at the official [OSSRH][] page and
-the [documentation](http://central.sonatype.org/pages/releasing-the-deployment.html).
+For JavaSMT itself:
+```bash
+ant publish-to-maven-central -Dpublish.component=java-smt -Dpublish.version=5.0.0
+```
 
-[Ivy Repository]: http://www.sosy-lab.org/ivy/org.sosy_lab/
-[OSSRH]: http://central.sonatype.org/pages/ossrh-guide.html
-[Nexus Repository Manager]: https://oss.sonatype.org/
-[staging repositories]: https://oss.sonatype.org/#stagingRepositories
+For binary solvers or bindings:
+```bash
+# Example for Z3
+ant publish-to-maven-central -Dpublish.component=javasmt-solver-z3 -Dpublish.version=4.15.4
+
+# Example for Yices2 bindings
+ant publish-to-maven-central -Dpublish.component=javasmt-yices2 -Dpublish.version=6.0.0-141-g04134287c
+```
+
+### Testing and Debugging
+- To prepare the bundle without uploading, add `-Dpublish.upload=false`.
+- You can use `scripts/test-maven-central-bundle.sh` to verify the bundle structure locally.
+  It contains several hardcoded paths and versions, so adjust it as needed for your case.
+
+## Finalizing Publication
+
+1.  **Review and Publish:**
+    - Log in to [Sonatype Central Deployments](https://central.sonatype.com/publishing/deployments).
+    - Check that the deployment is validated and contains all expected files.
+    - Click **Publish** to start the release process.
+2.  **Wait for Sync:**
+    - It usually takes about 15–30 minutes for the artifacts to appear in [Maven Central](https://repo1.maven.org/maven2/org/sosy-lab/).
+    - Search results on the Sonatype portal might take longer to update.

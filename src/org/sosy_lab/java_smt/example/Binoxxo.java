@@ -137,9 +137,11 @@ public final class Binoxxo {
     @SuppressWarnings("resource") // closing Scanner will close StdIn, and we do not want this
     Scanner scanner = new Scanner(System.in, Charset.defaultCharset());
     System.out.println(
-        "Please insert a square for Binxxo.\n"
-            + "Use 'X', 'O' as values any any other char as missing value.\n"
-            + "Use an empty line to terminate your input.");
+        """
+        Please insert a square for Binxxo.
+        Use 'X', 'O' as values any any other char as missing value.
+        Use an empty line to terminate your input.
+        """);
 
     // read all input
     String line = scanner.nextLine();

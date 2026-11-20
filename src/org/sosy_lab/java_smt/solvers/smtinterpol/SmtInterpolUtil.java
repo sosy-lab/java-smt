@@ -24,8 +24,7 @@ final class SmtInterpolUtil {
 
   private static void prettyPrint(Term t, StringBuilder str, int n) {
     str.append("  ".repeat(n));
-    if (t instanceof ApplicationTerm) {
-      ApplicationTerm at = (ApplicationTerm) t;
+    if (t instanceof ApplicationTerm at) {
       String function = at.getFunction().getName();
       if ("and".equals(function) || "or".equals(function)) {
         str.append('(').append(function).append('\n');

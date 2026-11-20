@@ -16,9 +16,14 @@ SPDX-License-Identifier: Apache-2.0
     <property file="build.properties"/>
     <property environment="env"/>
 
-    <!-- Yices2 is under GPL3 and has to be seperated from Apache2-licensed software. -->
+    <!-- We set the module name for JavaSMT Jars using this variable. This should NEVER be changed! -->
+    <property name="javasmt.module.name" value="org.sosy_lab.java_smt"/>
+
+    <!-- Yices2 is under GPL3 and has to be separated from Apache2-licensed software. -->
     <property name="yices2Sources" value="org/sosy_lab/java_smt/solvers/yices2/**.java"/>
     <property name="yices2Classes" value="org/sosy_lab/java_smt/solvers/yices2/**.class"/>
+    <!-- We set the module name for JavaSMT-Yices2 Jars using this variable. This should NEVER be changed! -->
+    <property name="javasmt.yices2.module.name" value="org.sosy_lab.java_smt.solvers.yices2"/>
 
     <!-- one configuration per solver -->
     <property name="ivy.solver.configurations" value="
@@ -42,6 +47,7 @@ SPDX-License-Identifier: Apache-2.0
     <property name="jar.excludes" value="**/*Test.class **/*Test$*.class ${yices2Classes} **/*smt2"/>
     <property name="jar.sources.excludes" value="**/*Test.java ${yices2Sources}"/>
     <property name="jar.excludesInYices2Jar" value=""/> <!-- only excluded in the Jar for Yices2 bindings -->
+    <property name="documentation.options.excludes" value="${yices2Classes} ${yices2Sources}"/>
     <property name="ivy.contrib.present" value="true"/> <!-- always download sources -->
     <property name="documentation.javadoc.exclude" value="org/sosy_lab/java_smt/solvers/**/*"/>
 
@@ -66,11 +72,17 @@ SPDX-License-Identifier: Apache-2.0
     <import file="build/build-spotbugs.xml"/>
     <import file="build/build-publish.xml"/>
     <import file="build/build-publish-solvers.xml"/>
-    <import file="build/build-maven-publish.xml"/>
+    <import file="build/build-maven-central.xml"/>
 
+    <!-- Classes of JavaSMT and all libraries, used for compiling, testing, and documentation -->
     <path id="classpath">
         <pathelement location="${class.dir}"/>
-        <fileset dir="${ivy.lib.dir}" includes="runtime-*/*.jar test/*.jar build/annotations.jar build/auto-value-annotations.jar build/error_prone_annotations.jar"/>
+        <path refid="classpath.libraries"/>
+    </path>
+
+    <!-- Only the libraries (without classes of JavaSMT), needed for collecting options of only some classes -->
+    <path id="classpath.libraries">
+        <fileset dir="${ivy.lib.dir}" includes="runtime-*/*.jar test/*.jar build/error_prone_annotations.jar"/>
     </path>
 
     <!-- Needs to include all annotation processors and error-prone -->
@@ -81,7 +93,7 @@ SPDX-License-Identifier: Apache-2.0
     <!-- Main targets -->
 
     <target name="clean" description="Clean">
-        <property name="jarFiles" value="${class.dir}/** ${source.generated.dir}/** ${ivy.module}-*.jar ivy-*.xml *.jar"/>
+        <property name="jarFiles" value="${class.dir}/** ${source.generated.dir}/** ${documentation.options.tmp.dir}/** ${ivy.module}-*.jar ivy-*.xml *.jar"/>
         <property name="docFiles" value="${documentation.javadoc.dir}/** ${z3.javadoc.dir}/**"/>
         <property name="junitFiles" value="${junit.dir}/** JUnit-coverage/** JUnit.html"/>
         <property name="libraryFiles" value="*.so *.dll *.dylib dist/"/>

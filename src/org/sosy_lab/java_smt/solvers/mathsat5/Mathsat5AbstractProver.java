@@ -32,11 +32,9 @@ import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_term
 import com.google.common.base.Preconditions;
 import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Lists;
 import com.google.common.primitives.Longs;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -146,8 +144,7 @@ abstract class Mathsat5AbstractProver<T2> extends AbstractProver<T2> {
 
   @SuppressWarnings("resource")
   @Override
-  public Model getModel() throws SolverException {
-    checkGenerateModels();
+  protected Model getModelImpl() throws SolverException {
     return new CachingModel(new Mathsat5Model(getMsatModel(), creator, this));
   }
 
@@ -155,14 +152,12 @@ abstract class Mathsat5AbstractProver<T2> extends AbstractProver<T2> {
    * @throws SolverException if an expected MathSAT failure occurs
    */
   protected long getMsatModel() throws SolverException {
-    checkGenerateModels();
     return Mathsat5NativeApi.msat_get_model(curEnv);
   }
 
   @SuppressWarnings("resource")
   @Override
-  public Evaluator getEvaluator() {
-    checkGenerateModels();
+  protected Evaluator getEvaluatorImpl() {
     return registerEvaluator(new Mathsat5Evaluator(this, creator, curEnv));
   }
 
@@ -280,9 +275,7 @@ abstract class Mathsat5AbstractProver<T2> extends AbstractProver<T2> {
     @Override
     public void callback(long[] model) throws InterruptedException {
       shutdownNotifier.shutdownIfNecessary();
-      clientCallback.apply(
-          Collections.unmodifiableList(
-              Lists.transform(Longs.asList(model), creator::encapsulateBoolean)));
+      clientCallback.apply(Longs.asList(model).stream().map(creator::encapsulateBoolean).toList());
     }
   }
 }

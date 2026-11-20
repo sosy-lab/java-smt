@@ -29,6 +29,8 @@ SPDX-License-Identifier: Apache-2.0
         <!-- main configurations -->
         <conf name="solver-z3-legacy-x64" extends="solver-z3-legacy-linux-x64"/>
         <conf name="solver-z3-legacy-arm64" extends="solver-z3-legacy-linux-arm64"/>
+        <conf name="sources"/>
+        <conf name="javadoc"/>
 
         <!-- basic configurations -->
         <conf name="solver-z3-legacy-linux-x64" extends="solver-z3-legacy-common"/>
@@ -47,6 +49,8 @@ SPDX-License-Identifier: Apache-2.0
 
         <!-- common Java file, Java is platform independent -->
         <artifact name="com.microsoft.z3legacy" conf="solver-z3-legacy-common" ext="jar"/>
+        <artifact name="com.microsoft.z3legacy" conf="sources" e:classifier="sources" type="source" ext="jar"/>
+        <artifact name="com.microsoft.z3legacy" conf="javadoc" e:classifier="javadoc" type="javadoc" ext="jar"/>
     </publications>
 
     <dependencies></dependencies>
