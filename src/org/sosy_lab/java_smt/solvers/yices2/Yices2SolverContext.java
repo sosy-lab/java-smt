@@ -11,6 +11,7 @@ package org.sosy_lab.java_smt.solvers.yices2;
 import com.sri.yices.Yices;
 import java.util.Set;
 import java.util.function.Consumer;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.configuration.Configuration;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
@@ -28,15 +29,80 @@ import org.sosy_lab.java_smt.basicimpl.AbstractSolverContext;
 public final class Yices2SolverContext extends AbstractSolverContext {
 
   @Options(prefix = "solver.yices2")
-  private static class Yices2Parameters {
+  static class Yices2Parameters {
     @Option(
         secure = true,
-        description = "Backend to use for the solver",
+        description = "DEPRECATED: Backend to use for the solver",
         values = {"dpllt", "mcsat"})
-    String solverType = "mcsat";
+    @Nullable String solverType;
+
+    @Option(
+        secure = true,
+        description =
+            "Sets the SMTLIB logic for solver selection. Select a nonlinear logic like QF_AUFNIRA"
+                + " to force Yices2 to use a MCSAT solver. Setting the logic to ALL will select a"
+                + " DPLLT solver with all theories enabled, and NONE means that only boolean logic"
+                + " is supported. If the selected logic is QF_IDL or QF_RDL and the mode is set to"
+                + " 'one-shot', Yices may either use its Floyd-Warshall solver, or the more general"
+                + " Simplex solver, based on an internal heuristic. ",
+        values = {
+          "ALL",
+          "NONE",
+          "QF_ABV",
+          "QF_ALIA",
+          "QF_ALIRA",
+          "QF_ALRA",
+          "QF_ANIA",
+          "QF_ANIRA",
+          "QF_ANRA",
+          "QF_AUF",
+          "QF_AUFBV",
+          "QF_AUFBVLIA",
+          "QF_AUFBVNIA",
+          "QF_AUFLIA",
+          "QF_AUFLIRA",
+          "QF_AUFLRA",
+          "QF_AUFNIA",
+          "QF_AUFNIRA",
+          "QF_AUFNRA",
+          "QF_AX",
+          "QF_BV",
+          "QF_BVLRA",
+          "QF_FFA",
+          "QF_IDL",
+          "QF_LIA",
+          "QF_LIRA",
+          "QF_LRA",
+          "QF_NIA",
+          "QF_NIRA",
+          "QF_NRA",
+          "QF_RDL",
+          "QF_UF",
+          "QF_UFBV",
+          "QF_UFBVLIA",
+          "QF_UFIDL",
+          "QF_UFLIA",
+          "QF_UFLIRA",
+          "QF_UFLRA",
+          "QF_UFNIA",
+          "QF_UFNIRA",
+          "QF_UFNRA",
+          "QF_UFRDL"
+        })
+    String logic = "ALL";
+
+    @Option(
+        secure = true,
+        description = "Configures the solver to allow/disable multiple SAT checks",
+        values = {"one-shot", "multi-checks", "push-pop", "interactive"})
+    String mode = "push-pop";
 
     Yices2Parameters(Configuration config) throws InvalidConfigurationException {
       config.inject(this);
+      if (solverType != null) {
+        throw new InvalidConfigurationException(
+            "Option \"solver.yices2.solverType\" is no longer supported.");
+      }
     }
   }
 
@@ -132,14 +198,13 @@ public final class Yices2SolverContext extends AbstractSolverContext {
 
   @Override
   protected ProverEnvironment newProverEnvironment0(Set<ProverOptions> pOptions) {
-    return new Yices2Prover(creator, pOptions, bfmgr, shutdownManager, parameters.solverType);
+    return new Yices2Prover(creator, pOptions, bfmgr, shutdownManager, parameters);
   }
 
   @Override
   protected InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation0(
       Set<ProverOptions> pOptions) {
-    return new Yices2InterpolatingProver(
-        creator, pOptions, bfmgr, shutdownManager, parameters.solverType);
+    return new Yices2InterpolatingProver(creator, pOptions, bfmgr, shutdownManager, parameters);
   }
 
   @Override

@@ -16,6 +16,8 @@ import com.google.common.collect.ImmutableList;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.Test;
+import org.sosy_lab.common.configuration.ConfigurationBuilder;
+import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
@@ -28,6 +30,16 @@ import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.api.visitors.DefaultFormulaVisitor;
 
 public class NumeralFormulaManagerTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
+
+  @Override
+  protected ConfigurationBuilder createTestConfigBuilder() throws InvalidConfigurationException {
+    var newConfig = super.createTestConfigBuilder();
+    if (solver == Solvers.YICES2) {
+      // We need MCSAT for division by zero
+      newConfig.setOption("solver.yices2.logic", "QF_AUFNIRA");
+    }
+    return newConfig;
+  }
 
   @Test
   public void divZeroTest() throws SolverException, InterruptedException {

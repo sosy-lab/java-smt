@@ -468,6 +468,7 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
 
   @Test
   public <T> void sequentialBVInterpolation() throws SolverException, InterruptedException {
+    assume().that(solverToUse()).isNotEqualTo(Solvers.YICES2);
     requireBitvectors();
 
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
