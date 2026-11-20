@@ -34,8 +34,8 @@ public final class Yices2SolverContext extends AbstractSolverContext {
         description =
             "Sets the SMTLIB logic for solver selection. Select a nonlinear logic like QF_AUFNIRA"
                 + " to force Yices2 to use a MCSAT solver. Setting the logic to ALL will select a"
-                + " DPLLT solver with all theories enabled, and NONE means that only bool logic is"
-                + " supported. If the selected logic is QF_IDL or QF_RDL and the mode is set to"
+                + " DPLLT solver with all theories enabled, and NONE means that only boolean logic"
+                + " is supported. If the selected logic is QF_IDL or QF_RDL and the mode is set to"
                 + " 'one-shot', Yices may either use its Floyd-Warshall solver, or the more general"
                 + " Simplex solver, based on an internal heuristic. ",
         values = {
