@@ -10,6 +10,13 @@ SPDX-License-Identifier: Apache-2.0
 
 # JavaSMT ChangeLog
 
+## Changes since 7.0.0
+
+### Yices
+
+- Added option `solver.yices2.logic` to set a logic and `solver.yices2.mode` to select the solver mode
+- Deprecated option `solver.yices2.solverType`
+
 ## JavaSMT 7.0.0
 
 #### Note: Version 7 will be the last mayor release for Java 17. We will adopt Java 21 soon.
