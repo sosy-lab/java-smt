@@ -31,7 +31,9 @@ public final class Yices2SolverContext extends AbstractSolverContext {
   static class Yices2Parameters {
     @Option(
         secure = true,
-        description = "Sets the SMTLIB logic for solver selection",
+        description =
+            "Sets the SMTLIB logic for solver selection. Select a nonlinear logic like QF_AUFNIRA"
+                + " to force Yices2 to use a MCSAT solver.",
         values = {
           "ALL",
           "NONE",
