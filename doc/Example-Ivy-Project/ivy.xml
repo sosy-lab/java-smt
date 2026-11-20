@@ -18,7 +18,7 @@ SPDX-License-Identifier: Apache-2.0
 
     <dependencies>
         <!-- JavaSMT -->
-        <dependency org="org.sosy_lab" name="java-smt" rev="6.0.0-148-gba08f432a" conf="runtime->runtime-x64,runtime-arm64"/>
+        <dependency org="org.sosy_lab" name="java-smt" rev="7.0.0" conf="runtime->runtime-x64,runtime-arm64"/>
 
         <!-- JUnit6 -->
         <dependency org="org.junit.jupiter" name="junit-jupiter-api" rev="6.1.0" conf="test->default"/>

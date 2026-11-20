@@ -15,20 +15,20 @@ plugins {
 
 // Globally define versions used for our dependencies
 def version = [
-  'javasmt': '6.0.0-148-gba08f432a',
-  'javasmtYices2': '6.0.0-141-g04134287c',
+  'javasmt': '7.0.0',
+  'javasmtYices2': '6.0.0-772-g388dc9b19',
 
-  'bitwuzla': '0.9.0-gd13ef925',
+  'bitwuzla': '0.9.1-g8d1eb010',
   'boolector': '3.2.2-g1a89c229',
-  'cvc4': '1.8-prerelease-2020-06-24-g7825d8f28',
-  'cvc5': '2026-02-26-d22638a',
-  'mathsat5': '5.6.15',
+  'cvc4': '1.8.1-11-g1f9dbdca4',
+  'cvc5': '2026-04-08-ca862b4',
+  'mathsat5': '5.6.19',
   'opensmt': '2.9.2-ge4c80308',
   'smtInterpol': '2.5-1242-g5c50fb6d',
   'princess': '2025-11-17',
   'ostrich': '2.0',
   'yices2': '2.7.0-gdc5687ca',
-  'z3': '4.15.0',
+  'z3': '4.17.0-1009b13',
   'z3legacy': '4.5.0-gd57a2a6dc',
 
   'junit6': '6.1.0'
@@ -98,7 +98,7 @@ dependencies {
   runtimeOnly("org.sosy-lab:javasmt-solver-bitwuzla:$version.bitwuzla@jar")
 
   // CVC4
-  runtimeOnly("org.sosy-lab:javasmt-solver-cvc4:$version.cvc4:CVC4@jar")
+  runtimeOnly("org.sosy-lab:javasmt-solver-cvc4:$version.cvc4@jar")
 
   // CVC5
   runtimeOnly("org.sosy-lab:javasmt-solver-cvc5:$version.cvc5@jar")
@@ -126,9 +126,8 @@ dependencies {
     runtimeOnly("org.sosy-lab:javasmt-solver-bitwuzla:$version.bitwuzla:libbitwuzlaj-x64@so")
 
     // CVC4
-    runtimeOnly("org.sosy-lab:javasmt-solver-cvc4:$version.cvc4:libcvc4@so")
-    runtimeOnly("org.sosy-lab:javasmt-solver-cvc4:$version.cvc4:libcvc4jni@so")
-    runtimeOnly("org.sosy-lab:javasmt-solver-cvc4:$version.cvc4:libcvc4parser@so")
+    runtimeOnly("org.sosy-lab:javasmt-solver-cvc4:$version.cvc4:libcvc4-x64@so")
+    runtimeOnly("org.sosy-lab:javasmt-solver-cvc4:$version.cvc4:libcvc4jni-x64@so")
 
     // CVC5
     runtimeOnly("org.sosy-lab:javasmt-solver-cvc5:$version.cvc5:libcvc5jni-x64@so")
