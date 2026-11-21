@@ -76,7 +76,7 @@ class Yices2InterpolatingProver extends Yices2AbstractProver<Integer>
     }
   }
 
-  @SuppressWarnings("try")
+  @SuppressWarnings("try") // ShutdownHook is never referenced, and this is correct.
   private int interpolate(Context ctxA, Context ctxB) throws InterruptedException, SolverException {
     var context = new InterpolationContext(ctxA, ctxB);
 
