@@ -13,10 +13,14 @@ package org.sosy_lab.java_smt.solvers.z3;
 import static com.google.common.truth.Truth.assertThat;
 import static org.junit.Assert.assertThrows;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Lists;
 import java.io.IOException;
+import java.math.BigInteger;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import org.junit.Ignore;
@@ -26,6 +30,10 @@ import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BasicProverEnvironment;
 import org.sosy_lab.java_smt.api.BooleanFormula;
+import org.sosy_lab.java_smt.api.Model;
+import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
+import org.sosy_lab.java_smt.api.ProverEnvironment;
+import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.test.SolverBasedTest0;
 
@@ -41,6 +49,11 @@ public class Z3NativeOptionsTest extends SolverBasedTest0 {
       (assert (forall ((a Int) (b Int)) (=> (Itp a b) (not (< b a)))))
       """;
 
+  private static final String SIMPLIFIERS = "simplify, propagate-values, simplify, solve-eqs";
+
+  // Statistics key of the simplifier solve-eqs in Z3 (see src/ast/simplifiers/solve_eqs.cpp)
+  private static final String SOLVE_EQS_ELIM_VARS_KEY = "solve-eqs-elim-vars";
+
   @Override
   protected Solvers solverToUse() {
     return Solvers.Z3;
@@ -55,8 +68,9 @@ public class Z3NativeOptionsTest extends SolverBasedTest0 {
       for (BooleanFormula hc : parsedCHC) {
         pe.addConstraint(hc);
       }
-      // Default Z3 runs endlessly for this HORN task
-      buildShutdownThreadWith(shutdownManager, 3000).start();
+      // Default Z3 runs endlessly for this HORN task (not solved within 60s), while Z3 with logic
+      // HORN solves it within milliseconds (see simpleHornSolvingTest), so a short timeout suffices
+      buildShutdownThreadWith(shutdownManager, 500).start();
       assertThrows(InterruptedException.class, pe::isUnsat);
     }
   }
@@ -221,6 +235,166 @@ public class Z3NativeOptionsTest extends SolverBasedTest0 {
       // ~9s for default options. We use 7.5s as timeout as the CI is a little slower.
       buildShutdownThreadWith(shutdownManager, 7500).start();
       assertThat(pe.isUnsat()).isTrue();
+    }
+  }
+
+  @Test
+  public void unknownSimplifierTest() {
+    InvalidConfigurationException exception =
+        assertThrows(
+            InvalidConfigurationException.class,
+            () ->
+                setAdditionalConfigOptionForSolver(
+                    "solver.z3.simplifiers", "solve-eqs, unknown-simplifier"));
+    assertThat(exception).hasMessageThat().contains("unknown-simplifier");
+  }
+
+  @Test
+  public void simplifierApplicationTest()
+      throws InvalidConfigurationException, SolverException, InterruptedException {
+    // Without push(), Z3 solves non-incrementally and applies solve-eqs as a tactic anyway.
+    // Simplifiers are designed for incremental solving, so we push() before adding constraints.
+
+    IntegerFormula x = imgr.makeVariable("x");
+    IntegerFormula y = imgr.makeVariable("y");
+
+    try (ProverEnvironment prover = context.newProverEnvironment()) {
+      prover.push();
+      prover.addConstraint(imgr.equal(x, imgr.add(y, imgr.makeNumber(1))));
+      prover.addConstraint(imgr.equal(y, imgr.makeNumber(3)));
+      assertThat(prover.isUnsat()).isFalse();
+      assertThat(prover.getStatistics()).doesNotContainKey(SOLVE_EQS_ELIM_VARS_KEY);
+    }
+
+    setAdditionalConfigOptionForSolver("solver.z3.simplifiers", SIMPLIFIERS);
+
+    x = imgr.makeVariable("x");
+    y = imgr.makeVariable("y");
+    IntegerFormula z = imgr.makeVariable("z");
+
+    try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
+      prover.push();
+      prover.addConstraint(imgr.equal(x, imgr.add(y, imgr.makeNumber(1))));
+      prover.addConstraint(imgr.equal(y, imgr.makeNumber(3)));
+      prover.addConstraint(imgr.greaterThan(x, z));
+      assertThat(prover.isUnsat()).isFalse();
+      assertThat(Integer.parseInt(prover.getStatistics().get(SOLVE_EQS_ELIM_VARS_KEY)))
+          .isGreaterThan(0);
+
+      // The model needs to contain correct values for eliminated variables
+      try (Model model = prover.getModel()) {
+        assertThat(model.evaluate(x)).isEqualTo(BigInteger.valueOf(4));
+        assertThat(model.evaluate(y)).isEqualTo(BigInteger.valueOf(3));
+        assertThat(model.evaluate(z)).isLessThan(BigInteger.valueOf(4));
+      }
+    }
+  }
+
+  @Test
+  public void incrementalSolvingWithSimplifiersTest()
+      throws InvalidConfigurationException, SolverException, InterruptedException {
+
+    setAdditionalConfigOptionForSolver("solver.z3.simplifiers", SIMPLIFIERS);
+
+    IntegerFormula x = imgr.makeVariable("x");
+    IntegerFormula y = imgr.makeVariable("y");
+
+    try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
+      prover.push(imgr.equal(x, imgr.add(y, imgr.makeNumber(1))));
+      prover.push(imgr.equal(y, imgr.makeNumber(3)));
+      assertThat(prover.isUnsat()).isFalse();
+      try (Model model = prover.getModel()) {
+        assertThat(model.evaluate(x)).isEqualTo(BigInteger.valueOf(4));
+      }
+
+      prover.push(imgr.greaterThan(x, imgr.makeNumber(10)));
+      assertThat(prover.isUnsat()).isTrue();
+      prover.pop();
+      assertThat(prover.isUnsat()).isFalse();
+
+      // Popping the definition of y must undo its elimination
+      prover.pop();
+      prover.push(imgr.equal(y, imgr.makeNumber(20)));
+      prover.push(imgr.greaterThan(x, imgr.makeNumber(10)));
+      assertThat(prover.isUnsat()).isFalse();
+      try (Model model = prover.getModel()) {
+        assertThat(model.evaluate(x)).isEqualTo(BigInteger.valueOf(21));
+        assertThat(model.evaluate(y)).isEqualTo(BigInteger.valueOf(20));
+      }
+    }
+  }
+
+  @Test
+  public void simplifiersWithLogicTest()
+      throws InvalidConfigurationException, SolverException, InterruptedException {
+
+    setAdditionalConfigOptionForSolver(
+        "solver.z3.simplifiers", SIMPLIFIERS, "solver.z3.logic", "QF_LIA");
+
+    IntegerFormula x = imgr.makeVariable("x");
+    IntegerFormula y = imgr.makeVariable("y");
+
+    try (ProverEnvironment prover = context.newProverEnvironment()) {
+      prover.addConstraint(imgr.equal(x, imgr.add(y, imgr.makeNumber(1))));
+      prover.addConstraint(imgr.equal(y, imgr.makeNumber(3)));
+      assertThat(prover.isUnsat()).isFalse();
+      prover.addConstraint(imgr.greaterThan(x, imgr.makeNumber(4)));
+      assertThat(prover.isUnsat()).isTrue();
+    }
+  }
+
+  /** Creates and closes many provers with simplifiers to exercise the reference counting. */
+  @SuppressWarnings("resource")
+  @Test
+  public void manyProversWithSimplifiersTest()
+      throws InvalidConfigurationException, SolverException, InterruptedException {
+    setAdditionalConfigOptionForSolver("solver.z3.simplifiers", SIMPLIFIERS);
+    IntegerFormula x = imgr.makeVariable("x");
+    IntegerFormula y = imgr.makeVariable("y");
+    for (int round = 0; round < 10; round++) {
+      List<ProverEnvironment> provers = new ArrayList<>();
+      for (int i = 0; i < 10; i++) {
+        ProverEnvironment prover = context.newProverEnvironment();
+        prover.addConstraint(imgr.equal(x, imgr.add(y, imgr.makeNumber(i))));
+        prover.addConstraint(imgr.equal(y, imgr.makeNumber(round)));
+        provers.add(prover);
+      }
+      for (int i = 0; i < provers.size(); i++) {
+        ProverEnvironment prover = provers.get(i);
+        prover.push(imgr.equal(x, imgr.makeNumber(round + i)));
+        assertThat(prover.isUnsat()).isFalse();
+        prover.pop();
+        prover.push(imgr.equal(x, imgr.makeNumber(round + i + 1)));
+        assertThat(prover.isUnsat()).isTrue();
+      }
+      // close in an order different from the creation order
+      for (ProverEnvironment prover : Lists.reverse(provers)) {
+        prover.close();
+      }
+    }
+  }
+
+  @Test
+  public void unsatCoresWithSimplifiersTest() throws InvalidConfigurationException {
+    setAdditionalConfigOptionForSolver("solver.z3.simplifiers", SIMPLIFIERS);
+    assertThrows(
+        UnsupportedOperationException.class,
+        () -> context.newProverEnvironment(ProverOptions.GENERATE_UNSAT_CORE));
+    assertThrows(
+        UnsupportedOperationException.class,
+        () -> context.newProverEnvironment(ProverOptions.GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS));
+  }
+
+  @Test
+  public void assumptionsWithSimplifiersTest()
+      throws InvalidConfigurationException, InterruptedException {
+    setAdditionalConfigOptionForSolver("solver.z3.simplifiers", SIMPLIFIERS);
+    IntegerFormula x = imgr.makeVariable("x");
+    try (ProverEnvironment prover = context.newProverEnvironment()) {
+      prover.addConstraint(imgr.equal(x, imgr.makeNumber(1)));
+      assertThrows(
+          UnsupportedOperationException.class,
+          () -> prover.isUnsatWithAssumptions(ImmutableList.of(imgr.equal(x, imgr.makeNumber(2)))));
     }
   }
 

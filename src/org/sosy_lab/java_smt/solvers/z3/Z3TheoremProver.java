@@ -12,11 +12,13 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static org.sosy_lab.java_smt.solvers.z3.Z3SolverContext.ENGINE_CONFIG_KEY;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.microsoft.z3.Native;
 import com.microsoft.z3.Z3Exception;
 import com.microsoft.z3.enumerations.Z3_lbool;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
@@ -35,9 +37,11 @@ class Z3TheoremProver extends Z3AbstractProver implements ProverEnvironment {
 
   private final long z3solver;
   private final ShutdownRequestListener interruptListener;
+  private final boolean usesSimplifiers;
 
   private @Nullable Z3UserPropagator propagator = null;
 
+  @SuppressWarnings("ParameterNumber")
   Z3TheoremProver(
       Z3FormulaCreator creator,
       Z3FormulaManager pMgr,
@@ -45,18 +49,24 @@ class Z3TheoremProver extends Z3AbstractProver implements ProverEnvironment {
       Engine pEngine,
       Set<ProverOptions> pOptions,
       ImmutableMap<String, Object> pSolverOptions,
+      ImmutableList<String> pSimplifiers,
       @Nullable PathCounterTemplate pLogfile,
       ShutdownNotifier pShutdownNotifier) {
     super(creator, pMgr, pLogic, pEngine, pOptions, pLogfile, pShutdownNotifier);
-    if (!logic.orElse("ALL").equalsIgnoreCase("ALL")) {
-      // mkSolverForLogic() allows setting logics,
-      // which seem to be getting ignored if set via options
-      long logicSymbol = Native.mkStringSymbol(z3context, logic.orElseThrow());
-      z3solver = Native.mkSolverForLogic(z3context, logicSymbol);
-    } else {
-      z3solver = Native.mkSolver(z3context);
+    usesSimplifiers = !pSimplifiers.isEmpty();
+    if (usesSimplifiers && generateUnsatCores) {
+      // TODO: unsat-cores with simplifiers fail with an exceptions.
+      //  Tested in Z3 4.17.0-1009b13 and up to 5.4.1
+      throw new UnsupportedOperationException(
+          "Unsat-core generation is not supported together with Z3 simplifiers.");
     }
-    Native.solverIncRef(z3context, z3solver);
+    if (usesSimplifiers && generateUnsatCoresOverAssumptions) {
+      // TODO: Allow this together with solving with assumptions? Or block it due to the
+      //  unsat-core issue above?
+      throw new UnsupportedOperationException(
+          "Unsat-core generation over assumptions is not supported together with Z3 simplifiers.");
+    }
+    z3solver = mkSolver(pSimplifiers);
 
     interruptListener = reason -> Native.solverInterrupt(z3context, z3solver);
     shutdownNotifier.register(interruptListener);
@@ -71,6 +81,59 @@ class Z3TheoremProver extends Z3AbstractProver implements ProverEnvironment {
     }
     Native.solverSetParams(z3context, z3solver, z3params);
     Native.paramsDecRef(z3context, z3params);
+  }
+
+  /**
+   * Creates a new Z3 solver that applies the given simplifiers (if any) as pre-processing. The
+   * returned solver is reference counted and needs to be released with {@link Native#solverDecRef}.
+   */
+  private long mkSolver(List<String> pSimplifiers) {
+    long solver;
+    if (!logic.orElse("ALL").equalsIgnoreCase("ALL")) {
+      // mkSolverForLogic() allows setting logics,
+      // which seem to be getting ignored if set via options
+      long logicSymbol = Native.mkStringSymbol(z3context, logic.orElseThrow());
+      solver = Native.mkSolverForLogic(z3context, logicSymbol);
+    } else {
+      solver = Native.mkSolver(z3context);
+    }
+    Native.solverIncRef(z3context, solver);
+    if (pSimplifiers.isEmpty()) {
+      return solver;
+    }
+
+    // Z3 returns a new solver that takes over the internal solver of the given solver object.
+    // The new solver neither references the given solver object nor the simplifier object.
+    long simplifier = mkSimplifier(pSimplifiers);
+    long solverWithSimplifier = Native.solverAddSimplifier(z3context, solver, simplifier);
+    Native.solverIncRef(z3context, solverWithSimplifier);
+    Native.simplifierDecRef(z3context, simplifier);
+    Native.solverDecRef(z3context, solver);
+    return solverWithSimplifier;
+  }
+
+  /**
+   * Creates a Z3 simplifier that applies the given simplifiers in the given order. The returned
+   * simplifier is reference counted and needs to be released with {@link Native#simplifierDecRef}.
+   */
+  private long mkSimplifier(List<String> pSimplifiers) {
+    checkArgument(!pSimplifiers.isEmpty());
+
+    long result = Native.mkSimplifier(z3context, pSimplifiers.get(0));
+    Native.simplifierIncRef(z3context, result);
+
+    for (String name : pSimplifiers.subList(1, pSimplifiers.size())) {
+      long next = Native.mkSimplifier(z3context, name);
+      Native.simplifierIncRef(z3context, next);
+      // The combined simplifier copies its components, so we can release them afterward.
+      long combined = Native.simplifierAndThen(z3context, result, next);
+      Native.simplifierIncRef(z3context, combined);
+      Native.simplifierDecRef(z3context, result);
+      Native.simplifierDecRef(z3context, next);
+      result = combined;
+    }
+
+    return result;
   }
 
   @Override
@@ -116,6 +179,12 @@ class Z3TheoremProver extends Z3AbstractProver implements ProverEnvironment {
   public boolean isUnsatWithAssumptions(Collection<BooleanFormula> assumptions)
       throws SolverException, InterruptedException {
     Preconditions.checkState(!closed);
+    if (usesSimplifiers) {
+      // TODO: Allow solving with assumptions with simplifiers once we use Z3 version 5.4.1,
+      //  which seems to support this
+      throw new UnsupportedOperationException(
+          "Solving with assumptions is not supported together with Z3 simplifiers.");
+    }
     changedSinceLastSatQuery = false;
     wasLastSatCheckSatisfiable = false;
 

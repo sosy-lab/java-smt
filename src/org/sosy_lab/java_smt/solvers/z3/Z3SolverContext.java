@@ -12,11 +12,13 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Verify.verify;
 
+import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Sets;
 import com.microsoft.z3.Native;
 import com.microsoft.z3.enumerations.Z3_ast_print_mode;
 import java.io.IOException;
@@ -191,6 +193,19 @@ public final class Z3SolverContext extends AbstractSolverContext {
                 + " 'furtherOptions' for those.")
     private String logic = "ALL";
 
+    @Option(
+        secure = true,
+        description =
+            "List of Z3 simplifiers that are applied, in the given order, as incremental"
+                + " pre-processing to the assertions of each ProverEnvironment created by this"
+                + " context. This option has no effect on OptimizationProverEnvironments."
+                + " Unsat-core generation and solving with assumptions are not supported together"
+                + " with simplifiers due to issues."
+                + " Example: \"simplify, propagate-values, solve-eqs\". Available simplifiers"
+                + " can be found in the Z3 documentation online:"
+                + " https://microsoft.github.io/z3guide/docs/strategies/simplifiers/")
+    private List<String> simplifiers = ImmutableList.of();
+
     private final @Nullable PathCounterTemplate logfile;
 
     private final int randomSeed;
@@ -298,6 +313,13 @@ public final class Z3SolverContext extends AbstractSolverContext {
     final long context = Native.mkContextRc(cfg);
     Native.delConfig(cfg);
 
+    try {
+      checkSimplifiers(context, extraOptions.simplifiers);
+    } catch (InvalidConfigurationException e) {
+      Native.delContext(context);
+      throw e;
+    }
+
     long boolSort = Native.mkBoolSort(context);
     Native.incRef(context, Native.sortToAst(context, boolSort));
     long integerSort = Native.mkIntSort(context);
@@ -371,6 +393,7 @@ public final class Z3SolverContext extends AbstractSolverContext {
         engine,
         options,
         buildSolverOptions(options),
+        ImmutableList.copyOf(extraOptions.simplifiers),
         extraOptions.logfile,
         shutdownNotifier);
   }
@@ -426,6 +449,28 @@ public final class Z3SolverContext extends AbstractSolverContext {
   @Override
   protected boolean supportsAssumptionSolving() {
     return true;
+  }
+
+  /** Checks that Z3 knows all simplifiers that are given by name. */
+  private static void checkSimplifiers(long context, List<String> pSimplifiers)
+      throws InvalidConfigurationException {
+    if (pSimplifiers.isEmpty()) {
+      return;
+    }
+    ImmutableSet.Builder<String> builder = ImmutableSet.builder();
+    for (int i = 0; i < Native.getNumSimplifiers(context); i++) {
+      builder.add(Native.getSimplifierName(context, i));
+    }
+    ImmutableSet<String> availableSimplifiers = builder.build();
+    Set<String> unknownSimplifiers =
+        Sets.difference(ImmutableSet.copyOf(pSimplifiers), availableSimplifiers);
+    if (!unknownSimplifiers.isEmpty()) {
+      throw new InvalidConfigurationException(
+          "Unknown Z3 simplifiers: %s. Z3 provides the following simplifiers: %s."
+              .formatted(
+                  Joiner.on(", ").join(unknownSimplifiers),
+                  Joiner.on(", ").join(availableSimplifiers)));
+    }
   }
 
   private static ImmutableMap<String, Object> buildSolverOptionsFromConfig(
