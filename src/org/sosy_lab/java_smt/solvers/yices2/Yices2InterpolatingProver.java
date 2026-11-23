@@ -110,7 +110,11 @@ class Yices2InterpolatingProver extends Yices2AbstractProver<Integer>
           throw new SolverException(
               "Solver returned 'Unknown' while trying to interpolate. It's possible that the"
                   + " formulas use a theory that is not supported by the MCSat solver.");
-      default -> throw new AssertionError("Should be unreachable");
+      default ->
+          throw new AssertionError(
+              String.format(
+                  "Invalid solver status %s while interpolating. Please report this bug to the JavaSMT developers",
+                  status));
     }
   }
 
