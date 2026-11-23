@@ -18,6 +18,7 @@ import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.collect.Sets;
 import com.microsoft.z3.Native;
 import com.microsoft.z3.enumerations.Z3_ast_print_mode;
@@ -74,6 +75,53 @@ public final class Z3SolverContext extends AbstractSolverContext {
           "qi.lazy_threshold",
           "restart_factor",
           "spacer.dump_threshold");
+
+  /**
+   * Names and descriptions of all simplifiers of the Z3 version used by JavaSMT, one simplifier per
+   * line and sorted by name. Z3NativeOptionsTest checks that this matches the simplifiers that Z3
+   * provides.
+   */
+  static final String AVAILABLE_SIMPLIFIERS =
+      """
+      bit-blast: reduce bit-vector expressions into SAT.
+      bit2int: simplify bit2int expressions.
+      blast-term-ite: blast term if-then-else by hoisting them.
+      bv-slice: simplify using bit-vector slices.
+      bv1-blast: reduce bit-vector expressions into bit-vectors of size 1 (notes: only equality, \
+      extract and concat are supported).
+      bvarray2uf: Rewrite bit-vector arrays into bit-vector (uninterpreted) functions.
+      card2bv: convert pseudo-boolean constraints to bit-vectors.
+      cheap-fourier-motzkin: eliminate variables from quantifiers using partial Fourier-Motzkin \
+      elimination.
+      cofactor-term-ite: eliminate term if-then-else using cofactors.
+      demodulator: extracts equalities from quantifiers and applies them to simplify.
+      der: destructive equality resolution.
+      distribute-forall: distribute forall over conjunctions.
+      dom-simplify: apply dominator simplification rules.
+      elim-predicates: eliminate predicates, macros and implicit definitions.
+      elim-term-ite: eliminate if-then-else term by hoisting them top top-level.
+      elim-unconstrained: eliminate unconstrained variables.
+      euf-completion: simplify modulo congruence closure.
+      factor: polynomial factorization.
+      max-bv-sharing: use heuristics to maximize the sharing of bit-vector expressions such as \
+      adders and multipliers.
+      ng-push-app-ite: Push functions over if-then-else within non-ground terms only.
+      ng-push-app-ite-conservative: Push functions over if-then-else within non-ground terms only.
+      propagate-bv-bounds: propagate bit-vector bounds by simplifying implied or contradictory \
+      bounds.
+      propagate-ineqs: propagate ineqs/bounds, remove subsumed inequalities.
+      propagate-values: propagate constants.
+      pull-nested-quantifiers: pull nested quantifiers to top-level.
+      push-app-ite: Push functions over if-then else.
+      push-app-ite-conservative: Push functions over if-then else.
+      qe-light: apply light-weight quantifier elimination.
+      randomizer: shuffle assertions and rename uninterpreted functions.
+      reduce-args: reduce the number of arguments of function applications, when for all \
+      occurrences of a function f the i-th is a value.
+      refine-injectivity: refine injectivity axioms.
+      simplify: apply simplification rules.
+      solve-eqs: solve for variables.
+      """;
 
   // Note: the options with : are named slightly differently when used normally
   private static final String RND_SEED_CONFIG_KEY = ":random-seed";
@@ -201,9 +249,11 @@ public final class Z3SolverContext extends AbstractSolverContext {
                 + " context. This option has no effect on OptimizationProverEnvironments."
                 + " Unsat-core generation and solving with assumptions are not supported together"
                 + " with simplifiers due to issues."
-                + " Example: \"simplify, propagate-values, solve-eqs\". Available simplifiers"
-                + " can be found in the Z3 documentation online:"
-                + " https://microsoft.github.io/z3guide/docs/strategies/simplifiers/")
+                + " Example: \"simplify, propagate-values, solve-eqs\". More information about"
+                + " simplifiers can be found in the Z3 documentation online:"
+                + " https://microsoft.github.io/z3guide/docs/strategies/simplifiers/"
+                + " Available simplifiers:\n"
+                + AVAILABLE_SIMPLIFIERS)
     private List<String> simplifiers = ImmutableList.of();
 
     private final @Nullable PathCounterTemplate logfile;
@@ -457,11 +507,7 @@ public final class Z3SolverContext extends AbstractSolverContext {
     if (pSimplifiers.isEmpty()) {
       return;
     }
-    ImmutableSet.Builder<String> builder = ImmutableSet.builder();
-    for (int i = 0; i < Native.getNumSimplifiers(context); i++) {
-      builder.add(Native.getSimplifierName(context, i));
-    }
-    ImmutableSet<String> availableSimplifiers = builder.build();
+    ImmutableSortedSet<String> availableSimplifiers = getAvailableSimplifiers(context);
     Set<String> unknownSimplifiers =
         Sets.difference(ImmutableSet.copyOf(pSimplifiers), availableSimplifiers);
     if (!unknownSimplifiers.isEmpty()) {
@@ -471,6 +517,15 @@ public final class Z3SolverContext extends AbstractSolverContext {
                   Joiner.on(", ").join(unknownSimplifiers),
                   Joiner.on(", ").join(availableSimplifiers)));
     }
+  }
+
+  /** Returns the names of all simplifiers that Z3 provides, sorted by name. */
+  static ImmutableSortedSet<String> getAvailableSimplifiers(long context) {
+    ImmutableSortedSet.Builder<String> builder = ImmutableSortedSet.naturalOrder();
+    for (int i = 0; i < Native.getNumSimplifiers(context); i++) {
+      builder.add(Native.getSimplifierName(context, i));
+    }
+    return builder.build();
   }
 
   private static ImmutableMap<String, Object> buildSolverOptionsFromConfig(

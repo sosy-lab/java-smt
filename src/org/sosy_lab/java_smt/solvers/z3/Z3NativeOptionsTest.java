@@ -16,6 +16,7 @@ import static org.junit.Assert.assertThrows;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
+import com.microsoft.z3.Native;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.nio.file.Files;
@@ -236,6 +237,28 @@ public class Z3NativeOptionsTest extends SolverBasedTest0 {
       buildShutdownThreadWith(shutdownManager, 7500).start();
       assertThat(pe.isUnsat()).isTrue();
     }
+  }
+
+  @Test
+  public void availableSimplifiersTest() {
+    // If this test fails, Z3 provides other simplifiers or descriptions than before (e.g., after a
+    // Z3 update). Then, update Z3SolverContext.AVAILABLE_SIMPLIFIERS to the simplifiers printed
+    // below, as it is shown to users in the description of the option solver.z3.simplifiers.
+    // Also check that the example in this option description still only uses available
+    // simplifiers.
+    long z3context = ((Z3FormulaManager) mgr).getEnvironment();
+    StringBuilder availableSimplifiers = new StringBuilder();
+    for (String name : Z3SolverContext.getAvailableSimplifiers(z3context)) {
+      availableSimplifiers
+          .append(name)
+          .append(": ")
+          .append(Native.simplifierGetDescr(z3context, name))
+          .append('\n');
+    }
+
+    // System.out.print("Simplifiers available in Z3:\n" + availableSimplifiers);
+
+    assertThat(availableSimplifiers.toString()).isEqualTo(Z3SolverContext.AVAILABLE_SIMPLIFIERS);
   }
 
   @Test
