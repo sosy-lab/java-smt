@@ -28,7 +28,7 @@ brew install gmp
 Then, we build the Yices2 binaries by running the build script included with JavaSMT:
 
 ```shell
-git clone git@github.com:sosy-lab/java-smt.git
+git clone https://github.com/sosy-lab/java-smt.git
 cd java-smt
 ant publish-yices2-macOS
 ```
