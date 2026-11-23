@@ -55,14 +55,14 @@ class Z3TheoremProver extends Z3AbstractProver implements ProverEnvironment {
     super(creator, pMgr, pLogic, pEngine, pOptions, pLogfile, pShutdownNotifier);
     usesSimplifiers = !pSimplifiers.isEmpty();
     if (usesSimplifiers && generateUnsatCores) {
-      // TODO: unsat-cores with simplifiers fail with an exceptions.
+      // TODO: unsat-cores with simplifiers fail with wrong results.
       //  Tested in Z3 4.17.0-1009b13 and up to 5.4.1
       throw new UnsupportedOperationException(
           "Unsat-core generation is not supported together with Z3 simplifiers.");
     }
     if (usesSimplifiers && generateUnsatCoresOverAssumptions) {
-      // TODO: Allow this together with solving with assumptions? Or block it due to the
-      //  unsat-core issue above?
+      // TODO: simplifiers with assumption solving can be supported using our wrapper or a newer
+      //  Z3 version.
       throw new UnsupportedOperationException(
           "Unsat-core generation over assumptions is not supported together with Z3 simplifiers.");
     }
