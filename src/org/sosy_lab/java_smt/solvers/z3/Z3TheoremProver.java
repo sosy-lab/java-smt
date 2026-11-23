@@ -49,6 +49,7 @@ class Z3TheoremProver extends Z3AbstractProver implements ProverEnvironment {
       Engine pEngine,
       Set<ProverOptions> pOptions,
       ImmutableMap<String, Object> pSolverOptions,
+      ImmutableList<String> pTactics,
       ImmutableList<String> pSimplifiers,
       @Nullable PathCounterTemplate pLogfile,
       ShutdownNotifier pShutdownNotifier) {
@@ -66,7 +67,7 @@ class Z3TheoremProver extends Z3AbstractProver implements ProverEnvironment {
       throw new UnsupportedOperationException(
           "Unsat-core generation over assumptions is not supported together with Z3 simplifiers.");
     }
-    z3solver = mkSolver(pSimplifiers);
+    z3solver = mkSolver(pTactics, pSimplifiers);
 
     interruptListener = reason -> Native.solverInterrupt(z3context, z3solver);
     shutdownNotifier.register(interruptListener);
@@ -84,20 +85,29 @@ class Z3TheoremProver extends Z3AbstractProver implements ProverEnvironment {
   }
 
   /**
-   * Creates a new Z3 solver that applies the given simplifiers (if any) as pre-processing. The
-   * returned solver is reference counted and needs to be released with {@link Native#solverDecRef}.
+   * Creates a new Z3 solver that solves with the given tactics (if any) and applies the given
+   * simplifiers (if any) as pre-processing. The returned solver is reference counted and needs to
+   * be released with {@link Native#solverDecRef}.
    */
-  private long mkSolver(List<String> pSimplifiers) {
+  private long mkSolver(List<String> pTactics, List<String> pSimplifiers) {
     long solver;
-    if (!logic.orElse("ALL").equalsIgnoreCase("ALL")) {
-      // mkSolverForLogic() allows setting logics,
-      // which seem to be getting ignored if set via options
-      long logicSymbol = Native.mkStringSymbol(z3context, logic.orElseThrow());
-      solver = Native.mkSolverForLogic(z3context, logicSymbol);
+    if (!pTactics.isEmpty()) {
+      long tactic = mkTactic(pTactics);
+      solver = Native.mkSolverFromTactic(z3context, tactic);
+      Native.solverIncRef(z3context, solver);
+      // The solver holds its own reference to the internal tactic, so we can release ours.
+      Native.tacticDecRef(z3context, tactic);
     } else {
-      solver = Native.mkSolver(z3context);
+      if (!logic.orElse("ALL").equalsIgnoreCase("ALL")) {
+        // mkSolverForLogic() allows setting logics,
+        // which seem to be getting ignored if set via options
+        long logicSymbol = Native.mkStringSymbol(z3context, logic.orElseThrow());
+        solver = Native.mkSolverForLogic(z3context, logicSymbol);
+      } else {
+        solver = Native.mkSolver(z3context);
+      }
+      Native.solverIncRef(z3context, solver);
     }
-    Native.solverIncRef(z3context, solver);
     if (pSimplifiers.isEmpty()) {
       return solver;
     }
@@ -110,6 +120,30 @@ class Z3TheoremProver extends Z3AbstractProver implements ProverEnvironment {
     Native.simplifierDecRef(z3context, simplifier);
     Native.solverDecRef(z3context, solver);
     return solverWithSimplifier;
+  }
+
+  /**
+   * Creates a Z3 tactic that applies the given tactics in the given order. The returned tactic is
+   * reference counted and needs to be released with {@link Native#tacticDecRef}.
+   */
+  private long mkTactic(List<String> pTactics) {
+    checkArgument(!pTactics.isEmpty());
+
+    long result = Native.mkTactic(z3context, pTactics.get(0));
+    Native.tacticIncRef(z3context, result);
+
+    for (String name : pTactics.subList(1, pTactics.size())) {
+      long next = Native.mkTactic(z3context, name);
+      Native.tacticIncRef(z3context, next);
+      // The combined tactic holds its own references to its components, so we can release ours.
+      long combined = Native.tacticAndThen(z3context, result, next);
+      Native.tacticIncRef(z3context, combined);
+      Native.tacticDecRef(z3context, result);
+      Native.tacticDecRef(z3context, next);
+      result = combined;
+    }
+
+    return result;
   }
 
   /**
@@ -259,8 +293,14 @@ class Z3TheoremProver extends Z3AbstractProver implements ProverEnvironment {
     Preconditions.checkState(!closed);
     if (propagator != null) {
       propagator.close();
+      propagator = null;
     }
-    propagator = new Z3UserPropagator(z3context, z3solver, creator, mgr, prop);
+    try {
+      propagator = new Z3UserPropagator(z3context, z3solver, creator, mgr, prop);
+    } catch (Z3Exception e) {
+      // The solver does not support user propagators, e.g., because of its tactics
+      return false;
+    }
     prop.initializeWithBackend(propagator);
     return true;
   }

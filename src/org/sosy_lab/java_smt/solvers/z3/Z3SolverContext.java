@@ -30,6 +30,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
+import java.util.function.IntFunction;
 import java.util.logging.Level;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.ShutdownNotifier;
@@ -206,6 +207,23 @@ public final class Z3SolverContext extends AbstractSolverContext {
                 + " https://microsoft.github.io/z3guide/docs/strategies/simplifiers/")
     private List<String> simplifiers = ImmutableList.of();
 
+    @Option(
+        secure = true,
+        description =
+            "List of Z3 tactics that are applied, in the given order, into the solving strategy"
+                + " of each ProverEnvironment created by this context. Tactics are applied to all"
+                + " assertions for each satisfiability check. While the ProverEnvironment can"
+                + " still be used incrementally, using tactics leads to Z3 not utilizing previous"
+                + " incremental results when checking satisfiability, i.e. every isUnsat*(),"
+                + " builds a fresh goal from all current constraints and runs the whole tactic"
+                + " chain on it. The tactics need to decide satisfiability, e.g., by"
+                + " ending with the tactic 'smt', otherwise Z3 returns 'unknown'. This option has"
+                + " no effect on OptimizationProverEnvironments."
+                + " Example: \"simplify, solve-eqs, smt\". Available tactics can be found in the"
+                + " Z3 documentation online:"
+                + " https://microsoft.github.io/z3guide/docs/strategies/summary/")
+    private List<String> tactics = ImmutableList.of();
+
     private final @Nullable PathCounterTemplate logfile;
 
     private final int randomSeed;
@@ -213,6 +231,18 @@ public final class Z3SolverContext extends AbstractSolverContext {
     ExtraOptions(Configuration config, @Nullable PathCounterTemplate pLogfile, int pRandomSeed)
         throws InvalidConfigurationException {
       config.inject(this);
+
+      // Z3 rejects the parameters for logic and engine for most tactics, and a solver based on
+      // tactics does not use them anyway.
+      if (!tactics.isEmpty() && !getLogic().orElse("ALL").equalsIgnoreCase("ALL")) {
+        throw new InvalidConfigurationException(
+            "Option solver.z3.logic can not be combined with solver.z3.tactics. Please use"
+                + " tactics for the logic instead, e.g., 'qfbv' for QF_BV.");
+      }
+      if (!tactics.isEmpty() && getZ3Engine() != Engine.DEFAULT) {
+        throw new InvalidConfigurationException(
+            "Option solver.z3.engine can not be combined with solver.z3.tactics.");
+      }
 
       randomSeed = pRandomSeed;
       logfile = pLogfile;
@@ -314,7 +344,16 @@ public final class Z3SolverContext extends AbstractSolverContext {
     Native.delConfig(cfg);
 
     try {
-      checkSimplifiers(context, extraOptions.simplifiers);
+      checkNames(
+          "simplifiers",
+          extraOptions.simplifiers,
+          Native.getNumSimplifiers(context),
+          i -> Native.getSimplifierName(context, i));
+      checkNames(
+          "tactics",
+          extraOptions.tactics,
+          Native.getNumTactics(context),
+          i -> Native.getTacticName(context, i));
     } catch (InvalidConfigurationException e) {
       Native.delContext(context);
       throw e;
@@ -393,6 +432,7 @@ public final class Z3SolverContext extends AbstractSolverContext {
         engine,
         options,
         buildSolverOptions(options),
+        ImmutableList.copyOf(extraOptions.tactics),
         ImmutableList.copyOf(extraOptions.simplifiers),
         extraOptions.logfile,
         shutdownNotifier);
@@ -451,25 +491,34 @@ public final class Z3SolverContext extends AbstractSolverContext {
     return true;
   }
 
-  /** Checks that Z3 knows all simplifiers that are given by name. */
-  private static void checkSimplifiers(long context, List<String> pSimplifiers)
+  /**
+   * Checks that Z3 knows all names, e.g., of simplifiers or tactics.
+   *
+   * @param pKind the kind of the names for the error message, e.g., "tactics".
+   * @param pNames the names to check.
+   * @param pNumAvailable the number of names available in Z3.
+   * @param pAvailableName returns the available name with the given index.
+   */
+  private static void checkNames(
+      String pKind, List<String> pNames, int pNumAvailable, IntFunction<String> pAvailableName)
       throws InvalidConfigurationException {
-    if (pSimplifiers.isEmpty()) {
+    if (pNames.isEmpty()) {
       return;
     }
     ImmutableSet.Builder<String> builder = ImmutableSet.builder();
-    for (int i = 0; i < Native.getNumSimplifiers(context); i++) {
-      builder.add(Native.getSimplifierName(context, i));
+    for (int i = 0; i < pNumAvailable; i++) {
+      builder.add(pAvailableName.apply(i));
     }
-    ImmutableSet<String> availableSimplifiers = builder.build();
-    Set<String> unknownSimplifiers =
-        Sets.difference(ImmutableSet.copyOf(pSimplifiers), availableSimplifiers);
-    if (!unknownSimplifiers.isEmpty()) {
+    ImmutableSet<String> availableNames = builder.build();
+    Set<String> unknownNames = Sets.difference(ImmutableSet.copyOf(pNames), availableNames);
+    if (!unknownNames.isEmpty()) {
       throw new InvalidConfigurationException(
-          "Unknown Z3 simplifiers: %s. Z3 provides the following simplifiers: %s."
+          "Unknown Z3 %s: %s. Z3 provides the following %s: %s."
               .formatted(
-                  Joiner.on(", ").join(unknownSimplifiers),
-                  Joiner.on(", ").join(availableSimplifiers)));
+                  pKind,
+                  Joiner.on(", ").join(unknownNames),
+                  pKind,
+                  Joiner.on(", ").join(availableNames)));
     }
   }
 
@@ -485,8 +534,13 @@ public final class Z3SolverContext extends AbstractSolverContext {
   }
 
   private ImmutableMap<String, Object> buildSolverOptions(Set<ProverOptions> options) {
-    return ImmutableMap.<String, Object>builder()
-        .put(RND_SEED_CONFIG_KEY, extraOptions.randomSeed)
+    ImmutableMap.Builder<String, Object> builder = ImmutableMap.builder();
+    if (extraOptions.tactics.isEmpty()) {
+      // Z3 rejects this option for tactics that do not use a random seed, e.g., 'simplify'.
+      // Tactics like 'smt' use the random seed that we set globally for the context.
+      builder.put(RND_SEED_CONFIG_KEY, extraOptions.randomSeed);
+    }
+    return builder
         .put(
             MODEL_CONFIG_KEY,
             options.contains(ProverOptions.GENERATE_MODELS)
