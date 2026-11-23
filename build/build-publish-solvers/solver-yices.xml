@@ -335,7 +335,7 @@ SPDX-License-Identifier: Apache-2.0
         </exec>
     </target>
 
-    <target name="publish-yices2-macOS" depends="load-ivy, build-yices2-java-macOS"
+    <target name="package-yices2-macOS" depends="load-ivy, build-yices2-java-macOS"
             description="Compile Yices2 binaries for macOS">
         <condition property="install.architecture" value="arm64" else="x86_64">
             <os arch="aarch64"/>

@@ -30,7 +30,7 @@ Then, we build the Yices2 binaries by running the build script included with Jav
 ```shell
 git clone https://github.com/sosy-lab/java-smt.git
 cd java-smt
-ant publish-yices2-macOS
+ant package-yices2-macOS
 ```
 
 The script will build several dependencies before compiling Yices and may run for up to 10
