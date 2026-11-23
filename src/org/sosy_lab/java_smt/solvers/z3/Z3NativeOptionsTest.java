@@ -327,17 +327,34 @@ public class Z3NativeOptionsTest extends SolverBasedTest0 {
   @Test
   public void simplifiersWithLogicTest()
       throws InvalidConfigurationException, SolverException, InterruptedException {
+    // We push() before adding constraints, see simplifierApplicationTest.
 
-    setAdditionalConfigOptionForSolver(
-        "solver.z3.simplifiers", SIMPLIFIERS, "solver.z3.logic", "QF_LIA");
+    setAdditionalConfigOptionForSolver("solver.z3.logic", "QF_LIA");
 
     IntegerFormula x = imgr.makeVariable("x");
     IntegerFormula y = imgr.makeVariable("y");
 
     try (ProverEnvironment prover = context.newProverEnvironment()) {
+      prover.push();
       prover.addConstraint(imgr.equal(x, imgr.add(y, imgr.makeNumber(1))));
       prover.addConstraint(imgr.equal(y, imgr.makeNumber(3)));
       assertThat(prover.isUnsat()).isFalse();
+      assertThat(prover.getStatistics()).doesNotContainKey(SOLVE_EQS_ELIM_VARS_KEY);
+    }
+
+    setAdditionalConfigOptionForSolver(
+        "solver.z3.simplifiers", SIMPLIFIERS, "solver.z3.logic", "QF_LIA");
+
+    x = imgr.makeVariable("x");
+    y = imgr.makeVariable("y");
+
+    try (ProverEnvironment prover = context.newProverEnvironment()) {
+      prover.push();
+      prover.addConstraint(imgr.equal(x, imgr.add(y, imgr.makeNumber(1))));
+      prover.addConstraint(imgr.equal(y, imgr.makeNumber(3)));
+      assertThat(prover.isUnsat()).isFalse();
+      assertThat(Integer.parseInt(prover.getStatistics().get(SOLVE_EQS_ELIM_VARS_KEY)))
+          .isGreaterThan(0);
       prover.addConstraint(imgr.greaterThan(x, imgr.makeNumber(4)));
       assertThat(prover.isUnsat()).isTrue();
     }
