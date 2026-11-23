@@ -86,11 +86,8 @@ public class NonLinearArithmeticTest<T extends NumeralFormula> extends SolverBas
 
   @Override
   protected ConfigurationBuilder createTestConfigBuilder() throws InvalidConfigurationException {
-    var newConfig = super.createTestConfigBuilder();
-    if (solver == Solvers.YICES2) {
-      newConfig.setOption("solver.yices2.logic", "QF_AUFNIRA");
-    }
-    return newConfig.setOption("solver.nonLinearArithmetic", nonLinearArithmetic.name());
+    return super.createTestConfigBuilder()
+        .setOption("solver.nonLinearArithmetic", nonLinearArithmetic.name());
   }
 
   private T handleExpectedException(Supplier<T> supplier) {
@@ -155,6 +152,27 @@ public class NonLinearArithmeticTest<T extends NumeralFormula> extends SolverBas
         bmgr.and(
             nmgr.equal(c, handleExpectedException(() -> nmgr.multiply(a, b))),
             nmgr.equal(c, nmgr.makeNumber(2 * 3)));
+
+    assertThatFormula(f).isSatisfiable();
+  }
+
+  @Test
+  public void testApproximateFallbackWithLinearYicesLogic()
+      throws SolverException, InterruptedException, InvalidConfigurationException {
+    assume().that(solver).isEqualTo(Solvers.YICES2);
+    assume().that(nonLinearArithmetic).isEqualTo(NonLinearArithmetic.APPROXIMATE_FALLBACK);
+
+    // The default logic selects DPLL(T), which does not support non-linear arithmetic. The
+    // multiplication should then be approximated with an UF instead of failing.
+    setAdditionalConfigOptionForSolver("solver.yices2.logic", "ALL");
+    chooseNumeralFormulaManager();
+
+    T a = nmgr.makeVariable("a");
+    T b = nmgr.makeVariable("b");
+    T c = nmgr.makeVariable("c");
+
+    BooleanFormula f =
+        bmgr.and(nmgr.equal(c, nmgr.multiply(a, b)), nmgr.equal(c, nmgr.makeNumber(2 * 3)));
 
     assertThatFormula(f).isSatisfiable();
   }
