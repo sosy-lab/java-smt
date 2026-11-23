@@ -32,19 +32,25 @@ public final class Yices2SolverContext extends AbstractSolverContext {
   static class Yices2Parameters {
     @Option(
         secure = true,
-        description = "DEPRECATED: Backend to use for the solver",
+        description =
+            "Backend to use for the solver: MCSAT supports non-linear arithmetic and division by"
+                + " zero, DPLL(T) supports constant arrays. This option is ignored if a logic is"
+                + " set with solver.yices2.logic, as the logic then determines the backend."
+                + " Without a logic, MCSAT only supports the mode 'push-pop'.",
         values = {"dpllt", "mcsat"})
-    @Nullable String solverType;
+    String solverType = "mcsat";
 
     @Option(
         secure = true,
         description =
-            "Sets the SMTLIB logic for solver selection. Select a nonlinear logic like QF_AUFNIRA"
-                + " to force Yices2 to use a MCSAT solver. Setting the logic to ALL will select a"
-                + " DPLLT solver with all theories enabled, and NONE means that only boolean logic"
-                + " is supported. If the selected logic is QF_IDL or QF_RDL and the mode is set to"
-                + " 'one-shot', Yices may either use its Floyd-Warshall solver, or the more general"
-                + " Simplex solver, based on an internal heuristic. ",
+            "Sets the SMTLIB logic for solver selection. If a logic is set, it determines the"
+                + " backend and solver.yices2.solverType is ignored: non-linear logics like"
+                + " QF_NIA or QF_AUFNIRA and the logic QF_FFA use MCSAT, all other logics use"
+                + " DPLL(T). Setting the logic to ALL will select DPLL(T) with all theories"
+                + " enabled, and NONE means that only boolean logic is supported. If the selected"
+                + " logic is QF_IDL or QF_RDL and the mode is set to 'one-shot', Yices may either"
+                + " use its Floyd-Warshall solver, or the more general Simplex solver, based on an"
+                + " internal heuristic.",
         values = {
           "ALL",
           "NONE",
@@ -89,19 +95,30 @@ public final class Yices2SolverContext extends AbstractSolverContext {
           "QF_UFNRA",
           "QF_UFRDL"
         })
-    String logic = "ALL";
+    @Nullable String logic;
 
     @Option(
         secure = true,
-        description = "Configures the solver to allow/disable multiple SAT checks",
+        description =
+            "Configures the solver to allow/disable multiple SAT checks: 'one-shot' allows only"
+                + " a single check, 'multi-checks' allows several checks but no push/pop,"
+                + " 'push-pop' allows push/pop, and 'interactive' additionally allows to continue"
+                + " after an interrupted check. Push/pop, assumptions and unsat cores need"
+                + " 'push-pop' or 'interactive'. If solver.yices2.solverType is 'mcsat' and no"
+                + " logic is set, only 'push-pop' is supported.",
         values = {"one-shot", "multi-checks", "push-pop", "interactive"})
     String mode = "push-pop";
 
     Yices2Parameters(Configuration config) throws InvalidConfigurationException {
       config.inject(this);
-      if (solverType != null) {
+      if (logic == null && solverType.equals("mcsat") && !mode.equals("push-pop")) {
+        // Yices2 ignores the mode in this case, and always uses 'push-pop'
         throw new InvalidConfigurationException(
-            "Option \"solver.yices2.solverType\" is no longer supported.");
+            ("Yices2 only supports the mode 'push-pop' for MCSAT without a logic, but"
+                    + " solver.yices2.mode is '%s'. Use the mode 'push-pop', set"
+                    + " solver.yices2.solverType to 'dpllt', or set a logic with"
+                    + " solver.yices2.logic.")
+                .formatted(mode));
       }
     }
   }

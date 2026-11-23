@@ -85,7 +85,11 @@ abstract class Yices2AbstractProver<T> extends AbstractProverWithAllSat<T>
   }
 
   Context newContext(Yices2Parameters options) {
-    try (var cfg = new Config(options.logic)) {
+    try (var cfg = options.logic == null ? new Config() : new Config(options.logic)) {
+      if (options.logic == null) {
+        // Yices2 ignores the solver type if a logic is set, and picks the backend for the logic
+        cfg.set("solver-type", options.solverType);
+      }
       cfg.set("mode", options.mode);
       // Setting this to 'auto' allows Yices to pick between Simplex and Floyd-Warshall based on a
       // heuristic when a difference logic is selected, and the mode is set to 'one-shot'
