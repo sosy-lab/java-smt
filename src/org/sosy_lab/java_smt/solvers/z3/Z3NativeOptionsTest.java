@@ -21,7 +21,6 @@ import java.math.BigInteger;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import org.junit.Ignore;
@@ -33,11 +32,9 @@ import org.sosy_lab.java_smt.api.BasicProverEnvironment;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
-import org.sosy_lab.java_smt.api.PropagatorBackend;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
-import org.sosy_lab.java_smt.api.UserPropagator;
 import org.sosy_lab.java_smt.basicimpl.AbstractUserPropagator;
 import org.sosy_lab.java_smt.test.SolverBasedTest0;
 
@@ -501,53 +498,18 @@ public class Z3NativeOptionsTest extends SolverBasedTest0 {
     }
   }
 
-  /** Forbids that registered Boolean formulas become true. */
-  private static class BlockingUserPropagator extends AbstractUserPropagator {
-    private final Set<BooleanFormula> blockedFormulas = new HashSet<>();
-
-    @Override
-    public void initializeWithBackend(PropagatorBackend backend) {
-      super.initializeWithBackend(backend);
-      backend.notifyOnKnownValue();
-    }
-
-    @Override
-    public void registerExpression(BooleanFormula expr) {
-      blockedFormulas.add(expr);
-      super.registerExpression(expr);
-    }
-
-    @Override
-    public void onKnownValue(BooleanFormula expr, boolean value) {
-      if (value && blockedFormulas.contains(expr)) {
-        getBackend().propagateConflict(new BooleanFormula[] {expr});
-      }
-    }
-  }
-
   @Test
   public void userPropagatorWithTacticsTest()
       throws InvalidConfigurationException, SolverException, InterruptedException {
-    // The tactic 'default' does not support user propagators
-    setAdditionalConfigOptionForSolver("solver.z3.tactics", "default");
-    try (ProverEnvironment prover = context.newProverEnvironment()) {
-      assertThat(prover.registerUserPropagator(new BlockingUserPropagator())).isFalse();
-      // The prover is still usable
-      prover.push(bmgr.makeVariable("p"));
-      assertThat(prover.isUnsat()).isFalse();
-    }
-
-    // The tactic 'smt' supports user propagators
-    setAdditionalConfigOptionForSolver("solver.z3.tactics", TACTICS);
-    BooleanFormula p = bmgr.makeVariable("p");
-    BooleanFormula q = bmgr.makeVariable("q");
-    try (ProverEnvironment prover = context.newProverEnvironment()) {
-      prover.push(bmgr.or(p, q));
-      UserPropagator propagator = new BlockingUserPropagator();
-      assertThat(prover.registerUserPropagator(propagator)).isTrue();
-      propagator.registerExpression(p);
-      propagator.registerExpression(q);
-      assertThat(prover.isUnsat()).isTrue();
+    // User propagators are not supported with tactics, also not with tactics ending with 'smt'
+    for (String tactics : ImmutableList.of("default", TACTICS)) {
+      setAdditionalConfigOptionForSolver("solver.z3.tactics", tactics);
+      try (ProverEnvironment prover = context.newProverEnvironment()) {
+        assertThat(prover.registerUserPropagator(new AbstractUserPropagator() {})).isFalse();
+        // The prover is still usable
+        prover.push(bmgr.makeVariable("p"));
+        assertThat(prover.isUnsat()).isFalse();
+      }
     }
   }
 

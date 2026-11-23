@@ -37,6 +37,7 @@ class Z3TheoremProver extends Z3AbstractProver implements ProverEnvironment {
 
   private final long z3solver;
   private final ShutdownRequestListener interruptListener;
+  private final boolean usesTactics;
   private final boolean usesSimplifiers;
 
   private @Nullable Z3UserPropagator propagator = null;
@@ -54,6 +55,7 @@ class Z3TheoremProver extends Z3AbstractProver implements ProverEnvironment {
       @Nullable PathCounterTemplate pLogfile,
       ShutdownNotifier pShutdownNotifier) {
     super(creator, pMgr, pLogic, pEngine, pOptions, pLogfile, pShutdownNotifier);
+    usesTactics = !pTactics.isEmpty();
     usesSimplifiers = !pSimplifiers.isEmpty();
     if (usesSimplifiers && generateUnsatCores) {
       // TODO: unsat-cores with simplifiers fail with an exceptions.
@@ -291,6 +293,13 @@ class Z3TheoremProver extends Z3AbstractProver implements ProverEnvironment {
   @Override
   public boolean registerUserPropagator(UserPropagator prop) {
     Preconditions.checkState(!closed);
+    if (usesTactics) {
+      // TODO: Allow user propagators with tactics once Z3 supports them properly.
+      //  Only tactics ending with 'smt' accept user propagators, and 'smt' uses them only in the
+      //  first satisfiability check. Other tactics make Z3 fail with an error that its Java API
+      //  does not report. Tested in Z3 4.17.0-1009b13 and up to 5.4.1
+      return false;
+    }
     if (propagator != null) {
       propagator.close();
       propagator = null;
@@ -298,7 +307,8 @@ class Z3TheoremProver extends Z3AbstractProver implements ProverEnvironment {
     try {
       propagator = new Z3UserPropagator(z3context, z3solver, creator, mgr, prop);
     } catch (Z3Exception e) {
-      // The solver does not support user propagators, e.g., because of its tactics
+      // TODO: this is not a good idea. User propagators may fail with exceptions and we should
+      //  just hand the exceptions through sensibly.
       return false;
     }
     prop.initializeWithBackend(propagator);
