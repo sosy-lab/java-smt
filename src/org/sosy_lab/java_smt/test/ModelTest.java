@@ -2701,6 +2701,10 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
 
     assume().that(solver).isNotEqualTo(Solvers.BOOLECTOR); // Doesn't support multiple indices
     assume().that(solver).isNotEqualTo(Solvers.CVC4); // FIXME Broken in JavaSMT
+    assume()
+        .withMessage("Yices does not support constant arrays when mcsat is used")
+        .that(solver)
+        .isNotEqualTo(Solvers.YICES2);
 
     var scalarType = FormulaType.getBitvectorTypeWithSize(8);
 
@@ -2743,10 +2747,10 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
 
     assume().that(solver).isNotEqualTo(Solvers.BOOLECTOR); // Doesn't support multiple indices
     assume()
-        .withMessage("Yices returns an empty array here")
+        .withMessage("Yices does not support constant arrays when mcsat is used")
         .that(solver)
-        .isNotEqualTo(Solvers.YICES2); // FIXME
-    // CVC4 array model is sometimes broken in JavaSMT. Unfixable in CVC4, fixed in CVC5.
+        .isNotEqualTo(Solvers.YICES2);
+    // FIXME CVC4 array model is sometimes broken in JavaSMT. Unfixable in CVC4, fixed in CVC5.
     assume().that(solver).isNotEqualTo(Solvers.CVC4);
 
     var scalarType = FormulaType.getBitvectorTypeWithSize(8);
@@ -2848,6 +2852,10 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
     requireConstArrays();
 
     assume().that(solver).isNotEqualTo(Solvers.CVC4); // FIXME Broken in JavaSMT
+    assume()
+        .withMessage("Yices does not support constant arrays when mcsat is used")
+        .that(solver)
+        .isNotEqualTo(Solvers.YICES2);
 
     var scalarType = FormulaType.IntegerType;
 
