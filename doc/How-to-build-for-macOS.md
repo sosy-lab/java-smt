@@ -21,7 +21,7 @@ installed via Homebrew:
 
 ```shell
 brew update
-brew install gperf lcov autoconf automake libtool
+brew install ant cmake gperf lcov autoconf automake libtool
 brew install gmp
 ```
 
