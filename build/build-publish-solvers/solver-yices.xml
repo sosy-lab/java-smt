@@ -231,6 +231,8 @@ SPDX-License-Identifier: Apache-2.0
             <arg value="${basedir}/lib/native/source/yices2/yices.patch"/>
         </exec>
         <exec executable="autoconf" dir="${yices2.buildDir}/yices2" failonerror="true"/>
+        <!-- On macOS file names are case-insensitive, so we have to delete "INSTALL" before we can create a folder
+             named "install" -->
         <delete file="${yices2.buildDir}/yices2/INSTALL"/>
         <mkdir dir="${yices2.buildDir}/yices2/install"/>
         <!-- macOS build -->
