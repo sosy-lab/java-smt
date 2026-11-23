@@ -35,8 +35,8 @@ ant package-yices2-macOS
 
 The script will build several dependencies before compiling Yices and may run for up to 10
 minutes. Once it's finished the binary `libyices2java.dylib` can be found under `lib/native`.
-Depending on your system architecture, it will be either in the `arm64-macos` (ARM) or
-`x64_64-macos` (Intel) folder
+Depending on your system architecture, it will be either in the `arm64-macosx` (ARM) or
+`x64_64-macosx` (Intel) folder
 
 You can then either copy the binary to your project folder, or
 set `DYLD_LIBRARY_PATH` to include the binary folder to make sure Yices will be found when
