@@ -514,6 +514,18 @@ public class Z3NativeOptionsTest extends SolverBasedTest0 {
   }
 
   @Test
+  public void userPropagatorWithUnsupportedLogicTest() throws InvalidConfigurationException {
+    // For the logic QF_FD, Z3 uses a solver that does not support user propagators (up to Z3
+    // 5.0.0). Additionally, this solver currently rejects the parameter 'logic' set by us.
+    setAdditionalConfigOptionForSolver("solver.z3.logic", "QF_FD");
+    try (ProverEnvironment prover = context.newProverEnvironment()) {
+      assertThrows(
+          SolverException.class,
+          () -> prover.registerUserPropagator(new AbstractUserPropagator() {}));
+    }
+  }
+
+  @Test
   public void tacticsWithSimplifiersTest()
       throws InvalidConfigurationException, SolverException, InterruptedException {
     setAdditionalConfigOptionForSolver(

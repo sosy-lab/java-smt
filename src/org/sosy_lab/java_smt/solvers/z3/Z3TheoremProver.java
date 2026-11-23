@@ -291,7 +291,7 @@ class Z3TheoremProver extends Z3AbstractProver implements ProverEnvironment {
   }
 
   @Override
-  public boolean registerUserPropagator(UserPropagator prop) {
+  public boolean registerUserPropagator(UserPropagator prop) throws SolverException {
     Preconditions.checkState(!closed);
     if (usesTactics) {
       // TODO: Allow user propagators with tactics once Z3 supports them properly.
@@ -307,9 +307,8 @@ class Z3TheoremProver extends Z3AbstractProver implements ProverEnvironment {
     try {
       propagator = new Z3UserPropagator(z3context, z3solver, creator, mgr, prop);
     } catch (Z3Exception e) {
-      // TODO: this is not a good idea. User propagators may fail with exceptions and we should
-      //  just hand the exceptions through sensibly.
-      return false;
+      // Z3 rejected the user propagator, e.g., for the logic QF_FD
+      throw new SolverException("Z3 failed to register the user propagator", e);
     }
     prop.initializeWithBackend(propagator);
     return true;
