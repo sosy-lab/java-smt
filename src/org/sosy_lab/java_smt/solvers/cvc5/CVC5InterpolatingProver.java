@@ -163,15 +163,11 @@ class CVC5InterpolatingProver extends CVC5AbstractProver<String>
     Term phiMinus = bmgr.andImpl(formulasB);
 
     // Uses a separate Solver instance to leave the original solver-context unmodified
-    Solver itpSolver = getNewSolver();
-
     Term interpolant;
-    try {
+    try (Solver itpSolver = getNewSolver()) {
       itpSolver.assertFormula(phiPlus);
       interpolant =
           itpSolver.simplify(itpSolver.getInterpolant(termManager.mkTerm(Kind.NOT, phiMinus)));
-    } finally {
-      itpSolver.deletePointer();
     }
 
     if (validateInterpolants) {
@@ -205,8 +201,7 @@ class CVC5InterpolatingProver extends CVC5AbstractProver<String>
 
     // build and check both Craig interpolation formulas with the generated interpolant.
     // interpolation option is not required for validation
-    Solver validationSolver = getNewSolver();
-    try {
+    try (Solver validationSolver = getNewSolver()) {
       validationSolver.push();
       validationSolver.assertFormula(termManager.mkTerm(Kind.IMPLIES, phiPlus, interpolant));
       checkState(
@@ -224,9 +219,6 @@ class CVC5InterpolatingProver extends CVC5AbstractProver<String>
     } catch (CVC5ApiException e) {
       throw new IllegalArgumentException(
           "Failure when validating interpolant '" + interpolant + "'.", e);
-
-    } finally {
-      validationSolver.deletePointer();
     }
   }
 }

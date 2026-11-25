@@ -53,10 +53,9 @@ class CVC5Parser {
   }
 
   List<Term> parseAll(String pSmtQuery) {
-    final SymbolManager symbolManager = new SymbolManager(creator.getEnv());
-    final Solver parseSolver = new Solver(creator.getEnv());
-    final InputParser parser = getParser(symbolManager, parseSolver);
-    try {
+    try (SymbolManager symbolManager = new SymbolManager(creator.getEnv());
+        Solver parseSolver = new Solver(creator.getEnv());
+        InputParser parser = getParser(symbolManager, parseSolver)) {
       int numberOfAssertions = parseQuery(pSmtQuery, parser, symbolManager, parseSolver);
       if (numberOfAssertions == 0) {
         return ImmutableList.of();
@@ -64,10 +63,6 @@ class CVC5Parser {
       Term[] assertionsAndDeclarations = parseSolver.getAssertions();
       return getAndRegisterParsedTerms(
           assertionsAndDeclarations, symbolManager, numberOfAssertions);
-    } finally {
-      parser.deletePointer();
-      parseSolver.deletePointer();
-      symbolManager.deletePointer();
     }
   }
 
