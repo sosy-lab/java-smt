@@ -10,6 +10,24 @@ SPDX-License-Identifier: Apache-2.0
 
 # JavaSMT ChangeLog
 
+## Changes since 7.0.0
+
+### Yices
+
+- Yices2 has the new options `solver.yices2.logic`, allowing the selection of a logic, and 
+  `solver.yices2.mode`, allowing the selection of the solving mode. Selecting a logic 
+  overrides `solver.yices2.solverType` and selects the backend solverType; MCSAT for `QF_FFA`, as 
+  well as all non-linear logics, and solverType DPLL(T) otherwise.
+  MCSAT without a logic only supports the mode `push-pop` and rejects other modes with an 
+  `InvalidConfigurationException`.
+  For `solver.yices2.solverType=dpllt`, the default mode is now `push-pop` instead of `interactive` 
+  (set `solver.yices2.mode=interactive` to restore it; MCSAT always used `push-pop` internally), 
+  and SAT checks now use the search parameters that Yices2 tunes for DPLL(T), which can change 
+  performance and model values.
+  When using DPLL(T), non-linear terms are now rejected with an `UnsupportedOperationException` when
+  they are created instead of when they are asserted, so that
+  `solver.nonLinearArithmetic=APPROXIMATE_FALLBACK` can approximate them with UFs.
+
 ## JavaSMT 7.0.0
 
 #### Note: Version 7 will be the last mayor release for Java 17. We will adopt Java 21 soon.

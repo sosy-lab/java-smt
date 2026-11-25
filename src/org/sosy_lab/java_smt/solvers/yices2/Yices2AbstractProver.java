@@ -12,7 +12,6 @@ import com.google.common.base.Preconditions;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import com.sri.yices.Config;
 import com.sri.yices.Context;
-import com.sri.yices.Parameters;
 import com.sri.yices.Status;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -35,6 +34,7 @@ import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractProverWithAllSat;
 import org.sosy_lab.java_smt.basicimpl.CachingModel;
 import org.sosy_lab.java_smt.basicimpl.ShutdownHook;
+import org.sosy_lab.java_smt.solvers.yices2.Yices2SolverContext.Yices2Parameters;
 
 /**
  * Info about the option {@link ProverOptions#GENERATE_UNSAT_CORE}: Yices provides the unsat core
@@ -52,8 +52,6 @@ import org.sosy_lab.java_smt.basicimpl.ShutdownHook;
 abstract class Yices2AbstractProver<T> extends AbstractProverWithAllSat<T>
     implements BasicProverEnvironment<T> {
 
-  static final Parameters DEFAULT_PARAMS = new Parameters(); // use default setting in the solver
-
   protected final Yices2FormulaCreator creator;
   protected final Context curEnv;
 
@@ -70,10 +68,10 @@ abstract class Yices2AbstractProver<T> extends AbstractProverWithAllSat<T>
       Set<ProverOptions> pOptions,
       BooleanFormulaManager pBmgr,
       ShutdownNotifier pShutdownNotifier,
-      String pSolverType) {
+      Yices2Parameters pSolverParameters) {
     super(pOptions, pBmgr, pShutdownNotifier);
     creator = pCreator;
-    curEnv = newContext(pSolverType);
+    curEnv = newContext(pSolverParameters);
     stack.push(PathCopyingPersistentTreeMap.of());
   }
 
@@ -86,11 +84,16 @@ abstract class Yices2AbstractProver<T> extends AbstractProverWithAllSat<T>
     return true;
   }
 
-  Context newContext(String solverType) {
-    try (var cfg = new Config()) {
-      cfg.set("solver-type", solverType);
-      cfg.set("mode", "interactive");
-      cfg.set("model-interpolation", "true");
+  Context newContext(Yices2Parameters options) {
+    try (var cfg = options.logic == null ? new Config() : new Config(options.logic)) {
+      if (options.logic == null) {
+        // Yices2 ignores the solver type if a logic is set, and picks the backend for the logic
+        cfg.set("solver-type", options.solverType);
+      }
+      cfg.set("mode", options.mode);
+      // Setting this to 'auto' allows Yices to pick between Simplex and Floyd-Warshall based on a
+      // heuristic when a difference logic is selected, and the mode is set to 'one-shot'
+      cfg.set("arith-solver", "auto");
       return new Context(cfg);
     }
   }
@@ -160,14 +163,12 @@ abstract class Yices2AbstractProver<T> extends AbstractProverWithAllSat<T>
       // calculate an unsat core
       unsat =
           !satCheckWithShutdownNotifier(
-              () -> curEnv.checkWithAssumptions(DEFAULT_PARAMS, getAllConstraints()),
+              () -> curEnv.checkWithAssumptions(null, getAllConstraints()),
               curEnv,
               shutdownNotifier);
 
     } else {
-      unsat =
-          !satCheckWithShutdownNotifier(
-              () -> curEnv.check(DEFAULT_PARAMS), curEnv, shutdownNotifier);
+      unsat = !satCheckWithShutdownNotifier(curEnv::check, curEnv, shutdownNotifier);
 
       if (unsat && stackSizeToUnsat == Integer.MAX_VALUE) {
         stackSizeToUnsat = size();
@@ -196,7 +197,7 @@ abstract class Yices2AbstractProver<T> extends AbstractProverWithAllSat<T>
 
     final boolean isUnsat =
         !satCheckWithShutdownNotifier(
-            () -> curEnv.checkWithAssumptions(DEFAULT_PARAMS, uncapsulate(pAssumptions)),
+            () -> curEnv.checkWithAssumptions(null, uncapsulate(pAssumptions)),
             curEnv,
             shutdownNotifier);
     if (!isUnsat) {

@@ -17,6 +17,7 @@ import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.BooleanFormulaManager;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
+import org.sosy_lab.java_smt.solvers.yices2.Yices2SolverContext.Yices2Parameters;
 
 class Yices2Prover extends Yices2AbstractProver<Void> implements ProverEnvironment {
   Yices2Prover(
@@ -24,8 +25,8 @@ class Yices2Prover extends Yices2AbstractProver<Void> implements ProverEnvironme
       Set<ProverOptions> pOptions,
       BooleanFormulaManager pBmgr,
       ShutdownNotifier pShutdownNotifier,
-      String pSolverType) {
-    super(creator, pOptions, pBmgr, pShutdownNotifier, pSolverType);
+      Yices2Parameters pSolverParameters) {
+    super(creator, pOptions, pBmgr, pShutdownNotifier, pSolverParameters);
   }
 
   @Override
