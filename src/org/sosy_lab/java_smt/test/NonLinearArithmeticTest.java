@@ -162,7 +162,7 @@ public class NonLinearArithmeticTest<T extends NumeralFormula> extends SolverBas
     assume().that(solver).isEqualTo(Solvers.YICES2);
     assume().that(nonLinearArithmetic).isEqualTo(NonLinearArithmetic.APPROXIMATE_FALLBACK);
 
-    // The default logic selects DPLL(T), which does not support non-linear arithmetic. The
+    // The logic ALL selects DPLL(T), which does not support non-linear arithmetic. The
     // multiplication should then be approximated with an UF instead of failing.
     setAdditionalConfigOptionForSolver("solver.yices2.logic", "ALL");
     chooseNumeralFormulaManager();

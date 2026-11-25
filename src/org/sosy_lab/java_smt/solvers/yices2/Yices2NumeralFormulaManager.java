@@ -22,9 +22,29 @@ abstract class Yices2NumeralFormulaManager<
     extends AbstractNumeralFormulaManager<
         Integer, Integer, Long, ParamFormulaType, ResultFormulaType, Integer> {
 
+  private final boolean supportsNonLinearArithmetic;
+
   Yices2NumeralFormulaManager(
-      Yices2FormulaCreator pCreator, NonLinearArithmetic pNonLinearArithmetic) {
+      Yices2FormulaCreator pCreator,
+      NonLinearArithmetic pNonLinearArithmetic,
+      boolean pSupportsNonLinearArithmetic) {
     super(pCreator, pNonLinearArithmetic);
+    supportsNonLinearArithmetic = pSupportsNonLinearArithmetic;
+  }
+
+  /**
+   * DPLL(T) only supports linear arithmetic, but Yices2 reports a non-linear term only when it is
+   * asserted. We already reject non-linear terms when creating them, so that the option
+   * solver.nonLinearArithmetic=APPROXIMATE_FALLBACK can replace them with an UF.
+   */
+  protected void checkNonLinearArithmeticIsSupported() {
+    if (!supportsNonLinearArithmetic) {
+      throw new UnsupportedOperationException(
+          "Non-linear arithmetic is not supported in the current logic, as Yices2 uses DPLL(T)"
+              + " for it. Set solver.yices2.logic to a non-linear logic like QF_NIA, or"
+              + " approximate non-linear arithmetic with"
+              + " solver.nonLinearArithmetic=APPROXIMATE_FALLBACK.");
+    }
   }
 
   @Override
@@ -75,6 +95,9 @@ abstract class Yices2NumeralFormulaManager<
 
   @Override
   public Integer multiply(Integer pParam1, Integer pParam2) {
+    if (!isNumeral(pParam1) && !isNumeral(pParam2)) {
+      checkNonLinearArithmeticIsSupported();
+    }
     return Terms.mul(pParam1, pParam2);
   }
 

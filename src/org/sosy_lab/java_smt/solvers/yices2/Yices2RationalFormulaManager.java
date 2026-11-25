@@ -19,8 +19,10 @@ class Yices2RationalFormulaManager
     implements RationalFormulaManager {
 
   Yices2RationalFormulaManager(
-      Yices2FormulaCreator pCreator, NonLinearArithmetic pNonLinearArithmetic) {
-    super(pCreator, pNonLinearArithmetic);
+      Yices2FormulaCreator pCreator,
+      NonLinearArithmetic pNonLinearArithmetic,
+      boolean pSupportsNonLinearArithmetic) {
+    super(pCreator, pNonLinearArithmetic, pSupportsNonLinearArithmetic);
   }
 
   @Override
@@ -40,6 +42,9 @@ class Yices2RationalFormulaManager
 
   @Override
   public Integer divide(Integer pParam1, Integer pParam2) {
+    if (!isNumeral(pParam2)) {
+      checkNonLinearArithmeticIsSupported();
+    }
     return Terms.div(pParam1, pParam2);
   }
 }

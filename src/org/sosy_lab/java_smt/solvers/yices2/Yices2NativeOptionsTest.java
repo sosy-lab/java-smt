@@ -21,6 +21,7 @@ import com.sri.yices.YicesException;
 import java.math.BigInteger;
 import java.util.Random;
 import org.junit.Test;
+import org.junit.function.ThrowingRunnable;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.common.configuration.Option;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
@@ -29,6 +30,7 @@ import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
+import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
@@ -50,14 +52,6 @@ public class Yices2NativeOptionsTest extends SolverBasedTest0 {
   @Override
   protected Solvers solverToUse() {
     return Solvers.YICES2;
-  }
-
-  /** Yices uses MCSAT for non-linear arithmetic and finite fields (see logic2arch in Yices). */
-  private static boolean expectMcsat(String logic) {
-    return logic.contains("NIA")
-        || logic.contains("NRA")
-        || logic.contains("NIRA")
-        || logic.equals("QF_FFA");
   }
 
   private static boolean expectPushSupport(String mode) {
@@ -194,10 +188,24 @@ public class Yices2NativeOptionsTest extends SolverBasedTest0 {
   }
 
   private void assertNonLinearArithmeticIsRejected(String message) {
-    BooleanFormula nonLinear = makeNonLinearFormula();
-    try (ProverEnvironment prover = context.newProverEnvironment()) {
-      YicesException e = assertThrows(YicesException.class, () -> prover.addConstraint(nonLinear));
-      assertWithMessage(message).that(e).hasMessageThat().contains("non-linear arithmetic");
+    // Yices would only reject non-linear terms when asserting them, JavaSMT already when creating
+    IntegerFormula x = imgr.makeVariable("x");
+    IntegerFormula y = imgr.makeVariable("y");
+    RationalFormula r = rmgr.makeVariable("r");
+    RationalFormula s = rmgr.makeVariable("s");
+    ImmutableList<ThrowingRunnable> nonLinearTerms =
+        ImmutableList.of(
+            () -> imgr.multiply(x, y),
+            () -> imgr.divide(x, y),
+            () -> imgr.modulo(x, y),
+            () -> rmgr.divide(r, s));
+    for (ThrowingRunnable nonLinearTerm : nonLinearTerms) {
+      UnsupportedOperationException e =
+          assertThrows(UnsupportedOperationException.class, nonLinearTerm);
+      assertWithMessage(message)
+          .that(e)
+          .hasMessageThat()
+          .contains("Non-linear arithmetic is not supported in the current logic");
     }
     BooleanFormula divisionByZero = makeDivisionByZeroFormula();
     try (ProverEnvironment prover = context.newProverEnvironment()) {
@@ -221,6 +229,7 @@ public class Yices2NativeOptionsTest extends SolverBasedTest0 {
       assertWithMessage("MCSAT is used for solver type %s", solverType)
           .that(usesMcsat())
           .isEqualTo(solverType.equals("mcsat"));
+      assertThat(new Yices2Parameters(config).usesMcsat()).isEqualTo(usesMcsat());
     }
   }
 
@@ -235,7 +244,7 @@ public class Yices2NativeOptionsTest extends SolverBasedTest0 {
             "solver.yices2.logic", logic, "solver.yices2.solverType", solverType);
         assertWithMessage("MCSAT is used for logic %s and solver type %s", logic, solverType)
             .that(usesMcsat())
-            .isEqualTo(expectMcsat(logic));
+            .isEqualTo(new Yices2Parameters(config).usesMcsat());
       }
     }
   }
@@ -285,7 +294,7 @@ public class Yices2NativeOptionsTest extends SolverBasedTest0 {
   }
 
   @Test
-  public void factoringWithMcsatTimeoutTest() throws SolverException, InterruptedException {
+  public void factoringWithMcsatTimeoutTest() throws InterruptedException {
     // MCSAT does not finish this within 10s, see factoringWithBitvectorLogicTest()
     try (ProverEnvironment prover = context.newProverEnvironment()) {
       prover.push(makeFactoringFormula(bvmgr.makeVariable(32, "x"), bvmgr.makeVariable(32, "y")));

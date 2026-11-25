@@ -121,6 +121,17 @@ public final class Yices2SolverContext extends AbstractSolverContext {
                 .formatted(mode));
       }
     }
+
+    /** Whether Yices2 uses MCSAT for this configuration, see logic2arch in Yices2. */
+    boolean usesMcsat() {
+      if (logic == null) {
+        return solverType.equals("mcsat");
+      }
+      return logic.contains("NIA")
+          || logic.contains("NRA")
+          || logic.contains("NIRA")
+          || logic.equals("QF_FFA");
+    }
   }
 
   private final Yices2FormulaCreator creator;
@@ -171,10 +182,11 @@ public final class Yices2SolverContext extends AbstractSolverContext {
     Yices2BooleanFormulaManager booleanTheory = new Yices2BooleanFormulaManager(creator);
     Yices2BitvectorFormulaManager bitvectorTheory =
         new Yices2BitvectorFormulaManager(creator, booleanTheory);
+    // Only MCSAT supports non-linear arithmetic
     Yices2IntegerFormulaManager integerTheory =
-        new Yices2IntegerFormulaManager(creator, pNonLinearArithmetic);
+        new Yices2IntegerFormulaManager(creator, pNonLinearArithmetic, params.usesMcsat());
     Yices2RationalFormulaManager rationalTheory =
-        new Yices2RationalFormulaManager(creator, pNonLinearArithmetic);
+        new Yices2RationalFormulaManager(creator, pNonLinearArithmetic, params.usesMcsat());
     Yices2QuantifiedFormulaManager quantTheory = new Yices2QuantifiedFormulaManager(creator);
     Yices2ArrayFormulaManager arrayTheory = new Yices2ArrayFormulaManager(creator);
     Yices2FormulaManager manager =
