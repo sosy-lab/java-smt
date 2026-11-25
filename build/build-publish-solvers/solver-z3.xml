@@ -19,10 +19,66 @@ SPDX-License-Identifier: Apache-2.0
     <property name="z3.project.name" value="Java Bindings for Z3"/>
     <property name="z3.javadoc.dir" value="Javadoc-z3"/>
 
-    <target name="check-z3-path">
+    <target name="download-z3" if="z3.version" unless="z3.path"
+        description="Download and prepare the official Z3 release given by -Dz3.version=X.Y.Z.">
+        <property name="z3.download.dir" location="downloads/z3/${z3.version}"/>
+        <mkdir dir="${z3.download.dir}"/>
+
+        <!-- download the binary releases (Linux, macOS, and Windows for x64 and arm64 architecture).
+             The release metadata contains the exact names, as they include varying versions of GLIBC and macOS. -->
+        <get src="https://api.github.com/repos/Z3Prover/z3/releases/tags/z3-${z3.version}"
+             dest="${z3.download.dir}/release.json"/>
+        <get dest="${z3.download.dir}" skipexisting="true" verbose="true">
+            <resourcelist>
+                <file file="${z3.download.dir}/release.json"/>
+                <filterchain>
+                    <tokenfilter delimoutput="${line.separator}">
+                        <stringtokenizer delims=","/>
+                        <containsregex flags="s"
+                            pattern='.*"browser_download_url"\s*:\s*"([^"]*/z3-${z3.version}-(x64|arm64)-(glibc|osx|win)[^"]*\.zip)".*'
+                            replace="\1"/>
+                    </tokenfilter>
+                </filterchain>
+            </resourcelist>
+        </get>
+        <fail message="Expected exactly 6 binary releases of Z3 (Linux, macOS, and Windows for x64 and arm64 architecture) in '${z3.download.dir}'.">
+            <condition>
+                <resourcecount when="ne" count="6">
+                    <fileset dir="${z3.download.dir}" includes="z3-${z3.version}-*.zip"/>
+                </resourcecount>
+            </condition>
+        </fail>
+        <unzip dest="${z3.download.dir}">
+            <fileset dir="${z3.download.dir}" includes="z3-${z3.version}-*.zip"/>
+        </unzip>
+
+        <!-- download the sources and generate all Java related files (required for JavaDoc).
+             Z3 v5 removed 'mk_make.py', thus we call the generators like Z3's CMake build does. -->
+        <get src="https://github.com/Z3Prover/z3/archive/refs/tags/z3-${z3.version}.tar.gz"
+             dest="${z3.download.dir}/z3-z3-${z3.version}.tar.gz" skipexisting="true" verbose="true"/>
+        <untar src="${z3.download.dir}/z3-z3-${z3.version}.tar.gz" dest="${z3.download.dir}" compression="gzip"/>
+        <property name="z3.path" location="${z3.download.dir}/z3-z3-${z3.version}"/>
+        <!-- same headers in same order as Z3_API_HEADER_FILES_TO_SCAN in Z3's CMakeLists.txt -->
+        <property name="z3.api.headers" value="src/api/z3_api.h src/api/z3_ast_containers.h src/api/z3_algebraic.h src/api/z3_polynomial.h src/api/z3_rcf.h src/api/z3_fixedpoint.h src/api/z3_optimization.h src/api/z3_fpa.h src/api/z3_spacer.h"/>
+        <exec executable="python3" dir="${z3.path}" failonerror="true">
+            <arg value="scripts/update_api.py"/>
+            <arg line="${z3.api.headers}"/>
+            <arg line="--java-input-dir src/api/java --java-output-dir src/api/java --java-package-name com.microsoft.z3"/>
+        </exec>
+        <exec executable="python3" dir="${z3.path}" failonerror="true">
+            <arg value="scripts/mk_consts_files.py"/>
+            <arg line="${z3.api.headers}"/>
+            <arg line="--java-output-dir src/api/java --java-package-name com.microsoft.z3"/>
+        </exec>
+    </target>
+
+    <target name="check-z3-path" depends="download-z3">
         <fail unless="z3.path">
             INFO
-            Please specify the path to Z3 sources directory with the flag '-Dz3.path=/path/to/z3/z3-unpacked-sources'.
+            For an official release of Z3, specify only the version with the flag '-Dz3.version=X.Y.Z'.
+            All required files are then downloaded and prepared automatically in the directory 'downloads/z3/'.
+
+            Otherwise, please specify the path to Z3 sources directory with the flag '-Dz3.path=/path/to/z3/z3-unpacked-sources'.
             The path should contain directories like './src/' and './scripts/', and can be relative or absolute.
             Please provide all unpacked releases (Linux, macOS, and Windows for x64 and arm64
             architecture) in the same parent directory './../' above the 'z3.path'.
@@ -51,7 +107,8 @@ SPDX-License-Identifier: Apache-2.0
         <!-- collect all files -->
         <copy todir="${z3.dist.dir}/" flatten="true" verbose="true">
             <fileset dir="${z3.path}/../">
-                <include name="z3-*-x64-glibc-*/bin/com.microsoft.z3.jar"/>
+                <include name="z3-*-x64-glibc-*/bin/com.microsoft.z3.jar"/> <!-- until Z3 v4 -->
+                <include name="z3-*-x64-glibc-*/java/com.microsoft.z3.jar"/> <!-- since Z3 v5 -->
             </fileset>
         </copy>
         <copy todir="${z3.dist.dir}/x64/" flatten="true" verbose="true">
@@ -89,7 +146,10 @@ SPDX-License-Identifier: Apache-2.0
         <move file="${z3.dist.dir}/arm64/libz3java.so" tofile="${z3.dist.dir}/arm64/libz3java-${z3.version}.so"/>
         <!-- Windows files -->
         <move file="${z3.dist.dir}/x64/libz3.dll" tofile="${z3.dist.dir}/x64/libz3-${z3.version}.dll" verbose="true"/>
-        <move file="${z3.dist.dir}/x64/libz3java.dll" tofile="${z3.dist.dir}/x64/libz3java-${z3.version}.dll" verbose="true"/>
+        <move tofile="${z3.dist.dir}/x64/libz3java-${z3.version}.dll" verbose="true">
+            <!-- named 'libz3java.dll' until Z3 v4 and 'z3java.dll' since Z3 v5 -->
+            <fileset dir="${z3.dist.dir}/x64" includes="libz3java.dll,z3java.dll"/>
+        </move>
         <move file="${z3.dist.dir}/arm64/libz3.dll" tofile="${z3.dist.dir}/arm64/libz3-${z3.version}.dll" verbose="true"/>
         <move file="${z3.dist.dir}/arm64/z3java.dll" tofile="${z3.dist.dir}/arm64/libz3java-${z3.version}.dll" verbose="true"/>
         <!-- MacOS files -->
