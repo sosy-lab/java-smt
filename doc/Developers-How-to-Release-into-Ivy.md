@@ -52,36 +52,43 @@ please build from source only if necessary (e.g., in case of an important bugfix
 
 ### From official binaries (for Linux, Windows, and OSX)
 
-To publish Z3, download the **Linux**, **Windows**, and **OSX** binary (for both, x64 and ARM64 architecture)
-and the sources (for JavaDoc) for the [latest release](https://github.com/Z3Prover/z3/releases) and unzip them.
-For example, the directory structure can look like this:
-```
-z3/                                 // <-- parent directory
- |-- z3-4.13.3-arm64-glibc-2.34/    // <-- unpacked release artifact
- |-- z3-4.13.3-arm64-osx-13.7/
- |-- z3-4.13.3-arm64-win/
- |-- z3-4.13.3-x64-glibc-2.35/
- |-- z3-4.13.3-x64-osx-13.7/
- |-- z3-4.13.3-x64-win/
- |-- z3-z3-4.13.3/                  // <-- sources directory used as 'z3.path'
-```
-
-You can prepare the Z3 Java sources on an arbitrary system, as we only prepare 
-Java sources and JavaDoc for the bindings, but do not compile any native library.
-This only depends on a Python3 environment and Java 17 or later.
-For simple usage, we provide a Docker definition/environment under `/docker`, in which the following command can be run.
-
-In the unpacked sources directory, prepare Java sources via `python3 scripts/mk_make.py --java`.
-Then execute the following command in the JavaSMT directory,
-where `$Z3_DIR` is the path of the sources directory and `$Z3_VERSION` is the version number:
+To publish an official release of Z3, execute the following command in the JavaSMT directory,
+where `$Z3_VERSION` is the version number of the [release](https://github.com/Z3Prover/z3/releases):
 ```bash
-ant publish-z3 -Dz3.path=$Z3_DIR -Dz3.version=$Z3_VERSION
+ant publish-z3 -Dz3.version=$Z3_VERSION
 ```
 Example:
 ```bash
-ant publish-z3 -Dz3.path=/workspace/solvers/z3/z3-z3-4.13.3 -Dz3.version=4.13.3
+ant publish-z3 -Dz3.version=5.4.1
 ```
+This downloads the **Linux**, **Windows**, and **OSX** binary (for both, x64 and ARM64 architecture)
+and the sources (for JavaDoc) into the directory `downloads/z3/$Z3_VERSION`, unpacks them,
+and prepares the Java sources of the bindings.
+To only download and prepare the files, use the target `download-z3` instead of `publish-z3`.
+You can run this on an arbitrary system, as we only prepare
+Java sources and JavaDoc for the bindings, but do not compile any native library.
+This only depends on a Python3 environment and Java 17 or later.
+For simple usage, we provide a Docker definition/environment under `/docker`, in which the command can be run.
 Finally, follow the instructions shown in the message at the end.
+
+Alternatively, you can provide the unpacked files manually
+(e.g., the output of `download-z3` with some replaced binaries).
+The directory structure needs to look like this:
+```
+z3/                                 // <-- parent directory
+ |-- z3-5.4.1-arm64-glibc-2.38/     // <-- unpacked release artifact
+ |-- z3-5.4.1-arm64-osx-13.3/
+ |-- z3-5.4.1-arm64-win/
+ |-- z3-5.4.1-x64-glibc-2.39/
+ |-- z3-5.4.1-x64-osx-13.3/
+ |-- z3-5.4.1-x64-win/
+ |-- z3-z3-5.4.1/                   // <-- sources directory used as 'z3.path'
+```
+Then execute the following command in the JavaSMT directory,
+where `$Z3_DIR` is the path of the sources directory:
+```bash
+ant publish-z3 -Dz3.path=$Z3_DIR -Dz3.version=$Z3_VERSION
+```
 
 
 #### Optional (from source for Linux target with older GLIBC)
