@@ -11,6 +11,8 @@ package org.sosy_lab.java_smt.solvers.z3;
 import com.microsoft.z3.Native;
 import com.microsoft.z3.Native.UserPropagatorBase;
 import com.microsoft.z3.Status;
+import com.microsoft.z3.Z3Exception;
+import com.microsoft.z3.enumerations.Z3_error_code;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -38,6 +40,15 @@ final class Z3UserPropagator extends UserPropagatorBase implements PropagatorBac
       Z3FormulaManager manager,
       UserPropagator userPropagator) {
     super(ctx, solver);
+    // Native.propagateInit does not check for errors, e.g., if the tactics of a solver do not
+    // support user propagators. Thus, we check for an error and clear it ourselves.
+    int errorCode = Native.getErrorCode(ctx);
+    if (errorCode != Z3_error_code.Z3_OK.toInt()) {
+      Native.setError(ctx, Z3_error_code.Z3_OK.toInt());
+      String message = Native.getErrorMsg(ctx, errorCode);
+      close();
+      throw new Z3Exception(message);
+    }
     this.creator = creator;
     this.userPropagator = userPropagator;
     this.manager = manager;

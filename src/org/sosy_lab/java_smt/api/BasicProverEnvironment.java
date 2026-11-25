@@ -218,9 +218,13 @@ public interface BasicProverEnvironment<T> extends AutoCloseable {
    *
    * @param propagator The (fresh) user propagator to register.
    * @return {@code true}, if the user propagator was successfully registered. Most SMT solvers do
-   *     not support user propagators and hence return {@code false}.
+   *     not support user propagators and hence return {@code false}. Z3 always returns {@code
+   *     false} if tactics are used (option {@code solver.z3.tactics}), independent of the chosen
+   *     tactics.
+   * @throws SolverException if the solver fails to register the user propagator, e.g., because it
+   *     does not support user propagators for the chosen solver configuration.
    */
-  default boolean registerUserPropagator(UserPropagator propagator) {
+  default boolean registerUserPropagator(UserPropagator propagator) throws SolverException {
     return false;
   }
 }
