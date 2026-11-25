@@ -66,6 +66,7 @@ public final class Z3SolverContext extends AbstractSolverContext {
   static final ImmutableSet<String> doubleOptions =
       ImmutableSet.of(
           "arith.epsilon",
+          "arith.nl.transcendental_tolerance",
           "dack.factor",
           "dack.gc_inv_decay",
           "qi.eager_threshold",
