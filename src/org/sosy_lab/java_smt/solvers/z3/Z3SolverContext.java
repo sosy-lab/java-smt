@@ -341,11 +341,6 @@ public final class Z3SolverContext extends AbstractSolverContext {
     Z3StringFormulaManager stringTheory = new Z3StringFormulaManager(creator);
     Z3EnumerationFormulaManager enumTheory = new Z3EnumerationFormulaManager(creator);
 
-    // Set the custom error handling
-    // which will throw Z3Exception
-    // instead of exit(1).
-    Native.setInternalErrorHandler(context);
-
     Z3FormulaManager manager =
         new Z3FormulaManager(
             creator,
