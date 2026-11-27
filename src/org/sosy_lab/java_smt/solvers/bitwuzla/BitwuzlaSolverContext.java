@@ -29,6 +29,7 @@ import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.configuration.Configuration;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.common.io.PathCounterTemplate;
+import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.FloatingPointRoundingMode;
 import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
@@ -105,6 +106,7 @@ public final class BitwuzlaSolverContext extends AbstractSolverContext {
 
   @SuppressWarnings("unused")
   public static BitwuzlaSolverContext create(
+      LogManager pLogger,
       Configuration config,
       ShutdownNotifier pShutdownNotifier,
       @Nullable PathCounterTemplate solverLogfile,
@@ -135,6 +137,8 @@ public final class BitwuzlaSolverContext extends AbstractSolverContext {
     BitwuzlaArrayFormulaManager arrayTheory = new BitwuzlaArrayFormulaManager(creator);
     BitwuzlaFormulaManager manager =
         new BitwuzlaFormulaManager(
+            pLogger,
+            config,
             creator,
             functionTheory,
             booleanTheory,

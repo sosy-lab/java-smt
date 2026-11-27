@@ -16,6 +16,9 @@ import ap.parser.ITerm;
 import ap.types.Sort;
 import java.io.IOException;
 import java.util.List;
+import org.sosy_lab.common.configuration.Configuration;
+import org.sosy_lab.common.configuration.InvalidConfigurationException;
+import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager;
@@ -28,6 +31,8 @@ final class PrincessFormulaManager
 
   @SuppressWarnings("checkstyle:parameternumber")
   PrincessFormulaManager(
+      LogManager pLogger,
+      Configuration pConfiguration,
       PrincessFormulaCreator pCreator,
       PrincessUFManager pFunctionManager,
       PrincessBooleanFormulaManager pBooleanManager,
@@ -36,8 +41,11 @@ final class PrincessFormulaManager
       PrincessBitvectorFormulaManager pBitpreciseManager,
       PrincessArrayFormulaManager pArrayManager,
       PrincessQuantifiedFormulaManager pQuantifierManager,
-      PrincessStringFormulaManager pStringManager) {
+      PrincessStringFormulaManager pStringManager)
+      throws InvalidConfigurationException {
     super(
+        pLogger,
+        pConfiguration,
         pCreator,
         pFunctionManager,
         pBooleanManager,

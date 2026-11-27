@@ -31,6 +31,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import org.sosy_lab.common.collect.Collections3;
+import org.sosy_lab.common.configuration.Configuration;
+import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.FormulaType;
@@ -41,14 +43,18 @@ class SmtInterpolFormulaManager extends AbstractFormulaManager<Term, Sort, Scrip
   private final LogManager logger;
 
   SmtInterpolFormulaManager(
+      LogManager pLogger,
+      Configuration pConfiguration,
       SmtInterpolFormulaCreator pCreator,
       SmtInterpolUFManager pFunctionManager,
       SmtInterpolBooleanFormulaManager pBooleanManager,
       SmtInterpolIntegerFormulaManager pIntegerManager,
       SmtInterpolRationalFormulaManager pRationalManager,
-      SmtInterpolArrayFormulaManager pArrayFormulaManager,
-      LogManager pLogger) {
+      SmtInterpolArrayFormulaManager pArrayFormulaManager)
+      throws InvalidConfigurationException {
     super(
+        pLogger,
+        pConfiguration,
         pCreator,
         pFunctionManager,
         pBooleanManager,

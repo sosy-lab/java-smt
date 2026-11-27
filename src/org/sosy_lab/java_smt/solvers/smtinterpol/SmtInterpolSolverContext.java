@@ -127,13 +127,14 @@ public final class SmtInterpolSolverContext extends AbstractSolverContext {
     SmtInterpolArrayFormulaManager arrayTheory = new SmtInterpolArrayFormulaManager(creator);
     SmtInterpolFormulaManager manager =
         new SmtInterpolFormulaManager(
+            logger,
+            config,
             creator,
             functionTheory,
             booleanTheory,
             integerTheory,
             rationalTheory,
-            arrayTheory,
-            logger);
+            arrayTheory);
     return new SmtInterpolSolverContext(manager, pShutdownNotifier, settings);
   }
 

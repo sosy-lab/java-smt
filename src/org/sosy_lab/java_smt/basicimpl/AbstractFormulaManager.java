@@ -32,10 +32,16 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.Appender;
 import org.sosy_lab.common.Appenders;
 import org.sosy_lab.common.collect.Collections3;
+import org.sosy_lab.common.configuration.Configuration;
+import org.sosy_lab.common.configuration.InvalidConfigurationException;
+import org.sosy_lab.common.configuration.Option;
+import org.sosy_lab.common.configuration.Options;
+import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.java_smt.api.ArrayFormulaManager;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.EnumerationFormulaManager;
@@ -68,6 +74,21 @@ import org.sosy_lab.java_smt.utils.SolverUtils;
 @SuppressWarnings("ClassTypeParameterName")
 public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl>
     implements FormulaManager {
+
+  @Options(prefix = "solver.parser")
+  private static class ParserOptions {
+    @Option(
+        secure = true,
+        description = "Sets how unknown commands should be handled while parsing",
+        values = {"ignore", "log", "fail"})
+    String illegalInput = "ignore";
+
+    ParserOptions(Configuration config) throws InvalidConfigurationException {
+      config.inject(this);
+    }
+  }
+
+  private final ParserOptions options;
 
   /**
    * Avoid using basic mathematical or logical operators of SMT-LIB2 as names for symbols.
@@ -112,6 +133,8 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
 
   private static final char ESCAPE = '$'; // just some allowed symbol, can be any char
 
+  private final LogManager logger;
+
   private final @Nullable AbstractArrayFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl>
       arrayManager;
 
@@ -145,6 +168,8 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
   /** Builds a solver from the given theory implementations. */
   @SuppressWarnings("checkstyle:parameternumber")
   protected AbstractFormulaManager(
+      LogManager logger,
+      Configuration config,
       FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> pFormulaCreator,
       AbstractUFManager<TFormulaInfo, ?, TType, TEnv> functionManager,
       AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl> booleanManager,
@@ -159,8 +184,11 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
       @Nullable AbstractArrayFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl> arrayManager,
       @Nullable AbstractSLFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl> slManager,
       @Nullable AbstractStringFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl> strManager,
-      @Nullable AbstractEnumerationFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl>
-          enumManager) {
+      @Nullable AbstractEnumerationFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl> enumManager)
+      throws InvalidConfigurationException {
+
+    this.options = new ParserOptions(config);
+    this.logger = logger;
 
     this.arrayManager = arrayManager;
     this.quantifiedManager = quantifiedManager;
@@ -443,32 +471,26 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
 
       } else if (SMTLibTokenizer.isForbiddenToken(token)) {
         // Throw an exception if the script contains commands like (pop) or (reset) that change the
-        // state of the assertion stack.
-        // We could keep track of the state of the stack and only consider the formulas that remain
-        // on the stack at the end of the script. However, this does not seem worth it at the
-        // moment. If needed, this feature can still be added later.
-        String message;
-        if (SMTLibTokenizer.isPushToken(token)) {
-          smtLibStateMachine.applyPCommand();
-          message = "(push ...)";
-        } else if (SMTLibTokenizer.isPopToken(token)) {
-          smtLibStateMachine.applyPCommand();
-          message = "(pop ...)";
-        } else if (SMTLibTokenizer.isResetAssertionsToken(token)) {
-          smtLibStateMachine.applyResetAssertionsCommand();
-          message = "(reset-assertions)";
-        } else if (SMTLibTokenizer.isResetToken(token)) {
-          smtLibStateMachine.applyResetCommand();
-          message = "(reset)";
-        } else {
-          // Should be unreachable
-          throw new UnsupportedOperationException("Unknown token " + checkNotNull(token));
-        }
+        // state of the assertion stack, or if the command is not supported by JavaSMT
         throw new IllegalArgumentException(
-            "SMTLIB command '%s' is not supported when parsing formulas.".formatted(message));
+            String.format(
+                "SMTLIB command '%s' is not supported when parsing formulas.",
+                SMTLibTokenizer.getCommand(token)));
+
+      } else if (SMTLibTokenizer.isIgnoredToken(token)) {
+        // We can safely skip this token
 
       } else {
-        // Remove everything else, such as unknown or solver-specific commands, comments, etc.
+        // We've encountered an illegal command
+        // Skip, report or crash, depending on value of the 'parser.illegalInput' option
+        var msg = String.format("Unexpected input: %s", token);
+        if (options.illegalInput.equals("fail")) {
+          throw new IllegalArgumentException(msg);
+        } else if (options.illegalInput.equals("log")) {
+          logger.log(Level.WARNING, msg);
+        } else {
+          // Ignore
+        }
       }
     }
 
