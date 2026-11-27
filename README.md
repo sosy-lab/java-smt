@@ -75,6 +75,7 @@ JavaSMT supports several SMT solvers (see [Getting Started](doc/Getting-started.
 | [Yices2](https://yices.csl.sri.com/)                                    | :heavy_check_mark:  |                     | :heavy_check_mark: |                    | [maybe](https://github.com/sosy-lab/java-smt/pull/400)⁴ |                    |                                                                             |
 | [Z3](https://github.com/Z3Prover/z3)                                    | :heavy_check_mark:³ | :heavy_check_mark:³ | :heavy_check_mark: | :heavy_check_mark: |                   :heavy_check_mark:                    | :heavy_check_mark: | mature and well-known solver                                                |
 | [Z3_WITH_INTERPOLATION](https://github.com/Z3Prover/z3)                 | :heavy_check_mark:  | :heavy_check_mark:  |                    |                    |                                                         |                    | an older version of Z3 that still provides interpolation support            |
+| [Eldarica](https://github.com/uuverifiers/eldarica)                     | :heavy_check_mark:  | :heavy_check_mark:  | :heavy_check_mark: | :heavy_check_mark: |                   :heavy_check_mark:                    | :heavy_check_mark: | Java/Scala-based Horn solver                                                |
 
 We support a reasonable list of operating systems and versions.
 - Our main target is Linux (mainly Ubuntu or comparable Linux distributions).

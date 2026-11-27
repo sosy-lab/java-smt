@@ -480,4 +480,11 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv, T
           return visitDefault(f);
         }
       };
+
+  @Override
+  public BooleanFormula makeHornClause(BooleanFormula head, Collection<BooleanFormula> body,
+                                       BooleanFormula constraint) {
+
+    return implication(and(constraint, and(body)), head);
+  }
 }

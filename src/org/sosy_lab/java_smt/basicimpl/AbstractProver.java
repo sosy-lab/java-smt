@@ -152,7 +152,7 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
 
   protected abstract boolean hasPersistentModel();
 
-  private void setChanged() {
+  protected void setChanged() {
     wasLastSatCheckSatisfiable = false;
     if (!changedSinceLastSatQuery) {
       changedSinceLastSatQuery = true;

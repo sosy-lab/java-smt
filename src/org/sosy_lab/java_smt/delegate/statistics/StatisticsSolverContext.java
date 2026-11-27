@@ -14,6 +14,7 @@ import com.google.common.collect.ImmutableMap;
 import java.util.Map;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.FormulaManager;
+import org.sosy_lab.java_smt.api.HornProverEnvironment;
 import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
 import org.sosy_lab.java_smt.api.OptimizationProverEnvironment;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
@@ -52,6 +53,12 @@ public class StatisticsSolverContext implements SolverContext {
   public OptimizationProverEnvironment newOptimizationProverEnvironment(ProverOptions... pOptions) {
     return new StatisticsOptimizationProverEnvironment(
         delegate.newOptimizationProverEnvironment(pOptions), stats);
+  }
+
+  @Override
+  public HornProverEnvironment newHornProverEnvironment(ProverOptions... options) {
+    return new StatisticsHornProverEnvironment(delegate.newHornProverEnvironment(options),
+        stats);
   }
 
   @Override

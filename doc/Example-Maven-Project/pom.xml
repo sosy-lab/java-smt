@@ -81,7 +81,7 @@ SPDX-License-Identifier: Apache-2.0
     <mathsat.version>5.6.15</mathsat.version>
     <opensmt.version>2.9.0-gef441e1c</opensmt.version>
     <smtinterpol.version>2.5-1242-g5c50fb6d</smtinterpol.version>
-    <princess.version>2025-11-17</princess.version>
+    <princess.version>2026-05-20</princess.version>
     <ostrich.version>2.0</ostrich.version>
     <javasmt-yices.version>5.0.1-1258-gdad634a69</javasmt-yices.version>
     <yices.version>2.6.4-264-g553897f5</yices.version>

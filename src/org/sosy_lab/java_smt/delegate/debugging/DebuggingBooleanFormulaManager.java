@@ -234,4 +234,11 @@ class DebuggingBooleanFormulaManager implements BooleanFormulaManager {
     }
     return result;
   }
+  @Override
+  public BooleanFormula makeHornClause(
+      BooleanFormula head,
+      Collection<BooleanFormula> body,
+      BooleanFormula constraint) { // TODO
+    return delegate.makeHornClause(head, body, constraint);
+  }
 }

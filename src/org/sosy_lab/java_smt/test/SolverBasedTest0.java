@@ -364,6 +364,14 @@ public abstract class SolverBasedTest0 {
         .that(solverToUse())
         .isNotEqualTo(Solvers.YICES2);
   }
+  protected final void requireHorn() {
+    assume()
+        .withMessage(
+            "Solver %s does not yet support solving horn clauses",
+            solverToUse())
+        .that(solverToUse())
+        .isEqualTo(Solvers.ELDARICA);
+  }
 
   @SuppressWarnings("CheckReturnValue")
   protected final void requireFPToBitvector() {
