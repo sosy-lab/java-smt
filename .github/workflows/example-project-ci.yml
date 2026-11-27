@@ -1,0 +1,298 @@
+# This file is part of JavaSMT,
+# an API wrapper for a collection of SMT solvers:
+# https://github.com/sosy-lab/java-smt
+#
+# SPDX-FileCopyrightText: 2026 Dirk Beyer <https://www.sosy-lab.org>
+#
+# SPDX-License-Identifier: Apache-2.0
+
+name: example-project-ci
+
+on:
+  push
+
+jobs:
+  ivy:
+    name: Ivy Example Project
+    strategy:
+      fail-fast: false
+      matrix:
+        java-version: [ 21 ]
+        os: [ubuntu-latest, ubuntu-24.04-arm, windows-latest, windows-11-arm, macos-26-intel, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Set up JDK ${{ matrix.java-version }}
+        uses: actions/setup-java@v5
+        with:
+          java-version: ${{ matrix.java-version }}
+          distribution: 'temurin'
+
+      - name: Shared Ivy Cache
+        uses: actions/cache@v5
+        with:
+          path: .ivy2
+          # We use a unique key for each run to ensure the cache is updated if needed,
+          # while restoring from the most recent "ivy-shared-" cache.
+          key: ivy-shared-${{ github.run_id }}
+          restore-keys: |
+            ivy-shared-
+          enableCrossOsArchive: true
+
+      - name: Build Ivy project
+        run: |
+          cd doc/Example-Ivy-Project
+          ant compile
+
+      - name: Show solver table
+        run: |
+          cd doc/Example-Ivy-Project
+          ant run
+        env:
+          LD_PRELOAD: /usr/lib/${{ matrix.os == 'ubuntu-24.04-arm' && 'aarch64-linux-gnu' || 'x86_64-linux-gnu' }}/libstdc++.so.6
+
+      - name: Run tests
+        run: |
+          cd doc/Example-Ivy-Project
+          ant test
+        env:
+          LD_PRELOAD: /usr/lib/${{ matrix.os == 'ubuntu-24.04-arm' && 'aarch64-linux-gnu' || 'x86_64-linux-gnu' }}/libstdc++.so.6
+
+      - name: Upload test report
+        uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          path: doc/Example-Ivy-Project/build/test-report/html/junit-noframes.html
+          archive: false
+
+  maven:
+    name: Maven Example Project
+    strategy:
+      fail-fast: false
+      matrix:
+        java-version: [ 21 ]
+        os: [ubuntu-24.04, ubuntu-24.04-arm, windows-2025, windows-11-arm, macos-26-intel, macos-26]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Set up JDK ${{ matrix.java-version }}
+        uses: actions/setup-java@v5
+        with:
+          java-version: ${{ matrix.java-version }}
+          distribution: 'temurin'
+
+      - name: Shared Maven Cache
+        uses: actions/cache@v5
+        with:
+          path: .m2/repository
+          # We use a unique key for each run to ensure the cache is updated if needed,
+          # while restoring from the most recent "maven-shared-" cache.
+          key: maven-shared-${{ github.run_id }}
+          restore-keys: |
+            maven-shared-
+          enableCrossOsArchive: true
+
+      - name: Build Maven example project
+        run: |
+          cd doc/Example-Maven-Project
+          mvn -DskipTests compile
+
+      - name: Show solver table
+        run: |
+          cd doc/Example-Maven-Project
+          mvn exec:exec
+        env:
+          LD_PRELOAD: /usr/lib/${{ matrix.os == 'ubuntu-24.04-arm' && 'aarch64-linux-gnu' || 'x86_64-linux-gnu' }}/libstdc++.so.6
+
+      - name: Run tests
+        run: |
+          cd doc/Example-Maven-Project
+          mvn test
+        env:
+          LD_PRELOAD: /usr/lib/${{ matrix.os == 'ubuntu-24.04-arm' && 'aarch64-linux-gnu' || 'x86_64-linux-gnu' }}/libstdc++.so.6
+
+      - name: Generate test report
+        run : |
+          cd doc/Example-Maven-Project
+          mvn surefire-report:report-only
+
+      - name: Upload test report
+        uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          path: doc/Example-Maven-Project/target/reports/surefire.html
+          archive: false
+
+  web:
+    name: Maven Web Example Project
+    strategy:
+      fail-fast: false
+      matrix:
+        java-version: [ 21 ]
+        os: [ubuntu-24.04]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Set up JDK ${{ matrix.java-version }}
+        uses: actions/setup-java@v5
+        with:
+          java-version: ${{ matrix.java-version }}
+          distribution: 'temurin'
+
+      - name: Shared Maven Cache
+        uses: actions/cache@v5
+        with:
+          path: .m2/repository
+          # We use a unique key for each run to ensure the cache is updated if needed,
+          # while restoring from the most recent "maven-shared-" cache.
+          key: maven-shared-${{ github.run_id }}
+          restore-keys: |
+            maven-shared-
+          enableCrossOsArchive: true
+
+      - name: Build Maven Web example project
+        run: |
+          cd doc/Example-Maven-Web-Project
+          mvn -DskipTests package
+
+      - name: Run tests
+        run: |
+          cd doc/Example-Maven-Web-Project
+          mvn test
+        env:
+          LD_PRELOAD: /usr/lib/${{ matrix.os == 'ubuntu-24.04-arm' && 'aarch64-linux-gnu' || 'x86_64-linux-gnu' }}/libstdc++.so.6
+
+      - name: Generate test report
+        run : |
+          cd doc/Example-Maven-Web-Project
+          mvn surefire-report:report-only
+
+      - name: Upload test report
+        uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          path: doc/Example-Maven-Web-Project/target/reports/surefire.html
+          archive: false
+
+  gradle:
+    name: Gradle Example Project
+    strategy:
+      fail-fast: false
+      matrix:
+        java-version: [ 21 ]
+        os: [ ubuntu-24.04, ubuntu-24.04-arm, windows-2025, windows-11-arm, macos-26-intel, macos-26 ]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Set up JDK ${{ matrix.java-version }}
+        uses: actions/setup-java@v5
+        with:
+          java-version: ${{ matrix.java-version }}
+          distribution: 'temurin'
+          architecture: ${{ matrix.arch }}
+
+      - name: Shared Maven Cache
+        uses: actions/cache@v5
+        with:
+          path: .m2/repository
+          # We use a unique key for each run to ensure the cache is updated if needed,
+          # while restoring from the most recent "maven-shared-" cache.
+          key: maven-shared-${{ github.run_id }}
+          restore-keys: |
+            maven-shared-
+          enableCrossOsArchive: true
+
+      - name: Install Gradle
+        uses: gradle/actions/setup-gradle@v6
+        with:
+          gradle-version: '9.5.1'
+
+      - name: Build Gradle example project
+        run: |
+          cd doc/Example-Gradle-Project
+          gradle build -x test
+
+      - name: Show solver table
+        run: |
+          cd doc/Example-Gradle-Project
+          gradle run
+        env:
+          LD_PRELOAD: /usr/lib/${{ matrix.os == 'ubuntu-24.04-arm' && 'aarch64-linux-gnu' || 'x86_64-linux-gnu' }}/libstdc++.so.6
+
+      - name: Run tests
+        run: |
+          cd doc/Example-Gradle-Project
+          gradle test
+        env:
+          LD_PRELOAD: /usr/lib/${{ matrix.os == 'ubuntu-24.04-arm' && 'aarch64-linux-gnu' || 'x86_64-linux-gnu' }}/libstdc++.so.6
+
+      - name: Upload test report
+        uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          path: doc/Example-Gradle-Project/build/reports/tests/test/index.html
+          archive: false
+
+  kotlin:
+    name: Kotlin Gradle Example Project
+    strategy:
+      fail-fast: false
+      matrix:
+        java-version: [ 21 ]
+        os: [ ubuntu-24.04, ubuntu-24.04-arm, windows-2025, windows-11-arm, macos-26-intel, macos-26 ]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Set up JDK ${{ matrix.java-version }}
+        uses: actions/setup-java@v5
+        with:
+          java-version: ${{ matrix.java-version }}
+          distribution: 'temurin'
+          architecture: ${{ matrix.arch }}
+
+      - name: Shared Maven Cache
+        uses: actions/cache@v5
+        with:
+          path: .m2/repository
+          # We use a unique key for each run to ensure the cache is updated if needed,
+          # while restoring from the most recent "maven-shared-" cache.
+          key: maven-shared-${{ github.run_id }}
+          restore-keys: |
+            maven-shared-
+          enableCrossOsArchive: true
+
+      - name: Install Gradle
+        uses: gradle/actions/setup-gradle@v6
+        with:
+          gradle-version: '9.5.1'
+
+      - name: Build Kotlin example project
+        run: |
+          cd doc/Example-Gradle-Project-Kotlin
+          gradle build -x test
+
+      - name: Show solver table
+        run: |
+          cd doc/Example-Gradle-Project-Kotlin
+          gradle run
+        env:
+          LD_PRELOAD: /usr/lib/${{ matrix.os == 'ubuntu-24.04-arm' && 'aarch64-linux-gnu' || 'x86_64-linux-gnu' }}/libstdc++.so.6
+
+      - name: Run tests
+        run: |
+          cd doc/Example-Gradle-Project-Kotlin
+          gradle test
+        env:
+          LD_PRELOAD: /usr/lib/${{ matrix.os == 'ubuntu-24.04-arm' && 'aarch64-linux-gnu' || 'x86_64-linux-gnu' }}/libstdc++.so.6
+
+      - name: Upload test report
+        uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          path: doc/Example-Gradle-Project-Kotlin/build/reports/tests/test/index.html
+          archive: false
