@@ -15,16 +15,20 @@ import static scala.collection.JavaConverters.asScala;
 import ap.api.PartialModel;
 import ap.api.SimpleAPI;
 import ap.api.SimpleAPI.SimpleAPIException;
+import ap.parser.IExpression;
 import ap.parser.IFormula;
 import ap.parser.IFunction;
 import ap.parser.ITerm;
+import ap.parser.Rewriter;
 import com.google.common.base.Preconditions;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Deque;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.Callable;
@@ -52,6 +56,11 @@ abstract class PrincessAbstractProver<E> extends AbstractProverWithAllSat<E> {
   protected final Deque<PersistentMap<Integer, BooleanFormula>> partitions = new ArrayDeque<>();
 
   private final PrincessFormulaCreator creator;
+
+  // Contains abbreviation symbols that were introduced when pushing formulas onto the stack to
+  // remove duplicate subterms. It's possible for these internal symbols to leak into interpolants,
+  // and we have to track them here so that they can then be substituted later
+  private final Map<IExpression, IExpression> abbreviations = new HashMap<>();
 
   PrincessAbstractProver(
       PrincessFormulaManager pMgr,
@@ -101,9 +110,24 @@ abstract class PrincessAbstractProver<E> extends AbstractProverWithAllSat<E> {
     api.setPartitionNumber(formulaId);
 
     final IFormula t = (IFormula) mgr.extractInfo(constraint);
-    api.addAssertion(api.abbrevSharedExpressions(t, creator.getEnv().getMinAtomsForAbbreviation()));
 
+    // Introduce abbreviation symbols for shared subterms before pushing the formula
+    // The call will return a tuple where the 2nd component is a map from abbreviation symbols to
+    // their term, and the 1st component is the fully substituted original formula
+    var abbreviated =
+        api.abbrevSharedExpressionsWithMap(t, creator.getEnv().getMinAtomsForAbbreviation());
+    // Store newly introduces abbreviation symbols for later. Note that Princess always introduces
+    // fresh symbols for abbreviations, so there can be no clashes with earlier symbols, even when
+    // the state of the solver has changed and old frames were popped
+    abbreviations.putAll(asJava(abbreviated._2));
+
+    api.addAssertion((IFormula) abbreviated._1);
     return formulaId;
+  }
+
+  /** Replace any abbreviation symbols in the term with their full expansion. */
+  protected IExpression substituteAbbreviations(IExpression root) {
+    return Rewriter.rewrite(root, expr -> abbreviations.getOrDefault(expr, expr));
   }
 
   @Override
@@ -187,6 +211,7 @@ abstract class PrincessAbstractProver<E> extends AbstractProverWithAllSat<E> {
       api.reset(); // cleanup memory, even if we keep a reference to "api" and "mgr"
       creator.getEnv().unregisterStack(this);
       partitions.clear();
+      abbreviations.clear();
     }
     super.close();
   }

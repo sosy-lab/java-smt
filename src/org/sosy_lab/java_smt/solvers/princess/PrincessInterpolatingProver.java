@@ -23,7 +23,6 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
 import com.google.common.graph.Traverser;
 import java.util.ArrayDeque;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Deque;
 import java.util.List;
@@ -91,13 +90,12 @@ class PrincessInterpolatingProver extends PrincessAbstractProver<Integer>
     assert itps.length() == pPartitions.size() - 1
         : "There should be (n-1) interpolants for n partitions";
 
-    // convert data-structure back
-    // TODO check that interpolants do not contain abbreviations we did not introduce ourselves
-    final List<BooleanFormula> result = new ArrayList<>();
+    // Substitute abbreviations and convert the data-structure back to Java
+    ImmutableList.Builder<BooleanFormula> builder = ImmutableList.builder();
     for (final IFormula itp : asJava(itps)) {
-      result.add(mgr.encapsulateBooleanFormula(itp));
+      builder.add(mgr.encapsulateBooleanFormula(substituteAbbreviations(itp)));
     }
-    return result;
+    return builder.build();
   }
 
   @Override
@@ -148,7 +146,7 @@ class PrincessInterpolatingProver extends PrincessAbstractProver<Integer>
         FluentIterable.from(
                 Traverser.<Tree<IFormula>>forTree(node -> asJava(node.children()))
                     .depthFirstPostOrder(tree))
-            .transform(node -> mgr.encapsulateBooleanFormula(node.d()))
+            .transform(node -> mgr.encapsulateBooleanFormula(substituteAbbreviations(node.d())))
             .toList();
     // root of interpolation tree is false, and we have to remove it.
     assert Iterables.getLast(lst).equals(mgr.encapsulateBooleanFormula(new IBoolLit(false)));
