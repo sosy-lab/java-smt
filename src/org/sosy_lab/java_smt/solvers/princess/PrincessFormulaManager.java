@@ -10,9 +10,12 @@ package org.sosy_lab.java_smt.solvers.princess;
 
 import ap.parser.IBinFormula;
 import ap.parser.IBinJunctor;
+import ap.parser.IEquation;
 import ap.parser.IExpression;
 import ap.parser.IFormula;
+import ap.parser.IIntLit;
 import ap.parser.ITerm;
+import ap.parser.Rewriter;
 import ap.types.Sort;
 import java.io.IOException;
 import java.util.List;
@@ -58,11 +61,13 @@ final class PrincessFormulaManager
   }
 
   @Override
-  protected IExpression equalImpl(IExpression pArg1, IExpression pArgs2) {
+  protected IExpression equalImpl(IExpression pArg1, IExpression pArg2) {
     if (pArg1 instanceof IFormula iFormula) {
-      return new IBinFormula(IBinJunctor.Eqv(), iFormula, (IFormula) pArgs2);
+      return new IBinFormula(IBinJunctor.Eqv(), iFormula, (IFormula) pArg2);
+    } else if (pArg2 instanceof IIntLit iIntLit && iIntLit.value().isZero()) {
+      return IExpression.eqZero((ITerm) pArg1);
     } else {
-      return ((ITerm) pArg1).$eq$eq$eq((ITerm) pArgs2);
+      return ((ITerm) pArg1).$eq$eq$eq((ITerm) pArg2);
     }
   }
 
@@ -71,7 +76,22 @@ final class PrincessFormulaManager
   protected List<IExpression> parseAllImpl(String pSmtScript) throws IllegalArgumentException {
     // Princess's parseStringToTerms already handles multiple assertions and returns them as a list.
     // The cast is safe because parseStringToTerms returns List<? extends IExpression>.
-    return (List<IExpression>) getEnvironment().parseStringToTerms(pSmtScript);
+    var parsed = (List<IExpression>) getEnvironment().parseStringToTerms(pSmtScript);
+    return parsed.stream()
+        .map(
+            f ->
+                Rewriter.rewrite(
+                    f,
+                    term -> {
+                      // Rewrite (= term 0) to (=0 term)
+                      if (term instanceof IEquation equation) {
+                        if (equation.right() instanceof IIntLit intLit && intLit.value().isZero()) {
+                          return IExpression.eqZero(equation.left());
+                        }
+                      }
+                      return term;
+                    }))
+        .toList();
   }
 
   @Override
