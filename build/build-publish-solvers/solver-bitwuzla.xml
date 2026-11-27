@@ -27,7 +27,7 @@ SPDX-License-Identifier: Apache-2.0
 
         <!-- TODO Change these paths when building outside of the container. We need static version of gmp and mpfr with `-fPIC` enabled -->
         <property name="jdk-linux-arm64.path" value="/dependencies/jdk17-linux-aarch64"/>
-        <property name="jdk-windows-x64.path" value="/dependencies/jdk11-windows-x64"/>
+        <property name="jdk-windows-x64.path" value="/dependencies/jdk17-windows-x64"/>
 
         <property name="gmp.x64-linux" location="/dependencies/gmp-6.3.0/install/x64-linux/"/>
         <property name="gmp.x64-windows" location="/dependencies/gmp-6.3.0/install/x64-windows/"/>
