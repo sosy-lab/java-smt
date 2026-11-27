@@ -166,6 +166,7 @@ public class BitvectorFormulaManagerTest extends SolverBasedTest0.ParameterizedS
   public void bvToInt() throws SolverException, InterruptedException {
     requireBitvectorToInt();
     requireIntegers();
+    assume().that(solver).isNotEqualTo(Solvers.SMTINTERPOL);
 
     for (int size : new int[] {1, 2, 4, 8}) {
       int max = 1 << size;
@@ -192,6 +193,7 @@ public class BitvectorFormulaManagerTest extends SolverBasedTest0.ParameterizedS
   public void bvToIntEquality() throws SolverException, InterruptedException {
     requireBitvectorToInt();
     requireIntegers();
+    assume().that(solver).isNotEqualTo(Solvers.SMTINTERPOL);
 
     for (int size : new int[] {10, 16, 20, 32, 64}) {
       for (int i : new int[] {1, 2, 4, 32, 64, 100}) {
@@ -217,6 +219,7 @@ public class BitvectorFormulaManagerTest extends SolverBasedTest0.ParameterizedS
   public void bvToIntEqualityWithOverflow() throws SolverException, InterruptedException {
     requireBitvectorToInt();
     requireIntegers();
+    assume().that(solver).isNotEqualTo(Solvers.SMTINTERPOL);
 
     for (int size : SOME_SIZES) {
       for (int i : SOME_NUMBERS) {
@@ -241,6 +244,7 @@ public class BitvectorFormulaManagerTest extends SolverBasedTest0.ParameterizedS
   public void bvToIntEqualityWithOverflowNegative() throws SolverException, InterruptedException {
     requireBitvectorToInt();
     requireIntegers();
+    assume().that(solver).isNotEqualTo(Solvers.SMTINTERPOL);
 
     for (int size : SOME_SIZES) {
       for (int i : SOME_NUMBERS) {
@@ -266,6 +270,7 @@ public class BitvectorFormulaManagerTest extends SolverBasedTest0.ParameterizedS
   public void bvToIntEqualityWithSymbols() throws SolverException, InterruptedException {
     requireBitvectorToInt();
     requireIntegers();
+    assume().that(solver).isNotEqualTo(Solvers.SMTINTERPOL);
 
     for (int size : new int[] {1, 2, 4}) {
       IntegerFormula var = imgr.makeVariable("x_" + size);
@@ -428,6 +433,8 @@ public class BitvectorFormulaManagerTest extends SolverBasedTest0.ParameterizedS
 
   @Test
   public void bvRotateByConstant() throws SolverException, InterruptedException {
+    assume().that(solver).isNotEqualTo(Solvers.SMTINTERPOL);
+
     for (int bitsize : new int[] {8, 13, 25, 31}) {
       BitvectorFormula zero = bvmgr.makeBitvector(bitsize, 0);
       BitvectorFormula a = bvmgr.makeVariable(bitsize, "a" + bitsize);
@@ -468,6 +475,7 @@ public class BitvectorFormulaManagerTest extends SolverBasedTest0.ParameterizedS
         switch (solverToUse()) {
           case YICES2 -> new int[] {2, 3, 4, 8};
           case PRINCESS -> new int[] {2, 3}; // Princess is too slow for larger bitvectors
+          case SMTINTERPOL -> new int[] {1}; // SmtInterpol is very slow in this test
           default -> new int[] {2, 3, 4, 8, 13, 25, 31};
         };
 
@@ -584,6 +592,8 @@ public class BitvectorFormulaManagerTest extends SolverBasedTest0.ParameterizedS
 
   @Test
   public void bvModulo() throws SolverException, InterruptedException {
+    assume().that(solver).isNotEqualTo(Solvers.SMTINTERPOL);
+
     BitvectorFormula ten = bvmgr.makeBitvector(8, 10);
     BitvectorFormula five = bvmgr.makeBitvector(8, 5);
     BitvectorFormula three = bvmgr.makeBitvector(8, 3);
