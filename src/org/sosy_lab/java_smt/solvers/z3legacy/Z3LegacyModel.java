@@ -27,7 +27,6 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.regex.Pattern;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.java_smt.basicimpl.AbstractModel;
 import org.sosy_lab.java_smt.basicimpl.AbstractProver;
@@ -36,7 +35,6 @@ final class Z3LegacyModel extends AbstractModel<Long, Long, Long> {
 
   private final long model;
   private final long z3context;
-  private static final Pattern Z3_IRRELEVANT_MODEL_TERM_PATTERN = Pattern.compile(".*![0-9]+");
 
   private final Z3LegacyFormulaCreator z3creator;
 
@@ -59,7 +57,9 @@ final class Z3LegacyModel extends AbstractModel<Long, Long, Long> {
       for (int constIdx = 0; constIdx < Native.modelGetNumConsts(z3context, model); constIdx++) {
         long keyDecl = Native.modelGetConstDecl(z3context, model, constIdx);
         Native.incRef(z3context, keyDecl);
-        out.addAll(getConstAssignments(keyDecl));
+        if (!isInternalSymbol(keyDecl)) {
+          out.addAll(getConstAssignments(keyDecl));
+        }
         Native.decRef(z3context, keyDecl);
       }
 
@@ -93,9 +93,7 @@ final class Z3LegacyModel extends AbstractModel<Long, Long, Long> {
         if (kind == Z3_symbol_kind.Z3_INT_SYMBOL) { // bound variables
           yield true;
         }
-        yield Z3_IRRELEVANT_MODEL_TERM_PATTERN
-            .matcher(z3creator.symbolToString(declName))
-            .matches();
+        yield false;
       }
     };
   }

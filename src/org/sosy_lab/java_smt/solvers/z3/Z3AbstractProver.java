@@ -26,7 +26,6 @@ import java.util.Optional;
 import java.util.Set;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.ShutdownNotifier;
-import org.sosy_lab.common.UniqueIdGenerator;
 import org.sosy_lab.common.collect.PathCopyingPersistentTreeMap;
 import org.sosy_lab.common.collect.PersistentMap;
 import org.sosy_lab.common.io.PathCounterTemplate;
@@ -47,8 +46,7 @@ abstract class Z3AbstractProver extends AbstractProverWithAllSat<Void> {
   protected final Engine engine;
   protected final Optional<String> logic;
 
-  private final UniqueIdGenerator trackId = new UniqueIdGenerator();
-  @Nullable private final Deque<PersistentMap<String, BooleanFormula>> storedConstraints;
+  @Nullable private final Deque<PersistentMap<Long, BooleanFormula>> storedConstraints;
 
   private final @Nullable PathCounterTemplate logfile;
 
@@ -137,10 +135,9 @@ abstract class Z3AbstractProver extends AbstractProverWithAllSat<Void> {
     long e = creator.extractInfo(f);
     try {
       if (storedConstraints != null) { // Unsat core generation is on.
-        String varName = "Z3_UNSAT_CORE_%d".formatted(trackId.getFreshId());
-        BooleanFormula t = mgr.getBooleanFormulaManager().makeVariable(varName);
-        assertContraintAndTrack(e, creator.extractInfo(t));
-        storedConstraints.push(storedConstraints.pop().putAndCopy(varName, f));
+        long id = creator.makeInternalSymbol(creator.getBoolType());
+        assertContraintAndTrack(e, id);
+        storedConstraints.push(storedConstraints.pop().putAndCopy(id, f));
       } else {
         assertContraint(e);
       }
@@ -179,10 +176,7 @@ abstract class Z3AbstractProver extends AbstractProverWithAllSat<Void> {
     Native.astVectorIncRef(z3context, unsatCore);
     for (int i = 0; i < Native.astVectorSize(z3context, unsatCore); i++) {
       long ast = Native.astVectorGet(z3context, unsatCore, i);
-      Native.incRef(z3context, ast);
-      String varName = Native.astToString(z3context, ast);
-      Native.decRef(z3context, ast);
-      constraints.add(storedConstraints.peek().get(varName));
+      constraints.add(storedConstraints.peek().get(ast));
     }
     Native.astVectorDecRef(z3context, unsatCore);
     return constraints;
@@ -200,7 +194,10 @@ abstract class Z3AbstractProver extends AbstractProverWithAllSat<Void> {
     Native.astVectorIncRef(z3context, unsatCore);
     for (int i = 0; i < Native.astVectorSize(z3context, unsatCore); i++) {
       long ast = Native.astVectorGet(z3context, unsatCore, i);
-      core.add(creator.encapsulateBoolean(ast));
+      if (storedConstraints == null || !storedConstraints.peek().containsKey(ast)) {
+        // Only add assumptions to the core and skip tracked assertions
+        core.add(creator.encapsulateBoolean(ast));
+      }
     }
     Native.astVectorDecRef(z3context, unsatCore);
     return Optional.of(core);

@@ -34,7 +34,7 @@ final class Z3Model extends AbstractModel<Long, Long, Long> {
 
   private final long model;
   private final long z3context;
-  private static final Pattern Z3_IRRELEVANT_MODEL_TERM_PATTERN = Pattern.compile(".*![0-9]+");
+  private static final Pattern Z3_IRRELEVANT_MODEL_TERM_PATTERN = Pattern.compile("poly![0-9]+");
 
   private final Z3FormulaCreator z3creator;
 
