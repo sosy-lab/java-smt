@@ -90,6 +90,21 @@ CALL0(msat_config, create_config)
 CONF_RETURN
 
 /*
+ * msat_config msat_create_default_config(const char * 	logic)
+ * Creates a new MathSAT configuration with the default settings for the given logic.
+ * Parameters:
+ *  logic	An SMT-LIB logic name
+ * Returns:
+ *  A new configuration. In case of errors, a cfg s.t. MSAT_ERROR_CONFIG(cfg) is true is returned. 
+ *  CONF_RETURN checks this and throws for errors.
+ */
+DEFINE_FUNC(jconf, 1create_1default_1config) WITH_ONE_ARG(string)
+STRING_ARG(1)
+CALL1(msat_config, create_default_config)
+FREE_STRING_ARG(1)
+CONF_RETURN
+
+/*
  * void msat_destroy_config(msat_config cfg);
  */
 DEFINE_FUNC(void, 1destroy_1config) WITH_ONE_ARG(jconf)
