@@ -230,8 +230,6 @@ class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, Expr> {
 
   @Override
   protected FloatingPointFormula encapsulateFloatingPoint(Expr pTerm) {
-    assert getFormulaType(pTerm).isFloatingPointType()
-        : "%s is no FP, but %s (%s)".formatted(pTerm, pTerm.getType(), getFormulaType(pTerm));
     return new CVC4FloatingPointFormula(pTerm);
   }
 

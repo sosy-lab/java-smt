@@ -618,7 +618,7 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
   public void fpToBvTest() {
     requireFloats();
     requireBitvectors();
-    requireFPToBitvector();
+    requireNativeFPToBitvector();
 
     var fpType = FormulaType.getFloatingPointTypeFromSizesWithoutHiddenBit(5, 10);
     var visitor =

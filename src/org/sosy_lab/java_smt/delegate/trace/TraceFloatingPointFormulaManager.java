@@ -245,6 +245,16 @@ class TraceFloatingPointFormulaManager implements FloatingPointFormulaManager {
   }
 
   @Override
+  public BooleanFormula bitwiseEqual(
+      FloatingPointFormula floatValue, BitvectorFormula bitvectorValue) {
+    return logger.logDef(
+        "mgr.getFloatingPointFormulaManager()",
+        "toIeeeBitvector(%s, %s)"
+            .formatted(logger.toVariable(floatValue), logger.toVariable(bitvectorValue)),
+        () -> delegate.bitwiseEqual(floatValue, bitvectorValue));
+  }
+
+  @Override
   public FloatingPointFormula round(
       FloatingPointFormula formula, FloatingPointRoundingMode roundingMode) {
     return logger.logDef(
